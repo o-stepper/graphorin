@@ -380,6 +380,25 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     const start = performance.now();
     const resolutions: CollisionResolution[] = [];
 
+    // W-116: the residual case where a loser could not be renamed. After
+    // the fallback namespace + truncation this is practically
+    // unreachable, but "losers are renamed or at least observable" must
+    // hold even for a pathological source shape - fix the outcome in the
+    // resolution list, the audit stream and a counter instead of a bare
+    // `continue`.
+    const suppress = (toolName: string, winner: ToolSource, loser: ToolSource): void => {
+      resolutions.push({ toolName, winner, losers: [loser], action: 'suppressed' });
+      emit({
+        action: 'tool:collision:suppressed',
+        actor: { kind: 'system', id: 'tool-registry' },
+        target: toolName,
+        decision: 'denied',
+        ts: Date.now(),
+        metadata: { winner: describeSource(winner), loser: describeSource(loser) },
+      });
+      incrementCounter('tool.collision.suppressed.total');
+    };
+
     for (const [name, bucket] of [...entriesByName.entries()]) {
       if (bucket.length < 2) continue;
       // Only resolve if `ctx.source` is among the colliding sources OR
@@ -407,14 +426,25 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
           for (const entry of bucket) {
             if (entry === firstParty) continue;
             const to = autoPrefix(name, entry.__source);
-            if (to === name) continue;
+            if (to === name) {
+              suppress(name, firstParty.__source, entry.__source);
+              continue;
+            }
             renamed.push({ entry, from: name, to });
           }
           // Apply the renames.
           entriesByName.set(name, [firstParty]);
           for (const r of renamed) {
-            const renamedEntry: RegistryEntry = { ...r.entry, name: r.to } as RegistryEntry;
             const targetBucket = entriesByName.get(r.to) ?? [];
+            // W-116: a rename must not mint a NEW collision (target name
+            // already taken - e.g. two same-source losers, or a tool
+            // registered under the prefixed name directly). Suppress the
+            // loser observably instead.
+            if (targetBucket.length > 0) {
+              suppress(name, firstParty.__source, r.entry.__source);
+              continue;
+            }
+            const renamedEntry: RegistryEntry = { ...r.entry, name: r.to } as RegistryEntry;
             targetBucket.push(renamedEntry);
             entriesByName.set(r.to, targetBucket);
             const resolution: CollisionResolution = {
@@ -492,9 +522,17 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
           for (const entry of bucket) {
             if (entry === winner) continue;
             const to = autoPrefix(name, entry.__source);
-            if (to === name) continue;
-            const renamedEntry: RegistryEntry = { ...entry, name: to } as RegistryEntry;
+            if (to === name) {
+              suppress(name, winner.__source, entry.__source);
+              continue;
+            }
             const targetBucket = entriesByName.get(to) ?? [];
+            // W-116: never mint a new collision through a rename.
+            if (targetBucket.length > 0) {
+              suppress(name, winner.__source, entry.__source);
+              continue;
+            }
+            const renamedEntry: RegistryEntry = { ...entry, name: to } as RegistryEntry;
             targetBucket.push(renamedEntry);
             entriesByName.set(to, targetBucket);
             const resolution: CollisionResolution = {
@@ -759,11 +797,30 @@ function toMatch(
 }
 
 function autoPrefix(name: string, source: ToolSource): string {
+  // W-116: a loser must ALWAYS be renameable. An empty sanitised
+  // namespace (e.g. an MCP serverIdentity made of non-alphanumerics)
+  // falls back to `<kind>-<hash of the identifying field>`, and an
+  // over-long candidate is truncated to the 128-char tool-name limit
+  // with a hash suffix (so two long names truncating to the same stem
+  // stay unique) instead of refusing the rename - previously either
+  // case returned `name` unchanged and the loser silently vanished.
   const ns = namespaceSource(source);
-  if (ns.length === 0) return name;
-  const candidate = `${ns}.${name}`;
-  if (candidate.length > 128) return name;
-  return candidate;
+  const effective =
+    ns.length > 0 ? ns : sanitiseNamespace(`${source.kind}-${fnv1a(describeSource(source))}`);
+  const candidate = `${effective}.${name}`;
+  if (candidate.length <= 128) return candidate;
+  const hash = fnv1a(candidate);
+  return `${candidate.slice(0, 128 - hash.length - 1)}-${hash}`;
+}
+
+/** Deterministic 32-bit FNV-1a as 8 hex chars (naming only, not security). */
+function fnv1a(input: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i += 1) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 function namespaceSource(source: ToolSource): string {

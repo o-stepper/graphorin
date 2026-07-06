@@ -286,3 +286,90 @@ describe('ToolRegistry - listByTag', () => {
     expect(registry.listByTag('')).toEqual([]);
   });
 });
+
+describe('W-116 - auto-prefix fallback namespace + observable suppression', () => {
+  beforeEach(() => resetCountersForTesting());
+  afterEach(() => resetCountersForTesting());
+
+  const mkTool = (name: string, description: string) =>
+    tool({
+      name,
+      description,
+      inputSchema: z.object({}),
+      async execute() {
+        return 'ok';
+      },
+    });
+
+  it('an all-symbols serverIdentity gets a deterministic fallback namespace instead of vanishing', () => {
+    const symbols: ToolSource = { kind: 'mcp', serverIdentity: '###' };
+    const registry = createToolRegistry();
+    registry.register(mkTool('a', 'first-party a'));
+    registry.register(mkTool('a', 'mcp a'), symbols);
+
+    const resolutions = registry.assertNoDuplicates('auto-prefix', { source: symbols }) ?? [];
+    expect(resolutions.some((r) => r.action === 'suppressed')).toBe(false);
+    const rename = resolutions.find(
+      (r): r is Extract<CollisionResolution, { action: 'auto-prefix-applied' }> =>
+        r.action === 'auto-prefix-applied',
+    );
+    expect(rename).toBeDefined();
+    // `<kind>-<hash>` fallback - the sanitised identity was empty.
+    expect(rename?.renamed.to).toMatch(/^mcp-[0-9a-f]{8}\.a$/u);
+    expect(registry.get(rename?.renamed.to ?? '')).toBeDefined();
+    expect(registry.get('a')?.__source.kind).toBe('first-party');
+  });
+
+  it('an over-long prefixed candidate truncates to 128 chars with a hash suffix and stays unique', () => {
+    const longName = `t${'x'.repeat(123)}`; // 124 chars; 'linear-mcp.' + 124 = 135 > 128
+    const registry = createToolRegistry();
+    registry.register(mkTool(longName, 'first-party long'));
+    registry.register(mkTool(longName, 'mcp long'), MCP_LINEAR);
+
+    const resolutions = registry.assertNoDuplicates('auto-prefix', { source: MCP_LINEAR }) ?? [];
+    const rename = resolutions.find(
+      (r): r is Extract<CollisionResolution, { action: 'auto-prefix-applied' }> =>
+        r.action === 'auto-prefix-applied',
+    );
+    expect(rename).toBeDefined();
+    const to = rename?.renamed.to ?? '';
+    expect(to.length).toBeLessThanOrEqual(128);
+    expect(to).not.toBe(longName);
+    expect(to).toMatch(/-[0-9a-f]{8}$/u);
+    expect(to.startsWith('linear-mcp.')).toBe(true);
+    expect(registry.get(to)).toBeDefined();
+  });
+
+  it('a rename that would mint a NEW collision is suppressed observably (resolution + audit + counter)', () => {
+    const registry = createToolRegistry();
+    registry.register(mkTool('a', 'first-party a'));
+    registry.register(mkTool('a', 'mcp a'), MCP_LINEAR);
+    // The rename target is ALREADY taken by a legitimate first-party
+    // tool - landing the loser there would mint a fresh collision (and
+    // pre-fix the rename silently did exactly that).
+    registry.register(mkTool('linear-mcp.a', 'first-party under the prefixed name'));
+
+    const resolutions = registry.assertNoDuplicates('auto-prefix', { source: MCP_LINEAR }) ?? [];
+    const suppressed = resolutions.filter(
+      (r): r is Extract<CollisionResolution, { action: 'suppressed' }> => r.action === 'suppressed',
+    );
+    expect(suppressed).toHaveLength(1);
+    expect(suppressed[0]?.toolName).toBe('a');
+    expect(suppressed[0]?.losers).toHaveLength(1);
+    expect(getCounterForTesting('tool.collision.suppressed.total')).toBe(1);
+    // The occupied bucket still holds exactly ONE entry - no hidden collision.
+    expect(registry.list().filter((e) => e.name === 'linear-mcp.a')).toHaveLength(1);
+    expect(registry.get('linear-mcp.a')?.__source.kind).toBe('first-party');
+  });
+
+  it('normal-namespace auto-prefix behaviour is unchanged (regression)', () => {
+    const registry = createToolRegistry();
+    registry.register(mkTool('a', 'first-party a'));
+    registry.register(mkTool('a', 'mcp a'), MCP_LINEAR);
+    const resolutions = registry.assertNoDuplicates('auto-prefix', { source: MCP_LINEAR }) ?? [];
+    expect(resolutions).toHaveLength(1);
+    expect(resolutions[0]?.action).toBe('auto-prefix-applied');
+    expect(registry.get('linear-mcp.a')).toBeDefined();
+    expect(getCounterForTesting('tool.collision.suppressed.total')).toBe(0);
+  });
+});

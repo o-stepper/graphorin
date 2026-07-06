@@ -74,6 +74,20 @@ export type CollisionResolution =
       readonly winner: ToolSource;
       readonly losers: ReadonlyArray<ToolSource>;
       readonly action: 'first-party-precedence';
+    }
+  | {
+      readonly toolName: string;
+      readonly winner: ToolSource;
+      readonly losers: ReadonlyArray<ToolSource>;
+      /**
+       * W-116: an auto-prefix loser whose rename was impossible (the
+       * residual case after the fallback namespace + truncation - e.g.
+       * a pathological future source shape). The loser is dropped from
+       * the catalogue, but never silently: this record, a
+       * `tool:collision:suppressed` audit row and the
+       * `tool.collision.suppressed.total` counter all mark it.
+       */
+      readonly action: 'suppressed';
     };
 
 /**

@@ -73,7 +73,8 @@ export type ToolAuditAction =
   | 'tool:collision:detected'
   | 'tool:collision:priority-resolved'
   | 'tool:collision:auto-prefix-applied'
-  | 'tool:collision:manual-rejected';
+  | 'tool:collision:manual-rejected'
+  | 'tool:collision:suppressed';
 
 /**
  * Lightweight actor descriptor for tool-subsystem audit events.
