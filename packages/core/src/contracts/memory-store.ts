@@ -147,7 +147,18 @@ export interface SemanticMemoryStore {
   remember(fact: Fact): Promise<void>;
   search(scope: SessionScope, opts: MemorySearchOptions): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   supersede(oldId: string, newFact: Fact, reason?: string): Promise<void>;
-  forget(id: string, reason?: string): Promise<void>;
+  /**
+   * Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+   * support tenant isolation MUST treat a fact outside the scope as a
+   * deterministic no-op (0 rows changed) - defense in depth so a
+   * leaked / cross-user id reaching a mutator cannot touch another
+   * user's memory. Omitting `scope` preserves the historical unscoped
+   * behaviour (trusted internal callers: consolidator, erasure
+   * cascades). The parameter is additive - existing adapter
+   * implementations with the narrower arity remain structurally
+   * compatible.
+   */
+  forget(id: string, reason?: string, scope?: SessionScope): Promise<void>;
 }
 
 /** @stable */

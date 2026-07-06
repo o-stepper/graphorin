@@ -817,8 +817,18 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
    *
    * @stable
    */
-  async archive(id: string, reason?: string): Promise<void> {
+  async archive(id: string, reason?: string, scope?: SessionScope): Promise<void> {
     void reason;
+    // W-154: with a scope, the mutation is a deterministic no-op unless
+    // the row belongs to it - defense in depth against a leaked /
+    // cross-user id reaching a mutator (reads were always scoped).
+    if (scope !== undefined) {
+      this.#conn.run(
+        'UPDATE episodes SET archived = 1, updated_at = ? WHERE id = ? AND scope_user_id = ?',
+        [Date.now(), id, scope.userId],
+      );
+      return;
+    }
     this.#conn.run('UPDATE episodes SET archived = 1, updated_at = ? WHERE id = ?', [
       Date.now(),
       id,
@@ -831,8 +841,22 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
    * only. Powers {@link EpisodicMemory.validate} so a quarantined (auto-formed)
    * episode can be promoted into default recall.
    */
-  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+  async setStatus(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: scoped calls no-op (no update, no history row) unless
+      // the episode belongs to the scope.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM episodes WHERE id = ? AND scope_user_id = ?',
+          [id, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       this.#conn.run('UPDATE episodes SET status = ?, updated_at = ? WHERE id = ?', [
         status,
         Date.now(),
@@ -1188,7 +1212,16 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     return rows.map(rowToFact);
   }
 
-  async forget(id: string, reason?: string): Promise<void> {
+  async forget(id: string, reason?: string, scope?: SessionScope): Promise<void> {
+    // W-154: scoped calls are a deterministic no-op for a foreign id -
+    // the ownership check also guards the vec0 deletes below.
+    if (scope !== undefined) {
+      const owned = this.#conn.get<{ one: number }>(
+        'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+        [id, scope.userId],
+      );
+      if (owned === undefined) return;
+    }
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
     // MRET-9: a tombstoned fact must not keep occupying k-nearest slots -
     // dead embeddings crowd the GLOBAL vec0 slice and starve live hits.
@@ -1213,8 +1246,21 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    *
    * @stable
    */
-  async setStatus(factId: string, status: MemoryStatus, reason?: string): Promise<void> {
+  async setStatus(
+    factId: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: scoped calls no-op unless the fact belongs to the scope.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+          [factId, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       this.#conn.run('UPDATE facts SET status = ?, updated_at = ? WHERE id = ?', [
         status,
         Date.now(),
@@ -1325,19 +1371,24 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    *
    * @stable
    */
-  async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void> {
+  async markAccessed(
+    ids: ReadonlyArray<string>,
+    accessedAt?: number,
+    scope?: SessionScope,
+  ): Promise<void> {
     if (ids.length === 0) return;
     const at = accessedAt ?? Date.now();
     const placeholders = ids.map(() => '?').join(', ');
     // D3 (migration 027): the monotonic access counter runs alongside
     // the capped strength bump - strength saturates at 2.0, the counter
     // never does, giving salience a true frequency signal.
+    // W-154: with a scope, foreign ids in the batch simply do not match.
     this.#conn.run(
       `UPDATE facts
        SET last_accessed_at = ?, strength = MIN(2.0, strength + 0.1),
            access_count = access_count + 1
-       WHERE id IN (${placeholders})`,
-      [at, ...ids],
+       WHERE id IN (${placeholders})${scope !== undefined ? ' AND scope_user_id = ?' : ''}`,
+      scope !== undefined ? [at, ...ids, scope.userId] : [at, ...ids],
     );
   }
 
@@ -1382,8 +1433,16 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    *
    * @stable
    */
-  async archiveFact(id: string, reason?: string): Promise<void> {
+  async archiveFact(id: string, reason?: string, scope?: SessionScope): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: scoped calls no-op unless the fact belongs to the scope.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+          [id, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       this.#conn.run('UPDATE facts SET archived = 1, updated_at = ? WHERE id = ?', [
         Date.now(),
         id,
@@ -1418,8 +1477,17 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    *
    * @stable
    */
-  async purge(id: string, reason?: string): Promise<void> {
+  async purge(id: string, reason?: string, scope?: SessionScope): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: a scoped purge of a foreign id is a FULL no-op - no
+      // history scrub, no PURGE audit row, no vec/graph deletes.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+          [id, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       const row = this.#conn.get<{ rowid: number; text: string }>(
         'SELECT rowid AS rowid, text FROM facts WHERE id = ?',
         [id],
@@ -1561,8 +1629,21 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
    * {@link ProceduralMemory.validate} so an induced (quarantined) procedure can
    * be promoted into `activate()`.
    */
-  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+  async setStatus(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: scoped calls no-op unless the rule belongs to the scope.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM rules WHERE id = ? AND scope_user_id = ?',
+          [id, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       this.#conn.run('UPDATE rules SET status = ?, updated_at = ? WHERE id = ?', [
         status,
         Date.now(),
@@ -1751,8 +1832,21 @@ export class SqliteInsightStore {
    * only. Powers {@link InsightMemory.validate} so a quarantined (reflection)
    * insight can be promoted out of quarantine.
    */
-  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+  async setStatus(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void> {
     this.#conn.transaction(() => {
+      // W-154: scoped calls no-op unless the insight belongs to the scope.
+      if (scope !== undefined) {
+        const owned = this.#conn.get<{ one: number }>(
+          'SELECT 1 AS one FROM insights WHERE id = ? AND scope_user_id = ?',
+          [id, scope.userId],
+        );
+        if (owned === undefined) return;
+      }
       this.#conn.run(
         'UPDATE insights SET status = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL',
         [status, Date.now(), id],

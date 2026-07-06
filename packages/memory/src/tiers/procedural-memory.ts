@@ -448,7 +448,7 @@ export class ProceduralMemory {
           }
         }
         span.setAttributes({ 'memory.procedural.validate.forced': force });
-        await store.setStatus(ruleId, 'active', reason);
+        await store.setStatus(ruleId, 'active', reason, scope);
       },
     );
   }

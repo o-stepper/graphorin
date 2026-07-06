@@ -978,7 +978,11 @@ export class SemanticMemory {
         // never break the read path.
         if (ranked.length > 0 && typeof this.#store.semantic.markAccessed === 'function') {
           try {
-            await this.#store.semantic.markAccessed(ranked.map((h) => h.record.id));
+            await this.#store.semantic.markAccessed(
+              ranked.map((h) => h.record.id),
+              undefined,
+              scope,
+            );
           } catch {
             // Best-effort: decay reinforcement is advisory.
           }
@@ -1223,7 +1227,7 @@ export class SemanticMemory {
           }
         }
         span.setAttributes({ 'memory.semantic.validate.forced': force });
-        await this.#store.semantic.setStatus(factId, 'active', reason);
+        await this.#store.semantic.setStatus(factId, 'active', reason, scope);
         // W-019: complete a PENDING supersede. If this fact was written
         // as a (quarantined) successor of an active fact, the old
         // fact's interval was deliberately left open; close it now that
@@ -1310,7 +1314,7 @@ export class SemanticMemory {
       scope,
       { 'memory.semantic.action': 'forget', 'memory.semantic.fact_id': factId },
       async () => {
-        await this.#store.semantic.forget(factId, reason);
+        await this.#store.semantic.forget(factId, reason, scope);
       },
     );
   }
@@ -1335,7 +1339,7 @@ export class SemanticMemory {
               'For storage adapters without GDPR-grade hard-delete, prefer `SemanticMemory.forget(...)`.',
           );
         }
-        await this.#store.semantic.purge(factId, reason);
+        await this.#store.semantic.purge(factId, reason, scope);
       },
     );
   }

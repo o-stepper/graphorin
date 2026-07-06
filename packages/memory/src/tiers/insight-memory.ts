@@ -156,7 +156,7 @@ export class InsightMemory {
           }
         }
         span.setAttributes({ 'memory.insight.validate.forced': force });
-        await store.setStatus(insightId, 'active', reason);
+        await store.setStatus(insightId, 'active', reason, scope);
       },
     );
   }

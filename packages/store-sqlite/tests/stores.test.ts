@@ -442,6 +442,155 @@ describe('createSqliteStore', () => {
     expect(hits.some((h) => h.record.id === 'ep-x')).toBe(false);
   });
 
+  it('mutators are scope-guarded: a foreign scope is a deterministic no-op (W-154)', async () => {
+    const mkFact = (id: string, userId: string) => ({
+      id,
+      kind: 'semantic' as const,
+      userId,
+      sensitivity: 'internal' as const,
+      text: `owned by ${userId} (${id})`,
+      createdAt: new Date().toISOString(),
+    });
+    await store.memory.semantic.remember(mkFact('vic-f1', 'victim'));
+    await store.memory.semantic.remember(mkFact('vic-f2', 'victim'));
+    const semantic = store.memory.semantic as unknown as {
+      get(id: string): Promise<{ status?: string; archived?: boolean } | null>;
+      forget(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+      archiveFact(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      purge(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      markAccessed(
+        ids: ReadonlyArray<string>,
+        accessedAt?: number,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    const attacker = { userId: 'attacker' };
+    const victim = { userId: 'victim' };
+
+    // Foreign-scope mutations: all no-ops.
+    await semantic.forget('vic-f1', 'evil', attacker);
+    expect(await semantic.get('vic-f1')).not.toBeNull();
+    await semantic.setStatus('vic-f1', 'quarantined', 'evil', attacker);
+    expect((await semantic.get('vic-f1'))?.status ?? 'active').not.toBe('quarantined');
+    await semantic.archiveFact('vic-f1', 'evil', attacker);
+    const archivedRow = store.connection.get<{ archived: number }>(
+      'SELECT archived FROM facts WHERE id = ?',
+      ['vic-f1'],
+    );
+    expect(archivedRow?.archived).toBe(0);
+    await semantic.purge('vic-f1', 'evil', attacker);
+    expect(await semantic.get('vic-f1')).not.toBeNull();
+    // A foreign purge writes NOTHING - not even the PURGE audit row.
+    const purgeRows = store.connection.all(
+      "SELECT 1 FROM memory_history WHERE memory_kind = 'fact' AND memory_id = ? AND event = 'PURGE'",
+      ['vic-f1'],
+    );
+    expect(purgeRows.length).toBe(0);
+    await semantic.markAccessed(['vic-f1'], undefined, attacker);
+    const accessRow = store.connection.get<{ access_count: number }>(
+      'SELECT access_count FROM facts WHERE id = ?',
+      ['vic-f1'],
+    );
+    expect(accessRow?.access_count).toBe(0);
+
+    // Correct scope: the same calls mutate.
+    await semantic.markAccessed(['vic-f1'], undefined, victim);
+    expect(
+      store.connection.get<{ access_count: number }>(
+        'SELECT access_count FROM facts WHERE id = ?',
+        ['vic-f1'],
+      )?.access_count,
+    ).toBe(1);
+    await semantic.setStatus('vic-f1', 'quarantined', 'ok', victim);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM facts WHERE id = ?', ['vic-f1'])
+        ?.status,
+    ).toBe('quarantined');
+    await semantic.purge('vic-f1', 'gdpr', victim);
+    expect(await semantic.get('vic-f1')).toBeNull();
+
+    // No scope: historical unscoped behaviour (trusted internal callers).
+    await semantic.forget('vic-f2');
+    expect(await semantic.get('vic-f2')).toBeNull();
+
+    // Episodes: archive + setStatus.
+    const ep = {
+      id: 'vic-e1',
+      kind: 'episodic' as const,
+      userId: 'victim',
+      summary: 'victim episode',
+      startedAt: new Date(0).toISOString(),
+      endedAt: new Date(1000).toISOString(),
+      sensitivity: 'internal' as const,
+      createdAt: new Date().toISOString(),
+    };
+    const episodic = store.memory.episodic as unknown as {
+      put(e: typeof ep): Promise<void>;
+      archive(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    await episodic.put(ep);
+    await episodic.archive('vic-e1', 'evil', attacker);
+    expect(
+      store.connection.get<{ archived: number }>('SELECT archived FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.archived,
+    ).toBe(0);
+    await episodic.setStatus('vic-e1', 'quarantined', 'evil', attacker);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.status,
+    ).not.toBe('quarantined');
+    await episodic.archive('vic-e1', 'ok', victim);
+    expect(
+      store.connection.get<{ archived: number }>('SELECT archived FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.archived,
+    ).toBe(1);
+
+    // Rules + insights setStatus.
+    await store.memory.procedural.add({
+      id: 'vic-r1',
+      kind: 'procedural' as const,
+      userId: 'victim',
+      text: 'victim rule',
+      priority: 10,
+      sensitivity: 'internal' as const,
+      status: 'quarantined' as const,
+      createdAt: new Date().toISOString(),
+    });
+    const procedural = store.memory.procedural as unknown as {
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    await procedural.setStatus('vic-r1', 'active', 'evil', attacker);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM rules WHERE id = ?', ['vic-r1'])
+        ?.status,
+    ).toBe('quarantined');
+    await procedural.setStatus('vic-r1', 'active', 'ok', victim);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM rules WHERE id = ?', ['vic-r1'])
+        ?.status,
+    ).toBe('active');
+  });
+
   it('episodic memory: count() applies the archived filter of its contract (W-155)', async () => {
     const base = {
       kind: 'episodic' as const,

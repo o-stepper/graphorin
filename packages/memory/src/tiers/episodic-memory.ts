@@ -263,7 +263,7 @@ export class EpisodicMemory {
               'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via EpisodicMemoryStoreExt.',
           );
         }
-        await this.#store.episodic.archive(episodeId, reason);
+        await this.#store.episodic.archive(episodeId, reason, scope);
       },
     );
   }
@@ -334,7 +334,7 @@ export class EpisodicMemory {
           }
         }
         span.setAttributes({ 'memory.episodic.validate.forced': force });
-        await store.setStatus(episodeId, 'active', reason);
+        await store.setStatus(episodeId, 'active', reason, scope);
       },
     );
   }
