@@ -53,15 +53,17 @@ COPY --from=builder --chown=graphorin:graphorin /build/packages /app/packages
 COPY --from=builder --chown=graphorin:graphorin /build/pnpm-lock.yaml /build/pnpm-workspace.yaml /build/package.json /app/
 
 # The native SQLite bindings (better-sqlite3, sqlite-vec) are PEER
-# dependencies of @graphorin/store-sqlite - registry consumers install
-# them alongside the package. Inside this workspace copy they are only
-# satisfied by store-sqlite's devDependencies, which `--prod` skips, so
-# the server would boot into "Cannot find package 'better-sqlite3'".
-# The second, filtered install pulls exactly that package's dev deps
-# (the two natives + their types) from the same frozen lockfile.
+# dependencies of @graphorin/store-sqlite: registry consumers get them
+# via auto-installed peers, but inside this workspace copy they are
+# only satisfied by store-sqlite's devDependencies, which `--prod`
+# skips - the server would boot into "Cannot find package
+# 'better-sqlite3'". Mirror what a consumer install does and add them
+# as regular dependencies of the IMAGE's copy of the package (the
+# manifest/lockfile edits stay inside the image). Their postinstall
+# scripts are allowlisted in the root pnpm.onlyBuiltDependencies.
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate \
  && pnpm install --frozen-lockfile --prod \
- && pnpm install --frozen-lockfile --filter @graphorin/store-sqlite \
+ && pnpm --filter @graphorin/store-sqlite add better-sqlite3 sqlite-vec \
  && pnpm cache delete
 
 # Symlink the binary so /usr/local/bin/graphorin works without PATH
