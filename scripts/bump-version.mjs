@@ -111,7 +111,8 @@ console.log(
 console.log('  - README.md "Latest release" line: refresh the date + highlights text');
 console.log('  - documentation/guide/migration.md: retitle the "-> next (unreleased)" section');
 console.log(
-  '  - regenerate documentation/api (pnpm --filter @graphorin/docs run clean && build:typedoc && build:sanitise)',
+  '  - regenerate documentation/api (pnpm --filter @graphorin/docs run clean && build:typedoc && build:sanitise)' +
+    ' - enforced by the docs.yml freshness gate (W-128), so CI fails if forgotten',
 );
 
 const check = spawnSync(process.execPath, [join(ROOT, 'scripts/check-version-consistency.mjs')], {
