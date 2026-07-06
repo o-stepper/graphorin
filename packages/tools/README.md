@@ -98,10 +98,15 @@ register, and execute tools the model can call:
   ctx.streamContent({ kind: 'text', text: 'chunk' });
   ctx.reportProgress(1, 3); } })`. The executor maintains a
   per-`toolCallId` aggregation buffer; the assembled buffer becomes
-  the canonical `output` when `execute` returns `void`. Bounded
-  backpressure queue (`streaming.eventQueueDepth`, default `256`)
-  drops the oldest in-flight event under load while the buffer
-  remains lossless.
+  the canonical `output` when `execute` returns `void`. Event
+  delivery to the sink is synchronous - there is no queue; the
+  `streamingEventQueueDepth` guard (default `256`) only trips on
+  sink re-entrancy and drops the CURRENT (newest) event, counted in
+  `tool.streaming.events.dropped.total`. The aggregation buffer is
+  byte-capped (`streamingMaxBufferBytes`, default 8 MiB): past the
+  cap chunks keep streaming to subscribers but stop accumulating,
+  dropped bytes are counted and the aggregator reports
+  `bufferTruncated` so the assembled body is marked incomplete.
 - **Side-effect classification** -
   `sideEffectClass: 'pure' | 'read-only' | 'side-effecting' |
   'external-stateful'` REQUIRED on the public surface (with a v0.1

@@ -55,6 +55,7 @@ import type { SandboxTrustLevel } from '@graphorin/security/sandbox';
 
 import { emitToolAudit, incrementCounter, observeHistogram } from '../audit/index.js';
 import { createDefaultSpillWriter } from '../result/spill.js';
+import { DEFAULT_MAX_BUFFER_BYTES } from '../streaming/channel.js';
 import { emitErrorAudit, frozenCompleted, toStartEvent } from './outcome.js';
 import { runApprovalPhase } from './phase-approval.js';
 import { runExecuteBatch } from './phase-batch.js';
@@ -104,6 +105,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     maxParallelTools: opts.maxParallelTools ?? 8,
     cancellationGraceMs: opts.cancellationGraceMs ?? 50,
     streamingEventQueueDepth: opts.streamingEventQueueDepth ?? 256,
+    streamingMaxBufferBytes: opts.streamingMaxBufferBytes ?? DEFAULT_MAX_BUFFER_BYTES,
     sandboxResolver: opts.sandboxResolver ?? (() => null),
     memoryGuardFactory: opts.memoryGuardFactory ?? (() => null),
     memoryRegionReader: opts.memoryRegionReader,

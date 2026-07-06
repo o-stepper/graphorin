@@ -68,6 +68,7 @@ export async function prepareCallContext(
     toolCallId: call.toolCallId,
     stepNumber,
     eventQueueDepth: rt.streamingEventQueueDepth,
+    maxBufferBytes: rt.streamingMaxBufferBytes,
     streamingHint: tool.__streamingHint,
     ...(sink !== undefined ? { sink: (event) => sink(event) } : {}),
   });
