@@ -91,14 +91,7 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
       }
       const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
       if (!parsed.success) {
-        return c.json(
-          {
-            error: 'config-invalid',
-            message: 'Invalid run body.',
-            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
-          },
-          400,
-        );
+        return invalidBodyResponse(c, parsed.error);
       }
       const runId = newRunId();
       const sessionId = parsed.data.sessionId;
@@ -143,11 +136,19 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
         const err = new AgentNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const runId = newRunId();
+      // W-151: validate the body BEFORE any run is registered - the old
+      // handler swallowed a failed parse and launched the agent on an
+      // empty prompt, burning provider tokens behind a 202 that looked
+      // successful. Identical validation to the sibling /run route
+      // (empty/absent bodies stay valid via the schema default).
       const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
-      const sessionId = parsed.success ? parsed.data.sessionId : undefined;
-      const userId = parsed.success ? parsed.data.userId : undefined;
-      const input = parsed.success ? (parsed.data.input ?? '') : '';
+      if (!parsed.success) {
+        return invalidBodyResponse(c, parsed.error);
+      }
+      const runId = newRunId();
+      const sessionId = parsed.data.sessionId;
+      const userId = parsed.data.userId;
+      const input = parsed.data.input ?? '';
       // IP-2: actually run the agent. The old handler parsed the input
       // and threw it away - the run sat 'pending' forever while the 202
       // advertised subjects nothing would ever emit on.
@@ -333,6 +334,24 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
   });
 
   return app;
+}
+
+/**
+ * W-151: byte-identical 400 for an invalid run/stream body - both
+ * sibling routes validate through this one helper.
+ */
+function invalidBodyResponse(
+  c: Context<{ Variables: ServerVariables }>,
+  error: { issues: ReadonlyArray<{ path: ReadonlyArray<PropertyKey>; message: string }> },
+) {
+  return c.json(
+    {
+      error: 'config-invalid',
+      message: 'Invalid run body.',
+      issues: error.issues.map((i) => ({ path: i.path, message: i.message })),
+    },
+    400,
+  );
 }
 
 async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
