@@ -17,6 +17,6 @@ type ToolPolicyDecision =
 };
 ```
 
-Defined in: packages/security/src/policy/tool-argument-policy.ts:68
+Defined in: packages/security/src/policy/tool-argument-policy.ts:77
 
 Decision returned by [evaluateToolArgumentPolicy](/api/@graphorin/security/functions/evaluateToolArgumentPolicy.md).

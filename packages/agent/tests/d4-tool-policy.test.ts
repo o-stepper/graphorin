@@ -136,6 +136,39 @@ describe('D4 - Rule-of-Two capability preset', () => {
     );
   });
 
+  it('W-101: denying untrustedInput blocks an mcp-derived tool; first-party passes', async () => {
+    const mcpRan = { ran: false };
+    const localRan = { ran: false };
+    const mcpTool = Object.assign(tool('mcp_fetch', 'read-only', mcpRan), {
+      // The stamp registry-build honours: registered with kind 'mcp',
+      // which resolves to trust class 'mcp-derived'.
+      __source: { kind: 'mcp', serverIdentity: 'srv-1' },
+    });
+    const agent = createAgent({
+      name: 'rot-untrusted',
+      instructions: 'browse',
+      provider: provider([
+        toolCallScript({ toolCallId: 'c1', toolName: 'mcp_fetch', args: {} }),
+        toolCallScript({ toolCallId: 'c2', toolName: 'local_read', args: {} }),
+        textOnlyScript('done'),
+      ]),
+      tools: [mcpTool, tool('local_read', 'read-only', localRan)],
+      // Holds sensitive data + external side effects, drops untrusted input.
+      ruleOfTwo: { untrustedInput: false, sensitiveData: true, externalSideEffects: true },
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    expect(mcpRan.ran).toBe(false);
+    expect(localRan.ran).toBe(true);
+    const outcomes = result.state.steps.flatMap((step) => step.toolCalls);
+    const mcpOutcome = outcomes.find((c) => c.call.toolName === 'mcp_fetch')?.outcome;
+    expect(mcpOutcome !== undefined && 'kind' in mcpOutcome ? mcpOutcome.kind : null).toBe(
+      'capability_blocked',
+    );
+    const localOutcome = outcomes.find((c) => c.call.toolName === 'local_read')?.outcome;
+    expect(localOutcome !== undefined && 'output' in localOutcome).toBe(true);
+  });
+
   it('denying sensitive data default-denies a secret-tier tool', async () => {
     const readSecret = { ran: false };
     const agent = createAgent({

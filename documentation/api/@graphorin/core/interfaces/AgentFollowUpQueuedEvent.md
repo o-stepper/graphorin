@@ -6,7 +6,7 @@
 
 # Interface: AgentFollowUpQueuedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:298
+Defined in: packages/core/src/types/agent-event.ts:303
 
 Emitted when `agent.followUp(...)` queues a follow-up turn to fire
 after the current turn completes.
@@ -17,5 +17,5 @@ after the current turn completes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:300 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | packages/core/src/types/agent-event.ts:299 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:305 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | packages/core/src/types/agent-event.ts:304 |

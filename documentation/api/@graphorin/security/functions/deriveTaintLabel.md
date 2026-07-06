@@ -10,7 +10,7 @@
 function deriveTaintLabel(input): TaintLabel;
 ```
 
-Defined in: packages/security/src/dataflow/derive.ts:33
+Defined in: packages/security/src/dataflow/derive.ts:45
 
 Derive the provenance label for a tool's output from its resolved
 trust class, source, and declared sensitivity.

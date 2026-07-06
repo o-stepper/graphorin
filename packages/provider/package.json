@@ -36,7 +36,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -44,47 +44,47 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./adapters/vercel": {
       "types": "./dist/adapters/vercel.d.ts",
-      "import": "./dist/adapters/vercel.js"
+      "default": "./dist/adapters/vercel.js"
     },
     "./adapters/ollama": {
       "types": "./dist/adapters/ollama.d.ts",
-      "import": "./dist/adapters/ollama.js"
+      "default": "./dist/adapters/ollama.js"
     },
     "./adapters/llamacpp-server": {
       "types": "./dist/adapters/llamacpp-server.d.ts",
-      "import": "./dist/adapters/llamacpp-server.js"
+      "default": "./dist/adapters/llamacpp-server.js"
     },
     "./adapters/openai-compatible": {
       "types": "./dist/adapters/openai-compatible.d.ts",
-      "import": "./dist/adapters/openai-compatible.js"
+      "default": "./dist/adapters/openai-compatible.js"
     },
     "./middleware": {
       "types": "./dist/middleware/index.d.ts",
-      "import": "./dist/middleware/index.js"
+      "default": "./dist/middleware/index.js"
     },
     "./counters": {
       "types": "./dist/counters/index.d.ts",
-      "import": "./dist/counters/index.js"
+      "default": "./dist/counters/index.js"
     },
     "./trust": {
       "types": "./dist/trust/index.d.ts",
-      "import": "./dist/trust/index.js"
+      "default": "./dist/trust/index.js"
     },
     "./model-tier": {
       "types": "./dist/model-tier/index.d.ts",
-      "import": "./dist/model-tier/index.js"
+      "default": "./dist/model-tier/index.js"
     },
     "./reasoning": {
       "types": "./dist/reasoning/index.d.ts",
-      "import": "./dist/reasoning/index.js"
+      "default": "./dist/reasoning/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./package.json": "./package.json"
   },

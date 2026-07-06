@@ -11,9 +11,11 @@ export type {
   CheckpointMetadata,
   CheckpointPutOptions,
   CheckpointStore,
+  CheckpointStoreExt,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
+  PruneThreadsOptions,
 } from './checkpoint-store.js';
 export { CheckpointConflictError } from './checkpoint-store.js';
 
@@ -80,6 +82,7 @@ export type {
 } from './session-store.js';
 export type { TokenCounter } from './token-counter.js';
 export type {
+  AnyTool,
   ResolvedTool,
   Tool,
   ToolExample,
@@ -89,6 +92,8 @@ export type {
 } from './tool.js';
 export type {
   AISpan,
+  CustomSpanType,
+  KnownSpanType,
   SpanAttributes,
   SpanAttributeValue,
   SpanStatus,

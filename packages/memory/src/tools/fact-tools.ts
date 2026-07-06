@@ -34,8 +34,26 @@ const factRememberOutputSchema = z.object({
   quarantineReason: z.enum(['injection', 'synthesized']).optional(),
 });
 
-type FactRememberInput = z.infer<typeof factRememberInputSchema>;
-type FactRememberOutput = z.infer<typeof factRememberOutputSchema>;
+/**
+ * W-013: explicit interfaces instead of `z.infer<typeof schema>` - the
+ * inferred aliases baked concrete v3 zod object generics into
+ * the published d.ts, which do not typecheck under a zod@4 consumer.
+ * Interface<->schema equality is pinned by type tests. Optionals carry
+ * `| undefined` to match zod's `.optional()` inference exactly.
+ */
+export interface FactRememberInput {
+  text: string;
+  tags?: string[] | undefined;
+  confidence?: number | undefined;
+  sensitivity?: 'public' | 'internal' | 'secret' | undefined;
+  validFrom?: string | undefined;
+  validTo?: string | undefined;
+}
+export interface FactRememberOutput {
+  factId: string;
+  quarantined: boolean;
+  quarantineReason?: 'injection' | 'synthesized' | undefined;
+}
 
 const factSearchInputSchema = z.object({
   query: z.string().min(1).max(1024),
@@ -63,8 +81,24 @@ const factSearchOutputSchema = z.object({
   ),
 });
 
-type FactSearchInput = z.infer<typeof factSearchInputSchema>;
-type FactSearchOutput = z.infer<typeof factSearchOutputSchema>;
+export interface FactSearchInput {
+  query: string;
+  topK?: number | undefined;
+  tags?: string[] | undefined;
+  asOf?: string | undefined;
+}
+export interface FactSearchHit {
+  factId: string;
+  text: string;
+  score: number;
+  sensitivity: 'public' | 'internal' | 'secret';
+  provenance?: 'user' | 'tool' | 'extraction' | 'reflection' | 'induction' | 'imported' | undefined;
+  validTo?: string | undefined;
+  supersededBy?: string | undefined;
+}
+export interface FactSearchOutput {
+  hits: FactSearchHit[];
+}
 
 const factSupersedeInputSchema = z.object({
   oldId: z.string().min(1),
@@ -76,8 +110,15 @@ const factSupersedeOutputSchema = z.object({
   newId: z.string(),
 });
 
-type FactSupersedeInput = z.infer<typeof factSupersedeInputSchema>;
-type FactSupersedeOutput = z.infer<typeof factSupersedeOutputSchema>;
+export interface FactSupersedeInput {
+  oldId: string;
+  newText: string;
+  reason?: string | undefined;
+}
+export interface FactSupersedeOutput {
+  oldId: string;
+  newId: string;
+}
 
 const factForgetInputSchema = z.object({
   factId: z.string().min(1),
@@ -88,8 +129,14 @@ const factForgetOutputSchema = z.object({
   forgotten: z.boolean(),
 });
 
-type FactForgetInput = z.infer<typeof factForgetInputSchema>;
-type FactForgetOutput = z.infer<typeof factForgetOutputSchema>;
+export interface FactForgetInput {
+  factId: string;
+  reason?: string | undefined;
+}
+export interface FactForgetOutput {
+  factId: string;
+  forgotten: boolean;
+}
 
 const factHistoryInputSchema = z.object({
   factId: z.string().min(1),
@@ -108,8 +155,21 @@ const factHistoryOutputSchema = z.object({
   ),
 });
 
-type FactHistoryInput = z.infer<typeof factHistoryInputSchema>;
-type FactHistoryOutput = z.infer<typeof factHistoryOutputSchema>;
+export interface FactHistoryInput {
+  factId: string;
+}
+export interface FactHistoryEntry {
+  factId: string;
+  text: string;
+  validFrom?: string | undefined;
+  validTo?: string | undefined;
+  supersedes?: string | undefined;
+  supersededBy?: string | undefined;
+  sensitivity: 'public' | 'internal' | 'secret';
+}
+export interface FactHistoryOutput {
+  chain: FactHistoryEntry[];
+}
 
 const factValidateInputSchema = z.object({
   factId: z.string().min(1),
@@ -120,8 +180,46 @@ const factValidateOutputSchema = z.object({
   validated: z.boolean(),
 });
 
-type FactValidateInput = z.infer<typeof factValidateInputSchema>;
-type FactValidateOutput = z.infer<typeof factValidateOutputSchema>;
+export interface FactValidateInput {
+  factId: string;
+  reason?: string | undefined;
+}
+export interface FactValidateOutput {
+  factId: string;
+  validated: boolean;
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): each explicit interface must stay MUTUALLY assignable with its
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<
+  W013Equals<FactRememberInput, z.infer<typeof factRememberInputSchema>>
+>;
+type _W013Check2 = W013Assert<
+  W013Equals<FactRememberOutput, z.infer<typeof factRememberOutputSchema>>
+>;
+type _W013Check3 = W013Assert<W013Equals<FactSearchInput, z.infer<typeof factSearchInputSchema>>>;
+type _W013Check4 = W013Assert<W013Equals<FactSearchOutput, z.infer<typeof factSearchOutputSchema>>>;
+type _W013Check5 = W013Assert<
+  W013Equals<FactSupersedeInput, z.infer<typeof factSupersedeInputSchema>>
+>;
+type _W013Check6 = W013Assert<
+  W013Equals<FactSupersedeOutput, z.infer<typeof factSupersedeOutputSchema>>
+>;
+type _W013Check7 = W013Assert<W013Equals<FactForgetInput, z.infer<typeof factForgetInputSchema>>>;
+type _W013Check8 = W013Assert<W013Equals<FactForgetOutput, z.infer<typeof factForgetOutputSchema>>>;
+type _W013Check9 = W013Assert<W013Equals<FactHistoryInput, z.infer<typeof factHistoryInputSchema>>>;
+type _W013Check10 = W013Assert<
+  W013Equals<FactHistoryOutput, z.infer<typeof factHistoryOutputSchema>>
+>;
+type _W013Check11 = W013Assert<
+  W013Equals<FactValidateInput, z.infer<typeof factValidateInputSchema>>
+>;
+type _W013Check12 = W013Assert<
+  W013Equals<FactValidateOutput, z.infer<typeof factValidateOutputSchema>>
+>;
 
 /**
  * `fact_remember` - persist a single semantic fact. The minimum-viable

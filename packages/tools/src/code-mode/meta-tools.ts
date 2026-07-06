@@ -70,7 +70,19 @@ const searchInput = z.object({
   query: z.string().min(1).max(512),
   limit: z.number().int().positive().max(25).optional(),
 });
-type CodeSearchInput = z.infer<typeof searchInput>;
+/** W-013: explicit interface - no concrete zod generics in the d.ts. */
+export interface CodeSearchInput {
+  query: string;
+  limit?: number | undefined;
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): the explicit interface must stay MUTUALLY assignable with the
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<W013Equals<CodeSearchInput, z.infer<typeof searchInput>>>;
+type _W013Check2 = W013Assert<W013Equals<CodeExecuteInput, z.infer<typeof executeInput>>>;
 
 /**
  * Build the `code_search` meta-tool. Returns matching `tools.<name>(…)`
@@ -161,7 +173,10 @@ export interface CodeExecuteToolOptions {
 const executeInput = z.object({
   source: z.string().min(1).max(100_000),
 });
-type CodeExecuteInput = z.infer<typeof executeInput>;
+/** W-013: explicit interface - no concrete zod generics in the d.ts. */
+export interface CodeExecuteInput {
+  source: string;
+}
 
 function buildExecuteDescription(
   projection: CodeApiProjection,

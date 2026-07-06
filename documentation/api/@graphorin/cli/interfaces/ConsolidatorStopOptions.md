@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorStopOptions
 
-Defined in: packages/cli/src/commands/consolidator.ts:168
+Defined in: packages/cli/src/commands/consolidator.ts:170
 
 ## Stable
 

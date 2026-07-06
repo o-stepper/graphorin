@@ -123,7 +123,6 @@ export async function runSkillsInspect(
     const print = options.print ?? defaultPrintSink;
     if (match === null) {
       print(brand(`skill '${options.name}' not found in this process registry.`));
-      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
       return;
     }
     print(brand(`skill ${match.id}`));
@@ -135,6 +134,8 @@ export async function runSkillsInspect(
     if (match.installPath !== undefined) print(`  installPath: ${match.installPath}`);
     if (match.publisher !== undefined) print(`  publisher: ${match.publisher}`);
   });
+  // W-002: exit code independent of --json (see runAuditVerify).
+  if (match === null) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
   return match;
 }
 

@@ -6,7 +6,7 @@
 
 # Interface: PruneAuditLogEvent
 
-Defined in: packages/security/src/audit/prune.ts:62
+Defined in: packages/security/src/audit/prune.ts:74
 
 Structured shape of the single log event emitted per prune run.
 
@@ -16,9 +16,9 @@ Structured shape of the single log event emitted per prune run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-before"></a> `before` | `readonly` | `number` | packages/security/src/audit/prune.ts:68 |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | packages/security/src/audit/prune.ts:65 |
-| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | packages/security/src/audit/prune.ts:66 |
-| <a id="property-level"></a> `level` | `readonly` | `"info"` | packages/security/src/audit/prune.ts:63 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/security/src/audit/prune.ts:64 |
-| <a id="property-retain"></a> `retain` | `readonly` | `number` | packages/security/src/audit/prune.ts:67 |
+| <a id="property-before"></a> `before` | `readonly` | `number` | packages/security/src/audit/prune.ts:80 |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | packages/security/src/audit/prune.ts:77 |
+| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | packages/security/src/audit/prune.ts:78 |
+| <a id="property-level"></a> `level` | `readonly` | `"info"` | packages/security/src/audit/prune.ts:75 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/security/src/audit/prune.ts:76 |
+| <a id="property-retain"></a> `retain` | `readonly` | `number` | packages/security/src/audit/prune.ts:79 |

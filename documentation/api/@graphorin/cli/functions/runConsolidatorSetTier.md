@@ -14,7 +14,7 @@ function runConsolidatorSetTier(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:132
+Defined in: packages/cli/src/commands/consolidator.ts:134
 
 ## Parameters
 

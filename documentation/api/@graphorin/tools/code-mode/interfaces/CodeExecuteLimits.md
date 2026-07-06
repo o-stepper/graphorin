@@ -6,7 +6,7 @@
 
 # Interface: CodeExecuteLimits
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:133
+Defined in: packages/tools/src/code-mode/meta-tools.ts:145
 
 Tunable sandbox limits for [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md).
 
@@ -14,6 +14,6 @@ Tunable sandbox limits for [createCodeExecuteTool](/api/@graphorin/tools/code-mo
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-maxmemorymb"></a> `maxMemoryMb?` | `readonly` | `number` | Worker memory ceiling (MB). Omitted ⇒ Node default. | packages/tools/src/code-mode/meta-tools.ts:137 |
-| <a id="property-maxtoolcalls"></a> `maxToolCalls?` | `readonly` | `number` | Ceiling on bridged tool calls per run. Default 64. | packages/tools/src/code-mode/meta-tools.ts:139 |
-| <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Hard wall-clock timeout (ms) for the whole script. Default 30000. | packages/tools/src/code-mode/meta-tools.ts:135 |
+| <a id="property-maxmemorymb"></a> `maxMemoryMb?` | `readonly` | `number` | Worker memory ceiling (MB). Omitted ⇒ Node default. | packages/tools/src/code-mode/meta-tools.ts:149 |
+| <a id="property-maxtoolcalls"></a> `maxToolCalls?` | `readonly` | `number` | Ceiling on bridged tool calls per run. Default 64. | packages/tools/src/code-mode/meta-tools.ts:151 |
+| <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Hard wall-clock timeout (ms) for the whole script. Default 30000. | packages/tools/src/code-mode/meta-tools.ts:147 |

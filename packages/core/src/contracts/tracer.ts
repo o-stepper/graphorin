@@ -1,12 +1,14 @@
 /**
- * Discriminator union for typed observability spans.
+ * Framework-known discriminators for typed observability spans.
  *
  * The list mirrors the span taxonomy documented for the observability
  * layer; concrete implementations live in `@graphorin/observability`.
+ * Promoting a frequently-used custom span kind (see
+ * {@link CustomSpanType}) into this union is an additive minor change.
  *
  * @stable
  */
-export type SpanType =
+export type KnownSpanType =
   | 'agent.run'
   | 'agent.step'
   | 'agent.handoff'
@@ -53,6 +55,32 @@ export type SpanType =
   | 'mcp.connect'
   | 'mcp.call'
   | 'mcp.list-tools';
+
+/**
+ * Namespaced escape hatch for user-defined span kinds (W-126): any
+ * string under the `x.` prefix, e.g. `'x.acme.rerank'`. The prefix
+ * keeps typo-safety for the known literals - `'memory.serch.semantic'`
+ * is still a compile error because it does not start with `x.` -
+ * which is why this is a template-literal type and not `string & {}`.
+ *
+ * Convention: `x.<vendor>.<operation>`. Backends and analytics must
+ * tolerate unknown span-type strings (the same policy events already
+ * follow). When a custom kind becomes common, promote it into
+ * {@link KnownSpanType} (additive minor).
+ *
+ * @stable
+ */
+export type CustomSpanType = `x.${string}`;
+
+/**
+ * Discriminator union for typed observability spans: every
+ * {@link KnownSpanType} literal plus the {@link CustomSpanType}
+ * namespaced escape. Exhaustive switches over `SpanType` need a
+ * default branch for the custom domain.
+ *
+ * @stable
+ */
+export type SpanType = KnownSpanType | CustomSpanType;
 
 /**
  * Status of a finished span. Mirrors the OTel status convention with

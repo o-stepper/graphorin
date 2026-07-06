@@ -15,55 +15,24 @@ A memory-backed agent that:
 2. Streams tokens to your terminal as it answers.
 3. Survives a process restart with all state intact.
 
-## 20-line hello world
+## Hello world
 
-```ts no-check
+One self-contained file. The 20 lines of agent code at the bottom are the
+part you will keep; the `createStubProvider()` above them is a tiny,
+deterministic `Provider` that echoes the last user message - no API keys, no
+network - so the whole thing runs offline. Swap it for a real adapter from
+[Providers](/guide/providers) when you are ready.
+
+```ts
+import type { Provider, ProviderEvent, ProviderRequest } from '@graphorin/core';
+import { zeroUsage } from '@graphorin/core';
 import { createAgent } from '@graphorin/agent';
 import { createMemory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
-import { createStubProvider } from './stub-provider.js'; // defined below
 
-const sqlite = await createSqliteStore({ path: './assistant.db' });
-await sqlite.init();
-
-const memory = createMemory({
-  store: sqlite.memory,
-  embeddings: sqlite.embeddings,
-  embedder: createTransformersJsEmbedder(),
-});
-
-const provider = createProvider(createStubProvider(), {
-  acceptsSensitivity: ['public', 'internal'],
-});
-
-const agent = createAgent({
-  name: 'hello',
-  instructions: 'Be brief and helpful.',
-  provider,
-  memory,
-  tools: memory.tools, // expose the eleven memory tools to the model
-});
-
-for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })) {
-  if (event.type === 'text.delta') process.stdout.write(event.delta);
-}
-
-await sqlite.close();
-```
-
-## The stub provider
-
-`createStubProvider()` is a tiny, deterministic `Provider` that echoes the last
-user message - no API keys, no network. Save it next to the snippet above as
-`stub-provider.ts`:
-
-```ts
-import type { Provider, ProviderEvent, ProviderRequest } from '@graphorin/core';
-import { zeroUsage } from '@graphorin/core';
-
-export function createStubProvider(): Provider {
+function createStubProvider(): Provider {
   const reply = (req: ProviderRequest): string => {
     const last = [...req.messages].reverse().find((m) => m.role === 'user');
     const text =
@@ -100,10 +69,37 @@ export function createStubProvider(): Provider {
     },
   };
 }
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+
+const memory = createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder: createTransformersJsEmbedder(),
+});
+
+const provider = createProvider(createStubProvider(), {
+  acceptsSensitivity: ['public', 'internal'],
+});
+
+const agent = createAgent({
+  name: 'hello',
+  instructions: 'Be brief and helpful.',
+  provider,
+  memory,
+  tools: memory.tools, // expose the eleven memory tools to the model
+});
+
+for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })) {
+  if (event.type === 'text.delta') process.stdout.write(event.delta);
+}
+
+await sqlite.close();
 ```
 
 The runnable [example apps](/guide/examples) ship a fuller version of this same
-stub.
+stub as a standalone `stub-provider.ts` module.
 
 ## What's happening
 
@@ -183,16 +179,26 @@ The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at comp
 
 Passing `tools: memory.tools` (as in the agent above) exposes the eleven memory tools to the model (a twelfth, `deep_recall`, when iterative retrieval is configured) - without it the model has no memory tools to call. You can also drive the same tiers directly from your own code, no agent required:
 
-```ts no-check
+```ts
+import { createMemory } from '@graphorin/memory';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+const memory = createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder: createTransformersJsEmbedder(),
+});
+
 await memory.semantic.remember(
   { userId: 'alex' },
   { text: 'Loves mountain hiking and fresh espresso.' },
 );
 
-const hits = await memory.semantic.search(
-  { userId: 'alex' },
-  'mountain trip ideas',
-);
+const hits = await memory.semantic.search({ userId: 'alex' }, 'mountain trip ideas');
+for (const hit of hits) console.log(hit.record.text, hit.score);
 ```
 
 See [Memory system](/guide/memory-system) for the full tier model and the conflict-resolution pipeline.

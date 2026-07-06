@@ -10,7 +10,7 @@
 function buildRuleOfTwoPolicy(profile): RuleOfTwoCompilation;
 ```
 
-Defined in: packages/security/src/policy/tool-argument-policy.ts:155
+Defined in: packages/security/src/policy/tool-argument-policy.ts:164
 
 Compile a Rule-of-Two profile into an enforceable policy. When the
 profile denies external side effects, the compilation yields a

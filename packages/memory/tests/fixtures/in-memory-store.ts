@@ -787,7 +787,12 @@ export function createInMemoryStore(
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
           if (opts.includeQuarantined !== true && fact.status === 'quarantined') continue;
-          if (opts.asOf !== undefined && !factValidAt(fact, opts.asOf)) continue;
+          // memory-retrieval-01 parity with store-sqlite: default reads
+          // evaluate validity at NOW, so superseded/expired facts are
+          // excluded unless includeSuperseded or an explicit asOf.
+          const validityAt =
+            opts.asOf ?? (opts.includeSuperseded === true ? undefined : new Date().toISOString());
+          if (validityAt !== undefined && !factValidAt(fact, validityAt)) continue;
           // P1-3: lexical match runs against the contextual index text
           // when present (mirrors store-sqlite's facts_fts); the canonical
           // `fact.text` is the fallback for non-contextualized writes.
@@ -821,12 +826,25 @@ export function createInMemoryStore(
         out.sort((a, b) => factOrderEpoch(a) - factOrderEpoch(b));
         return out;
       },
-      async searchVector(scope, embedding, embedderId, topK, _asOf, includeQuarantined) {
+      async searchVector(
+        scope,
+        embedding,
+        embedderId,
+        topK,
+        asOf,
+        includeQuarantined,
+        includeSuperseded,
+      ) {
         const out: Array<MemoryHit<Fact>> = [];
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
           if (includeQuarantined !== true && fact.status === 'quarantined') continue;
+          // memory-retrieval-01 parity: validity at NOW by default (see
+          // the lexical search above).
+          const validityAt =
+            asOf ?? (includeSuperseded === true ? undefined : new Date().toISOString());
+          if (validityAt !== undefined && !factValidAt(fact, validityAt)) continue;
           const vec = factVectors.get(fact.id);
           if (vec === undefined) continue;
           // The default sqlite store gates vector reads by `embedder_id`

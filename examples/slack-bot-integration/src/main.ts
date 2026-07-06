@@ -30,14 +30,7 @@ import { Buffer } from 'node:buffer';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import process from 'node:process';
 import { type Agent, createAgent } from '@graphorin/agent';
-import type {
-  AgentEvent,
-  Provider,
-  RunState,
-  SessionScope,
-  Tool,
-  ToolApproval,
-} from '@graphorin/core';
+import type { AgentEvent, Provider, RunState, SessionScope, ToolApproval } from '@graphorin/core';
 import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, type Memory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
@@ -309,13 +302,13 @@ export async function createSlackBotApp(
   const scope: SessionScope = { userId, sessionId, agentId };
 
   const memory: Memory = createMemory({
-    store: store.memory as never,
+    store: store.memory,
     embeddings: store.embeddings,
     resolveScope: () => scope,
   });
 
   const sessions: SessionManager = createSessionManager({
-    store: store.sessions as unknown as Parameters<typeof createSessionManager>[0]['store'],
+    store: store.sessions,
     memory: memory.session,
   });
 
@@ -344,10 +337,9 @@ export async function createSlackBotApp(
       'an expense; the framework will pause the run for approval when amounts exceed the ' +
       'configured threshold.',
     provider,
-    // The tool runtime carries opaque `TInput` / `TOutput` per-call so
-    // a strongly-typed tool slots into the agent's `Tool<unknown,
-    // unknown, undefined>[]` catalogue with a single structural cast.
-    tools: [expenseTool as unknown as Tool<unknown, unknown, undefined>],
+    // W-100: `AgentConfig.tools` accepts `AnyTool<TDeps>` - a
+    // strongly-typed tool slots in without a cast.
+    tools: [expenseTool],
     memory,
     sessionId,
     userId,

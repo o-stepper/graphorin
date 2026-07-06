@@ -102,8 +102,9 @@ export async function runSecretsGet(options: SecretsGetOptions): Promise<Secrets
     emitReport(options, out, () => {
       const print = options.print ?? defaultPrintSink;
       print(brand(`secret '${options.key}' not found.`));
-      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     });
+    // W-002: exit code independent of --json (see runAuditVerify).
+    process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     return out;
   }
   if (options.reveal === true) {
@@ -228,8 +229,9 @@ export async function runSecretsRef(options: SecretsRefOptions): Promise<Secrets
       print(
         brand(`${statusMarker('fail')} ${parsed.scheme} ref failed: ${(err as Error).message}`),
       );
-      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     });
+    // W-002: exit code independent of --json (see runAuditVerify).
+    process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     return out;
   }
 }

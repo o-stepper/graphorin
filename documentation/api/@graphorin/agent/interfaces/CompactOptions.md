@@ -6,7 +6,7 @@
 
 # Interface: CompactOptions
 
-Defined in: packages/agent/src/types.ts:534
+Defined in: packages/agent/src/types.ts:546
 
 `agent.compact({...})` options.
 
@@ -16,5 +16,5 @@ Defined in: packages/agent/src/types.ts:534
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:536 |
-| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:535 |
+| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:548 |
+| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:547 |

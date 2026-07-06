@@ -10,7 +10,7 @@
 function checkFtsIntegrity(conn): FtsIntegrityReport[];
 ```
 
-Defined in: packages/store-sqlite/src/fts-integrity.ts:59
+Defined in: packages/store-sqlite/src/fts-integrity.ts:76
 
 Count orphaned FTS rows (rowids with no matching base row) for every FTS
 table that exists. An empty array means every FTS index is consistent with

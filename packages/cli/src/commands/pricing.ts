@@ -160,7 +160,6 @@ export function runPricingLookup(options: PricingLookupOptions) {
     const print = options.print ?? defaultPrintSink;
     if (result === null) {
       print(brand(`no pricing entry for ${options.provider}/${options.model}.`));
-      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
       return;
     }
     print(
@@ -169,6 +168,8 @@ export function runPricingLookup(options: PricingLookupOptions) {
       ),
     );
   });
+  // W-002: exit code independent of --json (see runAuditVerify).
+  if (result === null) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
   return result;
 }
 

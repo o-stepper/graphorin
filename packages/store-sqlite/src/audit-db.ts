@@ -2,7 +2,12 @@ import { mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import type { BetterSqlite3Constructor, BetterSqlite3Database } from './connection.js';
 import type { EncryptionConfig } from './encryption/index.js';
-import { CipherPeerMissingError, loadCipherDriver, resolvePassphrase } from './encryption/index.js';
+import {
+  CipherPeerMissingError,
+  cipherSelectionPragmas,
+  loadCipherDriver,
+  resolvePassphrase,
+} from './encryption/index.js';
 
 /**
  * Options for {@link openAuditDatabase}. The audit database is **always
@@ -78,6 +83,16 @@ export async function openAuditDatabase(options: OpenAuditDatabaseOptions): Prom
 
   const passphrase = await resolvePassphrase(encryption);
   const db = new Ctor(absolutePath);
+  // W-110 / CS-7: pin the cipher BEFORE PRAGMA key, exactly like the
+  // main-store openConnection - otherwise `config.audit.cipher` was
+  // silently ignored and every audit.db came out as sqlite3mc's
+  // default. The audit default is 'chacha20' (NOT the main store's
+  // 'sqlcipher'): all pre-fix audit files were created without cipher
+  // pragmas, i.e. in chacha20 format, so pinning chacha20 stays
+  // byte-compatible while 'sqlcipher' would brick every existing file.
+  for (const pragma of cipherSelectionPragmas(encryption.cipher ?? 'chacha20')) {
+    db.pragma(pragma);
+  }
   db.pragma(`key = ${passphrase}`);
   db.pragma('journal_mode = WAL');
   db.pragma('synchronous = NORMAL');

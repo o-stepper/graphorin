@@ -25,7 +25,16 @@ export interface ZodLikeError<_TInput = unknown> {
   readonly name: string;
   readonly message: string;
   readonly issues: ReadonlyArray<{
-    readonly path: ReadonlyArray<string | number>;
+    /**
+     * W-013: `PropertyKey`, not `string | number` - zod 4 bases
+     * `$ZodIssue.path` on `PropertyKey`, and this shim must be a
+     * SUPERSET of both supported peer majors or the canonical
+     * `tool({ inputSchema: z.object({...}) })` fails to typecheck for
+     * every zod@4 consumer. Type-level widening of a produced position
+     * (breaking for downstream code assigning elements to
+     * `string | number`).
+     */
+    readonly path: ReadonlyArray<PropertyKey>;
     readonly message: string;
   }>;
 }
@@ -64,6 +73,10 @@ export function validate<T>(schema: ZodLikeSchema<T>, data: unknown): Validation
 export function validateOrThrow<T>(schema: ZodLikeSchema<T>, data: unknown, what?: string): T {
   const r = validate(schema, data);
   if (r.ok) return r.value;
-  const summary = r.error.issues.map((i) => `${i.path.join('.') || '.'}: ${i.message}`).join('; ');
+  // W-013: `Array.prototype.join` THROWS on symbol elements - map to
+  // String first (zod 4 paths are PropertyKey-based).
+  const summary = r.error.issues
+    .map((i) => `${i.path.map(String).join('.') || '.'}: ${i.message}`)
+    .join('; ');
   throw new TypeError(`graphorin: validation failed${what ? ` for ${what}` : ''}: ${summary}`);
 }

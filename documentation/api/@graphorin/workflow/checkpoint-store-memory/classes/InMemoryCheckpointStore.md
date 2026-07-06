@@ -6,9 +6,9 @@
 
 # Class: InMemoryCheckpointStore
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:35
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:36
 
-Pure in-memory [CheckpointStore](/api/@graphorin/workflow/interfaces/CheckpointStore.md) implementation. Thread-safe
+Pure in-memory CheckpointStore implementation. Thread-safe
 within a single Node.js event loop because every mutation is
 synchronous; concurrent runs that share the same instance will see
 a consistent view.
@@ -17,7 +17,7 @@ a consistent view.
 
 ## Implements
 
-- [`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md)
+- [`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md)
 
 ## Constructors
 
@@ -33,13 +33,49 @@ new InMemoryCheckpointStore(): InMemoryCheckpointStore;
 
 ## Methods
 
+### compactThread()
+
+```ts
+compactThread(
+   threadId, 
+   namespace, 
+keepLast): Promise<number>;
+```
+
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:204
+
+W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `namespace` | `string` |
+| `keepLast` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`compactThread`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#compactthread)
+
+***
+
 ### deleteThread()
 
 ```ts
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:155
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:156
+
+Full erasure primitive: delete every checkpoint and pending write of
+this thread across ALL namespaces. Namespace-blind by contract -
+retention sweeps must use [CheckpointStoreExt.pruneThreads](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
+instead, which is namespace-scoped and protects suspended threads.
 
 #### Parameters
 
@@ -53,7 +89,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:155
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md).[`deleteThread`](/api/@graphorin/workflow/interfaces/CheckpointStore.md#deletethread)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`deleteThread`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#deletethread)
 
 ***
 
@@ -68,7 +104,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:95
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:96
 
 #### Parameters
 
@@ -86,7 +122,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:95
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md).[`getTuple`](/api/@graphorin/workflow/interfaces/CheckpointStore.md#gettuple)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`getTuple`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#gettuple)
 
 ***
 
@@ -99,7 +135,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:119
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:120
 
 #### Parameters
 
@@ -115,7 +151,36 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:119
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md).[`list`](/api/@graphorin/workflow/interfaces/CheckpointStore.md#list)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`list`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#list)
+
+***
+
+### pruneThreads()
+
+```ts
+pruneThreads(opts): Promise<number>;
+```
+
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:175
+
+W-009 retention sweep - parity with the SQLite implementation:
+namespace-SCOPED (entries key as `threadId::namespace`), latest
+checkpoint decides age + status, suspended pairs survive unless
+`onlyTerminal: false`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`PruneThreadsOptions`](/api/@graphorin/core/interfaces/PruneThreadsOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`pruneThreads`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
 
 ***
 
@@ -130,7 +195,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:39
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:40
 
 #### Parameters
 
@@ -148,7 +213,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:39
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md).[`put`](/api/@graphorin/workflow/interfaces/CheckpointStore.md#put)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`put`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#put)
 
 ***
 
@@ -163,7 +228,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:73
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:74
 
 #### Parameters
 
@@ -181,7 +246,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:73
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md).[`putWrites`](/api/@graphorin/workflow/interfaces/CheckpointStore.md#putwrites)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`putWrites`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#putwrites)
 
 ***
 
@@ -191,7 +256,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:73
 size(): number;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:173
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:228
 
 Test-only helper that exposes the raw count of stored checkpoints
 - handy for assertions like "the runtime wrote exactly N

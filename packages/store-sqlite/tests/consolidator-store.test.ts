@@ -150,6 +150,79 @@ describe('SqliteConsolidatorStateStore', () => {
     const empty = await asConsolidator(store).listFailedBatches(scope);
     expect(empty.length).toBe(0);
   });
+
+  it('W-065: pruneRuns deletes old terminal runs, keeps running and fresh ones', async () => {
+    const scope = { userId: 'alex' };
+    const c = asConsolidator(store);
+    await c.recordRunStart({
+      id: 'run-old',
+      scope,
+      triggerKind: 'idle',
+      phase: 'light',
+      startedAt: Date.now() - 100_000,
+    });
+    await c.recordRunFinish({
+      id: 'run-old',
+      status: 'completed',
+      finishedAt: Date.now() - 99_000,
+    });
+    await c.recordRunStart({
+      id: 'run-live',
+      scope,
+      triggerKind: 'idle',
+      phase: 'light',
+      startedAt: Date.now() - 100_000,
+    });
+    await c.recordRunStart({
+      id: 'run-fresh',
+      scope,
+      triggerKind: 'idle',
+      phase: 'light',
+      startedAt: Date.now(),
+    });
+    await c.recordRunFinish({ id: 'run-fresh', status: 'completed', finishedAt: Date.now() });
+
+    const removed = await c.pruneRuns(Date.now() - 50_000);
+    expect(removed).toBe(1);
+    const left = store.connection
+      .all<{ id: string }>('SELECT id FROM consolidator_runs ORDER BY id')
+      .map((r) => r.id);
+    expect(left).toEqual(['run-fresh', 'run-live']);
+  });
+
+  it('W-065: pruneExhaustedBatches deletes only exhausted batches past the cutoff', async () => {
+    const scope = { userId: 'alex' };
+    const c = asConsolidator(store);
+    const mkBatch = async (id: string, exhausted: boolean, failedAt: number): Promise<void> => {
+      await c.enqueueFailedBatch({
+        id,
+        consolidatorRunId: null,
+        scope,
+        messageIds: ['m'],
+        errorKind: 'x',
+        errorMessage: 'x',
+        failedAt,
+        nextRetryAt: Date.now() + 60_000,
+        retryCount: 3,
+        phase: 'deep',
+      });
+      // Exhaustion happens through the production path (nulls next_retry_at).
+      if (exhausted) await c.markBatchExhausted(id, 'retries used up');
+    };
+    await mkBatch('exhausted-old', true, Date.now() - 100_000);
+    await mkBatch('exhausted-fresh', true, Date.now());
+    await mkBatch('retrying-old', false, Date.now() - 100_000);
+
+    const removed = await c.pruneExhaustedBatches(Date.now() - 50_000);
+    expect(removed).toBe(1);
+    const left = store.connection
+      .all<{ id: string }>('SELECT id FROM consolidator_failed_batches ORDER BY id')
+      .map((r) => r.id);
+    expect(left).toEqual(['exhausted-fresh', 'retrying-old']);
+    // The batch awaiting retry is still claimable.
+    const ready = await c.claimReadyBatches(scope, Date.now() + 120_000);
+    expect(ready.map((b) => b.id)).toEqual(['retrying-old']);
+  });
 });
 
 describe('SqliteSessionMemoryStore.listMessagesSince', () => {

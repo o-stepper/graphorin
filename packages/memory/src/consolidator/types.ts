@@ -200,6 +200,14 @@ export interface ConsolidatorConfig {
   /** Upper bound on salient questions reflection asks per pass. Defaults to `3`. */
   readonly reflectionMaxQuestions: number;
   /**
+   * W-082: cap on the unreviewed (quarantined) insight queue. Quarantined
+   * insights are exempt from reflection pass-decay - their decay clock
+   * starts at validation - and this bound keeps the review queue from
+   * growing without limit: beyond it the oldest quarantined insights are
+   * pruned. Defaults to `100`.
+   */
+  readonly reflectionMaxQuarantinedInsights: number;
+  /**
    * Contextual retrieval for facts written by the standard phase (P1-3).
    * `'late-chunk'` (default at every tier) relies on the offline
    * situating-context prefix the shared {@link SemanticMemory} computes
@@ -436,6 +444,8 @@ export interface CreateConsolidatorOptions {
   readonly importanceThreshold?: number;
   /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default (P1-1). */
   readonly reflectionMaxQuestions?: number;
+  /** Override the {@link ConsolidatorConfig.reflectionMaxQuarantinedInsights} default (W-082). */
+  readonly reflectionMaxQuarantinedInsights?: number;
   /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default (P1-3). */
   readonly contextualRetrieval?: ContextualRetrievalMode;
   /** Override the per-tier {@link ConsolidatorConfig.learnedContext} default (D3). */
@@ -467,6 +477,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly reflection: boolean;
       readonly importanceThreshold: number;
       readonly reflectionMaxQuestions: number;
+      readonly reflectionMaxQuarantinedInsights: number;
       readonly contextualRetrieval: ContextualRetrievalMode;
       readonly learnedContext: boolean;
       readonly learnedContextMaxChars: number;
@@ -490,6 +501,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
@@ -511,6 +523,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
@@ -532,6 +545,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
@@ -553,6 +567,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: true,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
@@ -574,6 +589,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,

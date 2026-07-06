@@ -6,7 +6,7 @@
 
 # Interface: SchedulerLike
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:37
+Defined in: packages/memory/src/consolidator/scheduler.ts:50
 
 Subset of the `@graphorin/triggers` Scheduler surface the bridge
 needs. Defined structurally so consumers can inject mocks in
@@ -22,7 +22,7 @@ tests without taking the package dependency.
 register(declaration): Promise<unknown>;
 ```
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:38
+Defined in: packages/memory/src/consolidator/scheduler.ts:51
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/memory/src/consolidator/scheduler.ts:38
 optional unregister(id): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:39
+Defined in: packages/memory/src/consolidator/scheduler.ts:52
 
 #### Parameters
 

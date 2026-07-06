@@ -10,7 +10,7 @@
 function evaluateToolArgumentPolicy(policy, facts): ToolPolicyDecision;
 ```
 
-Defined in: packages/security/src/policy/tool-argument-policy.ts:86
+Defined in: packages/security/src/policy/tool-argument-policy.ts:95
 
 Evaluate a policy against one tool call. Forbid-before-allow: any
 matching `forbid` rule wins immediately; otherwise a matching `allow`

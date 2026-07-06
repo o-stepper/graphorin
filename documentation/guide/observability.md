@@ -115,7 +115,7 @@ const manager = createSessionManager({
 });
 ```
 
-With that wiring, `session.replay()` (no arguments) reproduces the real run instead of emitting only `replay.start` / `replay.end`. Without it, replay falls back to the empty source. Replays are sanitised by default and bound by the configured retention window; the same `spans` table backs the `graphorin memory why` introspection. See [Standalone server](/guide/standalone-server) for the REST surface.
+With that wiring, `session.replay()` (no arguments) reproduces the real run instead of emitting only `replay.start` / `replay.end`. Without it, replay falls back to the empty source. Replays are sanitised by default. The `spans` table grows until you prune it: `graphorin traces prune --before <date>` (or the `pruneSpans` primitive from `@graphorin/store-sqlite`) deletes spans that finished before the cutoff, and a session hard-delete removes that session's spans as part of the erasure cascade; the same `spans` table backs the `graphorin memory why` introspection. See [Standalone server](/guide/standalone-server) for the REST surface.
 
 ## GenAI Semantic Convention attributes
 

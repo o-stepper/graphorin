@@ -6,7 +6,7 @@
 
 # Interface: EmbeddingMetaRegistryLike
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:226
+Defined in: packages/memory/src/internal/storage-adapter.ts:236
 
 Optional extension surface for storage adapters' embedder registry.
 The interface is structural so any adapter that matches the shape
@@ -22,7 +22,7 @@ works.
 assertKnown(id): void;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:237
+Defined in: packages/memory/src/internal/storage-adapter.ts:247
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:237
 get(id): unknown;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:236
+Defined in: packages/memory/src/internal/storage-adapter.ts:246
 
 #### Parameters
 
@@ -65,7 +65,7 @@ listActive(): readonly {
 }[];
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:240
+Defined in: packages/memory/src/internal/storage-adapter.ts:250
 
 #### Returns
 
@@ -85,7 +85,7 @@ listAll(): readonly {
 }[];
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:239
+Defined in: packages/memory/src/internal/storage-adapter.ts:249
 
 #### Returns
 
@@ -104,7 +104,7 @@ registerOrReturn(input): {
 };
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:227
+Defined in: packages/memory/src/internal/storage-adapter.ts:237
 
 #### Parameters
 
@@ -129,7 +129,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:227
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `id` | `string` | packages/memory/src/internal/storage-adapter.ts:235 |
+| `id` | `string` | packages/memory/src/internal/storage-adapter.ts:245 |
 
 ***
 
@@ -139,7 +139,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:227
 retire(id, retiredAt?): void;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:238
+Defined in: packages/memory/src/internal/storage-adapter.ts:248
 
 #### Parameters
 

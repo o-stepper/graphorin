@@ -21,6 +21,17 @@ import type {
  * transport. The id is suitable for use as a registry key and as the
  * operator-facing label in audit rows + trace attributes.
  *
+ * W-016: the id derives ONLY from operator-controlled data (the
+ * transport config) plus the optional operator-supplied
+ * `serverInfoName` override. The name a server self-reports on
+ * `initialize` never participates: every security-relevant surface
+ * keys off this id (TOFU pins, `mcp:<id>:<uri>` handle scoping, taint
+ * labels, audit rows), and a server-controlled id let a rug-pull
+ * server mint a fresh TOFU record by renaming itself, or impersonate a
+ * trusted server's scope by claiming its name. HTTP-family ids include
+ * a non-default port, so localhost:3001 and localhost:3002 are
+ * distinct servers.
+ *
  * @stable
  */
 export function deriveServerIdentity(
@@ -63,7 +74,9 @@ function deriveStreamableHttpIdentity(
   const url = new URL(typeof transport.url === 'string' ? transport.url : transport.url.toString());
   const urlHostname = url.hostname;
   const urlPath = url.pathname.length === 0 ? '/' : url.pathname;
-  const id = serverInfoName ?? `${urlHostname}${urlPath}`;
+  // W-016: `url.host` (hostname:port for non-default ports) - two local
+  // servers on different ports must not collide into one identity.
+  const id = serverInfoName ?? `${url.host}${urlPath}`;
   return Object.freeze({
     kind: 'mcp-streamable-http',
     id,
@@ -77,7 +90,8 @@ function deriveSseIdentity(transport: SseTransportConfig, serverInfoName?: strin
   const url = new URL(typeof transport.url === 'string' ? transport.url : transport.url.toString());
   const urlHostname = url.hostname;
   const urlPath = url.pathname.length === 0 ? '/' : url.pathname;
-  const id = serverInfoName ?? `${urlHostname}${urlPath}`;
+  // W-016: see deriveStreamableHttpIdentity - port-inclusive host.
+  const id = serverInfoName ?? `${url.host}${urlPath}`;
   return Object.freeze({
     kind: 'mcp-sse',
     id,

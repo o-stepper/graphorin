@@ -55,6 +55,66 @@ const ANTHROPIC_HISTORY: ProviderRequest = {
   ],
 };
 
+describe('W-024 - per-block reasoning terminators carry round-trip meta', () => {
+  const MODEL = {
+    provider: 'anthropic',
+    modelId: 'claude-sonnet-4-5',
+    specificationVersion: 'v4',
+  } as const;
+  const REQ: ProviderRequest = { messages: [{ role: 'user', content: 'think' }] };
+
+  function streamOverrides(chunks: ReadonlyArray<AISDKChunk>): VercelRuntimeOverrides {
+    return {
+      streamText: () => chunksToStream(chunks),
+      generateText: async () => ({ text: '' }),
+    };
+  }
+
+  async function collect(adapter: ReturnType<typeof vercelAdapter>) {
+    const out = [];
+    for await (const ev of adapter.stream(REQ)) out.push(ev);
+    return out;
+  }
+
+  it('v4 shape: reasoning deltas + reasoning-signature + redacted-reasoning', async () => {
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: streamOverrides([
+        { type: 'reasoning', textDelta: 'thinking hard' },
+        { type: 'reasoning-signature', signature: 'sig-1' },
+        { type: 'redacted-reasoning', data: 'redacted-blob' },
+        { type: 'text-delta', textDelta: 'answer' },
+        { type: 'finish', finishReason: 'stop', usage: {} },
+      ]),
+    });
+    const events = await collect(adapter);
+    const ends = events.filter((e) => e.type === 'reasoning-end');
+    expect(ends).toHaveLength(2);
+    expect(ends[0]).toMatchObject({ meta: { provider: 'anthropic', signature: 'sig-1' } });
+    expect(ends[1]).toMatchObject({ meta: { provider: 'anthropic', data: 'redacted-blob' } });
+  });
+
+  it('v7 shape: reasoning-start no-op, reasoning-end lifts providerMetadata.anthropic', async () => {
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: streamOverrides([
+        { type: 'reasoning-start', id: 'r1' },
+        { type: 'reasoning-delta', delta: 'block one' },
+        { type: 'reasoning-end', providerMetadata: { anthropic: { signature: 'sig-a' } } },
+        { type: 'reasoning-start', id: 'r2' },
+        { type: 'reasoning-delta', delta: 'block two' },
+        { type: 'reasoning-end', providerMetadata: { anthropic: { signature: 'sig-b' } } },
+        { type: 'finish', finishReason: 'stop', usage: {} },
+      ]),
+    });
+    const events = await collect(adapter);
+    const ends = events.filter((e) => e.type === 'reasoning-end');
+    expect(ends).toHaveLength(2);
+    expect(ends[0]).toMatchObject({ meta: { provider: 'anthropic', signature: 'sig-a' } });
+    expect(ends[1]).toMatchObject({ meta: { provider: 'anthropic', signature: 'sig-b' } });
+    const deltas = events.filter((e) => e.type === 'reasoning-delta');
+    expect(deltas).toHaveLength(2);
+  });
+});
+
 describe('vercelAdapter - reasoningContract auto-detection', () => {
   it('declares round-trip-required for Anthropic Claude models', () => {
     const adapter = vercelAdapter(
@@ -117,6 +177,42 @@ describe('vercelAdapter - reasoning preflight', () => {
     const assistant = messages?.find((m) => m.role === 'assistant');
     const parts = assistant?.content as ReadonlyArray<{ type: string }>;
     expect(parts.some((p) => p.type === 'reasoning')).toBe(true);
+  });
+
+  it('W-024 wire emission: a signed reasoning part reaches the SDK as providerOptions.anthropic.signature', async () => {
+    const capture: { lastArgs?: Record<string, unknown> } = {};
+    const adapter = vercelAdapter(
+      { provider: 'fixture', modelId: 'claude-sonnet-4-5' },
+      { runtimeOverrides: makeOverrides({ capture }) },
+    );
+    const history: ProviderRequest = {
+      messages: [
+        { role: 'user', content: 'go' },
+        {
+          role: 'assistant',
+          content: [
+            {
+              type: 'reasoning',
+              text: 'signed thinking',
+              meta: { provider: 'anthropic', signature: 'sig-wire' },
+            },
+            { type: 'text', text: 'answer' },
+          ],
+        },
+        { role: 'user', content: 'continue' },
+      ],
+    };
+    for await (const _ of adapter.stream(history)) void _;
+    const messages = capture.lastArgs?.messages as
+      | ReadonlyArray<{ role: string; content: unknown }>
+      | undefined;
+    const assistant = messages?.find((m) => m.role === 'assistant');
+    const parts = assistant?.content as ReadonlyArray<{
+      type: string;
+      providerOptions?: { anthropic?: { signature?: string } };
+    }>;
+    const reasoning = parts.find((p) => p.type === 'reasoning');
+    expect(reasoning?.providerOptions?.anthropic?.signature).toBe('sig-wire');
   });
 
   it('o1 adapter (hidden → strip default) drops every reasoning part', async () => {

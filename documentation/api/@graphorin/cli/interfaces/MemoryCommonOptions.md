@@ -19,6 +19,7 @@ Defined in: packages/cli/src/commands/memory.ts:34
 - [`MemoryActivityOptions`](/api/@graphorin/cli/interfaces/MemoryActivityOptions.md)
 - [`MemoryInspectOptions`](/api/@graphorin/cli/interfaces/MemoryInspectOptions.md)
 - [`MemoryMigrateOptions`](/api/@graphorin/cli/interfaces/MemoryMigrateOptions.md)
+- [`MemoryPruneHistoryOptions`](/api/@graphorin/cli/interfaces/MemoryPruneHistoryOptions.md)
 - [`MemoryReviewOptions`](/api/@graphorin/cli/interfaces/MemoryReviewOptions.md)
 - [`MemoryWhyOptions`](/api/@graphorin/cli/interfaces/MemoryWhyOptions.md)
 

@@ -90,6 +90,30 @@ Re-exports [ConsolidatorCommonOptions](/api/@graphorin/cli/interfaces/Consolidat
 
 ***
 
+### ConsolidatorDlqClearOptions
+
+Re-exports [ConsolidatorDlqClearOptions](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearOptions.md)
+
+***
+
+### ConsolidatorDlqClearResult
+
+Re-exports [ConsolidatorDlqClearResult](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearResult.md)
+
+***
+
+### ConsolidatorDlqEntry
+
+Re-exports [ConsolidatorDlqEntry](/api/@graphorin/cli/interfaces/ConsolidatorDlqEntry.md)
+
+***
+
+### ConsolidatorDlqListOptions
+
+Re-exports [ConsolidatorDlqListOptions](/api/@graphorin/cli/interfaces/ConsolidatorDlqListOptions.md)
+
+***
+
 ### ConsolidatorSetTierOptions
 
 Re-exports [ConsolidatorSetTierOptions](/api/@graphorin/cli/interfaces/ConsolidatorSetTierOptions.md)
@@ -237,6 +261,18 @@ Re-exports [MemoryInspectResult](/api/@graphorin/cli/interfaces/MemoryInspectRes
 ### MemoryMigrateOptions
 
 Re-exports [MemoryMigrateOptions](/api/@graphorin/cli/interfaces/MemoryMigrateOptions.md)
+
+***
+
+### MemoryPruneHistoryOptions
+
+Re-exports [MemoryPruneHistoryOptions](/api/@graphorin/cli/interfaces/MemoryPruneHistoryOptions.md)
+
+***
+
+### MemoryPruneHistoryResult
+
+Re-exports [MemoryPruneHistoryResult](/api/@graphorin/cli/interfaces/MemoryPruneHistoryResult.md)
 
 ***
 
@@ -414,6 +450,18 @@ Re-exports [runAuthStatus](/api/@graphorin/cli/functions/runAuthStatus.md)
 
 ***
 
+### runConsolidatorDlqClear
+
+Re-exports [runConsolidatorDlqClear](/api/@graphorin/cli/functions/runConsolidatorDlqClear.md)
+
+***
+
+### runConsolidatorDlqList
+
+Re-exports [runConsolidatorDlqList](/api/@graphorin/cli/functions/runConsolidatorDlqList.md)
+
+***
+
 ### runConsolidatorSetTier
 
 Re-exports [runConsolidatorSetTier](/api/@graphorin/cli/functions/runConsolidatorSetTier.md)
@@ -471,6 +519,12 @@ Re-exports [runMemoryInspect](/api/@graphorin/cli/functions/runMemoryInspect.md)
 ### runMemoryMigrate
 
 Re-exports [runMemoryMigrate](/api/@graphorin/cli/functions/runMemoryMigrate.md)
+
+***
+
+### runMemoryPruneHistory
+
+Re-exports [runMemoryPruneHistory](/api/@graphorin/cli/functions/runMemoryPruneHistory.md)
 
 ***
 

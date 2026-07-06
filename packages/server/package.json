@@ -34,7 +34,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -42,55 +42,55 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./config": {
       "types": "./dist/config.d.ts",
-      "import": "./dist/config.js"
+      "default": "./dist/config.js"
     },
     "./middleware": {
       "types": "./dist/middleware/index.d.ts",
-      "import": "./dist/middleware/index.js"
+      "default": "./dist/middleware/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./registry": {
       "types": "./dist/registry/index.d.ts",
-      "import": "./dist/registry/index.js"
+      "default": "./dist/registry/index.js"
     },
     "./ws": {
       "types": "./dist/ws/index.d.ts",
-      "import": "./dist/ws/index.js"
+      "default": "./dist/ws/index.js"
     },
     "./sse": {
       "types": "./dist/sse/index.d.ts",
-      "import": "./dist/sse/index.js"
+      "default": "./dist/sse/index.js"
     },
     "./commentary": {
       "types": "./dist/commentary/index.d.ts",
-      "import": "./dist/commentary/index.js"
+      "default": "./dist/commentary/index.js"
     },
     "./triggers": {
       "types": "./dist/triggers/index.d.ts",
-      "import": "./dist/triggers/index.js"
+      "default": "./dist/triggers/index.js"
     },
     "./consolidator": {
       "types": "./dist/consolidator/index.d.ts",
-      "import": "./dist/consolidator/index.js"
+      "default": "./dist/consolidator/index.js"
     },
     "./health": {
       "types": "./dist/health/index.d.ts",
-      "import": "./dist/health/index.js"
+      "default": "./dist/health/index.js"
     },
     "./metrics": {
       "types": "./dist/metrics/index.d.ts",
-      "import": "./dist/metrics/index.js"
+      "default": "./dist/metrics/index.js"
     },
     "./replay": {
       "types": "./dist/replay/index.d.ts",
-      "import": "./dist/replay/index.js"
+      "default": "./dist/replay/index.js"
     },
     "./package.json": "./package.json"
   },

@@ -78,6 +78,12 @@ Re-exports [deriveTaintLabel](/api/@graphorin/security/functions/deriveTaintLabe
 
 ***
 
+### isUntrustedTrustClass
+
+Re-exports [isUntrustedTrustClass](/api/@graphorin/security/functions/isUntrustedTrustClass.md)
+
+***
+
 ### TaintFlowKind
 
 Re-exports [TaintFlowKind](/api/@graphorin/security/type-aliases/TaintFlowKind.md)

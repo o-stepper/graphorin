@@ -11,10 +11,11 @@ import type {
   CheckpointId,
   CheckpointMetadata,
   CheckpointPutOptions,
-  CheckpointStore,
+  CheckpointStoreExt,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
+  PruneThreadsOptions,
 } from '@graphorin/core';
 import { CheckpointConflictError } from '@graphorin/core';
 
@@ -32,7 +33,7 @@ interface StoredCheckpoint {
  *
  * @stable
  */
-export class InMemoryCheckpointStore implements CheckpointStore {
+export class InMemoryCheckpointStore implements CheckpointStoreExt {
   #checkpoints = new Map<string, StoredCheckpoint>();
   #threadIndex = new Map<string, string[]>();
 
@@ -163,6 +164,60 @@ export class InMemoryCheckpointStore implements CheckpointStore {
         this.#threadIndex.delete(key);
       }
     }
+  }
+
+  /**
+   * W-009 retention sweep - parity with the SQLite implementation:
+   * namespace-SCOPED (entries key as `threadId::namespace`), latest
+   * checkpoint decides age + status, suspended pairs survive unless
+   * `onlyTerminal: false`.
+   */
+  async pruneThreads(opts: PruneThreadsOptions): Promise<number> {
+    const onlyTerminal = opts.onlyTerminal !== false;
+    let pruned = 0;
+    for (const key of [...this.#threadIndex.keys()]) {
+      const sep = key.indexOf('::');
+      const threadId = key.slice(0, sep);
+      const namespace = key.slice(sep + 2);
+      const ids = this.#threadIndex.get(key) ?? [];
+      const latest = this.#latestStored(threadId, namespace, ids);
+      if (latest === undefined) continue;
+      if (Date.parse(latest.checkpoint.createdAt) >= opts.beforeEpochMs) continue;
+      if (
+        onlyTerminal &&
+        latest.metadata.status !== 'completed' &&
+        latest.metadata.status !== 'failed' &&
+        latest.metadata.status !== 'aborted'
+      ) {
+        continue;
+      }
+      for (const id of ids) {
+        this.#checkpoints.delete(makeKey(threadId, namespace, id));
+      }
+      this.#threadIndex.delete(key);
+      pruned += 1;
+    }
+    return pruned;
+  }
+
+  /** W-009 compaction - keep the `keepLast` newest checkpoints of one pair. */
+  async compactThread(threadId: string, namespace: string, keepLast: number): Promise<number> {
+    const keep = Math.max(1, Math.floor(keepLast));
+    const indexKey = `${threadId}::${namespace}`;
+    const ids = this.#threadIndex.get(indexKey) ?? [];
+    const ordered = [...ids]
+      .map((id) => this.#checkpoints.get(makeKey(threadId, namespace, id)))
+      .filter((s): s is StoredCheckpoint => s !== undefined)
+      .sort((a, b) => b.checkpoint.stepNumber - a.checkpoint.stepNumber);
+    const victims = ordered.slice(keep);
+    for (const victim of victims) {
+      this.#checkpoints.delete(makeKey(threadId, namespace, victim.checkpoint.id));
+    }
+    this.#threadIndex.set(
+      indexKey,
+      ordered.slice(0, keep).map((s) => s.checkpoint.id),
+    );
+    return victims.length;
   }
 
   /**

@@ -70,7 +70,9 @@ export function createMcpResourceReader(opts: McpResourceReaderOptions): ResultR
       let uri = handle;
       let candidates = clients;
       if (scoped !== null) {
-        const serverId = scoped[1] ?? '';
+        // W-140: the id segment is percent-encoded at mint time (ids
+        // carry ':' since W-016 made ports part of the identity).
+        const serverId = decodeURIComponent(scoped[1] ?? '');
         uri = scoped[2] ?? '';
         candidates = clients.filter((c) => c.serverIdentity.id === serverId);
         if (candidates.length === 0) {

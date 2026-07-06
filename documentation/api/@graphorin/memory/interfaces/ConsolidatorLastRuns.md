@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorLastRuns
 
-Defined in: packages/memory/src/consolidator/types.ts:235
+Defined in: packages/memory/src/consolidator/types.ts:243
 
 Per-phase last-run snapshot surfaced inside
 [ConsolidatorStatus.lastRuns](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md#property-lastruns). Each entry carries the
@@ -19,6 +19,6 @@ phase (`undefined` when the phase has never run).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-deep"></a> `deep?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:238 |
-| <a id="property-light"></a> `light?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:236 |
-| <a id="property-standard"></a> `standard?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:237 |
+| <a id="property-deep"></a> `deep?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:246 |
+| <a id="property-light"></a> `light?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:244 |
+| <a id="property-standard"></a> `standard?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:245 |

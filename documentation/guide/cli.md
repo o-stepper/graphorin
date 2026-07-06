@@ -140,7 +140,12 @@ graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedde
 graphorin consolidator status
 graphorin consolidator set-tier standard
 graphorin consolidator stop
+graphorin consolidator dlq-list                       # dead-letter batches, all users
+graphorin consolidator dlq-clear                      # delete EXHAUSTED batches (default)
+graphorin consolidator dlq-clear --before 2026-06-01  # ...older than a cutoff
 ```
+
+`dlq-list` makes the `dead-letter queue: N` warning from `status` actionable: it shows every failed batch (id, user, phase, error kind, retry count, exhausted flag) across all users; narrow with `--user <id>`. `dlq-clear` deletes batches - by default only EXHAUSTED ones (retries used up, `next_retry_at` empty); batches still awaiting retry belong to the automatic retry loop and are only removed with an explicit `--exhausted-only=false`. `--id <id>` clears one batch. Clearing discards the batch payload (the unprocessed message ids) permanently.
 
 > `consolidator set-tier` / `consolidator stop` exit with code `2` (UNSUPPORTED) - there is no runtime control channel into the daemon yet, and the CLI refuses to pretend otherwise (IP-4). To change the tier, edit `consolidator.tier` in the config and restart; to stop consolidation now, stop the server process. `triggers fire` likewise points at the working server route (`POST /v1/triggers/:id/fire`).
 
@@ -160,6 +165,15 @@ graphorin telemetry inspect           # dump the resolved exporter + redaction c
 ```
 
 `status` prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime - there is no way to disable redaction from the CLI.
+
+## `graphorin traces`
+
+```bash
+graphorin traces status                         # span count + time range
+graphorin traces prune --before 2026-06-01      # delete spans that FINISHED before the cutoff
+```
+
+Both operate on the `spans` table written by the SQLite span exporter (the same table that backs `session.replay()` and `graphorin memory why`). `status` reports the row count and the ISO time range of recorded span starts. `prune` deletes spans whose END time is strictly before `--before` (ISO date or epoch milliseconds; the ns conversion happens internally) - including spans not attached to any session, whose only deletion path is age. Session-scoped spans are also removed by the session hard-delete cascade. Put `traces prune` in cron to bound trace growth.
 
 ## Privacy
 

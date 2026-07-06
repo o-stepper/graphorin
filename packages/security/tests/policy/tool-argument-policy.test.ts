@@ -95,6 +95,70 @@ describe('evaluateToolArgumentPolicy - forbid-before-allow', () => {
   });
 });
 
+describe('W-101 - Rule-of-Two untrustedInput leg is enforced', () => {
+  it('a profile denying untrustedInput forbids untrusted-source tools, allows first-party', () => {
+    const c = buildRuleOfTwoPolicy({
+      untrustedInput: false,
+      sensitiveData: true,
+      externalSideEffects: true,
+    });
+    const blocked = evaluateToolArgumentPolicy(c.policy, {
+      toolName: 'web_search',
+      sideEffectClass: 'read-only',
+      untrustedSource: true,
+      args: {},
+    });
+    expect(blocked.effect).toBe('forbid');
+    if (blocked.effect === 'forbid') {
+      expect(blocked.reason).toContain('untrusted input');
+    }
+    const allowed = evaluateToolArgumentPolicy(c.policy, {
+      toolName: 'local_calc',
+      sideEffectClass: 'read-only',
+      untrustedSource: false,
+      args: {},
+    });
+    expect(allowed.effect).toBe('allow');
+    // Bookkeeping surfaces are unchanged.
+    expect(c.heldLegs).toEqual(['sensitive-data', 'external-side-effects']);
+    expect(c.holdsFullTrifecta).toBe(false);
+  });
+
+  it('a profile holding untrustedInput adds no such rule', () => {
+    const c = buildRuleOfTwoPolicy({
+      untrustedInput: true,
+      sensitiveData: false,
+      externalSideEffects: true,
+    });
+    const verdict = evaluateToolArgumentPolicy(c.policy, {
+      toolName: 'web_search',
+      sideEffectClass: 'read-only',
+      untrustedSource: true,
+      args: {},
+    });
+    expect(verdict.effect).toBe('allow');
+  });
+
+  it('forbid-before-allow survives composition with an explicit allow rule', () => {
+    const c = buildRuleOfTwoPolicy({
+      untrustedInput: false,
+      sensitiveData: true,
+      externalSideEffects: true,
+    });
+    const composed = {
+      rules: [...c.policy.rules, { effect: 'allow' as const, tool: 'web_search' }],
+      defaultDenySensitive: c.policy.defaultDenySensitive ?? false,
+    };
+    const verdict = evaluateToolArgumentPolicy(composed, {
+      toolName: 'web_search',
+      sideEffectClass: 'read-only',
+      untrustedSource: true,
+      args: {},
+    });
+    expect(verdict.effect).toBe('forbid');
+  });
+});
+
 describe('buildRuleOfTwoPolicy - capability profiles', () => {
   it('flags the full trifecta and produces no capability floor', () => {
     const c = buildRuleOfTwoPolicy({

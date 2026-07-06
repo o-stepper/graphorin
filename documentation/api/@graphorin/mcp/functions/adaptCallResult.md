@@ -10,7 +10,7 @@
 function adaptCallResult(args): ToolReturn<unknown>;
 ```
 
-Defined in: packages/mcp/src/client/adapt-result.ts:39
+Defined in: packages/mcp/src/client/adapt-result.ts:53
 
 **`Internal`**
 

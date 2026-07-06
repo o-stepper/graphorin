@@ -189,6 +189,7 @@ export function createConsolidatorPlaceholder(
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    reflectionMaxQuarantinedInsights: 100,
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,

@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:187
+Defined in: packages/memory/src/internal/storage-adapter.ts:197
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:216
+Defined in: packages/memory/src/internal/storage-adapter.ts:226
 
 Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -50,7 +50,7 @@ counts instead of `list(...)`-materialising up to 1000 rows.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:64
+Defined in: packages/core/dist/contracts/memory-store.d.ts:86
 
 #### Parameters
 
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:206
+Defined in: packages/memory/src/internal/storage-adapter.ts:216
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -105,7 +105,7 @@ idempotency cursor without rereading already-processed turns.
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:69
+Defined in: packages/core/dist/contracts/memory-store.d.ts:91
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -133,7 +133,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:63
+Defined in: packages/core/dist/contracts/memory-store.d.ts:85
 
 #### Parameters
 
@@ -161,7 +161,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:70
+Defined in: packages/core/dist/contracts/memory-store.d.ts:92
 
 #### Parameters
 
@@ -191,7 +191,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:188
+Defined in: packages/memory/src/internal/storage-adapter.ts:198
 
 #### Parameters
 
@@ -214,7 +214,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:188
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:199
+Defined in: packages/memory/src/internal/storage-adapter.ts:209
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

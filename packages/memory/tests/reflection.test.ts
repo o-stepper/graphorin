@@ -302,7 +302,7 @@ describe('consolidator deep phase - reflection (P1-1)', () => {
     expect(remaining.length).toBe(1);
   });
 
-  it('ExpeL loop: an unretrieved insight decays to the prune floor across passes; a retrieved one survives (MCON-16)', async () => {
+  it('ExpeL loop: an unretrieved VALIDATED insight decays to the prune floor across passes; a retrieved one survives (MCON-16)', async () => {
     const provider = reflectionProvider();
     const { memory, store } = await setup({
       provider,
@@ -310,6 +310,8 @@ describe('consolidator deep phase - reflection (P1-1)', () => {
     });
     const insightStore = store.insights;
     if (insightStore === undefined) throw new Error('expected an insight store');
+    // W-082: pass-decay applies to VALIDATED (active) insights only -
+    // use-it-or-lose-it economics need the row to be usable.
     const seed = (id: string, text: string) =>
       insightStore.insert({
         id,
@@ -319,7 +321,7 @@ describe('consolidator deep phase - reflection (P1-1)', () => {
         cites: ['ep_old'],
         salience: 2,
         provenance: 'reflection',
-        status: 'quarantined',
+        status: 'active',
         sensitivity: 'internal',
         createdAt: T0,
       });
@@ -347,6 +349,79 @@ describe('consolidator deep phase - reflection (P1-1)', () => {
     );
     expect(remaining).not.toContain('ins_idle');
     expect(remaining).toContain('ins_used');
+  });
+
+  it('W-082: a quarantined insight survives any number of passes unvalidated', async () => {
+    const provider = reflectionProvider();
+    const { memory, store } = await setup({
+      provider,
+      consolidatorExtra: { importanceThreshold: 1.0 },
+    });
+    const insightStore = store.insights;
+    if (insightStore === undefined) throw new Error('expected an insight store');
+    await insightStore.insert({
+      id: 'ins_q',
+      kind: 'insight',
+      userId: SCOPE.userId,
+      text: 'Unreviewed synthesis awaiting a human.',
+      cites: ['ep_old'],
+      salience: 2,
+      provenance: 'reflection',
+      status: 'quarantined',
+      sensitivity: 'internal',
+      createdAt: T0,
+    });
+    await seedEpisodes(memory);
+    await memory.consolidator.fireNow('deep', SCOPE);
+    await seedEpisodes(memory, '2026-05-02T03:00:00.000Z');
+    await memory.consolidator.fireNow('deep', SCOPE);
+    await seedEpisodes(memory, '2026-05-03T03:00:00.000Z');
+    await memory.consolidator.fireNow('deep', SCOPE);
+    const remaining = (await memory.insights.list(SCOPE, { includeQuarantined: true })).map(
+      (i) => i.id,
+    );
+    // Three passes (previously: soft-deleted after two) - still there.
+    expect(remaining).toContain('ins_q');
+    const row = (await memory.insights.list(SCOPE, { includeQuarantined: true })).find(
+      (i) => i.id === 'ins_q',
+    );
+    expect(row?.salience).toBe(2);
+  });
+
+  it('W-082: beyond the quarantined-queue cap the OLDEST quarantined insights are pruned', async () => {
+    const provider = reflectionProvider();
+    const { memory, store } = await setup({
+      provider,
+      consolidatorExtra: { importanceThreshold: 1.0, reflectionMaxQuarantinedInsights: 2 },
+    });
+    const insightStore = store.insights;
+    if (insightStore === undefined) throw new Error('expected an insight store');
+    const seed = (id: string, createdAt: string) =>
+      insightStore.insert({
+        id,
+        kind: 'insight',
+        userId: SCOPE.userId,
+        text: `queued ${id}`,
+        cites: ['ep_old'],
+        salience: 2,
+        provenance: 'reflection',
+        status: 'quarantined',
+        sensitivity: 'internal',
+        createdAt,
+      });
+    await seed('ins_oldest', '2026-04-01T00:00:00.000Z');
+    await seed('ins_mid', '2026-04-02T00:00:00.000Z');
+    await seed('ins_newest', '2026-04-03T00:00:00.000Z');
+    await seedEpisodes(memory);
+    await memory.consolidator.fireNow('deep', SCOPE);
+    const remaining = (await memory.insights.list(SCOPE, { includeQuarantined: true })).map(
+      (i) => i.id,
+    );
+    // Cap 2 (+ the pass's own fresh insight, which does not count against
+    // the pre-existing queue): the oldest pre-seeded row is swept.
+    expect(remaining).not.toContain('ins_oldest');
+    expect(remaining).toContain('ins_mid');
+    expect(remaining).toContain('ins_newest');
   });
 
   it('makes no insight + no LLM call below the importance threshold', async () => {

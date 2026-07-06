@@ -1,7 +1,7 @@
 import type { AssistantMessage, Message, ProviderEvent, ProviderRequest } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
-import { createMockProvider } from './fixtures/mock-provider.js';
+import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
 const reasoningScript = (reasoning: string, text: string): { events: ProviderEvent[] } => ({
   events: [
@@ -14,6 +14,86 @@ const reasoningScript = (reasoning: string, text: string): { events: ProviderEve
       usage: { promptTokens: 4, completionTokens: 4, totalTokens: 8, reasoningTokens: 3 },
     },
   ],
+});
+
+describe('W-024 - thinking-block signatures survive to the NEXT step request', () => {
+  it('a signed thinking block round-trips byte-equal onto step 2; two blocks keep both signatures', async () => {
+    const requests: ProviderRequest[] = [];
+    const base = createMockProvider({
+      modelId: 'claude-sonnet-4.5',
+      scripts: [
+        {
+          // Step 1: two signed thinking blocks + a tool call.
+          events: [
+            { type: 'stream-start', metadata: { providerName: 'mock', modelId: 'mock' } },
+            { type: 'reasoning-delta', delta: 'block one thinking' },
+            {
+              type: 'reasoning-end',
+              meta: { provider: 'anthropic', signature: 'sig-block-1' },
+            },
+            { type: 'reasoning-delta', delta: 'block two thinking' },
+            {
+              type: 'reasoning-end',
+              meta: { provider: 'anthropic', signature: 'sig-block-2' },
+            },
+            { type: 'tool-call-start', toolCallId: 'tc-1', toolName: 'noop_lookup' },
+            { type: 'tool-call-end', toolCallId: 'tc-1', finalArgs: {} },
+            {
+              type: 'finish',
+              finishReason: 'tool-calls',
+              usage: { promptTokens: 4, completionTokens: 4, totalTokens: 8 },
+            },
+          ],
+        },
+        textOnlyScript('done'),
+      ],
+    });
+    const claudeProvider = {
+      ...base,
+      capabilities: { ...base.capabilities, reasoningContract: 'round-trip-required' },
+      stream(req: ProviderRequest) {
+        requests.push(req);
+        return base.stream(req);
+      },
+    } as typeof base;
+    const agent = createAgent({
+      name: 'signer',
+      instructions: 'Think.',
+      provider: claudeProvider,
+      tools: [
+        {
+          name: 'noop_lookup',
+          description: 'noop',
+          inputSchema: {
+            parse: (v: unknown) => v,
+            safeParse: (v: unknown) => ({ success: true as const, data: v }),
+            toJSON: () => ({ type: 'object' }),
+          },
+          sideEffectClass: 'read-only',
+          execute: async () => 'ok',
+        } as never,
+      ],
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    expect(requests.length).toBe(2);
+    // The step-2 request's assistant message carries BOTH per-block
+    // reasoning parts with their signatures byte-equal.
+    const assistant = requests[1]?.messages.findLast?.(
+      (m): m is AssistantMessage => m.role === 'assistant',
+    ) as AssistantMessage | undefined;
+    expect(assistant).toBeDefined();
+    const parts = Array.isArray(assistant?.content) ? assistant.content : [];
+    const reasoningParts = parts.filter(
+      (part): part is Extract<(typeof parts)[number], { type: 'reasoning' }> =>
+        part.type === 'reasoning',
+    );
+    expect(reasoningParts).toHaveLength(2);
+    expect(reasoningParts[0]?.meta?.signature).toBe('sig-block-1');
+    expect(reasoningParts[0]?.text).toBe('block one thinking');
+    expect(reasoningParts[1]?.meta?.signature).toBe('sig-block-2');
+    expect(reasoningParts[1]?.text).toBe('block two thinking');
+  });
 });
 
 describe('Agent - intra-loop reasoning preservation (RB-42)', () => {

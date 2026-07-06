@@ -302,6 +302,11 @@ export interface ToolArgumentPolicyGuard {
     readonly toolName: string;
     readonly sideEffectClass: SideEffectClass;
     readonly sensitive: boolean;
+    /**
+     * Trust class of the tool under evaluation (W-101) - lets guards
+     * enforce trust-taxonomy rules (Rule-of-Two `untrustedInput`).
+     */
+    readonly trustClass: ToolTrustClass;
     readonly args: unknown;
   }): { readonly effect: 'allow' } | { readonly effect: 'forbid'; readonly reason: string };
 }

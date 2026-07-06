@@ -6,7 +6,7 @@
 
 # Interface: LayerConfig
 
-Defined in: packages/memory/src/context-engine/engine.ts:95
+Defined in: packages/memory/src/context-engine/engine.ts:99
 
 Per-layer cap configuration. Mirrors the documented
 `ContextEngineConfig.layers.*` fields.
@@ -17,5 +17,5 @@ Per-layer cap configuration. Mirrors the documented
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/engine.ts:97 |
-| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:96 |
+| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/engine.ts:101 |
+| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:100 |

@@ -41,9 +41,17 @@
  */
 
 import { execFileSync, execSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -128,13 +136,63 @@ for (const pkg of packages) {
     execFileSync(publintBin, [tarball, '--strict'], { stdio: 'pipe', encoding: 'utf8' });
   });
   leg(`attw:${pkg.name}`, () => {
-    // `--profile esm-only` gates what the packages currently CLAIM
-    // (import-only export maps). The require() condition is W-072,
-    // scheduled next wave - once it lands, tighten this to
-    // `--profile node16` so CJS resolution is gated too.
-    execFileSync(attwBin, ['--profile', 'esm-only', tarball], { stdio: 'pipe', encoding: 'utf8' });
+    // W-072: the export maps now end in a `default` condition, so CJS
+    // consumers resolve too (require(esm), Node >= 22.12) - gate the
+    // full node16 matrix instead of the old esm-only claim.
+    // `cjs-resolves-to-esm` is ignored BY DESIGN: attw's model predates
+    // stable require(esm) and flags exactly the state we ship (a
+    // require() that resolves to an ESM file). The runtime
+    // `require-esm-smoke` leg below proves the real behaviour instead.
+    // Tarball FIRST: --ignore-rules is variadic and would swallow it.
+    execFileSync(
+      attwBin,
+      [tarball, '--profile', 'node16', '--ignore-rules', 'cjs-resolves-to-esm'],
+      { stdio: 'pipe', encoding: 'utf8' },
+    );
   });
 }
+
+// ------------------------------------------------- d.ts zod-generic scan
+// W-013: the published d.ts must never bake CONCRETE zod generics
+// (`z.ZodObject<...>`, `z.ZodEnum<...>`) - those are version-specific
+// shapes that fail typechecking under the other supported zod major.
+// Public schema positions go through the structural `ZodLikeSchema`.
+leg('dts-no-concrete-zod-generics', () => {
+  const offenders = [];
+  for (const pkg of packages) {
+    // Scope: packages where zod is a PEER (consumer-supplied version).
+    // Packages that ship zod as a direct dependency (protocol, server)
+    // resolve their d.ts against their OWN pinned zod - concrete
+    // generics there cannot mismatch the consumer's major (the zod4
+    // tsc leg proves it).
+    const manifest = JSON.parse(readFileSync(join(pkg.dir, 'package.json'), 'utf8'));
+    if (manifest.peerDependencies?.zod === undefined) continue;
+    const distDir = join(pkg.dir, 'dist');
+    if (!existsSync(distDir)) continue;
+    const stack = [distDir];
+    while (stack.length > 0) {
+      const dir = stack.pop();
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          stack.push(full);
+          continue;
+        }
+        if (!entry.name.endsWith('.d.ts')) continue;
+        const text = readFileSync(full, 'utf8');
+        // Type positions only: `: z.ZodX<` / `z.ZodObject<{`.
+        if (/z\.Zod\w+</.test(text)) {
+          offenders.push(relative(ROOT, full));
+        }
+      }
+    }
+  }
+  if (offenders.length > 0) {
+    throw new Error(
+      `concrete zod generics leaked into published d.ts (W-013):\n  ${offenders.join('\n  ')}`,
+    );
+  }
+});
 
 // -------------------------------------------- scratch consumer (one-shot)
 const consumerDir = join(scratch, 'consumer');
@@ -170,6 +228,25 @@ leg('consumer-install', () => {
   // typescript + the zod-3 baseline ride along in the same call.
   specs.push('typescript@~5.9.0', 'zod@^3.25.0');
   npmInstall(consumerDir, specs, 'consumer-install');
+});
+
+// W-072: the `default` exports condition makes the packages consumable
+// from CommonJS via require(esm) on Node >= 22.12. Smoke it for real -
+// a runtime require of the installed tarball, not a type-level claim.
+leg('require-esm-smoke', () => {
+  const cjsFile = join(consumerDir, 'require-smoke.cjs');
+  writeFileSync(
+    cjsFile,
+    [
+      "const core = require('@graphorin/core');",
+      "if (typeof core.validate !== 'function') throw new Error('require(@graphorin/core) missing validate');",
+      "const tools = require('@graphorin/tools');",
+      "if (typeof tools.tool !== 'function') throw new Error('require(@graphorin/tools) missing tool');",
+      "console.log('require-esm ok');",
+      '',
+    ].join('\n'),
+  );
+  execFileSync(process.execPath, [cjsFile], { cwd: consumerDir, stdio: 'pipe', encoding: 'utf8' });
 });
 
 // ------------------------------------------------------------- tsc matrix

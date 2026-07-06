@@ -7,27 +7,10 @@
 # Function: createReadResultTool()
 
 ```ts
-function createReadResultTool(opts): Tool<{
-  endLine?: number;
-  handle: string;
-  length?: number;
-  maxBytes?: number;
-  offset?: number;
-  startLine?: number;
-}, {
-  bytes: number;
-  content: string;
-  eof: boolean;
-  producerSensitivity?: string;
-  producerSource?: objectOutputType<{
-     kind: ZodString;
-  }, ZodTypeAny, "passthrough">;
-  producerTrustClass?: string;
-  totalBytes: number;
-}>;
+function createReadResultTool(opts): Tool<ReadResultInput, ReadResultOutput>;
 ```
 
-Defined in: packages/tools/src/built-in/read-result.ts:61
+Defined in: packages/tools/src/built-in/read-result.ts:85
 
 Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md).
 
@@ -39,23 +22,6 @@ Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/to
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `endLine?`: `number`;
-  `handle`: `string`;
-  `length?`: `number`;
-  `maxBytes?`: `number`;
-  `offset?`: `number`;
-  `startLine?`: `number`;
-\}, \{
-  `bytes`: `number`;
-  `content`: `string`;
-  `eof`: `boolean`;
-  `producerSensitivity?`: `string`;
-  `producerSource?`: `objectOutputType`\<\{
-     `kind`: `ZodString`;
-  \}, `ZodTypeAny`, `"passthrough"`\>;
-  `producerTrustClass?`: `string`;
-  `totalBytes`: `number`;
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ReadResultInput`, `ReadResultOutput`\&gt;
 
 ## Stable

@@ -18,6 +18,7 @@ sidecar table for efficient listing.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-nodename"></a> `nodeName?` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:44 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | Session this checkpoint's state belongs to, when known (W-005). The agent runtime stamps it on every HITL-suspend write so a session hard-delete can cascade into `workflow_checkpoints` / `workflow_pending_writes` without parsing the opaque state blob. Optional and additive: third-party stores may ignore it, but any store that also implements `SessionStoreExt.deleteSession` should use it to honour the full erasure contract. | packages/core/src/contracts/checkpoint-store.ts:55 |
 | <a id="property-source"></a> `source` | `readonly` | `"sync"` \| `"exit"` | Durability mode that produced this write. The legacy `'async'` value was removed (workflow-14 / WF-7 - it was byte-identical to `'sync'`); adapters normalize legacy persisted rows to `'sync'` at read time. | packages/core/src/contracts/checkpoint-store.ts:42 |
 | <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | - | packages/core/src/contracts/checkpoint-store.ts:43 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/core/src/contracts/checkpoint-store.ts:45 |

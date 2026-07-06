@@ -19,7 +19,7 @@
 
 import type {
   AuthTokenStore,
-  CheckpointStore,
+  CheckpointStoreExt,
   MemoryStoreExt,
   OAuthServerStore,
   SessionStoreExt,
@@ -74,6 +74,7 @@ import {
 } from './embedding-meta-repo.js';
 import {
   CipherPeerMissingError,
+  cipherSelectionPragmas,
   type EncryptionCipher,
   type EncryptionConfig,
   loadCipherDriver,
@@ -97,11 +98,18 @@ import {
   type SqliteMemoryWriteOptions,
 } from './memory-store.js';
 import { listMigrations, type Migration, registerMigration } from './migrations/registry.js';
-import { type AppliedMigration, runMigrations } from './migrations/runner.js';
+import { type AppliedMigration, pendingMigrations, runMigrations } from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
-import { SqliteSessionStore } from './session-store.js';
+import {
+  SESSION_SCOPED_PURGES,
+  SESSION_TABLE_EXEMPTIONS,
+  type SessionScopedPurge,
+  SqliteSessionStore,
+} from './session-store.js';
 import {
   createSqliteSpanExporter,
+  deleteSpansForSession,
+  pruneSpans,
   SPAN_SESSION_ATTRIBUTE,
   traceSourceForSession,
 } from './span-store.js';
@@ -183,7 +191,7 @@ export interface CreateSqliteStoreOptions {
  */
 export interface GraphorinSqliteStore {
   readonly memory: MemoryStoreExt;
-  readonly checkpoints: CheckpointStore;
+  readonly checkpoints: CheckpointStoreExt;
   readonly sessions: SessionStoreExt;
   readonly triggers: TriggerStore;
   readonly authTokens: AuthTokenStore;
@@ -323,10 +331,12 @@ export {
   type ConsolidatorStateRow,
   // FTS integrity (CS-10)
   checkFtsIntegrity,
+  cipherSelectionPragmas,
   // span persistence (RP-17)
   createSqliteSpanExporter,
   type DlqBatchInput,
   type DlqBatchRow,
+  deleteSpansForSession,
   EmbedderLockOnFirstError,
   // embedder registry
   type EmbedderPolicy,
@@ -351,12 +361,17 @@ export {
   type PassphraseResolver,
   type PendingConflictInput,
   type PendingConflictRow,
+  pendingMigrations,
+  pruneSpans,
   type RegisterEmbedderInput,
   readPragma,
   readWalSize,
   registerMigration,
   resolvePassphrase,
   runMigrations,
+  SESSION_SCOPED_PURGES,
+  SESSION_TABLE_EXEMPTIONS,
+  type SessionScopedPurge,
   SPAN_SESSION_ATTRIBUTE,
   SqliteAuthTokenStore,
   SqliteBusyError,

@@ -33,7 +33,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -41,19 +41,19 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./connection": {
       "types": "./dist/connection.d.ts",
-      "import": "./dist/connection.js"
+      "default": "./dist/connection.js"
     },
     "./migrations": {
       "types": "./dist/migrations/index.d.ts",
-      "import": "./dist/migrations/index.js"
+      "default": "./dist/migrations/index.js"
     },
     "./encryption": {
       "types": "./dist/encryption/index.d.ts",
-      "import": "./dist/encryption/index.js"
+      "default": "./dist/encryption/index.js"
     },
     "./package.json": "./package.json"
   },

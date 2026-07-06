@@ -165,7 +165,18 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
           if (typeof semantic.get === 'function') {
             const candidateFact = await semantic.get(row.factId);
             if (candidateFact !== null) {
-              await semantic.supersede(conflictingId, candidateFact, judge.reason);
+              if (candidateFact.status === 'quarantined') {
+                // W-019: a quarantined candidate must not close the
+                // active fact's interval - the knowledge would vanish
+                // from default recall until (if ever) validation.
+                // Record the pending link; SemanticMemory.validate
+                // completes the closure on promotion.
+                if (typeof semantic.linkPendingSupersede === 'function') {
+                  await semantic.linkPendingSupersede(row.factId, conflictingId);
+                }
+              } else {
+                await semantic.supersede(conflictingId, candidateFact, judge.reason);
+              }
               factsUpdated += 1;
             }
           }

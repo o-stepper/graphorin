@@ -6,7 +6,7 @@
 
 # Interface: CheckpointPutOptions
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:99
+Defined in: packages/core/src/contracts/checkpoint-store.ts:109
 
 Optional atomicity contract for [CheckpointStore.put](/api/@graphorin/core/interfaces/CheckpointStore.md#put) (D1 /
 workflow-01). When `expectedLatestId` is supplied, the store MUST
@@ -24,4 +24,4 @@ the engine backstops with its own pre-check.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | packages/core/src/contracts/checkpoint-store.ts:100 |
+| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | packages/core/src/contracts/checkpoint-store.ts:110 |

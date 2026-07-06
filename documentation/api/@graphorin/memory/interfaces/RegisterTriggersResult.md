@@ -6,7 +6,7 @@
 
 # Interface: RegisterTriggersResult
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:99
+Defined in: packages/memory/src/consolidator/scheduler.ts:112
 
 Outcome of [registerConsolidatorTriggers](/api/@graphorin/memory/functions/registerConsolidatorTriggers.md).
 
@@ -16,5 +16,5 @@ Outcome of [registerConsolidatorTriggers](/api/@graphorin/memory/functions/regis
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-registered"></a> `registered` | `readonly` | readonly \{ `id`: `string`; `kind`: `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"`; `raw`: `string`; \}[] | packages/memory/src/consolidator/scheduler.ts:100 |
-| <a id="property-skipped"></a> `skipped` | `readonly` | readonly \{ `raw`: `string`; `reason`: `"unsupported-by-scheduler"` \| `"filtered-out"`; \}[] | packages/memory/src/consolidator/scheduler.ts:105 |
+| <a id="property-registered"></a> `registered` | `readonly` | readonly \{ `id`: `string`; `kind`: `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"`; `raw`: `string`; \}[] | packages/memory/src/consolidator/scheduler.ts:113 |
+| <a id="property-skipped"></a> `skipped` | `readonly` | readonly \{ `raw`: `string`; `reason`: `"unsupported-by-scheduler"` \| `"filtered-out"`; \}[] | packages/memory/src/consolidator/scheduler.ts:118 |

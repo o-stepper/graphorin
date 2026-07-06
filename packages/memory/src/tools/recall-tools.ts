@@ -28,8 +28,23 @@ const recallEpisodesOutputSchema = z.object({
   ),
 });
 
-type RecallEpisodesInput = z.infer<typeof recallEpisodesInputSchema>;
-type RecallEpisodesOutput = z.infer<typeof recallEpisodesOutputSchema>;
+/** W-013: explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
+export interface RecallEpisodesInput {
+  query: string;
+  topK?: number | undefined;
+  dateRange?: { from?: string | undefined; to?: string | undefined } | undefined;
+}
+export interface RecallEpisodeHit {
+  episodeId: string;
+  summary: string;
+  score: number;
+  startedAt: string;
+  endedAt: string;
+  provenance?: string | undefined;
+}
+export interface RecallEpisodesOutput {
+  episodes: RecallEpisodeHit[];
+}
 
 const conversationSearchInputSchema = z.object({
   query: z.string().min(1).max(1024),
@@ -44,8 +59,13 @@ const conversationSearchOutputSchema = z.object({
   ),
 });
 
-type ConversationSearchInput = z.infer<typeof conversationSearchInputSchema>;
-type ConversationSearchOutput = z.infer<typeof conversationSearchOutputSchema>;
+export interface ConversationSearchInput {
+  query: string;
+  topK?: number | undefined;
+}
+export interface ConversationSearchOutput {
+  matches: Array<{ messageId: string; score: number }>;
+}
 
 const deepRecallSensitivityEnum = z.enum(['public', 'internal', 'secret']);
 const deepRecallInputSchema = z.object({
@@ -80,8 +100,48 @@ const deepRecallOutputSchema = z.object({
   iterations: z.number().int(),
 });
 
-type DeepRecallInput = z.infer<typeof deepRecallInputSchema>;
-type DeepRecallOutput = z.infer<typeof deepRecallOutputSchema>;
+export interface DeepRecallInput {
+  query: string;
+  topK?: number | undefined;
+  maxIterations?: number | undefined;
+  asOf?: string | undefined;
+}
+export interface DeepRecallHit {
+  factId: string;
+  text: string;
+  score: number;
+  sensitivity: 'public' | 'internal' | 'secret';
+  provenance?: string | undefined;
+  validTo?: string | undefined;
+  supersededBy?: string | undefined;
+}
+export interface DeepRecallOutput {
+  hits: DeepRecallHit[];
+  sufficient: boolean;
+  abstained: boolean;
+  graded: boolean;
+  iterations: number;
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): each explicit interface must stay MUTUALLY assignable with its
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<
+  W013Equals<RecallEpisodesInput, z.infer<typeof recallEpisodesInputSchema>>
+>;
+type _W013Check2 = W013Assert<
+  W013Equals<RecallEpisodesOutput, z.infer<typeof recallEpisodesOutputSchema>>
+>;
+type _W013Check3 = W013Assert<
+  W013Equals<ConversationSearchInput, z.infer<typeof conversationSearchInputSchema>>
+>;
+type _W013Check4 = W013Assert<
+  W013Equals<ConversationSearchOutput, z.infer<typeof conversationSearchOutputSchema>>
+>;
+type _W013Check5 = W013Assert<W013Equals<DeepRecallInput, z.infer<typeof deepRecallInputSchema>>>;
+type _W013Check6 = W013Assert<W013Equals<DeepRecallOutput, z.infer<typeof deepRecallOutputSchema>>>;
 
 /**
  * `recall_episodes` - triple-signal episode retrieval (recency ×

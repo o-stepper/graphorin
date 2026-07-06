@@ -6,7 +6,7 @@
 
 # Interface: TracesPruneResult
 
-Defined in: packages/cli/src/commands/traces.ts:90
+Defined in: packages/cli/src/commands/traces.ts:103
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/cli/src/commands/traces.ts:90
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cutoff"></a> `cutoff` | `readonly` | `string` | packages/cli/src/commands/traces.ts:92 |
-| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/cli/src/commands/traces.ts:91 |
+| <a id="property-cutoff"></a> `cutoff` | `readonly` | `string` | packages/cli/src/commands/traces.ts:105 |
+| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/cli/src/commands/traces.ts:104 |

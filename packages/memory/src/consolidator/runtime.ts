@@ -272,6 +272,7 @@ class ConsolidatorImpl implements Consolidator {
       reflection: preset.reflection,
       importanceThreshold: preset.importanceThreshold,
       reflectionMaxQuestions: preset.reflectionMaxQuestions,
+      reflectionMaxQuarantinedInsights: preset.reflectionMaxQuarantinedInsights,
       contextualRetrieval: preset.contextualRetrieval,
     });
     this.#budget.reconfigure({
@@ -785,6 +786,7 @@ class ConsolidatorImpl implements Consolidator {
         importanceThreshold: this.#config.importanceThreshold,
         reflectionWatermark: priorWatermark,
         maxQuestions: this.#config.reflectionMaxQuestions,
+        maxQuarantinedInsights: this.#config.reflectionMaxQuarantinedInsights,
         now: this.#now,
         ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
       });
@@ -917,6 +919,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     reflection: opts.reflection ?? preset.reflection,
     importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
     reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,
+    reflectionMaxQuarantinedInsights:
+      opts.reflectionMaxQuarantinedInsights ?? preset.reflectionMaxQuarantinedInsights,
     contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
     learnedContext: opts.learnedContext ?? preset.learnedContext,
     learnedContextMaxChars: opts.learnedContextMaxChars ?? preset.learnedContextMaxChars,

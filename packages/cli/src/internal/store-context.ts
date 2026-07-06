@@ -17,6 +17,7 @@ import {
   type CreateSqliteStoreOptions,
   createSqliteStore,
   type GraphorinSqliteStore,
+  pendingMigrations,
 } from '@graphorin/store-sqlite';
 
 import { loadConfig } from './load-config.js';
@@ -43,6 +44,19 @@ export interface OpenStoreContextOptions {
    * against an initialized schema.
    */
   readonly skipInit?: boolean;
+  /**
+   * W-068: what to do about pending schema migrations.
+   *
+   * - `'apply'` (default, the historical behaviour): run `store.init()`,
+   *   which applies every pending migration.
+   * - `'check'`: do NOT migrate. Read-only commands use this so a newer
+   *   CLI never silently upgrades the schema of a database a running
+   *   (older) server owns; when the schema is behind, the command fails
+   *   with an actionable message instead.
+   *
+   * Ignored when `skipInit` is `true`.
+   */
+  readonly migrationPolicy?: 'apply' | 'check';
 }
 
 /**
@@ -94,7 +108,31 @@ export async function openStoreContext(
   }
   const store = await factory(storeOpts);
   if (options.skipInit !== true) {
-    await store.init();
+    if (options.migrationPolicy === 'check') {
+      // Read-only commands must not auto-migrate a live server's
+      // database (W-068). Compare the applied set against this build's
+      // bundle; refuse with a recipe when the schema is behind. The
+      // helper reads sqlite_master first, so a foreign database is not
+      // marked by creating schema_migrations.
+      let pendingCount = 0;
+      try {
+        pendingCount = pendingMigrations(store.connection).length;
+      } catch {
+        // A store without a raw connection (test fakes) has nothing to
+        // check - treat as up to date.
+        pendingCount = 0;
+      }
+      if (pendingCount > 0) {
+        await store.close();
+        throw new Error(
+          `[graphorin/cli] the database schema is ${pendingCount} migration(s) behind this CLI. ` +
+            'This is a read-only command and will not upgrade a live database. ' +
+            "Run 'graphorin migrate' (with the server stopped) or use a CLI version matching the server.",
+        );
+      }
+    } else {
+      await store.init();
+    }
   }
 
   let pepper: SecretValue | undefined;

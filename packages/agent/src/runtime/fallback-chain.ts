@@ -212,12 +212,20 @@ export async function* runProviderFallbackChain<TOutput>(
       modelSucceeded = true;
       textBuffer = evState.textBuffer;
       finalCalls = evState.finalCalls;
-      // Materialize the streamed reasoning deltas into a
-      // single `ReasoningContent` part. Adapters that expose
-      // structured reasoning blocks may emit multiple
-      // deltas; v0.1 collapses them into one part - Phase
-      // 06 owns the per-block structure when it lands.
-      if (evState.reasoningBuffer.length > 0) {
+      // W-024: adapters with per-block structure ('reasoning-end'
+      // terminators) produce reasoningParts carrying the provider's
+      // round-trip meta (thinking signatures) - use them as-is, plus a
+      // meta-less tail for any deltas after the last terminator. The
+      // single-part collapse remains the fallback for adapters without
+      // block structure (ollama, openai-shaped, llamacpp).
+      if (evState.reasoningParts.length > 0) {
+        stepReasoningParts = [
+          ...evState.reasoningParts,
+          ...(evState.reasoningBuffer.length > 0
+            ? [{ type: 'reasoning' as const, text: evState.reasoningBuffer }]
+            : []),
+        ];
+      } else if (evState.reasoningBuffer.length > 0) {
         stepReasoningParts = [
           {
             type: 'reasoning',

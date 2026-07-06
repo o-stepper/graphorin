@@ -6,7 +6,7 @@
 
 # Interface: ToolDefinitionExample
 
-Defined in: packages/core/src/contracts/provider.ts:255
+Defined in: packages/core/src/contracts/provider.ts:265
 
 A single worked example as projected onto the provider wire contract -
 a serializable, schema-agnostic view of a `ToolExample`. `input` /
@@ -19,6 +19,6 @@ optional rationale shown to the model.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-comment"></a> `comment?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:258 |
-| <a id="property-input"></a> `input` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:256 |
-| <a id="property-output"></a> `output` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:257 |
+| <a id="property-comment"></a> `comment?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:268 |
+| <a id="property-input"></a> `input` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:266 |
+| <a id="property-output"></a> `output` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:267 |

@@ -16,7 +16,8 @@ type ImperativePatternName =
   | "developer-mode"
   | "jailbreak-marker"
   | "tool-call-injection"
-  | "role-tag-injection";
+  | "role-tag-injection"
+  | "untrusted-content-delimiter-injection";
 ```
 
 Defined in: packages/observability/src/redaction/imperative-patterns.ts:30

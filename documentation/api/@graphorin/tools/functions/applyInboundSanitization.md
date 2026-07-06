@@ -10,7 +10,7 @@
 function applyInboundSanitization(opts): SanitizationOutcome;
 ```
 
-Defined in: packages/tools/src/inbound/sanitize.ts:87
+Defined in: packages/tools/src/inbound/sanitize.ts:93
 
 Apply the per-policy inbound sanitization.
 

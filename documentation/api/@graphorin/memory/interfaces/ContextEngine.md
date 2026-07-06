@@ -6,7 +6,7 @@
 
 # Interface: ContextEngine
 
-Defined in: packages/memory/src/context-engine/engine.ts:253
+Defined in: packages/memory/src/memory-interface.ts:55
 
 Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextEngine.md) instance returned by
 [createContextEngine](/api/@graphorin/memory/functions/createContextEngine.md).
@@ -21,7 +21,7 @@ Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextE
 assemble(memory, input): Promise<AssembledPrompt>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:255
+Defined in: packages/memory/src/memory-interface.ts:57
 
 Assemble the layered system prompt for a single step.
 
@@ -29,7 +29,7 @@ Assemble the layered system prompt for a single step.
 
 | Parameter | Type |
 | ------ | ------ |
-| `memory` | [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md) |
+| `memory` | [`Memory`](/api/@graphorin/memory/interfaces/Memory.md) |
 | `input` | [`AssembleInput`](/api/@graphorin/memory/interfaces/AssembleInput.md) |
 
 #### Returns
@@ -51,7 +51,7 @@ compactNow(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:286
+Defined in: packages/memory/src/memory-interface.ts:88
 
 Run a compaction call. Phase 12 calls this when the trigger
 fires (`source: 'auto-trigger'`) or the operator invokes
@@ -61,9 +61,9 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `input` | \{ `agentId`: `string`; `memory`: [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md); `messages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `prefixMessages?`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `preserveRecentTurns?`: `number`; `procedural?`: \{ `tags?`: readonly `string`[]; `topic?`: `string`; \}; `runId`: `string`; `scope`: [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md); `sessionId`: `string`; `signal?`: `AbortSignal`; `source`: [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md); `summarizer?`: [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md); \} | - |
+| `input` | \{ `agentId`: `string`; `memory`: [`Memory`](/api/@graphorin/memory/interfaces/Memory.md); `messages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `prefixMessages?`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `preserveRecentTurns?`: `number`; `procedural?`: \{ `tags?`: readonly `string`[]; `topic?`: `string`; \}; `runId`: `string`; `scope`: [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md); `sessionId`: `string`; `signal?`: `AbortSignal`; `source`: [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md); `summarizer?`: [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md); \} | - |
 | `input.agentId` | `string` | - |
-| `input.memory` | [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md) | - |
+| `input.memory` | [`Memory`](/api/@graphorin/memory/interfaces/Memory.md) | - |
 | `input.messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
 | `input.prefixMessages?` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | The caller's pinned system prefix - the messages EXCLUDED from `messages` before this call (context-engine-04). Used only for accounting: the anti-thrash guard and the "still above threshold" warning must compare against the FULL post-splice context (prefix + summary + preserved + essentials), or a real system prompt defeats the guard and a summarizer call fires every step at the context edge. Never compacted, never returned. |
 | `input.preserveRecentTurns?` | `number` | Per-call override of the strategy's preserve-recent count (CE-3). |
@@ -96,7 +96,7 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 config(): ResolvedContextEngineConfig;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:316
+Defined in: packages/memory/src/memory-interface.ts:118
 
 Resolved configuration snapshot.
 
@@ -112,7 +112,7 @@ Resolved configuration snapshot.
 shouldCompact(messages, options?): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:266
+Defined in: packages/memory/src/memory-interface.ts:68
 
 Trigger evaluation primitive used by Phase 12 (agent runtime)
 at the top of every step. Returns `true` when the in-flight

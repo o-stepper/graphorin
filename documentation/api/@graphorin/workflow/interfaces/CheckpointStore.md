@@ -6,7 +6,7 @@
 
 # Interface: CheckpointStore
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:117
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:127
 
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
@@ -21,7 +21,12 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:122
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:138
+
+Full erasure primitive: delete every checkpoint and pending write of
+this thread across ALL namespaces. Namespace-blind by contract -
+retention sweeps must use [CheckpointStoreExt.pruneThreads](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
+instead, which is namespace-scoped and protects suspended threads.
 
 #### Parameters
 
@@ -46,7 +51,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:120
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:130
 
 #### Parameters
 
@@ -73,7 +78,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:121
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:131
 
 #### Parameters
 
@@ -100,7 +105,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:118
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:128
 
 #### Parameters
 
@@ -129,7 +134,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:119
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:129
 
 #### Parameters
 

@@ -57,6 +57,7 @@ export { createEncryptedConnection } from './connection.js';
 export {
   type EncryptDatabaseOptions,
   type EncryptDatabaseResult,
+  EncryptSwapLiveWriterError,
   encryptDatabase,
 } from './encrypt.js';
 export { type CipherIntegrityCheckResult, cipherIntegrityCheck } from './integrity-check.js';

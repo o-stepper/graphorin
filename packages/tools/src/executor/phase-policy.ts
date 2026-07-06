@@ -38,6 +38,7 @@ export function runArgumentPolicyPhase(
     toolName: tool.name,
     sideEffectClass: tool.__sideEffectClass,
     sensitive: tool.sensitivity === 'secret',
+    trustClass: tool.__trustClass,
     args: validatedInput,
   });
   if (decision.effect === 'forbid') {

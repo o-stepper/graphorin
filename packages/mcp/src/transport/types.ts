@@ -78,22 +78,31 @@ export interface SseTransportConfig {
 export type ServerIdentity =
   | {
       readonly kind: 'mcp-stdio';
+      /** Transport-derived id (W-016) - see the union TSDoc. */
       readonly id: string;
       readonly command: string;
       readonly argsHash: string;
       readonly serverInfoName?: string;
+      /** Self-reported `serverInfo.name` - display/logs ONLY, never identity. */
+      readonly reportedServerName?: string;
     }
   | {
       readonly kind: 'mcp-streamable-http';
+      /** Transport-derived id including a non-default port (W-016). */
       readonly id: string;
       readonly urlHostname: string;
       readonly urlPath: string;
       readonly serverInfoName?: string;
+      /** Self-reported `serverInfo.name` - display/logs ONLY, never identity. */
+      readonly reportedServerName?: string;
     }
   | {
       readonly kind: 'mcp-sse';
+      /** Transport-derived id including a non-default port (W-016). */
       readonly id: string;
       readonly urlHostname: string;
       readonly urlPath: string;
       readonly serverInfoName?: string;
+      /** Self-reported `serverInfo.name` - display/logs ONLY, never identity. */
+      readonly reportedServerName?: string;
     };

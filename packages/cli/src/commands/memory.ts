@@ -273,6 +273,8 @@ export async function runMemoryInspect(
   options: MemoryInspectOptions,
 ): Promise<MemoryInspectResult> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -471,6 +473,8 @@ export async function runMemoryActivity(
 ): Promise<MemoryActivityResult> {
   const limit = Math.max(1, options.limit ?? 20);
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {

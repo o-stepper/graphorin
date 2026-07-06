@@ -24,7 +24,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "scripts": {
     "dev": "echo \"no dev entry for this package\" && exit 0",

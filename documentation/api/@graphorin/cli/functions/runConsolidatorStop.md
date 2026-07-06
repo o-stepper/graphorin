@@ -13,7 +13,7 @@ function runConsolidatorStop(options?): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:171
+Defined in: packages/cli/src/commands/consolidator.ts:173
 
 ## Parameters
 

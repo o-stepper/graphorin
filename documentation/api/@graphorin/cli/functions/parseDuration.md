@@ -10,7 +10,7 @@
 function parseDuration(input): number;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:338
+Defined in: packages/cli/src/commands/token.ts:340
 
 **`Internal`**
 

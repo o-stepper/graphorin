@@ -106,60 +106,78 @@ export async function pruneAudit(
   if (!Number.isFinite(beforeMs)) {
     throw new RangeError(`pruneAudit: 'before' must be finite; got ${String(options.before)}.`);
   }
+  // W-011: the delete+rewrite MUST be one write transaction. Without
+  // the fence, an append racing the rewrite loop hashes against a
+  // pre-prune tip and the chain verifies broken FOREVER after. A prune
+  // that cannot be made atomic is worse than no prune - fail closed.
+  if (db.transact === undefined) {
+    throw new Error(
+      `pruneAudit: the '${db.binding}' audit-db binding does not implement transact(), ` +
+        'so the prune cannot run atomically against live appends. Upgrade the binding ' +
+        '(the default @graphorin/store-sqlite binding implements it) or stop all writers first.',
+    );
+  }
   const retain = Math.max(1, options.retain ?? 1);
-  const total = await db.count();
-  if (total === 0) return Object.freeze({ deleted: 0 });
-
-  // Collect candidate seqs while respecting the retain floor. We
-  // walk the iterator twice - once to identify the threshold and
-  // once to find the first surviving entry - so we never have to
-  // load the entire chain into memory.
-  let lastQualifyingSeq: number | undefined;
-  let walked = 0;
-  for await (const entry of db.iterate()) {
-    walked += 1;
-    if (entry.ts >= beforeMs) break;
-    if (total - walked < retain) break;
-    lastQualifyingSeq = entry.seq;
-  }
-  if (lastQualifyingSeq === undefined) return Object.freeze({ deleted: 0 });
-
-  const deleted = await db.deleteUpTo(lastQualifyingSeq);
-
-  // Reroot the surviving chain at the genesis prev-hash. Every
-  // surviving entry's `prevHash` (and consequently its `hash`) is
-  // recomputed so `verifyAuditChain` keeps reporting a clean chain
-  // on the trimmed log. The cryptographic link to the deleted prefix
-  // is severed by design - that is the documented retention contract.
-  //
-  // The rewrite is BATCHED (W-062): `iterate()` may hold a live
-  // statement on the underlying connection (the shipped
-  // better-sqlite3 binding does), and writing through the same
-  // connection while an iterator is open throws
-  // "This database connection is busy executing a query". Collect a
-  // bounded batch, let the iterator CLOSE (the early `break`
-  // propagates return() through the generator), then rewrite; memory
-  // stays bounded by the batch size instead of the chain length.
-  let prevHash = GENESIS_PREV_HASH;
-  let firstSurviving: StoredAuditEntry | undefined;
-  let fromSeq = 0;
-  for (;;) {
-    const batch: StoredAuditEntry[] = [];
-    for await (const entry of db.iterate({ fromSeq })) {
-      batch.push(entry);
-      if (batch.length >= REWRITE_BATCH_SIZE) break;
+  const { deleted, firstSurviving } = await db.transact(async () => {
+    const total = await db.count();
+    if (total === 0) {
+      return { deleted: 0, firstSurviving: undefined as StoredAuditEntry | undefined };
     }
-    if (batch.length === 0) break;
-    for (const entry of batch) {
-      const rewritten = withRehashedChain(entry, prevHash);
-      await db.replaceEntry(rewritten);
-      if (firstSurviving === undefined) firstSurviving = rewritten;
-      prevHash = rewritten.hash;
+
+    // Collect candidate seqs while respecting the retain floor. We
+    // walk the iterator twice - once to identify the threshold and
+    // once to find the first surviving entry - so we never have to
+    // load the entire chain into memory.
+    let lastQualifyingSeq: number | undefined;
+    let walked = 0;
+    for await (const entry of db.iterate()) {
+      walked += 1;
+      if (entry.ts >= beforeMs) break;
+      if (total - walked < retain) break;
+      lastQualifyingSeq = entry.seq;
     }
-    const lastInBatch = batch[batch.length - 1];
-    if (lastInBatch === undefined) break;
-    fromSeq = lastInBatch.seq + 1;
-  }
+    if (lastQualifyingSeq === undefined) {
+      return { deleted: 0, firstSurviving: undefined as StoredAuditEntry | undefined };
+    }
+
+    const removed = await db.deleteUpTo(lastQualifyingSeq);
+
+    // Reroot the surviving chain at the genesis prev-hash. Every
+    // surviving entry's `prevHash` (and consequently its `hash`) is
+    // recomputed so `verifyAuditChain` keeps reporting a clean chain
+    // on the trimmed log. The cryptographic link to the deleted prefix
+    // is severed by design - that is the documented retention contract.
+    //
+    // The rewrite is BATCHED (W-062): `iterate()` may hold a live
+    // statement on the underlying connection (the shipped
+    // better-sqlite3 binding does), and writing through the same
+    // connection while an iterator is open throws
+    // "This database connection is busy executing a query". Collect a
+    // bounded batch, let the iterator CLOSE (the early `break`
+    // propagates return() through the generator), then rewrite; memory
+    // stays bounded by the batch size instead of the chain length.
+    let prevHash = GENESIS_PREV_HASH;
+    let first: StoredAuditEntry | undefined;
+    let fromSeq = 0;
+    for (;;) {
+      const batch: StoredAuditEntry[] = [];
+      for await (const entry of db.iterate({ fromSeq })) {
+        batch.push(entry);
+        if (batch.length >= REWRITE_BATCH_SIZE) break;
+      }
+      if (batch.length === 0) break;
+      for (const entry of batch) {
+        const rewritten = withRehashedChain(entry, prevHash);
+        await db.replaceEntry(rewritten);
+        if (first === undefined) first = rewritten;
+        prevHash = rewritten.hash;
+      }
+      const lastInBatch = batch[batch.length - 1];
+      if (lastInBatch === undefined) break;
+      fromSeq = lastInBatch.seq + 1;
+    }
+    return { deleted: removed, firstSurviving: first };
+  });
 
   const result: PruneAuditResult = Object.freeze({
     deleted,

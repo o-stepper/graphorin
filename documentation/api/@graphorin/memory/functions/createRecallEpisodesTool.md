@@ -7,26 +7,10 @@
 # Function: createRecallEpisodesTool()
 
 ```ts
-function createRecallEpisodesTool(deps): Tool<{
-  dateRange?: {
-     from?: string;
-     to?: string;
-  };
-  query: string;
-  topK?: number;
-}, {
-  episodes: {
-     endedAt: string;
-     episodeId: string;
-     provenance?: string;
-     score: number;
-     startedAt: string;
-     summary: string;
-  }[];
-}>;
+function createRecallEpisodesTool(deps): Tool<RecallEpisodesInput, RecallEpisodesOutput>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:92
+Defined in: packages/memory/src/tools/recall-tools.ts:152
 
 `recall_episodes` - triple-signal episode retrieval (recency ×
 relevance × importance).
@@ -39,22 +23,6 @@ relevance × importance).
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `dateRange?`: \{
-     `from?`: `string`;
-     `to?`: `string`;
-  \};
-  `query`: `string`;
-  `topK?`: `number`;
-\}, \{
-  `episodes`: \{
-     `endedAt`: `string`;
-     `episodeId`: `string`;
-     `provenance?`: `string`;
-     `score`: `number`;
-     `startedAt`: `string`;
-     `summary`: `string`;
-  \}[];
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`RecallEpisodesInput`, `RecallEpisodesOutput`\&gt;
 
 ## Stable

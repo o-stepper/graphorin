@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:479
+Defined in: packages/memory/src/internal/storage-adapter.ts:489
 
 Optional consolidator-state surface every storage adapter exposes
 for Phase 10c. Mirrors the `consolidator_state`,
@@ -30,7 +30,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:489
+Defined in: packages/memory/src/internal/storage-adapter.ts:499
 
 Atomically claim the per-scope lock. Returns `true` when the
 row was either unlocked, owned by `runId`, or stale (the held
@@ -62,7 +62,7 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:517
+Defined in: packages/memory/src/internal/storage-adapter.ts:527
 
 Claim every DLQ row whose `nextRetryAt` is at or before `now`,
 up to `limit`. Returns the rows in failed-at order so the
@@ -88,7 +88,7 @@ oldest backlog drains first.
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:511
+Defined in: packages/memory/src/internal/storage-adapter.ts:521
 
 #### Parameters
 
@@ -110,7 +110,7 @@ getState(scope): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:480
+Defined in: packages/memory/src/internal/storage-adapter.ts:490
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:480
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:540
+Defined in: packages/memory/src/internal/storage-adapter.ts:550
 
 #### Parameters
 
@@ -163,7 +163,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:494
+Defined in: packages/memory/src/internal/storage-adapter.ts:504
 
 #### Parameters
 
@@ -197,7 +197,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:539
+Defined in: packages/memory/src/internal/storage-adapter.ts:549
 
 Mark the row exhausted (`retryCount` exceeded the configured
 cap). The row stays in the DLQ for operator inspection.
@@ -227,7 +227,7 @@ exhaustion.
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:523
+Defined in: packages/memory/src/internal/storage-adapter.ts:533
 
 Mark the row succeeded - removes it from the DLQ.
 
@@ -249,7 +249,7 @@ Mark the row succeeded - removes it from the DLQ.
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:493
+Defined in: packages/memory/src/internal/storage-adapter.ts:503
 
 #### Parameters
 
@@ -269,7 +269,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:493
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:492
+Defined in: packages/memory/src/internal/storage-adapter.ts:502
 
 #### Parameters
 
@@ -289,7 +289,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:492
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:490
+Defined in: packages/memory/src/internal/storage-adapter.ts:500
 
 #### Parameters
 
@@ -313,7 +313,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:529
+Defined in: packages/memory/src/internal/storage-adapter.ts:539
 
 Schedule the next retry attempt. The caller computes
 `nextRetryAt` so the backoff schedule is centralized in the
@@ -339,7 +339,7 @@ consolidator.
 upsertState(scope, patch): Promise<ConsolidatorStateRow>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:481
+Defined in: packages/memory/src/internal/storage-adapter.ts:491
 
 #### Parameters
 

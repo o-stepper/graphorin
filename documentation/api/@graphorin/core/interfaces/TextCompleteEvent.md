@@ -6,7 +6,7 @@
 
 # Interface: TextCompleteEvent
 
-Defined in: packages/core/src/types/agent-event.ts:77
+Defined in: packages/core/src/types/agent-event.ts:82
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:77
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/core/src/types/agent-event.ts:79 |
-| <a id="property-type"></a> `type` | `readonly` | `"text.complete"` | packages/core/src/types/agent-event.ts:78 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/core/src/types/agent-event.ts:84 |
+| <a id="property-type"></a> `type` | `readonly` | `"text.complete"` | packages/core/src/types/agent-event.ts:83 |

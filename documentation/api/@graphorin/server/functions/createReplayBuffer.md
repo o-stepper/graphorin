@@ -10,7 +10,7 @@
 function createReplayBuffer(options?): ReplayBuffer;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:63
+Defined in: packages/server/src/ws/replay-buffer.ts:82
 
 Build an in-memory replay buffer.
 

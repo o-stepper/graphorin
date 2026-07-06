@@ -6,6 +6,8 @@ import { createSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 
 import {
+  runConsolidatorDlqClear,
+  runConsolidatorDlqList,
   runConsolidatorSetTier,
   runConsolidatorStatus,
   runConsolidatorStop,
@@ -26,8 +28,17 @@ async function fixture(): Promise<string> {
 }
 
 describe('graphorin consolidator', () => {
-  it('status returns zeroed counters on a fresh DB', async () => {
+  it('status returns zeroed counters on a fresh (migrated) DB', async () => {
     const cfg = await fixture();
+    // W-068: `consolidator status` runs with migrationPolicy 'check' and
+    // never migrates - initialize the schema first.
+    {
+      const dbPath = JSON.parse(await (await import('node:fs/promises')).readFile(cfg, 'utf8'))
+        .storage.path as string;
+      const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+      await store.init();
+      await store.close();
+    }
     const out = await runConsolidatorStatus({ config: cfg, print: () => undefined });
     expect(out.recentRuns).toBe(0);
     expect(out.dlqSize).toBe(0);
@@ -104,5 +115,75 @@ describe('graphorin consolidator', () => {
     expect(out.unsupported).toBe(true);
     expect(process.exitCode).toBe(2);
     process.exitCode = before;
+  });
+});
+
+describe('graphorin consolidator dlq (W-065)', () => {
+  async function dlqFixture(): Promise<string> {
+    const cfg = await fixture();
+    const dbPath = JSON.parse(await (await import('node:fs/promises')).readFile(cfg, 'utf8'))
+      .storage.path as string;
+    const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+    await store.init();
+    const insert = (
+      id: string,
+      userId: string,
+      nextRetryAt: number | null,
+      failedAt: number,
+    ): void => {
+      store.connection.run(
+        `INSERT INTO consolidator_failed_batches (
+           id, consolidator_run_id, scope_user_id, message_ids_json, error_kind,
+           error_message, failed_at, next_retry_at, retry_count, phase
+         ) VALUES (?, NULL, ?, '["m1"]', 'llm_error', 'boom', ?, ?, 3, 'deep')`,
+        [id, userId, failedAt, nextRetryAt],
+      );
+    };
+    insert('b-exhausted-alex', 'alex', null, Date.now() - 60_000);
+    insert('b-retrying-alex', 'alex', Date.now() + 60_000, Date.now() - 60_000);
+    insert('b-exhausted-kim', 'kim', null, Date.now() - 60_000);
+    await store.close();
+    return cfg;
+  }
+
+  it('dlq list shows batches across users with the exhausted flag; --user narrows', async () => {
+    const cfg = await dlqFixture();
+    const all = await runConsolidatorDlqList({ config: cfg, print: () => undefined });
+    expect(all.length).toBe(3);
+    const exhausted = all.filter((e) => e.exhausted).map((e) => e.id);
+    expect(exhausted.sort()).toEqual(['b-exhausted-alex', 'b-exhausted-kim']);
+    const alexOnly = await runConsolidatorDlqList({
+      config: cfg,
+      user: 'alex',
+      print: () => undefined,
+    });
+    expect(alexOnly.map((e) => e.userId)).toEqual(['alex', 'alex']);
+  });
+
+  it('dlq clear defaults to exhausted-only and leaves batches awaiting retry', async () => {
+    const cfg = await dlqFixture();
+    const out = await runConsolidatorDlqClear({ config: cfg, print: () => undefined });
+    expect(out.removed).toBe(2);
+    const left = await runConsolidatorDlqList({ config: cfg, print: () => undefined });
+    expect(left.map((e) => e.id)).toEqual(['b-retrying-alex']);
+  });
+
+  it('dlq clear --id removes one batch; --user narrows the sweep', async () => {
+    const cfg = await dlqFixture();
+    const one = await runConsolidatorDlqClear({
+      config: cfg,
+      id: 'b-exhausted-kim',
+      print: () => undefined,
+    });
+    expect(one.removed).toBe(1);
+    const scoped = await runConsolidatorDlqClear({
+      config: cfg,
+      user: 'alex',
+      exhaustedOnly: false,
+      print: () => undefined,
+    });
+    expect(scoped.removed).toBe(2);
+    const left = await runConsolidatorDlqList({ config: cfg, print: () => undefined });
+    expect(left).toEqual([]);
   });
 });

@@ -6,7 +6,7 @@
 
 # Interface: MemoryActivityEvent
 
-Defined in: packages/cli/src/commands/memory.ts:426
+Defined in: packages/cli/src/commands/memory.ts:428
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/cli/src/commands/memory.ts:426
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:431 |
-| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:429 |
-| <a id="property-memoryid"></a> `memoryId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:428 |
-| <a id="property-memorykind"></a> `memoryKind` | `readonly` | `string` | packages/cli/src/commands/memory.ts:427 |
-| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:430 |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:433 |
+| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:431 |
+| <a id="property-memoryid"></a> `memoryId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:430 |
+| <a id="property-memorykind"></a> `memoryKind` | `readonly` | `string` | packages/cli/src/commands/memory.ts:429 |
+| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:432 |

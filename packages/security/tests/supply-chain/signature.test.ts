@@ -181,6 +181,64 @@ describe('@graphorin/security/supply-chain - signature verifier', () => {
       expect(result.reason).toContain('untrusted-key');
     });
 
+    it('W-026 SPOOF: a self-signed inline key claiming a trusted publisher is REJECTED', async () => {
+      // The attacker generates their own keypair, sets
+      // `publisher: trusted.example.com` (unsigned frontmatter!) and
+      // inlines their public key. Pre-fix this passed a
+      // publishers-only trust root.
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'trusted.example.com',
+        publicKeyRef: { url: 'https://trusted.example.com/.well-known/graphorin-skill-pubkey.pem' },
+      });
+      const inlinePem = publicKeyPem.replace(/\n/g, '\n      ');
+      const inlineReplacement = `${[
+        '  publicKeyRef:',
+        '    kind: inline',
+        `    publicKeyPem: |\n      ${inlinePem.trim()}`,
+      ].join('\n')}$1`;
+      const skillMdInline = skillMd.replace(/ {2}publicKeyRef:[\s\S]*?(\n---)/u, inlineReplacement);
+      const result = await verifySkillSignature({
+        skillMd: skillMdInline,
+        trustRoot: { publishers: ['trusted.example.com'] },
+      });
+      expect(result.valid).toBe(false);
+      if (!result.valid) {
+        expect(result.reason).toContain('untrusted-key');
+      }
+    });
+
+    it('W-102 BINDING: a well-known key hosted off the publisher domain is rejected at resolve', async () => {
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'trusted.example.com',
+        publicKeyRef: { url: 'https://evil.example.org/.well-known/graphorin-skill-pubkey.pem' },
+      });
+      _setPublicKeyFetcherForTesting(async () => publicKeyPem);
+      await expect(
+        verifySkillSignature({
+          skillMd,
+          trustRoot: { publishers: ['trusted.example.com'] },
+        }),
+      ).rejects.toThrow(/does not belong to publisher/);
+    });
+
+    it('W-102: a subdomain of the publisher passes the host binding', async () => {
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'trusted.example.com',
+        publicKeyRef: {
+          url: 'https://keys.trusted.example.com/.well-known/graphorin-skill-pubkey.pem',
+        },
+      });
+      _setPublicKeyFetcherForTesting(async () => publicKeyPem);
+      const result = await verifySkillSignature({
+        skillMd,
+        trustRoot: { publishers: ['trusted.example.com'] },
+      });
+      expect(result.valid).toBe(true);
+    });
+
     it('accepts a valid signature whose publisher is in the trust root', async () => {
       const { skillMd, publicKeyPem } = buildSignedSkill({
         name: 'pdf-processing',

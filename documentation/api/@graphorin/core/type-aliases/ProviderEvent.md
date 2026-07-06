@@ -17,6 +17,10 @@ type ProviderEvent =
   type: "reasoning-delta";
 }
   | {
+  meta?: ReasoningContentMeta;
+  type: "reasoning-end";
+}
+  | {
   delta: string;
   type: "text-delta";
 }
@@ -60,5 +64,140 @@ Defined in: packages/core/src/contracts/provider.ts:170
 
 Streamed provider event. Shape matches the wire-stable subset of the
 provider event union - adapters hide vendor specifics.
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  metadata: ResponseMetadata;
+  type: "stream-start";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  delta: string;
+  type: "reasoning-delta";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  meta?: ReasoningContentMeta;
+  type: "reasoning-end";
+}
+```
+
+Closes the current reasoning block (W-024). Deltas stay textual;
+this terminator carries the provider's opaque round-trip metadata
+(e.g. the Anthropic thinking-block `signature`, or `data` for a
+redacted block) so multi-step tool use with extended thinking can
+replay the block byte-equal on the next request. Adapters without
+per-block structure simply never emit it - consumers fall back to
+collapsing the deltas.
+
+***
+
+### Type Literal
+
+```ts
+{
+  delta: string;
+  type: "text-delta";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  toolCallId: string;
+  toolName: string;
+  type: "tool-call-start";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  argsDelta: string;
+  toolCallId: string;
+  type: "tool-call-input-delta";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  finalArgs: unknown;
+  toolCallId: string;
+  type: "tool-call-end";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  data: Uint8Array;
+  mimeType: string;
+  type: "file";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  title?: string;
+  type: "source";
+  uri: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  finishReason: FinishReason;
+  type: "finish";
+  usage: Usage;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  error: ProviderError;
+  type: "error";
+}
+```
 
 ## Stable

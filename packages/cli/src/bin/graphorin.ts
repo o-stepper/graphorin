@@ -41,6 +41,8 @@ import {
   runAuthRefresh,
   runAuthRevoke,
   runAuthStatus,
+  runConsolidatorDlqClear,
+  runConsolidatorDlqList,
   runConsolidatorSetTier,
   runConsolidatorStatus,
   runConsolidatorStop,
@@ -184,7 +186,7 @@ function registerLifecycleCommands(program: Command): void {
   program
     .command('init')
     .description(
-      '[Bootstrap] Generate a fresh graphorin.config.ts and a one-shot bootstrap admin token.',
+      '[Bootstrap] Generate a fresh graphorin.config.ts + the server pepper (mint tokens afterwards with token create).',
     )
     .option('-o, --out <path>', 'Output path; defaults to ./graphorin.config.ts.')
     .option('--non-interactive', 'Accept defaults / env vars without prompting.', false)
@@ -529,7 +531,7 @@ function registerStorageCommands(program: Command): void {
     )
     .option(
       '--swap',
-      'Atomically swap the encrypted output into the storage path; original kept under .bak.<ts>.',
+      'Atomically swap the encrypted output into the storage path (REQUIRES a stopped server - refused when another process holds the DB); original kept under .bak.<ts>.',
     )
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(
@@ -837,6 +839,49 @@ function registerConsolidatorCommands(program: Command): void {
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });
     });
+  c.command('dlq-list')
+    .description('List dead-letter batches (all users; narrow with --user).')
+    .option('--user <id>', 'Only batches scoped to this user id.')
+    .option('--limit <n>', 'Maximum rows to list.', '100')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { user?: string; limit?: string; config?: string; json?: boolean }) => {
+      await runConsolidatorDlqList({
+        ...(opts.user !== undefined ? { user: opts.user } : {}),
+        ...(opts.limit !== undefined ? { limit: Number(opts.limit) } : {}),
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
+  c.command('dlq-clear')
+    .description(
+      'Delete dead-letter batches. Default: only EXHAUSTED batches (retries used up); batches awaiting retry need --exhausted-only=false.',
+    )
+    .option('--exhausted-only [bool]', 'Only exhausted batches (default true).', 'true')
+    .option('--before <date>', 'Only batches that failed before this ISO date / epoch ms.')
+    .option('--id <id>', 'Clear one batch by id.')
+    .option('--user <id>', 'Only batches scoped to this user id.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (opts: {
+        exhaustedOnly?: string | boolean;
+        before?: string;
+        id?: string;
+        user?: string;
+        config?: string;
+        json?: boolean;
+      }) => {
+        await runConsolidatorDlqClear({
+          exhaustedOnly: String(opts.exhaustedOnly ?? 'true') !== 'false',
+          ...(opts.before !== undefined ? { before: opts.before } : {}),
+          ...(opts.id !== undefined ? { id: opts.id } : {}),
+          ...(opts.user !== undefined ? { user: opts.user } : {}),
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
 }
 
 function registerTriggersCommands(program: Command): void {
@@ -1101,9 +1146,9 @@ function registerSkillsCommands(program: Command): void {
 }
 
 function registerTracesCommands(program: Command): void {
-  const t = program.command('traces').description('[Diagnostics] Operate on the trace cache.');
+  const t = program.command('traces').description('[Diagnostics] Operate on persisted spans.');
   t.command('status')
-    .description('Count rows + report TTL config.')
+    .description('Count persisted spans + report their time range.')
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { config?: string; json?: boolean }) => {
@@ -1113,8 +1158,11 @@ function registerTracesCommands(program: Command): void {
       });
     });
   t.command('prune')
-    .description('Manual TTL enforcement (cutoff is required).')
-    .requiredOption('--before <date>', 'ISO date / epoch ms cutoff.')
+    .description('Delete spans that FINISHED before the cutoff (cutoff is required).')
+    .requiredOption(
+      '--before <date>',
+      'ISO date / epoch ms cutoff (spans ending strictly before it are deleted).',
+    )
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { before: string; config?: string; json?: boolean }) => {

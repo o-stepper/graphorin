@@ -59,10 +59,18 @@ uses the `'wrap'` default).
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:323
+Defined in: packages/sessions/src/facade.ts:331
 
-Hard-delete a session and cascade its handoffs / workflow runs / audit rows
-(RP-6). Message rows are owned by the memory store; purge them separately.
+Hard-delete a session (RP-6). The cascade removes the session's
+bookkeeping (handoffs, workflow-run attachments, audit rows), the
+checkpoints of suspended runs linked to it (W-005), AND its content:
+messages and episodes with their FTS/vector index rows plus the full
+registry of session-scoped surfaces (facts, insights, rules, working
+blocks, spans, consolidator state - see `SESSION_SCOPED_PURGES` in
+`@graphorin/store-sqlite`). No separate purge step is required.
+Delegates to [SessionStoreExt.deleteSession](/api/@graphorin/core/interfaces/SessionStoreExt.md#deletesession); authors of custom
+`SessionStore` implementations must honour that contract in full, or
+"deleted" conversations remain searchable.
 
 #### Parameters
 
@@ -134,7 +142,7 @@ importFromString(body, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:333
+Defined in: packages/sessions/src/facade.ts:341
 
 Import a JSONL stream into a fresh session.
 
@@ -183,7 +191,7 @@ List sessions for a scope (newest-first by `createdAt`).
 pruneAudit(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:340
+Defined in: packages/sessions/src/facade.ts:348
 
 Prune audit rows older than the supplied epoch ms.
 
@@ -205,7 +213,7 @@ Prune audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:328
+Defined in: packages/sessions/src/facade.ts:336
 
 Retention sweep (RP-6): delete every session matching the policy. Returns
 the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/interfaces/SessionStoreExt.md#prunesessions).
@@ -230,7 +238,7 @@ the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/inte
 replayer(): SessionReplayer;
 ```
 
-Defined in: packages/sessions/src/facade.ts:338
+Defined in: packages/sessions/src/facade.ts:346
 
 Build the underlying replay engine for advanced consumers.
 

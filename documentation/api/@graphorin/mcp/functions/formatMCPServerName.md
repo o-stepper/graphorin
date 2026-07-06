@@ -10,7 +10,7 @@
 function formatMCPServerName(transport): string;
 ```
 
-Defined in: packages/mcp/src/helpers/identity.ts:103
+Defined in: packages/mcp/src/helpers/identity.ts:117
 
 Operator-facing single-line label for a [MCPTransportConfig](/api/@graphorin/mcp/type-aliases/MCPTransportConfig.md).
 Suitable for trace attributes, audit rows, and CLI output.

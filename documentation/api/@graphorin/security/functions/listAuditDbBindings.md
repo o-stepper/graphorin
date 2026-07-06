@@ -14,7 +14,7 @@ function listAuditDbBindings(): readonly {
 }[];
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:146
+Defined in: packages/security/src/audit/audit-db.ts:159
 
 Snapshot of the binding registry. Used by `graphorin doctor` once
 the CLI ships.

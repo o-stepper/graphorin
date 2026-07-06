@@ -63,7 +63,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1164
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1222
 
 Soft-delete a fact (kept for replay; never hard-deleted).
 
@@ -90,7 +90,7 @@ fuse(
 options?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1202
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1260
 
 Fuse multiple ranked lists outside of a `search()` call.
 
@@ -116,7 +116,7 @@ Fuse multiple ranked lists outside of a `search()` call.
 get(scope, factId): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1025
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1038
 
 Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
@@ -139,7 +139,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 history(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1055
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1068
 
 Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
@@ -172,7 +172,7 @@ neighbors(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1016
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1029
 
 Raw vector KNN neighbours for the consolidator's reconcile
 pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
@@ -209,7 +209,7 @@ purge(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1183
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1241
 
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
@@ -345,7 +345,7 @@ searchIterative(
 opts?): Promise<IterativeRecallResult>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:948
+Defined in: packages/memory/src/tiers/semantic-memory.ts:961
 
 Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
@@ -408,15 +408,29 @@ supersede(
    scope, 
    oldId, 
    newInput, 
-   reason?): Promise<{
+   reason?, 
+   options?): Promise<{
   new: Fact;
   old: string;
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1135
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1182
 
 Mark `oldId` superseded by a new fact. Returns the new record.
+
+W-019 (security-first, knowledge-preserving): when the successor
+lands QUARANTINED (the default for `extraction`/synthesized
+provenance), the old ACTIVE fact's validity interval is NOT closed
+- default recall keeps returning the old knowledge until the
+successor passes [validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate), which completes the closure.
+The link is recorded on the successor's `supersedes` field. With
+`autoPromoteSynthesized` (threaded from the consolidator's
+`autoPromoteExtraction` escape hatch) an injection-clean successor
+is active immediately and the interval closes right away - the
+pre-W-019 behaviour. Inverting the default (auto-activating the
+successor) would hand a MINJA attacker instant active memory via
+any text the reconciler classifies as an 'update'.
 
 #### Parameters
 
@@ -426,6 +440,8 @@ Mark `oldId` superseded by a new fact. Returns the new record.
 | `oldId` | `string` |
 | `newInput` | [`FactInput`](/api/@graphorin/memory/interfaces/FactInput.md) |
 | `reason?` | `string` |
+| `options?` | \{ `autoPromoteSynthesized?`: `boolean`; \} |
+| `options.autoPromoteSynthesized?` | `boolean` |
 
 #### Returns
 
@@ -446,7 +462,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1095
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1108
 
 Promote a quarantined fact to `active` (P1-4). The validation path
 that admits a synthesized memory into action-driving recall once a
@@ -489,7 +505,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1211
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1269
 
 Pure-fusion helper - exposed for callers that already collected results.
 
@@ -521,7 +537,7 @@ static fuseWeighted<TRecord>(
    k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1224
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1282
 
 Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by

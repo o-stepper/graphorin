@@ -69,6 +69,15 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   `'auto-prefix'`), and the optional per-client `priority` field;
   the registry consumes the trio when its strategy-aware
   `assertNoDuplicates(strategy, ctx)` overload runs.
+- **Transport-derived identity (W-016).** `serverIdentity.id` derives
+  from the operator-controlled transport config (HTTP ids include a
+  non-default port), never from the name a server self-reports on
+  `initialize` - TOFU pins, `mcp:<id>:<uri>` handle scoping and taint
+  labels all key off it, so a rug-pull rename cannot mint a fresh pin
+  and a malicious server cannot claim a trusted server's scope. The
+  self-reported name survives as display-only `reportedServerName`;
+  the explicit `serverInfoName` option remains the operator override.
+  Handle ids are percent-encoded (`:` is routine in ids now).
 - **OAuth integration.** `createOAuthAuthorizationProvider({...})`
   wraps the existing `refreshOAuthSession(...)` helper from
   `@graphorin/security/oauth`, resolves the bearer header on every
@@ -152,7 +161,19 @@ Tool descriptions are always sanitized at registration time using
 the `'detect-and-strip'` variant of the configured policy (the
 wrap envelope is reserved for tool-result bodies inside the
 conversation history; the description goes into the per-step tool
-catalogue verbatim aside from the strip pass).
+catalogue verbatim aside from the strip pass). The same strip pass
+covers the ANNOTATION strings inside the tool's JSON Schemas
+(`description`, `title`, `$comment`, string `examples` at any
+nesting depth) before the schema reaches the provider wire and the
+`tool_search` projection - the Invariant Labs tool-poisoning
+hiding place. Semantic keywords (`enum`, `const`, `pattern`,
+`required`, property names) are never modified, and the TOFU
+fingerprint keeps hashing the RAW definition, so existing pins
+survive and drift detection still sees the original bytes
+(`mcp.tool-schema.injection-flagged.total` counts hits). The text
+of an `isError` result goes through the full configured policy
+(strip + envelope by default) before it reaches the model as a
+tool error message.
 
 ## OAuth integration
 

@@ -10,7 +10,7 @@
 function executeCompaction(input): Promise<CompactionResult>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/compactor.ts:117
+Defined in: packages/memory/src/context-engine/compaction/compactor.ts:142
 
 Perform a compaction call. Returns the result envelope containing
 the produced summary, the dropped/preserved message slices, and

@@ -10,7 +10,7 @@
 function runAuditPrune(options): Promise<PruneAuditResult>;
 ```
 
-Defined in: packages/cli/src/commands/audit.ts:112
+Defined in: packages/cli/src/commands/audit.ts:116
 
 ## Parameters
 

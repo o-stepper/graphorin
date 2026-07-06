@@ -7,22 +7,10 @@
 # Function: createFactHistoryTool()
 
 ```ts
-function createFactHistoryTool(deps): Tool<{
-  factId: string;
-}, {
-  chain: {
-     factId: string;
-     sensitivity: "public" | "internal" | "secret";
-     supersededBy?: string;
-     supersedes?: string;
-     text: string;
-     validFrom?: string;
-     validTo?: string;
-  }[];
-}>;
+function createFactHistoryTool(deps): Tool<FactHistoryInput, FactHistoryOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:294
+Defined in: packages/memory/src/tools/fact-tools.ts:392
 
 `fact_history` - trace how a fact changed over time. Returns the
 full bi-temporal supersede chain the given fact belongs to, oldest →
@@ -37,18 +25,6 @@ did the user say before" / "how did this change". Read-only. P0-2.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `factId`: `string`;
-\}, \{
-  `chain`: \{
-     `factId`: `string`;
-     `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
-     `supersededBy?`: `string`;
-     `supersedes?`: `string`;
-     `text`: `string`;
-     `validFrom?`: `string`;
-     `validTo?`: `string`;
-  \}[];
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactHistoryInput`, `FactHistoryOutput`\&gt;
 
 ## Stable

@@ -67,6 +67,13 @@ const UnsubscribedFrame = z
   })
   .strict();
 
+// The runtime schema keeps `payload` opaque so this package stays
+// zod-only (no `@graphorin/core` dependency, not even type-only - it
+// would force a resolvable dependency for the d.ts). For agent-run
+// subjects the actual payload shape is the JSON-safe `WireAgentEvent`
+// union documented in `@graphorin/core` (decode with
+// `fromWireAgentEvent`); the cross-package round-trip is pinned by a
+// gate test in core.
 const EventFrame = z
   .object({
     v: z.literal('1'),

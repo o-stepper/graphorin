@@ -8,59 +8,15 @@
 
 ```ts
 type SpanType = 
-  | "agent.run"
-  | "agent.step"
-  | "agent.handoff"
-  | "agent.suspend"
-  | "agent.resume"
-  | "provider.generate"
-  | "provider.stream"
-  | "tool.execute"
-  | "tool.approval"
-  | "memory.read.working"
-  | "memory.read.session"
-  | "memory.read.episodic"
-  | "memory.read.semantic"
-  | "memory.read.procedural"
-  | "memory.read.shared"
-  | "memory.write.working"
-  | "memory.write.session"
-  | "memory.write.episodic"
-  | "memory.write.semantic"
-  | "memory.write.procedural"
-  | "memory.write.shared"
-  | "memory.search.working"
-  | "memory.search.session"
-  | "memory.search.episodic"
-  | "memory.search.semantic"
-  | "memory.search.procedural"
-  | "memory.search.shared"
-  | "memory.consolidate.light"
-  | "memory.consolidate.standard"
-  | "memory.consolidate.deep"
-  | "memory.consolidate.reflect"
-  | "memory.consolidate.learned-context"
-  | "memory.search.insight"
-  | "memory.read.insight"
-  | "memory.write.insight"
-  | "memory.conflict"
-  | "memory.embed"
-  | "workflow.run"
-  | "workflow.step"
-  | "workflow.task"
-  | "workflow.checkpoint"
-  | "skill.activate"
-  | "skill.load"
-  | "mcp.connect"
-  | "mcp.call"
-  | "mcp.list-tools";
+  | KnownSpanType
+  | CustomSpanType;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:9
+Defined in: packages/core/src/contracts/tracer.ts:83
 
-Discriminator union for typed observability spans.
-
-The list mirrors the span taxonomy documented for the observability
-layer; concrete implementations live in `@graphorin/observability`.
+Discriminator union for typed observability spans: every
+[KnownSpanType](/api/@graphorin/core/type-aliases/KnownSpanType.md) literal plus the [CustomSpanType](/api/@graphorin/core/type-aliases/CustomSpanType.md)
+namespaced escape. Exhaustive switches over `SpanType` need a
+default branch for the custom domain.
 
 ## Stable

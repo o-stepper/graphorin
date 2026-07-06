@@ -3,9 +3,17 @@
  *
  * Writes a fresh `graphorin.config.ts` to the current working
  * directory (or `--out`), prompts the operator for the cloud-upload
- * sensitivity tier + storage encryption opt-in, and prints exactly
- * one bootstrap admin token (held by the operator from this point
- * onward - the tool never persists nor logs the raw value).
+ * sensitivity tier + storage encryption opt-in, prints the server
+ * pepper hex ONCE, and walks the operator through the working
+ * credential path: persist the pepper (stdin, never argv), migrate,
+ * then mint a real token with `graphorin token create`.
+ *
+ * W-003: init deliberately does NOT emit a token itself. Token
+ * verification requires an HMAC lookup in the auth-token store, which
+ * requires migrations + the pepper - init's contract is "write the
+ * config file, touch nothing else" (pinned by tests), so any token it
+ * printed was guaranteed to 401. Honestly pointing at `token create`
+ * follows the IP-4 precedent (no phantom credentials).
  *
  * `--non-interactive` accepts every choice through flags or env vars
  * so the command works equally well in CI / image-build pipelines.
@@ -17,7 +25,7 @@ import { mkdir, stat, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import process from 'node:process';
 
-import { generatePepper, generateRawToken } from '@graphorin/security';
+import { generatePepper } from '@graphorin/security';
 
 import { confirm, select } from '../internal/prompts.js';
 
@@ -41,7 +49,6 @@ export interface InitCommandOptions {
  */
 export interface InitCommandResult {
   readonly configPath: string;
-  readonly bootstrapToken: string;
   readonly serverPepperHex: string;
   readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly storageEncrypted: boolean;
@@ -61,8 +68,6 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   const pepper = generatePepper();
   const pepperHex = await pepper.useBuffer((buf) => buf.toString('hex'));
 
-  const bootstrap = generateRawToken({ env: 'live' });
-
   if (options.dryRun !== true) {
     if (await fileExists(target)) {
       throw new Error(
@@ -74,22 +79,24 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   }
 
   print(`[graphorin/cli] wrote ${target}`);
-  print(`[graphorin/cli] bootstrap admin token (shown ONCE):`);
-  print(`  ${bootstrap.raw}`);
   print(`[graphorin/cli] server pepper hex (store in your keyring as 'graphorin_server_pepper'):`);
   print(`  ${pepperHex}`);
   print('');
   print('Next steps:');
+  // W-041: never put the pepper on argv - shell history and the process
+  // list would hold the key material behind every token HMAC (the
+  // secrets CLI itself refuses plaintext on the command line).
   print(
-    `  1. Persist the pepper: graphorin secrets set graphorin_server_pepper --value ${pepperHex}`,
+    `  1. Persist the pepper WITHOUT argv: printf '%s' '<hex-from-above>' | graphorin secrets set graphorin_server_pepper --from-stdin`,
   );
-  print(`  2. Persist the bootstrap token securely; do NOT commit it.`);
-  print(`  3. Run \`graphorin migrate --config ${target}\` to apply storage migrations.`);
+  print(`  2. Run \`graphorin migrate --config ${target}\` to apply storage migrations.`);
+  print(
+    '  3. Mint your admin token: graphorin token create --label bootstrap --scopes <scopes> (the raw token is shown ONCE).',
+  );
   print(`  4. Run \`graphorin start --config ${target}\` to launch the server.`);
 
   return Object.freeze({
     configPath: target,
-    bootstrapToken: bootstrap.raw,
     serverPepperHex: pepperHex,
     cloudConsent,
     storageEncrypted,

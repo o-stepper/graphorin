@@ -429,6 +429,38 @@ export class SqliteConsolidatorStateStore {
     );
   }
 
+  /**
+   * W-065: retention for the per-tick run log. Deletes terminal runs
+   * that started before the cutoff; in-flight rows
+   * (`status = 'running'`) always survive. Returns rows deleted.
+   *
+   * @stable
+   */
+  async pruneRuns(beforeEpochMs: number): Promise<number> {
+    const result = this.#conn.run(
+      "DELETE FROM consolidator_runs WHERE started_at < ? AND status != 'running'",
+      [beforeEpochMs],
+    );
+    return result.changes ?? 0;
+  }
+
+  /**
+   * W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
+   * batches (`next_retry_at IS NULL` - parked forever by
+   * `markBatchExhausted`) that failed before the cutoff; batches still
+   * awaiting a retry are never touched (they belong to
+   * `claimReadyBatches`). Returns rows deleted.
+   *
+   * @stable
+   */
+  async pruneExhaustedBatches(beforeEpochMs: number): Promise<number> {
+    const result = this.#conn.run(
+      'DELETE FROM consolidator_failed_batches WHERE next_retry_at IS NULL AND failed_at < ?',
+      [beforeEpochMs],
+    );
+    return result.changes ?? 0;
+  }
+
   async listFailedBatches(scope: SessionScope, limit = 100): Promise<ReadonlyArray<DlqBatchRow>> {
     const rows = this.#conn.all<DlqRowDb>(
       `SELECT * FROM consolidator_failed_batches

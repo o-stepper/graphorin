@@ -10,7 +10,7 @@
 const DEFAULT_PRESERVE_RECENT_TURNS: 6 = 6;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/compactor.ts:50
+Defined in: packages/memory/src/context-engine/compaction/compactor.ts:54
 
 Default count of recent turns preserved verbatim by the
 `summarize-old-preserve-recent` strategy.

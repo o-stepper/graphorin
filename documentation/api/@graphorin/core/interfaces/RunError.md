@@ -6,7 +6,7 @@
 
 # Interface: RunError
 
-Defined in: packages/core/src/types/run.ts:195
+Defined in: packages/core/src/types/run.ts:237
 
 Failure carried by `RunState.error`. The shape mirrors the wire format
 used by `agent.error` events.
@@ -17,6 +17,6 @@ used by `agent.error` events.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:197 |
-| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:198 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:196 |
+| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:239 |
+| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:240 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:238 |

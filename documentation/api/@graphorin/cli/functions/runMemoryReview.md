@@ -10,7 +10,7 @@
 function runMemoryReview(options?): Promise<MemoryReviewResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:724
+Defined in: packages/cli/src/commands/memory.ts:728
 
 `graphorin memory review` - list the facts / episodes / insights / induced
 procedures the consolidator left in quarantine (read-only), or promote a

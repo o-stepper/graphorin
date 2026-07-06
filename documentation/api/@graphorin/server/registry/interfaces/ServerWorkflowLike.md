@@ -21,6 +21,28 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 
 ## Methods
 
+### deleteThread()?
+
+```ts
+optional deleteThread(threadId): Promise<void>;
+```
+
+Defined in: packages/server/src/registry/index.ts:63
+
+W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### execute()
 
 ```ts

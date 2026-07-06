@@ -7,13 +7,10 @@
 # Function: createCodeSearchTool()
 
 ```ts
-function createCodeSearchTool(opts): Tool<{
-  limit?: number;
-  query: string;
-}, string>;
+function createCodeSearchTool(opts): Tool<CodeSearchInput, string>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:81
+Defined in: packages/tools/src/code-mode/meta-tools.ts:93
 
 Build the `code_search` meta-tool. Returns matching `tools.<name>(…)`
 signatures as text (eager substring match + the deferred pool).
@@ -26,9 +23,6 @@ signatures as text (eager substring match + the deferred pool).
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `limit?`: `number`;
-  `query`: `string`;
-\}, `string`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`CodeSearchInput`, `string`\&gt;
 
 ## Stable

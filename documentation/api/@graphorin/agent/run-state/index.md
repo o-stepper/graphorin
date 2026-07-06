@@ -18,7 +18,7 @@ discipline.
 
 | Interface | Description |
 | ------ | ------ |
-| [SerializedRunState](/api/@graphorin/agent/run-state/interfaces/SerializedRunState.md) | On-disk payload returned by [serializeRunState](/api/@graphorin/agent/run-state/functions/serializeRunState.md) and accepted by [deserializeRunState](/api/@graphorin/agent/run-state/functions/deserializeRunState.md). The shape is JSON-stable. |
+| [SerializedRunState](/api/@graphorin/agent/run-state/interfaces/SerializedRunState.md) | On-disk payload returned by [serializeRunState](/api/@graphorin/agent/run-state/functions/serializeRunState.md) and accepted by [deserializeRunState](/api/@graphorin/agent/run-state/functions/deserializeRunState.md). The shape is JSON-stable: binary message/tool-outcome payloads appear in their `WireMessage` / `WireRunStep` (base64 / href envelope) form. |
 | [SerializeRunStateOptions](/api/@graphorin/agent/run-state/interfaces/SerializeRunStateOptions.md) | Options accepted by [serializeRunState](/api/@graphorin/agent/run-state/functions/serializeRunState.md). |
 
 ## Variables

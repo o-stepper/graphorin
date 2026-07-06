@@ -312,3 +312,62 @@ describe('SEP-1303 - every producible ToolErrorKind returns as a model-visible o
     expect(error.kind).toBe('inbound_sanitization_blocked' satisfies ToolErrorKind);
   });
 });
+
+describe('W-031 - timeout recovery envelope by side-effect class', () => {
+  function slowTool(args: {
+    readonly name: string;
+    readonly sideEffectClass: 'read-only' | 'side-effecting' | 'external-stateful';
+    readonly withIdempotencyKey?: boolean;
+  }) {
+    return tool({
+      name: args.name,
+      description: 'hangs forever',
+      inputSchema: z.object({}),
+      sideEffectClass: args.sideEffectClass,
+      ...(args.withIdempotencyKey === true ? { idempotencyKey: () => 'stable-key' } : {}),
+      execute: () => new Promise<never>(() => {}),
+    });
+  }
+
+  async function timeoutOutcome(t: ReturnType<typeof slowTool>) {
+    const registry = createToolRegistry();
+    registry.register(t);
+    const executor = createToolExecutor({ registry, inlineToolTimeoutMs: 40 });
+    const [completed] = await executor.executeBatch({
+      calls: [{ toolCallId: 'c1', toolName: t.name, args: {} }],
+      runContext: makeRunContext(),
+      stepNumber: 1,
+    });
+    const outcome = completed?.outcome;
+    if (outcome === undefined || !('kind' in outcome)) throw new Error('expected ToolError');
+    return outcome;
+  }
+
+  it('non-idempotent side-effecting timeout: NOT recoverable, report_to_user, completion warning', async () => {
+    const outcome = await timeoutOutcome(
+      slowTool({ name: 'send_payment', sideEffectClass: 'external-stateful' }),
+    );
+    expect(outcome.kind).toBe('timeout');
+    expect(outcome.recoverable).toBe(false);
+    expect(outcome.recoveryHint).toBe('report_to_user');
+    expect(outcome.hint).toContain('may still have completed');
+  });
+
+  it('read-only timeout keeps the default retry_later envelope', async () => {
+    const outcome = await timeoutOutcome(
+      slowTool({ name: 'slow_read', sideEffectClass: 'read-only' }),
+    );
+    expect(outcome.kind).toBe('timeout');
+    expect(outcome.recoverable).toBe(true);
+    expect(outcome.recoveryHint).toBe('retry_later');
+  });
+
+  it('an idempotency-keyed side-effecting timeout keeps retry_later (safe to retry)', async () => {
+    const outcome = await timeoutOutcome(
+      slowTool({ name: 'send_keyed', sideEffectClass: 'side-effecting', withIdempotencyKey: true }),
+    );
+    expect(outcome.kind).toBe('timeout');
+    expect(outcome.recoverable).toBe(true);
+    expect(outcome.recoveryHint).toBe('retry_later');
+  });
+});

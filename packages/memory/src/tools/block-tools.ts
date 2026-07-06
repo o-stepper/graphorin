@@ -12,8 +12,20 @@ const blockAppendOutputSchema = z.object({
   length: z.number(),
 });
 
-type BlockAppendInput = z.infer<typeof blockAppendInputSchema>;
-type BlockAppendOutput = z.infer<typeof blockAppendOutputSchema>;
+/**
+ * W-013: explicit interfaces instead of `z.infer<typeof schema>` - the
+ * inferred aliases baked concrete v3 zod object generics into
+ * the published d.ts, which do not typecheck under a zod@4 consumer.
+ * Interface<->schema equality is pinned by type tests.
+ */
+export interface BlockAppendInput {
+  label: string;
+  content: string;
+}
+export interface BlockAppendOutput {
+  label: string;
+  length: number;
+}
 
 const blockReplaceInputSchema = z.object({
   label: z.string().min(1).max(128),
@@ -25,8 +37,15 @@ const blockReplaceOutputSchema = z.object({
   length: z.number(),
 });
 
-type BlockReplaceInput = z.infer<typeof blockReplaceInputSchema>;
-type BlockReplaceOutput = z.infer<typeof blockReplaceOutputSchema>;
+export interface BlockReplaceInput {
+  label: string;
+  oldUnique: string;
+  newText: string;
+}
+export interface BlockReplaceOutput {
+  label: string;
+  length: number;
+}
 
 const blockRethinkInputSchema = z.object({
   label: z.string().min(1).max(128),
@@ -37,8 +56,36 @@ const blockRethinkOutputSchema = z.object({
   length: z.number(),
 });
 
-type BlockRethinkInput = z.infer<typeof blockRethinkInputSchema>;
-type BlockRethinkOutput = z.infer<typeof blockRethinkOutputSchema>;
+export interface BlockRethinkInput {
+  label: string;
+  newValue: string;
+}
+export interface BlockRethinkOutput {
+  label: string;
+  length: number;
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): each explicit interface must stay MUTUALLY assignable with its
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<W013Equals<BlockAppendInput, z.infer<typeof blockAppendInputSchema>>>;
+type _W013Check2 = W013Assert<
+  W013Equals<BlockAppendOutput, z.infer<typeof blockAppendOutputSchema>>
+>;
+type _W013Check3 = W013Assert<
+  W013Equals<BlockReplaceInput, z.infer<typeof blockReplaceInputSchema>>
+>;
+type _W013Check4 = W013Assert<
+  W013Equals<BlockReplaceOutput, z.infer<typeof blockReplaceOutputSchema>>
+>;
+type _W013Check5 = W013Assert<
+  W013Equals<BlockRethinkInput, z.infer<typeof blockRethinkInputSchema>>
+>;
+type _W013Check6 = W013Assert<
+  W013Equals<BlockRethinkOutput, z.infer<typeof blockRethinkOutputSchema>>
+>;
 
 /**
  * `block_append` - append text (with a newline separator) to a working

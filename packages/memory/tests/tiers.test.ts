@@ -418,7 +418,10 @@ describe('@graphorin/memory/tiers - SemanticMemory', () => {
     });
     expect(after.map((h) => h.record.text)).toEqual(['residence is Munich']);
     const live = await memory.semantic.search(SCOPE, 'residence');
-    expect(live.length).toBe(2);
+    // memory-retrieval-01: default reads evaluate validity at NOW - the
+    // superseded Munich fact is excluded (fixture now mirrors sqlite).
+    expect(live.length).toBe(1);
+    expect(live[0]?.record.text).toContain('Munich');
   });
 
   it('history returns the ordered supersede chain incl. soft-deleted rows', async () => {

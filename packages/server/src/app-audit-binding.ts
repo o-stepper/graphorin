@@ -10,7 +10,20 @@
  */
 
 import { registerAuditDbBinding } from '@graphorin/security/audit';
-import { loadCipherDriver } from '@graphorin/store-sqlite';
+import {
+  cipherSelectionPragmas,
+  type EncryptionCipher,
+  loadCipherDriver,
+} from '@graphorin/store-sqlite';
+
+/** The ciphers sqlite3mc supports - mirrors `EncryptionCipher`. */
+const KNOWN_CIPHERS: ReadonlySet<string> = new Set([
+  'sqlcipher',
+  'chacha20',
+  'aes256cbc',
+  'aes128cbc',
+  'rc4',
+]);
 
 /**
  * Pre-built audit-db binding shipped from `@graphorin/store-sqlite`.
@@ -47,7 +60,23 @@ export function ensureStoreAuditBinding(): void {
           close(): void;
           open: boolean;
         };
+        // W-110 / CS-7: pin the cipher BEFORE PRAGMA key - `opts.cipher`
+        // (config.audit.cipher) was previously ignored, so every audit.db
+        // silently came out as sqlite3mc's default. Default 'chacha20':
+        // pre-fix files were created without cipher pragmas (= chacha20
+        // format), so this pin is byte-compatible with every existing
+        // audit.db, while 'sqlcipher' (the MAIN store's ADR-030 default)
+        // would brick them. Unknown values fail fast.
+        const cipher = opts.cipher ?? 'chacha20';
+        if (!KNOWN_CIPHERS.has(cipher)) {
+          throw new Error(
+            `[graphorin/server] unknown audit.cipher '${cipher}'. Supported: ${[...KNOWN_CIPHERS].join(', ')}.`,
+          );
+        }
         const db = new Db(opts.path);
+        for (const pragma of cipherSelectionPragmas(cipher as EncryptionCipher)) {
+          db.pragma(pragma);
+        }
         db.pragma(`key = '${passphrase.replace(/'/g, "''")}'`);
         db.pragma('journal_mode = WAL');
         db.pragma('synchronous = NORMAL');
@@ -133,6 +162,32 @@ export function ensureStoreAuditBinding(): void {
               entry.hash,
               entry.seq,
             );
+          },
+          // W-011: cross-process fence. Raw BEGIN IMMEDIATE (not
+          // better-sqlite3's .transaction() - that helper rejects async
+          // functions, while this binding's methods are async-shaped
+          // with synchronous bodies; the in-process WRITE_CHAINS
+          // serialisation guarantees no foreign statement interleaves
+          // inside the transaction). ROLLBACK strictly in finally so an
+          // exception can never leave the handle wedged inside an open
+          // transaction.
+          async transact(fn) {
+            db.exec('BEGIN IMMEDIATE');
+            let committed = false;
+            try {
+              const result = await fn();
+              db.exec('COMMIT');
+              committed = true;
+              return result;
+            } finally {
+              if (!committed) {
+                try {
+                  db.exec('ROLLBACK');
+                } catch {
+                  // Already rolled back / connection unusable - nothing to release.
+                }
+              }
+            }
           },
           async close() {
             if (db.open) db.close();

@@ -6,7 +6,7 @@
 
 # Interface: MemoryReviewItem
 
-Defined in: packages/cli/src/commands/memory.ts:680
+Defined in: packages/cli/src/commands/memory.ts:684
 
 A single quarantined memory row surfaced by `graphorin memory review`.
 
@@ -14,6 +14,6 @@ A single quarantined memory row surfaced by `graphorin memory review`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:681 |
-| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:683 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:682 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:685 |
+| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:687 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:686 |

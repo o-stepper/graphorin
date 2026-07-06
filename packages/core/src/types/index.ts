@@ -46,6 +46,14 @@ export type {
   VerifierResultEvent,
 } from './agent-event.js';
 export type {
+  WireAgentEndEvent,
+  WireAgentEvent,
+  WireContentChunk,
+  WireFileGeneratedEvent,
+  WireToolExecutePartialEvent,
+} from './agent-event-wire.js';
+export { fromWireAgentEvent, toWireAgentEvent } from './agent-event-wire.js';
+export type {
   Handoff,
   HandoffFilter,
   HandoffInputFilterDescriptor,
@@ -86,6 +94,7 @@ export type {
 } from './message.js';
 export {
   flattenUsageByModel,
+  type ReadonlyRunState,
   type RunContext,
   type RunError,
   type RunState,

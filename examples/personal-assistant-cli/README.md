@@ -8,7 +8,7 @@ This example is the smallest end-to-end graphorin assistant. Everything runs on 
 
 ## Prerequisites
 
-- **Node.js 22+** (the workspace pins `>=22.0.0`).
+- **Node.js 22.12+** (the workspace pins `>=22.12.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
 - **Optional** - at least one of:
   - [Ollama](https://ollama.com/) daemon listening on `http://127.0.0.1:11434`.
@@ -121,7 +121,7 @@ import { createStubProvider } from './stub-provider.js';
 
 const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
 await store.init();
-const memory = createMemory({ store: store.memory as never, embeddings: store.embeddings });
+const memory = createMemory({ store: store.memory, embeddings: store.embeddings });
 const provider = createProvider(createStubProvider(), {
   acceptsSensitivity: ['public', 'internal'],
 });

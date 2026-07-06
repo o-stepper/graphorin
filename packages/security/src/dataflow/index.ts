@@ -12,7 +12,7 @@
  * @packageDocumentation
  */
 
-export { deriveTaintLabel } from './derive.js';
+export { deriveTaintLabel, isUntrustedTrustClass } from './derive.js';
 export { createTaintLedger } from './ledger.js';
 export { createDataFlowPolicy } from './policy.js';
 export type {

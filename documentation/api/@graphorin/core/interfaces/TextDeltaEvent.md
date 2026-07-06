@@ -6,7 +6,7 @@
 
 # Interface: TextDeltaEvent
 
-Defined in: packages/core/src/types/agent-event.ts:71
+Defined in: packages/core/src/types/agent-event.ts:76
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:71
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:73 |
-| <a id="property-type"></a> `type` | `readonly` | `"text.delta"` | packages/core/src/types/agent-event.ts:72 |
+| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:78 |
+| <a id="property-type"></a> `type` | `readonly` | `"text.delta"` | packages/core/src/types/agent-event.ts:77 |

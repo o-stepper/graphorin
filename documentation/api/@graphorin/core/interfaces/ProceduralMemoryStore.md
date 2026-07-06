@@ -6,7 +6,7 @@
 
 # Interface: ProceduralMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:118
+Defined in: packages/core/src/contracts/memory-store.ts:141
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:118
 add(rule): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:119
+Defined in: packages/core/src/contracts/memory-store.ts:142
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:119
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:120
+Defined in: packages/core/src/contracts/memory-store.ts:143
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:120
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:121
+Defined in: packages/core/src/contracts/memory-store.ts:144
 
 #### Parameters
 

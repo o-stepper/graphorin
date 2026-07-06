@@ -6,7 +6,7 @@
 
 # Interface: RuleOfTwoProfile
 
-Defined in: packages/security/src/policy/tool-argument-policy.ts:120
+Defined in: packages/security/src/policy/tool-argument-policy.ts:129
 
 Capability profile for the Rule-of-Two preset. Declares which of the
 three trifecta legs the agent is permitted to hold this session. The
@@ -19,6 +19,6 @@ drops at least one.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-externalsideeffects"></a> `externalSideEffects` | `readonly` | `boolean` | May the agent take external side effects (write / send / deploy)? | packages/security/src/policy/tool-argument-policy.ts:126 |
-| <a id="property-sensitivedata"></a> `sensitiveData` | `readonly` | `boolean` | May the agent read sensitive data (secrets / PII)? | packages/security/src/policy/tool-argument-policy.ts:124 |
-| <a id="property-untrustedinput"></a> `untrustedInput` | `readonly` | `boolean` | May the agent ingest untrusted input (web / MCP / untrusted skills)? | packages/security/src/policy/tool-argument-policy.ts:122 |
+| <a id="property-externalsideeffects"></a> `externalSideEffects` | `readonly` | `boolean` | May the agent take external side effects (write / send / deploy)? | packages/security/src/policy/tool-argument-policy.ts:135 |
+| <a id="property-sensitivedata"></a> `sensitiveData` | `readonly` | `boolean` | May the agent read sensitive data (secrets / PII)? | packages/security/src/policy/tool-argument-policy.ts:133 |
+| <a id="property-untrustedinput"></a> `untrustedInput` | `readonly` | `boolean` | May the agent ingest untrusted input (web / MCP / untrusted skills)? | packages/security/src/policy/tool-argument-policy.ts:131 |

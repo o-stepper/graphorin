@@ -268,6 +268,8 @@ The same `validate(...)` exists on **every derived tier** - `memory.episodic.val
 
 Quarantine is **fail-safe by default** - paid distillation stays invisible until validated. Where that trade-off is wrong for a deployment, the consolidator's opt-in `autoPromoteExtraction` flag (`createMemory({ consolidator: { autoPromoteExtraction: true } })`, **off by default**) admits **injection-clean extraction facts** as `active` directly. Injection-flagged facts always stay quarantined, and episodes / insights / induced procedures are unaffected - they remain quarantined-until-validated.
 
+When the reconciler routes a candidate as an **update / conflict** of an existing ACTIVE fact, the supersede is **pending** by default (W-019): the successor lands quarantined and the old fact's validity interval stays OPEN, so default recall keeps returning the old knowledge instead of nothing. Validating the successor (`fact_validate`, `graphorin memory review --promote`, or `semantic.validate`) promotes it AND completes the supersede - the old interval closes at that moment. With `autoPromoteExtraction` the injection-clean successor is active immediately and the interval closes right away, on the add and update/conflict routes alike. At no point in the lifecycle are both versions hidden.
+
 Quarantine is a **retrieval gate, never a delete** - quarantined rows stay fully auditable. This is the precondition for safely shipping synthesised memory (reflection / reconciliation / induction) against memory-poisoning attacks. See [Security](/guide/security#memory-safety-provenance-quarantine) for the threat model.
 
 ### Principal / owner dimension
@@ -339,6 +341,8 @@ createMemory({
 ### Reflection & insight synthesis
 
 At the `full` tier, once the accumulated importance of recent episodes crosses a threshold, the deep phase asks the model for the few most salient questions, retrieves evidence for each, and synthesises a higher-order **insight** (Generative Agents). Insights land `provenance: 'reflection'` + `status: 'quarantined'`, carry **mandatory citations set from the retrieved evidence** (never hallucinated), and are **rank-capped below the facts they cite**. Read them through `memory.insights.search` / `memory.insights.list`.
+
+Use-it-or-lose-it decay (ExpeL) applies to **validated** insights only: each reflection pass decays them by 1 and retrieval bumps them back (+1), so an unused validated insight is soft-pruned after two idle passes. Quarantined insights are **exempt** (W-082) - default retrieval cannot see them, so the reinforcement bump can never fire, and decaying them silently discarded every paid synthesis a human did not review within two passes. Their decay clock starts at validation. The unreviewed queue is bounded by `reflectionMaxQuarantinedInsights` (default 100): beyond it the oldest quarantined insights are pruned.
 
 ### Learned-context digest (opt-in)
 

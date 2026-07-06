@@ -7,21 +7,10 @@
 # Function: createToolSearchTool()
 
 ```ts
-function createToolSearchTool(opts): Tool<{
-  k?: number;
-  query: string;
-}, {
-  matches: {
-     description: string;
-     inputSchema: Record<string, unknown>;
-     name: string;
-     score: number;
-     source: "semantic" | "bm25" | "regex-name";
-  }[];
-}>;
+function createToolSearchTool(opts): Tool<ToolSearchInput, ToolSearchOutput>;
 ```
 
-Defined in: packages/tools/src/built-in/tool-search.ts:66
+Defined in: packages/tools/src/built-in/tool-search.ts:87
 
 Build a `tool_search` tool bound to a specific registry.
 
@@ -33,17 +22,6 @@ Build a `tool_search` tool bound to a specific registry.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `k?`: `number`;
-  `query`: `string`;
-\}, \{
-  `matches`: \{
-     `description`: `string`;
-     `inputSchema`: `Record`\&lt;`string`, `unknown`\&gt;;
-     `name`: `string`;
-     `score`: `number`;
-     `source`: `"semantic"` \| `"bm25"` \| `"regex-name"`;
-  \}[];
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ToolSearchInput`, `ToolSearchOutput`\&gt;
 
 ## Stable

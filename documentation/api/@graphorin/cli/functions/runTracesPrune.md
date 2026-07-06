@@ -10,7 +10,11 @@
 function runTracesPrune(options): Promise<TracesPruneResult>;
 ```
 
-Defined in: packages/cli/src/commands/traces.ts:96
+Defined in: packages/cli/src/commands/traces.ts:115
+
+Delete spans that FINISHED before the cutoff (see `pruneSpans` in
+`@graphorin/store-sqlite` - the ms-to-ns conversion and the strict
+`<` boundary live there, backed by the `idx_spans_end` index).
 
 ## Parameters
 

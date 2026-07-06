@@ -55,8 +55,29 @@ const outputSchema = z.object({
   ),
 });
 
-type ToolSearchInput = z.infer<typeof inputSchema>;
-type ToolSearchOutput = z.infer<typeof outputSchema>;
+/** W-013: explicit interfaces - no concrete zod generics in the d.ts. */
+export interface ToolSearchInput {
+  query: string;
+  k?: number | undefined;
+}
+export interface ToolSearchMatch {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  score: number;
+  source: 'semantic' | 'bm25' | 'regex-name';
+}
+export interface ToolSearchOutput {
+  matches: ToolSearchMatch[];
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): the explicit interface must stay MUTUALLY assignable with the
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<W013Equals<ToolSearchInput, z.infer<typeof inputSchema>>>;
+type _W013Check2 = W013Assert<W013Equals<ToolSearchOutput, z.infer<typeof outputSchema>>>;
 
 /**
  * Build a `tool_search` tool bound to a specific registry.

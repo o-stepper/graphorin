@@ -37,7 +37,7 @@ import {
   registerConsolidatorTriggers,
 } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
-import { createServer, type GraphorinServer } from '@graphorin/server';
+import { type ConsolidatorLike, createServer, type GraphorinServer } from '@graphorin/server';
 import { createSessionManager, type Session, type SessionManager } from '@graphorin/sessions';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import {
@@ -219,7 +219,7 @@ export async function createBackgroundConsolidatorApp(
   const scope: SessionScope = { userId, sessionId, agentId };
 
   const memory: Memory = createMemory({
-    store: store.memory as never,
+    store: store.memory,
     embeddings: store.embeddings,
     consolidator: {
       enabled: true,
@@ -232,7 +232,7 @@ export async function createBackgroundConsolidatorApp(
   });
 
   const sessions: SessionManager = createSessionManager({
-    store: store.sessions as unknown as Parameters<typeof createSessionManager>[0]['store'],
+    store: store.sessions,
     memory: memory.session,
   });
 
@@ -538,14 +538,10 @@ export async function runConsolidatorCycle(
  * `drainDlq()` (no args). The adapter binds the scope so the daemon
  * can pump the DLQ without re-knowing the runtime's shape.
  */
-function toConsolidatorLike(
-  consolidator: Consolidator,
-  scope: SessionScope,
-): Parameters<typeof createServer>[0] extends { consolidator?: infer C } ? C : never {
-  type ServerConsolidator = Parameters<typeof createServer>[0] extends { consolidator?: infer C }
-    ? C
-    : never;
-  const adapter = {
+function toConsolidatorLike(consolidator: Consolidator, scope: SessionScope): ConsolidatorLike {
+  // Typed directly against the exported server-side surface - the
+  // adapter is structurally a ConsolidatorLike, no cast needed (W-025).
+  const adapter: ConsolidatorLike = {
     async start(): Promise<void> {
       await consolidator.start();
     },
@@ -568,7 +564,7 @@ function toConsolidatorLike(
       return consolidator.drainDlq(scope);
     },
   };
-  return adapter as unknown as ServerConsolidator;
+  return adapter;
 }
 
 function sleep(ms: number): Promise<void> {

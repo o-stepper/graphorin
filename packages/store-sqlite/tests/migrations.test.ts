@@ -23,6 +23,35 @@ describe('migrations', () => {
     expect(versions).toContain('013');
   });
 
+  it('W-068 TOCTOU: a racing process that already applied a migration turns the loser into a no-op', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-race-'));
+    const conn = await openConnection({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
+    runMigrations(conn);
+    // Emulate the losing side of the race: the pre-transaction
+    // applied-set read misses one version (the winner committed it in
+    // between), so the runner believes it is pending. The authoritative
+    // in-transaction re-check must skip it instead of replaying its
+    // non-idempotent SQL ("duplicate column name").
+    const staleConn: typeof conn = Object.create(conn, {
+      all: {
+        value: (sql: string, params?: ReadonlyArray<unknown>) => {
+          const rows = conn.all<Record<string, unknown>>(sql, params);
+          if (/FROM schema_migrations/.test(sql)) {
+            return rows.filter((r) => r.version !== '027');
+          }
+          return rows;
+        },
+      },
+    });
+    const applied = runMigrations(staleConn);
+    expect(applied).toEqual([]);
+    // The migration is still recorded exactly once.
+    const rows = conn.all<{ n: number }>(
+      "SELECT COUNT(*) AS n FROM schema_migrations WHERE version = '027'",
+    );
+    expect(rows[0]?.n).toBe(1);
+  });
+
   it('applies every migration on a clean DB and is idempotent on re-run', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-'));
     const path = `${dir}/db.sqlite`;
@@ -56,7 +85,8 @@ describe('migrations', () => {
     expect(names.has('session_handoffs')).toBe(true);
     expect(names.has('session_workflow_runs')).toBe(true);
     expect(names.has('trigger_state')).toBe(true);
-    expect(names.has('trigger_fire_log')).toBe(true);
+    // Migration 031 dropped the dead trigger_fire_log table (W-065).
+    expect(names.has('trigger_fire_log')).toBe(false);
     expect(names.has('auth_tokens')).toBe(true);
     expect(names.has('oauth_servers')).toBe(true);
     expect(names.has('idempotency_records')).toBe(true);
@@ -65,6 +95,9 @@ describe('migrations', () => {
     expect(names.has('consolidator_failed_batches')).toBe(true);
     expect(names.has('conflict_check_pending')).toBe(true);
     expect(names.has('fact_conflicts')).toBe(true);
+    // Migration 030: the span end-time retention index exists.
+    const spanIndexes = conn.all<{ name: string }>("PRAGMA index_list('spans')");
+    expect(spanIndexes.map((i) => i.name)).toContain('idx_spans_end');
     // Migration 012 added the `conflicting_ids_json` column to
     // `conflict_check_pending` - make sure it actually landed.
     const cols = conn.all<{ name: string }>(

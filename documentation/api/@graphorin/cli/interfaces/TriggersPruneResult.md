@@ -6,7 +6,7 @@
 
 # Interface: TriggersPruneResult
 
-Defined in: packages/cli/src/commands/triggers.ts:185
+Defined in: packages/cli/src/commands/triggers.ts:188
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/cli/src/commands/triggers.ts:185
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/triggers.ts:186 |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/triggers.ts:189 |

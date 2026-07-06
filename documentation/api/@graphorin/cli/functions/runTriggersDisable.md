@@ -12,7 +12,7 @@ function runTriggersDisable(options): Promise<
 | null>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:148
+Defined in: packages/cli/src/commands/triggers.ts:151
 
 ## Parameters
 

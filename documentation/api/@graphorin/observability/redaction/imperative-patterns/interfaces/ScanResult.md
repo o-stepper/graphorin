@@ -6,7 +6,7 @@
 
 # Interface: ScanResult
 
-Defined in: packages/observability/src/redaction/imperative-patterns.ts:173
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:186
 
 Compiled scan helper. Returns the list of pattern names that fired
 AND the number of bytes the strip would remove if applied. Bounded
@@ -19,6 +19,6 @@ apply the best-effort `'detect-failed'` annotation.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-bytesmatched"></a> `bytesMatched` | `readonly` | `number` | packages/observability/src/redaction/imperative-patterns.ts:175 |
-| <a id="property-hits"></a> `hits` | `readonly` | readonly \{ `matchCount`: `number`; `pattern`: `string`; \}[] | packages/observability/src/redaction/imperative-patterns.ts:174 |
-| <a id="property-scandurationus"></a> `scanDurationUs` | `readonly` | `number` | packages/observability/src/redaction/imperative-patterns.ts:176 |
+| <a id="property-bytesmatched"></a> `bytesMatched` | `readonly` | `number` | packages/observability/src/redaction/imperative-patterns.ts:188 |
+| <a id="property-hits"></a> `hits` | `readonly` | readonly \{ `matchCount`: `number`; `pattern`: `string`; \}[] | packages/observability/src/redaction/imperative-patterns.ts:187 |
+| <a id="property-scandurationus"></a> `scanDurationUs` | `readonly` | `number` | packages/observability/src/redaction/imperative-patterns.ts:189 |

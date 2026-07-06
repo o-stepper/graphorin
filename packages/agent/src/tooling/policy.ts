@@ -11,6 +11,7 @@
  * @packageDocumentation
  */
 
+import { isUntrustedTrustClass } from '@graphorin/security/dataflow';
 import {
   buildRuleOfTwoPolicy,
   evaluateToolArgumentPolicy,
@@ -52,6 +53,10 @@ export function buildToolArgumentPolicy(
         toolName: input.toolName,
         sideEffectClass: input.sideEffectClass as PolicySideEffectClass,
         sensitive: input.sensitive,
+        // W-101: derived with the same taxonomy the taint engine uses,
+        // so the Rule-of-Two untrustedInput leg and dataflow policy can
+        // never disagree about what "untrusted source" means.
+        untrustedSource: isUntrustedTrustClass(input.trustClass),
         args: input.args,
       }),
   };

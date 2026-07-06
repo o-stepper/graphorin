@@ -6,7 +6,7 @@
 
 # Interface: ApprovalGate
 
-Defined in: packages/tools/src/executor/executor.ts:287
+Defined in: packages/tools/src/executor/types.ts:255
 
 Approval gate the executor consults before executing a gated tool.
 
@@ -18,7 +18,7 @@ Approval gate the executor consults before executing a gated tool.
 request(call, approval): Promise<ApprovalDecision>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:292
+Defined in: packages/tools/src/executor/types.ts:260
 
 Request approval for the tool call. Returns `{ granted: true }` to
 proceed, `{ granted: false, reason? }` to deny.

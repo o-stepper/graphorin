@@ -277,7 +277,11 @@ function formatResourceLinkPreview(
  * @stable
  */
 export function scopedResourceHandle(serverId: string, uri: string): string {
-  return `mcp:${serverId}:${uri}`;
+  // W-140: the transport-derived id (W-016) routinely contains ':'
+  // (localhost:3001) which would break the `mcp:<id>:<uri>` grammar -
+  // percent-encode the id segment; the reader decodes before matching.
+  // Handles are ephemeral (minted per result), so no migration.
+  return `mcp:${encodeURIComponent(serverId)}:${uri}`;
 }
 
 /** Human-readable size of a base64 payload's decoded bytes (MC-8). */

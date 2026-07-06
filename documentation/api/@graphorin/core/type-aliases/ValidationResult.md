@@ -18,7 +18,7 @@ type ValidationResult<T> =
 };
 ```
 
-Defined in: packages/core/src/utils/validation.ts:40
+Defined in: packages/core/src/utils/validation.ts:49
 
 Validate `data` against `schema` and return a `Result` instead of
 throwing. Use this in code paths where you want explicit

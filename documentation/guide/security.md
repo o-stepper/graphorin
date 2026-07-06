@@ -77,7 +77,7 @@ Every privileged operation writes one row to the audit log:
 - token issuance / revocation;
 - OAuth flows (initiation / token issuance / refresh).
 
-The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain.
+The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain. `config.audit.cipher` selects the cipher and is pinned before `PRAGMA key` on both open paths (W-110); the audit default is `chacha20` - deliberately DIFFERENT from the main store's `sqlcipher` (ADR-030) because every pre-fix audit.db was created in the sqlite3mc default format and pinning `chacha20` keeps them byte-compatible. If you set `audit.cipher: 'sqlcipher'` in a config where it was previously ignored, an existing chacha20 file will now fail to open (correct fail-fast, not data loss) - re-encrypt it or drop the setting.
 
 The CLI command `graphorin audit verify` walks the chain and reports any breaks (`graphorin audit export` / `prune` round out the group).
 
@@ -109,7 +109,7 @@ Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditIncl
 
 `pruneAudit` re-roots the surviving suffix (every surviving entry's `prevHash`/`hash` is recomputed), and the RFC-6962 leaves hash the canonical JSON of each entry INCLUDING those fields - so **verification against any checkpoint signed before the prune MUST fail afterwards, by design**. A legitimate retention prune is cryptographically indistinguishable from the truncate-and-re-root attack this layer exists to detect; only the operator's out-of-band procedure tells them apart. Run every retention prune as one atomic ceremony:
 
-1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`).
+1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`). The delete + suffix re-hash executes inside ONE write transaction (W-011): the write lock is held for the whole rewrite, so live appends wait (`busy_timeout`) and then chain to the post-prune tip - schedule prunes of very large chains in a maintenance window. On a custom audit-db binding without the `transact` fence the prune refuses to run (fail closed) rather than risk a permanent chain break.
 2. Immediately sign a FRESH checkpoint of the new head: `signAuditCheckpoint(auditDb, { privateKeyPem, writerId })`.
 3. Distribute the new checkpoint to every out-of-band anchor location (other host, object store, ticket).
 4. Revoke or explicitly mark superseded every pre-prune checkpoint, recording the prune timestamp next to them - a later `verifyAuditAgainstCheckpoint` failure against one of them must read as "expected: pre-prune anchor", not as an alarm.
@@ -172,7 +172,7 @@ An operator allow/deny policy gates which package names may be installed. By def
 await installSkillFromNpm({
   packageName: '@vendor/skill',
   trustRoot: {
-    publishers: ['vendor.example.com'],           // trusted publisher ids
+    publishers: ['vendor.example.com'],           // trusted publisher DOMAINS (well-known only)
     fingerprints: ['sha256:...'],                  // and/or pinned key fingerprints
     allowSigstore: true,                           // sigstore-resolved keys exempt (default)
   },
@@ -180,6 +180,8 @@ await installSkillFromNpm({
 ```
 
 The root check runs after the ed25519 signature itself is valid, so the result distinguishes a forged signature from an untrusted signer.
+
+The `publishers` leg is domain-bound (W-026): the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
 
 ## Lateral-leak defense layer
 
@@ -259,7 +261,7 @@ createAgent({
 
 A matching `forbid` always beats an `allow`, so narrowing composes safely and a later broad allow can never re-open a denied call.
 
-**Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the third leg is deterministically blocked, not merely flagged.
+**Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools; denying `untrustedInput` deterministically blocks calling untrusted-SOURCE tools - those whose trust class the taint engine treats as injection-bearing (`mcp-derived`, `web-search`, `skill-untrusted`; one shared taxonomy, W-101). Note the scope: the leg gates untrusted tool SOURCES; untrusted content arriving in user messages is outside it. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the dropped leg is deterministically blocked, not merely flagged.
 
 ```ts
 createAgent({
@@ -323,7 +325,7 @@ release enforces. Each is a design-class change (an operator trust root, a signe
 external anchor, a persisted registry) rather than a one-line fix, and is tracked
 rather than shipped speculatively.
 
-- **Skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - but for an `inline` key that key comes from the (attacker-authored) frontmatter itself, and for a `well-known` key the pin fingerprint is frontmatter-supplied too. Without an operator-pinned `publicKeySource`, a *self-signed* skill verifies as `signatureVerified: true`. Treat signature verification as integrity-in-transit, not publisher authenticity, until you configure an operator trust root. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
+- **Without a trust root, skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - for an `inline` key that key comes from the (attacker-authored) frontmatter itself, so a *self-signed* skill verifies as `signatureVerified: true` until you configure an operator trust root. WITH a trust root the story is now stronger (W-026): the `publishers` leg is satisfied only by `well-known` keys served from the publisher's own domain (host-bound, redirects refused), which under the web-PKI assumption IS publisher provenance; the residual caveat applies to inline keys without a `fingerprints` pin. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
 - **The audit chain is tamper-*evident*, not tamper-*resistant*.** It is an unkeyed SHA-256 hash chain with no signing key or external anchor. An actor with write access to the audit database - or a compromised process holding the at-rest passphrase - can delete or rewrite entries and re-root the chain so `verifyAuditChain` still reports clean (`pruneAudit` does exactly this re-rooting by design). It defends only against actors *without* DB write access. Anchor the chain head externally if you need resistance against privileged actors. A prune also rewrites surviving entries' hashes, so hashes archived from an earlier `exportAudit` no longer match the live chain.
 - **The installed-skills registry is process-memory only.** `auditInstalledSkills()` reflects only installations performed in the current process; it is not persisted across restarts. Relatedly, the `trusted-with-scripts` trust level is currently unreachable in practice (no folder installer constructs a `{ kind: 'folder' }` source), so skill `postinstall` lifecycles never run.
 

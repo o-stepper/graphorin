@@ -42,6 +42,8 @@ export async function runTriggersList(
   options: TriggersCommonOptions = {},
 ): Promise<ReadonlyArray<TriggerState>> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -84,7 +86,6 @@ export async function runTriggersStatus(
       const print = options.print ?? defaultPrintSink;
       if (state === null) {
         print(brand(`trigger '${options.id}' not found.`));
-        process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
         return;
       }
       print(brand(`trigger ${state.id}`));
@@ -96,6 +97,8 @@ export async function runTriggersStatus(
       print(`  lastFiredAt: ${state.lastFiredAt ?? '-'}`);
       print(`  missedFires: ${state.missedFires}`);
     });
+    // W-002: exit code independent of --json (see runAuditVerify).
+    if (state === null) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     return state;
   } finally {
     await ctx.close();

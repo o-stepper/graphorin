@@ -29,7 +29,7 @@ Returns the picked hint together with the original `ModelSpec`
 
 | Parameter | Type |
 | ------ | ------ |
-| `hints` | readonly ( \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md) \| [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md) \| `undefined`)[] |
+| `hints` | readonly ( \| [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md) \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md) \| `undefined`)[] |
 
 ## Returns
 

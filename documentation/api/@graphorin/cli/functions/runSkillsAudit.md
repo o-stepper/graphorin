@@ -10,7 +10,7 @@
 function runSkillsAudit(options?): readonly SkillInstallationStatus[];
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:145
+Defined in: packages/cli/src/commands/skills.ts:146
 
 ## Parameters
 

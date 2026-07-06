@@ -10,7 +10,7 @@
 function createSessionManager(opts): SessionManager;
 ```
 
-Defined in: packages/sessions/src/facade.ts:349
+Defined in: packages/sessions/src/facade.ts:357
 
 Build a session manager. The manager is the public entry point;
 sessions are obtained via `manager.create(...)` / `manager.get(...)`.

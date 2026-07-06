@@ -10,7 +10,7 @@
 function runStateToJSON(state, options?): string;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:184
+Defined in: packages/agent/src/run-state/index.ts:197
 
 Render the canonical JSON string representation of the supplied
 [RunState](/api/@graphorin/core/interfaces/RunState.md). `JSON.stringify(serializeRunState(state))` -

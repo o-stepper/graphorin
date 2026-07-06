@@ -18,6 +18,10 @@ preserving append-only semantics - soft-delete only.
 
 ## Stable
 
+## Extended by
+
+- [`MemoryStoreExt`](/api/@graphorin/core/interfaces/MemoryStoreExt.md)
+
 ## Properties
 
 | Property | Modifier | Type | Defined in |

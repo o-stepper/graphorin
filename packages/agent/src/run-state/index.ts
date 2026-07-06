@@ -13,25 +13,32 @@
 import type {
   CompletedToolCall,
   HandoffRecord,
-  Message,
   RunState,
   RunStateUsageByModel,
   RunStatus,
-  RunStep,
   RunTaintSummary,
   TodoItem,
   ToolApproval,
   Usage,
+  WireMessage,
+  WireRunState,
+  WireRunStep,
 } from '@graphorin/core';
-import { zeroUsage } from '@graphorin/core';
+import { fromJsonSafeRunState, toJsonSafeRunState, zeroUsage } from '@graphorin/core';
 import { RunStateMalformedError, RunStateVersionUnsupportedError } from '../errors/index.js';
 
 /**
  * Canonical schema id for serialized {@link RunState} payloads.
  *
+ * 1.2 encodes binary message/tool-outcome payloads (`Uint8Array | URL`)
+ * through the core `WireRunState` projection (base64 / href envelopes)
+ * instead of letting `JSON.stringify` corrupt them. 1.0/1.1 payloads
+ * remain readable; their corrupted numeric-key byte objects are
+ * repaired best-effort on rehydration.
+ *
  * @stable
  */
-export const RUN_STATE_SCHEMA_VERSION = 'graphorin-run-state/1.1' as const;
+export const RUN_STATE_SCHEMA_VERSION = 'graphorin-run-state/1.2' as const;
 
 /**
  * Reader-supported schema id range. Major version 1 only for v0.1.
@@ -42,7 +49,9 @@ export const RUN_STATE_SCHEMA_MAJOR_SUPPORTED = 1;
 
 /**
  * On-disk payload returned by {@link serializeRunState} and accepted
- * by {@link deserializeRunState}. The shape is JSON-stable.
+ * by {@link deserializeRunState}. The shape is JSON-stable: binary
+ * message/tool-outcome payloads appear in their `WireMessage` /
+ * `WireRunStep` (base64 / href envelope) form.
  *
  * @stable
  */
@@ -54,8 +63,8 @@ export interface SerializedRunState {
   readonly sessionId: string;
   readonly userId?: string;
   readonly status: RunStatus;
-  readonly steps: ReadonlyArray<RunStep>;
-  readonly messages: ReadonlyArray<Message>;
+  readonly steps: ReadonlyArray<WireRunStep>;
+  readonly messages: ReadonlyArray<WireMessage>;
   readonly pendingApprovals: ReadonlyArray<ToolApproval>;
   readonly handoffs: ReadonlyArray<HandoffRecord>;
   readonly usage: Usage;
@@ -100,26 +109,30 @@ export function serializeRunState(
   state: RunState,
   options: SerializeRunStateOptions = {},
 ): SerializedRunState {
+  // W-004: binary payloads (Uint8Array | URL in messages and tool-outcome
+  // contentParts) must be projected to their JSON-safe wire form BEFORE
+  // the detach stringify below, or they corrupt silently.
+  const wire = toJsonSafeRunState(state);
   const out: SerializedRunState = {
     version: RUN_STATE_SCHEMA_VERSION,
-    id: state.id,
-    agentId: state.agentId,
-    currentAgentId: state.currentAgentId,
-    sessionId: state.sessionId,
-    ...(state.userId !== undefined ? { userId: state.userId } : {}),
-    status: state.status,
-    steps: state.steps,
-    messages: state.messages,
-    pendingApprovals: state.pendingApprovals,
-    handoffs: state.handoffs,
-    usage: state.usage,
-    ...(state.usageByModel !== undefined ? { usageByModel: state.usageByModel } : {}),
-    ...(state.taintSummary !== undefined ? { taintSummary: state.taintSummary } : {}),
-    ...(state.promotedTools !== undefined ? { promotedTools: state.promotedTools } : {}),
-    ...(state.todos !== undefined ? { todos: state.todos } : {}),
-    startedAt: state.startedAt,
-    ...(state.finishedAt !== undefined ? { finishedAt: state.finishedAt } : {}),
-    ...(state.error !== undefined ? { error: state.error } : {}),
+    id: wire.id,
+    agentId: wire.agentId,
+    currentAgentId: wire.currentAgentId,
+    sessionId: wire.sessionId,
+    ...(wire.userId !== undefined ? { userId: wire.userId } : {}),
+    status: wire.status,
+    steps: wire.steps,
+    messages: wire.messages,
+    pendingApprovals: wire.pendingApprovals,
+    handoffs: wire.handoffs,
+    usage: wire.usage,
+    ...(wire.usageByModel !== undefined ? { usageByModel: wire.usageByModel } : {}),
+    ...(wire.taintSummary !== undefined ? { taintSummary: wire.taintSummary } : {}),
+    ...(wire.promotedTools !== undefined ? { promotedTools: wire.promotedTools } : {}),
+    ...(wire.todos !== undefined ? { todos: wire.todos } : {}),
+    startedAt: wire.startedAt,
+    ...(wire.finishedAt !== undefined ? { finishedAt: wire.finishedAt } : {}),
+    ...(wire.error !== undefined ? { error: wire.error } : {}),
   };
   // AG-23: the snapshot must be DETACHED from the live MutableRunState -
   // a post-suspend mutation must never reach an already-persisted
@@ -252,8 +265,8 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     typeof payload.currentAgentId === 'string' ? payload.currentAgentId : agentId;
   const sessionId = requiredString('sessionId');
   const status = requiredString('status') as RunStatus;
-  const steps = requiredArray<RunStep>('steps');
-  const messages = requiredArray<Message>('messages');
+  const steps = requiredArray<WireRunStep>('steps');
+  const messages = requiredArray<WireMessage>('messages');
   const pendingApprovals = requiredArray<ToolApproval>('pendingApprovals');
   const handoffs = requiredArray<HandoffRecord>('handoffs');
   const usageRaw = payload.usage;
@@ -367,7 +380,7 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
         .map((t) => ({ id: t.id, content: t.content, status: t.status }))
     : undefined;
 
-  const out: RunState = {
+  const wire: WireRunState = {
     id,
     agentId,
     currentAgentId,
@@ -388,7 +401,10 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     ...(error !== undefined ? { error } : {}),
   };
   void zeroUsage; // kept available; some callers prefer zeroUsage as a default.
-  return out;
+  // W-004: decode base64/href envelopes back into Uint8Array/URL. Legacy
+  // 1.0/1.1 payloads whose binary fields were stringify-corrupted into
+  // numeric-key objects are repaired best-effort inside the codec.
+  return fromJsonSafeRunState(wire);
 }
 
 /** Convenience JSON-string parser pairing with {@link runStateToJSON}. */

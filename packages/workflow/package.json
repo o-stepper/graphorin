@@ -33,7 +33,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -41,23 +41,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./factory": {
       "types": "./dist/factory.d.ts",
-      "import": "./dist/factory.js"
+      "default": "./dist/factory.js"
     },
     "./node": {
       "types": "./dist/node.d.ts",
-      "import": "./dist/node.js"
+      "default": "./dist/node.js"
     },
     "./checkpoint-store-memory": {
       "types": "./dist/checkpoint-store-memory.d.ts",
-      "import": "./dist/checkpoint-store-memory.js"
+      "default": "./dist/checkpoint-store-memory.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./package.json": "./package.json"
   },

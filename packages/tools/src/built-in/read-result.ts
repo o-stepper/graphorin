@@ -50,8 +50,32 @@ const outputSchema = z.object({
   producerSensitivity: z.string().optional(),
 });
 
-type ReadResultInput = z.infer<typeof inputSchema>;
-type ReadResultOutput = z.infer<typeof outputSchema>;
+/** W-013: explicit interfaces - no concrete zod generics in the d.ts. */
+export interface ReadResultInput {
+  handle: string;
+  offset?: number | undefined;
+  length?: number | undefined;
+  startLine?: number | undefined;
+  endLine?: number | undefined;
+  maxBytes?: number | undefined;
+}
+export interface ReadResultOutput {
+  content: string;
+  bytes: number;
+  totalBytes: number;
+  eof: boolean;
+  producerTrustClass?: string | undefined;
+  producerSource?: ({ kind: string } & Record<string, unknown>) | undefined;
+  producerSensitivity?: string | undefined;
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): the explicit interface must stay MUTUALLY assignable with the
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<W013Equals<ReadResultInput, z.infer<typeof inputSchema>>>;
+type _W013Check2 = W013Assert<W013Equals<ReadResultOutput, z.infer<typeof outputSchema>>>;
 
 /**
  * Build a `read_result` tool bound to a specific {@link ResultReader}.

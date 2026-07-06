@@ -6,7 +6,7 @@
 
 # Interface: MemoryWhyResult
 
-Defined in: packages/cli/src/commands/memory.ts:581
+Defined in: packages/cli/src/commands/memory.ts:585
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/cli/src/commands/memory.ts:581
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-recalls"></a> `recalls` | `readonly` | readonly [`MemoryWhyRecall`](/api/@graphorin/cli/interfaces/MemoryWhyRecall.md)[] | packages/cli/src/commands/memory.ts:582 |
+| <a id="property-recalls"></a> `recalls` | `readonly` | readonly [`MemoryWhyRecall`](/api/@graphorin/cli/interfaces/MemoryWhyRecall.md)[] | packages/cli/src/commands/memory.ts:586 |

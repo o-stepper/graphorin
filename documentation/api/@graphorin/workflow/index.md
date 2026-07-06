@@ -226,7 +226,7 @@ Stepurenko · <https://github.com/o-stepper/graphorin>
 | Module | Description |
 | ------ | ------ |
 | [](/api/@graphorin/workflow/README.md) | `@graphorin/workflow` - step-graph workflow engine for the Graphorin framework. |
-| [checkpoint-store-memory](/api/@graphorin/workflow/checkpoint-store-memory/index.md) | In-memory [CheckpointStore](/api/@graphorin/workflow/interfaces/CheckpointStore.md) adapter. Useful in tests, REPL sessions, and small examples where SQLite would be overkill. The production-grade adapter lives in `@graphorin/store-sqlite`. |
+| [checkpoint-store-memory](/api/@graphorin/workflow/checkpoint-store-memory/index.md) | In-memory CheckpointStore adapter. Useful in tests, REPL sessions, and small examples where SQLite would be overkill. The production-grade adapter lives in `@graphorin/store-sqlite`. |
 | [errors](/api/@graphorin/workflow/errors/index.md) | Typed error surface for `@graphorin/workflow`. Every workflow-level failure lands as a subclass of [WorkflowError](/api/@graphorin/workflow/errors/classes/WorkflowError.md) carrying the stable string `code` discriminator so consumers can pattern-match without inspecting messages. |
 | [factory](/api/@graphorin/workflow/factory/index.md) | `createWorkflow({...})` - the public entry point for the workflow runtime. Validates the supplied configuration and returns the [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) handle that exposes `execute / resume / getState / listCheckpoints / fork`. |
 | [node](/api/@graphorin/workflow/node/index.md) | `createNode({...})` - minimal factory wrapper for declaring a workflow node. Returns a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md) carrying the supplied `name` + `run(...)` callback. |

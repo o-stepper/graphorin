@@ -10,7 +10,7 @@
 function runSecretsRef(options): Promise<SecretsRefResult>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:198
+Defined in: packages/cli/src/commands/secrets.ts:199
 
 Test resolution of a `SecretRef` URI. The CLI parses the URI first
 (sanity check + scheme echo), then resolves through the registered

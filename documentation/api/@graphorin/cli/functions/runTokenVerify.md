@@ -10,7 +10,7 @@
 function runTokenVerify(options): TokenVerifyResult;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:311
+Defined in: packages/cli/src/commands/token.ts:312
 
 Offline checksum verification. Confirms the structural shape, the
 environment marker, and the CRC checksum but does NOT consult the

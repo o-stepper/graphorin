@@ -10,7 +10,7 @@
 type ServerMessage = z.infer<typeof ServerMessageSchema>;
 ```
 
-Defined in: src/server-message.ts:151
+Defined in: src/server-message.ts:158
 
 Inferred TypeScript union for the `ServerMessage` discriminator.
 

@@ -6,7 +6,7 @@
 
 # Interface: TracesCommonOptions
 
-Defined in: packages/cli/src/commands/traces.ts:27
+Defined in: packages/cli/src/commands/traces.ts:32
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/cli/src/commands/traces.ts:27
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/traces.ts:28 |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/traces.ts:33 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | `CommonOutputOptions.json` | packages/cli/src/internal/output.ts:71 |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | `CommonOutputOptions.jsonPrint` | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | `CommonOutputOptions.nonInteractive` | packages/cli/src/internal/output.ts:73 |

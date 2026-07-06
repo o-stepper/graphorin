@@ -6,7 +6,7 @@
 
 # Interface: ToolDefinition
 
-Defined in: packages/core/src/contracts/provider.ts:226
+Defined in: packages/core/src/contracts/provider.ts:236
 
 Tool description shipped with a provider request. Implementations
 convert the user's Zod schema to a JSON Schema 7 fragment.
@@ -17,8 +17,8 @@ convert the user's Zod schema to a JSON Schema 7 fragment.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:228 |
-| <a id="property-examples"></a> `examples?` | `readonly` | readonly [`ToolDefinitionExample`](/api/@graphorin/core/interfaces/ToolDefinitionExample.md)[] | Worked examples surfaced to the provider alongside the schema. The agent runtime populates this from the tool's `examples` when they are eagerly rendered (see `Tool.examplesEagerlyRendered`); it is bounded to ≤5 and absent when the tool declares none or defers them. Implementations MAY fold these into the model-facing tool description. | packages/core/src/contracts/provider.ts:244 |
-| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | packages/core/src/contracts/provider.ts:229 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:227 |
-| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | A5: the tool's output schema (JSON Schema), when declared. The agent runtime populates it from `Tool.outputSchema`; structured-output providers and typed code-mode use it to validate / type the tool's result. Absent when the tool declares no output schema. | packages/core/src/contracts/provider.ts:236 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:238 |
+| <a id="property-examples"></a> `examples?` | `readonly` | readonly [`ToolDefinitionExample`](/api/@graphorin/core/interfaces/ToolDefinitionExample.md)[] | Worked examples surfaced to the provider alongside the schema. The agent runtime populates this from the tool's `examples` when they are eagerly rendered (see `Tool.examplesEagerlyRendered`); it is bounded to ≤5 and absent when the tool declares none or defers them. Implementations MAY fold these into the model-facing tool description. | packages/core/src/contracts/provider.ts:254 |
+| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | packages/core/src/contracts/provider.ts:239 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:237 |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | A5: the tool's output schema (JSON Schema), when declared. The agent runtime populates it from `Tool.outputSchema`; structured-output providers and typed code-mode use it to validate / type the tool's result. Absent when the tool declares no output schema. | packages/core/src/contracts/provider.ts:246 |

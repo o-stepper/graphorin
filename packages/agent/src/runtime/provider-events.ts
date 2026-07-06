@@ -92,6 +92,21 @@ export function handleProviderEvent(
     case 'reasoning-delta':
       state.reasoningBuffer += ev.delta;
       return { emit: { type: 'reasoning.delta', delta: ev.delta } };
+    case 'reasoning-end': {
+      // W-024: close the current reasoning block - flush the buffered
+      // deltas into a per-block ReasoningContent carrying the adapter's
+      // opaque round-trip meta (Anthropic thinking signature / redacted
+      // data). A redacted block has no deltas: its part is meta-only
+      // with empty text, which the retention pipeline still round-trips.
+      const text = state.reasoningBuffer;
+      state.reasoningBuffer = '';
+      state.reasoningParts.push({
+        type: 'reasoning',
+        text,
+        ...(ev.meta !== undefined ? { meta: ev.meta } : {}),
+      });
+      return {};
+    }
     case 'text-delta':
       state.textBuffer += ev.delta;
       return { emit: { type: 'text.delta', delta: ev.delta } };

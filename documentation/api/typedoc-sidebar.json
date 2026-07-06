@@ -996,10 +996,6 @@
               {
                 "text": "CreateMemoryOptions",
                 "link": "/api/@graphorin/memory/facade/interfaces/CreateMemoryOptions.md"
-              },
-              {
-                "text": "Memory",
-                "link": "/api/@graphorin/memory/facade/interfaces/Memory.md"
               }
             ]
           },
@@ -2219,6 +2215,16 @@
         "collapsed": true,
         "items": [
           {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ReplayBufferStats",
+                "link": "/api/@graphorin/server/ws/interfaces/ReplayBufferStats.md"
+              }
+            ]
+          },
+          {
             "text": "Type Aliases",
             "collapsed": true,
             "items": [
@@ -2235,6 +2241,10 @@
               {
                 "text": "isSubjectAllowed",
                 "link": "/api/@graphorin/server/ws/functions/isSubjectAllowed.md"
+              },
+              {
+                "text": "scheduleReplayBufferPruning",
+                "link": "/api/@graphorin/server/ws/functions/scheduleReplayBufferPruning.md"
               }
             ]
           }
@@ -2885,6 +2895,10 @@
             "text": "Classes",
             "collapsed": true,
             "items": [
+              {
+                "text": "SqliteBusyError",
+                "link": "/api/@graphorin/store-sqlite/connection/classes/SqliteBusyError.md"
+              },
               {
                 "text": "SqliteVecMissingError",
                 "link": "/api/@graphorin/store-sqlite/connection/classes/SqliteVecMissingError.md"

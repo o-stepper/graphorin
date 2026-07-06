@@ -100,10 +100,45 @@ export async function appendAudit(db: AuditDb, input: AuditEntryInput): Promise<
   return run;
 }
 
+/** Cross-process seq-collision retries for bindings without `transact`. */
+const APPEND_SEQ_CONFLICT_RETRIES = 3;
+
 async function appendAuditUnsynchronized(
   db: AuditDb,
   input: AuditEntryInput,
 ): Promise<StoredAuditEntry> {
+  // W-011: the in-process WeakMap chain serialises callers on THIS
+  // handle, but two processes sharing one audit file each have their
+  // own chain. With `transact`, the whole read-modify-write runs under
+  // the database write lock (BEGIN IMMEDIATE), so a concurrent process
+  // blocks until commit and then reads the fresh tip. Without it,
+  // retry on the seq primary-key collision instead of silently
+  // dropping the losing entry (the bridges' one-console.warn path).
+  if (db.transact !== undefined) {
+    return db.transact(() => appendOnce(db, input));
+  }
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= APPEND_SEQ_CONFLICT_RETRIES; attempt += 1) {
+    try {
+      return await appendOnce(db, input);
+    } catch (err) {
+      if (!isSeqConflictError(err)) throw err;
+      lastError = err;
+    }
+  }
+  throw lastError;
+}
+
+/** The shape better-sqlite3 (and most SQLite drivers) throw on a seq PK collision. */
+function isSeqConflictError(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const code = (err as { code?: unknown }).code;
+  if (typeof code === 'string' && code.includes('SQLITE_CONSTRAINT')) return true;
+  const message = (err as { message?: unknown }).message;
+  return typeof message === 'string' && /UNIQUE constraint|PRIMARY KEY/i.test(message);
+}
+
+async function appendOnce(db: AuditDb, input: AuditEntryInput): Promise<StoredAuditEntry> {
   const last = await db.latest();
   const seq = (last?.seq ?? 0) + 1;
   const prevHash = last?.hash ?? GENESIS_PREV_HASH;

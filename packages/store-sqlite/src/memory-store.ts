@@ -1129,6 +1129,20 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
+   * W-019: pending supersede link - `newId.supersedes = oldId` without
+   * closing the old fact's interval (that happens on validation).
+   *
+   * @stable
+   */
+  async linkPendingSupersede(newId: string, oldId: string): Promise<void> {
+    this.#conn.run('UPDATE facts SET supersedes = ?, updated_at = ? WHERE id = ?', [
+      oldId,
+      Date.now(),
+      newId,
+    ]);
+  }
+
+  /**
    * Walk the supersede chain in both directions from `factId` and
    * return every fact in it, ordered by `valid_from` ascending
    * (oldest → newest, falling back to `created_at`). Unlike

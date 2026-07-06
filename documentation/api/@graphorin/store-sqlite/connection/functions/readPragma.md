@@ -10,7 +10,7 @@
 function readPragma(conn, name): unknown;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:296
+Defined in: packages/store-sqlite/src/connection.ts:323
 
 Pragma helper that surfaces the runtime value of a single setting as
 a typed scalar. Used by the integration tests to verify the WAL

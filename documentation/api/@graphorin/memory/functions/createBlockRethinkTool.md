@@ -7,16 +7,10 @@
 # Function: createBlockRethinkTool()
 
 ```ts
-function createBlockRethinkTool(deps): Tool<{
-  label: string;
-  newValue: string;
-}, {
-  label: string;
-  length: number;
-}>;
+function createBlockRethinkTool(deps): Tool<BlockRethinkInput, BlockRethinkOutput>;
 ```
 
-Defined in: packages/memory/src/tools/block-tools.ts:105
+Defined in: packages/memory/src/tools/block-tools.ts:152
 
 `block_rethink` - rewrite a working memory block from scratch.
 
@@ -28,12 +22,6 @@ Defined in: packages/memory/src/tools/block-tools.ts:105
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `label`: `string`;
-  `newValue`: `string`;
-\}, \{
-  `label`: `string`;
-  `length`: `number`;
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockRethinkInput`, `BlockRethinkOutput`\&gt;
 
 ## Stable

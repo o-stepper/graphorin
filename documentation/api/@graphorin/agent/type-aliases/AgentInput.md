@@ -13,7 +13,7 @@ type AgentInput =
 | ReadonlyArray<Message>;
 ```
 
-Defined in: packages/agent/src/types.ts:49
+Defined in: packages/agent/src/types.ts:50
 
 Forward-compatible type alias for the input accepted by
 `Agent.stream / run / steer / followUp`. v0.1 ships with the

@@ -10,7 +10,7 @@
 function isEventFrame(message): message is { eventId: string; kind: "event"; payload?: unknown; subject: string; subscriptionId: string; type: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:184
+Defined in: src/server-message.ts:191
 
 Type guard helpers, one per discriminator. The narrow over the
 `ServerMessage` union without forcing consumers to memorize the

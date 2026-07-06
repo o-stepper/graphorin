@@ -93,6 +93,17 @@ graphorin storage encrypt <db>      # convert an existing plaintext DB
 graphorin storage rekey <db>        # rotate the passphrase
 ```
 
+`storage encrypt --swap` replaces the plaintext file in place and **requires a
+stopped server**: the swap renames the source, and a live writer would keep
+committing into the renamed `.bak.<ts>` inode - those writes silently diverge
+from the new encrypted database and are later deleted by
+`storage cleanup-backups`. The command probes for a live connection and
+refuses the swap when one is detected (best-effort: the probe-to-rename window
+remains, so stopping the server is the rule, not the probe). Writes committed
+between the snapshot and the swap live only in the `.bak.<ts>` file reported
+as `swap.originalRenamedTo`. `storage rekey` on a live WAL database already
+fails fast with "database is locked".
+
 ## Custom backends
 
 Any backend that satisfies the store contracts (Postgres, libSQL, a cloud KV,

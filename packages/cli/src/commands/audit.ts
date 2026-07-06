@@ -89,8 +89,12 @@ export async function runAuditVerify(options: AuditCommonOptions = {}): Promise<
       print(brand(`audit chain ${statusMarker('fail')} broken at seq ${out.broken?.seq}`));
       print(`  expected prevHash=${out.broken?.expected}`);
       print(`  actual prevHash=${out.broken?.actual}`);
-      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     });
+    // W-002: the exit code is part of the machine contract - it must be
+    // set OUTSIDE the human() callback (emitReport skips that callback
+    // entirely under --json, so a broken chain exited 0 for exactly the
+    // CI consumers the flag exists for).
+    if (!out.ok) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     return out;
   } finally {
     await ctx.close();
