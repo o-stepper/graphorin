@@ -42,6 +42,8 @@ interface AggregateBucket {
   promptTokens: number;
   completionTokens: number;
   reasoningTokens: number;
+  cachedReadTokens: number;
+  cacheWriteTokens: number;
   callCount: number;
   costAmount: number;
   costCurrency: string | null;
@@ -56,6 +58,8 @@ function freshBucket(): AggregateBucket {
     promptTokens: 0,
     completionTokens: 0,
     reasoningTokens: 0,
+    cachedReadTokens: 0,
+    cacheWriteTokens: 0,
     callCount: 0,
     costAmount: 0,
     costCurrency: null,
@@ -82,12 +86,16 @@ function combine(target: AggregateBucket, input: CostRecordInput): void {
   target.promptTokens += input.promptTokens;
   target.completionTokens += input.completionTokens;
   target.reasoningTokens += input.reasoningTokens ?? 0;
+  target.cachedReadTokens += input.cachedReadTokens ?? 0;
+  target.cacheWriteTokens += input.cacheWriteTokens ?? 0;
   target.callCount += 1;
   if (input.cost !== undefined) addCost(target, input.cost);
   const modelBucket = target.byModel.get(input.model) ?? freshBucket();
   modelBucket.promptTokens += input.promptTokens;
   modelBucket.completionTokens += input.completionTokens;
   modelBucket.reasoningTokens += input.reasoningTokens ?? 0;
+  modelBucket.cachedReadTokens += input.cachedReadTokens ?? 0;
+  modelBucket.cacheWriteTokens += input.cacheWriteTokens ?? 0;
   modelBucket.callCount += 1;
   if (input.cost !== undefined) addCost(modelBucket, input.cost);
   target.byModel.set(input.model, modelBucket);
@@ -102,6 +110,8 @@ function snapshotOf(bucket: AggregateBucket): CostSnapshot {
     promptTokens: bucket.promptTokens,
     completionTokens: bucket.completionTokens,
     reasoningTokens: bucket.reasoningTokens,
+    cachedReadTokens: bucket.cachedReadTokens,
+    cacheWriteTokens: bucket.cacheWriteTokens,
     totalTokens: bucket.promptTokens + bucket.completionTokens + bucket.reasoningTokens,
     callCount: bucket.callCount,
     cost,
@@ -111,6 +121,8 @@ function snapshotOf(bucket: AggregateBucket): CostSnapshot {
       promptTokens: b.promptTokens,
       completionTokens: b.completionTokens,
       reasoningTokens: b.reasoningTokens,
+      cachedReadTokens: b.cachedReadTokens,
+      cacheWriteTokens: b.cacheWriteTokens,
       callCount: b.callCount,
       cost: b.costCurrency === null ? null : { amount: b.costAmount, currency: b.costCurrency },
       mixedCurrency: b.mixedCurrency,
@@ -122,6 +134,8 @@ const ZERO: CostSnapshot = Object.freeze({
   promptTokens: 0,
   completionTokens: 0,
   reasoningTokens: 0,
+  cachedReadTokens: 0,
+  cacheWriteTokens: 0,
   totalTokens: 0,
   callCount: 0,
   cost: null,
@@ -138,6 +152,17 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
   const budgets: CostBudgets = opts.budgets ?? {};
   const currency = budgets.currency ?? 'USD';
   const onExceed = opts.onExceed;
+  // W-092: memory bounds - the tracker lives for the process lifetime,
+  // so unbounded maps are a leak in the long-running-assistant scenario.
+  const retention = opts.retention;
+  const maxSpanEntries =
+    retention === false
+      ? Number.POSITIVE_INFINITY
+      : (retention?.maxSpanEntries ?? DEFAULT_MAX_SPAN_ENTRIES);
+  const maxScopeEntries =
+    retention === false
+      ? Number.POSITIVE_INFINITY
+      : (retention?.maxScopeEntries ?? DEFAULT_MAX_SCOPE_ENTRIES);
 
   const bySpan = new Map<string, AggregateBucket>();
   const byScope: Record<CostScope, Map<string, AggregateBucket>> = {
@@ -152,12 +177,35 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
   const parents = new Map<string, string>();
   const listeners = new Set<(input: CostRecordInput) => void>();
 
+  // W-092: evict OLDEST entries (Map insertion order - a re-recorded
+  // key keeps its original position on purpose: this is an age bound,
+  // not an LRU) once a map exceeds its cap. Evicting a span also drops
+  // its parent edge so `parents` cannot outgrow `bySpan`.
+  function evictOldest(
+    map: Map<string, AggregateBucket>,
+    max: number,
+    surface: 'span' | CostScope,
+  ): void {
+    while (map.size > max) {
+      const oldest = map.keys().next().value;
+      if (oldest === undefined) return;
+      map.delete(oldest);
+      if (surface === 'span') parents.delete(oldest);
+      try {
+        opts.onEviction?.({ surface, id: oldest });
+      } catch {
+        // Observers must never break the tracker.
+      }
+    }
+  }
+
   function bump(scope: CostScope, id: string | undefined, input: CostRecordInput): void {
     if (id === undefined) return;
     const map = byScope[scope];
     const bucket = map.get(id) ?? freshBucket();
     combine(bucket, input);
     map.set(id, bucket);
+    evictOldest(map, maxScopeEntries, scope);
     enforceBudget(scope, id, bucket, onExceed);
   }
 
@@ -203,6 +251,9 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
         bySpan.set(ancestor, ancestorBucket);
         ancestor = parents.get(ancestor);
       }
+      // W-092: bound the span map AFTER the rollup walk so the entries
+      // this record touched are all present before age eviction runs.
+      evictOldest(bySpan, maxSpanEntries, 'span');
 
       // Roll up to the requested aggregation scopes.
       bump('run', input.runId, input);
@@ -218,6 +269,8 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
         }
       }
     },
+    // W-092: an id evicted by the retention bound reports ZERO - same
+    // as never-seen. Pass `retention: false` for the old unbounded maps.
     usage(scope: CostScope, id: string): CostSnapshot {
       const bucket = byScope[scope].get(id);
       if (bucket === undefined) return ZERO;
@@ -243,6 +296,10 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
     },
   };
 }
+
+/** W-092: default retention caps - generous for a long-lived assistant. */
+const DEFAULT_MAX_SPAN_ENTRIES = 10_000;
+const DEFAULT_MAX_SCOPE_ENTRIES = 10_000;
 
 function pickBudget(budgets: CostBudgets, scope: CostScope): number | undefined {
   switch (scope) {
