@@ -117,6 +117,17 @@ export interface SessionMemoryStore {
     scope: SessionScope,
     opts?: SessionListOptions,
   ): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
+  /**
+   * Full-text search over the scoped session messages.
+   *
+   * Query precedence (W-127): the POSITIONAL `query` parameter is
+   * authoritative; when the caller also sets `opts.query` (the field
+   * exists because {@link MemorySearchOptions} is shared with the
+   * option-object search surfaces), implementations MUST ignore it.
+   * The duplication is a known wart: narrowing `opts` to
+   * `Omit<MemorySearchOptions, 'query'>` is a candidate for the next
+   * major, not a change this line can make compatibly.
+   */
   search(
     scope: SessionScope,
     query: string,

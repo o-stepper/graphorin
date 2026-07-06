@@ -62,3 +62,6 @@ tmp/
 
 # DOC-13 snippet-gate temp dirs (created + removed per run; ignored as a safety)
 .doc-snippet-*/
+
+# api-extractor working dir (committed report lives in packages/core/etc)
+packages/*/temp/

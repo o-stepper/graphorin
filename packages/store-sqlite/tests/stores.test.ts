@@ -689,6 +689,25 @@ describe('createSqliteStore', () => {
     expect(handoffs[0]?.toAgentId).toBe('helper');
   });
 
+  it('session search: the positional query is authoritative over opts.query (W-127)', async () => {
+    const scope = { userId: 'alex', sessionId: 's-prio' };
+    const alphaRef = await store.memory.session.push(scope, {
+      role: 'user',
+      content: 'the alpha topic',
+    });
+    const betaRef = await store.memory.session.push(scope, {
+      role: 'user',
+      content: 'the beta topic',
+    });
+    const hits = await store.memory.session.search(scope, 'alpha', {
+      query: 'beta',
+      topK: 5,
+    });
+    expect(hits.length).toBe(1);
+    expect(hits[0]?.record.id).toBe(alphaRef.messageId);
+    expect(hits[0]?.record.id).not.toBe(betaRef.messageId);
+  });
+
   it('trigger store: upsert + recordFire + list', async () => {
     const t = {
       id: 't-cron-1',

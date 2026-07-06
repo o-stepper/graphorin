@@ -133,6 +133,14 @@ jobs:
       - name: Character rules gate
         run: pnpm run check-character-rules
 
+      # W-127: the @graphorin/core public surface is committed as an
+      # api-extractor report; a PR that changes the surface without
+      # updating packages/core/etc/core.api.md fails here, making every
+      # API change an explicit, reviewable diff. Runs after Build (the
+      # report extracts from dist).
+      - name: Core API report gate
+        run: pnpm run check-api-report
+
       # Runs on the ubuntu+node22 leg only by design (same rationale as
       # examples-smoke): the benchmarks measure framework logic the
       # OS/node matrix already covers; repeating them on macos/windows or
