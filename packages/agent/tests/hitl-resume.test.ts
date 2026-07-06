@@ -169,6 +169,12 @@ describe('Agent - HITL approval flow', () => {
     const end = execEnds[0];
     if (end?.type === 'tool.execute.end') {
       expect(end.result).toBe('sent:a@b.c');
+      // W-049: the resumed dispatch carries toolName too.
+      expect(end.toolName).toBe('send_email');
+    }
+    const resumedStart = events.find((e) => e.type === 'tool.execute.start');
+    if (resumedStart?.type === 'tool.execute.start') {
+      expect(resumedStart.toolName).toBe('send_email');
     }
   });
 

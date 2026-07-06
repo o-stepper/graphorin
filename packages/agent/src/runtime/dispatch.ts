@@ -88,7 +88,8 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
   const { executorBridgeSlot } = env;
   if (calls.length === 0) return;
   for (const call of calls) {
-    yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+    // W-049: toolName duplicated for subscriber convenience.
+    yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
   }
 
   const bridge = createExecutorEventBridge();
@@ -128,7 +129,12 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
     }
     const outcome = result.outcome;
     if ('kind' in outcome) {
-      yield { type: 'tool.execute.error', toolCallId: call.toolCallId, error: outcome };
+      yield {
+        type: 'tool.execute.error',
+        toolCallId: call.toolCallId,
+        toolName: call.toolName,
+        error: outcome,
+      };
       const text = renderToolErrorMessage(outcome);
       messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
       state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
@@ -138,6 +144,7 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
       yield {
         type: 'tool.execute.end',
         toolCallId: call.toolCallId,
+        toolName: call.toolName,
         result: output,
         durationMs: outcome.durationMs,
       };

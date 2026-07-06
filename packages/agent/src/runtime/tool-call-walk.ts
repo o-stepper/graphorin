@@ -131,10 +131,11 @@ export async function* processStepToolCalls<TDeps, TOutput>(
             stepNumber,
           });
         }
-        yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+        yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
         yield {
           type: 'tool.execute.error',
           toolCallId: call.toolCallId,
+          toolName: call.toolName,
           error: toolError,
         };
         const text = renderToolErrorMessage(toolError);
@@ -155,7 +156,7 @@ export async function* processStepToolCalls<TDeps, TOutput>(
         yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
         batch = [];
       }
-      yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+      yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
       const approval: ToolApproval = {
         toolCallId: call.toolCallId,
         toolName: call.toolName,
@@ -260,7 +261,7 @@ async function* executeSubAgentToolCall<TDeps, TOutput>(
   stepNumber: number,
 ): AsyncGenerator<AgentEvent<TOutput>, { readonly suspendRequested: boolean }, void> {
   const { config, options, messages, sessionId, signal, toolDataFlowGuard } = env;
-  yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+  yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
   const rawInput = (call.args ?? {}) as { readonly input?: unknown };
   const input = { input: typeof rawInput.input === 'string' ? rawInput.input : '' };
   const parentSpan = env.getCurrentStepSpan?.();

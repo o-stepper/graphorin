@@ -63,7 +63,7 @@ const FIXTURES: Record<AgentEvent['type'], AgentEvent> = {
   'tool.call.start': { type: 'tool.call.start', toolCallId: 't', toolName: 'n', args: { q: 1 } },
   'tool.call.delta': { type: 'tool.call.delta', toolCallId: 't', argsDelta: '{' },
   'tool.call.end': { type: 'tool.call.end', toolCallId: 't', finalArgs: { q: 1 } },
-  'tool.execute.start': { type: 'tool.execute.start', toolCallId: 't' },
+  'tool.execute.start': { type: 'tool.execute.start', toolCallId: 't', toolName: 'n' },
   'tool.execute.progress': {
     type: 'tool.execute.progress',
     toolName: 'n',
@@ -82,10 +82,17 @@ const FIXTURES: Record<AgentEvent['type'], AgentEvent> = {
     stepNumber: 1,
     ts: 1,
   },
-  'tool.execute.end': { type: 'tool.execute.end', toolCallId: 't', result: 'ok', durationMs: 1 },
+  'tool.execute.end': {
+    type: 'tool.execute.end',
+    toolCallId: 't',
+    toolName: 'n',
+    result: 'ok',
+    durationMs: 1,
+  },
   'tool.execute.error': {
     type: 'tool.execute.error',
     toolCallId: 't',
+    toolName: 'n',
     error: { toolCallId: 't', toolName: 'n', kind: 'execution_failed', message: 'boom' },
   },
   'tool.approval.requested': { type: 'tool.approval.requested', toolCallId: 't' },

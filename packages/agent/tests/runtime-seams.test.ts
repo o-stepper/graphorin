@@ -388,6 +388,11 @@ describe('handoff: executeHandoffToolCall', () => {
     ]);
     const end = events[2] as Extract<Ev, { type: 'tool.execute.end' }>;
     expect(end.result).toBe('child says hi');
+    // W-049: handoff-path tool.execute.* events carry toolName too.
+    expect(end.toolName).toBe('transfer_to_child');
+    expect((events[0] as Extract<Ev, { type: 'tool.execute.start' }>).toolName).toBe(
+      'transfer_to_child',
+    );
     // W-034: the transfer is scoped to the child observation.
     expect(fx.state.currentAgentId).toBe('parent');
     expect(fx.state.handoffs).toHaveLength(1);
@@ -419,6 +424,7 @@ describe('handoff: executeHandoffToolCall', () => {
     >;
     expect(error.error.kind).toBe('execution_failed');
     expect(error.error.message).toContain("handoff to 'child-agent' failed: boom");
+    expect(error.toolName).toBe('transfer_to_child');
     expect(fx.state.currentAgentId).toBe('parent');
     expect(fx.messages.at(-1)?.role).toBe('tool');
   });
@@ -593,7 +599,72 @@ describe('tool-call-walk: processStepToolCalls', () => {
       { type: 'tool.execute.error' }
     >;
     expect(error.error.kind).toBe('invalid_input');
+    expect(error.toolName).toBe('danger_tool');
     expect(fx.state.pendingApprovals).toHaveLength(0);
     expect(fx.messages.at(-1)?.role).toBe('tool');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// W-049: toolName rides every tool.execute.* event end-to-end
+// ---------------------------------------------------------------------------
+
+describe('W-049: toolName on tool.execute.* events', () => {
+  it('ordinary and error dispatch paths carry toolName without a stateful join', async () => {
+    const { createAgent } = await import('../src/index.js');
+    const { createMockProvider, toolCallScript, textOnlyScript } = await import(
+      './fixtures/mock-provider.js'
+    );
+    const mkTool = (name: string, execute: () => Promise<string>) =>
+      ({
+        name,
+        description: 'w049 fixture',
+        inputSchema: {
+          parse: (v: unknown) => v,
+          safeParse: (v: unknown) => ({ success: true as const, data: v }),
+          toJSON: () => ({ type: 'object' }),
+        },
+        execute,
+      }) as never;
+    const agent = createAgent({
+      name: 'w049',
+      instructions: 'x',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({ toolCallId: 'c1', toolName: 'ok_tool', args: {} }),
+          toolCallScript({ toolCallId: 'c2', toolName: 'bad_tool', args: {} }),
+          textOnlyScript('done', 4),
+        ],
+      }),
+      tools: [
+        mkTool('ok_tool', async () => 'fine'),
+        mkTool('bad_tool', async () => {
+          throw new Error('nope');
+        }),
+      ],
+    });
+    const events: AgentEvent<string>[] = [];
+    for await (const ev of agent.stream('go')) events.push(ev);
+
+    const start = events.find(
+      (e) => e.type === 'tool.execute.start' && e.toolCallId === 'c1',
+    ) as Extract<Ev, { type: 'tool.execute.start' }>;
+    const end = events.find((e) => e.type === 'tool.execute.end') as Extract<
+      Ev,
+      { type: 'tool.execute.end' }
+    >;
+    const error = events.find((e) => e.type === 'tool.execute.error') as Extract<
+      Ev,
+      { type: 'tool.execute.error' }
+    >;
+    expect(start.toolName).toBe('ok_tool');
+    expect(end.toolName).toBe('ok_tool');
+    expect(error.toolName).toBe('bad_tool');
+    // The duplicated name agrees with the model-side tool.call.start.
+    const callStart = events.find(
+      (e) => e.type === 'tool.call.start' && e.toolCallId === 'c1',
+    ) as Extract<Ev, { type: 'tool.call.start' }>;
+    expect(callStart.toolName).toBe(start.toolName);
   });
 });
