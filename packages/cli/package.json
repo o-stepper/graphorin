@@ -24,6 +24,9 @@
     "graphorin-migrate"
   ],
   "type": "module",
+  "sideEffects": [
+    "./dist/bin/*"
+  ],
   "engines": {
     "node": ">=22.12.0"
   },

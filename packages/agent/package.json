@@ -33,6 +33,7 @@
     "causality-monitor"
   ],
   "type": "module",
+  "sideEffects": false,
   "engines": {
     "node": ">=22.12.0"
   },
