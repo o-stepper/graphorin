@@ -1,0 +1,48 @@
+{
+  "name": "@graphorin/example-memory-graph-recall",
+  "version": "0.6.1",
+  "private": true,
+  "description": "Memory deep-dive for the Graphorin framework: entity graph with expandHops, deep recall with a graded loop and abstention, fact validation/quarantine, and the insights read tier - fully offline on a scripted stub provider. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/memory-graph-recall",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/memory-graph-recall"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*"
+  },
+  "bin": {
+    "graphorin-example-memory-graph-recall": "./dist/main.js"
+  }
+}

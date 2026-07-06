@@ -22,18 +22,43 @@ const pkgVersion: string = testPkg.version;
  *     surfaces at some point across `execute(...) + resume(...)`.
  *  4. Stream modes `'values'`, `'updates'`, `'tasks'` all complete
  *     without throwing on a small auto-approve workflow.
+ *  5. Durable primitives (settlement stage): `sleepFor(...)` parks the
+ *     thread on a persisted `wakeAt`, `workflow.tick(...)` fires the
+ *     due timer, `awaitExternal(name)` re-parks it on the named
+ *     awakeable, and `workflow.resolveAwakeable(...)` delivers the
+ *     confirmation into the node result - once via manual ticks with
+ *     an injected clock, and once via the real `createTimerDriver`
+ *     sweep loop the CLI helpers use.
  */
 
-import { type CheckpointStore, collect, Directive, type WorkflowEvent } from '@graphorin/core';
+import {
+  type CheckpointStore,
+  collect,
+  Directive,
+  isTimerPauseValue,
+  type WorkflowEvent,
+} from '@graphorin/core';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+import { namespaceFor } from '@graphorin/workflow';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  confirmSettlement,
   createApprovalWorkflow,
+  createSettlementWorkflow,
+  fireSettlementTimer,
   runApprovalDemo,
+  runSettlementDemo,
   simulateServerRestart,
   VERSION,
 } from '../src/main.js';
-import { type ApprovalDecision, type ExpenseState, NODE_NAMES } from '../src/types.js';
+import {
+  type ApprovalDecision,
+  type ExpenseState,
+  NODE_NAMES,
+  SETTLEMENT_AWAKEABLE,
+  SETTLEMENT_NODE_NAMES,
+  type SettlementState,
+} from '../src/types.js';
 
 const REQUIRED_EVENT_TAGS: ReadonlyArray<WorkflowEvent<ExpenseState>['type']> = [
   'workflow.start',
@@ -206,5 +231,96 @@ describe('examples/approval-workflow - smoke', () => {
     expect(resumed.finalState.approved).toBe(true);
     expect(resumed.finalState.reason).toBe('OK');
     expect(resumed.events[0]?.type).toBe('workflow.resumed');
+  });
+
+  it('settlement stage - timer parks with wakeAt, tick fires it, awakeable parks, resolveAwakeable delivers the value', async () => {
+    const wf = createSettlementWorkflow({ checkpointStore: handle.checkpoints });
+    const events = (await collect(
+      wf.execute({ batchId: 'batch-q3' }, { threadId: 'settle-manual', stream: 'debug' }),
+    )) as ReadonlyArray<WorkflowEvent<SettlementState>>;
+
+    // 1. sleepFor(...) parked the thread: checkpoint suspended with a
+    //    persisted wakeAt (exposed on the pendingPauses frontier set and
+    //    stamped on the checkpoint row the timer driver polls).
+    const parked = await wf.getState('settle-manual');
+    expect(parked.status).toBe('suspended');
+    expect(parked.pendingPause?.nodeName).toBe(SETTLEMENT_NODE_NAMES.hold);
+    const wakeAt = parked.pendingPauses?.[0]?.wakeAt;
+    if (wakeAt === undefined) throw new Error('expected a persisted wakeAt on the timer pause');
+    const suspendedEvent = events.find((e) => e.type === 'workflow.suspended');
+    expect(suspendedEvent?.type).toBe('workflow.suspended');
+    if (suspendedEvent?.type === 'workflow.suspended') {
+      expect(isTimerPauseValue(suspendedEvent.value)).toBe(true);
+      if (isTimerPauseValue(suspendedEvent.value)) {
+        expect(suspendedEvent.value.wakeAt).toBe(wakeAt);
+      }
+    }
+    const due = await handle.checkpoints.listSuspended?.(
+      namespaceFor({ name: 'expense-settlement' }),
+      { dueBefore: wakeAt + 1 },
+    );
+    expect(due).toEqual([{ threadId: 'settle-manual', wakeAt }]);
+
+    // 2. An early tick is a no-op that reports the pending deadline; a
+    //    due tick fires the timer and the thread re-parks on the awakeable.
+    const early = await wf.tick('settle-manual', { now: wakeAt - 1 });
+    expect(early).toEqual({ fired: false, nextWakeAt: wakeAt });
+    const fired = await wf.tick('settle-manual', { now: wakeAt + 1 });
+    expect(fired.fired).toBe(true);
+    expect(fired.nextWakeAt).toBeNull();
+    const awaiting = await wf.getState('settle-manual');
+    expect(awaiting.status).toBe('suspended');
+    expect(awaiting.pendingPauses?.[0]?.name).toBe(SETTLEMENT_AWAKEABLE);
+    expect(awaiting.pendingPauses?.[0]?.wakeAt).toBeUndefined();
+
+    // 3. resolveAwakeable delivers the confirmation into the node result
+    //    and the workflow runs archive-batch to completion.
+    const resolveEvents = (await collect(
+      wf.resolveAwakeable('settle-manual', SETTLEMENT_AWAKEABLE, {
+        confirmedBy: 'qa-finance',
+        reference: 'SET-TEST-0001',
+      }),
+    )) as ReadonlyArray<WorkflowEvent<SettlementState>>;
+    expect(resolveEvents[resolveEvents.length - 1]?.type).toBe('workflow.end');
+    const done = await wf.getState('settle-manual');
+    expect(done.status).toBe('completed');
+    expect(done.state.confirmedBy).toBe('qa-finance');
+    expect(done.state.reference).toBe('SET-TEST-0001');
+    expect(done.state.settledAt).toBeDefined();
+    expect(done.state.log.some((line) => line.includes('SET-TEST-0001'))).toBe(true);
+    expect(done.state.log.some((line) => line.includes('archived'))).toBe(true);
+  });
+
+  it('settlement stage - CLI helpers drive createTimerDriver end-to-end across fresh Workflow instances', async () => {
+    const started = await runSettlementDemo({
+      batchId: 'batch-e2e',
+      checkpointStore: handle.checkpoints,
+      threadId: 'settle-e2e',
+    });
+    expect(started.status).toBe('suspended');
+    expect(started.suspendedAtNode).toBe(SETTLEMENT_NODE_NAMES.hold);
+    expect(typeof started.wakeAt).toBe('number');
+
+    // Real driver sweep loop: waits out the short SETTLEMENT_HOLD_MS
+    // timer against the SQLite store's listSuspended enumeration.
+    const ticked = await fireSettlementTimer({
+      checkpointStore: handle.checkpoints,
+      threadId: 'settle-e2e',
+    });
+    expect(ticked.fired).toBe(1);
+    expect(ticked.sweeps).toBeGreaterThanOrEqual(1);
+    expect(ticked.status).toBe('suspended');
+    expect(ticked.awakeableName).toBe(SETTLEMENT_AWAKEABLE);
+
+    const confirmed = await confirmSettlement({
+      checkpointStore: handle.checkpoints,
+      threadId: 'settle-e2e',
+      confirmation: { confirmedBy: 'qa-finance', reference: 'SET-TEST-0002' },
+    });
+    expect(confirmed.status).toBe('completed');
+    expect(confirmed.finalState.confirmedBy).toBe('qa-finance');
+    expect(confirmed.finalState.reference).toBe('SET-TEST-0002');
+    expect(confirmed.finalState.log.length).toBeGreaterThanOrEqual(2);
+    expect(confirmed.events[confirmed.events.length - 1]?.type).toBe('workflow.end');
   });
 });

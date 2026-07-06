@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 
 const DOCS_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LINK_WARNING_RE = /Failed to resolve link to|which was resolved but is not included/;
+const ANSI_RE = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
 const result = spawnSync('npx', ['typedoc', '--options', './typedoc.json'], {
   cwd: DOCS_DIR,
@@ -51,8 +52,10 @@ if (result.status !== 0) {
 const offenders = output
   .split('\n')
   .filter((line) => LINK_WARNING_RE.test(line))
-  // Strip ANSI colour codes for a clean report.
-  .map((line) => line.replace(/\[[0-9;]*m/g, '').trim());
+  // Strip ANSI colour codes for a clean report (the ESC byte is the
+  // point here, so the regex is built from its char code to keep the
+  // source free of control characters).
+  .map((line) => line.replace(ANSI_RE, '').trim());
 
 if (offenders.length > 0) {
   console.error(

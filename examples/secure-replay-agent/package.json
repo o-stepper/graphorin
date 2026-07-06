@@ -1,0 +1,51 @@
+{
+  "name": "@graphorin/example-secure-replay-agent",
+  "version": "0.6.1",
+  "private": true,
+  "description": "Security and replay demo for the Graphorin framework: dataFlowPolicy shadow-to-enforce on an untrusted tool + secret + blocked sink with a declassifySinks escape, cachePolicy anchors with cache legs from Usage, a deterministic replay provider, and a read-only sub-agent - fully offline. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/secure-replay-agent",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/secure-replay-agent"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/provider": "workspace:*",
+    "@graphorin/tools": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "zod": "^3.25.0"
+  },
+  "bin": {
+    "graphorin-example-secure-replay-agent": "./dist/main.js"
+  }
+}

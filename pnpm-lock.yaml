@@ -358,6 +358,21 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tools
 
+  examples/memory-graph-recall:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/example-trace-helper':
+        specifier: workspace:*
+        version: link:../example-trace-helper
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+
   examples/multi-agent-crew:
     dependencies:
       '@graphorin/agent':
@@ -430,6 +445,30 @@ importers:
         specifier: workspace:*
         version: link:../../packages/tools
 
+  examples/secure-replay-agent:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/example-trace-helper':
+        specifier: workspace:*
+        version: link:../example-trace-helper
+      '@graphorin/provider':
+        specifier: workspace:*
+        version: link:../../packages/provider
+      '@graphorin/security':
+        specifier: workspace:*
+        version: link:../../packages/security
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../../packages/tools
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
+
   examples/slack-bot-integration:
     dependencies:
       '@graphorin/agent':
@@ -489,6 +528,30 @@ importers:
       '@graphorin/provider':
         specifier: workspace:*
         version: link:../../packages/provider
+
+  examples/tools-harness-tour:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/example-trace-helper':
+        specifier: workspace:*
+        version: link:../example-trace-helper
+      '@graphorin/mcp':
+        specifier: workspace:*
+        version: link:../../packages/mcp
+      '@graphorin/skills':
+        specifier: workspace:*
+        version: link:../../packages/skills
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../../packages/tools
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@3.25.76)
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
 
   packages/agent:
     dependencies:

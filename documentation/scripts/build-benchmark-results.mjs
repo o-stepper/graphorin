@@ -37,7 +37,10 @@ export function wilson(passed, total) {
   const denom = 1 + z2 / total;
   const centre = p + z2 / (2 * total);
   const margin = z * Math.sqrt((p * (1 - p)) / total + z2 / (4 * total * total));
-  return { low: Math.max(0, (centre - margin) / denom), high: Math.min(1, (centre + margin) / denom) };
+  return {
+    low: Math.max(0, (centre - margin) / denom),
+    high: Math.min(1, (centre + margin) / denom),
+  };
 }
 
 const pct = (x) => `${(x * 100).toFixed(1)}%`;
@@ -233,10 +236,16 @@ function selfTest() {
   cases.push(['real not plumbing', !isPlumbingOnly(real)]);
   const stubSection = renderReport('stub.json', stub);
   cases.push(['plumbing banner present', stubSection.includes('Plumbing-only fixture')]);
-  cases.push(['conditions table present', stubSection.includes('| Provider | `stub (plumbing-only)` |')]);
+  cases.push([
+    'conditions table present',
+    stubSection.includes('| Provider | `stub (plumbing-only)` |'),
+  ]);
   const realSection = renderReport('real.json', real);
   cases.push(['no banner on real report', !realSection.includes('Plumbing-only fixture')]);
-  cases.push(['pass rate with CI rendered', /Pass rate \| 80\.0% \(95% Wilson CI/.test(realSection)]);
+  cases.push([
+    'pass rate with CI rendered',
+    /Pass rate \| 80\.0% \(95% Wilson CI/.test(realSection),
+  ]);
   const page = buildPage([
     { name: 'a.json', report: mk('real', 'default', 70, 100) },
     { name: 'b.json', report: mk('real', 'hyde', 75, 100) },
@@ -244,7 +253,10 @@ function selfTest() {
   cases.push(['ablation matrix across retrieval variants', page.includes('Retrieval ablation')]);
   cases.push(['no-real banner absent when real present', !page.includes('No real-provider run')]);
   const stubPage = buildPage([{ name: 's.json', report: stub }]);
-  cases.push(['no-real banner present on all-stub page', stubPage.includes('No real-provider run')]);
+  cases.push([
+    'no-real banner present on all-stub page',
+    stubPage.includes('No real-provider run'),
+  ]);
   let bad = 0;
   for (const [label, pass] of cases) {
     if (!pass) {
