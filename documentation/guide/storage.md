@@ -40,10 +40,31 @@ import { openConnection } from '@graphorin/store-sqlite/connection';
 // or use the higher-level store factory exported from the package root.
 ```
 
-::: tip Concurrency
-`better-sqlite3` is synchronous; the store is safe for a single Node process.
-For multi-process deployments, front it with the standalone server rather than
-opening the same file from several processes.
+### Concurrency: what is safe while the server is live {#concurrency-matrix}
+
+`better-sqlite3` is synchronous and SQLite is single-writer, so the model is:
+**one writing service process per database file** - for multi-process
+applications, front the store with the standalone server instead of opening
+the file from several app processes. The specific exception the code
+hardens for is **server + CLI on the same WAL-mode file**: the connection
+layer applies `busy_timeout` (default 5000 ms, tunable via `busyTimeoutMs`)
+and WAL checkpointing so the supported operator commands below work against
+a live server.
+
+| While the server is live | Commands |
+|---|---|
+| Safe (read-only) | `memory status/inspect/activity/why/review` (listing), `traces status`, `triggers list/status`, `audit verify/export`, `storage status`, `storage backup` (online page-level copy, safe under a live writer) |
+| Works, but contends for the write lock | `memory review --promote`, `memory prune-history`, `traces prune`, `triggers disable/prune`, `consolidator dlq-clear`, `token create/revoke/rotate/rekey`, `secrets set/rotate/delete`, `audit prune`, `storage compact` |
+| Requires a stopped server | `storage rekey` (fails fast with `database is locked`), `storage encrypt --swap` (refuses while another process holds the file), `graphorin migrate` when the CLI and server versions disagree |
+
+::: warning Contended writes stall the server's event loop
+Every contended statement blocks the calling thread synchronously for up to
+`busy_timeout` (default 5 s). When a CLI write holds the lock, the **server's
+next write freezes its whole event loop** for up to that long - including
+`/v1/health` responses. Keep the "contends" commands to maintenance windows
+on busy deployments, and see the
+[standalone server guide](/guide/standalone-server) for the liveness-probe
+implications.
 :::
 
 ::: danger Never run `VACUUM`

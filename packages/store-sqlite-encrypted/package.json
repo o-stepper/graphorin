@@ -70,7 +70,6 @@
     "provenance": true
   },
   "devDependencies": {
-    "@graphorin/security": "workspace:*",
     "@types/better-sqlite3": "^7.6.13"
   }
 }

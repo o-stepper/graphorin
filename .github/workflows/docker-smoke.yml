@@ -34,38 +34,45 @@ jobs:
       - name: CLI smoke (entrypoint + symlinked binary)
         run: docker run --rm graphorin:smoke --version
 
-      - name: Boot the server and probe /v1/health
+      - name: Boot the server with the shipped config and probe the published port
         run: |
           set -euo pipefail
-          # Minimal smoke config. `auth.kind: 'none'` avoids needing a pepper
-          # secret just to reach the unauthenticated /v1/health route; the
-          # server warns about it on a non-loopback bind but still boots
-          # (IP-13). Storage is the image's writable /data mount.
-          mkdir -p "${RUNNER_TEMP}/gconf"
-          cat > "${RUNNER_TEMP}/gconf/config.json" <<'JSON'
-          {
-            "server": { "host": "0.0.0.0", "port": 8080 },
-            "auth": { "kind": "none" },
-            "storage": { "path": "/data/data.db", "mode": "server", "encryption": { "enabled": false } },
-            "audit": { "enabled": false },
-            "secrets": { "source": "auto", "strict": false },
-            "observability": { "logger": "json" }
-          }
-          JSON
+          # W-098: run EXACTLY the README recipe - the committed
+          # examples/docker/config.example.json (0.0.0.0 bind, /data storage,
+          # token auth + encrypted store via file: secret refs) under the
+          # documented hardening flags, with throwaway secrets mounted at
+          # /run/secrets/graphorin. The probe hits the PUBLISHED port from
+          # the runner host, so a 127.0.0.1 bind or a wrong storage path
+          # fails here even while the in-container HEALTHCHECK (which probes
+          # 127.0.0.1 inside) would keep reporting healthy. The old inline
+          # config could never catch that class. (The previous
+          # -e GRAPHORIN_CONFIG is gone: no such variable exists - the CMD
+          # passes --config.)
+          mkdir -p "${RUNNER_TEMP}/gsecrets"
+          openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/pepper"
+          openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/db-passphrase"
+          openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/audit-passphrase"
+          chmod 0644 "${RUNNER_TEMP}/gsecrets"/*
           docker run -d --name graphorin-smoke \
-            -v "${RUNNER_TEMP}/gconf:/etc/graphorin:ro" \
-            -e GRAPHORIN_CONFIG=/etc/graphorin/config.json \
+            --read-only --tmpfs /tmp \
+            --security-opt no-new-privileges \
+            --cap-drop=ALL \
+            -v graphorin-data:/data \
+            -v "${GITHUB_WORKSPACE}/examples/docker/config.example.json:/etc/graphorin/config.json:ro" \
+            -v "${RUNNER_TEMP}/gsecrets:/run/secrets/graphorin:ro" \
             -p 8080:8080 \
             graphorin:smoke
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:8080/v1/health >/dev/null 2>&1; then
-              echo "health OK after ${i}s:"
-              curl -fsS http://127.0.0.1:8080/v1/health
+          # 45s window: the encrypted store's KDF makes first boot slower
+          # than the old plaintext smoke.
+          for i in $(seq 1 45); do
+            if curl -fsS http://localhost:8080/v1/health >/dev/null 2>&1; then
+              echo "health OK after ${i}s (published port, from the runner host):"
+              curl -fsS http://localhost:8080/v1/health
               exit 0
             fi
             sleep 1
           done
-          echo "::error::/v1/health did not become ready within 30s"
+          echo "::error::/v1/health did not become ready within 45s"
           exit 1
 
       - name: Container logs (on failure)

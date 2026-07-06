@@ -109,7 +109,6 @@
   },
   "dependencies": {
     "@graphorin/core": "workspace:*",
-    "@graphorin/observability": "workspace:*",
     "@graphorin/protocol": "workspace:*",
     "@graphorin/security": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*",
@@ -146,7 +145,6 @@
   },
   "devDependencies": {
     "@graphorin/agent": "workspace:*",
-    "@graphorin/memory": "workspace:*",
     "@graphorin/sessions": "workspace:*",
     "@graphorin/workflow": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",

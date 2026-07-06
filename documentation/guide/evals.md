@@ -20,6 +20,10 @@ import {
   exitOnFailures,
 } from '@graphorin/evals';
 
+// Anything with a `run(input)` method is an agent to the runner -
+// here a trivial offline stub; pass your real agent in production.
+const agent = { run: async (input: unknown) => input };
+
 const dataset = await loadJsonlDataset('./fixtures/golden.jsonl');
 const report = await runEvals({
   agent,

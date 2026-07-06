@@ -95,18 +95,25 @@ Declare a tier on a tool:
 
 ```ts
 import { tool } from '@graphorin/tools';
+import { z } from 'zod';
 
 export const heavyPlanner = tool({
   name: 'plan',
+  description: 'Draft a step-by-step plan for the given goal.',
+  inputSchema: z.object({ goal: z.string() }),
   preferredModel: 'smart',
-  // …
+  async execute({ goal }) {
+    return { plan: `Break "${goal}" into steps.` };
+  },
 });
 ```
 
 Map tiers to concrete Providers on the agent:
 
-```ts
+```ts no-check
 import { openai } from '@ai-sdk/openai';
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter, vercelAdapter } from '@graphorin/provider';
 
 const agent = createAgent({
   // …
@@ -146,7 +153,7 @@ The same adapters now consume `ProviderRequest.outputType` (set by the agent's `
 
 ### Vercel AI SDK
 
-```ts
+```ts no-check
 import { openai } from '@ai-sdk/openai';
 import { createProvider, vercelAdapter } from '@graphorin/provider';
 
@@ -236,6 +243,11 @@ Prompt-cache reads are billed at roughly a tenth of the input price, and for a m
 3. **Breakpoints.** Caching on Anthropic is opt-in per request. Set the policy once on the agent and every request carries it:
 
 ```ts
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
+const provider = createProvider(ollamaAdapter({ model: 'qwen2.5:7b-instruct' }));
+
 const agent = createAgent({
   name: 'assistant',
   instructions: '...',

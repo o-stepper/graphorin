@@ -41,6 +41,10 @@ const CALL_PATTERNS = [
   ['EventSource', /\bnew\s+EventSource\s*\(/m],
   // EB-10: namespace-bound HTTP-client calls, e.g. `undici.request(...)`.
   ['undici/got call', /\b(?:undici|got)\.(?:request|stream|fetch|get|post)\s*\(/m],
+  // W-039 lockstep: the eslint-plugin rule flags axios call sites; give
+  // the script the same reach so the two matchers agree (axios was
+  // previously import-only here).
+  ['axios call', /\baxios(?:\.(?:get|post|put|patch|delete|head|options|request))?\s*\(/m],
 ];
 
 /**
@@ -74,8 +78,11 @@ const IMPORT_PATTERNS = [
  * Allow-list — paths relative to the repo root. Each entry corresponds
  * to a documented explicit-user-action code path. Add new entries with
  * a comment explaining why (auditable in `git log`).
+ *
+ * Exported (with {@link isAllowListed}) so the eslint-plugin dogfood
+ * test skips exactly the paths this gate skips - one source of truth.
  */
-const ALLOW_LIST = [
+export const ALLOW_LIST = [
   // OTLP HTTP exporter — fires only when the operator wires an OTLP
   // collector URL into the tracer config (Phase 04).
   'packages/observability/src/exporters/otlp-http.ts',
@@ -88,15 +95,20 @@ const ALLOW_LIST = [
   // Skill signature verifier — explicit user action; resolves the
   // publisher key over the configured well-known URL (Phase 03d).
   'packages/security/src/supply-chain/signature.ts',
-  // Provider adapters — Phase 06 will fill the directory; preemptively
-  // allow-list to keep the guard green when Phase 06 lands.
-  /^packages\/provider\//,
-  // MCP client transports — Phase 09.
-  /^packages\/mcp\//,
-  // Embedder model downloads — Phase 05.
-  /^packages\/embedder-[A-Za-z-]+\//,
-  // Storage backends — Phase 05+.
-  /^packages\/store-[A-Za-z-]+\//,
+  // W-074: the former whole-package entries (provider/, mcp/,
+  // embedder-*/, store-*/) are gone. A scan with an emptied allow-list
+  // shows zero detectable primitives in those packages: their network
+  // paths all take an injected `fetchImpl ?? globalThis.fetch`
+  // reference instead of calling the bare primitive, so the directory
+  // regexes shielded nothing while hiding any future implicit call in
+  // their utils/config helpers. A new legitimate transport file that
+  // does call a bare primitive should get its own pointed entry here.
+  //
+  // Design note: the shipped eslint-plugin rule no-implicit-network-call
+  // polices the same promise for ESLint consumers; this repo lints with
+  // Biome, so the rule is exercised by the eslint-plugin dogfood test
+  // (W-039) against these same ALLOW_LIST entries rather than by adding
+  // a second linter toolchain.
 ];
 
 const PACKAGES_DIR = join(ROOT, 'packages');
@@ -129,7 +141,8 @@ async function* walk(root) {
   }
 }
 
-function isAllowListed(relativePath) {
+/** True when `relativePath` (repo-root relative) matches {@link ALLOW_LIST}. */
+export function isAllowListed(relativePath) {
   for (const entry of ALLOW_LIST) {
     if (typeof entry === 'string' && entry === relativePath) return true;
     if (entry instanceof RegExp && entry.test(relativePath)) return true;
@@ -212,12 +225,81 @@ async function main() {
   process.exit(1);
 }
 
+/**
+ * W-073: in-memory fixtures for the two exported seams. A silent parser
+ * regression would turn this gate permanently green; CI runs this mode
+ * (`check-gates-selftest`) so a broken matcher fails loudly instead.
+ */
+function selfTest() {
+  const detectCases = [
+    { label: 'bare fetch call', src: 'const r = await fetch(url);', want: true },
+    { label: 'http.request call', src: "http.request({ host: 'x' });", want: true },
+    { label: 'net.createConnection call', src: 'net.createConnection(80);', want: true },
+    { label: 'new WebSocket', src: "const ws = new WebSocket('wss://x');", want: true },
+    { label: 'static undici import', src: "import { request } from 'undici';", want: true },
+    { label: 'dynamic got import', src: "const got = await import('got');", want: true },
+    { label: 'axios require', src: "const axios = require('axios');", want: true },
+    {
+      label: 'fetch inside a string literal',
+      src: "const s = 'call fetch(x) later';",
+      want: false,
+    },
+    {
+      label: 'fetch inside a comment',
+      src: '// fetch(url) would be wrong here\nconst a = 1;',
+      want: false,
+    },
+    { label: 'identifier suffix refetch', src: 'await refetch(query);', want: false },
+    {
+      label: 'node:fs import is clean',
+      src: "import { readFile } from 'node:fs/promises';",
+      want: false,
+    },
+  ];
+  const allowCases = [
+    { label: 'exact-path entry matches', path: 'packages/pricing/src/refresh.ts', want: true },
+    { label: 'regex entry matches', path: 'packages/security/src/oauth/discovery.ts', want: true },
+    { label: 'non-listed path does not match', path: 'packages/core/src/index.ts', want: false },
+    {
+      label: 'listed basename in wrong package does not match',
+      path: 'packages/core/src/refresh.ts',
+      want: false,
+    },
+  ];
+  let bad = 0;
+  for (const c of detectCases) {
+    const got = detectViolations(c.src).length > 0;
+    if (got !== c.want) {
+      bad += 1;
+      console.error(`self-test FAIL [${c.label}] - expected flagged=${c.want}, got ${got}`);
+    }
+  }
+  for (const c of allowCases) {
+    const got = isAllowListed(c.path);
+    if (got !== c.want) {
+      bad += 1;
+      console.error(`self-test FAIL [${c.label}] - expected ${c.want}, got ${got}`);
+    }
+  }
+  const total = detectCases.length + allowCases.length;
+  console.log(
+    bad === 0
+      ? `[check-no-network] self-test: ${total}/${total} ok`
+      : `[check-no-network] self-test: ${bad} failed`,
+  );
+  process.exit(bad > 0 ? 1 : 0);
+}
+
 // Only run the repo scan when executed directly — importing this module
 // (e.g. for testing `detectViolations`) must not trigger a full scan.
 if (process.argv[1] === __filename) {
-  main().catch((err) => {
-    console.error('check-no-network: ERROR');
-    console.error(err);
-    process.exit(2);
-  });
+  if (process.argv.includes('--self-test')) {
+    selfTest();
+  } else {
+    main().catch((err) => {
+      console.error('check-no-network: ERROR');
+      console.error(err);
+      process.exit(2);
+    });
+  }
 }

@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
 import { describe, expect, it } from 'vitest';
 
 import { lintSource } from './_lint.js';
@@ -189,5 +192,68 @@ describe('@graphorin/no-implicit-network-call', () => {
       filename: APP_PATH,
     });
     expect(messages).toEqual([]);
+  });
+});
+
+/**
+ * W-039 two-stage activation: real fixture trees on disk, so the
+ * nearest-package.json walk actually resolves (unlike the virtual
+ * /repo/... paths above, which exercise the fail-open branch).
+ */
+describe('@graphorin/no-implicit-network-call - W-039 activation', () => {
+  const acmeApp = fileURLToPath(
+    new URL('./fixtures/acme-monorepo/packages/x/src/app.js', import.meta.url),
+  );
+  const acmeSecond = fileURLToPath(
+    new URL('./fixtures/acme-monorepo/packages/x/src/second.js', import.meta.url),
+  );
+  const graphorinLike = fileURLToPath(
+    new URL('./fixtures/graphorin-like/packages/y/src/app.js', import.meta.url),
+  );
+
+  const read = (p: string) => readFileSync(p, 'utf8');
+
+  it('does not report a third-party scope (@acme/x) under packages/*/src by default', () => {
+    const messages = lintSource({
+      source: read(acmeApp),
+      rule: 'no-implicit-network-call',
+      filename: acmeApp,
+    });
+    expect(messages).toEqual([]);
+  });
+
+  it('reports @acme/x when packagePrefixes opts the scope in', () => {
+    const messages = lintSource({
+      source: read(acmeApp),
+      rule: 'no-implicit-network-call',
+      filename: acmeApp,
+      options: [{ packagePrefixes: ['@acme/'] }],
+    });
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.messageId).toBe('forbidden');
+  });
+
+  it('reports @graphorin/y by default (prefix match)', () => {
+    const messages = lintSource({
+      source: read(graphorinLike),
+      rule: 'no-implicit-network-call',
+      filename: graphorinLike,
+    });
+    expect(messages).toHaveLength(1);
+  });
+
+  it('stays consistent for a second file of the same package (cached walk-up)', () => {
+    const first = lintSource({
+      source: read(acmeApp),
+      rule: 'no-implicit-network-call',
+      filename: acmeApp,
+    });
+    const second = lintSource({
+      source: read(acmeSecond),
+      rule: 'no-implicit-network-call',
+      filename: acmeSecond,
+    });
+    expect(first).toEqual([]);
+    expect(second).toEqual([]);
   });
 });

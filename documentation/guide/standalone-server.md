@@ -220,6 +220,19 @@ Runs are **not** tied to the client connection: a background run started via `PO
 
 The route answers `200` for both `ok` and `degraded` rollups so liveness probes do not flap on minor degradations (e.g. WAL above the warn threshold); only a `failing` rollup short-circuits with `503`.
 
+::: warning Concurrent CLI writes stall the event loop - liveness implications
+`better-sqlite3` is synchronous: when an operator CLI command holds the write
+lock on the same database file (the "contends" rows of the
+[concurrency matrix](/guide/storage#concurrency-matrix)), the server's next
+write blocks the whole event loop for up to `busy_timeout` (default 5 s,
+`busyTimeoutMs` in the storage options) per contended statement - and a
+blocked event loop cannot answer `/v1/health` either. Under Kubernetes,
+several back-to-back stalls can exhaust a liveness probe's failure threshold
+and restart a healthy pod: budget probe `timeoutSeconds`/`failureThreshold`
+above the configured busy timeout, or keep write-side CLI maintenance to
+windows.
+:::
+
 ## Prometheus metrics
 
 `GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted.

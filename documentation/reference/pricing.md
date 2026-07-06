@@ -111,7 +111,10 @@ The CLI command `graphorin pricing diff` prints the same diff in human-readable 
 When you wire `@graphorin/observability` against a custom provider whose pricing isn't in the snapshot, the trace audit can't compute a cost for those calls. `listMissingModels(...)` enumerates every `(provider, model)` pair the audit saw without a matching price entry - useful for telling you which entries to add to a custom snapshot.
 
 ```ts
-import { listMissingModels } from '@graphorin/pricing';
+import { listMissingModels, type PricingTraceSpanLike } from '@graphorin/pricing';
+
+// Finished spans from your trace store - only `attributes` is read.
+const traceAudit: PricingTraceSpanLike[] = [];
 
 const missing = listMissingModels(traceAudit);
 for (const { provider, model, count } of missing) {

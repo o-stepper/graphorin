@@ -24,7 +24,6 @@ export default defineConfig({
   treeshake: true,
   external: [
     '@graphorin/core',
-    '@graphorin/observability',
     '@graphorin/security',
     '@graphorin/tools',
     '@modelcontextprotocol/sdk',

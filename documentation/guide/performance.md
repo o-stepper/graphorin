@@ -74,8 +74,13 @@ hybrid p95 ~5 ms and hop-1 graph p95 ~53 ms.
   derived surfaces by default (`config.retention`); in lib-mode schedule the
   prune primitives yourself - see the
   [deployment guide](/guide/deployment#retention-and-database-growth).
-- **One writer.** SQLite is single-writer: keep one process writing per DB
-  file (the k8s template pins `replicas: 1` for exactly this reason).
+- **One writer.** SQLite is single-writer: keep one writing **service**
+  process per DB file (the k8s template pins `replicas: 1` for exactly this
+  reason). Operator CLI commands against a live server are the supported
+  exception - see the [concurrency matrix](/guide/storage#concurrency-matrix)
+  for which commands read safely, which contend for the write lock (stalling
+  the server's event loop up to `busy_timeout` per statement), and which
+  require stopping the server.
 
 ## Reproducing
 

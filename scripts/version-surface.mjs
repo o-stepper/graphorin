@@ -137,9 +137,14 @@ export function workspaceManifests() {
     [
       'ls-files',
       'package.json',
-      'packages/*/package.json',
-      'benchmarks/*/package.json',
-      'examples/*/package.json',
+      // :(glob) pathspec magic keeps * from crossing directory boundaries -
+      // a bare 'packages/*/package.json' also matches test fixtures like
+      // packages/eslint-plugin/tests/fixtures/**/packages/x/package.json
+      // (git wildmatch lets * span slashes), and fixture manifests must not
+      // be version-checked.
+      ':(glob)packages/*/package.json',
+      ':(glob)benchmarks/*/package.json',
+      ':(glob)examples/*/package.json',
       'documentation/package.json',
     ],
     { cwd: ROOT, encoding: 'utf8' },

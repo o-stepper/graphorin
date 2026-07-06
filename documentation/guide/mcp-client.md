@@ -41,6 +41,12 @@ const httpClient = await createMCPClient({
 ## Discovering tools, prompts, and resources
 
 ```ts
+import { createMCPClient } from '@graphorin/mcp';
+
+const stdioClient = await createMCPClient({
+  transport: { kind: 'stdio', command: 'mcp-server-filesystem' },
+});
+
 const tools = await stdioClient.listTools();
 const prompts = await stdioClient.listPrompts();
 const resources = await stdioClient.listResources();
@@ -53,7 +59,14 @@ Every discovered surface is fully typed.
 The client exposes a `toTools(...)` adapter that turns the discovered MCP tool descriptors into Graphorin `Tool` objects ready to register with `@graphorin/tools`:
 
 ```ts
+import type { Tool } from '@graphorin/core';
 import { createToolRegistry } from '@graphorin/tools';
+import { createMCPClient } from '@graphorin/mcp';
+
+const stdioClient = await createMCPClient({
+  transport: { kind: 'stdio', command: 'mcp-server-filesystem' },
+});
+const firstPartyTools: ReadonlyArray<Tool> = []; // your own Tool objects
 
 const mcpTools = await stdioClient.toTools({
   // Optional namespace prefix to disambiguate tool names.
@@ -94,12 +107,21 @@ When a tool result includes a `resource_link` content part, the adapter does **n
 
 ```ts
 import { createAgent } from '@graphorin/agent';
+import { createMCPClient } from '@graphorin/mcp';
 import { createMcpResourceReader } from '@graphorin/mcp/client';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
+const httpClient = await createMCPClient({
+  transport: { kind: 'streamable-http', url: 'https://mcp.example.com/v1' },
+});
+const mcpTools = await httpClient.toTools();
 
 const agent = createAgent({
   name: 'researcher',
-  instructions: '…',
-  provider,
+  instructions: 'Answer with the MCP resources at hand.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+  ),
   tools: mcpTools,
   // Lets `read_result` resolve MCP `resource_link` handles on demand by
   // calling `readResource(uri)`. Tried after the built-in spill-file
@@ -123,6 +145,14 @@ The 2026-07-28 protocol revision **deprecates Sampling, Roots, and protocol-leve
 A server can ask the human for structured input in the middle of a tool call. Back it with your HITL surface (a CLI prompt, the agent's approval channel, …):
 
 ```ts
+import { createMCPClient } from '@graphorin/mcp';
+
+// Back this with your real HITL surface (a CLI prompt, an approval queue, ...).
+const promptOperator = async (message: string): Promise<boolean> => {
+  console.log(message);
+  return true;
+};
+
 const client = await createMCPClient({
   transport: { kind: 'stdio', command: 'my-mcp-server' },
   elicitation: async (request) => {
@@ -142,6 +172,21 @@ Because an elicitation arrives while a `callTool(...)` request is in flight, the
 A server can ask the client's model to generate a completion. Back it with a `Provider`. The request messages are **MCP-derived (untrusted)** - run them through the same redaction / sensitivity middleware you use elsewhere:
 
 ```ts
+import type { Message } from '@graphorin/core';
+import { createMCPClient, type MCPSamplingMessage } from '@graphorin/mcp';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
+const provider = createProvider(
+  ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+);
+
+// Project each MCP-derived message onto the provider `Message` shape
+// (text parts only here) - and run your redaction middleware over it.
+const toProviderMessage = (m: MCPSamplingMessage): Message => {
+  const text = m.content.map((part) => (part.type === 'text' ? part.text : '')).join('');
+  return m.role === 'user' ? { role: 'user', content: text } : { role: 'assistant', content: text };
+};
+
 const client = await createMCPClient({
   transport: { kind: 'stdio', command: 'my-mcp-server' },
   sampling: async (request) => {
@@ -149,7 +194,7 @@ const client = await createMCPClient({
       messages: request.messages.map(toProviderMessage),
       maxTokens: request.maxTokens,
     });
-    return { role: 'assistant', content: { type: 'text', text: out.text }, model: out.model };
+    return { role: 'assistant', content: { type: 'text', text: out.text ?? '' }, model: provider.modelId };
   },
 });
 ```
@@ -164,6 +209,10 @@ The CLI command `graphorin auth login` walks the operator through the flow once;
 
 ```ts
 import { createOAuthAuthorizationProvider, createMCPClient } from '@graphorin/mcp';
+import { createInMemoryOAuthServerStore } from '@graphorin/security';
+
+// In production: the persistent OAuthServerStore the login flow wrote to.
+const storage = createInMemoryOAuthServerStore();
 
 const authProvider = createOAuthAuthorizationProvider({
   serverId: 'example-mcp',

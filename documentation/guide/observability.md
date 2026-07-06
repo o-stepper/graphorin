@@ -99,8 +99,14 @@ const tracer = createTracer({
 Spans persist so a run can be reconstructed later. `@graphorin/store-sqlite` ships a durable span sink (migration 024 + the `spans` table):
 
 ```ts
+import { createMemory } from '@graphorin/memory';
 import { createTracer, withValidation } from '@graphorin/observability';
-import { createSqliteSpanExporter, traceSourceForSession } from '@graphorin/store-sqlite';
+import { createSessionManager } from '@graphorin/sessions';
+import { createSqliteSpanExporter, createSqliteStore, traceSourceForSession } from '@graphorin/store-sqlite';
+
+const store = await createSqliteStore({ path: './assistant.db' });
+await store.init();
+const memory = createMemory({ store: store.memory, embeddings: store.embeddings });
 
 // Persist every span, keyed by the `graphorin.session.id` attribute.
 const tracer = createTracer({ exporters: [withValidation(createSqliteSpanExporter(store.connection))] });
@@ -108,7 +114,7 @@ const tracer = createTracer({ exporters: [withValidation(createSqliteSpanExporte
 // Read a session's spans back as the `traceSource` Session.replay() consumes.
 const manager = createSessionManager({
   store: store.sessions,
-  memory,
+  memory: memory.session,
   replayTraceSource: (id) => traceSourceForSession(store.connection, id),
 });
 ```

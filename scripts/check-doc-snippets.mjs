@@ -51,14 +51,22 @@ const CHECKED = [
   'documentation/guide/secrets.md',
   'documentation/guide/standalone-server.md',
   'documentation/guide/agent-runtime.md',
-  // Many illustrative fragments; check the API-bearing snippets.
-  { file: 'documentation/guide/memory-system.md', includes: 'migrateEmbedder(' },
-  { file: 'documentation/guide/memory-system.md', includes: 'RRFReranker(' },
-  // Check the token-counter + llama.cpp snippets (the vercel block imports
-  // @ai-sdk/* which is not installed in this workspace; the rest reference
-  // external context).
-  { file: 'documentation/guide/providers.md', includes: 'setGlobalTokenCounter' },
-  { file: 'documentation/guide/providers.md', includes: 'llamaCppNodeAdapter' },
+  // W-057: full-page coverage. Deliberately illustrative fragments and
+  // blocks importing packages absent from the workspace (@ai-sdk/* in
+  // providers.md) carry a visible `ts no-check` token in the page itself
+  // instead of an invisible manifest filter.
+  'documentation/guide/memory-system.md',
+  'documentation/guide/providers.md',
+  'documentation/guide/evals.md',
+  'documentation/guide/mcp-client.md',
+  'documentation/guide/observability.md',
+  'documentation/guide/rerankers.md',
+  'documentation/guide/security.md',
+  'documentation/guide/sessions.md',
+  'documentation/guide/skills.md',
+  'documentation/guide/storage.md',
+  'documentation/guide/workflow-engine.md',
+  'documentation/reference/pricing.md',
 ];
 
 const COMPILER_OPTIONS = {
@@ -82,9 +90,20 @@ const COMPILER_OPTIONS = {
   paths: {
     // Subpath exports need their own entry (the `@graphorin/*` glob below maps
     // the package name only). Add one per subpath a checked snippet imports.
+    '@graphorin/mcp/client': ['packages/mcp/dist/client'],
     '@graphorin/memory/migration': ['packages/memory/dist/migration'],
+    '@graphorin/security/audit': ['packages/security/dist/audit'],
     '@graphorin/security/guardrails': ['packages/security/dist/guardrails'],
     '@graphorin/security/sandbox': ['packages/security/dist/sandbox'],
+    '@graphorin/sessions/export': ['packages/sessions/dist/export'],
+    '@graphorin/skills/activation': ['packages/skills/dist/activation'],
+    '@graphorin/skills/errors': ['packages/skills/dist/errors'],
+    '@graphorin/skills/frontmatter': ['packages/skills/dist/frontmatter'],
+    '@graphorin/skills/loader': ['packages/skills/dist/loader'],
+    '@graphorin/skills/migration': ['packages/skills/dist/migration'],
+    '@graphorin/skills/registry': ['packages/skills/dist/registry'],
+    '@graphorin/skills/spec': ['packages/skills/dist/spec'],
+    '@graphorin/store-sqlite/connection': ['packages/store-sqlite/dist/connection'],
     '@graphorin/tools/code-mode': ['packages/tools/dist/code-mode'],
     '@graphorin/*': ['packages/*/dist'],
     // Third-party deps a snippet may import are not in root node_modules
@@ -94,8 +113,17 @@ const COMPILER_OPTIONS = {
   },
 };
 
-/** Extract `ts` / `typescript` fenced blocks; honour a `no-check` opt-out token. */
-function extractTsBlocks(markdown) {
+/**
+ * Extract `ts` / `typescript` fenced blocks with their info-string flags.
+ * Tokens honoured (W-057):
+ *   - `no-check`         - deliberately illustrative/partial; not compiled.
+ *   - `file=<name>.ts`   - the block is a named FILE of the page: it is
+ *     written into the page's temp dir so sibling blocks can import it
+ *     relatively (`./<name>.js` under Bundler resolution). A named block
+ *     is still compiled itself unless it also carries `no-check`.
+ * Exported for the `--self-test` fixtures.
+ */
+export function extractTsBlocks(markdown) {
   const blocks = [];
   const fence = /```(ts|typescript)([^\n]*)\n([\s\S]*?)```/g;
   let match;
@@ -103,11 +131,13 @@ function extractTsBlocks(markdown) {
   for (match = fence.exec(markdown); match !== null; match = fence.exec(markdown)) {
     const info = match[2].trim();
     const code = match[3];
-    if (/\bno-check\b/.test(info)) {
-      index += 1;
-      continue;
-    }
-    blocks.push({ index, code });
+    const fileMatch = /\bfile=([\w./-]+)\b/.exec(info);
+    blocks.push({
+      index,
+      code,
+      check: !/\bno-check\b/.test(info),
+      ...(fileMatch !== null ? { file: fileMatch[1] } : {}),
+    });
     index += 1;
   }
   return blocks;
@@ -118,59 +148,145 @@ function extractTsBlocks(markdown) {
  * a temp dir AT THE REPO ROOT so the `baseUrl` + the `@graphorin` paths mapping
  * (see COMPILER_OPTIONS) resolve against the real packages, and it is
  * type-checked with a standard program — no synthetic compiler-host module
- * resolution to get wrong.
+ * resolution to get wrong. `namedFiles` (W-057) are the page's `file=` blocks,
+ * written alongside so relative imports resolve; their own diagnostics are
+ * reported when they are the block under check, not here.
  */
-function checkSnippet(code) {
+function checkSnippet(code, namedFiles = new Map()) {
   const dir = mkdtempSync(join(ROOT, '.doc-snippet-'));
   const file = join(dir, 'snippet.ts');
+  // TypeScript normalizes fileName to forward slashes; path.join on
+  // Windows produces backslashes, so a raw === comparison filters every
+  // diagnostic out and the gate is vacuously green there (the W-057
+  // self-test caught this on the windows CI leg). Normalize both sides.
+  const normalizePath = (p) => p.replace(/\\/g, '/');
+  const target = normalizePath(file);
   try {
+    for (const [name, content] of namedFiles) {
+      writeFileSync(join(dir, name), content, 'utf8');
+    }
     writeFileSync(file, code, 'utf8');
     const program = ts.createProgram([file], COMPILER_OPTIONS);
-    return ts.getPreEmitDiagnostics(program).filter((d) => d.file?.fileName === file);
+    return ts
+      .getPreEmitDiagnostics(program)
+      .filter((d) => normalizePath(d.file?.fileName ?? '') === target);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
 }
 
-let checked = 0;
-let failed = 0;
+function run() {
+  let checked = 0;
+  let failed = 0;
 
-for (const entry of CHECKED) {
-  // An entry is either a path (check every `ts` block) or `{ file, includes }`
-  // to check only the blocks whose code contains `includes` — for heavy pages
-  // where just one snippet is API-bearing and the rest are illustrative.
-  const relFile = typeof entry === 'string' ? entry : entry.file;
-  const includes = typeof entry === 'string' ? undefined : entry.includes;
-  let markdown;
-  try {
-    markdown = readFileSync(resolve(ROOT, relFile), 'utf8');
-  } catch (err) {
-    console.error(`[check-doc-snippets] cannot read ${relFile}: ${err.message}`);
-    process.exit(2);
-  }
-  for (const block of extractTsBlocks(markdown)) {
-    if (includes !== undefined && !block.code.includes(includes)) continue;
-    checked += 1;
-    const diagnostics = checkSnippet(block.code);
-    if (diagnostics.length > 0) {
-      failed += 1;
-      for (const d of diagnostics) {
-        const message = ts.flattenDiagnosticMessageText(d.messageText, '\n');
-        const where =
-          d.file && typeof d.start === 'number'
-            ? ` (line ${d.file.getLineAndCharacterOfPosition(d.start).line + 1} of the snippet)`
-            : '';
-        console.error(`✗ ${relFile} — ts block #${block.index}${where}: ${message}`);
+  for (const entry of CHECKED) {
+    // An entry is either a path (check every `ts` block) or `{ file, includes }`
+    // to check only the blocks whose code contains `includes` — for heavy pages
+    // where just one snippet is API-bearing and the rest are illustrative.
+    const relFile = typeof entry === 'string' ? entry : entry.file;
+    const includes = typeof entry === 'string' ? undefined : entry.includes;
+    let markdown;
+    try {
+      markdown = readFileSync(resolve(ROOT, relFile), 'utf8');
+    } catch (err) {
+      console.error(`[check-doc-snippets] cannot read ${relFile}: ${err.message}`);
+      process.exit(2);
+    }
+    const blocks = extractTsBlocks(markdown);
+    // W-057: the page's named blocks are written next to every snippet of
+    // the page so relative imports (`./stub.js` -> stub.ts under Bundler
+    // resolution) work.
+    const namedFiles = new Map(
+      blocks.filter((b) => b.file !== undefined).map((b) => [b.file, b.code]),
+    );
+    for (const block of blocks) {
+      if (!block.check) continue;
+      if (includes !== undefined && !block.code.includes(includes)) continue;
+      checked += 1;
+      const diagnostics = checkSnippet(block.code, namedFiles);
+      if (diagnostics.length > 0) {
+        failed += 1;
+        for (const d of diagnostics) {
+          const message = ts.flattenDiagnosticMessageText(d.messageText, '\n');
+          const where =
+            d.file && typeof d.start === 'number'
+              ? ` (line ${d.file.getLineAndCharacterOfPosition(d.start).line + 1} of the snippet)`
+              : '';
+          console.error(`✗ ${relFile} — ts block #${block.index}${where}: ${message}`);
+        }
       }
     }
   }
+
+  if (checked === 0) {
+    console.error('[check-doc-snippets] no checkable snippets found — manifest empty?');
+    process.exit(2);
+  }
+  console.log(
+    `[check-doc-snippets] checked ${checked} snippet(s) across ${CHECKED.length} page(s); ${failed} failed.`,
+  );
+  process.exit(failed > 0 ? 1 : 0);
 }
 
-if (checked === 0) {
-  console.error('[check-doc-snippets] no checkable snippets found — manifest empty?');
-  process.exit(2);
+/**
+ * W-057: fixtures for the extraction seam - `no-check`, `file=`, and the
+ * multi-file write path. Wired into `check-gates-selftest` (W-073).
+ */
+function selfTest() {
+  let bad = 0;
+  const md = [
+    'Intro.',
+    '```ts',
+    'export const a = 1;',
+    '```',
+    '```ts no-check',
+    'partial fragment',
+    '```',
+    '```ts file=helper.ts',
+    "export const helper = 'h';",
+    '```',
+    '```ts file=skipped.ts no-check',
+    "export const skipped: number = 'not checked';",
+    '```',
+  ].join('\n');
+  const blocks = extractTsBlocks(md);
+  const cases = [
+    ['four blocks extracted', blocks.length === 4],
+    ['plain block is checked', blocks[0]?.check === true && blocks[0]?.file === undefined],
+    ['no-check block is skipped', blocks[1]?.check === false],
+    ['file= block carries its name', blocks[2]?.file === 'helper.ts' && blocks[2]?.check === true],
+    [
+      'file= + no-check writes but does not check',
+      blocks[3]?.file === 'skipped.ts' && blocks[3]?.check === false,
+    ],
+  ];
+  // Multi-file compile: a snippet importing the named helper resolves.
+  const named = new Map([['helper.ts', "export const helper: string = 'h';\n"]]);
+  const ok = checkSnippet(
+    "import { helper } from './helper.js';\nconst x: string = helper;\n",
+    named,
+  );
+  cases.push(['relative import of a named block compiles', ok.length === 0]);
+  const bad2 = checkSnippet(
+    "import { helper } from './helper.js';\nconst x: number = helper;\n",
+    named,
+  );
+  cases.push(['type error against a named block is caught', bad2.length > 0]);
+  for (const [label, pass] of cases) {
+    if (!pass) {
+      bad += 1;
+      console.error(`self-test FAIL [${label}]`);
+    }
+  }
+  console.log(
+    bad === 0
+      ? `[check-doc-snippets] self-test: ${cases.length}/${cases.length} ok`
+      : `[check-doc-snippets] self-test: ${bad} failed`,
+  );
+  process.exit(bad > 0 ? 1 : 0);
 }
-console.log(
-  `[check-doc-snippets] checked ${checked} snippet(s) across ${CHECKED.length} page(s); ${failed} failed.`,
-);
-process.exit(failed > 0 ? 1 : 0);
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  if (process.argv.includes('--self-test')) selfTest();
+  else run();
+}

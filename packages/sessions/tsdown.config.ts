@@ -25,10 +25,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
-  external: [
-    '@graphorin/core',
-    '@graphorin/memory',
-    '@graphorin/observability',
-    '@graphorin/security',
-  ],
+  external: ['@graphorin/core', '@graphorin/observability'],
 });

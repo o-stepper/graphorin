@@ -27,6 +27,18 @@
  * almost always a `SecretValue` in this codebase and (b) the
  * one-line opt-out is cheap.
  *
+ * Known collision (W-043): Zod's `ZodOptional`/`ZodNullable`/
+ * `ZodDefault` expose `.unwrap()`, and Rust-style result libraries use
+ * it too - schema-introspection code trips the rule. The
+ * `allowReceiverPattern` option carves those receivers out: when the
+ * SOURCE TEXT of the receiver expression matches the pattern, both
+ * `unwrap` and `reveal` reports are skipped. The default stays
+ * undefined (byte-identical historical behaviour - the deprecation
+ * cliff keeps its edge), and there is deliberately NO built-in
+ * "looks like Zod" auto-heuristic: a nondeterministic guess is worse
+ * than an explicit, narrow setting (pick a suffix pattern like
+ * `'Schema$'`, or prefer a file-glob rule override).
+ *
  * @packageDocumentation
  */
 
@@ -45,7 +57,15 @@ const rule: Rule.RuleModule = {
         'Disallow `.unwrap()` / `.reveal()` calls on `SecretValue` instances. Prefer `.use(fn)` (scoped) or attach a `// graphorin-allow-secret-unwrap: <reason>` opt-out comment for `.reveal()`.',
       recommended: true,
     },
-    schema: [],
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          allowReceiverPattern: { type: 'string' },
+        },
+        additionalProperties: false,
+      },
+    ],
     messages: {
       avoidReveal:
         '`.reveal()` returns the unwrapped secret as a V8 string. Prefer `.use(fn)` so the value is scoped to a single callback. Add `// graphorin-allow-secret-unwrap: <reason>` to opt out.',
@@ -54,6 +74,9 @@ const rule: Rule.RuleModule = {
     },
   },
   create(context: Rule.RuleContext): Rule.RuleListener {
+    const options = (context.options?.[0] ?? {}) as { allowReceiverPattern?: string };
+    const allowReceiver =
+      options.allowReceiverPattern !== undefined ? new RegExp(options.allowReceiverPattern) : null;
     return {
       CallExpression(node: CallExpression): void {
         const callee = node.callee;
@@ -62,6 +85,13 @@ const rule: Rule.RuleModule = {
         if (me.computed) return;
         if (me.property.type !== 'Identifier') return;
         const propName = (me.property as Identifier).name;
+        if (propName !== 'unwrap' && propName !== 'reveal') return;
+        // W-043 carve-out: a receiver whose source text matches the
+        // configured pattern is not a SecretValue (Zod schemas,
+        // Rust-style results) - skip both report paths.
+        if (allowReceiver?.test(context.sourceCode.getText(me.object)) === true) {
+          return;
+        }
         if (propName === 'unwrap') {
           context.report({
             node,

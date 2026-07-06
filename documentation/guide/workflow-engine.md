@@ -21,7 +21,7 @@ For production, plug in `@graphorin/store-sqlite`'s `SqliteCheckpointStore` to g
 
 ## Quick start
 
-```ts
+```ts file=order-workflow.ts
 import {
   createNode,
   createWorkflow,
@@ -40,19 +40,19 @@ interface OrderState {
 
 const checkpointStore = new InMemoryCheckpointStore();
 
-const orderProcessing = createWorkflow<OrderState>({
+export const orderProcessing = createWorkflow<OrderState>({
   name: 'order-processing',
   channels: {
     status: latestValue<OrderState['status']>({ default: 'pending' }),
-    notes: listAggregate<string>({ default: [] }),
+    notes: listAggregate<OrderState['notes']>({ default: [] }),
     decision: latestValue<OrderState['decision']>(),
   },
   nodes: {
-    validate: createNode({
+    validate: createNode<OrderState>({
       name: 'validate',
       run: async () => ({ status: 'validated', notes: ['validated'] }),
     }),
-    awaitApproval: createNode({
+    awaitApproval: createNode<OrderState>({
       name: 'awaitApproval',
       run: async () => {
         const decision = pause<{ kind: 'approval' }, 'approved' | 'rejected'>({
@@ -61,7 +61,7 @@ const orderProcessing = createWorkflow<OrderState>({
         return { decision, status: decision === 'approved' ? 'approved' : 'pending' };
       },
     }),
-    ship: createNode({
+    ship: createNode<OrderState>({
       name: 'ship',
       run: async () => ({ status: 'shipped', notes: ['shipped'] }),
     }),
@@ -175,6 +175,12 @@ Three durable primitives ride the same pause substrate (so they survive restarts
 
 ```ts
 import { awaitExternal, requestApproval, sleepFor, sleepUntil } from '@graphorin/workflow';
+import { orderProcessing as workflow } from './order-workflow.js';
+
+const threadId = 'order-42';
+interface WebhookPayload {
+  readonly paid: boolean;
+}
 
 // Durable timer: suspends with a persisted wake-at timestamp.
 sleepUntil('2026-08-01T09:00:00Z'); // or sleepFor(ms)
@@ -199,6 +205,11 @@ Nothing needs to poll by hand: `createTimerDriver` ships with the package. The e
 
 ```ts
 import { createTimerDriver } from '@graphorin/workflow';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { orderProcessing as workflow } from './order-workflow.js';
+
+const store = await createSqliteStore({ path: './app.db' });
+await store.init();
 
 const driver = createTimerDriver({
   workflows: [{ workflow, checkpointStore: store.checkpoints }],
@@ -212,6 +223,10 @@ On the server, wire the same driver through the lifecycle daemon instead: `creat
 ### Per-node timeout and retry
 
 ```ts
+import { createNode } from '@graphorin/workflow';
+
+const run = async () => ({ fetched: true });
+
 createNode({ name: 'fetch', run, timeoutMs: 30_000, retry: { maxAttempts: 3, backoffMs: 250 } });
 // or workflow-wide: createWorkflow({ ..., nodeDefaults: { timeoutMs, retry } })
 ```
@@ -230,7 +245,7 @@ createNode({ name: 'fetch', run, timeoutMs: 30_000, retry: { maxAttempts: 3, bac
 
 Declare suspension points without hand-rolling `pause(...)` inside the node body:
 
-```ts
+```ts no-check
 createWorkflow({
   // …
   pauseAt: { before: ['shipOrder'], after: ['chargeCard'] },
@@ -244,6 +259,9 @@ A node returns one or more `Dispatch('processOrder', { orderId })` directives; t
 ## Cancellation
 
 ```ts
+import { orderProcessing as workflow } from './order-workflow.js';
+
+const input = {};
 const ac = new AbortController();
 const stream = workflow.execute(input, { signal: ac.signal });
 // later
@@ -255,6 +273,9 @@ Aborting stops the run within the configurable grace window (default 100 ms) and
 ## Stream modes
 
 ```ts
+import { orderProcessing as workflow } from './order-workflow.js';
+
+const input = {};
 workflow.execute(input, { stream: 'updates' });
 ```
 

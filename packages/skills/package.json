@@ -90,7 +90,6 @@
   "dependencies": {
     "@graphorin/core": "workspace:*",
     "@graphorin/security": "workspace:*",
-    "@graphorin/tools": "workspace:*",
     "yaml": "^2.8.0"
   },
   "publishConfig": {

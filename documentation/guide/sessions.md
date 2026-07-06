@@ -20,16 +20,22 @@ A **session** is the unit of conversation that survives across turns, agent step
 
 ## The hybrid facade
 
-```ts
+```ts file=session-setup.ts
+import { createMemory } from '@graphorin/memory';
 import { createSessionManager } from '@graphorin/sessions';
+import { createSqliteStore } from '@graphorin/store-sqlite';
 
-const manager = createSessionManager({
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+
+export const manager = createSessionManager({
   store: sqlite.sessions,
   memory: memory.session, // or any SessionMemoryFacade
 });
 
 // New session.
-const session = await manager.create({
+export const session = await manager.create({
   userId: 'alex',
   agentId: 'planner',
   title: 'Saturday hike planning',
@@ -49,12 +55,14 @@ await session.push({
 Every agent that participates in any session registers once on the manager-level registry:
 
 ```ts
-manager.agents.register('planner', {
+import { manager } from './session-setup.js';
+
+await manager.agents.register('planner', {
   displayName: 'Trip planner',
   tags: ['travel'],
 });
 
-const planner = manager.agents.resolveOrPlaceholder('planner');
+const planner = await manager.agents.resolveOrPlaceholder('planner');
 ```
 
 The registry exposes `register`, `retire`, `delete`, `resolveOrPlaceholder` for the multi-agent lifecycle.
@@ -64,6 +72,8 @@ The registry exposes `register`, `retire`, `delete`, `resolveOrPlaceholder` for 
 Every session message persisted by the agent runtime can carry an optional `agentId`. Filter per-agent on read:
 
 ```ts
+import { session } from './session-setup.js';
+
 const plannerTurns = await session.list({ agentId: 'planner' });
 ```
 
@@ -78,8 +88,10 @@ When `Agent A` hands off to `Agent B`, the session records:
 - the resolved sub-agent secrets inheritance posture.
 
 ```ts
+import { session } from './session-setup.js';
+
 const all = await session.listHandoffs();
-const incoming = await session.handoffsByAgent('planner', 'incoming');
+const incoming = await session.handoffsByAgent('planner', 'to');
 ```
 
 The `lastN(10)` default plus the filter library from `@graphorin/agent` mean the boundary payload is **always** explicit.
@@ -111,10 +123,13 @@ footer stamps `cipher: "aes256gcm"`. Supply either a pre-derived 32-byte `key`
 or a `passphrase` + `salt` (derived via `deriveSessionExportKey`).
 
 ```ts
-import { createSessionExportWriter, deriveSessionExportKey } from '@graphorin/sessions/export';
+import { randomBytes } from 'node:crypto';
+import { createBufferSink, createSessionExportWriter, deriveSessionExportKey } from '@graphorin/sessions/export';
 
-const key = await deriveSessionExportKey(passphrase, salt);
-const writer = createSessionExportWriter(sink, { encrypt: { key } });
+const { sink } = createBufferSink(); // or any streaming SessionExportSink
+const salt = randomBytes(16); // persist it: the importer re-derives with the same salt
+const key = await deriveSessionExportKey('a-high-entropy-passphrase', salt);
+const writer = createSessionExportWriter(sink, { writer: 'my-app@1.0.0', encrypt: { key } });
 // Import: readSessionExport(body, { decryptionKey: key }).
 // Without the key, the reader throws SessionExportEncryptionRequiredError.
 ```
@@ -134,9 +149,13 @@ throws `SessionExportChecksumMismatchError` on any mismatch.
 ## Replay
 
 ```ts
-const replayed = await session.replay({
+import { session } from './session-setup.js';
+
+for await (const event of session.replay({
   toolReplayMode: 'auto', // 'auto' | 'live' | 'recorded' | 'mixed'
-});
+})) {
+  console.log(event);
+}
 ```
 
 `session.replay()` reads its spans from the `traceSource` you pass, or - when you construct the manager with `replayTraceSource: (id) => traceSourceForSession(store.connection, id)` (the durable span sink from `@graphorin/store-sqlite`, migration 024) - from the persisted spans for that session. With no source wired, replay falls back to the empty source and emits only `replay.start` / `replay.end`. See [Observability § Replay](/guide/observability#replay).

@@ -1,0 +1,15 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "vitest.config.ts",
+        "tsconfig.tests.json",
+        "package.json",
+        "$TURBO_ROOT$/scripts/check-no-network.mjs"
+      ]
+    }
+  }
+}

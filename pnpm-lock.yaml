@@ -495,12 +495,6 @@ importers:
       '@graphorin/memory':
         specifier: workspace:*
         version: link:../memory
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
-      '@graphorin/provider':
-        specifier: workspace:*
-        version: link:../provider
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
@@ -611,6 +605,9 @@ importers:
       '@types/estree':
         specifier: ^1.0.9
         version: 1.0.9
+      '@typescript-eslint/parser':
+        specifier: ^8.62.1
+        version: 8.62.1(eslint@10.3.0)(typescript@5.9.3)
       eslint:
         specifier: ^10.3.0
         version: 10.3.0
@@ -629,9 +626,6 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
@@ -667,9 +661,6 @@ importers:
         specifier: workspace:*
         version: link:../tools
     devDependencies:
-      '@graphorin/embedder-transformersjs':
-        specifier: workspace:*
-        version: link:../embedder-transformersjs
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
@@ -811,9 +802,9 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
+      '@graphorin/memory':
+        specifier: workspace:>=0.5.0 <1.0.0
+        version: link:../memory
       '@graphorin/protocol':
         specifier: workspace:*
         version: link:../protocol
@@ -845,9 +836,6 @@ importers:
       '@graphorin/agent':
         specifier: workspace:*
         version: link:../agent
-      '@graphorin/memory':
-        specifier: workspace:*
-        version: link:../memory
       '@graphorin/sessions':
         specifier: workspace:*
         version: link:../sessions
@@ -872,19 +860,13 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/memory':
-        specifier: workspace:*
-        version: link:../memory
       '@graphorin/observability':
         specifier: workspace:*
         version: link:../observability
-      '@graphorin/security':
-        specifier: workspace:*
-        version: link:../security
     devDependencies:
-      '@graphorin/embedder-transformersjs':
+      '@graphorin/memory':
         specifier: workspace:*
-        version: link:../embedder-transformersjs
+        version: link:../memory
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
@@ -903,9 +885,6 @@ importers:
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
-      '@graphorin/tools':
-        specifier: workspace:*
-        version: link:../tools
       yaml:
         specifier: ^2.8.0
         version: 2.8.4
@@ -948,9 +927,6 @@ importers:
         specifier: ^12.9.0
         version: 12.9.0
     devDependencies:
-      '@graphorin/security':
-        specifier: workspace:*
-        version: link:../security
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
@@ -989,9 +965,6 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
     devDependencies:
       '@graphorin/store-sqlite':
         specifier: workspace:*
@@ -2784,6 +2757,43 @@ packages:
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
+  '@typescript-eslint/parser@8.62.1':
+    resolution: {integrity: sha512-sPhE4iHuJDSvoAiec+Ro8JyXw8f0ql13HFR82P99nCm9GwTEKG0KYLvDe6REk8BCXuit6vJAv/Yxg5ABaNS2rA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/project-service@8.62.1':
+    resolution: {integrity: sha512-yQ3RgY5RkSBpsNS1Bx/JQEcA24FOSdfGktoyprAr5u18390UQdtVcfnEv4nIrIshNnavlVyZBKxQwT1fIAE6cg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/scope-manager@8.62.1':
+    resolution: {integrity: sha512-r4d249KbQ1SFdpeStvob8Ih6aPPIzfqllPVOtvhve6ZcpuVcYo5/7zUWckKpHE7StASX4kTKZTLf0WQm/wPkcg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/tsconfig-utils@8.62.1':
+    resolution: {integrity: sha512-xadytJqX9vJVQ2fdQjkcIVigwaOJNWkpjdLt6cEQ+xPnrI1fkp+/jZE/I97k9KUjqtpd25i0HeyZf3T6dutv2g==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/types@8.62.1':
+    resolution: {integrity: sha512-ooCzJFaf+Hg+uG6fA3NRFGuFjlfNlDhBthbv4ZPU/0elCAFUfnyXUvf/WOpHz/jYwSmvU2GkR2LtyUfy1AxZ1Q==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/typescript-estree@8.62.1':
+    resolution: {integrity: sha512-xMcW9oP9u7fAMXYs9A65CVmtLQe2r//oXINHfi8HV+oiqhih17sbLdhXr4540YWlgpDKQdY854OL5ZrdCiQsAA==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/visitor-keys@8.62.1':
+    resolution: {integrity: sha512-4g3BLxfdTMy8iZG0MaBkadnlRrCJ74cQiFbyEVMrkwIoqdyaXXQM22cotDvrl4x28wgIZ9rEJRoM+mmhSJpJ1g==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@typescript/vfs@1.6.4':
     resolution: {integrity: sha512-PJFXFS4ZJKiJ9Qiuix6Dz/OwEIqHD7Dme1UwZhTK11vR+5dqW2ACbdndWQexBzCx+CPuMe5WBYQWCsFyGlQLlQ==}
@@ -5220,6 +5230,12 @@ packages:
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
 
+  ts-api-utils@2.5.0:
+    resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
+    engines: {node: '>=18.12'}
+    peerDependencies:
+      typescript: '>=4.8.4'
+
   ts-dedent@2.2.0:
     resolution: {integrity: sha512-q5W7tVM71e2xjHZTlgfTDoPF/SmqKG5hddq9SzR49CH2hayqRKJtQ4mtRlSxKaJlR/+9rEM+mnBHf7I2/BQcpQ==}
     engines: {node: '>=6.10'}
@@ -7212,6 +7228,58 @@ snapshots:
   '@types/ws@8.18.1':
     dependencies:
       '@types/node': 22.19.17
+
+  '@typescript-eslint/parser@8.62.1(eslint@10.3.0)(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/scope-manager': 8.62.1
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/typescript-estree': 8.62.1(typescript@5.9.3)
+      '@typescript-eslint/visitor-keys': 8.62.1
+      debug: 4.4.3
+      eslint: 10.3.0
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/project-service@8.62.1(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/tsconfig-utils': 8.62.1(typescript@5.9.3)
+      '@typescript-eslint/types': 8.62.1
+      debug: 4.4.3
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/scope-manager@8.62.1':
+    dependencies:
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/visitor-keys': 8.62.1
+
+  '@typescript-eslint/tsconfig-utils@8.62.1(typescript@5.9.3)':
+    dependencies:
+      typescript: 5.9.3
+
+  '@typescript-eslint/types@8.62.1': {}
+
+  '@typescript-eslint/typescript-estree@8.62.1(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/project-service': 8.62.1(typescript@5.9.3)
+      '@typescript-eslint/tsconfig-utils': 8.62.1(typescript@5.9.3)
+      '@typescript-eslint/types': 8.62.1
+      '@typescript-eslint/visitor-keys': 8.62.1
+      debug: 4.4.3
+      minimatch: 10.2.5
+      semver: 7.7.4
+      tinyglobby: 0.2.17
+      ts-api-utils: 2.5.0(typescript@5.9.3)
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/visitor-keys@8.62.1':
+    dependencies:
+      '@typescript-eslint/types': 8.62.1
+      eslint-visitor-keys: 5.0.1
 
   '@typescript/vfs@1.6.4(typescript@5.9.3)':
     dependencies:
@@ -10027,6 +10095,10 @@ snapshots:
   tree-kill@1.2.2: {}
 
   trim-lines@3.0.1: {}
+
+  ts-api-utils@2.5.0(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
 
   ts-dedent@2.2.0: {}
 
