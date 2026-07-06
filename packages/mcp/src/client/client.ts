@@ -593,6 +593,10 @@ export async function createMCPClientFromSdkTransport(
     // explicit trust decision).
     let pins = toolsOpts?.pinnedFingerprints;
     let mismatchAction = toolsOpts?.onPinMismatch ?? 'warn';
+    // W-079: the added/removed lifecycle legs only apply to STORE pins -
+    // a store snapshot covers the full catalogue by construction, while
+    // explicit pinnedFingerprints may deliberately pin a subset.
+    let pinsFromStore = false;
     const pinStore = toolsOpts?.pinStore;
     if (pins === undefined && pinStore !== undefined) {
       const stored = await pinStore.get(serverIdentity.id);
@@ -607,6 +611,7 @@ export async function createMCPClientFromSdkTransport(
         });
       } else {
         pins = stored;
+        pinsFromStore = true;
         mismatchAction = toolsOpts?.onPinMismatch ?? 'reject';
       }
     }
@@ -629,6 +634,55 @@ export async function createMCPClientFromSdkTransport(
             tool: name,
           });
         }
+      }
+      // W-079: the comparison loop above only sees names that were
+      // pinned. A server that passed its first-use recording can later
+      // ADD a poisoned tool (or rename one) - without this leg it would
+      // enter the catalogue with no counter and no rejection.
+      const pinnedNames = new Set(Object.keys(pins));
+      for (const name of pinsFromStore ? adapted.fingerprints.keys() : []) {
+        if (pinnedNames.has(name)) continue;
+        if (mismatchAction === 'reject') {
+          throw new MCPToolPinningError(
+            `MCP server added tool '${name}' after its catalogue was pinned - a post-approval addition is rejected until the operator re-pins (onPinMismatch: 'accept-and-update').`,
+            { metadata: { server: serverIdentity.id, tool: name } },
+          );
+        }
+        incrementCounter('mcp.tools.pin-added.total', {
+          server: serverIdentity.id,
+          tool: name,
+        });
+        options.logger?.('warn', 'mcp.tools.pin-added: tool added after the catalogue was pinned', {
+          server: serverIdentity.id,
+          tool: name,
+        });
+      }
+      // W-079: removals are not an injection by themselves, but they can
+      // hide a rename (remove + add) - keep them observable.
+      for (const name of pinsFromStore ? pinnedNames : []) {
+        if (adapted.fingerprints.has(name)) continue;
+        incrementCounter('mcp.tools.pin-removed.total', {
+          server: serverIdentity.id,
+          tool: name,
+        });
+        options.logger?.('info', 'mcp.tools.pin-removed: pinned tool disappeared from the catalogue', {
+          server: serverIdentity.id,
+          tool: name,
+        });
+      }
+      // W-079: the explicit operator path to accept a changed catalogue -
+      // overwrite the store with the CURRENT snapshot so subsequent
+      // toTools() calls are clean. Explicit pinnedFingerprints stay
+      // read-only (they are config, not a store).
+      if (mismatchAction === 'accept-and-update' && pinsFromStore && pinStore !== undefined) {
+        const refreshed: Record<string, string> = {};
+        for (const [name, hash] of adapted.fingerprints) refreshed[name] = hash;
+        await pinStore.set(serverIdentity.id, refreshed);
+        incrementCounter('mcp.tools.pins-updated.total', { server: serverIdentity.id });
+        options.logger?.('info', 'mcp.tools.pins-updated: operator accepted the current catalogue', {
+          server: serverIdentity.id,
+          tools: Object.keys(refreshed).length,
+        });
       }
     }
     return adapted.tools;

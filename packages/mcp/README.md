@@ -34,7 +34,15 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   first use and, when a pin store is present, **rejects** silent drift
   by default (`onPinMismatch: 'warn'` downgrades to a warning);
   description-injection heuristics at registration feed the
-  `mcp.tool-description.injection-flagged.total` counter.
+  `mcp.tool-description.injection-flagged.total` counter. The full pin
+  lifecycle (W-079): tools ADDED after the first recording are rejected
+  by default too (`mcp.tools.pin-added.total` under `'warn'`), removals
+  are observable (`mcp.tools.pin-removed.total`, never an exception),
+  and `onPinMismatch: 'accept-and-update'` is the explicit operator
+  path to re-trust a legitimately changed catalogue - it rewrites the
+  store with the current snapshot (`mcp.tools.pins-updated.total`) so
+  subsequent calls are clean. Explicit `pinnedFingerprints` remain
+  subset-pins and win over the store.
 - **Strict default for MCP-derived tools.** Every `Tool` produced
   by `MCPClient.toTools()` defaults to the
   `'detect-and-strip-and-wrap'` inbound prompt-injection
