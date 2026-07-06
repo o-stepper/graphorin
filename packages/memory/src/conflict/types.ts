@@ -210,7 +210,7 @@ export interface ConflictPipelineDeps {
 export type ReconcileAction = 'add' | 'update' | 'noop' | 'conflict';
 
 /**
- * Outcome of {@link reconcileCandidate}. `add` is independent / unsure
+ * Outcome of `reconcileCandidate`. `add` is independent / unsure
  * (a fresh fact); `noop` is a duplicate that adds nothing; `update` is
  * a newer version of `targetId`; `conflict` contradicts `targetId` and
  * closes it. The three neighbour-referencing variants carry the

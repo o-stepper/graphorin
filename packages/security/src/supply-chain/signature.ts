@@ -66,7 +66,7 @@ export function _setSigstoreVerifierForTesting(verifier: SigstoreVerifier | null
 }
 
 /**
- * Options accepted by {@link verifySkillSignature}.
+ * Options accepted by `verifySkillSignature`.
  *
  * @stable
  */

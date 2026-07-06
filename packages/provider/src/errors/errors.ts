@@ -212,7 +212,7 @@ const CONTEXT_LENGTH_BODY_RE =
 
 /**
  * Map an HTTP status (plus optional error-body text) onto the
- * canonical {@link import('@graphorin/core').ProviderErrorKind}. One
+ * canonical `ProviderErrorKind`. One
  * shared table so `withRetry` / `withFallback` and consumers switching
  * on the documented kinds see consistent values from every HTTP
  * adapter:

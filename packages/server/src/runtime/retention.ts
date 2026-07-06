@@ -39,7 +39,7 @@ const DAY_MS = 86_400_000;
 
 /**
  * Mirror of the `config.retention` section of
- * {@link import('../config.js').ServerConfigSpec}.
+ * `ServerConfigSpec`.
  *
  * @stable
  */

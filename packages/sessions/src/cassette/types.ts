@@ -74,7 +74,7 @@ export type ToolCallRecordStatus = 'completed' | 'failed' | 'cancelled' | 'budge
 
 /**
  * Per-`Tool.execute(...)` invocation. The canonical record kind that
- * the {@link ToolCassetteReplayPolicy} consumes during replay.
+ * the `ToolCassetteReplayPolicy` consumes during replay.
  *
  * @stable
  */

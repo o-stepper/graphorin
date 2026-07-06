@@ -163,7 +163,7 @@ export interface ExecutorOptions {
    * Wall-clock limit applied to INLINE tool execution (TL-4). When set,
    * this executor-level value takes precedence; otherwise the resolved
    * per-tool sandbox-tier `timeoutMs` applies when > 0, else
-   * {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s). Expiry fails the call
+   * `DEFAULT_INLINE_TOOL_TIMEOUT_MS` (60s). Expiry fails the call
    * with `ToolError({ kind: 'timeout' })`; the run continues.
    */
   readonly inlineToolTimeoutMs?: number;

@@ -21,7 +21,7 @@
   "scripts": {
     "predev": "node ./scripts/sync-root-docs.mjs",
     "dev": "vitepress dev .",
-    "build:typedoc": "typedoc --options ./typedoc.json",
+    "build:typedoc": "node ./scripts/run-typedoc-checked.mjs",
     "build:sanitise": "node ./scripts/sanitise-typedoc.mjs",
     "build:vitepress": "vitepress build .",
     "build:llms": "node ./scripts/build-llms-txt.mjs",

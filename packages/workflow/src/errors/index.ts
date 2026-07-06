@@ -60,7 +60,7 @@ export class WorkflowError extends Error {
   }
 }
 
-/** Thrown by {@link createWorkflow} on configuration validation failure. */
+/** Thrown by `createWorkflow` on configuration validation failure. */
 export class InvalidWorkflowConfigError extends WorkflowError {
   constructor(message: string, hint?: string) {
     super('invalid-config', message, hint === undefined ? {} : { hint });
@@ -104,7 +104,7 @@ export class MultiWriteError extends WorkflowError {
   }
 }
 
-/** Thrown by {@link createWorkflow} when an edge references a node that is not registered. */
+/** Thrown by `createWorkflow` when an edge references a node that is not registered. */
 export class UnknownNodeError extends WorkflowError {
   readonly nodeName: string;
 
@@ -115,7 +115,7 @@ export class UnknownNodeError extends WorkflowError {
   }
 }
 
-/** Thrown when {@link Workflow.resume} cannot find the named thread. */
+/** Thrown when `Workflow.resume` cannot find the named thread. */
 export class ThreadNotFoundError extends WorkflowError {
   readonly threadId: string;
 
@@ -126,7 +126,7 @@ export class ThreadNotFoundError extends WorkflowError {
   }
 }
 
-/** Thrown when {@link Workflow.fork} cannot find the named checkpoint. */
+/** Thrown when `Workflow.fork` cannot find the named checkpoint. */
 export class CheckpointNotFoundError extends WorkflowError {
   readonly threadId: string;
   readonly checkpointId: string;
@@ -154,7 +154,7 @@ export class ConcurrentResumeError extends WorkflowError {
   }
 }
 
-/** Thrown by {@link Workflow.resume} when the named thread is not in a suspended state. */
+/** Thrown by `Workflow.resume` when the named thread is not in a suspended state. */
 export class ResumeWithoutSuspensionError extends WorkflowError {
   readonly threadId: string;
   readonly status: string;
@@ -219,7 +219,7 @@ export class NodeTimeoutError extends WorkflowError {
 
 /**
  * Thrown on resume when the stored frontier was written by a different
- * {@link WorkflowConfig.version} (D1 / workflow-14) - replaying
+ * `WorkflowConfig.version` (D1 / workflow-14) - replaying
  * persisted state through changed code must fail loudly, not silently
  * diverge. Opt out per call via `allowVersionMismatch`.
  */
@@ -359,7 +359,7 @@ export class StateNotSerializableError extends WorkflowError {
   }
 }
 
-/** Thrown when a {@link Reducer} channel's `reduce(...)` callback throws. */
+/** Thrown when a `Reducer` channel's `reduce(...)` callback throws. */
 export class ReducerError extends WorkflowError {
   readonly channel: string;
 

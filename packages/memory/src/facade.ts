@@ -179,7 +179,7 @@ export interface CreateMemoryOptions {
    * distils a reusable, value-abstracted procedure from a successful agent
    * trajectory and stores it **quarantined** + `provenance: 'induction'`.
    * Omitted (the default) ⇒ `induce(...)` throws
-   * {@link ProcedureInductionNotConfiguredError} and the procedural tier
+   * `ProcedureInductionNotConfiguredError` and the procedural tier
    * stays pure offline CRUD - no provider call.
    */
   readonly procedureInduction?: {

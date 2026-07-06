@@ -1,6 +1,6 @@
 /**
  * Pure-functional reconnect-backoff helper. Encapsulated in its own
- * module so the {@link GraphorinClient} stays free of timing
+ * module so the `GraphorinClient` stays free of timing
  * heuristics - and so tests can drive the policy with a deterministic
  * RNG.
  *
@@ -57,8 +57,8 @@ export function computeBackoffMs(attempt: number, policy: BackoffPolicy = {}): n
 
 /**
  * Resolve when the requested number of milliseconds elapsed, or
- * reject (with a {@link DOMException}-style abort error) when the
- * supplied {@link AbortSignal} fires first.
+ * reject (with a `DOMException`-style abort error) when the
+ * supplied `AbortSignal` fires first.
  *
  * @stable
  */

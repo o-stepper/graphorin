@@ -70,7 +70,7 @@ export interface RuleInput {
 export interface InduceOptions {
   /** Sensitivity of the stored procedure. Default `'internal'`. */
   readonly sensitivity?: Sensitivity;
-  /** Priority of the stored procedure. Default {@link INDUCED_PRIORITY} (40). */
+  /** Priority of the stored procedure. Default `INDUCED_PRIORITY` (40). */
   readonly priority?: number;
 }
 

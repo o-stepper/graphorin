@@ -68,7 +68,7 @@ export const DEFAULT_DELIVERY_COMMENTARY_PATTERNS: ReadonlyArray<DeliveryComment
 /**
  * Default whitelist of `event.type` strings the dispatcher walks
  * through the sanitizer. Extension is opt-in via
- * {@link import('./types.js').DeliveryCommentaryConfig}.applyToEvents.
+ * `DeliveryCommentaryConfig.applyToEvents`.
  *
  * @stable
  */

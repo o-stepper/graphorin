@@ -96,7 +96,7 @@ export interface Transport {
    * Send a client → server frame. Throws when the transport is not
    * in the open state, or when the underlying back-end does not
    * support send (the SSE transport throws every send via
-   * {@link import('../errors.js').TransportFailedError} - clients
+   * `TransportFailedError` - clients
    * should fall back to REST for control-plane operations on SSE).
    */
   send(frame: ClientMessage): void;

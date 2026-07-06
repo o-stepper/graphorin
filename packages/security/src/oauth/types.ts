@@ -74,7 +74,7 @@ export interface DiscoveredMetadata {
  * @stable
  */
 export interface CreateOAuthClientOptions {
-  /** Stable identifier; persisted into the {@link OAuthServerStore}. */
+  /** Stable identifier; persisted into the `OAuthServerStore`. */
   readonly serverId: string;
   /** Base URL of the OAuth-protected resource server. */
   readonly serverUrl: string;

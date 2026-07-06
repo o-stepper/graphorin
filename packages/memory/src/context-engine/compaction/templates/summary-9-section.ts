@@ -83,7 +83,7 @@ export function buildSummarizerPrompt(input: {
    * Character budget for the message dump (context-engine-07). When the
    * rendered dump exceeds it, the OLDEST lines are elided (newest kept)
    * and a marker notes how many were dropped. `undefined` ⇒ default
-   * {@link DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET}; `0` disables the cap.
+   * `DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET`; `0` disables the cap.
    */
   readonly maxDumpChars?: number;
 }): string {

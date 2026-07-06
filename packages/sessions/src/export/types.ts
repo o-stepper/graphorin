@@ -137,7 +137,7 @@ export interface SessionExportMessageRecord {
 }
 
 /**
- * Single handoff record. Mirrors {@link HandoffRecord} byte-for-byte
+ * Single handoff record. Mirrors `HandoffRecord` byte-for-byte
  * plus the session id.
  *
  * @stable

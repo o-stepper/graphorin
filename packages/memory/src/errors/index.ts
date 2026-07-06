@@ -215,7 +215,7 @@ export class EmbedderMigrationStateError extends GraphorinMemoryError {
 }
 
 /**
- * Raised by {@link SemanticMemory.validate} (P1-4 / MRET-3) when a caller
+ * Raised by `SemanticMemory.validate` (P1-4 / MRET-3) when a caller
  * tries to promote a fact whose quarantine was triggered by the offline
  * injection heuristics. Such a fact is a memory-poisoning candidate: the
  * agent's own `fact_validate` tool must never be able to admit it into
@@ -247,7 +247,7 @@ export class QuarantinePromotionRefusedError extends GraphorinMemoryError {
 }
 
 /**
- * Raised when {@link ProceduralMemory.induce} (P2-2) is called but no
+ * Raised when `ProceduralMemory.induce` (P2-2) is called but no
  * workflow inducer was configured. Induction abstracts concrete values into
  * variables, which needs a provider - so the capability is opt-in and the
  * default (offline) procedural tier never silently no-ops a requested
