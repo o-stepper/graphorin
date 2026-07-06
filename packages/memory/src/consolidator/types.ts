@@ -149,6 +149,20 @@ export interface ConsolidatorConfig {
    */
   readonly salienceWeights: SalienceWeights;
   readonly maxStandardBatchSize: number;
+  /**
+   * Input-side transcript budget for the standard phase, in characters
+   * (W-081; chars/4 is the package's deterministic token proxy, so the
+   * 60k default approximates 15k tokens). `maxStandardBatchSize` bounds
+   * only the MESSAGE COUNT of a slice; without a size budget a batch of
+   * near-cap messages can render to hundreds of kilobytes, overflow a
+   * cheap-tier model context on every retry and wedge the cursor
+   * permanently. A transcript over this budget is half-split BEFORE the
+   * provider call (same convergent recursion as the
+   * `finishReason: 'length'` output handling); a single message that
+   * alone exceeds the budget is tail-truncated and recorded on the
+   * phase span. Conservative for CJK scripts by design.
+   */
+  readonly maxTranscriptChars: number;
   readonly maxDeepConflictsPerRun: number;
   readonly dlqMaxRetries: number;
   readonly dlqBaseBackoffMs: number;
@@ -425,6 +439,8 @@ export interface CreateConsolidatorOptions {
   /** Override the {@link ConsolidatorConfig.salienceWeights} default (X-1). */
   readonly salienceWeights?: SalienceWeights;
   readonly maxStandardBatchSize?: number;
+  /** Override the per-tier {@link ConsolidatorConfig.maxTranscriptChars} default (W-081). */
+  readonly maxTranscriptChars?: number;
   readonly maxDeepConflictsPerRun?: number;
   readonly dlqMaxRetries?: number;
   readonly dlqBaseBackoffMs?: number;
@@ -472,6 +488,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly cheapModel: string | null;
       readonly deepModel: string | null;
       readonly onExceed: OnBudgetExceed;
+      /** W-081: input transcript budget for one standard-phase slice. */
+      readonly maxTranscriptChars: number;
       readonly formEpisodes: boolean;
       readonly importanceScoring: boolean;
       readonly reflection: boolean;
@@ -496,6 +514,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    maxTranscriptChars: 60_000,
     formEpisodes: false,
     importanceScoring: false,
     reflection: false,
@@ -518,6 +537,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    maxTranscriptChars: 60_000,
     formEpisodes: false,
     importanceScoring: false,
     reflection: false,
@@ -540,6 +560,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    maxTranscriptChars: 60_000,
     formEpisodes: true,
     importanceScoring: true,
     reflection: false,
@@ -562,6 +583,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    // Full-tier models carry wider contexts - a larger input budget
+    // keeps slices coarse (fewer calls) without risking overflow.
+    maxTranscriptChars: 120_000,
     formEpisodes: true,
     importanceScoring: true,
     reflection: true,
@@ -584,6 +608,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    maxTranscriptChars: 60_000,
     formEpisodes: false,
     importanceScoring: false,
     reflection: false,

@@ -315,6 +315,11 @@ In library mode the consolidator is **dormant until you start and trigger it** -
 
 Every `trigger(...)` dispatch first replays ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
 
+Two safeguards keep a single bad slice from wedging a scope forever:
+
+- **Input transcript budget** (`maxTranscriptChars`, per-tier default 60 000 characters ~ 15k tokens, 120 000 at `full`): `maxStandardBatchSize` bounds only the message *count*, so a batch of long messages could exceed a cheap model's context on every retry. A slice whose rendered transcript exceeds the budget is half-split *before* the provider call (the same convergent recursion that handles `finishReason: 'length'` output truncation); a single message that alone exceeds the budget is tail-truncated, and both events are recorded on the phase span (`consolidator.standard.budget_splits` / `.input_truncations`).
+- **Poison-slice skip**: when a standard-phase batch exhausts its dead-letter retries and the cursor still points inside the failed window, the cursor is force-advanced past the window (logged, and the `messageIds` stay on the exhausted row for manual replay). Skipping the slice loses its facts deliberately - the alternative is losing every slice after it. The check is membership-based, so it can never move the cursor backwards.
+
 Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 
 | Tier | Phases enabled | `maxTokensPerDay` | `maxCostPerDay` (USD) | `onExceed` |

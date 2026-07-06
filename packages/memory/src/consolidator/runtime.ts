@@ -21,6 +21,7 @@ import type { Provider, SessionScope, Tracer } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
 import type {
   ConsolidatorMemoryStoreExt,
+  DlqBatchRow,
   MemoryStoreAdapter,
 } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
@@ -490,6 +491,7 @@ class ConsolidatorImpl implements Consolidator {
       const nextRetryCount = row.retryCount + 1;
       if (nextRetryCount >= this.#config.dlqMaxRetries) {
         await store.markBatchExhausted(row.id, describeError(lastError), nextRetryCount);
+        await this.#skipPoisonSlice(scope, row, replayPhase);
       } else {
         const delayMs = nextBackoffMs({
           retryCount: nextRetryCount,
@@ -500,6 +502,43 @@ class ConsolidatorImpl implements Consolidator {
       }
     }
     return drained;
+  }
+
+  /**
+   * W-081: poison-slice skip. When a standard-phase batch exhausts its
+   * DLQ retries while the cursor still points before / inside the failed
+   * window, every future trigger re-reads the SAME slice, fails the same
+   * way and consolidation for the scope stalls forever (each drain also
+   * used to mint a fresh DLQ row for the identical window). Force-advance
+   * the cursor past the window instead: losing the poison slice's facts
+   * is deliberate and bounded - its messageIds stay on the exhausted row
+   * for manual replay - whereas the alternative is losing every
+   * subsequent slice too. The gate is membership-based: the cursor is
+   * "not past the window" exactly when the next unprocessed message falls
+   * inside the exhausted window, so the advance can never move the cursor
+   * backwards over a window that was already passed.
+   */
+  async #skipPoisonSlice(
+    scope: SessionScope,
+    row: DlqBatchRow,
+    replayPhase: ConsolidatorPhase,
+  ): Promise<void> {
+    if (replayPhase !== 'standard' || row.messageIds.length === 0) return;
+    const store = this.#consolidatorStore;
+    if (store === null) return;
+    const session = this.#store.session;
+    if (typeof session.listMessagesSince !== 'function') return;
+    const tip = row.messageIds[row.messageIds.length - 1];
+    if (tip === undefined) return;
+    const state = await store.getState(scope);
+    const cursor = state?.lastProcessedMessageId ?? null;
+    if (cursor === tip) return;
+    const next = (await session.listMessagesSince(scope, cursor, 1))[0];
+    if (next === undefined || !row.messageIds.includes(next.id)) return;
+    await store.upsertState(scope, { lastProcessedMessageId: tip });
+    process.stderr.write(
+      `[graphorin/memory] poison slice skipped: standard-phase DLQ batch '${row.id}' exhausted its retries with the cursor still inside the failed window - advancing lastProcessedMessageId past ${row.messageIds.length} message(s); the ids remain on the exhausted row for manual replay.\n`,
+    );
   }
 
   // ---------------------------------------------------------------------------
@@ -741,6 +780,7 @@ class ConsolidatorImpl implements Consolidator {
         cheapModel: this.#config.cheapModel,
         noiseFilters: this.#config.noiseFilters as ReadonlyArray<NoiseFilterPreset>,
         maxBatchSize: this.#config.maxStandardBatchSize,
+        maxTranscriptChars: this.#config.maxTranscriptChars,
         lastProcessedMessageId,
         budget: this.#budget,
         tier: this.#config.tier === 'free' ? 'cheap' : this.#config.tier,
@@ -925,6 +965,7 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     decayCapacity: opts.decayCapacity ?? null,
     salienceWeights: opts.salienceWeights ?? DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: opts.maxStandardBatchSize ?? 50,
+    maxTranscriptChars: opts.maxTranscriptChars ?? preset.maxTranscriptChars,
     maxDeepConflictsPerRun: opts.maxDeepConflictsPerRun ?? 20,
     dlqMaxRetries: opts.dlqMaxRetries ?? 5,
     dlqBaseBackoffMs: opts.dlqBaseBackoffMs ?? 60_000,

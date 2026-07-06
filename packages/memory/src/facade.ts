@@ -229,6 +229,13 @@ export interface CreateMemoryOptions {
     /** Weights for the multi-signal salience score (X-1). */
     readonly salienceWeights?: SalienceWeights;
     readonly maxStandardBatchSize?: number;
+    /**
+     * Input transcript budget for one standard-phase slice, in
+     * characters (W-081). Over-budget batches are half-split before the
+     * provider call; a lone over-budget message is tail-truncated.
+     * Per-tier default (60k chars ~ 15k tokens; 120k on `full`).
+     */
+    readonly maxTranscriptChars?: number;
     readonly maxDeepConflictsPerRun?: number;
     readonly dlqMaxRetries?: number;
     readonly dlqBaseBackoffMs?: number;
@@ -644,6 +651,9 @@ function buildConsolidator(
     ...(opts.salienceWeights !== undefined ? { salienceWeights: opts.salienceWeights } : {}),
     ...(opts.maxStandardBatchSize !== undefined
       ? { maxStandardBatchSize: opts.maxStandardBatchSize }
+      : {}),
+    ...(opts.maxTranscriptChars !== undefined
+      ? { maxTranscriptChars: opts.maxTranscriptChars }
       : {}),
     ...(opts.maxDeepConflictsPerRun !== undefined
       ? { maxDeepConflictsPerRun: opts.maxDeepConflictsPerRun }
