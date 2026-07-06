@@ -15,10 +15,13 @@ import type {
   Provider,
   ReasoningContent,
   ReasoningRetention,
+  RunState,
   ToolCall,
   ToolError,
   Usage,
+  UsageAccumulator,
 } from '@graphorin/core';
+import { addModelUsage } from '../run-state/index.js';
 import { renderPlanRecitation } from '../tooling/plan.js';
 
 /** Most-recent user-role text in `messages` (for context-engine auto-recall). */
@@ -233,6 +236,48 @@ export function accumulateUsage(target: Usage, delta: Usage): void {
   if (delta.cacheWriteTokens !== undefined) {
     target.cacheWriteTokens = (target.cacheWriteTokens ?? 0) + delta.cacheWriteTokens;
   }
+}
+
+/**
+ * Fold a completed (or failed - tokens were spent either way) child
+ * run's usage into the parent run's accounting: `state.usage`,
+ * `state.usageByModel` and the run's {@link UsageAccumulator} (W-033).
+ * Children carrying a per-model breakdown fold model-by-model (each
+ * child model entry counts as one attempt on the parent); a child
+ * without `usageByModel` folds its aggregate under the synthetic id
+ * `sub-agent:<name>`, skipped entirely when all-zero so phantom
+ * entries never appear.
+ *
+ * Must be called exactly once per child run at exactly one seam -
+ * a second call double-counts (pinned by test).
+ */
+export function foldChildRunUsage(
+  state: RunState,
+  usageAcc: UsageAccumulator | undefined,
+  childState: RunState,
+  childName: string,
+): void {
+  const byModel = childState.usageByModel;
+  if (byModel !== undefined && Object.keys(byModel).length > 0) {
+    for (const [modelId, usage] of Object.entries(byModel)) {
+      addModelUsage(state, modelId, usage);
+      accumulateUsage(state.usage, usage);
+      usageAcc?.add(modelId, usage);
+    }
+    return;
+  }
+  const aggregate = childState.usage;
+  if (
+    aggregate.promptTokens === 0 &&
+    aggregate.completionTokens === 0 &&
+    aggregate.totalTokens === 0
+  ) {
+    return;
+  }
+  const syntheticId = `sub-agent:${childName}`;
+  addModelUsage(state, syntheticId, aggregate);
+  accumulateUsage(state.usage, aggregate);
+  usageAcc?.add(syntheticId, aggregate);
 }
 
 /**

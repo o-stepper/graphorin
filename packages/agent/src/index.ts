@@ -145,6 +145,7 @@ export {
   type SerializeRunStateOptions,
   serializeRunState,
 } from './run-state/index.js';
+export { foldChildRunUsage } from './runtime/messages.js';
 export {
   createReplayProvider,
   type ReplayProviderOptions,

@@ -18,10 +18,11 @@ import type {
   Tool,
   ToolCall,
   ToolError,
+  UsageAccumulator,
 } from '@graphorin/core';
 import { type DescribedFilter, filters as filterLib } from '../filters/index.js';
 import type { Agent, AgentCallOptions, AgentConfig } from '../types.js';
-import { renderToolErrorMessage } from './messages.js';
+import { foldChildRunUsage, renderToolErrorMessage } from './messages.js';
 import type { MutableRunState } from './run-input.js';
 
 export const HANDOFF_TOOL_PREFIX = 'transfer_to_';
@@ -57,6 +58,54 @@ export function buildHandoffTool<TDeps>(
   return tool;
 }
 
+/**
+ * A handoff child's seed must be a well-formed transcript in its own
+ * right: the parent history it is cut from ends with the in-flight
+ * handoff call itself (a dangling tool_use), and `lastN`-style filters
+ * can orphan tool results whose assistant partner was cut. Real
+ * providers reject both shapes with `invalid-request`, so strip
+ * unresolved tool calls (dropping the assistant message when nothing
+ * remains) and orphan tool messages before seeding the child.
+ */
+export function sanitizeHandoffSeed(messages: ReadonlyArray<Message>): Message[] {
+  const announcedSoFar = new Set<string>();
+  const resolved = new Set<string>();
+  for (const m of messages) {
+    if (m.role === 'assistant' && m.toolCalls !== undefined) {
+      for (const c of m.toolCalls) announcedSoFar.add(c.toolCallId);
+    } else if (m.role === 'tool' && announcedSoFar.has(m.toolCallId)) {
+      resolved.add(m.toolCallId);
+    }
+  }
+  const out: Message[] = [];
+  const keptAnnounced = new Set<string>();
+  for (const m of messages) {
+    if (m.role === 'tool') {
+      if (!keptAnnounced.has(m.toolCallId)) continue;
+      out.push(m);
+      continue;
+    }
+    if (m.role === 'assistant' && m.toolCalls !== undefined) {
+      const kept = m.toolCalls.filter((c) => resolved.has(c.toolCallId));
+      for (const c of kept) keptAnnounced.add(c.toolCallId);
+      if (kept.length === m.toolCalls.length) {
+        out.push(m);
+        continue;
+      }
+      const { toolCalls: _dropped, ...rest } = m;
+      const hasContent =
+        typeof rest.content === 'string'
+          ? rest.content.length > 0
+          : Array.isArray(rest.content) && rest.content.length > 0;
+      if (kept.length === 0 && !hasContent) continue;
+      out.push(kept.length > 0 ? { ...rest, toolCalls: kept } : rest);
+      continue;
+    }
+    out.push(m);
+  }
+  return out;
+}
+
 /** One resolved handoff target (the factory's `handoffMap` values). */
 export interface HandoffEntry<TDeps> {
   readonly agent: Agent<TDeps, unknown>;
@@ -72,6 +121,8 @@ export interface HandoffRunEnv<TDeps, TOutput> {
   readonly sessionId: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
+  /** The run's usage accumulator - child-run usage folds into it (W-033). */
+  readonly usageAcc: UsageAccumulator;
 }
 
 /**
@@ -88,10 +139,10 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   handoff: HandoffEntry<TDeps>,
   stepNumber: number,
 ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-  const { config, options, state, messages, sessionId, agentId, signal } = env;
+  const { config, options, state, messages, sessionId, agentId, signal, usageAcc } = env;
   yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
   const filter = (handoff.filter ?? filterLib.defaultHandoffFilter()) as DescribedFilter;
-  const filtered = filter(messages);
+  const filtered = sanitizeHandoffSeed(filter(messages) as Message[]);
   const targetId = handoff.agent.id;
   // The secrets fields record the structural reality: no
   // inheritance mechanism exists at this boundary, so the
@@ -131,6 +182,11 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
     }
   }
   const subDurationMs = Date.now() - subStart;
+  // W-033: fold the child's usage into the parent's accounting on EVERY
+  // outcome - tokens were spent whether the child completed or failed.
+  if (subResult !== undefined) {
+    foldChildRunUsage(state, usageAcc, subResult.state, handoff.agent.config.name);
+  }
   const stepEntry = state.steps[state.steps.length - 1];
   if (subResult !== undefined && subResult.status !== 'completed') {
     const toolError: ToolError = {

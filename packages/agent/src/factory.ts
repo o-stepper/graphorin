@@ -473,6 +473,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       agentId,
       userId,
       signal,
+      usageAcc,
       stopWhen,
       fallbackPolicy,
       structuredInstruction,

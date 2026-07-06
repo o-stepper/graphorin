@@ -25,6 +25,31 @@ describe('runFanOut', () => {
     expect(types).toContain('agent.fanout.merged');
   });
 
+  it('W-033: FanOutResult.usage sums usage-reporting children; plain children contribute nothing', async () => {
+    const envelope = (id: string, prompt: number, completion: number) => ({
+      output: `out-${id}`,
+      usage: {
+        promptTokens: prompt,
+        completionTokens: completion,
+        totalTokens: prompt + completion,
+      },
+      state: { id: `run-${id}`, status: 'completed', steps: [] },
+    });
+    const r = await runFanOut<unknown>({
+      children: [
+        { agentId: 'a', invoke: async () => envelope('a', 5, 5) },
+        { agentId: 'b', invoke: async () => envelope('b', 7, 3) },
+        { agentId: 'plain', invoke: async () => 'no envelope' },
+      ],
+      runId: 'r',
+      sessionId: 's',
+      agentId: 'p',
+    });
+    expect(r.usage).toEqual({ promptTokens: 12, completionTokens: 8, totalTokens: 20 });
+    expect(r.children.find((c) => c.agentId === 'a')?.usage?.totalTokens).toBe(10);
+    expect(r.children.find((c) => c.agentId === 'plain')?.usage).toBeUndefined();
+  });
+
   it('isolates failed children - never throws from the fan-out call itself', async () => {
     const r = await runFanOut<string>({
       children: [

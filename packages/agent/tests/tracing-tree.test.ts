@@ -161,4 +161,35 @@ describe('C7 - agent.run / agent.step / tool.execute form one trace tree', () =>
     expect(tools[0]?.parentId).toBe(steps[0]?.id);
     expect(tools[0]?.attrs['gen_ai.tool.name']).toBe('echo');
   });
+
+  it('W-033: run-span gen_ai.usage.* includes handoff-child tokens', async () => {
+    const { tracer, spans } = recordingTracer();
+    const target = createAgent({
+      name: 'specialist',
+      instructions: 'x',
+      provider: mockProvider([textOnlyScript('done', 20)]),
+    });
+    const parent = createAgent({
+      name: 'router',
+      instructions: 'route',
+      provider: mockProvider([
+        toolCallScript({
+          toolCallId: 'h1',
+          toolName: 'transfer_to_specialist',
+          args: {},
+          totalTokens: 8,
+        }),
+        textOnlyScript('final', 4),
+      ]),
+      handoffs: [target],
+      tracer,
+    });
+    for await (const _ev of parent.stream('go')) {
+      /* drain */
+    }
+    const run = spans.find((s) => s.type === 'agent.run');
+    // Prompt halves: 4 + 2 (parent steps) + 10 (child) = 16.
+    expect(run?.attrs['gen_ai.usage.input_tokens']).toBe(16);
+    expect(run?.attrs['gen_ai.usage.output_tokens']).toBe(16);
+  });
 });

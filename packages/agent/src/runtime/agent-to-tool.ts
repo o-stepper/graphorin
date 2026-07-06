@@ -9,8 +9,48 @@
  * @packageDocumentation
  */
 
-import type { AgentEvent, AgentResult, Message, RunState, Tool } from '@graphorin/core';
+import type {
+  AgentEvent,
+  AgentResult,
+  Message,
+  RunState,
+  Tool,
+  ToolExecutionContext,
+  UsageAccumulator,
+} from '@graphorin/core';
 import type { AgentCallOptions, AgentConfig, AgentInput, AgentToToolOptions } from '../types.js';
+import { foldChildRunUsage } from './messages.js';
+
+/**
+ * W-033: fold the child's usage into the parent run through the tool
+ * context. `RunContext.state` is typed as a readonly projection for
+ * user tools (W-047); this runtime-internal seam is the sanctioned
+ * mutation point - the runtime owns the state lifecycle.
+ */
+function foldIntoParent(
+  ctx: ToolExecutionContext<unknown> | undefined,
+  childState: RunState,
+  childName: string,
+): void {
+  if (ctx === undefined) return;
+  const parentState = ctx.runContext.state as unknown as RunState | undefined;
+  const usageAcc = ctx.runContext.usage as UsageAccumulator | undefined;
+  if (parentState !== undefined && typeof parentState.usage?.totalTokens === 'number') {
+    foldChildRunUsage(parentState, usageAcc, childState, childName);
+    return;
+  }
+  // A foreign harness mounting this tool outside the graphorin loop may
+  // hand a structurally-minimal context - fold into the accumulator only.
+  const byModel = childState.usageByModel;
+  if (byModel !== undefined && Object.keys(byModel).length > 0) {
+    for (const [modelId, usage] of Object.entries(byModel)) usageAcc?.add(modelId, usage);
+    return;
+  }
+  const aggregate = childState.usage;
+  if (aggregate.promptTokens > 0 || aggregate.completionTokens > 0 || aggregate.totalTokens > 0) {
+    usageAcc?.add(`sub-agent:${childName}`, aggregate);
+  }
+}
 
 /** What {@link createToTool} needs from the agent factory scope. */
 export interface ToToolDeps<TDeps, TOutput> {
@@ -136,6 +176,15 @@ export function createToTool<TDeps, TOutput>(
             if (ev.type === 'text.complete') turns.push(ev.text);
             else if (ev.type === 'agent.end') endResult = ev.result;
           }
+          // W-033: fold BEFORE the non-completed throw - tokens were
+          // spent whether or not the child completed.
+          if (endResult !== undefined) {
+            foldIntoParent(
+              ctx as ToolExecutionContext<unknown> | undefined,
+              endResult.state,
+              config.name,
+            );
+          }
           if (endResult !== undefined && endResult.status !== 'completed') {
             throw new Error(
               `sub-agent '${config.name}' ${endResult.status}${
@@ -155,6 +204,8 @@ export function createToTool<TDeps, TOutput>(
             : allOutput) as unknown as TOutput;
         }
         const result = await run(seed, callOpts);
+        // W-033: fold BEFORE the non-completed throw (see 'all' branch).
+        foldIntoParent(ctx as ToolExecutionContext<unknown> | undefined, result.state, config.name);
         // AG-17/AG-22 class: a non-completed sub-run is a TOOL ERROR,
         // never an empty-string success.
         if (result.status !== 'completed') {
