@@ -155,13 +155,21 @@ export function extractTsBlocks(markdown) {
 function checkSnippet(code, namedFiles = new Map()) {
   const dir = mkdtempSync(join(ROOT, '.doc-snippet-'));
   const file = join(dir, 'snippet.ts');
+  // TypeScript normalizes fileName to forward slashes; path.join on
+  // Windows produces backslashes, so a raw === comparison filters every
+  // diagnostic out and the gate is vacuously green there (the W-057
+  // self-test caught this on the windows CI leg). Normalize both sides.
+  const normalizePath = (p) => p.replace(/\\/g, '/');
+  const target = normalizePath(file);
   try {
     for (const [name, content] of namedFiles) {
       writeFileSync(join(dir, name), content, 'utf8');
     }
     writeFileSync(file, code, 'utf8');
     const program = ts.createProgram([file], COMPILER_OPTIONS);
-    return ts.getPreEmitDiagnostics(program).filter((d) => d.file?.fileName === file);
+    return ts
+      .getPreEmitDiagnostics(program)
+      .filter((d) => normalizePath(d.file?.fileName ?? '') === target);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
