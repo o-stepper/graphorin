@@ -9,6 +9,26 @@ After memory retrieves candidates, a **reranker** reorders them by relevance
 to the query before they enter the context window. Rerankers implement the
 `ReRanker` contract, so the stage is pluggable.
 
+The runnable fragments below share one setup file - save it as `setup.ts` next
+to the snippet you copy:
+
+```ts file=setup.ts
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+import { createMemory } from '@graphorin/memory';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+import type { SessionScope } from '@graphorin/core';
+
+export const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+
+export const embedder = createTransformersJsEmbedder();
+export const provider = createProvider(ollamaAdapter({ model: 'qwen2.5:7b-instruct' }));
+export const base = { store: sqlite.memory, embeddings: sqlite.embeddings, embedder };
+export const memory = createMemory(base);
+export const scope: SessionScope = { userId: 'alex' };
+```
+
 ## The default: Reciprocal Rank Fusion (RRF)
 
 Out of the box, memory fuses the FTS5 keyword ranking and the vector-search
@@ -36,6 +56,8 @@ Once you have labelled data - for example from the `@graphorin/evals` harness - 
 by its *kind* (FTS vs. vector) per call:
 
 ```ts
+import { memory, scope } from './setup.js';
+
 await memory.semantic.search(scope, 'where does anna live now', {
   fusion: { strategy: 'weighted', weights: { vector: 3, fts: 1 } },
 });
@@ -87,10 +109,11 @@ scoring instructions, non-text criteria).
 ```ts
 import { createMemory } from '@graphorin/memory';
 import { createCrossEncoderReranker } from '@graphorin/reranker-transformersjs';
+import { embedder, sqlite } from './setup.js';
 
 const memory = createMemory({
-  store,
-  embeddings: store.embeddings,
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
   embedder,
   reranker: createCrossEncoderReranker({ locale: 'en', batchSize: 32 }),
 });
@@ -120,6 +143,11 @@ transformation** widens recall *before* fusion:
   ([HyDE](https://arxiv.org/abs/2212.10496)) and fuses its nearest neighbours.
 
 ```ts
+import { createMemory } from '@graphorin/memory';
+import { base, provider, scope } from './setup.js';
+
+const memory = createMemory({ ...base, queryTransform: { provider } });
+
 await memory.semantic.search(scope, 'what does alex like to drink', {
   multiQuery: 3,
   hyde: true,

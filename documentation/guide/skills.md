@@ -105,11 +105,18 @@ The validator walks this ladder for every recognised field. Direct collisions tr
 `/skill:trip-planner plan a weekend in Rome` parses into:
 
 ```ts
-{
-  name: 'trip-planner',
-  args: 'plan a weekend in Rome', // the raw argument string after the name
-  raw: '/skill:trip-planner plan a weekend in Rome',
-}
+import { parseSlashCommand } from '@graphorin/skills/activation';
+import type { SlashCommandActivation } from '@graphorin/skills';
+
+const activation: SlashCommandActivation = parseSlashCommand(
+  '/skill:trip-planner plan a weekend in Rome',
+);
+// activation:
+// {
+//   name: 'trip-planner',
+//   args: 'plan a weekend in Rome', // the raw argument string after the name
+//   raw: '/skill:trip-planner plan a weekend in Rome',
+// }
 ```
 
 Skills that opt out via `disable-model-invocation: true` are excluded from auto-activation but remain reachable through the slash command - useful for human-only workflows.

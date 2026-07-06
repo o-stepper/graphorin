@@ -79,6 +79,25 @@ Everything above runs **fully offline** with no provider. The richer capabilitie
 | `procedureInduction: { provider }` | `procedural.induce(...)` workflow learning (see [Procedural induction](#procedural-memory-induction)). | `induce(...)` throws; procedural stays pure CRUD. |
 | `reranker` | Swap the default fusion reranker (see [Hybrid search](#hybrid-search)). | Reciprocal Rank Fusion (`k=60`). |
 
+The runnable fragments in the rest of this guide share one setup file - the facade above plus a local provider for the opt-in features. Save it as `setup.ts` next to the snippet you copy:
+
+```ts file=setup.ts
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+import { createMemory } from '@graphorin/memory';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+import type { SessionScope } from '@graphorin/core';
+
+export const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+
+export const embedder = createTransformersJsEmbedder();
+export const provider = createProvider(ollamaAdapter({ model: 'qwen2.5:7b-instruct' }));
+export const base = { store: sqlite.memory, embeddings: sqlite.embeddings, embedder };
+export const memory = createMemory(base);
+export const scope: SessionScope = { userId: 'alex' };
+```
+
 ## The eleven memory tools
 
 `memory.tools` is a typed `Tool[]` ready to register with `@graphorin/tools`. Every entry exposes typed input / output schemas, the right memory-modification guard tier, and the right `sideEffectClass` so that the agent runtime can sandbox and audit it.
@@ -116,6 +135,8 @@ const reranker = new RRFReranker(60); // k = 60, the framework default
 Once you have labelled data (the `@graphorin/evals` harness), a **calibrated weighted fusion** can beat plain RRF - and **query transformation** can recover memories whose stored wording differs from the question. Both are covered in [Rerankers & fusion](/guide/rerankers). In brief:
 
 ```ts
+import { memory, scope } from './setup.js';
+
 // Weight the retrievers per-call - RRF stays the default; equal weights reproduce it exactly.
 await memory.semantic.search(scope, 'where does anna live now', {
   fusion: { strategy: 'weighted', weights: { vector: 3, fts: 1 } },
@@ -129,7 +150,10 @@ A terse fact like `"moved to Tbilisi"` is hard to find later because the embeddi
 The default mode, `'late-chunk'`, derives that context **deterministically from the fact's own structured signals with no extra LLM call** (and is a no-op for plain free-text writes), so it stays fully offline. An opt-in, **consolidator-only** `'llm'` mode spends one budgeted cheap-model call per write to author the prefix, degrading to late-chunk on any failure.
 
 ```ts
-createMemory({ /* … */ contextualRetrieval: 'late-chunk' }); // default
+import { createMemory } from '@graphorin/memory';
+import { base } from './setup.js';
+
+createMemory({ ...base, contextualRetrieval: 'late-chunk' }); // default
 // consolidator: { contextualRetrieval: 'llm' }  // opt-in, consolidator writes only
 ```
 
@@ -138,6 +162,8 @@ createMemory({ /* … */ contextualRetrieval: 'late-chunk' }); // default
 When the question and the stored fact use different words, one query may miss. `multiQuery` fans the query into reworded variants (RAG-Fusion) and `hyde` embeds a hypothetical answer - both fused through the same reranker:
 
 ```ts
+import { memory, scope } from './setup.js';
+
 await memory.semantic.search(scope, 'what does alex like to drink', {
   multiQuery: 3,   // original + up to 2 reworded variants, then fuse
   hyde: true,      // also embed a hypothetical answer and fuse its neighbours
@@ -151,6 +177,9 @@ Both are **opt-in**: wire `createMemory({ queryTransform: { provider } })`. With
 Per-call options only help code that calls `memory.semantic.search(...)` directly - the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) expose no `multiQuery`/`expandHops` knobs. `searchDefaults` sets construction-time defaults that every `search()` call inherits, per-call options winning key-by-key:
 
 ```ts
+import { createMemory } from '@graphorin/memory';
+import { sqlite, embedder, provider } from './setup.js';
+
 createMemory({
   store: sqlite.memory,
   embeddings: sqlite.embeddings,
@@ -170,7 +199,10 @@ Every fact can carry a `(subject, predicate, object)` triple. When you enable th
 At read time, one-hop expansion answers associative questions without leaving SQLite:
 
 ```ts
-createMemory({ /* … */ graph: { entityResolution: true } }); // opt-in; offline
+import { createMemory } from '@graphorin/memory';
+import { base, scope } from './setup.js';
+
+const memory = createMemory({ ...base, graph: { entityResolution: true } }); // opt-in; offline
 
 await memory.semantic.search(scope, 'what did the person I met in Tbilisi recommend?', {
   expandHops: 1, // seed on the candidates, fuse in facts sharing an entity (recursive CTE)
@@ -196,7 +228,10 @@ The `longmemeval` harness exposes `--retrieval ppr` and `--retrieval entity` alo
 For hard multi-hop or temporal questions one pass can't answer, `searchIterative` runs a **grade-then-reformulate loop** (CRAG / Self-RAG). A cheap **local difficulty gate** keeps simple lookups single-shot; only a query judged *hard* - and only when a grader is configured - is graded for sufficiency and, when weak, reformulated and retrieved again (widening to one-hop graph expansion each round), up to a hard-capped `maxIterations` (≤ 5). If it still can't satisfy the question it **abstains** rather than confabulating:
 
 ```ts
-createMemory({ /* … */ iterativeRetrieval: { provider } }); // opt-in
+import { createMemory } from '@graphorin/memory';
+import { base, provider, scope } from './setup.js';
+
+const memory = createMemory({ ...base, iterativeRetrieval: { provider } }); // opt-in
 
 const result = await memory.semantic.searchIterative(scope, 'who introduced me to my current employer?');
 if (result.abstained) {
@@ -240,7 +275,9 @@ The consolidator's standard phase reuses this same machinery for **neighbour-awa
 Fact writes set `validFrom = now` and leave `validTo = null`. A supersede **closes** the old fact's `validTo` (it is never silently overwritten) and keeps the chain intact for replay - every change is auditable.
 
 ```ts
-const decision = await memory.semantic.rememberWithDecision(scope, {
+import { memory, scope } from './setup.js';
+
+const { decision } = await memory.semantic.rememberWithDecision(scope, {
   text: 'I just moved to Tbilisi for the new gig.',
 });
 console.log(decision.kind);
@@ -250,12 +287,15 @@ console.log(decision.kind);
 Because `validTo` is closed on supersede, you can read memory **as it was at any past instant** - and trace how a single fact evolved:
 
 ```ts
+import { memory, scope } from './setup.js';
+
 // Point-in-time read: what did we believe last spring?
 const past = await memory.semantic.search(scope, 'where does alex live', {
   asOf: '2025-04-01T00:00:00Z', // ISO-8601 instant
 });
 
 // The full supersede chain for one fact, oldest → newest.
+const factId = past[0].record.id;
 const chain = await memory.semantic.history(scope, factId);
 ```
 
@@ -278,6 +318,10 @@ Promotion is two-gated so the model cannot poison its own memory in one turn (`f
 - `validate(...)` **re-checks the text against the injection heuristics and refuses** an injection-flagged fact with `QuarantinePromotionRefusedError`. Synthesized-but-clean writes promote normally; an injection-flagged fact is an **operator-only** decision and needs the explicit `force` flag from a trusted (non-agent) caller:
 
 ```ts
+import { memory, scope } from './setup.js';
+
+declare const factId: string; // the quarantined fact under review
+
 await memory.semantic.validate(scope, factId); // synthesized → active, audited
 // Injection-flagged facts are refused unless an operator forces, after review:
 await memory.semantic.validate(scope, factId, 'reviewed by operator', { force: true });
@@ -303,7 +347,13 @@ Orthogonal to provenance (*where a memory came from*), every fact / episode / ru
 The procedural tier stores *how to do things*. You can author procedures directly with `define(...)`, or - opt-in - let the assistant **learn** them from its own successful runs (Agent Workflow Memory):
 
 ```ts
-createMemory({ /* … */ procedureInduction: { provider } }); // opt-in
+import { createMemory } from '@graphorin/memory';
+import type { RunState } from '@graphorin/core';
+import { base, provider, scope } from './setup.js';
+
+const memory = createMemory({ ...base, procedureInduction: { provider } }); // opt-in
+
+declare const runState: RunState; // a completed run's `result.state`
 
 // After a run completes successfully, distil a reusable workflow.
 const rule = await memory.procedural.induceFromRun(scope, runState);
@@ -357,6 +407,10 @@ Two things the table does not say by itself. `'log'` is **observability, not enf
 Phase-level features are gated by per-tier flags: **episode formation** and **importance scoring** are on at `standard` / `full`; **contextual retrieval** defaults to `late-chunk` on every tier (the `'llm'` upgrade is consolidator-only); **reflection** is on **only at `full`**. The default `'free'` tier registers the `light` phase but pins both ceilings to zero, so consolidation effectively does nothing until you opt in:
 
 ```ts
+import { createMemory } from '@graphorin/memory';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+import { sqlite, provider } from './setup.js';
+
 createMemory({
   store: sqlite.memory,
   embeddings: sqlite.embeddings,
@@ -386,7 +440,10 @@ Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `last
 Separately from fact decay, the `memory_history` audit trail grows **by design**: every supersede, purge, and quarantine transition appends a row (seven insert sites in the sqlite adapter), and nothing prunes it automatically. `purge()` already scrubs sensitive text from history rows, so the retained rows are event skeletons - keeping them is a storage-cost question, not a privacy one. The supported retention lever is `graphorin memory prune-history --older-than 90d` (or `store.memory.pruneHistory(olderThanMs)` on the `MemoryStoreExt` facade of the sqlite store); the argument is an AGE in milliseconds, not an epoch cutoff.
 
 ```ts
-createMemory({ /* … */ consolidator: { tier: 'standard', enabled: true, provider, decayCapacity: 50_000 } });
+import { createMemory } from '@graphorin/memory';
+import { base, provider } from './setup.js';
+
+createMemory({ ...base, consolidator: { tier: 'standard', enabled: true, provider, decayCapacity: 50_000 } });
 ```
 
 ## Recall explainability

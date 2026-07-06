@@ -88,11 +88,18 @@ The CLI command `graphorin audit verify` walks the chain and reports any breaks 
 The linear hash chain is tamper-*evident* but not tamper-*resistant*: a writer who can rewrite the whole database can re-root the chain (exactly what `pruneAudit` does by design). `@graphorin/security/audit` adds an RFC-6962 Merkle layer over the same rows so the log can be **anchored** and made tamper-resistant against that adversary:
 
 ```ts
+import { SecretValue } from '@graphorin/security';
 import {
+  openAuditDb,
   signAuditCheckpoint,
   verifyAuditAgainstCheckpoint,
   generateAuditSigningKeyPair,
 } from '@graphorin/security/audit';
+
+const auditDb = await openAuditDb({
+  path: './audit.db',
+  passphrase: SecretValue.fromString('replace-with-a-real-passphrase'),
+});
 
 const { publicKeyPem, privateKeyPem } = generateAuditSigningKeyPair(); // Ed25519
 // Periodically sign the current tree head and store it OUT OF BAND
@@ -171,6 +178,8 @@ An operator allow/deny policy gates which package names may be installed. By def
 **Operator trust root (D4).** A valid signature is not authenticity if the signer is anyone - a self-signed skill whose inline key is not pinned would otherwise verify green under the signature-required policy. Pass a `trustRoot` (through `installSkillFromNpm` / `installSkillFromGit` or directly to `verifySkillSignature`) and the resolved signing key must be in it, or verification returns `valid: false` with `reason: 'untrusted-key'`:
 
 ```ts
+import { installSkillFromNpm } from '@graphorin/security';
+
 await installSkillFromNpm({
   packageName: '@vendor/skill',
   trustRoot: {
@@ -251,8 +260,15 @@ The data-flow policy above is *detective* (it flags/blocks at the sink after tai
 **Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are forbid-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. A `forbid` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
 
 ```ts
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
 createAgent({
-  // ...
+  name: 'guarded-ops',
+  instructions: 'Operate the account tools within policy.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+  ),
   toolPolicy: {
     rules: [
       { effect: 'forbid', tool: 'delete_*', reason: 'destructive ops disabled' },
@@ -268,8 +284,15 @@ A matching `forbid` always beats an `allow`, so narrowing composes safely and a 
 **Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools; denying `untrustedInput` deterministically blocks calling untrusted-SOURCE tools - those whose trust class the taint engine treats as injection-bearing (`mcp-derived`, `web-search`, `skill-untrusted`; one shared taxonomy, W-101). Note the scope: the leg gates untrusted tool SOURCES; untrusted content arriving in user messages is outside it. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the dropped leg is deterministically blocked, not merely flagged.
 
 ```ts
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
 createAgent({
-  // ...
+  name: 'browsing-worker',
+  instructions: 'Research the web; never act on the world.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+  ),
   // A browsing worker that reads untrusted web content and secrets, but
   // cannot act on the world:
   ruleOfTwo: { untrustedInput: true, sensitiveData: true, externalSideEffects: false },
