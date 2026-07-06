@@ -1,0 +1,5 @@
+---
+'@graphorin/provider-llamacpp-node': minor
+---
+
+W-096: `llamaCppNodeAdapter` speaks real chat history. When the session exposes node-llama-cpp v3's `setChatHistory` (the default factory's sessions do), a multi-turn transcript is fed as structured history turns (system included - `setChatHistory` replaces the whole history, so relying on the constructor `systemPrompt` alone would drop it) and only the LAST user turn is prompted - the pre-fix pseudo-prompt serialised the entire conversation into one `[user]`-framed string, double-templating it and degrading chat-tuned GGUF models. Sessions without the setter (older fixtures, custom factories) keep the legacy renderPrompt path byte-identically. `completionTokens` now tokenize the ASSEMBLED response once instead of per streamed chunk (BPE merges span chunk seams, so per-chunk counting over-billed). New opt-in `persistentSession: true` caches one session (context + KV cache) per adapter instance, serialised by a promise mutex with per-request `setChatHistory` re-sync, so an agent loop stops re-prefilling the growing transcript every step; the default per-request create/dispose lifecycle is unchanged.

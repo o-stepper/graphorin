@@ -31,6 +31,17 @@ export interface LlamaModelInstance {
 }
 
 /**
+ * Structural mirror of node-llama-cpp v3's `ChatHistoryItem` (W-096).
+ * A `'model'` turn carries its text as `response: string[]`.
+ *
+ * @internal
+ */
+export type LlamaChatHistoryItem =
+  | { readonly type: 'system'; readonly text: string }
+  | { readonly type: 'user'; readonly text: string }
+  | { readonly type: 'model'; readonly response: ReadonlyArray<string> };
+
+/**
  * Loaded chat session capable of streaming responses.
  *
  * @internal
@@ -44,6 +55,15 @@ export interface LlamaSessionInstance {
       readonly temperature?: number;
     },
   ): AsyncIterable<string>;
+  /**
+   * W-096: replace the session's chat history (node-llama-cpp v3
+   * `setChatHistory`). When present, the adapter feeds multi-turn
+   * transcripts as REAL chat history + prompts only the last user turn
+   * - instead of serialising the whole conversation into one
+   * pseudo-prompt string. Optional: fixtures / custom factories without
+   * it keep the legacy render-prompt path.
+   */
+  setChatHistory?(history: ReadonlyArray<LlamaChatHistoryItem>): void;
   /**
    * Release the per-request context / sequence backing this session.
    * node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
@@ -96,6 +116,8 @@ export interface LlamaChatSessionPeer {
       readonly onTextChunk?: (chunk: string) => void;
     },
   ): Promise<string>;
+  /** W-096: node-llama-cpp v3 chat-history setter (optional slice). */
+  setChatHistory?(history: ReadonlyArray<LlamaChatHistoryItem>): void;
 }
 
 /** @internal */
