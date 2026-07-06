@@ -47,24 +47,18 @@ RUN groupadd --system --gid 10001 graphorin \
 
 WORKDIR /app
 
-# Copy the built workspace + the lockfile so the runtime stays
-# pnpm-frozen and reproducible.
-COPY --from=builder --chown=graphorin:graphorin /build/packages /app/packages
-COPY --from=builder --chown=graphorin:graphorin /build/pnpm-lock.yaml /build/pnpm-workspace.yaml /build/package.json /app/
-
-# The native SQLite bindings (better-sqlite3, sqlite-vec) are PEER
-# dependencies of @graphorin/store-sqlite: registry consumers get them
-# via auto-installed peers, but inside this workspace copy they are
-# only satisfied by store-sqlite's devDependencies, which `--prod`
-# skips - the server would boot into "Cannot find package
-# 'better-sqlite3'". Mirror what a consumer install does and add them
-# as regular dependencies of the IMAGE's copy of the package (the
-# manifest/lockfile edits stay inside the image). Their postinstall
-# scripts are allowlisted in the root pnpm.onlyBuiltDependencies.
-RUN corepack enable && corepack prepare pnpm@10.28.2 --activate \
- && pnpm install --frozen-lockfile --prod \
- && pnpm --filter @graphorin/store-sqlite add better-sqlite3 sqlite-vec \
- && pnpm cache delete
+# Ship the builder's tree wholesale: built dist, manifests, lockfile,
+# and the fully-linked node_modules (pnpm's symlinks are relative, so
+# the /build -> /app move preserves resolution). Re-installing here
+# with --prod would drop better-sqlite3/sqlite-vec: in this workspace
+# copy the natives are dev-satisfied PEER dependencies of
+# @graphorin/store-sqlite (registry consumers get them as
+# auto-installed peers instead), and every prod-pruning path removes
+# them again. Carrying devDependencies is the size trade-off of
+# building the image from source; install the published packages if
+# you need a lean image. No pnpm/corepack in the runtime stage means
+# no network access after the builder, either.
+COPY --from=builder --chown=graphorin:graphorin /build /app
 
 # Symlink the binary so /usr/local/bin/graphorin works without PATH
 # gymnastics for downstream consumers.
