@@ -16,10 +16,7 @@
 
 import path from 'node:path';
 import type { TruncationStrategy } from '@graphorin/core';
-import {
-  type ImperativePattern,
-  scanImperativePatterns,
-} from '@graphorin/observability/redaction';
+import { type ImperativePattern, scanImperativePatterns } from '@graphorin/observability/redaction';
 
 /**
  * Pluggable token counter used by the truncation pipeline. Defaults

@@ -1,8 +1,7 @@
 import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import { afterEach, describe, expect, it } from 'vitest';
-
-import { computeClientCapabilities } from '../src/client/client-handlers.js';
 import { createMCPClientFromSdkTransport } from '../src/client/client.js';
+import { computeClientCapabilities } from '../src/client/client-handlers.js';
 import type { MCPClient } from '../src/client/index.js';
 import {
   GraphorinMCPError,

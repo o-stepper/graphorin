@@ -162,7 +162,9 @@ export function selfTest() {
     }
   }
   if (failed > 0) return 1;
-  console.log(`check-character-rules self-test: OK (${cases.length + 1 + exclusion.length} checks)`);
+  console.log(
+    `check-character-rules self-test: OK (${cases.length + 1 + exclusion.length} checks)`,
+  );
   return 0;
 }
 
