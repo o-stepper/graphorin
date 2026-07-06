@@ -21,6 +21,7 @@ import type {
   Usage,
   UsageAccumulator,
 } from '@graphorin/core';
+import { COMPACTION_SUMMARY_MARKER } from '@graphorin/memory';
 import { addModelUsage } from '../run-state/index.js';
 import { renderPlanRecitation } from '../tooling/plan.js';
 
@@ -138,15 +139,16 @@ export function stripReasoningFromMessages(messages: Message[]): { stripped: num
  * folds it into a fresh summary-of-summary.
  */
 /**
- * Marker prefix stamped on every compaction summary (see the memory
- * package's summary template). context-engine-05: the prefix scan must
- * stop at it - after a compact-then-suspend cycle the summary is a
- * SYSTEM message sitting right after the true prefix, and counting it
- * in would pin it (and every later summary) outside the compactable
- * window forever, growing the uncompactable prefix by one summary per
- * cycle.
+ * Marker prefix stamped on every compaction summary. context-engine-05:
+ * the prefix scan must stop at it - after a compact-then-suspend cycle
+ * the summary is a SYSTEM message sitting right after the true prefix,
+ * and counting it in would pin it (and every later summary) outside the
+ * compactable window forever, growing the uncompactable prefix by one
+ * summary per cycle. W-056: the constant is canonical in
+ * `@graphorin/memory` (next to the summary template that stamps it);
+ * re-exported here for the runtime's internal imports.
  */
-export const COMPACTION_SUMMARY_MARKER = '<graphorin_compaction_summary';
+export { COMPACTION_SUMMARY_MARKER };
 
 export function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
   let i = 0;
