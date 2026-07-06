@@ -196,6 +196,89 @@ describe('sanitizeHandoffSeed - the child seed is a well-formed transcript', () 
   });
 });
 
+describe('W-036 - sub-agent lifecycle events forward into the parent stream', () => {
+  function childWithTool() {
+    const echo: Tool<unknown, unknown, unknown> = {
+      name: 'echo',
+      description: 'echo',
+      inputSchema: {
+        parse: (v: unknown) => v,
+        safeParse: (v: unknown) => ({ success: true as const, data: v }),
+        toJSON: () => ({ type: 'object' }),
+      } as never,
+      sideEffectClass: 'read-only',
+      execute: async () => 'ok',
+    } as Tool<unknown, unknown, unknown>;
+    return createAgent({
+      name: 'specialist',
+      instructions: 'x',
+      provider: createMockProvider({
+        modelId: 'mock-child',
+        scripts: [
+          toolCallScript({ toolCallId: 'tc-echo', toolName: 'echo', args: {}, totalTokens: 8 }),
+          textOnlyScript('child done', 4),
+        ],
+      }),
+      tools: [echo],
+    });
+  }
+  function parentFor(
+    child: ReturnType<typeof childWithTool>,
+    forwardEvents?: 'none' | 'lifecycle' | 'all',
+  ) {
+    return createAgent({
+      name: 'router',
+      instructions: 'route',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({
+            toolCallId: 'h1',
+            toolName: 'transfer_to_specialist',
+            args: {},
+            totalTokens: 8,
+          }),
+          textOnlyScript('final', 4),
+        ],
+      }),
+      handoffs: [
+        forwardEvents === undefined
+          ? child
+          : ({ target: child, forwardEvents } as never),
+      ],
+    });
+  }
+  async function collect(agent: ReturnType<typeof parentFor>) {
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream('go')) events.push(ev);
+    return events;
+  }
+
+  it("default 'lifecycle' forwards the child's tool.execute.end wrapped, never text.delta", async () => {
+    const events = await collect(parentFor(childWithTool()));
+    const wrapped = events.filter((e) => e.type === 'subagent.event');
+    expect(wrapped.length).toBeGreaterThan(0);
+    for (const w of wrapped) {
+      if (w.type !== 'subagent.event') continue;
+      expect(w.toolCallId).toBe('h1');
+      expect(w.agentName).toBe('specialist');
+      expect(w.event.type).not.toBe('text.delta');
+    }
+    expect(
+      wrapped.some((w) => w.type === 'subagent.event' && w.event.type === 'tool.execute.end'),
+    ).toBe(true);
+  });
+
+  it("'all' forwards text deltas too; 'none' forwards nothing", async () => {
+    const all = await collect(parentFor(childWithTool(), 'all'));
+    expect(
+      all.some((e) => e.type === 'subagent.event' && e.event.type === 'text.delta'),
+    ).toBe(true);
+    const none = await collect(parentFor(childWithTool(), 'none'));
+    expect(none.some((e) => e.type === 'subagent.event')).toBe(false);
+  });
+});
+
 describe('W-034 - currentAgentId is restored after the handoff child returns', () => {
   function routerWith(childScripts: Parameters<typeof createMockProvider>[0]['scripts']) {
     const target = createAgent({

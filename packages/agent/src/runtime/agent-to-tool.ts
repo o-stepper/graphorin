@@ -102,6 +102,8 @@ export interface SubAgentToolRefs {
   ) => AsyncIterable<AgentEvent<unknown>>;
   /** D2 capability restriction from `AgentToToolOptions.capability`. */
   readonly capability?: 'read-only';
+  /** W-036: forwarding policy from `AgentToToolOptions.forwardEvents`. */
+  readonly forwardEvents?: 'none' | 'lifecycle' | 'all';
   /** Reproduce `execute()`'s seed semantics (inputFilter + input string). */
   readonly buildSeed: (
     input: { readonly input: string },
@@ -245,6 +247,9 @@ export function createToTool<TDeps, TOutput>(
           // D2: run the child under a restricted capability (read-only
           // workers in an orchestrator-worker fan-out).
           ...(options.capability !== undefined ? { capability: options.capability } : {}),
+          // W-036: the child's run span parents under the calling tool's
+          // span - one trace tree even through the executor path.
+          ...(ctx?.runContext.span !== undefined ? { parentSpan: ctx.runContext.span } : {}),
         };
         const seed = buildSeed(input, ctx?.runContext.messages);
         if (exposeTurns === 'all') {
@@ -305,6 +310,7 @@ export function createToTool<TDeps, TOutput>(
       run: run as unknown as SubAgentToolRefs['run'],
       stream: stream as unknown as SubAgentToolRefs['stream'],
       ...(options.capability !== undefined ? { capability: options.capability } : {}),
+      ...(options.forwardEvents !== undefined ? { forwardEvents: options.forwardEvents } : {}),
       buildSeed,
       shapeCompleted: shapeCompleted as unknown as SubAgentToolRefs['shapeCompleted'],
     };

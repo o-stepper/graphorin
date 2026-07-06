@@ -21,7 +21,7 @@ import type {
   UsageAccumulator,
 } from '@graphorin/core';
 import { type DescribedFilter, filters as filterLib } from '../filters/index.js';
-import type { Agent, AgentCallOptions, AgentConfig } from '../types.js';
+import type { Agent, AgentCallOptions, AgentConfig, SubagentForwardPolicy } from '../types.js';
 import type { SubAgentFoldTaint } from './agent-to-tool.js';
 import { foldChildRunUsage, renderToolErrorMessage } from './messages.js';
 import type { MutableRunState } from './run-input.js';
@@ -111,6 +111,8 @@ export function sanitizeHandoffSeed(messages: ReadonlyArray<Message>): Message[]
 export interface HandoffEntry<TDeps> {
   readonly agent: Agent<TDeps, unknown>;
   readonly filter: DescribedFilter | undefined;
+  /** W-036: which child events forward into the parent stream. */
+  readonly forwardEvents?: SubagentForwardPolicy | undefined;
 }
 
 /** The run-scoped context a handoff execution operates on. */
@@ -124,6 +126,11 @@ export interface HandoffRunEnv<TDeps, TOutput> {
   readonly signal: AbortSignal;
   /** The run's usage accumulator - child-run usage folds into it (W-033). */
   readonly usageAcc: UsageAccumulator;
+  /**
+   * W-036: live read of the parent's current step span, the parent for
+   * a sub-agent's `agent.run` span (one trace tree).
+   */
+  readonly getCurrentStepSpan?: () => import('@graphorin/core').AISpan | undefined;
 }
 
 /**
@@ -174,12 +181,15 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
     // deps, and sessionId; its terminal `agent.end` is observed
     // so a failed/aborted sub-run surfaces as a TOOL ERROR -
     // never an empty-string success with durationMs 0.
+    const parentSpan = env.getCurrentStepSpan?.();
     const subStream = subAgent.stream(filtered as Message[], {
       signal,
       ...(options.deps !== undefined || config.deps !== undefined
         ? { deps: (options.deps ?? config.deps) as TDeps }
         : {}),
       sessionId,
+      // W-036: one trace tree - the child's run span parents here.
+      ...(parentSpan !== undefined ? { parentSpan } : {}),
     });
     return yield* runSubAgentCall<TDeps, TOutput>(
       env,
@@ -189,6 +199,7 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
         subStream: subStream as AsyncIterable<AgentEvent<unknown>>,
         errorLabel: `handoff to '${targetId}'`,
         renderCompleted: (_subResult, turns) => ({ output: turns.join('') }),
+        ...(handoff.forwardEvents !== undefined ? { forwardEvents: handoff.forwardEvents } : {}),
       },
       stepNumber,
     );
@@ -211,6 +222,36 @@ export interface SubRunSpec {
   ) => { readonly output: unknown; readonly taint?: SubAgentFoldTaint };
   /** Optional taint sink (the inline toTool path records D2 folds). */
   readonly recordTaint?: (taint: SubAgentFoldTaint, renderedText: string) => void;
+  /** W-036: forwarding policy (default `'lifecycle'`). */
+  readonly forwardEvents?: SubagentForwardPolicy;
+}
+
+/**
+ * W-036: the `'lifecycle'` forwarding whitelist - load-bearing child
+ * events, never the high-frequency text/reasoning deltas.
+ */
+const LIFECYCLE_FORWARD_TYPES: ReadonlySet<string> = new Set([
+  'tool.execute.start',
+  'tool.execute.progress',
+  'tool.execute.partial',
+  'tool.execute.end',
+  'tool.execute.error',
+  'tool.approval.requested',
+  'tool.approval.granted',
+  'tool.approval.denied',
+  'guardrail.tripped',
+  'agent.lateral-leak.detected',
+  'context.compacted',
+  'agent.error',
+]);
+
+function shouldForwardSubagentEvent(
+  policy: SubagentForwardPolicy,
+  eventType: string,
+): boolean {
+  if (policy === 'none') return false;
+  if (policy === 'all') return true;
+  return LIFECYCLE_FORWARD_TYPES.has(eventType);
 }
 
 /**
@@ -284,11 +325,22 @@ export async function* runSubAgentCall<TDeps, TOutput>(
   const { state, messages, usageAcc } = env;
   const subStart = Date.now();
   const turns: string[] = [];
+  const forwardPolicy = spec.forwardEvents ?? 'lifecycle';
   let subResult: AgentResult<unknown> | undefined;
   for await (const subEv of spec.subStream) {
     if (subEv.type === 'text.complete') turns.push(subEv.text);
     else if (subEv.type === 'agent.end') {
       subResult = subEv.result as AgentResult<unknown>;
+    }
+    // W-036: surface the child's load-bearing events in the parent
+    // stream, wrapped so they never alias the parent's own lifecycle.
+    if (shouldForwardSubagentEvent(forwardPolicy, subEv.type)) {
+      yield {
+        type: 'subagent.event',
+        toolCallId: call.toolCallId,
+        agentName: spec.agentName,
+        event: subEv as AgentEvent<unknown>,
+      } as AgentEvent<TOutput>;
     }
   }
   const subDurationMs = Date.now() - subStart;

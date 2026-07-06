@@ -9,6 +9,7 @@
 import type {
   AgentEvent,
   AgentResult,
+  AISpan,
   AnyTool,
   CheckpointStore,
   HandoffFilter,
@@ -131,7 +132,19 @@ export type HandoffEntry<TDeps = unknown> =
       // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
       readonly target: Agent<TDeps, any>;
       readonly inputFilter?: HandoffFilter;
+      /** W-036: which child events forward into the parent stream. */
+      readonly forwardEvents?: SubagentForwardPolicy;
     };
+
+/**
+ * W-036: sub-agent event-forwarding policy. `'lifecycle'` (default)
+ * forwards tool execution/approval, guardrail, lateral-leak,
+ * compaction and error events - never the high-frequency text deltas;
+ * `'all'` forwards everything; `'none'` keeps the child a black box.
+ *
+ * @stable
+ */
+export type SubagentForwardPolicy = 'none' | 'lifecycle' | 'all';
 
 /**
  * The full options object accepted by {@link createAgent}.
@@ -463,6 +476,15 @@ export interface AgentCallOptions<TDeps> {
    * resuming a suspended run.
    */
   readonly capability?: AgentCapability;
+  /**
+   * W-036: parent span for this run's `agent.run` root span - a
+   * multi-agent invocation forms ONE trace tree (the child's run span
+   * parents under the caller's step/tool span). The runtime supplies it
+   * automatically for handoffs and `toTool` sub-agents. Like
+   * `capability`, it is NOT persisted in `RunState`: re-supply on
+   * resume when stitching matters.
+   */
+  readonly parentSpan?: AISpan;
 }
 
 /**
@@ -498,6 +520,8 @@ export interface AgentToToolOptions {
    * boundary at all).
    */
   readonly inputFilter?: HandoffFilter;
+  /** W-036: which child events forward into the parent stream. */
+  readonly forwardEvents?: SubagentForwardPolicy;
   /**
    * Run the sub-agent under a restricted capability (D2): a
    * `'read-only'` worker cannot execute or advertise writer tools. The

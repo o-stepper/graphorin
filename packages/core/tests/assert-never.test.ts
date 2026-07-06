@@ -96,6 +96,8 @@ function describeAgentEvent(e: AgentEvent): string {
       return e.guardrailName;
     case 'verifier.result':
       return e.verifierId;
+    case 'subagent.event':
+      return e.agentName;
     case 'agent.end':
       return e.runId;
     case 'agent.error':

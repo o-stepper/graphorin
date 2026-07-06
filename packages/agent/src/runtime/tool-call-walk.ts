@@ -263,6 +263,7 @@ async function* executeSubAgentToolCall<TDeps, TOutput>(
   yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
   const rawInput = (call.args ?? {}) as { readonly input?: unknown };
   const input = { input: typeof rawInput.input === 'string' ? rawInput.input : '' };
+  const parentSpan = env.getCurrentStepSpan?.();
   const callOpts: Record<string, unknown> = {
     signal,
     ...(options.deps !== undefined || config.deps !== undefined
@@ -270,6 +271,8 @@ async function* executeSubAgentToolCall<TDeps, TOutput>(
       : {}),
     sessionId,
     ...(refs.capability !== undefined ? { capability: refs.capability } : {}),
+    // W-036: one trace tree through the inline walk too.
+    ...(parentSpan !== undefined ? { parentSpan } : {}),
   };
   const seed = refs.buildSeed(input, messages);
   const subStream = refs.stream(seed, callOpts);
@@ -281,6 +284,7 @@ async function* executeSubAgentToolCall<TDeps, TOutput>(
       subStream,
       errorLabel: `sub-agent '${refs.agentName}'`,
       renderCompleted: refs.shapeCompleted,
+      ...(refs.forwardEvents !== undefined ? { forwardEvents: refs.forwardEvents } : {}),
       recordTaint: (taint, renderedText) => {
         toolDataFlowGuard?.record({
           toolName: call.toolName,

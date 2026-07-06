@@ -116,6 +116,7 @@ import type {
   AgentConfig,
   AgentInput,
   AgentProgressIO,
+  SubagentForwardPolicy,
 } from './types.js';
 
 /**
@@ -159,7 +160,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   const fallbackPolicy: AgentFallbackPolicy = config.fallbackPolicy ?? {};
   const handoffMap = new Map<
     string,
-    { readonly agent: Agent<TDeps, unknown>; readonly filter: DescribedFilter | undefined }
+    {
+      readonly agent: Agent<TDeps, unknown>;
+      readonly filter: DescribedFilter | undefined;
+      readonly forwardEvents: SubagentForwardPolicy | undefined;
+    }
   >();
   for (const entry of config.handoffs ?? []) {
     const isWrappedHandoff = typeof entry === 'object' && entry !== null && 'target' in entry;
@@ -176,8 +181,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         ).inputFilter
       : undefined;
     const filter = isDescribedFilter(userFilter) ? userFilter : undefined;
+    const forwardEvents = isWrappedHandoff
+      ? (entry as { readonly forwardEvents?: SubagentForwardPolicy }).forwardEvents
+      : undefined;
     const toolName = `${HANDOFF_TOOL_PREFIX}${subAgent.config.name}`;
-    handoffMap.set(toolName, { agent: subAgent, filter });
+    handoffMap.set(toolName, { agent: subAgent, filter, forwardEvents });
   }
 
   let pendingSteer: Message[] = [];
@@ -357,6 +365,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // the OTel GenAI semantic conventions (gen_ai.*).
     const runSpan = tracer.startSpan({
       type: 'agent.run',
+      // W-036: a sub-agent invocation parents under the caller's live
+      // step/tool span so multi-agent load forms ONE trace tree.
+      ...(options.parentSpan !== undefined ? { parent: options.parentSpan } : {}),
       attrs: {
         'gen_ai.operation.name': 'invoke_agent',
         'gen_ai.agent.id': agentId,
@@ -503,6 +514,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       executorBridgeSlot,
       pendingManualCompacts,
       getPendingAbort: () => pendingAbort,
+      // W-036: live read of the current step span for sub-agent trace
+      // stitching (the child's agent.run parents under it).
+      getCurrentStepSpan: () => currentStepSpan,
       getActiveTodos: () => activeRunState?.todos,
       tryEmergencyCompact: () => tryEmergencyCompact<TOutput>(runEnv),
       dispatchBatch: (calls, executor, runContext, stepNum, dispatchOpts) =>
