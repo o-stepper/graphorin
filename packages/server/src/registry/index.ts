@@ -8,6 +8,13 @@
  * receive `undefined` and the route handler decides how to surface
  * the miss (typically a 404 with a typed error body).
  *
+ * W-053: compatibility of `ServerAgentLike` / `ServerWorkflowLike` with
+ * the real `Agent` / `Workflow` surfaces is gated at compile time by
+ * `tests/registry-contract.types.test.ts` - a drift in either direction
+ * fails the server package's typecheck, not a user's runtime. When a
+ * mismatch appears, fix THESE structural types (they are the copy), not
+ * the source interfaces.
+ *
  * @packageDocumentation
  */
 
