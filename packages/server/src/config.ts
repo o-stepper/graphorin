@@ -130,6 +130,14 @@ export interface ServerConfigSpec {
     readonly path?: string;
     readonly passphraseRef?: SecretRefString;
     readonly cipher?: string;
+    /**
+     * W-051: which tools/MCP audit-bus events land in the audit chain.
+     * `'security'` (default) writes the security-significant subset
+     * (dataflow flagged/blocked/declassified, sanitization, approvals,
+     * collisions, cap-disabled); `'all'` adds per-call
+     * `tool:execute:*` chatter; `'off'` disables the bridge.
+     */
+    readonly toolEvents: 'security' | 'all' | 'off';
   };
   readonly secrets: {
     readonly source: SecretsSource;
@@ -339,6 +347,8 @@ const auditSchema = z
     path: z.string().optional(),
     passphraseRef: z.string().optional(),
     cipher: z.string().optional(),
+    // W-051: tools/MCP audit-bus bridge volume policy.
+    toolEvents: z.enum(['security', 'all', 'off']).default('security'),
   })
   .strict()
   .default({});

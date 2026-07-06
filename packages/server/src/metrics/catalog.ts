@@ -24,6 +24,11 @@ import { MetricRegistry } from './registry.js';
 // layer; OAuth freshness needs an MCP token store the server does not own). A
 // permanently-empty series is worse than an absent one for dashboards, so they
 // are dropped until a real producer exists rather than advertised inert.
+// W-051 update: tool/MCP telemetry NOW has a producer - the scrape-time
+// `metrics/tools-bridge.ts` sync lazily registers
+// `graphorin_tool_*` / `graphorin_mcp_*` series from the tools package's
+// live counter snapshot, so only series that actually moved ever appear
+// (consistent with IP-15: nothing advertised inert).
 export const SERVER_METRIC_NAMES = Object.freeze({
   agentRunsTotal: 'graphorin_agent_runs_total',
   agentRunDuration: 'graphorin_agent_run_duration_seconds',

@@ -832,6 +832,9 @@ importers:
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../tools
       '@graphorin/triggers':
         specifier: workspace:*
         version: link:../triggers

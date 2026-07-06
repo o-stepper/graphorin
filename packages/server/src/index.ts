@@ -114,6 +114,7 @@ export {
   MetricRegistry,
   SERVER_METRIC_NAMES,
 } from './metrics/index.js';
+export { syncToolCounters } from './metrics/tools-bridge.js';
 export {
   type AuditErrorSink,
   type AuditMiddlewareOptions,
@@ -193,6 +194,12 @@ export {
   type RunStatus,
 } from './runtime/run-state.js';
 export { createSseRoutes, type SseRoutesDeps } from './sse/index.js';
+export {
+  bridgeToolAuditToAudit,
+  type ToolAuditBridge,
+  type ToolEventsAuditPolicy,
+  toolAuditEventToAuditInput,
+} from './tools-audit-bridge.js';
 export {
   type CreateTriggersDaemonOptions,
   createTriggersDaemon,

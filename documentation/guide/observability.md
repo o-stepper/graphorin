@@ -146,6 +146,32 @@ The framework exposes in-process counters for high-frequency events in two famil
 
 Counter names are unprefixed in-process (`snapshotCounters()`); add your own namespace prefix at the export boundary if your metrics backend needs one.
 
+### Server exposition and the audit chain
+
+On the standalone server both families are wired for you (W-051):
+
+- **`/v1/metrics`** - every scrape folds the live `tool.*` / `mcp.*` counters into the Prometheus registry as `graphorin_tool_*` / `graphorin_mcp_*` series (dots and dashes map to `_`; series appear lazily, only once they have moved). Counters delta-sync (re-scrapes never double-count) and gauges set absolutely - the snapshot's `kinds` field tells the bridge which is which. Histograms are not bridged yet; their raw observation lists stay available through `snapshotCounters().histograms`.
+- **`/v1/audit`** - when the audit chain is enabled, the tools audit bus feeds it through a bridge governed by `audit.toolEvents`: `'security'` (default) writes only the security-significant subset (dataflow flagged/blocked/declassified, sanitization hits/blocks, approval lifecycle, collisions, cap-disabled), `'all'` adds per-call `tool:execute:*` chatter, `'off'` disables the bridge. Shadow-mode dataflow findings are therefore operator-visible out of the box.
+
+Library-mode (non-server) users wire the same two seams by hand:
+
+```ts no-check
+import { onToolAudit, snapshotCounters } from '@graphorin/tools/audit';
+
+// Pull-based: export the counter snapshot to your metrics backend.
+setInterval(() => {
+  const { counters, kinds } = snapshotCounters();
+  for (const [key, value] of Object.entries(counters)) {
+    myBackend.record(key, value, kinds[key] ?? 'counter');
+  }
+}, 15_000);
+
+// Push-based: forward audit-bus events to your own sink.
+const stop = onToolAudit((event) => {
+  if (event.action.startsWith('tool:dataflow:')) mySecurityLog.write(event);
+});
+```
+
 ## Next steps
 
 - [Security](/guide/security) - sensitivity flow + sandbox + audit log.

@@ -26,6 +26,14 @@
 
 const counters = new Map<string, number>();
 const histograms = new Map<string, number[]>();
+/**
+ * W-051: counters and gauges share the `counters` map, so an exporter
+ * bridging into a delta-synced Prometheus registry cannot tell a
+ * monotonic counter (delta-inc) from a gauge (absolute set) by value
+ * alone. Track the kind per KEY at write time; last writer wins for a
+ * key written by both (which the taxonomy does not do).
+ */
+const kinds = new Map<string, 'counter' | 'gauge'>();
 
 const COUNTER_NAME_PATTERN = /^[a-z][a-z0-9._-]*$/i;
 
@@ -55,6 +63,7 @@ export function incrementCounter(
   if (!COUNTER_NAME_PATTERN.test(name)) return;
   const key = buildKey(name, labels);
   counters.set(key, (counters.get(key) ?? 0) + by);
+  kinds.set(key, 'counter');
 }
 
 /**
@@ -71,6 +80,7 @@ export function setGauge(
   if (!COUNTER_NAME_PATTERN.test(name)) return;
   const key = buildKey(name, labels);
   counters.set(key, value);
+  kinds.set(key, 'gauge');
 }
 
 /**
@@ -101,6 +111,12 @@ export function observeHistogram(
 export interface CounterSnapshot {
   readonly counters: Readonly<Record<string, number>>;
   readonly histograms: Readonly<Record<string, ReadonlyArray<number>>>;
+  /**
+   * W-051: per-key instrument kind - `'counter'` (monotonic; bridge
+   * with a delta-inc) vs `'gauge'` (absolute; bridge with a set). Keys
+   * mirror `counters`.
+   */
+  readonly kinds: Readonly<Record<string, 'counter' | 'gauge'>>;
 }
 
 /**
@@ -113,9 +129,12 @@ export function snapshotCounters(): CounterSnapshot {
   for (const [k, v] of counters) flatCounters[k] = v;
   const flatHistograms: Record<string, readonly number[]> = {};
   for (const [k, v] of histograms) flatHistograms[k] = Object.freeze([...v]);
+  const flatKinds: Record<string, 'counter' | 'gauge'> = {};
+  for (const [k, v] of kinds) flatKinds[k] = v;
   return Object.freeze({
     counters: Object.freeze(flatCounters),
     histograms: Object.freeze(flatHistograms),
+    kinds: Object.freeze(flatKinds),
   });
 }
 
@@ -127,6 +146,7 @@ export function snapshotCounters(): CounterSnapshot {
 export function resetCountersForTesting(): void {
   counters.clear();
   histograms.clear();
+  kinds.clear();
 }
 
 /**

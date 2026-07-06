@@ -11,6 +11,7 @@ import { type GraphorinSqliteStore, readWalSize } from '@graphorin/store-sqlite'
 import type { ConsolidatorDaemon } from './consolidator/daemon.js';
 import { SERVER_METRIC_NAMES } from './metrics/catalog.js';
 import type { MetricRegistry } from './metrics/registry.js';
+import { syncToolCounters } from './metrics/tools-bridge.js';
 import type { RunStateTracker } from './runtime/run-state.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import type { WsDispatcher } from './ws/index.js';
@@ -28,6 +29,10 @@ export interface RefreshLiveMetricsOptions {
 
 export async function refreshLiveMetrics(options: RefreshLiveMetricsOptions): Promise<void> {
   const { registry, store, runs, startedAt, now } = options;
+
+  // W-051: fold the tools/MCP module counters (dataflow shadow signals,
+  // executor retries, reconnects, ...) into the scrape.
+  syncToolCounters(registry);
 
   try {
     const wal = readWalSize(store.connection);
