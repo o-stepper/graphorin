@@ -10,7 +10,7 @@
 function requestApproval<TDecision>(name, payload?): TDecision;
 ```
 
-Defined in: [packages/core/dist/channels/durable.d.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts#L91)
+Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
 Suspend on a named persisted approval. Resolved by
 `workflow.approve(threadId, name, decision)`; the decision is returned

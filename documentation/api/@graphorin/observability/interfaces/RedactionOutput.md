@@ -6,7 +6,7 @@
 
 # Interface: RedactionOutput
 
-Defined in: [packages/core/dist/contracts/redaction-validator.d.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L51)
+Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
 Result of `RedactionValidator.validate(...)` - either the sanitized
 payload (possibly equal to the input) or `null` if the value must be
@@ -18,6 +18,6 @@ dropped entirely.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-matched"></a> `matched?` | `readonly` | readonly `string`[] | List of pattern names matched while validating. | [packages/core/dist/contracts/redaction-validator.d.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L55) |
-| <a id="property-tier"></a> `tier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | [packages/core/dist/contracts/redaction-validator.d.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L53) |
-| <a id="property-value"></a> `value` | `readonly` | `unknown` | - | [packages/core/dist/contracts/redaction-validator.d.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L52) |
+| <a id="property-matched"></a> `matched?` | `readonly` | readonly `string`[] | List of pattern names matched while validating. | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
+| <a id="property-tier"></a> `tier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
+| <a id="property-value"></a> `value` | `readonly` | `unknown` | - | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |

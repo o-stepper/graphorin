@@ -10,7 +10,7 @@
 function dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: [packages/core/dist/channels/dispatch.d.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts#L31)
+Defined in: [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts)
 
 Convenience factory equivalent to `new Dispatch(nodeName, args)`.
 

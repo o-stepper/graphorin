@@ -6,7 +6,7 @@
 
 # Interface: SystemMessage
 
-Defined in: [packages/core/dist/types/message.d.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L132)
+Defined in: [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: [packages/core/dist/types/message.d.ts:132](https://github.com/o-ste
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | `string` | [packages/core/dist/types/message.d.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L134) |
-| <a id="property-role"></a> `role` | `readonly` | `"system"` | [packages/core/dist/types/message.d.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L133) |
+| <a id="property-content"></a> `content` | `readonly` | `string` | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-role"></a> `role` | `readonly` | `"system"` | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |

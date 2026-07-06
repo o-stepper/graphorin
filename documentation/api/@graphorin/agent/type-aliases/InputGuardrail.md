@@ -12,7 +12,7 @@ type InputGuardrail<TValue> = GuardrailDefinition<TValue> & {
 };
 ```
 
-Defined in: [packages/security/dist/guardrails/types.d.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts#L85)
+Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
 
 Input guardrail discriminator.
 
@@ -20,7 +20,7 @@ Input guardrail discriminator.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `kind` | `"input"` | [packages/security/dist/guardrails/types.d.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts#L86) |
+| `kind` | `"input"` | [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts) |
 
 ## Type Parameters
 

@@ -53,7 +53,7 @@ forget(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L147)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 Soft-delete a fact. W-154: when `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
@@ -198,7 +198,7 @@ Distinct from [SemanticMemoryStore.forget](/api/@graphorin/memory/interfaces/Sem
 remember(fact): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L133)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -243,7 +243,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:110](https://github
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L134)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -340,7 +340,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L135)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 

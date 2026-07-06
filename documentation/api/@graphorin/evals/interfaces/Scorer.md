@@ -6,7 +6,7 @@
 
 # Interface: Scorer\&lt;I, O\&gt;
 
-Defined in: [packages/observability/dist/eval/types.d.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts#L46)
+Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
 ## Stable
 
@@ -21,7 +21,7 @@ Defined in: [packages/observability/dist/eval/types.d.ts:46](https://github.com/
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts#L47) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
 
 ## Methods
 
@@ -31,7 +31,7 @@ Defined in: [packages/observability/dist/eval/types.d.ts:46](https://github.com/
 score(args): Promise<ScoreResult>;
 ```
 
-Defined in: [packages/observability/dist/eval/types.d.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts#L48)
+Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
 #### Parameters
 

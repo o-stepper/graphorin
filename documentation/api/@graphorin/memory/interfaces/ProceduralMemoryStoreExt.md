@@ -25,7 +25,7 @@ promotion helper that storage adapters may expose (MCON-2).
 add(rule): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L151)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -49,7 +49,7 @@ Defined in: [packages/core/dist/contracts/memory-store.d.ts:151](https://github.
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L152)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -99,7 +99,7 @@ the counter simply never auto-promote.
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L153)
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 

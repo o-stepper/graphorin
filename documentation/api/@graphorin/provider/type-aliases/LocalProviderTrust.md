@@ -10,7 +10,7 @@
 type LocalProviderTrust = "loopback" | "private" | "public-tls" | "public-cleartext";
 ```
 
-Defined in: [packages/core/dist/contracts/local-provider-trust.d.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/local-provider-trust.d.ts#L25)
+Defined in: [packages/core/dist/contracts/local-provider-trust.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/local-provider-trust.d.ts)
 
 Trust class assigned to a local-LLM provider based on the
 configured `baseUrl`. The classifier dispatcher lives in

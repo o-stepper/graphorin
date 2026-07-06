@@ -28,7 +28,7 @@ type SandboxResult<TOutput> =
 };
 ```
 
-Defined in: [packages/core/dist/contracts/sandbox.d.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts#L58)
+Defined in: [packages/core/dist/contracts/sandbox.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts)
 
 Result of a sandboxed run. The shape mirrors the `ToolOutcome` union -
 the runtime maps `SandboxResult` to `ToolOutcome` after the call.

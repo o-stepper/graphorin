@@ -67,7 +67,7 @@ tracer-managed validator.
 shutdown(): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts#L121)
+Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
 
 Force-flush any pending spans.
 
@@ -87,7 +87,7 @@ Force-flush any pending spans.
 span<T, R>(opts, fn): Promise<R>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts#L119)
+Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
 
 Convenience wrapper: start a span, run `fn` inside, and call
 `setStatus('ok' | 'error')` + `end()` based on the outcome.
@@ -122,7 +122,7 @@ Convenience wrapper: start a span, run `fn` inside, and call
 startSpan<T>(opts): AISpan<T>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts#L114)
+Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
 
 #### Type Parameters
 

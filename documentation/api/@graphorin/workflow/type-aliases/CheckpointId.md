@@ -10,7 +10,7 @@
 type CheckpointId = string;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts:9](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts#L9)
+Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
 Opaque identifier for a single workflow checkpoint. Treated as a string
 by every consumer so adapters can pick whatever encoding they prefer

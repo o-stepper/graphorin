@@ -21,8 +21,8 @@ Concrete validator returned by [createRedactionValidator](/api/@graphorin/observ
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-counters"></a> `counters` | `readonly` | () => [`RedactionCounters`](/api/@graphorin/observability/interfaces/RedactionCounters.md) | Snapshot of internal counters. Returned object is a fresh copy. | - | [packages/observability/src/redaction/types.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/types.ts#L113) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | [`RedactionValidator`](/api/@graphorin/observability/interfaces/RedactionValidator.md).[`id`](/api/@graphorin/observability/interfaces/RedactionValidator.md#property-id) | [packages/core/dist/contracts/redaction-validator.d.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L19) |
-| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | [`RedactionValidator`](/api/@graphorin/observability/interfaces/RedactionValidator.md).[`minTier`](/api/@graphorin/observability/interfaces/RedactionValidator.md#property-mintier) | [packages/core/dist/contracts/redaction-validator.d.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L21) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | [`RedactionValidator`](/api/@graphorin/observability/interfaces/RedactionValidator.md).[`id`](/api/@graphorin/observability/interfaces/RedactionValidator.md#property-id) | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
+| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | [`RedactionValidator`](/api/@graphorin/observability/interfaces/RedactionValidator.md).[`minTier`](/api/@graphorin/observability/interfaces/RedactionValidator.md#property-mintier) | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
 | <a id="property-resetcounters"></a> `resetCounters` | `readonly` | () => `void` | Reset all counters back to zero. | - | [packages/observability/src/redaction/types.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/types.ts#L115) |
 
 ## Methods
@@ -35,7 +35,7 @@ validate(input):
   | null;
 ```
 
-Defined in: [packages/core/dist/contracts/redaction-validator.d.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts#L26)
+Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
 Validate (and optionally rewrite) an attribute payload. Returns the
 sanitized value or `null` if the entire record must be dropped.

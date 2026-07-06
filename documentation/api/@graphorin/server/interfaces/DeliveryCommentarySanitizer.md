@@ -77,10 +77,10 @@ The frame is returned unchanged when:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `eventId` | `string` | [packages/protocol/dist/server-message.d.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L103) |
-| `kind` | `"event"` | [packages/protocol/dist/server-message.d.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L100) |
-| `payload?` | `unknown` | [packages/protocol/dist/server-message.d.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L104) |
-| `subject` | `string` | [packages/protocol/dist/server-message.d.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L102) |
-| `subscriptionId` | `string` | [packages/protocol/dist/server-message.d.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L101) |
-| `type` | `string` | [packages/protocol/dist/server-message.d.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L99) |
-| `v` | `"1"` | [packages/protocol/dist/server-message.d.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L98) |
+| `eventId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `kind` | `"event"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `payload?` | `unknown` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `subject` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `subscriptionId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `type` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `v` | `"1"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |

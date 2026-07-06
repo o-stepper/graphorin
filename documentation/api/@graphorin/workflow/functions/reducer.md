@@ -10,7 +10,7 @@
 function reducer<T>(reduce, opts?): Reducer<T>;
 ```
 
-Defined in: [packages/core/dist/channels/channels.d.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L118)
+Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
 Construct a `Reducer` channel.
 

@@ -6,7 +6,7 @@
 
 # Interface: ToolMessage
 
-Defined in: [packages/core/dist/types/message.d.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L155)
+Defined in: [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: [packages/core/dist/types/message.d.ts:155](https://github.com/o-ste
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | \| `string` \| readonly [`MessageContent`](/api/@graphorin/sessions/facade/type-aliases/MessageContent.md)[] | [packages/core/dist/types/message.d.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L158) |
-| <a id="property-role"></a> `role` | `readonly` | `"tool"` | [packages/core/dist/types/message.d.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L156) |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/dist/types/message.d.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L157) |
+| <a id="property-content"></a> `content` | `readonly` | \| `string` \| readonly [`MessageContent`](/api/@graphorin/sessions/facade/type-aliases/MessageContent.md)[] | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-role"></a> `role` | `readonly` | `"tool"` | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
