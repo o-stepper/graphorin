@@ -30,6 +30,7 @@
 import type { Message } from '@graphorin/core';
 import type { ContextLocalePack } from '../../locale-packs/index.js';
 import { renderMessageText } from '../../token-counter.js';
+import { COMPACTION_SUMMARY_CLOSE, COMPACTION_SUMMARY_OPEN } from './marker.js';
 
 /**
  * Template version surfaced into the summary's section 9 metadata.
@@ -209,7 +210,7 @@ export function renderFinalSummary(input: {
     .join('\n');
   const metadataBlock = JSON.stringify(metadata, null, 2);
   return [
-    '<graphorin_compaction_summary>',
+    COMPACTION_SUMMARY_OPEN,
     summaryFromLlm.trim(),
     '',
     `## ${recentTurnsHeader}`,
@@ -217,6 +218,6 @@ export function renderFinalSummary(input: {
     '',
     `## ${metadataHeader}`,
     metadataBlock,
-    '</graphorin_compaction_summary>',
+    COMPACTION_SUMMARY_CLOSE,
   ].join('\n');
 }

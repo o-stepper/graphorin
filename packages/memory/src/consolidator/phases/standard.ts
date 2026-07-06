@@ -23,6 +23,7 @@ import {
   contextualizeWithLlm,
 } from '../../internal/contextualize.js';
 import { newMemoryId } from '../../internal/id.js';
+import { sliceJsonObject, stripFence } from '../../internal/llm-json.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
@@ -72,6 +73,13 @@ export interface StandardPhaseDeps {
   readonly cheapModel: string | null;
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
   readonly maxBatchSize: number;
+  /**
+   * W-081: input transcript budget in characters (chars/4 token proxy).
+   * A multi-message slice whose rendered transcript exceeds it is
+   * half-split BEFORE the provider call; a single message that alone
+   * exceeds it is tail-truncated (recorded on the phase span).
+   */
+  readonly maxTranscriptChars: number;
   readonly lastProcessedMessageId: string | null;
   readonly budget: BudgetTracker;
   /** Computes USD cost for the recorded usage. Defaults to 0 when omitted. */
@@ -470,6 +478,9 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.standard.extraction_calls': extraction.generateCalls,
         'consolidator.standard.length_splits': extraction.lengthSplits,
         'consolidator.standard.truncated_salvage': extraction.truncatedSalvages,
+        // W-081: input-budget splits / single-message tail truncations.
+        'consolidator.standard.budget_splits': extraction.budgetSplits,
+        'consolidator.standard.input_truncations': extraction.inputTruncations,
         'consolidator.standard.tokens.input': extraction.promptTokens,
         'consolidator.standard.tokens.output': extraction.completionTokens,
         'consolidator.standard.cost.estimate.usd': totalCost,
@@ -509,6 +520,10 @@ interface SliceExtraction {
   readonly lengthSplits: number;
   /** Number of single-message slices salvaged from a truncated output. */
   readonly truncatedSalvages: number;
+  /** W-081: number of batches half-split on the INPUT transcript budget. */
+  readonly budgetSplits: number;
+  /** W-081: number of lone over-budget messages that were tail-truncated. */
+  readonly inputTruncations: number;
 }
 
 /**
@@ -537,7 +552,44 @@ async function extractFactsFromSlice(
   deps: StandardPhaseDeps,
   messages: ReadonlyArray<SessionMessageRecord>,
 ): Promise<SliceExtraction> {
-  const request = buildRequest(deps, renderTranscript(messages));
+  // W-081: input-side transcript budget. `maxStandardBatchSize` bounds
+  // only the MESSAGE COUNT; a batch of near-noise-cap messages can render
+  // to hundreds of kilobytes and overflow a cheap-tier context on EVERY
+  // retry - the permanent cursor wedge W-081 describes. Split BEFORE
+  // spending a provider call that would deterministically fail.
+  if (messages.length > 1 && renderTranscript(messages).length > deps.maxTranscriptChars) {
+    return extractHalves(deps, messages, {
+      tokens: 0,
+      costUsd: 0,
+      promptTokens: 0,
+      completionTokens: 0,
+      generateCalls: 0,
+      lengthSplits: 0,
+      truncatedSalvages: 0,
+      budgetSplits: 1,
+      inputTruncations: 0,
+    });
+  }
+
+  // W-081: a lone message that alone exceeds the budget cannot be split
+  // further - truncate its tail (the phase span records the count) so
+  // extraction keeps whatever facts the head carries instead of failing
+  // on the same oversized message forever.
+  let effective = messages;
+  let inputTruncations = 0;
+  const sole = messages.length === 1 ? messages[0] : undefined;
+  if (sole !== undefined) {
+    const rendered = renderTranscript(messages);
+    if (rendered.length > deps.maxTranscriptChars) {
+      const overshoot = rendered.length - deps.maxTranscriptChars;
+      const text = renderText(sole.message);
+      const keep = Math.max(0, text.length - overshoot);
+      effective = [{ ...sole, message: { ...sole.message, content: text.slice(0, keep) } }];
+      inputTruncations = 1;
+    }
+  }
+
+  const request = buildRequest(deps, renderTranscript(effective));
   const response = await deps.provider.generate(request);
   const usage = response.usage;
   const costUsd =
@@ -554,6 +606,8 @@ async function extractFactsFromSlice(
     promptTokens: usage.promptTokens ?? 0,
     completionTokens: usage.completionTokens ?? 0,
     generateCalls: 1,
+    budgetSplits: 0,
+    inputTruncations,
   };
 
   if (response.finishReason !== 'length') {
@@ -574,22 +628,38 @@ async function extractFactsFromSlice(
     };
   }
 
+  return extractHalves(deps, messages, { ...base, lengthSplits: 1, truncatedSalvages: 0 });
+}
+
+/**
+ * Split `messages` in half (order preserved) and extract each half
+ * recursively, folding counters into `seed`. Shared by the two split
+ * triggers: output truncation (W-020, `finishReason: 'length'`) and the
+ * W-081 input budget (transcript over `maxTranscriptChars`). Depth is
+ * bounded by log2(maxStandardBatchSize); a paused budget THROWS so the
+ * runtime lands the batch in the DLQ WITHOUT advancing the cursor (the
+ * established failure semantics - see the {@link extractFactsFromSlice}
+ * docblock for why a DLQ route on truncation itself was rejected).
+ */
+async function extractHalves(
+  deps: StandardPhaseDeps,
+  messages: ReadonlyArray<SessionMessageRecord>,
+  seed: Omit<SliceExtraction, 'facts'>,
+): Promise<SliceExtraction> {
   const mid = Math.ceil(messages.length / 2);
   const halves = [messages.slice(0, mid), messages.slice(mid)];
   const merged: ExtractedFact[] = [];
-  let acc = { ...base, lengthSplits: 1, truncatedSalvages: 0 };
+  let acc = seed;
   for (const half of halves) {
     if (deps.budget.snapshot().paused) {
       throw new Error(
-        'standard extraction output was truncated (finishReason=length) and the budget is ' +
-          'paused - aborting the half-split so the batch lands in the DLQ without advancing ' +
-          'the cursor',
+        'standard extraction needs a sub-slice split and the budget is paused - aborting ' +
+          'the split so the batch lands in the DLQ without advancing the cursor',
       );
     }
     const sub = await extractFactsFromSlice(deps, half);
     merged.push(...sub.facts);
     acc = {
-      ...acc,
       tokens: acc.tokens + sub.tokens,
       costUsd: acc.costUsd + sub.costUsd,
       promptTokens: acc.promptTokens + sub.promptTokens,
@@ -597,6 +667,8 @@ async function extractFactsFromSlice(
       generateCalls: acc.generateCalls + sub.generateCalls,
       lengthSplits: acc.lengthSplits + sub.lengthSplits,
       truncatedSalvages: acc.truncatedSalvages + sub.truncatedSalvages,
+      budgetSplits: acc.budgetSplits + sub.budgetSplits,
+      inputTruncations: acc.inputTruncations + sub.inputTruncations,
     };
   }
   return { ...acc, facts: merged };
@@ -835,18 +907,6 @@ export function normalizeImportance(raw: number | undefined): number | undefined
   if (typeof raw !== 'number' || !Number.isFinite(raw)) return undefined;
   const clamped = Math.min(10, Math.max(1, raw));
   return clamped / 10;
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
-}
-
-function sliceJsonObject(text: string): string | null {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end < start) return null;
-  return text.slice(start, end + 1);
 }
 
 /**

@@ -10,7 +10,7 @@
 function parseQueryVariants(text, max): readonly string[];
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:156
+Defined in: packages/memory/src/search/query-transform.ts:157
 
 Parse the variant-generation model output into a deduped, capped list
 of reworded queries. Tolerates a JSON array, a `{ "variants": [...] }`

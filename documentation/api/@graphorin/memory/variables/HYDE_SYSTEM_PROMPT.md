@@ -10,7 +10,7 @@
 const HYDE_SYSTEM_PROMPT: string;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:96
+Defined in: packages/memory/src/search/query-transform.ts:97
 
 **`Internal`**
 

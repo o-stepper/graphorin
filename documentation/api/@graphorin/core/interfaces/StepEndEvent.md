@@ -6,7 +6,7 @@
 
 # Interface: StepEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:263
+Defined in: packages/core/src/types/agent-event.ts:283
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:263
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:265 |
-| <a id="property-type"></a> `type` | `readonly` | `"step.end"` | packages/core/src/types/agent-event.ts:264 |
-| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/agent-event.ts:266 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:285 |
+| <a id="property-type"></a> `type` | `readonly` | `"step.end"` | packages/core/src/types/agent-event.ts:284 |
+| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/agent-event.ts:286 |

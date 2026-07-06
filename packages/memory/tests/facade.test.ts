@@ -1,6 +1,7 @@
+import type { Provider, ProviderRequest, SessionScope } from '@graphorin/core';
 import { NOOP_LOGGER, NOOP_TRACER } from '@graphorin/core';
-import { describe, expect, it } from 'vitest';
-import { createMemory, defineBlock } from '../src/index.js';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import { createMemory, defineBlock, type SemanticSearchDefaults } from '../src/index.js';
 import {
   createInMemoryStore,
   createStubEmbedder,
@@ -149,3 +150,94 @@ function makeFakeCtx(): import('@graphorin/core').ToolExecutionContext<unknown> 
     streamContent() {},
   };
 }
+
+describe('W-086 searchDefaults', () => {
+  function expansionProvider(variants: ReadonlyArray<string>): Provider & {
+    readonly calls: ProviderRequest[];
+  } {
+    const calls: ProviderRequest[] = [];
+    return {
+      name: 'expander',
+      modelId: 'expander:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      calls,
+      async generate(req: ProviderRequest) {
+        calls.push(req);
+        return {
+          text: JSON.stringify(variants),
+          usage: { promptTokens: 5, completionTokens: 5, totalTokens: 10 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream() {
+        throw new Error('not implemented');
+      },
+    };
+  }
+
+  const scope: SessionScope = { userId: 'alex' };
+
+  async function seeded(provider: Provider, searchDefaults?: SemanticSearchDefaults) {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      queryTransform: { provider },
+      ...(searchDefaults !== undefined ? { searchDefaults } : {}),
+    });
+    await memory.semantic.remember(scope, { text: 'alpha gizmo' }, { pipeline: 'off' });
+    await memory.semantic.remember(scope, { text: 'beta thing' }, { pipeline: 'off' });
+    return memory;
+  }
+
+  it('activates the fan-out for a bare search() call', async () => {
+    const provider = expansionProvider(['beta thing']);
+    const memory = await seeded(provider, { multiQuery: 2 });
+
+    const hits = await memory.semantic.search(scope, 'alpha');
+
+    expect(provider.calls).toHaveLength(1);
+    expect(hits.map((h) => h.record.text)).toContain('beta thing');
+  });
+
+  it('per-call options override the defaults key-by-key', async () => {
+    const provider = expansionProvider(['beta thing']);
+    const memory = await seeded(provider, { multiQuery: 2 });
+
+    const hits = await memory.semantic.search(scope, 'alpha', { multiQuery: 1 });
+
+    expect(provider.calls).toHaveLength(0);
+    expect(hits.map((h) => h.record.text)).toEqual(['alpha gizmo']);
+  });
+
+  it('offline default stays byte-identical when searchDefaults is omitted', async () => {
+    const provider = expansionProvider(['beta thing']);
+    const memory = await seeded(provider);
+
+    const hits = await memory.semantic.search(scope, 'alpha');
+
+    expect(provider.calls).toHaveLength(0);
+    expect(hits.map((h) => h.record.text)).toEqual(['alpha gizmo']);
+  });
+
+  it('the defaultable key set excludes the trust predicates', () => {
+    expectTypeOf<keyof SemanticSearchDefaults>().toEqualTypeOf<
+      | 'multiQuery'
+      | 'hyde'
+      | 'expandHops'
+      | 'entityMatch'
+      | 'graphScoring'
+      | 'fusion'
+      | 'decay'
+      | 'candidateTopK'
+    >();
+  });
+});

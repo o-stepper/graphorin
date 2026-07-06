@@ -114,7 +114,7 @@ const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodObject<{
 }>]>]>;
 ```
 
-Defined in: src/server-message.ts:151
+Defined in: src/server-message.ts:163
 
 Zod schema for every legal server → client frame. Validation runs
 twice in the server pipeline: first when a route handler enqueues

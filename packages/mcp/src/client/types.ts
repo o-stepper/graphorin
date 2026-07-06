@@ -92,7 +92,10 @@ export interface CreateMCPClientOptions {
    * resume). Without it a disconnect is observable only as
    * `MCPProtocolError`s on subsequent calls. The client does NOT
    * auto-reconnect - rebuild it via `createMCPClient(...)` (and re-run
-   * `toTools()` for the drift diff) when this fires.
+   * `toTools()` for the drift diff) when this fires, or use the W-080
+   * `createManagedMCPClient(...)` wrapper, which does exactly that
+   * automatically (there the operator callback fires only when the
+   * wrapper's reconnect attempts are exhausted).
    */
   readonly onTransportClose?: (info: { readonly server: string }) => void;
   /** mcp-skills-10: called on transport-level errors (see {@link onTransportClose}). */

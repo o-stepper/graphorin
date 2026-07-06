@@ -10,7 +10,7 @@
 function assessQueryDifficulty(query, options?): DifficultyAssessment;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:117
+Defined in: packages/memory/src/search/iterative.ts:118
 
 Score a query's retrieval difficulty with cheap, deterministic, fully
 **local** heuristics (no I/O). Conservative by design - it prefers to

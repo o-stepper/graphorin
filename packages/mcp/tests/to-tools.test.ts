@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
-import { DEFAULT_DEFER_LOADING_THRESHOLD } from '../src/client/index.js';
+import { adaptMCPTools, DEFAULT_DEFER_LOADING_THRESHOLD } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
 describe('MCPClient.toTools - adapter', () => {
@@ -270,5 +270,64 @@ describe('MCPClient.toTools - adapter', () => {
     if (typeof result === 'object' && result !== null && 'output' in result) {
       expect(result.output).toBe('Hello\n, world.');
     }
+  });
+});
+
+describe('W-105 - operator sideEffectClass downgrades are visible', () => {
+  const identity = { id: 'mcp:fake', reportedServerName: 'fake' } as never;
+  const stubClient = {} as never;
+  const catalogue = [
+    { name: 'query', description: 'query things', inputSchema: { type: 'object' } },
+    { name: 'write', description: 'write things', inputSchema: { type: 'object' } },
+  ];
+
+  it('a read-only/pure override warns once per tool and lands in downgradedTools', () => {
+    const warns: Array<Record<string, unknown> | undefined> = [];
+    const result = adaptMCPTools({
+      client: stubClient,
+      serverIdentity: identity,
+      catalogue,
+      options: {
+        sideEffectClassByTool: { query: 'read-only', write: 'pure' },
+      },
+      logger: (level, message, fields) => {
+        if (level === 'warn' && message.includes('side-effect-downgraded')) warns.push(fields);
+      },
+    });
+    expect([...result.downgradedTools]).toEqual(['query', 'write']);
+    expect(warns).toHaveLength(2);
+    expect(warns[0]).toMatchObject({ server: 'mcp:fake', tool: 'query' });
+    expect(Object.isFrozen(result.downgradedTools)).toBe(true);
+  });
+
+  it('no overrides: no warn, empty downgradedTools (byte-identical default)', () => {
+    const warns: string[] = [];
+    const result = adaptMCPTools({
+      client: stubClient,
+      serverIdentity: identity,
+      catalogue,
+      logger: (level, message) => {
+        if (level === 'warn' && message.includes('side-effect-downgraded')) warns.push(message);
+      },
+    });
+    expect(result.downgradedTools).toHaveLength(0);
+    expect(warns).toHaveLength(0);
+  });
+
+  it('a non-downgrade override (side-effecting / external-stateful) does not warn', () => {
+    const warns: string[] = [];
+    const result = adaptMCPTools({
+      client: stubClient,
+      serverIdentity: identity,
+      catalogue,
+      options: {
+        sideEffectClassByTool: { query: 'side-effecting', write: 'external-stateful' },
+      },
+      logger: (level, message) => {
+        if (level === 'warn' && message.includes('side-effect-downgraded')) warns.push(message);
+      },
+    });
+    expect(result.downgradedTools).toHaveLength(0);
+    expect(warns).toHaveLength(0);
   });
 });

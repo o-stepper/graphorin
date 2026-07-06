@@ -6,7 +6,7 @@
 
 # Interface: HandoffEvent
 
-Defined in: packages/core/src/types/agent-event.ts:231
+Defined in: packages/core/src/types/agent-event.ts:251
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:231
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-fromagentid"></a> `fromAgentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:233 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:235 |
-| <a id="property-toagentid"></a> `toAgentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:234 |
-| <a id="property-type"></a> `type` | `readonly` | `"handoff"` | packages/core/src/types/agent-event.ts:232 |
+| <a id="property-fromagentid"></a> `fromAgentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:253 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:255 |
+| <a id="property-toagentid"></a> `toAgentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:254 |
+| <a id="property-type"></a> `type` | `readonly` | `"handoff"` | packages/core/src/types/agent-event.ts:252 |

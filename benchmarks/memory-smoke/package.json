@@ -5,11 +5,11 @@
   "description": "Synthetic memory-retrieval smoke test for the Graphorin framework - a small set of hand-written QA cases scored by deterministic substring match, kept fast and offline for benchmark:ci. This is NOT the published LOCOMO benchmark; for the real memory-eval harness (LongMemEval + real LOCOMO + DMR with LLM-judge 'J' scoring and per-category regression gates) use @graphorin/benchmark-longmemeval. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
-  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/locomo",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/memory-smoke",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/o-stepper/graphorin.git",
-    "directory": "benchmarks/locomo"
+    "directory": "benchmarks/memory-smoke"
   },
   "bugs": {
     "url": "https://github.com/o-stepper/graphorin/issues"

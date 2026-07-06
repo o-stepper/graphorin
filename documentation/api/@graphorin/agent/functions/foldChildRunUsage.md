@@ -14,7 +14,7 @@ function foldChildRunUsage(
    childName): void;
 ```
 
-Defined in: packages/agent/src/runtime/messages.ts:254
+Defined in: packages/agent/src/runtime/messages.ts:256
 
 Fold a completed (or failed - tokens were spent either way) child
 run's usage into the parent run's accounting: `state.usage`,

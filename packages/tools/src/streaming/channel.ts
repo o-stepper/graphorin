@@ -26,13 +26,38 @@ import { incrementCounter, observeHistogram } from '../audit/index.js';
 /** Discriminated union of streaming events the channel forwards. */
 export type StreamingEvent = ToolExecuteProgressEvent | ToolExecutePartialEvent;
 
+/**
+ * W-117: default byte cap on the per-call aggregation buffer. Generous -
+ * an ordinary tool result is orders of magnitude smaller; the cap exists
+ * so an unbounded streaming producer cannot exhaust host memory.
+ *
+ * @stable
+ */
+export const DEFAULT_MAX_BUFFER_BYTES = 8 * 1024 * 1024;
+
 /** Configuration for {@link createStreamingChannel}. */
 export interface StreamingChannelOptions {
   readonly toolName: string;
   readonly toolCallId: string;
   readonly stepNumber: number;
-  /** Max in-flight events kept in the per-channel buffer. Default `256`. */
+  /**
+   * Re-entrancy guard depth for the SYNCHRONOUS sink delivery. Delivery
+   * is not a queue: each event is handed to the sink inline and
+   * `inFlight` only exceeds 1 when the sink itself re-enters the
+   * channel - in which case the CURRENT (newest) event is dropped and
+   * counted. Default `256`.
+   */
   readonly eventQueueDepth?: number;
+  /**
+   * W-117: byte cap on the in-memory aggregation buffer (the
+   * buffer-becomes-output `chunks`). Past the cap, chunks still DELIVER
+   * to the sink (subscribers keep streaming) but stop accumulating, the
+   * dropped bytes are counted (`tool.streaming.buffer.dropped-bytes.total`)
+   * and {@link StreamingAggregator.bufferTruncated} flips so the
+   * envelope / spill path can mark the assembled body incomplete.
+   * Default 8 MiB.
+   */
+  readonly maxBufferBytes?: number;
   /**
    * Optional streaming-hint flag. When `false` the channel turns
    * `report` / `content` into no-ops; the executor still reads the
@@ -64,6 +89,13 @@ export interface StreamingAggregator {
   readonly chunkCount: number;
   readonly progressEventCount: number;
   readonly totalBytes: number;
+  /**
+   * W-117: `true` when the aggregation buffer hit `maxBufferBytes` and
+   * later chunks were dropped from the ASSEMBLED body (sink delivery
+   * continued). Consumers building an output / spill artifact from
+   * `chunks` must treat the body as incomplete.
+   */
+  readonly bufferTruncated: boolean;
 }
 
 /**
@@ -90,6 +122,7 @@ export interface StreamingChannel {
  */
 export function createStreamingChannel(opts: StreamingChannelOptions): StreamingChannel {
   const eventQueueDepth = opts.eventQueueDepth ?? 256;
+  const maxBufferBytes = opts.maxBufferBytes ?? DEFAULT_MAX_BUFFER_BYTES;
   const streamingHint = opts.streamingHint ?? true;
   const sink = opts.sink;
   const now = opts.now ?? (() => Date.now());
@@ -99,10 +132,31 @@ export function createStreamingChannel(opts: StreamingChannelOptions): Streaming
   let chunkIndex = 0;
   let progressEventCount = 0;
   let totalBytes = 0;
+  let bufferTruncated = false;
   let aborted = false;
   let inFlight = 0;
   const startedAt = now();
   let firstChunkRecorded = false;
+
+  // W-117: bound the in-memory aggregation buffer. A capped-out chunk
+  // still delivers to the sink (subscribers keep streaming); it just
+  // stops accumulating, so a runaway streaming tool cannot grow host
+  // memory without bound. Surfaced via snapshot().bufferTruncated.
+  function appendToBuffer(chunk: ContentChunk): void {
+    const size = chunkBytes(chunk);
+    if (totalBytes + size > maxBufferBytes) {
+      bufferTruncated = true;
+      incrementCounter(
+        'tool.streaming.buffer.dropped-bytes.total',
+        { toolName: opts.toolName, kind: chunk.kind },
+        size,
+      );
+      return;
+    }
+    chunks.push(chunk);
+    chunkCount++;
+    totalBytes += size;
+  }
 
   function reportProgress(current: number, total?: number, message?: string): void {
     if (!streamingHint || aborted) return;
@@ -136,14 +190,17 @@ export function createStreamingChannel(opts: StreamingChannelOptions): Streaming
     if (!streamingHint || aborted) return;
     recordFirstChunk();
     if (inFlight >= eventQueueDepth) {
+      // Honest semantics (W-117): delivery is synchronous, so this
+      // guard only trips on sink RE-ENTRANCY, and it is the current
+      // (newest) event that is dropped - there is no queue to shed
+      // older entries from.
       incrementCounter('tool.streaming.events.dropped.total', {
         toolName: opts.toolName,
         reason: 'backpressure',
       });
-      // The aggregated buffer is unaffected - append regardless.
-      chunks.push(chunk);
-      chunkCount++;
-      addBytes(chunk);
+      // The aggregated buffer is unaffected by event drops - append
+      // (still subject to the byte cap).
+      appendToBuffer(chunk);
       return;
     }
     const event: ToolExecutePartialEvent = {
@@ -155,9 +212,7 @@ export function createStreamingChannel(opts: StreamingChannelOptions): Streaming
       stepNumber: opts.stepNumber,
       ts: now(),
     };
-    chunks.push(chunk);
-    chunkCount++;
-    addBytes(chunk);
+    appendToBuffer(chunk);
     incrementCounter('tool.streaming.events.emitted.total', {
       toolName: opts.toolName,
       kind: chunkKindLabel(chunk),
@@ -203,11 +258,8 @@ export function createStreamingChannel(opts: StreamingChannelOptions): Streaming
       chunkCount,
       progressEventCount,
       totalBytes,
+      bufferTruncated,
     });
-  }
-
-  function addBytes(chunk: ContentChunk): void {
-    totalBytes += chunkBytes(chunk);
   }
 
   function deliver(event: StreamingEvent): void {

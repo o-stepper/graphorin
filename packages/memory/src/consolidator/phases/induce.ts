@@ -29,6 +29,7 @@
  */
 
 import type { Message, Provider, ProviderRequest, RunState } from '@graphorin/core';
+import { stripFence } from '../../internal/llm-json.js';
 
 /** Output-token ceiling for one induction call. */
 export const DEFAULT_INDUCTION_MAX_TOKENS = 512;
@@ -403,11 +404,6 @@ function toStringArray(value: unknown): string[] {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
 }
 
 function tryParseObject(candidate: string): unknown {

@@ -6,6 +6,7 @@
 
 export {
   createStreamingChannel,
+  DEFAULT_MAX_BUFFER_BYTES,
   type StreamingAggregator,
   type StreamingChannel,
   type StreamingChannelOptions,

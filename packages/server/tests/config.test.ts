@@ -70,6 +70,15 @@ describe('parseServerConfig', () => {
     expect(config.retention.auditDays).toBeUndefined();
   });
 
+  it('W-051: audit.toolEvents defaults to the security allowlist policy', () => {
+    const config = parseServerConfig({});
+    expect(config.audit.toolEvents).toBe('security');
+    expect(parseServerConfig({ audit: { toolEvents: 'all' } }).audit.toolEvents).toBe('all');
+    expect(() => parseServerConfig({ audit: { toolEvents: 'everything' } })).toThrowError(
+      ConfigInvalidError,
+    );
+  });
+
   it('W-010: retention rejects non-positive day windows', () => {
     expect(() => parseServerConfig({ retention: { spansDays: -1 } })).toThrowError(
       ConfigInvalidError,

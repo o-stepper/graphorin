@@ -217,3 +217,25 @@ describe('prompt-cache write pricing + date-suffix fallback (core-provider-02/03
     expect((withWrite?.amount ?? 0) - (base?.amount ?? 0)).toBeCloseTo(inputRate * 2_000, 12);
   });
 });
+
+describe('W-045 - Cost.amount units pin (whole dollars, never minor units)', () => {
+  it('one million input tokens at $5/Mtok cost exactly 5 (dollars, not 500 cents)', () => {
+    const cost = calculateCost({
+      provider: 'anthropic',
+      model: 'claude-opus-4-5',
+      inputTokens: 1_000_000,
+      outputTokens: 0,
+    });
+    expect(cost).toEqual({ amount: 5, currency: 'USD' });
+  });
+
+  it('a typical single call is a fraction of a dollar (sub-cent figures expected)', () => {
+    const cost = calculateCost({
+      provider: 'anthropic',
+      model: 'claude-opus-4-5',
+      inputTokens: 1_000,
+      outputTokens: 0,
+    });
+    expect(cost?.amount).toBeCloseTo(0.005, 10);
+  });
+});

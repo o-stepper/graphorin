@@ -24,6 +24,6 @@ type MCPSamplingContent =
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:138
+Defined in: packages/mcp/src/client/types.ts:141
 
 A single content block carried by a sampling message or result.

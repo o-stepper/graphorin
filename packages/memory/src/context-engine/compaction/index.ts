@@ -25,6 +25,12 @@ export {
 } from './hooks/reanchor-recent-results.js';
 export type { HookDeps, NamedPostCompactionHook } from './hooks/types.js';
 export {
+  COMPACTION_SUMMARY_CLOSE,
+  COMPACTION_SUMMARY_MARKER,
+  COMPACTION_SUMMARY_OPEN,
+  COMPACTION_SUMMARY_TAG,
+} from './templates/marker.js';
+export {
   buildSummarizerPrompt,
   type CompactionMetadataPayload,
   DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET,

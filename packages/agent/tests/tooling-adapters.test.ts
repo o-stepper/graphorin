@@ -350,4 +350,82 @@ describe('SDF-1 - memory guard snapshot/verify wired through the loop', () => {
       stop();
     }
   });
+
+  it('W-054: the region reader invokes Memory.working.compile with (scope, agentId) and degrades to empty on throw', {
+    timeout: 20_000,
+  }, async () => {
+    const { createAgent } = await import('../src/index.js');
+    const { createMockProvider, toolCallScript, textOnlyScript } = await import(
+      './fixtures/mock-provider.js'
+    );
+    const guardedTool = () =>
+      ({
+        name: 'risky_tool',
+        description: 'untrusted-tier tool',
+        memoryGuardTier: 'untrusted',
+        inputSchema: {
+          parse: (v: unknown) => v,
+          safeParse: (v: unknown) => ({ success: true as const, data: v }),
+          toJSON: () => ({ type: 'object' }),
+        },
+        async execute() {
+          return 'done';
+        },
+      }) as never;
+    const scripts = () => [
+      toolCallScript({ toolCallId: 't1', toolName: 'risky_tool', args: {} }),
+      textOnlyScript('ok', 4),
+    ];
+    const contextEngine = {
+      shouldCompact: async () => false,
+      compactNow: async () => ({ result: { summary: '', summaryTokens: 0 } }),
+    };
+
+    // The statically-typed seam: compile receives the lazily-resolved
+    // scope and the agent id (no more double cast that silently fell
+    // back to '' when the shape drifted).
+    const compileCalls: unknown[][] = [];
+    const memory = {
+      working: {
+        compile: async (...args: unknown[]) => {
+          compileCalls.push(args);
+          return 'WORKING-BLOCKS';
+        },
+      },
+      contextEngine,
+    } as never;
+    const agent = createAgent({
+      name: 'guarded-mem-seam',
+      instructions: 'x',
+      provider: createMockProvider({ modelId: 'mock', scripts: scripts() }),
+      tools: [guardedTool()],
+      memory,
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    expect(compileCalls.length).toBeGreaterThan(0);
+    const [scope, agentIdArg] = compileCalls[0] ?? [];
+    expect(typeof agentIdArg).toBe('string');
+    expect(scope).toMatchObject({ agentId: agentIdArg });
+
+    // Best-effort contract: a throwing compile degrades the region read
+    // to '' - the guard step must never fail the run.
+    const throwing = {
+      working: {
+        compile: async () => {
+          throw new Error('compile exploded');
+        },
+      },
+      contextEngine,
+    } as never;
+    const agent2 = createAgent({
+      name: 'guarded-mem-throwing',
+      instructions: 'x',
+      provider: createMockProvider({ modelId: 'mock', scripts: scripts() }),
+      tools: [guardedTool()],
+      memory: throwing,
+    });
+    const result2 = await agent2.run('go');
+    expect(result2.status).toBe('completed');
+  });
 });

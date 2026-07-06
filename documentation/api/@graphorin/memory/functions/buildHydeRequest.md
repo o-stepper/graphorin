@@ -10,7 +10,7 @@
 function buildHydeRequest(query, options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:133
+Defined in: packages/memory/src/search/query-transform.ts:134
 
 Build the HyDE pseudo-document request. Pure - no I/O.
 

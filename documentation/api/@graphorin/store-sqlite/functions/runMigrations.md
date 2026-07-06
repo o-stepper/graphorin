@@ -7,10 +7,10 @@
 # Function: runMigrations()
 
 ```ts
-function runMigrations(conn): readonly AppliedMigration[];
+function runMigrations(conn, options?): readonly AppliedMigration[];
 ```
 
-Defined in: packages/store-sqlite/src/migrations/runner.ts:25
+Defined in: packages/store-sqlite/src/migrations/runner.ts:44
 
 Apply every pending migration in version order. Each migration runs
 inside its own transaction so a failure mid-sequence leaves the
@@ -22,6 +22,7 @@ fully-migrated DB is a no-op.
 | Parameter | Type |
 | ------ | ------ |
 | `conn` | [`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) |
+| `options?` | `RunMigrationsOptions` |
 
 ## Returns
 

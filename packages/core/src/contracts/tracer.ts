@@ -108,6 +108,22 @@ export type SpanAttributeValue =
   | ReadonlyArray<boolean>;
 
 /**
+ * W-094: sensitivity opts for {@link AISpan.addEvent}. Event attributes
+ * used to be un-taggable, so a default-`'public'` export floor dropped
+ * ALL of them - including `exception.type` from `recordException`.
+ *
+ * @stable
+ */
+export interface AddEventOptions {
+  /** Default tier applied to every attribute of this event. */
+  readonly sensitivity?: import('../types/sensitivity.js').Sensitivity;
+  /** Per-attribute overrides; win over {@link AddEventOptions.sensitivity}. */
+  readonly sensitivityByAttribute?: Readonly<
+    Record<string, import('../types/sensitivity.js').Sensitivity>
+  >;
+}
+
+/**
  * Typed span. Generic over `SpanType` so consumers can specialize a
  * function on a particular span kind without losing the discriminator.
  *
@@ -120,8 +136,14 @@ export interface AISpan<T extends SpanType = SpanType> {
   readonly parentId?: string;
   /** Add or replace attributes. Repeated calls are merged (last write wins). */
   setAttributes(attrs: SpanAttributes): void;
-  /** Append a span event (attribute-bearing time-stamped marker). */
-  addEvent(name: string, attrs?: SpanAttributes): void;
+  /**
+   * Append a span event (attribute-bearing time-stamped marker). The
+   * optional `opts` (W-094) tags the event's attributes with a
+   * sensitivity tier so the validation exporter can pass safe ones
+   * through the default-deny floor - untagged attributes keep being
+   * dropped below the floor.
+   */
+  addEvent(name: string, attrs?: SpanAttributes, opts?: AddEventOptions): void;
   /** Record an exception. Multiple calls are kept in the span event log. */
   recordException(err: unknown): void;
   /** Set the terminal status. */

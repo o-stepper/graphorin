@@ -23,7 +23,7 @@ const RPC_ERROR_CODES: Readonly<{
 }>;
 ```
 
-Defined in: src/server-message.ts:243
+Defined in: src/server-message.ts:255
 
 Stable JSON-RPC error code catalogue used by the server when
 surfacing routine failures (per JSON-RPC 2.0 § 5.1 + Graphorin

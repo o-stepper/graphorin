@@ -10,7 +10,7 @@
 type PhaseListener = (outcome) => void;
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:336
+Defined in: packages/memory/src/consolidator/types.ts:350
 
 Listener callback subscribed via
 [Consolidator.onPhaseFinished](/api/@graphorin/memory/interfaces/Consolidator.md#onphasefinished). Useful for tests + observers.

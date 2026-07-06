@@ -10,7 +10,7 @@
 const MAX_ITERATIONS_CEILING: 5 = 5;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:45
+Defined in: packages/memory/src/search/iterative.ts:46
 
 Absolute clamp on total retrieval passes, applied regardless of the
 caller's `maxIterations` - a latency guardrail so a mis-configured

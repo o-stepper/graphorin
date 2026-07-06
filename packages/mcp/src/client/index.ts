@@ -6,6 +6,11 @@
 
 export { _resetSseWarnDedupForTesting, createMCPClient } from './client.js';
 export {
+  type CreateManagedMCPClientOptions,
+  createManagedMCPClient,
+  type ManagedReconnectOptions,
+} from './managed.js';
+export {
   createMcpResourceReader,
   type McpResourceReaderOptions,
 } from './mcp-resource-reader.js';

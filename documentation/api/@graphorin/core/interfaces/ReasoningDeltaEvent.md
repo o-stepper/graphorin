@@ -6,7 +6,7 @@
 
 # Interface: ReasoningDeltaEvent
 
-Defined in: packages/core/src/types/agent-event.ts:107
+Defined in: packages/core/src/types/agent-event.ts:115
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:107
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:109 |
-| <a id="property-type"></a> `type` | `readonly` | `"reasoning.delta"` | packages/core/src/types/agent-event.ts:108 |
+| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:117 |
+| <a id="property-type"></a> `type` | `readonly` | `"reasoning.delta"` | packages/core/src/types/agent-event.ts:116 |

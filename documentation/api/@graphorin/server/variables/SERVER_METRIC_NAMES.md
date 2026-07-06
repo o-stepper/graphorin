@@ -24,6 +24,6 @@ const SERVER_METRIC_NAMES: Readonly<{
 }>;
 ```
 
-Defined in: packages/server/src/metrics/catalog.ts:27
+Defined in: packages/server/src/metrics/catalog.ts:32
 
 ## Stable

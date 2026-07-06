@@ -78,9 +78,9 @@ The frame is returned unchanged when:
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
 | `eventId` | `string` | packages/protocol/dist/server-message.d.ts:103 |
-| `kind` | `"event"` | packages/protocol/dist/server-message.d.ts:100 |
+| `kind` | `"event"` | packages/protocol/dist/server-message.d.ts:102 |
 | `payload?` | `unknown` | packages/protocol/dist/server-message.d.ts:104 |
-| `subject` | `string` | packages/protocol/dist/server-message.d.ts:102 |
+| `subject` | `string` | packages/protocol/dist/server-message.d.ts:100 |
 | `subscriptionId` | `string` | packages/protocol/dist/server-message.d.ts:101 |
 | `type` | `string` | packages/protocol/dist/server-message.d.ts:99 |
 | `v` | `"1"` | packages/protocol/dist/server-message.d.ts:98 |

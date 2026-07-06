@@ -154,3 +154,29 @@ function mockExporter(onExport: (record: SpanRecord) => void): TraceExporter {
     async shutdown(): Promise<void> {},
   };
 }
+
+describe('W-094 - message events carry role (public) but not content through the default floor', () => {
+  it('a sanitized message event keeps gen_ai.message.role and drops content', async () => {
+    const records: SpanRecord[] = [];
+    const exporter: TraceExporter = {
+      id: 'capture',
+      async export(record) {
+        records.push(record);
+      },
+      async flush() {},
+      async shutdown() {},
+    };
+    const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
+    await tracer.span({ type: 'provider.generate' }, async (span) => {
+      emitGenAIMessageEvents(span, [{ role: 'user', content: 'my card is 4111 1111 1111 1111' }], {
+        system: 'anthropic',
+      });
+    });
+    await tracer.shutdown();
+    const event = records[0]?.events.find((entry) => entry.name === 'gen_ai.user.message');
+    expect(event).toBeDefined();
+    expect(event?.attributes['gen_ai.message.role']).toBe('user');
+    expect(event?.attributes['gen_ai.system']).toBe('anthropic');
+    expect(event?.attributes.content).toBeUndefined();
+  });
+});

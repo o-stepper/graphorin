@@ -19,7 +19,7 @@ type DataFlowVerdict =
 };
 ```
 
-Defined in: packages/tools/src/executor/types.ts:253
+Defined in: packages/tools/src/executor/types.ts:260
 
 Verdict returned by [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.md#inspect). Mirrors
 `@graphorin/security`'s `DataFlowDecision`; the agent maps one to the

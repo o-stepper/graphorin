@@ -15,6 +15,25 @@ export interface AppliedMigration {
 }
 
 /**
+ * W-111: tuning knobs for {@link runMigrations}. Only `upTo` exists so
+ * far and it is test-only.
+ *
+ * @internal
+ */
+export interface RunMigrationsOptions {
+  /**
+   * Stop after this version (inclusive) - later migrations stay
+   * pending. Test-only: lets a suite build a database frozen at a
+   * historical schema and then exercise the upgrade path across a
+   * specific migration. Not for production use; a partially-migrated
+   * database is not a supported runtime state.
+   *
+   * @internal
+   */
+  readonly upTo?: string;
+}
+
+/**
  * Apply every pending migration in version order. Each migration runs
  * inside its own transaction so a failure mid-sequence leaves the
  * database in a known-good state. Re-running `runMigrations` on a
@@ -22,11 +41,15 @@ export interface AppliedMigration {
  *
  * @stable
  */
-export function runMigrations(conn: SqliteConnection): readonly AppliedMigration[] {
+export function runMigrations(
+  conn: SqliteConnection,
+  options?: RunMigrationsOptions,
+): readonly AppliedMigration[] {
   ensureSchemaMigrationsTable(conn);
   const applied = readApplied(conn);
   const pending: Migration[] = [];
   for (const m of listMigrations()) {
+    if (options?.upTo !== undefined && m.version.localeCompare(options.upTo) > 0) continue;
     const prior = applied.get(m.version);
     if (prior === undefined) {
       pending.push(m);
@@ -61,6 +84,10 @@ export function runMigrations(conn: SqliteConnection): readonly AppliedMigration
         skipped = true;
         return;
       }
+      // W-111: data-repair preflight - same transaction, before the
+      // SQL, and only on the pending path (an already-applied version
+      // returned above, so preflights never touch settled databases).
+      m.preflight?.(conn);
       conn.execMany(m.sql);
       conn.run(
         'INSERT INTO schema_migrations (version, name, applied_at, checksum) VALUES (?, ?, ?, ?)',

@@ -14,6 +14,7 @@
 import type { Provider, ProviderRequest, SessionScope, Tracer } from '@graphorin/core';
 import { wrapUntrusted } from '../../internal/envelope.js';
 import { stripMemoryInjectionMarkers } from '../../internal/injection-heuristics.js';
+import { sliceJsonObject, stripFence } from '../../internal/llm-json.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
@@ -283,18 +284,6 @@ function parseJudge(text: string | undefined): JudgeOutcome | null {
   if (decision !== 'supersede' && decision !== 'dedup' && decision !== 'admit') return null;
   const reason = typeof obj.reason === 'string' ? obj.reason : 'unspecified';
   return { decision, reason };
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
-}
-
-function sliceJsonObject(text: string): string | null {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end < start) return null;
-  return text.slice(start, end + 1);
 }
 
 function makeOutcome(

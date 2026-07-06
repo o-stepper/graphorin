@@ -229,3 +229,62 @@ describe('ollamaAdapter - streaming', () => {
     expect(result.usage).toEqual({ promptTokens: 5, completionTokens: 2, totalTokens: 7 });
   });
 });
+
+describe('W-095 - native images array', () => {
+  const IMG = new Uint8Array([9, 8, 7]);
+  const RESPONSE = {
+    message: { role: 'assistant', content: 'a dog' },
+    done: true,
+    done_reason: 'stop',
+    prompt_eval_count: 5,
+    eval_count: 2,
+  };
+  const imageRequest = {
+    messages: [
+      {
+        role: 'user' as const,
+        content: [
+          { type: 'text' as const, text: 'describe' },
+          { type: 'image' as const, image: IMG },
+        ],
+      },
+    ],
+  };
+
+  it('capabilities.multimodal: true sends the per-message images base64 array', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = ollamaAdapter({
+      model: 'llava',
+      fetchImpl: makeFetchImpl({ jsonOnce: RESPONSE, capture }),
+      logger: () => {},
+      capabilities: { multimodal: true },
+    });
+    const result = await provider.generate(imageRequest);
+    expect(result.text).toBe('a dog');
+    const body = JSON.parse(String(capture.init?.body ?? '{}')) as {
+      messages: Array<{ content: string; images?: string[] }>;
+    };
+    expect(body.messages[0]?.content).toBe('describe');
+    expect(body.messages[0]?.images).toEqual([Buffer.from(IMG).toString('base64')]);
+  });
+
+  it('default capabilities: no images field, flat content, one warn per instance', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const warns: string[] = [];
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({ jsonOnce: RESPONSE, capture }),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    await provider.generate(imageRequest);
+    await provider.generate(imageRequest);
+    const body = JSON.parse(String(capture.init?.body ?? '{}')) as {
+      messages: Array<{ content: string; images?: string[] }>;
+    };
+    expect(body.messages[0]?.images).toBeUndefined();
+    expect(body.messages[0]?.content).toBe('describe');
+    expect(warns.filter((w) => w.includes('capabilities.multimodal'))).toHaveLength(1);
+  });
+});

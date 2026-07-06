@@ -348,3 +348,121 @@ describe('llamaCppNodeAdapter - multimodal user content', () => {
     expect(result.finishReason).toBe('stop');
   });
 });
+
+describe('W-096 - real chat history + honest tokens + persistent session', () => {
+  const MULTI_TURN: ProviderRequest = {
+    systemMessage: 'be terse',
+    messages: [
+      { role: 'user', content: 'first question' },
+      { role: 'assistant', content: 'first answer' },
+      { role: 'user', content: 'second question' },
+    ],
+  };
+
+  function historySession(pieces: ReadonlyArray<string>) {
+    const setHistoryCalls: unknown[][] = [];
+    const prompts: string[] = [];
+    const session: LlamaSessionInstance = {
+      async *promptStreamingResponse(prompt: string): AsyncIterable<string> {
+        prompts.push(prompt);
+        for (const p of pieces) yield p;
+      },
+      setChatHistory(history) {
+        setHistoryCalls.push([...history]);
+      },
+    };
+    return { session, setHistoryCalls, prompts };
+  }
+
+  it('passes prior turns via setChatHistory and prompts ONLY the last user text', async () => {
+    const fx = historySession(['ok']);
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: async () => fx.session,
+    });
+    await provider.generate(MULTI_TURN);
+    expect(fx.prompts).toEqual(['second question']);
+    expect(fx.setHistoryCalls).toHaveLength(1);
+    expect(fx.setHistoryCalls[0]).toEqual([
+      { type: 'system', text: 'be terse' },
+      { type: 'user', text: 'first question' },
+      { type: 'model', response: ['first answer'] },
+    ]);
+    // No pseudo-prompt [user]/[assistant] framing anywhere.
+    expect(fx.prompts[0]).not.toContain('[user]');
+  });
+
+  it('a session WITHOUT setChatHistory keeps the legacy renderPrompt path (regression)', async () => {
+    const prompts: string[] = [];
+    const session: LlamaSessionInstance = {
+      async *promptStreamingResponse(prompt: string): AsyncIterable<string> {
+        prompts.push(prompt);
+        yield 'ok';
+      },
+    };
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: async () => session,
+    });
+    await provider.generate(MULTI_TURN);
+    expect(prompts[0]).toBe(
+      '[user] first question\n[assistant] first answer\n[user] second question',
+    );
+  });
+
+  it('completionTokens tokenize the ASSEMBLED text once - never per chunk', async () => {
+    const tokenizedTexts: string[] = [];
+    const model = fixtureModel({
+      tokenize: (text: string) => {
+        tokenizedTexts.push(text);
+        return new Uint32Array(text.length);
+      },
+    });
+    const fx = historySession(['ab', 'cd', 'e']);
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: model,
+      sessionFactory: async () => fx.session,
+    });
+    const result = await provider.generate(MULTI_TURN);
+    // Exactly two tokenize calls: the prompt proxy + the joined response.
+    expect(tokenizedTexts).toHaveLength(2);
+    expect(tokenizedTexts[1]).toBe('abcde');
+    expect(result.usage.completionTokens).toBe(5);
+  });
+
+  it('persistentSession: one factory call across requests, history re-synced, mutex serialises', async () => {
+    let factoryCalls = 0;
+    const fx = historySession(['ok']);
+    let inFlight = 0;
+    let sawOverlap = false;
+    const session: LlamaSessionInstance = {
+      async *promptStreamingResponse(prompt: string): AsyncIterable<string> {
+        inFlight += 1;
+        if (inFlight > 1) sawOverlap = true;
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        fx.prompts.push(prompt);
+        yield 'ok';
+        inFlight -= 1;
+      },
+      setChatHistory(history) {
+        fx.setHistoryCalls.push([...history]);
+      },
+    };
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      persistentSession: true,
+      sessionFactory: async () => {
+        factoryCalls += 1;
+        return session;
+      },
+    });
+    await Promise.all([provider.generate(MULTI_TURN), provider.generate(MULTI_TURN)]);
+    expect(factoryCalls).toBe(1);
+    expect(fx.setHistoryCalls).toHaveLength(2);
+    expect(sawOverlap).toBe(false);
+  });
+});

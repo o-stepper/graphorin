@@ -155,6 +155,46 @@ describe('HyDE (P2-3)', () => {
     expect(embedder.embedded).toContain(pseudo);
   });
 
+  it('W-144: the HyDE leg carries includeSuperseded and owner like the direct vector leg', async () => {
+    const provider = spyProvider({ hypothetical: 'recalled: the runbook lives in confluence' });
+    const store = createInMemoryStore();
+    type SearchVectorFn = NonNullable<typeof store.semantic.searchVector>;
+    const original = store.semantic.searchVector;
+    if (original === undefined) throw new Error('fixture must expose searchVector');
+    const captured: Array<Parameters<SearchVectorFn>> = [];
+    (store.semantic as { searchVector: SearchVectorFn }).searchVector = async (...args) => {
+      captured.push(args);
+      return original.call(store.semantic, ...args);
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: spyEmbedder(),
+      queryTransform: { provider },
+    });
+    await memory.semantic.remember(
+      scope,
+      { text: 'the deploy runbook lives in confluence' },
+      PIPELINE_OFF,
+    );
+
+    captured.length = 0;
+    await memory.semantic.search(scope, 'where are the docs', {
+      hyde: true,
+      includeSuperseded: true,
+      owner: 'agent',
+    });
+
+    // Direct vector leg + HyDE leg - and BOTH must carry the predicates
+    // in-store (the HyDE call used to drop them, so an includeSuperseded
+    // audit search silently evaluated that leg validity-now).
+    expect(captured).toHaveLength(2);
+    for (const args of captured) {
+      expect(args[6]).toBe(true);
+      expect(args[7]).toBe('agent');
+    }
+  });
+
   it('skips the hypothetical LLM call when no embedder is configured', async () => {
     const provider = spyProvider({ hypothetical: 'x' });
     const memory = createMemory({
@@ -167,6 +207,83 @@ describe('HyDE (P2-3)', () => {
     await memory.semantic.search(scope, 'q', { hyde: true });
 
     expect(provider.calls).toHaveLength(0); // no embedder ⇒ no point generating a passage
+  });
+});
+
+describe('W-087 batched fan-out embeddings', () => {
+  /** Stub embedder that records each embed CALL (not just each text). */
+  function callCountingEmbedder(opts: { failBatches?: boolean } = {}): EmbedderProvider & {
+    readonly calls: string[][];
+  } {
+    const calls: string[][] = [];
+    const base = createStubEmbedder();
+    return {
+      calls,
+      id: () => base.id(),
+      dim: () => base.dim(),
+      configHash: () => base.configHash(),
+      async embed(texts, embedOpts) {
+        calls.push([...texts]);
+        if (opts.failBatches === true && texts.length > 1) {
+          throw new Error('batch endpoint down');
+        }
+        return base.embed(texts, embedOpts);
+      },
+    };
+  }
+
+  async function seededMemory(embedder: EmbedderProvider) {
+    const provider = spyProvider({ variants: ['beta thing'] });
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder,
+      queryTransform: { provider },
+    });
+    await memory.semantic.remember(scope, { text: 'alpha gizmo' }, PIPELINE_OFF);
+    await memory.semantic.remember(scope, { text: 'beta thing' }, PIPELINE_OFF);
+    return memory;
+  }
+
+  it('multiQuery=N performs ONE embed call carrying every variant', async () => {
+    const embedder = callCountingEmbedder();
+    const memory = await seededMemory(embedder);
+
+    embedder.calls.length = 0;
+    const hits = await memory.semantic.search(scope, 'alpha', { multiQuery: 2 });
+
+    expect(embedder.calls).toHaveLength(1);
+    expect(embedder.calls[0]).toEqual(['alpha', 'beta thing']);
+    expect(hits.map((h) => h.record.text)).toContain('beta thing');
+  });
+
+  it('the single-shot path still embeds exactly once with one element', async () => {
+    const embedder = callCountingEmbedder();
+    const memory = await seededMemory(embedder);
+
+    embedder.calls.length = 0;
+    await memory.semantic.search(scope, 'alpha');
+
+    expect(embedder.calls).toEqual([['alpha']]);
+  });
+
+  it('a failing batch embed degrades to per-variant embedding with identical results', async () => {
+    const batched = callCountingEmbedder();
+    const flaky = callCountingEmbedder({ failBatches: true });
+    const memoryBatched = await seededMemory(batched);
+    const memoryFlaky = await seededMemory(flaky);
+
+    flaky.calls.length = 0;
+    const hitsBatched = await memoryBatched.semantic.search(scope, 'alpha', { multiQuery: 2 });
+    const hitsFlaky = await memoryFlaky.semantic.search(scope, 'alpha', { multiQuery: 2 });
+
+    // Fallback path: the failed batch call, then one single-text call per
+    // variant - and the search still succeeds with the same results.
+    expect(flaky.calls[0]).toEqual(['alpha', 'beta thing']);
+    expect(flaky.calls.slice(1)).toEqual([['alpha'], ['beta thing']]);
+    expect(hitsFlaky.map((h) => [h.record.text, h.score])).toEqual(
+      hitsBatched.map((h) => [h.record.text, h.score]),
+    );
   });
 });
 

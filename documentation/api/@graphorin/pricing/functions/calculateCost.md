@@ -15,7 +15,7 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:127
+Defined in: pricing/src/lookup.ts:132
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost
@@ -30,6 +30,11 @@ Token-count contract (PS-19):
 - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
   declares one, else at the full input rate (a cache write is at minimum a
   normal input token - the fallback never under-bills relative to no cache).
+
+Units contract (W-045): this is the CANONICAL producer of core
+`Cost.amount`, and it returns WHOLE US dollars (per-token USD rates
+times token counts) - never cents / minor units. One million input
+tokens at `inputUsdPerToken = 3e-6` cost `3` (three dollars).
 
 ## Parameters
 

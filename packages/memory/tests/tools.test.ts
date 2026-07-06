@@ -44,6 +44,55 @@ describe('@graphorin/memory/tools - fact tools', () => {
     expect(result.hits.length).toBeGreaterThan(0);
   });
 
+  it('W-086: fact_search inherits createMemory searchDefaults (multi-query fan-out)', async () => {
+    let expansions = 0;
+    const provider = {
+      name: 'expander',
+      modelId: 'expander:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        expansions += 1;
+        return {
+          text: JSON.stringify(['beta thing']),
+          usage: { promptTokens: 5, completionTokens: 5, totalTokens: 10 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream() {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      resolveScope: () => SCOPE,
+      queryTransform: { provider },
+      searchDefaults: { multiQuery: 2 },
+    });
+    const remember = findTool(memory.tools, 'fact_remember');
+    const search = findTool(memory.tools, 'fact_search');
+    const ctx = makeCtx();
+    await remember.execute({ text: 'alpha gizmo' }, ctx);
+    await remember.execute({ text: 'beta thing' }, ctx);
+    expansions = 0;
+    // The tool schema exposes no multiQuery knob - the fan-out comes
+    // from searchDefaults alone, recovering the variant-only match.
+    const result = (await search.execute({ query: 'alpha' }, ctx)) as {
+      hits: Array<{ text: string }>;
+    };
+    expect(expansions).toBe(1);
+    expect(result.hits.map((h) => h.text)).toContain('beta thing');
+  });
+
   it('fact_supersede chains the new fact and stores the link', async () => {
     const memory = createMemoryWithScope();
     const remember = findTool(memory.tools, 'fact_remember');

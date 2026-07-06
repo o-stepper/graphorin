@@ -6,7 +6,7 @@
 
 # Interface: QueryTransformOptions
 
-Defined in: packages/memory/src/search/query-transform.ts:70
+Defined in: packages/memory/src/search/query-transform.ts:71
 
 Per-call options for a [QueryTransformer](/api/@graphorin/memory/interfaces/QueryTransformer.md).
 
@@ -16,4 +16,4 @@ Per-call options for a [QueryTransformer](/api/@graphorin/memory/interfaces/Quer
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation signal forwarded to the underlying provider call. | packages/memory/src/search/query-transform.ts:72 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation signal forwarded to the underlying provider call. | packages/memory/src/search/query-transform.ts:73 |

@@ -6,7 +6,7 @@
 
 # Interface: ToolApprovalGrantedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:199
+Defined in: packages/core/src/types/agent-event.ts:219
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:199
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:201 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.granted"` | packages/core/src/types/agent-event.ts:200 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:221 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.granted"` | packages/core/src/types/agent-event.ts:220 |

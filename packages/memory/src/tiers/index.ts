@@ -34,6 +34,7 @@ export {
   type IterativeSearchOptions,
   type RememberOutcome,
   SemanticMemory,
+  type SemanticSearchDefaults,
 } from './semantic-memory.js';
 export {
   type SessionCompactionPolicy,

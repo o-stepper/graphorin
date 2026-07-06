@@ -10,7 +10,7 @@
 const QUERY_EXPANSION_SYSTEM_PROMPT: string;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:82
+Defined in: packages/memory/src/search/query-transform.ts:83
 
 **`Internal`**
 

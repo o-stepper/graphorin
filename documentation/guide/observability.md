@@ -28,12 +28,11 @@ Run/step/tool spans carry OTel GenAI attributes (`gen_ai.operation.name` = `invo
 ## Wiring a tracer
 
 ```ts
-import { createTracer, withValidation } from '@graphorin/observability';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { createOTLPHttpExporter, createTracer } from '@graphorin/observability';
 
 const tracer = createTracer({
   serviceName: 'my-assistant',
-  exporters: [new OTLPTraceExporter({ url: 'https://otel.example.com/v1/traces' })],
+  exporters: [createOTLPHttpExporter({ url: 'https://otel.example.com/v1/traces' })],
   // Default validation config is conservative; pass an object to tune.
 });
 ```
@@ -80,20 +79,17 @@ GRAPHORIN_TRACE=console
 
 ## OTLP export
 
-`@graphorin/observability` exposes the OTLP-HTTP exporter from `@opentelemetry/exporter-trace-otlp-http`. The exporter only fires when the operator wires a collector URL - Graphorin never opens an OTLP connection on its own.
+`@graphorin/observability` ships its **own minimal OTLP-HTTP exporter** - `createOTLPHttpExporter` - which implements the package's `TraceExporter` contract (an OTel SDK exporter class does NOT: different `export` signature, no `id`/`flush()`). It only fires when the operator wires a collector URL - Graphorin never opens an OTLP connection on its own. To integrate an upstream OTel SDK pipeline instead, convert finished spans with the exported `toOtlpEnvelope` helper inside your own exporter.
 
 ```ts
-import { createTracer, withValidation } from '@graphorin/observability';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { createOTLPHttpExporter, createTracer } from '@graphorin/observability';
 
 const tracer = createTracer({
   exporters: [
-    withValidation(
-      new OTLPTraceExporter({
-        url: process.env.OTLP_URL,
-        headers: { authorization: `Bearer ${process.env.OTLP_TOKEN}` },
-      }),
-    ),
+    createOTLPHttpExporter({
+      url: process.env.OTLP_URL ?? 'https://otel.example.com/v1/traces',
+      headers: { authorization: `Bearer ${process.env.OTLP_TOKEN}` },
+    }),
   ],
 });
 ```
@@ -121,16 +117,16 @@ With that wiring, `session.replay()` (no arguments) reproduces the real run inst
 
 ## GenAI Semantic Convention attributes
 
-The framework targets the published OpenTelemetry GenAI conventions. Common attributes you'll see:
+The framework targets the published OpenTelemetry GenAI conventions. Attributes `withTracing(provider)` actually emits:
 
 | Attribute | Where |
 |---|---|
-| `gen_ai.system` | Every provider span. Derived from the adapter (`'openai'`, `'anthropic'`, `'ollama'`, …). |
+| `gen_ai.operation.name` | Every provider span (`'chat'`); agent/tool spans carry `invoke_agent` / `execute_tool`. |
+| `gen_ai.provider.name` | Every provider span. Derived from the adapter name (`'openai'`, `'anthropic'`, `'ollama'`, …). |
 | `gen_ai.request.model` | Every provider span. |
-| `gen_ai.request.temperature` | Set when the call configures it. |
-| `gen_ai.usage.input_tokens` | On stream completion. |
-| `gen_ai.usage.output_tokens` | On stream completion. |
-| `gen_ai.completion.0.role` / `gen_ai.completion.0.content` | The assistant message; redaction-respecting. |
+| `gen_ai.usage.input_tokens` / `gen_ai.usage.output_tokens` | On completion (generate) / stream finish. |
+
+A wider attribute family (`gen_ai.system`, `gen_ai.response.model`/`.id`/`.finish_reasons`, `gen_ai.tool.*`, `gen_ai.agent.*`, and the internal-tier message content attributes) is available through the explicit helpers `emitGenAIAttributes` / `emitGenAIMessageEvents` - those fire only where you call them, not automatically.
 
 ## Counters
 
@@ -145,6 +141,32 @@ The framework exposes in-process counters for high-frequency events in two famil
 | `mcp.tools.pin-mismatch.total` | A pinned MCP tool's fingerprint drifted (rug-pull defense). |
 
 Counter names are unprefixed in-process (`snapshotCounters()`); add your own namespace prefix at the export boundary if your metrics backend needs one.
+
+### Server exposition and the audit chain
+
+On the standalone server both families are wired for you (W-051):
+
+- **`/v1/metrics`** - every scrape folds the live `tool.*` / `mcp.*` counters into the Prometheus registry as `graphorin_tool_*` / `graphorin_mcp_*` series (dots and dashes map to `_`; series appear lazily, only once they have moved). Counters delta-sync (re-scrapes never double-count) and gauges set absolutely - the snapshot's `kinds` field tells the bridge which is which. Histograms are not bridged yet; their raw observation lists stay available through `snapshotCounters().histograms`.
+- **`/v1/audit`** - when the audit chain is enabled, the tools audit bus feeds it through a bridge governed by `audit.toolEvents`: `'security'` (default) writes only the security-significant subset (dataflow flagged/blocked/declassified, sanitization hits/blocks, approval lifecycle, collisions, cap-disabled), `'all'` adds per-call `tool:execute:*` chatter, `'off'` disables the bridge. Shadow-mode dataflow findings are therefore operator-visible out of the box.
+
+Library-mode (non-server) users wire the same two seams by hand:
+
+```ts no-check
+import { onToolAudit, snapshotCounters } from '@graphorin/tools/audit';
+
+// Pull-based: export the counter snapshot to your metrics backend.
+setInterval(() => {
+  const { counters, kinds } = snapshotCounters();
+  for (const [key, value] of Object.entries(counters)) {
+    myBackend.record(key, value, kinds[key] ?? 'counter');
+  }
+}, 15_000);
+
+// Push-based: forward audit-bus events to your own sink.
+const stop = onToolAudit((event) => {
+  if (event.action.startsWith('tool:dataflow:')) mySecurityLog.write(event);
+});
+```
 
 ## Next steps
 

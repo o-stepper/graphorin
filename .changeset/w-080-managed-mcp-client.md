@@ -1,0 +1,5 @@
+---
+'@graphorin/mcp': minor
+---
+
+W-080: new opt-in `createManagedMCPClient(options & { reconnect })` - a managed wrapper for long-running agents whose MCP tools must survive a dead stdio child or a lost HTTP session. It implements `MCPClient` by delegating to an inner client it rebuilds on transport close (exponential backoff + jitter; `mcp.reconnect.attempt/success/gave-up.total` counters), and - the key move - its `toTools()` binds adapted tools to the WRAPPER, so already-registered `Tool` objects keep working across a reconnect without re-registration (the full toTools pipeline was extracted into a shared, client-parameterized `runToTools` helper; the plain client uses it byte-identically). After a successful reconnect the wrapper re-runs `toTools()` with the last-used options so the pin comparison / TOFU store re-screens the post-reconnect catalogue (rug-pull caught). Deliberate contracts: an in-flight call is NEVER retried (only the connection heals), and the operator's `onTransportClose` fires once, on final (gave-up) failure. The default `createMCPClient` behaviour is unchanged.

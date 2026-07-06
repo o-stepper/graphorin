@@ -19,6 +19,14 @@ import type { Usage } from './usage.js';
  * with `fromWireAgentEvent`. Adding a variant here counts as a
  * wire-format change; track it through changesets.
  *
+ * Correlation policy (W-049): events are consumed from a per-run
+ * stream, so cross-run attribution is the ENVELOPE's job (`subject`
+ * carries `agentId`/`runId`); an in-payload `runId` exists only on the
+ * variants that historically carry one and is deliberately NOT
+ * retrofitted onto the rest. Within one tool lifecycle the correlation
+ * key is `toolCallId`; `toolName` is duplicated onto the
+ * `tool.execute.*` variants purely for subscriber convenience.
+ *
  * @stable
  */
 export type AgentEvent<TOutput = string> =
@@ -135,6 +143,14 @@ export interface ToolCallEndEvent {
 export interface ToolExecuteStartEvent {
   readonly type: 'tool.execute.start';
   readonly toolCallId: string;
+  /**
+   * Convenience duplicate of the executing tool's name (W-049).
+   * Correlation within a tool lifecycle is by `toolCallId`; this field
+   * spares direct subscribers a stateful join back to the
+   * `tool.call.start` that carried the name. Optional for wire
+   * compatibility; the agent runtime always fills it.
+   */
+  readonly toolName?: string;
 }
 
 /**
@@ -177,6 +193,8 @@ export interface ToolExecutePartialEvent {
 export interface ToolExecuteEndEvent {
   readonly type: 'tool.execute.end';
   readonly toolCallId: string;
+  /** See {@link ToolExecuteStartEvent.toolName} (W-049). */
+  readonly toolName?: string;
   readonly result: unknown;
   readonly durationMs: number;
 }
@@ -185,6 +203,8 @@ export interface ToolExecuteEndEvent {
 export interface ToolExecuteErrorEvent {
   readonly type: 'tool.execute.error';
   readonly toolCallId: string;
+  /** See {@link ToolExecuteStartEvent.toolName} (W-049). */
+  readonly toolName?: string;
   readonly error: ToolError;
 }
 

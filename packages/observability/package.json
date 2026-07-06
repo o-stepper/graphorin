@@ -109,30 +109,11 @@
   "dependencies": {
     "@graphorin/core": "workspace:*"
   },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/sdk-node": ">=0.215.0 <1.0.0",
-    "@opentelemetry/exporter-trace-otlp-http": ">=0.215.0 <1.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@opentelemetry/api": {
-      "optional": false
-    },
-    "@opentelemetry/sdk-node": {
-      "optional": true
-    },
-    "@opentelemetry/exporter-trace-otlp-http": {
-      "optional": true
-    }
-  },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
-    "@opentelemetry/sdk-node": "^0.220.0",
     "fast-check": "^3.23.0"
   }
 }

@@ -146,6 +146,23 @@ await memory.semantic.search(scope, 'what does alex like to drink', {
 
 Both are **opt-in**: wire `createMemory({ queryTransform: { provider } })`. With no transformer configured (the default) these options are silent no-ops and search stays offline + single-shot. Reserve them for retrieval-heavy recall - they add provider latency.
 
+### Retrieval defaults for every surface
+
+Per-call options only help code that calls `memory.semantic.search(...)` directly - the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) expose no `multiQuery`/`expandHops` knobs. `searchDefaults` sets construction-time defaults that every `search()` call inherits, per-call options winning key-by-key:
+
+```ts
+createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder,
+  queryTransform: { provider },          // required for multiQuery / hyde
+  graph: { entityResolution: true },     // required for expandHops / entityMatch
+  searchDefaults: { multiQuery: 3, expandHops: 1 },
+});
+```
+
+Two caveats. The fan-out switches only do something when their backing dependency is configured (`queryTransform` for `multiQuery`/`hyde`, `graph` for `expandHops`/`entityMatch`) - a default without the dependency stays a silent no-op. And the defaults apply to **every** recall, including auto-recall on each turn and each pass of the `deep_recall` loop (whose widen-pass `expandHops` override still wins, since it is per-call) - so they multiply provider cost and latency; opt in deliberately. The trust-sensitive predicates (`includeQuarantined`, `includeSuperseded`, `trustWeighting`, `owner`) are deliberately **not defaultable** - configuration cannot silently weaken trust gates.
+
 ## Relation graph & one-hop expansion
 
 Every fact can carry a `(subject, predicate, object)` triple. When you enable the **entity resolver**, Graphorin folds the subject/object strings into canonical entities - `"Anna"`, `"Anna S."`, `"my sister"` collapse to one entity - via lexical + embedding dedup, with **auditable, reversible merges** (an append-only ledger; `merged_into` is single-level).
@@ -162,7 +179,7 @@ await memory.semantic.search(scope, 'what did the person I met in Tbilisi recomm
 
 The ambiguous-similarity band **mints a new entity by default** - it never auto-merges on weak evidence. Opt into LLM adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band. Omit `graph` entirely and the path is unchanged and fully offline (`expandHops` defaults to `0`).
 
-The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors.
+The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors. One known bound, documented with the security residuals in the [security guide](./security.md): the fuzzy-dedup candidate window is the fixed 1000 most-recent entities, so an alias of a much older entity may mint a new one (exact-name aliases are immune - they match through the normalized-name index regardless of age).
 
 ### PPR-lite, graph fusion weight, and exact entity-match (D5)
 
@@ -188,6 +205,11 @@ if (result.abstained) {
 ```
 
 Exposed programmatically as `searchIterative(...)` and as the gated **`deep_recall`** tool (the twelfth tool). Omit `iterativeRetrieval` and `searchIterative` degrades to one difficulty-gated pass with **no provider call**, and the tool surface stays at eleven.
+
+Two properties of the difficulty gate to plan around:
+
+- **The gate's signal lexicon is English-only.** Its multi-hop / temporal / comparison markers are English words, so on non-English deployments the auto-gate never fires. `deep_recall` is unaffected (it always forces the loop); for programmatic `searchIterative` either pass `forceHard: true` or lower the threshold.
+- **The threshold is configurable** (default `0.5` - conservative on purpose, a single multi-hop signal scores `0.4` and stays single-shot): per-call via `searchIterative(scope, q, { difficultyThreshold: 0.3 })`, or as a construction-time default via `createMemory({ iterativeRetrieval: { provider, difficultyThreshold: 0.3 } })` (per-call wins). Even a mis-gated call still returns a valid single-shot result with `graded: false`.
 
 ## Multi-stage conflict resolution
 
@@ -296,7 +318,7 @@ Procedures used to be reachable only through their activation predicate (`'alway
 
 ## Background consolidator
 
-A background pipeline (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget so it can never run away with your bill:
+A background pipeline (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget; how a breach is handled depends on the tier's `onExceed` default: at `free`/`cheap` an exceeded ceiling **pauses** consolidation until the next budget reset, while at `standard`/`full` the default is `'log'` - a WARN only, spending continues. For hard enforcement on the paid tiers set `onExceed: 'pause'` (or `'throw'`) explicitly:
 
 | Phase | What it does |
 |---|---|
@@ -315,6 +337,11 @@ In library mode the consolidator is **dormant until you start and trigger it** -
 
 Every `trigger(...)` dispatch first replays ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
 
+Two safeguards keep a single bad slice from wedging a scope forever:
+
+- **Input transcript budget** (`maxTranscriptChars`, per-tier default 60 000 characters ~ 15k tokens, 120 000 at `full`): `maxStandardBatchSize` bounds only the message *count*, so a batch of long messages could exceed a cheap model's context on every retry. A slice whose rendered transcript exceeds the budget is half-split *before* the provider call (the same convergent recursion that handles `finishReason: 'length'` output truncation); a single message that alone exceeds the budget is tail-truncated, and both events are recorded on the phase span (`consolidator.standard.budget_splits` / `.input_truncations`).
+- **Poison-slice skip**: when a standard-phase batch exhausts its dead-letter retries and the cursor still points inside the failed window, the cursor is force-advanced past the window (logged, and the `messageIds` stay on the exhausted row for manual replay). Skipping the slice loses its facts deliberately - the alternative is losing every slice after it. The check is membership-based, so it can never move the cursor backwards.
+
 Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 
 | Tier | Phases enabled | `maxTokensPerDay` | `maxCostPerDay` (USD) | `onExceed` |
@@ -324,6 +351,8 @@ Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 | `'standard'` | `light + standard + deep` | `200 000` | `1.00` | `'log'` |
 | `'full'` | `light + standard + deep` | `1 000 000` | `5.00` | `'log'` |
 | `'custom'` | operator-defined | operator must set | operator must set | operator must set |
+
+Two things the table does not say by itself. `'log'` is **observability, not enforcement**: the consolidator keeps spending past the ceiling and only WARNs - the advisory default on the paid tiers is deliberate (a paused background pipeline silently stops forming memories), and hard enforcement is one config key away (`onExceed: 'pause' | 'throw'`). And the USD leg (`maxCostPerDay`) can only trip when you supply `priceUsage` - without a price callback every call is metered at $0 and only the token ceiling is live. See the `ConsolidatorCeilings` / `OnBudgetExceed` API docs for the exact semantics.
 
 Phase-level features are gated by per-tier flags: **episode formation** and **importance scoring** are on at `standard` / `full`; **contextual retrieval** defaults to `late-chunk` on every tier (the `'llm'` upgrade is consolidator-only); **reflection** is on **only at `full`**. The default `'free'` tier registers the `light` phase but pins both ceilings to zero, so consolidation effectively does nothing until you opt in:
 

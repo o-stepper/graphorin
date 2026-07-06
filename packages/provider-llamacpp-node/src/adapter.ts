@@ -19,6 +19,7 @@ import type {
 import { ProviderHttpError } from '@graphorin/provider/errors';
 import { applyReasoningPolicy, resolveReasoningRetention } from '@graphorin/provider/reasoning';
 import {
+  type LlamaChatHistoryItem,
   type LlamaChatSessionPeer,
   type LlamaCppNodeRuntimeOverrides,
   type LlamaModelInstance,
@@ -80,6 +81,19 @@ export interface LlamaCppNodeAdapterOptions {
     model: LlamaModelInstance,
     system?: string,
   ) => Promise<LlamaSessionInstance>;
+  /**
+   * W-096: reuse ONE session (context + KV cache) across requests
+   * instead of creating and disposing a fresh one per call - an agent
+   * loop then avoids re-prefilling the growing transcript on every
+   * step. Requests serialise through a promise mutex (a llama context
+   * sequence is single-threaded), and the chat history re-syncs via
+   * `setChatHistory` before each prompt. Strictly opt-in: the default
+   * per-request lifecycle stays memory-safe and concurrency-safe; the
+   * cached session also skips per-request disposal (it lives until the
+   * process / instance is released). Sessions WITHOUT `setChatHistory`
+   * cannot re-sync and silently degrade to per-request behaviour.
+   */
+  readonly persistentSession?: boolean;
 }
 
 const DEFAULT_CAPABILITIES: ProviderCapabilities = {
@@ -125,6 +139,7 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
     options.sessionFactory ??
     options.runtimeOverrides?.createSession ??
     ((model: LlamaModelInstance, system?: string) => defaultSessionFactory(model, system, options));
+  const acquireSession = buildSessionManager(options, sessionFactory);
   return {
     name: providerName,
     modelId: options.modelPath,
@@ -133,7 +148,7 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
     stream(req) {
       return streamLlamaCppNode(
         ensureModel,
-        sessionFactory,
+        acquireSession,
         providerName,
         options,
         applyLlamaCppNodePreflight(req, capabilities),
@@ -142,7 +157,7 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
     async generate(req) {
       const events = streamLlamaCppNode(
         ensureModel,
-        sessionFactory,
+        acquireSession,
         providerName,
         options,
         applyLlamaCppNodePreflight(req, capabilities),
@@ -196,18 +211,35 @@ function applyLlamaCppNodePreflight(
 
 async function* streamLlamaCppNode(
   ensureModel: () => Promise<{ model: LlamaModelInstance }>,
-  sessionFactory: (model: LlamaModelInstance, system?: string) => Promise<LlamaSessionInstance>,
+  acquireSession: SessionManager,
   providerName: string,
   options: LlamaCppNodeAdapterOptions,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
   const { model } = await ensureModel();
-  const session = await sessionFactory(
+  const lease = await acquireSession(
     model,
     typeof req.systemMessage === 'string' ? req.systemMessage : undefined,
   );
-  const prompt = renderPrompt(req);
-  const promptTokens = lengthOf(model.tokenize(prompt));
+  const session = lease.session;
+  // W-096: feed the transcript as REAL chat history when the session
+  // supports it (node-llama-cpp v3 `setChatHistory`) and prompt ONLY
+  // the last user turn - the pre-fix pseudo-prompt double-templated the
+  // whole conversation inside one user turn, degrading chat-tuned GGUF
+  // models. Sessions without the setter (older fixtures, custom
+  // factories) keep the legacy renderPrompt path unchanged.
+  const historic = typeof session.setChatHistory === 'function';
+  let prompt: string;
+  if (historic) {
+    const { priorTurns, lastUserText } = buildChatHistory(req);
+    session.setChatHistory?.(priorTurns);
+    prompt = lastUserText;
+  } else {
+    prompt = renderPrompt(req);
+  }
+  // Prompt-token accounting stays the full-transcript proxy in both
+  // modes so the figure is comparable regardless of the wire path.
+  const promptTokens = lengthOf(model.tokenize(renderPrompt(req)));
   yield {
     type: 'stream-start',
     metadata: {
@@ -216,7 +248,7 @@ async function* streamLlamaCppNode(
       createdAt: new Date().toISOString(),
     },
   };
-  let completionTokens = 0;
+  const pieces: string[] = [];
   let errored = false;
   let aborted = false;
   try {
@@ -230,7 +262,7 @@ async function* streamLlamaCppNode(
         break;
       }
       if (typeof piece !== 'string' || piece.length === 0) continue;
-      completionTokens += lengthOf(model.tokenize(piece));
+      pieces.push(piece);
       yield { type: 'text-delta', delta: piece };
       if (req.signal?.aborted) {
         aborted = true;
@@ -241,13 +273,11 @@ async function* streamLlamaCppNode(
     errored = true;
     yield { type: 'error', error: { kind: 'unknown', message: (err as Error).message } };
   } finally {
-    // Release the per-request context / KV cache (core-provider-08).
-    try {
-      session.dispose?.();
-    } catch {
-      // Disposal failures must never mask the stream outcome.
-    }
+    lease.release();
   }
+  // W-096: tokenize the ASSEMBLED response once - per-chunk tokenization
+  // over-counted at every chunk boundary (BPE merges span chunk seams).
+  const completionTokens = lengthOf(model.tokenize(pieces.join('')));
   yield {
     type: 'finish',
     // PS-4: a mid-stream failure must not masquerade as a clean stop -
@@ -260,6 +290,115 @@ async function* streamLlamaCppNode(
       totalTokens: promptTokens + completionTokens,
     },
   };
+}
+
+/** Lease over a session: per-request leases dispose on release. */
+interface SessionLease {
+  readonly session: LlamaSessionInstance;
+  release(): void;
+}
+
+type SessionManager = (model: LlamaModelInstance, system?: string) => Promise<SessionLease>;
+
+/**
+ * W-096: per-request sessions by default (create -> use -> dispose, the
+ * memory-safe core-provider-08 lifecycle); with `persistentSession:
+ * true` ONE cached session serialised by a promise mutex (a llama
+ * context sequence is single-threaded) whose history re-syncs via
+ * `setChatHistory` on every request. A cached session that turns out
+ * not to support `setChatHistory` degrades to per-request behaviour -
+ * without the setter its history cannot be made consistent.
+ */
+function buildSessionManager(
+  options: LlamaCppNodeAdapterOptions,
+  sessionFactory: (model: LlamaModelInstance, system?: string) => Promise<LlamaSessionInstance>,
+): SessionManager {
+  if (options.persistentSession !== true) {
+    return async (model, system) => {
+      const session = await sessionFactory(model, system);
+      return {
+        session,
+        release: () => {
+          // Release the per-request context / KV cache (core-provider-08).
+          try {
+            session.dispose?.();
+          } catch {
+            // Disposal failures must never mask the stream outcome.
+          }
+        },
+      };
+    };
+  }
+  let cached: LlamaSessionInstance | null = null;
+  let queueTail: Promise<void> = Promise.resolve();
+  return async (model, system) => {
+    let unlock!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      unlock = resolve;
+    });
+    const priorTail = queueTail;
+    queueTail = queueTail.then(() => gate);
+    await priorTail;
+    if (cached === null) cached = await sessionFactory(model, system);
+    const session = cached;
+    if (typeof session.setChatHistory !== 'function') {
+      // Cannot re-sync history across requests - fall back to the
+      // per-request lifecycle for THIS session and try again next call.
+      cached = null;
+      return {
+        session,
+        release: () => {
+          try {
+            session.dispose?.();
+          } catch {
+            // best-effort
+          }
+          unlock();
+        },
+      };
+    }
+    return { session, release: () => unlock() };
+  };
+}
+
+/**
+ * W-096: split the request into node-llama-cpp chat-history turns plus
+ * the trailing user text (the prompt). The system message is included
+ * as a history item because `setChatHistory` REPLACES the session's
+ * whole history - including the slot the constructor `systemPrompt`
+ * seeded - so relying on the constructor alone would drop it. Tool
+ * roles cannot occur (`toolCalling: false`); a defensive skip keeps a
+ * stray one from corrupting the template.
+ */
+function buildChatHistory(req: ProviderRequest): {
+  readonly priorTurns: ReadonlyArray<LlamaChatHistoryItem>;
+  readonly lastUserText: string;
+} {
+  const turns: LlamaChatHistoryItem[] = [];
+  if (typeof req.systemMessage === 'string' && req.systemMessage.length > 0) {
+    turns.push({ type: 'system', text: req.systemMessage });
+  }
+  for (const msg of req.messages) {
+    const text = textOf(msg);
+    if (msg.role === 'user') turns.push({ type: 'user', text });
+    else if (msg.role === 'assistant') turns.push({ type: 'model', response: [text] });
+    else if (msg.role === 'system') turns.push({ type: 'system', text });
+  }
+  const last = turns[turns.length - 1];
+  if (last !== undefined && last.type === 'user') {
+    turns.pop();
+    return { priorTurns: turns, lastUserText: last.text };
+  }
+  // No trailing user turn (continuation) - full history, empty prompt.
+  return { priorTurns: turns, lastUserText: '' };
+}
+
+function textOf(msg: ProviderRequest['messages'][number]): string {
+  return typeof msg.content === 'string'
+    ? msg.content
+    : msg.content
+        .map((p) => (p.type === 'text' ? p.text : p.type === 'reasoning' ? p.text : ''))
+        .join('');
 }
 
 async function resolveModel(options: LlamaCppNodeAdapterOptions): Promise<LlamaModelInstance> {

@@ -84,7 +84,7 @@ The adapter:
 
 - filters / namespaces the surfaced tools;
 - maps the MCP tool's input/output schemas into the `Tool` contract;
-- defaults each generated tool to `sideEffectClass: 'external-stateful'` (operators downgrade per-tool through `sideEffectClassByTool`);
+- defaults each generated tool to `sideEffectClass: 'external-stateful'` (operators downgrade per-tool through `sideEffectClassByTool`). A downgrade to `'read-only'` / `'pure'` is a wide trust decision: sink classification is fully metadata-driven, so the tool leaves **every** sink check at once - the data-flow gate, the Rule-of-Two writer forbid, and the read-only capability gate. The server's own `readOnlyHint` is deliberately **not** trusted for this (a hostile server could self-declare read-only). Downgrade only tools whose read-only nature you have verified yourself; each downgrade logs one WARN at adaptation time and is listed in `AdaptedToolsResult.downgradedTools` for audits;
 - routes execution back through the client's `callTool(name, input)`;
 - emits `mcp.call.invoked.total` / `mcp.call.failed.total` / `mcp.call.cancelled.total` counters per call (there is no MCP-specific span today; adapted tools still get the executor's regular `tool.execute` span).
 

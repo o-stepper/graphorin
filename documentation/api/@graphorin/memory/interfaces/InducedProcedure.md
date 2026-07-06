@@ -6,7 +6,7 @@
 
 # Interface: InducedProcedure
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:79
+Defined in: packages/memory/src/consolidator/phases/induce.ts:80
 
 A reusable workflow distilled from a successful trajectory.
 
@@ -16,7 +16,7 @@ A reusable workflow distilled from a successful trajectory.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-steps"></a> `steps` | `readonly` | readonly `string`[] | Ordered, value-abstracted steps (`"search for {product}"`, …). | packages/memory/src/consolidator/phases/induce.ts:83 |
-| <a id="property-successcriteria"></a> `successCriteria` | `readonly` | readonly `string`[] | Voyager-style verifiable success criteria for self-verification on reuse. | packages/memory/src/consolidator/phases/induce.ts:87 |
-| <a id="property-title"></a> `title` | `readonly` | `string` | Short imperative title / goal of the reusable workflow. | packages/memory/src/consolidator/phases/induce.ts:81 |
-| <a id="property-variables"></a> `variables` | `readonly` | readonly `string`[] | Variable names abstracted from concrete values (`"product"`, `"day"`). | packages/memory/src/consolidator/phases/induce.ts:85 |
+| <a id="property-steps"></a> `steps` | `readonly` | readonly `string`[] | Ordered, value-abstracted steps (`"search for {product}"`, …). | packages/memory/src/consolidator/phases/induce.ts:84 |
+| <a id="property-successcriteria"></a> `successCriteria` | `readonly` | readonly `string`[] | Voyager-style verifiable success criteria for self-verification on reuse. | packages/memory/src/consolidator/phases/induce.ts:88 |
+| <a id="property-title"></a> `title` | `readonly` | `string` | Short imperative title / goal of the reusable workflow. | packages/memory/src/consolidator/phases/induce.ts:82 |
+| <a id="property-variables"></a> `variables` | `readonly` | readonly `string`[] | Variable names abstracted from concrete values (`"product"`, `"day"`). | packages/memory/src/consolidator/phases/induce.ts:86 |

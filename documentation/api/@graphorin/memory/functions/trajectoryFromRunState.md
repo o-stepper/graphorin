@@ -10,7 +10,7 @@
 function trajectoryFromRunState(run): Trajectory;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:297
+Defined in: packages/memory/src/consolidator/phases/induce.ts:298
 
 Distil a [RunState](/api/@graphorin/core/interfaces/RunState.md) into the minimal [Trajectory](/api/@graphorin/memory/interfaces/Trajectory.md) the inducer
 needs. Pure - consumes the agent's already-emitted run state, so capturing

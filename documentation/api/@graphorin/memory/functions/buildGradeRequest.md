@@ -13,7 +13,7 @@ function buildGradeRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:240
+Defined in: packages/memory/src/search/iterative.ts:241
 
 Build the grade request. Pure - no I/O. Temperature 0 so the verdict
 is as stable as the model allows.

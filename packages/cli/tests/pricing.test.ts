@@ -35,3 +35,36 @@ describe('graphorin pricing missing', () => {
     ).rejects.toThrow();
   });
 });
+
+describe('graphorin pricing refresh --format (W-097)', () => {
+  const GENAI_BODY = {
+    providers: [
+      {
+        id: 'anthropic',
+        models: [
+          { id: 'claude-sonnet-4-5', prices: { input_mtok: 3, output_mtok: 15 } },
+          { id: 'tiered', prices: [{ input_mtok: 1 }, { input_mtok: 2 }] },
+        ],
+      },
+    ],
+  };
+
+  it('converts a genai-prices body and reports the skipped count', async () => {
+    const { runPricingRefresh } = await import('../src/commands/pricing.js');
+    const lines: string[] = [];
+    const result = await runPricingRefresh({
+      url: 'https://example.com/genai-prices/data.json',
+      format: 'auto',
+      print: (line) => lines.push(line),
+      fetchImpl: (async () =>
+        new Response(JSON.stringify(GENAI_BODY), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        })) as typeof fetch,
+    });
+    expect(result.entries).toBe(1);
+    expect(result.version).toBe('genai-prices+converted');
+    expect(result.skipped).toBe(1);
+    expect(lines.some((line) => line.includes('1 entry skipped'))).toBe(true);
+  });
+});

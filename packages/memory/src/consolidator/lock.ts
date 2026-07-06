@@ -130,6 +130,12 @@ export class LockManager {
   }
 }
 
-function scopeKey(scope: SessionScope): string {
+/**
+ * Canonical string key for a consolidation scope. The lock manager and
+ * the runtime's per-scope dispatch bookkeeping (W-142) must agree on
+ * this shape: the lock serialises work per scope, so any state keyed by
+ * `scopeKey` holds at most one live entry per scope.
+ */
+export function scopeKey(scope: SessionScope): string {
   return `${scope.userId}|${scope.sessionId ?? ''}|${scope.agentId ?? ''}`;
 }

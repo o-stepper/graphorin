@@ -137,6 +137,53 @@ describe('ServerMessageSchema (negative paths)', () => {
   });
 });
 
+describe('W-109 - lockstep envelope vs additive extension points', () => {
+  it('accepts an event frame with an UNKNOWN type and an arbitrary payload (additive point)', () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '1',
+      kind: 'event',
+      subscriptionId: 'sub-1',
+      subject: 'agent:a1:run:r1',
+      type: 'some.future.event-type',
+      payload: { anything: { nested: [1, 'x', null] } },
+      eventId: 'evt-9',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts an arbitrary rpc result value (additive point)', () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '1',
+      jsonrpc: '2.0',
+      id: 7,
+      result: { future: ['shape', { deep: true }] },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects an extra field on the EVENT envelope (strict envelope)', () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '1',
+      kind: 'event',
+      subscriptionId: 'sub-1',
+      subject: 'agent:a1:run:r1',
+      type: 'text.delta',
+      payload: {},
+      eventId: 'evt-9',
+      futureEnvelopeField: 1,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects v: '2' - the version literal is lockstep, not negotiated", () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '2',
+      kind: 'pong',
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
 describe('Type guards', () => {
   it('narrow each variant correctly', () => {
     expect(isSubscribedFrame(validSubscribed)).toBe(true);

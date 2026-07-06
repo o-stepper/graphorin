@@ -12,6 +12,7 @@
  * @packageDocumentation
  */
 
+import { convertGenaiPrices, isGenaiPricesShape } from './convert-genai-prices.js';
 import { computeEntriesDigest } from './snapshot/bundled.js';
 import type { ModelPrice, PricingSnapshot } from './types.js';
 
@@ -43,6 +44,13 @@ export interface RefreshPricingOptions {
   readonly timeoutMs?: number;
   /** Caller-supplied abort signal, combined with the timeout. */
   readonly signal?: AbortSignal;
+  /**
+   * W-097: accepted body format. `'auto'` (default) tries the native
+   * graphorin shape, then auto-detects + converts the
+   * `@pydantic/genai-prices` dataset; the explicit values pin one
+   * format and fail fast on anything else.
+   */
+  readonly format?: 'auto' | 'graphorin' | 'genai-prices';
 }
 
 /**
@@ -79,9 +87,27 @@ export async function refreshPricing(opts: RefreshPricingOptions): Promise<Prici
     throw new Error(`refreshPricing: HTTP ${res.status} ${res.statusText} from ${opts.url}`);
   }
   const body = (await res.json()) as unknown;
-  const entries = parseEntries(body);
+  const format = opts.format ?? 'auto';
+  let entries: ReadonlyArray<ModelPrice>;
+  let conversion: PricingSnapshot['conversion'];
+  if (format === 'graphorin') {
+    entries = parseEntries(body);
+  } else if (format === 'genai-prices') {
+    ({ entries, conversion } = convertForeign(body, opts.url));
+  } else {
+    // 'auto': native first; a shape miss falls through to detection so
+    // the operator error names the NATIVE expectation when neither fits.
+    try {
+      entries = parseEntries(body);
+    } catch (nativeError) {
+      if (!isGenaiPricesShape(body)) throw nativeError;
+      ({ entries, conversion } = convertForeign(body, opts.url));
+    }
+  }
   const snapshotDate = opts.snapshotDate ?? new Date().toISOString().slice(0, 10);
-  const version = opts.version ?? 'graphorin/0.1+refreshed';
+  const version =
+    opts.version ??
+    (conversion !== undefined ? 'genai-prices+converted' : 'graphorin/0.1+refreshed');
   return Object.freeze<PricingSnapshot>({
     version,
     source: opts.url,
@@ -89,7 +115,33 @@ export async function refreshPricing(opts: RefreshPricingOptions): Promise<Prici
     currency: 'USD',
     sha256: computeEntriesDigest(entries),
     entries,
+    ...(conversion !== undefined ? { conversion } : {}),
   });
+}
+
+/**
+ * W-097: convert a genai-prices dataset body, guarding the currency -
+ * `PricingSnapshot.currency` is a `'USD'` literal, so a body that
+ * DECLARES another currency must fail loudly instead of being stamped
+ * dollars.
+ */
+function convertForeign(
+  body: unknown,
+  url: string,
+): { entries: ReadonlyArray<ModelPrice>; conversion: NonNullable<PricingSnapshot['conversion']> } {
+  const declared = (body as { currency?: unknown }).currency;
+  if (typeof declared === 'string' && declared.toUpperCase() !== 'USD') {
+    throw new Error(
+      `refreshPricing: dataset at ${url} declares currency '${declared}' - graphorin snapshots are USD-only and no conversion rate is available`,
+    );
+  }
+  const { entries, skipped } = convertGenaiPrices(body);
+  if (entries.length === 0) {
+    throw new Error(
+      `refreshPricing: the genai-prices dataset at ${url} converted to zero usable entries (${skipped} skipped) - the supported subset may have drifted; see convert-genai-prices.ts`,
+    );
+  }
+  return { entries, conversion: { format: 'genai-prices', skipped } };
 }
 
 function parseEntries(body: unknown): ReadonlyArray<ModelPrice> {

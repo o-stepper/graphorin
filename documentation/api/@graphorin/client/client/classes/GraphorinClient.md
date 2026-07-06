@@ -6,7 +6,7 @@
 
 # Class: GraphorinClient
 
-Defined in: packages/client/src/graphorin-client.ts:201
+Defined in: packages/client/src/graphorin-client.ts:211
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/client/src/graphorin-client.ts:201
 new GraphorinClient(options): GraphorinClient;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:213
+Defined in: packages/client/src/graphorin-client.ts:223
 
 #### Parameters
 
@@ -42,7 +42,7 @@ get transportKind():
   | undefined;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:461
+Defined in: packages/client/src/graphorin-client.ts:471
 
 Return the active transport kind (or `undefined` if not connected).
 
@@ -59,7 +59,7 @@ Return the active transport kind (or `undefined` if not connected).
 cancel(runId, opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:339
+Defined in: packages/client/src/graphorin-client.ts:349
 
 Cancel a server-side run. Sends the `run.cancel` RPC and
 resolves with the server's `result` payload (typically
@@ -87,7 +87,7 @@ resolves with the server's `result` payload (typically
 cancelNotify(requestId): void;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:419
+Defined in: packages/client/src/graphorin-client.ts:429
 
 Send an MCP-compatible cancellation notification. Does not wait
 for a server reply (notifications have no `id`).
@@ -110,7 +110,7 @@ for a server reply (notifications have no `id`).
 connect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:228
+Defined in: packages/client/src/graphorin-client.ts:238
 
 Open the underlying transport. Resolves once the server has
 accepted the handshake (`'open'`); rejects with a typed
@@ -131,7 +131,7 @@ it during another `connect()` returns the same promise.
 disconnect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:437
+Defined in: packages/client/src/graphorin-client.ts:447
 
 Disconnect the underlying transport and abort every pending RPC
 + subscription. Idempotent.
@@ -148,7 +148,7 @@ Disconnect the underlying transport and abort every pending RPC
 ping(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:262
+Defined in: packages/client/src/graphorin-client.ts:272
 
 Send a `ping` RPC and resolve when the server replies with `pong`.
 
@@ -167,7 +167,7 @@ resume(
 opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:373
+Defined in: packages/client/src/graphorin-client.ts:383
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
 does NOT carry a `resume` control message - resumes are durable
@@ -198,7 +198,7 @@ implemented yet. Library-mode callers resume directly:
 subscribe(target, opts?): Promise<Subscription>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:272
+Defined in: packages/client/src/graphorin-client.ts:282
 
 Subscribe to a server-side event stream. Resolves with a
 [Subscription](/api/@graphorin/client/client/interfaces/Subscription.md) once the server confirms with the matching

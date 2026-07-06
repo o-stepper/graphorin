@@ -67,7 +67,7 @@ tracer-managed validator.
 shutdown(): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:99
+Defined in: packages/core/dist/contracts/tracer.d.ts:121
 
 Force-flush any pending spans.
 
@@ -87,7 +87,7 @@ Force-flush any pending spans.
 span<T, R>(opts, fn): Promise<R>;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:97
+Defined in: packages/core/dist/contracts/tracer.d.ts:119
 
 Convenience wrapper: start a span, run `fn` inside, and call
 `setStatus('ok' | 'error')` + `end()` based on the outcome.
@@ -122,7 +122,7 @@ Convenience wrapper: start a span, run `fn` inside, and call
 startSpan<T>(opts): AISpan<T>;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:92
+Defined in: packages/core/dist/contracts/tracer.d.ts:114
 
 #### Type Parameters
 

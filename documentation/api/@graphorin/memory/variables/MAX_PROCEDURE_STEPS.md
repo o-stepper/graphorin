@@ -10,6 +10,6 @@
 const MAX_PROCEDURE_STEPS: 50 = 50;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:37
+Defined in: packages/memory/src/consolidator/phases/induce.ts:38
 
 Hard cap on steps in an induced procedure (defends against runaway output).

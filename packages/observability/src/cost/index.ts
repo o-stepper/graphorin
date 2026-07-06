@@ -8,6 +8,11 @@ export {
   type CostTracker,
   createCostTracker,
 } from './cost-tracker.js';
+export {
+  type CostTrackerDelegateIds,
+  costTrackerUsageDelegate,
+  type ProviderUsageInfoLike,
+} from './delegate.js';
 export type {
   CostBudgetExceededCallback,
   CostBudgets,

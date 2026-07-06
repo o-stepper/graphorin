@@ -1,0 +1,5 @@
+---
+'@graphorin/observability': minor
+---
+
+W-092: `CostTracker` grows three capabilities for the long-running-assistant scenario. (1) Prompt-cache legs: `CostRecordInput` accepts `cachedReadTokens` / `cacheWriteTokens` (names mirror core `Usage`), and `CostSnapshot` + its byModel entries always carry both (0 when never recorded) so cache economics are visible per span/scope/model. (2) Bounded memory: internal maps are capped by default (`retention: { maxSpanEntries: 10_000, maxScopeEntries: 10_000 }`) with oldest-first (insertion-order) eviction, an `onEviction` observer, documented ZERO reads for evicted ids, and `retention: false` restoring the previous unbounded behaviour - the maps no longer grow for the process lifetime. (3) A shipped provider bridge: `costTrackerUsageDelegate(tracker, ids)` converts `withCostTracking`'s `onUsage` info (structurally - no provider import) into `record()` calls, carrying the cache legs and converting `costUsd` to a `Cost` (a zero cost records tokens without fabricating a $0 entry). Structural consumers of the exact `CostSnapshot` shape gain two required fields.

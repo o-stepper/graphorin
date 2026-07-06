@@ -46,12 +46,30 @@ Re-exports [CostTracker](/api/@graphorin/observability/interfaces/CostTracker.md
 
 ***
 
+### CostTrackerDelegateIds
+
+Re-exports [CostTrackerDelegateIds](/api/@graphorin/observability/type-aliases/CostTrackerDelegateIds.md)
+
+***
+
 ### CostTrackerOptions
 
 Re-exports [CostTrackerOptions](/api/@graphorin/observability/interfaces/CostTrackerOptions.md)
 
 ***
 
+### costTrackerUsageDelegate
+
+Re-exports [costTrackerUsageDelegate](/api/@graphorin/observability/functions/costTrackerUsageDelegate.md)
+
+***
+
 ### createCostTracker
 
 Re-exports [createCostTracker](/api/@graphorin/observability/functions/createCostTracker.md)
+
+***
+
+### ProviderUsageInfoLike
+
+Re-exports [ProviderUsageInfoLike](/api/@graphorin/observability/interfaces/ProviderUsageInfoLike.md)

@@ -10,7 +10,7 @@
 function listAppliedMigrations(conn): readonly AppliedMigration[];
 ```
 
-Defined in: packages/store-sqlite/src/migrations/runner.ts:105
+Defined in: packages/store-sqlite/src/migrations/runner.ts:132
 
 Snapshot of every migration ever applied to this database.
 

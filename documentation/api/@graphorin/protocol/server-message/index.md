@@ -20,8 +20,20 @@ server may push to a client. Three families share the channel:
      - server-initiated messages that do not correlate with a
      single client RPC id.
 
-Every frame carries the `v: '1'` literal so future revisions can
-negotiate forward-compatible additions without a subprotocol bump.
+Versioning contract (W-109, honest edition): the frame ENVELOPE -
+the set of `kind`s, the fields of the control frames, and the
+`v: '1'` literal - is validated strictly (`.strict()`, literal `v`)
+on BOTH server and client, and evolves only in lockstep with both
+sides shipping together: there is NO negotiation, and a frame with
+`v: '2'` is rejected outright. That is the deployment model of the
+0.x line. The additive extension points are deliberate and inside
+the envelope: the `type` string + `payload: z.unknown()` of event
+frames (consumers ignore unknown `type`s per the agent-event
+convention), `result: z.unknown()` of RPC responses, and the
+`capabilities` record of the `initialize` result (which today the
+shipped client does not consume). If additive envelope evolution is
+ever promised publicly, that is a separate negotiation feature -
+do not loosen `.strict()` for it piecemeal.
 
 ## Type Aliases
 

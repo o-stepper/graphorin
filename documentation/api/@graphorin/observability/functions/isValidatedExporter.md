@@ -10,7 +10,7 @@
 function isValidatedExporter(exporter): boolean;
 ```
 
-Defined in: packages/observability/src/exporters/with-validation.ts:145
+Defined in: packages/observability/src/exporters/with-validation.ts:164
 
 Quickly check whether an exporter is the result of a previous
 [withValidation](/api/@graphorin/observability/functions/withValidation.md) call. The tracer uses this to fail fast at

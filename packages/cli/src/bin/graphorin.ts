@@ -1050,10 +1050,23 @@ function registerPricingCommands(program: Command): void {
     .description('Pull a fresh snapshot from --url (network).')
     .requiredOption('--url <url>', 'Snapshot URL.')
     .option('--out <file>', 'Optional path to write the refreshed snapshot to.')
+    .option(
+      '--format <format>',
+      "Body format: 'auto' (default), 'graphorin', or 'genai-prices'.",
+      'auto',
+    )
     .option('--json', 'Emit a structured JSON document on stdout.')
-    .action(async (opts: { url: string; out?: string; json?: boolean }) => {
+    .action(async (opts: { url: string; out?: string; format?: string; json?: boolean }) => {
+      const format = opts.format ?? 'auto';
+      if (format !== 'auto' && format !== 'graphorin' && format !== 'genai-prices') {
+        process.stderr.write(
+          `graphorin pricing refresh: invalid --format '${format}' (expected auto | graphorin | genai-prices)\n`,
+        );
+        process.exit(2);
+      }
       await runPricingRefresh({
         url: opts.url,
+        format,
         ...(opts.out !== undefined ? { out: opts.out } : {}),
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });

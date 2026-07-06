@@ -10,7 +10,7 @@
 function snapshotCounters(): CounterSnapshot;
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:111
+Defined in: packages/tools/src/audit/counters.ts:127
 
 Snapshot the current state of the counter / histogram registry.
 

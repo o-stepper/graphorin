@@ -6,7 +6,7 @@
 
 # Interface: EpisodicMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:123
+Defined in: packages/core/src/contracts/memory-store.ts:136
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:123
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:129
+Defined in: packages/core/src/contracts/memory-store.ts:142
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:129
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:124
+Defined in: packages/core/src/contracts/memory-store.ts:137
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:124
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:125
+Defined in: packages/core/src/contracts/memory-store.ts:138
 
 #### Parameters
 

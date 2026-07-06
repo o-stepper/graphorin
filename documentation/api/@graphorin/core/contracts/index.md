@@ -10,6 +10,12 @@ Cross-package contracts for the Graphorin framework.
 
 ## References
 
+### AddEventOptions
+
+Re-exports [AddEventOptions](/api/@graphorin/core/interfaces/AddEventOptions.md)
+
+***
+
 ### AgentRegistryEntry
 
 Re-exports [AgentRegistryEntry](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)

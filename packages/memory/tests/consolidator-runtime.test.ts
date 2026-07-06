@@ -60,6 +60,15 @@ function fakeProvider(plan: ProviderResponse[]): Provider & {
   return provider;
 }
 
+async function listMessageIds(
+  store: ReturnType<typeof createInMemoryStore>,
+  scope: SessionScope,
+): Promise<string[]> {
+  const list = store.session.listMessagesSince;
+  if (list === undefined) throw new Error('fixture must expose listMessagesSince');
+  return (await list.call(store.session, scope, null, 50)).map((r) => r.id);
+}
+
 async function pushUserMessages(
   memory: ReturnType<typeof createMemory>,
   scope: SessionScope,
@@ -1002,5 +1011,303 @@ describe('consolidator/runtime - trigger() drains the DLQ (memory-consolidation-
     clock += 2 * 60 * 60 * 1000;
     await memory.consolidator.trigger({ kind: 'turn' }, scope);
     expect((await memory.consolidator.status()).dlqSize).toBe(0);
+  });
+});
+
+describe('consolidator/runtime - W-081 transcript budget + poison-slice skip', () => {
+  it('splits an over-budget batch into sub-slices, extracts everything, advances the cursor', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    // Distinct response per extraction call - the count and the merged
+    // facts prove the batch really was processed as sub-slices.
+    const provider = fakeProvider([
+      {
+        text: '{"facts":[{"text":"Fact alpha about the user."}]}',
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+        finishReason: 'stop',
+      },
+      {
+        text: '{"facts":[{"text":"Fact bravo about the user."}]}',
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+        finishReason: 'stop',
+      },
+      {
+        text: '{"facts":[{"text":"Fact charlie about the user."}]}',
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+        finishReason: 'stop',
+      },
+      {
+        text: '{"facts":[{"text":"Fact delta about the user."}]}',
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+        finishReason: 'stop',
+      },
+    ]);
+    // NO embedder: neighbour pre-filter sees no neighbours, every
+    // candidate routes to a plain add - provider calls are extraction-only.
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: scope,
+        maxTranscriptChars: 200,
+      },
+    });
+    await pushUserMessages(memory, scope, [
+      'Alex practices bouldering at the local climbing gym every Tuesday evening after work with two colleagues.',
+      'Alex adopted a rescue greyhound named Biscuit last spring and walks her along the river every morning.',
+      'Alex is studying Portuguese with a tutor twice a week because of a planned relocation to Lisbon next year.',
+      'Alex maintains a sourdough starter called Clint and bakes two loaves of bread every single weekend.',
+    ]);
+    const ids = await listMessageIds(store, scope);
+    expect(ids).toHaveLength(4);
+
+    await memory.consolidator.start();
+    const outcome = await memory.consolidator.fireNow('standard', scope);
+    expect(outcome?.status).toBe('completed');
+    expect(outcome?.factsCreated).toBe(4);
+    // ~110-char messages under a 200-char budget: full batch and both
+    // halves exceed it, singles fit - exactly four extraction calls.
+    expect(provider.calls).toHaveLength(4);
+    const state = await store.consolidator?.getState(scope);
+    expect(state?.lastProcessedMessageId).toBe(ids[3]);
+  });
+
+  it('tail-truncates a lone message that alone exceeds the budget instead of failing', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const provider = fakeProvider([
+      {
+        text: '{"facts":[{"text":"Alex hikes near Kyoto."}]}',
+        usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: scope,
+        maxTranscriptChars: 300,
+      },
+    });
+    const body = 'AAAHEAD mountain hiking near Kyoto brings Alex a lot of joy every autumn. ';
+    await pushUserMessages(memory, scope, [`${body.repeat(8)}ZZZTAIL`]);
+
+    await memory.consolidator.start();
+    const outcome = await memory.consolidator.fireNow('standard', scope);
+    expect(outcome?.status).toBe('completed');
+    expect(provider.calls).toHaveLength(1);
+    const wire = JSON.stringify(provider.calls[0]);
+    expect(wire).toContain('AAAHEAD');
+    expect(wire).not.toContain('ZZZTAIL');
+  });
+
+  it('force-advances the cursor past a poison slice once its DLQ retries exhaust', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    let clock = Date.parse('2026-04-21T00:00:00Z');
+    const poisoned: Provider = {
+      name: 'poisoned',
+      modelId: 'poisoned:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        throw new Error('deterministic upstream failure');
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap',
+        provider: poisoned,
+        defaultScope: scope,
+        dlqMaxRetries: 1,
+        now: () => clock,
+      },
+    });
+    await pushUserMessages(memory, scope, ['This slice fails extraction every single time.']);
+    const ids = await listMessageIds(store, scope);
+
+    await memory.consolidator.start();
+    const failed = await memory.consolidator.fireNow('standard', scope);
+    expect(failed?.status).toBe('failed');
+    expect(store.__consolidator?.dlq).toHaveLength(1);
+
+    // Past the backoff: the drain replays once, exhausts the row
+    // (dlqMaxRetries: 1) and force-advances the cursor past the window.
+    clock += 2 * 60 * 60 * 1000;
+    await memory.consolidator.drainDlq(scope);
+    const state = await store.consolidator?.getState(scope);
+    expect(state?.lastProcessedMessageId).toBe(ids[0]);
+    expect(store.__consolidator?.dlq).toHaveLength(1);
+    expect([...(store.__consolidator?.dlq[0]?.messageIds ?? [])]).toEqual(ids);
+
+    // The scope is unwedged: the next run reads the (empty) NEXT slice,
+    // completes, and does NOT mint a fresh DLQ row on the old window.
+    clock += 2 * 60 * 60 * 1000;
+    const after = await memory.consolidator.fireNow('standard', scope);
+    expect(after?.status).toBe('completed');
+    expect(store.__consolidator?.dlq).toHaveLength(1);
+  });
+
+  it('does NOT touch a cursor that already moved past the exhausted window', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const poisoned: Provider = {
+      name: 'poisoned',
+      modelId: 'poisoned:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        throw new Error('deterministic upstream failure');
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap',
+        provider: poisoned,
+        defaultScope: scope,
+        dlqMaxRetries: 1,
+      },
+    });
+    await pushUserMessages(memory, scope, ['old window message', 'already processed message']);
+    const ids = await listMessageIds(store, scope);
+    const oldWindowId = ids[0];
+    const cursorId = ids[1];
+    if (oldWindowId === undefined || cursorId === undefined) throw new Error('setup');
+    // The cursor moved PAST the old window while its row sat in the DLQ.
+    await store.consolidator?.upsertState(scope, { lastProcessedMessageId: cursorId });
+    await store.consolidator?.enqueueFailedBatch({
+      id: 'dlq_poison',
+      consolidatorRunId: null,
+      scope,
+      messageIds: [oldWindowId],
+      errorKind: 'rate_limit',
+      errorMessage: 'stale window',
+      failedAt: 0,
+      nextRetryAt: 0,
+      retryCount: 0,
+      phase: 'standard',
+    });
+    // A NEW unprocessed message makes the replay fail (and exhaust).
+    await pushUserMessages(memory, scope, ['fresh message the replay fails on']);
+
+    await memory.consolidator.start();
+    await memory.consolidator.drainDlq(scope);
+    // Exhausted - but the skip must NOT regress the cursor back to the
+    // old window's tip; the next unprocessed message is outside it.
+    const state = await store.consolidator?.getState(scope);
+    expect(state?.lastProcessedMessageId).toBe(cursorId);
+  });
+});
+
+describe('consolidator/runtime - W-142 per-scope DLQ slice capture', () => {
+  it('a failing dispatch enqueues its OWN captured batch, not a concurrent scope slice', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    let generateCalls = 0;
+    let signalParked!: () => void;
+    const parked = new Promise<void>((resolve) => {
+      signalParked = resolve;
+    });
+    let releaseParked!: () => void;
+    const released = new Promise<void>((resolve) => {
+      releaseParked = resolve;
+    });
+    const provider: Provider = {
+      name: 'fake',
+      modelId: 'fake:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        generateCalls += 1;
+        if (generateCalls === 1) {
+          // Scope A's extraction: park until scope B has dispatched over
+          // the shared instance, then fail - the pre-W-142 single field
+          // would by now hold scope B's slice.
+          signalParked();
+          await released;
+          throw new Error('extraction exploded for scope A');
+        }
+        return {
+          text: '{"facts":[]}',
+          usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex' },
+      },
+    });
+    const scopeA: SessionScope = { userId: 'alex', sessionId: 'session-a' };
+    const scopeB: SessionScope = { userId: 'alex', sessionId: 'session-b' };
+    await pushUserMessages(memory, scopeA, ['I will move to Lisbon in September.']);
+    const idsA = await listMessageIds(store, scopeA);
+    expect(idsA.length).toBeGreaterThan(0);
+
+    await memory.consolidator.start();
+    const pendingA = memory.consolidator.fireNow('standard', scopeA);
+    await parked;
+    // While A is parked inside generate, scope B pushes its own slice and
+    // dispatches to completion - its batch overwrote the capture in the
+    // pre-fix single-field implementation.
+    await pushUserMessages(memory, scopeB, ['My dentist appointment is on Friday.']);
+    const outcomeB = await memory.consolidator.fireNow('standard', scopeB);
+    expect(outcomeB?.status).toBe('completed');
+    releaseParked();
+    const outcomeA = await pendingA;
+    expect(outcomeA?.status).toBe('failed');
+
+    const dlq = store.__consolidator?.dlq ?? [];
+    expect(dlq).toHaveLength(1);
+    // The DLQ row must carry the batch scope A actually failed on -
+    // exactly the ids captured at A's dispatch, none of B's later slice.
+    expect([...(dlq[0]?.messageIds ?? [])]).toEqual(idsA);
   });
 });

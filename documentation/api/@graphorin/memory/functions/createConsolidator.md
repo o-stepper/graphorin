@@ -10,7 +10,7 @@
 function createConsolidator(opts): Consolidator;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:120
+Defined in: packages/memory/src/consolidator/runtime.ts:121
 
 Build the runtime consolidator.
 

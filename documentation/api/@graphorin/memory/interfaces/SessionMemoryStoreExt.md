@@ -50,7 +50,7 @@ counts instead of `list(...)`-materialising up to 1000 rows.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:86
+Defined in: packages/core/dist/contracts/memory-store.d.ts:99
 
 #### Parameters
 
@@ -105,7 +105,7 @@ idempotency cursor without rereading already-processed turns.
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:91
+Defined in: packages/core/dist/contracts/memory-store.d.ts:104
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -133,7 +133,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:85
+Defined in: packages/core/dist/contracts/memory-store.d.ts:98
 
 #### Parameters
 
@@ -161,7 +161,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:92
+Defined in: packages/core/dist/contracts/memory-store.d.ts:105
 
 #### Parameters
 

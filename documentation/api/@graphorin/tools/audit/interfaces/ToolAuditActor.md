@@ -6,7 +6,7 @@
 
 # Interface: ToolAuditActor
 
-Defined in: packages/tools/src/audit/index.ts:83
+Defined in: packages/tools/src/audit/index.ts:84
 
 Lightweight actor descriptor for tool-subsystem audit events.
 
@@ -16,5 +16,5 @@ Lightweight actor descriptor for tool-subsystem audit events.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/tools/src/audit/index.ts:85 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"tool"` \| `"agent"` \| `"system"` | packages/tools/src/audit/index.ts:84 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/tools/src/audit/index.ts:86 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"tool"` \| `"agent"` \| `"system"` | packages/tools/src/audit/index.ts:85 |

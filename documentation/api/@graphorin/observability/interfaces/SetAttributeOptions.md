@@ -6,7 +6,7 @@
 
 # Interface: SetAttributeOptions
 
-Defined in: packages/observability/src/tracer/span.ts:27
+Defined in: packages/observability/src/tracer/span.ts:28
 
 Optional metadata accepted by `setAttribute(...)` to declare the
 sensitivity of a single attribute. The validator uses the declared
@@ -18,4 +18,4 @@ tier when deciding whether to drop the attribute.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/observability/src/tracer/span.ts:28 |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/observability/src/tracer/span.ts:29 |

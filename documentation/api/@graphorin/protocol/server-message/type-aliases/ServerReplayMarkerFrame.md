@@ -10,6 +10,6 @@
 type ServerReplayMarkerFrame = z.infer<typeof ReplayMarkerFrame>;
 ```
 
-Defined in: src/server-message.ts:178
+Defined in: src/server-message.ts:190
 
 ## Stable

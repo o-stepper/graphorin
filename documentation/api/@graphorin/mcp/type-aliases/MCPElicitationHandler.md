@@ -12,7 +12,7 @@ type MCPElicitationHandler = (request, opts) =>
 | Promise<MCPElicitationResult>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:132
+Defined in: packages/mcp/src/client/types.ts:135
 
 Handler for server-initiated elicitation requests.
 

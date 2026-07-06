@@ -51,9 +51,29 @@ outbound network calls without an explicit user action.
   requires the `canReadRaw` callback to return `true` and emits an
   audit-bridge entry on every invocation.
 - **Hierarchical `CostTracker`.** `createCostTracker({...})` rolls up
-  tokens + cost across parent-child spans and supports per-run /
-  per-session / per-agent / per-user budgets with an `onExceed`
-  callback.
+  tokens + cost (including the prompt-cache read/write legs) across
+  parent-child spans and supports per-run / per-session / per-agent /
+  per-user budgets with an `onExceed` callback. Internal maps are
+  bounded by default (`retention: { maxSpanEntries, maxScopeEntries }`,
+  10k each; oldest-first eviction with an `onEviction` observer -
+  `usage()` for an evicted id reports zero; pass `retention: false`
+  for the old unbounded behaviour). Feed it from the provider
+  middleware with the shipped bridge:
+
+  ```ts no-check
+  import { costTrackerUsageDelegate, createCostTracker } from '@graphorin/observability';
+  import { withCostTracking } from '@graphorin/provider';
+
+  const tracker = createCostTracker({ budgets: { perSession: 5 } });
+  const provider = withCostTracking(base, {
+    priceLookup: () => ({ inputPerMtok: 3, outputPerMtok: 15 }),
+    onUsage: costTrackerUsageDelegate(tracker, () => ({
+      spanId: currentSpanId(),
+      sessionId: currentSessionId(),
+    })),
+  });
+  // Later: tracker.usage('session', sessionId).cost
+  ```
 - **Structured logger.** `createLogger({...})` writes JSON or pretty
   records, automatically correlates with the current span via
   `withCurrentSpan(...)`, and pipes every field through the validator.

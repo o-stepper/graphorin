@@ -6,7 +6,7 @@
 
 # Interface: ServerAgentLike
 
-Defined in: packages/server/src/registry/index.ts:21
+Defined in: packages/server/src/registry/index.ts:28
 
 Minimal shape the server needs from an `Agent`. Compatible with
 the `Agent` interface from `@graphorin/agent` but kept
@@ -18,7 +18,7 @@ structurally so we avoid the peer dependency.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:22 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:29 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ structurally so we avoid the peer dependency.
 run(input, options?): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:23
+Defined in: packages/server/src/registry/index.ts:30
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/server/src/registry/index.ts:23
 optional stream(input, options?): AsyncIterable<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:37
+Defined in: packages/server/src/registry/index.ts:44
 
 Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
 structurally; `POST /agents/:id/stream` consumes it and emits

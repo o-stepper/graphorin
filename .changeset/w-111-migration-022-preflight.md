@@ -1,0 +1,5 @@
+---
+'@graphorin/store-sqlite': patch
+---
+
+W-111: migration 022 (session sequence unique index) now runs a data-repair preflight, so databases that actually hit the MAX+1 sequence race it fixes can upgrade instead of failing to start. The `Migration` contract gains an optional `preflight(conn)` hook that the runner invokes inside the migration's own transaction, immediately before its SQL, and only when the version is pending - the SQL file stays byte-identical, so the checksum tamper-guard keeps holding for already-migrated databases. The 022 preflight deterministically renumbers `session_messages.sequence` only inside sessions that contain duplicate `(scope_session_id, sequence)` pairs, preserving relative order via `ROW_NUMBER() OVER (PARTITION BY scope_session_id ORDER BY sequence, created_at, rowid)`; sessions without duplicates keep their sequence values byte-for-byte, and row ids/message ids are untouched. `runMigrations` also accepts an internal, test-only `{ upTo }` option used to freeze a database at a historical schema and exercise the upgrade path.

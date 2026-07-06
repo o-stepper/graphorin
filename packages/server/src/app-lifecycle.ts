@@ -40,6 +40,7 @@ import type { ReplayApi } from './replay/index.js';
 import type { AuditApi, McpApi, MemoryApi, SessionApi, SkillsApi } from './routes/index.js';
 import { createConsoleRetentionLog, scheduleRetentionSweeps } from './runtime/retention.js';
 import { type RunStateTracker, scheduleRunPruning } from './runtime/run-state.js';
+import { bridgeToolAuditToAudit, type ToolAuditBridge } from './tools-audit-bridge.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
@@ -126,6 +127,9 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
   // DLQ, idempotency + the opt-in content surfaces) on shutdown.
   let stopRetention: (() => void) | undefined;
   let auditDb: AuditDb | undefined;
+  // W-051: tools/MCP audit-bus -> audit-chain bridge (process-global
+  // subscription; must unsubscribe on stop()).
+  let toolAuditBridge: ToolAuditBridge | undefined;
   let preBind: Awaited<ReturnType<typeof runPreBind>> | undefined;
   let verifier: TokenVerifier | undefined;
   let pepperHandle: import('@graphorin/security').SecretValue | undefined;
@@ -179,6 +183,11 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           // IP-21: now that the audit chain is open, route the WS dispatcher's
           // commentary-sanitizer decisions into it.
           commentaryAuditSink?.bind(bridgeCommentaryToAudit(auditDb));
+          // W-051: subscribe the audit chain to the tools/MCP audit bus
+          // (shadow-mode dataflow findings, approvals, collisions, ...).
+          toolAuditBridge = bridgeToolAuditToAudit(auditDb, {
+            policy: config.audit.toolEvents,
+          });
         }
 
         if (config.auth.kind === 'token') {
@@ -345,6 +354,17 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       // W-010: halt the retention sweep symmetrically.
       stopRetention?.();
       stopRetention = undefined;
+      // W-051: unsubscribe from the tools audit bus and let in-flight
+      // audit writes settle before the audit DB closes below.
+      if (toolAuditBridge !== undefined) {
+        toolAuditBridge.stop();
+        try {
+          await toolAuditBridge.drain();
+        } catch {
+          // Write errors were already surfaced by the bridge itself.
+        }
+        toolAuditBridge = undefined;
+      }
       const drainTimeoutMs = force === true ? 0 : config.server.shutdown.drainTimeoutMs;
       try {
         if (options.hooks?.beforeShutdown !== undefined) {

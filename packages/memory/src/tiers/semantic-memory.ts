@@ -130,6 +130,31 @@ export type FusionStrategy =
  *
  * @stable
  */
+/**
+ * Search options an operator may default at construction time via
+ * `createMemory({ searchDefaults })` (W-086) - the advanced-retrieval
+ * switches (fan-out, HyDE, graph expansion, fusion, decay) that the
+ * model-facing surfaces (`fact_search`, auto-recall, `deep_recall`)
+ * cannot reach per-call. Deliberately a `Pick` that EXCLUDES the
+ * trust-sensitive predicates (`includeQuarantined`, `includeSuperseded`,
+ * `trustWeighting`, `owner`): configuration must not be able to silently
+ * weaken trust gates for every caller. Per-call options always win
+ * key-by-key.
+ *
+ * @stable
+ */
+export type SemanticSearchDefaults = Pick<
+  FactSearchOptions,
+  | 'multiQuery'
+  | 'hyde'
+  | 'expandHops'
+  | 'entityMatch'
+  | 'graphScoring'
+  | 'fusion'
+  | 'decay'
+  | 'candidateTopK'
+>;
+
 export interface FactSearchOptions {
   readonly topK?: number;
   readonly signal?: AbortSignal;
@@ -313,6 +338,14 @@ export interface IterativeSearchOptions extends FactSearchOptions {
    * requests and tests.
    */
   readonly forceHard?: boolean;
+  /**
+   * Difficulty-gate threshold in `[0, 1]` for THIS call (W-088). The
+   * gate's signal lexicon is **English-only** - for non-English
+   * deployments lower the threshold or use {@link forceHard}. Omitted ⇒
+   * the facade default (`iterativeRetrieval.difficultyThreshold`) or the
+   * built-in `0.5`.
+   */
+  readonly difficultyThreshold?: number;
 }
 
 /**
@@ -404,8 +437,10 @@ export class SemanticMemory {
   readonly #entityResolver: EntityResolver | null;
   readonly #grader: RetrievalGrader | null;
   readonly #iterativeMaxIterations: number;
+  readonly #iterativeDifficultyThreshold: number | undefined;
   #reranker: ReRanker;
   readonly #trustWeights: SalienceWeights;
+  readonly #searchDefaults: SemanticSearchDefaults;
 
   constructor(args: {
     store: MemoryStoreAdapter;
@@ -450,11 +485,26 @@ export class SemanticMemory {
     /** Default total-pass cap for `searchIterative`. Default 3. */
     iterativeMaxIterations?: number;
     /**
+     * Default difficulty-gate threshold for `searchIterative` (W-088).
+     * Omitted ⇒ the gate's built-in `0.5`. Per-call
+     * `difficultyThreshold` overrides it.
+     */
+    iterativeDifficultyThreshold?: number;
+    /**
      * Weights for the rank-time trust discount (C5). Reuses the
      * eviction-path `SalienceWeights` semantics; defaults to
      * `DEFAULT_SALIENCE_WEIGHTS`.
      */
     trustWeights?: SalienceWeights;
+    /**
+     * Construction-time retrieval defaults (W-086) merged under every
+     * `search(...)` call - see {@link SemanticSearchDefaults}. Because
+     * the merge happens inside `search()`, the model-facing surfaces
+     * (`fact_search`, auto-recall, `deep_recall`) inherit them without
+     * any per-surface wiring; per-call options override key-by-key (so
+     * e.g. `deep_recall`'s widen-pass `expandHops` still wins).
+     */
+    searchDefaults?: SemanticSearchDefaults;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -467,7 +517,9 @@ export class SemanticMemory {
     this.#entityResolver = args.entityResolver ?? null;
     this.#grader = args.grader ?? null;
     this.#iterativeMaxIterations = args.iterativeMaxIterations ?? DEFAULT_MAX_ITERATIONS;
+    this.#iterativeDifficultyThreshold = args.iterativeDifficultyThreshold;
     this.#trustWeights = args.trustWeights ?? DEFAULT_SALIENCE_WEIGHTS;
+    this.#searchDefaults = args.searchDefaults ?? {};
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -721,8 +773,12 @@ export class SemanticMemory {
   async search(
     scope: SessionScope,
     query: string,
-    opts: FactSearchOptions = {},
+    callOpts: FactSearchOptions = {},
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    // W-086: construction-time retrieval defaults; per-call options win
+    // key-by-key. The trust predicates are not defaultable by design
+    // (SemanticSearchDefaults excludes them).
+    const opts: FactSearchOptions = { ...this.#searchDefaults, ...callOpts };
     return withMemorySpan(
       this.#tracer,
       'memory.search.semantic',
@@ -745,6 +801,13 @@ export class SemanticMemory {
         // a transformer is configured; otherwise this is just `[query]`
         // (single-shot, no provider call - the offline default).
         const queries = await this.#expandQueries(query, opts);
+        // W-087: one batched embed call for the whole fan-out (null on
+        // the single-shot path or on failure - per-variant fallback).
+        const variantVectors = await this.#tryBatchEmbedQueries(queries);
+        // W-087: kick the HyDE LLM call off NOW so it overlaps with the
+        // FTS + vector legs below; #tryHyde never rejects (it returns []
+        // on any failure), so an early start cannot leak a rejection.
+        const hydeHitsPromise = this.#tryHyde(scope, query, opts, candidateTopK);
         const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
         const listWeights: number[] = [];
         // MRET-13: retriever-kind labels in lockstep with `lists` so the
@@ -769,15 +832,27 @@ export class SemanticMemory {
           lists.push(ftsHits);
           listWeights.push(wFts);
           listLabels.push(`fts_${queries.indexOf(q)}`);
-          const vectorHits = await this.#tryVectorSearch(
-            scope,
-            q,
-            candidateTopK,
-            opts.asOf,
-            opts.includeQuarantined,
-            opts.includeSuperseded,
-            opts.owner,
-          );
+          const preVector = variantVectors?.get(q);
+          const vectorHits =
+            preVector !== undefined
+              ? await this.#vectorSearchWithVector(
+                  scope,
+                  preVector,
+                  candidateTopK,
+                  opts.asOf,
+                  opts.includeQuarantined,
+                  opts.includeSuperseded,
+                  opts.owner,
+                )
+              : await this.#tryVectorSearch(
+                  scope,
+                  q,
+                  candidateTopK,
+                  opts.asOf,
+                  opts.includeQuarantined,
+                  opts.includeSuperseded,
+                  opts.owner,
+                );
           if (vectorHits.length > 0) {
             lists.push(vectorHits);
             listWeights.push(wVector);
@@ -790,8 +865,9 @@ export class SemanticMemory {
           }
         }
         // P2-3 HyDE: embed a hypothetical answer and fuse its neighbours
-        // (a vector list ⇒ it takes the `vector` weight).
-        const hydeHits = await this.#tryHyde(scope, query, opts, candidateTopK);
+        // (a vector list ⇒ it takes the `vector` weight). Started before
+        // the fan-out loop (W-087) - awaited here.
+        const hydeHits = await hydeHitsPromise;
         if (hydeHits.length > 0) {
           lists.push(hydeHits);
           listWeights.push(wVector);
@@ -994,12 +1070,20 @@ export class SemanticMemory {
             // pass-1 noise (discovery order silently dropped it).
             fuse: (lists) => fuseRrf(lists, 60),
           },
-          {
-            maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
-            maxResults: opts.topK ?? 10,
-            ...(opts.forceHard !== undefined ? { forceHard: opts.forceHard } : {}),
-            ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
-          },
+          (() => {
+            // W-088: per-call threshold wins over the facade default.
+            const difficultyThreshold =
+              opts.difficultyThreshold ?? this.#iterativeDifficultyThreshold;
+            return {
+              maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
+              maxResults: opts.topK ?? 10,
+              ...(opts.forceHard !== undefined ? { forceHard: opts.forceHard } : {}),
+              ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+              ...(difficultyThreshold !== undefined
+                ? { difficulty: { threshold: difficultyThreshold } }
+                : {}),
+            };
+          })(),
         );
         span.setAttributes({
           'memory.search.semantic.iterative.gate_hard': result.gateHard,
@@ -1344,7 +1428,19 @@ export class SemanticMemory {
         ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
       });
       if (pseudo === null || pseudo.trim().length === 0) return [];
-      return this.#tryVectorSearch(scope, pseudo, topK, opts.asOf, opts.includeQuarantined);
+      // W-144: the HyDE leg carries the SAME predicate set as the direct
+      // FTS / vector / graph / entity legs - an includeSuperseded audit
+      // search must not silently evaluate this leg validity-now, and the
+      // owner filter belongs in-store, not post-fusion.
+      return this.#tryVectorSearch(
+        scope,
+        pseudo,
+        topK,
+        opts.asOf,
+        opts.includeQuarantined,
+        opts.includeSuperseded,
+        opts.owner,
+      );
     } catch {
       return [];
     }
@@ -1478,6 +1574,36 @@ export class SemanticMemory {
     // PS-10: a search query is the `query` role for asymmetric (E5) embedders.
     const [vector] = await this.#embedder.embed([query], { taskType: 'query' });
     if (vector === undefined) return [];
+    return this.#vectorSearchWithVector(
+      scope,
+      vector,
+      topK,
+      asOf,
+      includeQuarantined,
+      includeSuperseded,
+      owner,
+    );
+  }
+
+  /**
+   * W-087: the store half of {@link SemanticMemory.#tryVectorSearch} -
+   * runs the KNN read against an ALREADY-COMPUTED query vector so the
+   * multi-query fan-out can batch its N variant embeddings into one
+   * `embed([q1..qN])` call instead of N provider round-trips.
+   */
+  async #vectorSearchWithVector(
+    scope: SessionScope,
+    vector: Float32Array,
+    topK: number,
+    asOf?: string,
+    includeQuarantined?: boolean,
+    includeSuperseded?: boolean,
+    owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    const embedderId = this.#embedderIdProvider();
+    if (embedderId === null || typeof this.#store.semantic.searchVector !== 'function') {
+      return [];
+    }
     return this.#store.semantic.searchVector(
       scope,
       vector,
@@ -1488,6 +1614,37 @@ export class SemanticMemory {
       includeSuperseded,
       owner,
     );
+  }
+
+  /**
+   * W-087: embed every fan-out variant in ONE embedder call. Returns
+   * `null` - and the caller degrades to the per-variant path - when
+   * there is no fan-out, no vector surface, or the batch call fails; a
+   * batching failure must never fail the search.
+   */
+  async #tryBatchEmbedQueries(
+    queries: ReadonlyArray<string>,
+  ): Promise<ReadonlyMap<string, Float32Array> | null> {
+    if (queries.length <= 1) return null;
+    if (
+      this.#embedder === null ||
+      this.#embedderIdProvider() === null ||
+      typeof this.#store.semantic.searchVector !== 'function'
+    ) {
+      return null;
+    }
+    try {
+      const vectors = await this.#embedder.embed([...queries], { taskType: 'query' });
+      if (vectors.length !== queries.length) return null;
+      const byQuery = new Map<string, Float32Array>();
+      queries.forEach((q, i) => {
+        const v = vectors[i];
+        if (v !== undefined) byQuery.set(q, v);
+      });
+      return byQuery;
+    } catch {
+      return null;
+    }
   }
 
   /**

@@ -72,7 +72,7 @@ never materialising rows. Powers honest `metadata()` counts.
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:105
+Defined in: packages/core/dist/contracts/memory-store.d.ts:118
 
 #### Parameters
 
@@ -127,7 +127,7 @@ adapter implements it.
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:103
+Defined in: packages/core/dist/contracts/memory-store.d.ts:116
 
 #### Parameters
 
@@ -172,7 +172,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:57
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:104
+Defined in: packages/core/dist/contracts/memory-store.d.ts:117
 
 #### Parameters
 

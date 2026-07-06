@@ -6,7 +6,7 @@
 
 # Interface: DifficultyGateOptions
 
-Defined in: packages/memory/src/search/iterative.ts:80
+Defined in: packages/memory/src/search/iterative.ts:81
 
 Tuning for [assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md).
 
@@ -16,4 +16,4 @@ Tuning for [assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryD
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-threshold"></a> `threshold?` | `readonly` | `number` | Minimum score (0..1) to classify the query as hard. Default 0.5. | packages/memory/src/search/iterative.ts:82 |
+| <a id="property-threshold"></a> `threshold?` | `readonly` | `number` | Minimum score (0..1) to classify the query as hard. Default 0.5. | packages/memory/src/search/iterative.ts:83 |

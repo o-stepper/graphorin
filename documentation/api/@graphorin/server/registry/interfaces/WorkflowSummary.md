@@ -6,7 +6,7 @@
 
 # Interface: WorkflowSummary
 
-Defined in: packages/server/src/registry/index.ts:105
+Defined in: packages/server/src/registry/index.ts:112
 
 Snapshot record returned by [WorkflowRegistry.list](/api/@graphorin/server/registry/classes/WorkflowRegistry.md#list).
 
@@ -16,6 +16,6 @@ Snapshot record returned by [WorkflowRegistry.list](/api/@graphorin/server/regis
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:107 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:106 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:108 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:114 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:113 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:115 |

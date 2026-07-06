@@ -10,7 +10,7 @@
 function buildSummarizerPrompt(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:78
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:79
 
 Build the prompt the summarizer LLM receives. The prompt
 contains:

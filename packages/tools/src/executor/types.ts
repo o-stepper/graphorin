@@ -114,6 +114,13 @@ export interface ExecutorOptions {
   /** Default streaming queue depth. Default `256`. */
   readonly streamingEventQueueDepth?: number;
   /**
+   * W-117: byte cap on each call's streaming aggregation buffer (the
+   * buffer-becomes-output `chunks`). Past the cap, chunks keep
+   * DELIVERING to the sink but stop accumulating; the aggregator flags
+   * `bufferTruncated` and dropped bytes are counted. Default 8 MiB.
+   */
+  readonly streamingMaxBufferBytes?: number;
+  /**
    * Optional sandbox-dispatch resolver. Returns the {@link Sandbox}
    * implementation to use for a given resolved policy, OR `null` to
    * run the tool inline (the default for `kind: 'none'` policies).
@@ -376,6 +383,8 @@ export interface ExecutorRuntime {
   readonly cancellationGraceMs: number;
   /** Resolved streaming queue depth. Default `256`. */
   readonly streamingEventQueueDepth: number;
+  /** W-117: resolved aggregation-buffer byte cap. Default 8 MiB. */
+  readonly streamingMaxBufferBytes: number;
   /** Resolved sandbox-dispatch resolver (defaults to inline-only). */
   readonly sandboxResolver: (policy: ResolvedSandboxPolicy) => Sandbox | null;
   /** Resolved memory-guard factory (defaults to no guard). */

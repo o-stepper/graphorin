@@ -179,6 +179,7 @@ export function createConsolidatorPlaceholder(
     decayCapacity: null,
     salienceWeights: DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: 50,
+    maxTranscriptChars: 60_000,
     maxDeepConflictsPerRun: 20,
     dlqMaxRetries: 5,
     dlqBaseBackoffMs: 60_000,

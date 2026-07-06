@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:133
+Defined in: packages/core/src/contracts/memory-store.ts:146
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:133
 forget(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:137
+Defined in: packages/core/src/contracts/memory-store.ts:150
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:137
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:134
+Defined in: packages/core/src/contracts/memory-store.ts:147
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:134
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:135
+Defined in: packages/core/src/contracts/memory-store.ts:148
 
 #### Parameters
 
@@ -87,7 +87,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:136
+Defined in: packages/core/src/contracts/memory-store.ts:149
 
 #### Parameters
 

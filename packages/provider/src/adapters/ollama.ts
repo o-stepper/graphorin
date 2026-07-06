@@ -23,7 +23,12 @@ import type {
 } from '@graphorin/core';
 
 import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
-import { callJsonHttp, makeStreamStartEvent, toOllamaChatMessages } from '../internal/http.js';
+import {
+  type ChatMessageConversionOptions,
+  callJsonHttp,
+  makeStreamStartEvent,
+  toOllamaChatMessages,
+} from '../internal/http.js';
 import { parseNdJsonStream } from '../internal/sse.js';
 import { stripTrailingSlashes } from '../internal/url-utils.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
@@ -135,7 +140,13 @@ async function* streamOllama(
   url: string,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const body = buildBody(options.model, req, true, options.capabilities?.structuredOutput ?? true);
+  const body = buildBody(
+    options.model,
+    req,
+    true,
+    options.capabilities?.structuredOutput ?? true,
+    conversionOptionsFor(options),
+  );
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -197,7 +208,13 @@ async function generateOllama(
   url: string,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(options.model, req, false, options.capabilities?.structuredOutput ?? true);
+  const body = buildBody(
+    options.model,
+    req,
+    false,
+    options.capabilities?.structuredOutput ?? true,
+    conversionOptionsFor(options),
+  );
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -236,6 +253,7 @@ function buildBody(
   req: ProviderRequest,
   stream: boolean,
   structuredOutput: boolean,
+  conversion: ChatMessageConversionOptions,
 ): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
@@ -243,7 +261,7 @@ function buildBody(
       : req.messages;
   const body: Record<string, unknown> = {
     model,
-    messages: toOllamaChatMessages(messages),
+    messages: toOllamaChatMessages(messages, conversion),
     stream,
   };
   if (req.temperature !== undefined || req.maxTokens !== undefined) {
@@ -329,6 +347,21 @@ function defaultLogger(level: 'warn' | 'info', message: string, meta?: object): 
   } else {
     fn(`[graphorin/provider] ${message}`);
   }
+}
+
+/** W-095: one dropped-content WARN per adapter instance. */
+const droppedContentWarned = new WeakSet<object>();
+
+function conversionOptionsFor(options: OllamaAdapterOptions): ChatMessageConversionOptions {
+  const log = options.logger ?? defaultLogger;
+  return {
+    multimodal: options.capabilities?.multimodal ?? false,
+    warn: (message) => {
+      if (droppedContentWarned.has(options)) return;
+      droppedContentWarned.add(options);
+      log('warn', message);
+    },
+  };
 }
 
 interface OllamaChatChunk {

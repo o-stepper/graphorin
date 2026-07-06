@@ -148,7 +148,7 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   stepNumber: number,
 ): AsyncGenerator<AgentEvent<TOutput>, { readonly suspendRequested: boolean }, void> {
   const { config, options, state, messages, sessionId, agentId, signal } = env;
-  yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+  yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
   const filter = (handoff.filter ?? filterLib.defaultHandoffFilter()) as DescribedFilter;
   const filtered = sanitizeHandoffSeed(filter(messages) as Message[]);
   const targetId = handoff.agent.id;
@@ -383,6 +383,7 @@ export async function* runSubAgentCall<TDeps, TOutput>(
     yield {
       type: 'tool.execute.error',
       toolCallId: call.toolCallId,
+      toolName: call.toolName,
       error: toolError,
     };
     const text = renderToolErrorMessage(toolError);
@@ -413,6 +414,7 @@ export async function* runSubAgentCall<TDeps, TOutput>(
   yield {
     type: 'tool.execute.end',
     toolCallId: call.toolCallId,
+    toolName: call.toolName,
     result,
     durationMs: subDurationMs,
   };
