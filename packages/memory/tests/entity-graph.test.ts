@@ -186,6 +186,33 @@ describe('P2-1 EntityResolver', () => {
     expect((await graph.listEntities(scope)).length).toBe(2); // conservative
   });
 
+  it('W-089: the resolve AbortSignal reaches embedder.embed; abort degrades to mint-new', async () => {
+    const graph = graphOf(createInMemoryStore({ withGraphStore: true }));
+    const seenSignals: Array<AbortSignal | undefined> = [];
+    const embedder: EmbedderProvider = {
+      id: () => 'vec:test',
+      dim: () => 3,
+      configHash: () => 'vec:test',
+      async embed(texts, opts) {
+        seenSignals.push(opts?.signal);
+        if (opts?.signal?.aborted === true) throw new Error('aborted');
+        return texts.map(() => new Float32Array([1, 0, 0]));
+      },
+    };
+    const resolver = new EntityResolver({ store: graph, embedder, embedderId: () => 'vec:test' });
+    const controller = new AbortController();
+    await resolver.resolve(scope, 'Anna', { signal: controller.signal });
+    expect(seenSignals[0]).toBe(controller.signal);
+
+    // Aborted before the call: embed throws, resolve degrades to a
+    // mint-new write instead of surfacing the abort.
+    const aborted = new AbortController();
+    aborted.abort();
+    const id = await resolver.resolve(scope, 'Bianca', { signal: aborted.signal });
+    expect(typeof id).toBe('string');
+    expect((await graph.listEntities(scope)).length).toBe(2);
+  });
+
   it('LLM adjudication folds an ambiguous match when the provider says yes', async () => {
     const graph = graphOf(createInMemoryStore({ withGraphStore: true }));
     const resolver = new EntityResolver({

@@ -310,9 +310,16 @@ export class EntityResolver {
   async #embed(name: string, signal?: AbortSignal): Promise<Float32Array | null> {
     const embedder = this.#embedder;
     if (embedder === null || this.#embedderId() === null) return null;
-    void signal;
     try {
-      const [vector] = await embedder.embed([name]);
+      // W-089: forward the caller's AbortSignal so a cancelled write
+      // really interrupts a remote embedding. An abort lands in the
+      // catch: resolve degrades to mint-new, which is the correct
+      // cancellation semantics for a best-effort enrichment. No
+      // `taskType` on purpose - entity names are compared name-to-name,
+      // so both sides must use the same (document) embedding role.
+      const [vector] = await embedder.embed([name], {
+        ...(signal !== undefined ? { signal } : {}),
+      });
       return vector ?? null;
     } catch {
       return null;

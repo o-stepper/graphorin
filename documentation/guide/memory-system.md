@@ -179,7 +179,7 @@ await memory.semantic.search(scope, 'what did the person I met in Tbilisi recomm
 
 The ambiguous-similarity band **mints a new entity by default** - it never auto-merges on weak evidence. Opt into LLM adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band. Omit `graph` entirely and the path is unchanged and fully offline (`expandHops` defaults to `0`).
 
-The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors.
+The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors. One known bound, documented with the security residuals in the [security guide](./security.md): the fuzzy-dedup candidate window is the fixed 1000 most-recent entities, so an alias of a much older entity may mint a new one (exact-name aliases are immune - they match through the normalized-name index regardless of age).
 
 ### PPR-lite, graph fusion weight, and exact entity-match (D5)
 
