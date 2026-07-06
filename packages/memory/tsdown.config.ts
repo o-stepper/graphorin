@@ -32,8 +32,6 @@ export default defineConfig({
     '@graphorin/observability',
     '@graphorin/security',
     '@graphorin/tools',
-    '@graphorin/store-sqlite',
-    '@graphorin/embedder-transformersjs',
     'zod',
   ],
 });

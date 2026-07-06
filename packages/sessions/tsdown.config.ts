@@ -27,8 +27,6 @@ export default defineConfig({
   treeshake: true,
   external: [
     '@graphorin/core',
-    '@graphorin/memory',
     '@graphorin/observability',
-    '@graphorin/security',
   ],
 });

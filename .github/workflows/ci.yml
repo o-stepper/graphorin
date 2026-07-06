@@ -89,6 +89,12 @@ jobs:
       - name: Version consistency
         run: pnpm run check-version-consistency
 
+      # W-050: every declared @graphorin/* edge must be a real import and
+      # every tsdown external entry must be a declared dependency/peer -
+      # phantom manifest edges lie about the install graph.
+      - name: Phantom dependency gate
+        run: pnpm run check-phantom-deps
+
       - name: Benchmark smoke + cost regression + doc guards
         run: pnpm run benchmark:ci
 

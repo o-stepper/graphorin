@@ -102,8 +102,6 @@
   "dependencies": {
     "@graphorin/core": "workspace:*",
     "@graphorin/memory": "workspace:*",
-    "@graphorin/observability": "workspace:*",
-    "@graphorin/provider": "workspace:*",
     "@graphorin/security": "workspace:*",
     "@graphorin/skills": "workspace:*",
     "@graphorin/tools": "workspace:*"

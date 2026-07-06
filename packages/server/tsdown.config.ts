@@ -31,7 +31,6 @@ export default defineConfig({
   treeshake: true,
   external: [
     '@graphorin/core',
-    '@graphorin/observability',
     '@graphorin/protocol',
     '@graphorin/security',
     '@graphorin/store-sqlite',

@@ -30,10 +30,7 @@ export default defineConfig({
   external: [
     '@graphorin/core',
     '@graphorin/memory',
-    '@graphorin/observability',
-    '@graphorin/provider',
     '@graphorin/security',
-    '@graphorin/sessions',
     '@graphorin/skills',
     '@graphorin/tools',
   ],

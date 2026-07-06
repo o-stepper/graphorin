@@ -328,6 +328,12 @@ async function main() {
       cmd: 'pnpm',
       args: ['run', 'check-version-consistency'],
     },
+    {
+      label: 'check-phantom-deps',
+      kind: 'cmd',
+      cmd: 'pnpm',
+      args: ['run', 'check-phantom-deps'],
+    },
     { label: 'workspace-audit', kind: 'audit' },
   ]
     .filter(Boolean)

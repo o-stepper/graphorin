@@ -495,12 +495,6 @@ importers:
       '@graphorin/memory':
         specifier: workspace:*
         version: link:../memory
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
-      '@graphorin/provider':
-        specifier: workspace:*
-        version: link:../provider
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
@@ -629,9 +623,6 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
@@ -667,9 +658,6 @@ importers:
         specifier: workspace:*
         version: link:../tools
     devDependencies:
-      '@graphorin/embedder-transformersjs':
-        specifier: workspace:*
-        version: link:../embedder-transformersjs
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
@@ -811,9 +799,9 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
+      '@graphorin/memory':
+        specifier: workspace:>=0.5.0 <1.0.0
+        version: link:../memory
       '@graphorin/protocol':
         specifier: workspace:*
         version: link:../protocol
@@ -845,9 +833,6 @@ importers:
       '@graphorin/agent':
         specifier: workspace:*
         version: link:../agent
-      '@graphorin/memory':
-        specifier: workspace:*
-        version: link:../memory
       '@graphorin/sessions':
         specifier: workspace:*
         version: link:../sessions
@@ -872,19 +857,13 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/memory':
-        specifier: workspace:*
-        version: link:../memory
       '@graphorin/observability':
         specifier: workspace:*
         version: link:../observability
-      '@graphorin/security':
-        specifier: workspace:*
-        version: link:../security
     devDependencies:
-      '@graphorin/embedder-transformersjs':
+      '@graphorin/memory':
         specifier: workspace:*
-        version: link:../embedder-transformersjs
+        version: link:../memory
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
@@ -903,9 +882,6 @@ importers:
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
-      '@graphorin/tools':
-        specifier: workspace:*
-        version: link:../tools
       yaml:
         specifier: ^2.8.0
         version: 2.8.4
@@ -948,9 +924,6 @@ importers:
         specifier: ^12.9.0
         version: 12.9.0
     devDependencies:
-      '@graphorin/security':
-        specifier: workspace:*
-        version: link:../security
       '@types/better-sqlite3':
         specifier: ^7.6.13
         version: 7.6.13
@@ -989,9 +962,6 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../observability
     devDependencies:
       '@graphorin/store-sqlite':
         specifier: workspace:*

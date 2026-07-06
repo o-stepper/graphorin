@@ -24,5 +24,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
-  external: ['yaml', '@graphorin/core', '@graphorin/security', '@graphorin/tools'],
+  external: ['yaml', '@graphorin/core', '@graphorin/security'],
 });

@@ -92,16 +92,14 @@
   },
   "dependencies": {
     "@graphorin/core": "workspace:*",
-    "@graphorin/memory": "workspace:*",
-    "@graphorin/observability": "workspace:*",
-    "@graphorin/security": "workspace:*"
+    "@graphorin/observability": "workspace:*"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
   "devDependencies": {
-    "@graphorin/embedder-transformersjs": "workspace:*",
+    "@graphorin/memory": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.9.0"

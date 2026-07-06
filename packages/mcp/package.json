@@ -80,7 +80,6 @@
   },
   "dependencies": {
     "@graphorin/core": "workspace:*",
-    "@graphorin/observability": "workspace:*",
     "@graphorin/security": "workspace:*",
     "@graphorin/tools": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0"
