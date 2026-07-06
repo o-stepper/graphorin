@@ -84,6 +84,8 @@ jobs:
       - name: API reference freshness (regen + diff)
         run: |
           if ! git diff --exit-code --stat -- documentation/api; then
+            echo "--- first 200 lines of the content diff (for diagnosis) ---"
+            git diff -- documentation/api | head -200
             echo "::error title=documentation/api is stale::Public API/TSDoc changed without regenerating the committed reference. Run: pnpm --filter @graphorin/docs run clean && pnpm --filter @graphorin/docs run build:typedoc && pnpm --filter @graphorin/docs run build:sanitise, then commit documentation/api."
             exit 1
           fi
