@@ -60,6 +60,15 @@ function fakeProvider(plan: ProviderResponse[]): Provider & {
   return provider;
 }
 
+async function listMessageIds(
+  store: ReturnType<typeof createInMemoryStore>,
+  scope: SessionScope,
+): Promise<string[]> {
+  const list = store.session.listMessagesSince;
+  if (list === undefined) throw new Error('fixture must expose listMessagesSince');
+  return (await list.call(store.session, scope, null, 50)).map((r) => r.id);
+}
+
 async function pushUserMessages(
   memory: ReturnType<typeof createMemory>,
   scope: SessionScope,
@@ -1051,7 +1060,7 @@ describe('consolidator/runtime - W-081 transcript budget + poison-slice skip', (
       'Alex is studying Portuguese with a tutor twice a week because of a planned relocation to Lisbon next year.',
       'Alex maintains a sourdough starter called Clint and bakes two loaves of bread every single weekend.',
     ]);
-    const ids = (await store.session.listMessagesSince(scope, null, 50)).map((r) => r.id);
+    const ids = await listMessageIds(store, scope);
     expect(ids).toHaveLength(4);
 
     await memory.consolidator.start();
@@ -1133,7 +1142,7 @@ describe('consolidator/runtime - W-081 transcript budget + poison-slice skip', (
       },
     });
     await pushUserMessages(memory, scope, ['This slice fails extraction every single time.']);
-    const ids = (await store.session.listMessagesSince(scope, null, 50)).map((r) => r.id);
+    const ids = await listMessageIds(store, scope);
 
     await memory.consolidator.start();
     const failed = await memory.consolidator.fireNow('standard', scope);
@@ -1191,7 +1200,7 @@ describe('consolidator/runtime - W-081 transcript budget + poison-slice skip', (
       },
     });
     await pushUserMessages(memory, scope, ['old window message', 'already processed message']);
-    const ids = (await store.session.listMessagesSince(scope, null, 50)).map((r) => r.id);
+    const ids = await listMessageIds(store, scope);
     const oldWindowId = ids[0];
     const cursorId = ids[1];
     if (oldWindowId === undefined || cursorId === undefined) throw new Error('setup');
@@ -1279,7 +1288,7 @@ describe('consolidator/runtime - W-142 per-scope DLQ slice capture', () => {
     const scopeA: SessionScope = { userId: 'alex', sessionId: 'session-a' };
     const scopeB: SessionScope = { userId: 'alex', sessionId: 'session-b' };
     await pushUserMessages(memory, scopeA, ['I will move to Lisbon in September.']);
-    const idsA = (await store.session.listMessagesSince(scopeA, null, 50)).map((r) => r.id);
+    const idsA = await listMessageIds(store, scopeA);
     expect(idsA.length).toBeGreaterThan(0);
 
     await memory.consolidator.start();

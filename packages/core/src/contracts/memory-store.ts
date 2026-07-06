@@ -19,6 +19,19 @@ import type { SessionScope } from '../types/session-scope.js';
  * pick its own physical layout (one big table, six tables, mixed) while
  * preserving append-only semantics - soft-delete only.
  *
+ * **Baseline vs full adapter (W-048).** This interface is the MINIMUM a
+ * third-party adapter must implement; `@graphorin/memory` accepts it and
+ * degrades gracefully (vector search, decay, consolidation, insights,
+ * graph expansion, conflict audit switch off where the surface is
+ * absent). Full feature parity with `@graphorin/store-sqlite` (asOf
+ * reads, vector KNN, decay signals, insights, entity graph, conflicts,
+ * consolidator state/DLQ) is described by `MemoryStoreAdapter` and the
+ * `*MemoryStoreExt` interfaces exported from the root of
+ * `@graphorin/memory`. Every Ext addition over the six tier namespaces
+ * is optional BY CONTRACT - a type test in `@graphorin/memory` pins
+ * `MemoryStore extends MemoryStoreAdapter`, so a core-only adapter can
+ * never stop compiling.
+ *
  * @stable
  */
 export interface MemoryStore {

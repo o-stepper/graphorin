@@ -282,6 +282,11 @@ export interface Rule extends MemoryRecord {
  * an ExpeL-style salience counter (new insights start at `2`, pruned at
  * `≤ 0`) and are retrieval-ranked **below** the primary facts they cite.
  *
+ * Core defines only the record shape; the storage surface for insights
+ * is NOT part of the baseline {@link MemoryStore} contract - it lives in
+ * the optional `InsightMemoryStoreExt` exported from `@graphorin/memory`
+ * (W-048). Adapters without it simply have no insight tier.
+ *
  * @stable
  */
 export interface Insight extends MemoryRecord {
@@ -336,6 +341,12 @@ export type EntityRole = 'subject' | 'object';
  * canonical entity, every merge / unmerge is recorded in an audit
  * ledger, and `mergedInto` is single-level (it always points directly at
  * a root), so `mergedInto ?? id` is the canonical id.
+ *
+ * Core defines only the record shape; the storage surface for the graph
+ * (upsert / link / merge / one-hop expansion) is NOT part of the
+ * baseline {@link MemoryStore} contract - it lives in the optional
+ * `GraphMemoryStoreExt` exported from `@graphorin/memory` (W-048).
+ * Adapters without it simply have no relation graph.
  *
  * @stable
  */

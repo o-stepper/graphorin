@@ -147,6 +147,8 @@ Recommended defaults are `0600` for the secrets store and the audit log, and `06
 
 The contracts in `@graphorin/core/contracts` are deliberately small. Build a non-SQLite adapter (Postgres, libSQL, DuckDB, in-memory) by implementing the `MemoryStore`, `SessionStore`, `CheckpointStore`, `TriggerStore`, `AuthTokenStore`, `OAuthServerStore`, and `SecretsStore` interfaces (embedding metadata and the audit database are store-sqlite internals, not core contracts). Existing packages depend only on the contracts.
 
+For memory specifically, the core `MemoryStore` is the **baseline**: an adapter implementing only it works, and `@graphorin/memory` degrades gracefully (vector search, decay, consolidation, insights, graph expansion, and conflict audit switch off where the surface is absent). Full parity with the sqlite adapter is described by `MemoryStoreAdapter` plus the optional `*MemoryStoreExt` interfaces (`SemanticMemoryStoreExt`, `ConsolidatorMemoryStoreExt`, `InsightMemoryStoreExt`, `GraphMemoryStoreExt`, `ProceduralMemoryStoreExt`, ...) - all exported from the root of `@graphorin/memory`. Every Ext member is optional by contract; a type test in the memory package pins `MemoryStore extends MemoryStoreAdapter` so a core-only adapter can never stop compiling.
+
 ## Next steps
 
 - [Memory system](/guide/memory-system) - what each sub-store actually stores.
