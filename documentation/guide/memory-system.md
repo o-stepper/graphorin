@@ -318,7 +318,7 @@ Procedures used to be reachable only through their activation predicate (`'alway
 
 ## Background consolidator
 
-A background pipeline (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget so it can never run away with your bill:
+A background pipeline (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget; how a breach is handled depends on the tier's `onExceed` default: at `free`/`cheap` an exceeded ceiling **pauses** consolidation until the next budget reset, while at `standard`/`full` the default is `'log'` - a WARN only, spending continues. For hard enforcement on the paid tiers set `onExceed: 'pause'` (or `'throw'`) explicitly:
 
 | Phase | What it does |
 |---|---|
@@ -351,6 +351,8 @@ Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 | `'standard'` | `light + standard + deep` | `200 000` | `1.00` | `'log'` |
 | `'full'` | `light + standard + deep` | `1 000 000` | `5.00` | `'log'` |
 | `'custom'` | operator-defined | operator must set | operator must set | operator must set |
+
+Two things the table does not say by itself. `'log'` is **observability, not enforcement**: the consolidator keeps spending past the ceiling and only WARNs - the advisory default on the paid tiers is deliberate (a paused background pipeline silently stops forming memories), and hard enforcement is one config key away (`onExceed: 'pause' | 'throw'`). And the USD leg (`maxCostPerDay`) can only trip when you supply `priceUsage` - without a price callback every call is metered at $0 and only the token ceiling is live. See the `ConsolidatorCeilings` / `OnBudgetExceed` API docs for the exact semantics.
 
 Phase-level features are gated by per-tier flags: **episode formation** and **importance scoring** are on at `standard` / `full`; **contextual retrieval** defaults to `late-chunk` on every tier (the `'llm'` upgrade is consolidator-only); **reflection** is on **only at `full`**. The default `'free'` tier registers the `light` phase but pins both ceilings to zero, so consolidation effectively does nothing until you opt in:
 
