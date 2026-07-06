@@ -36,6 +36,23 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: pnpm
 
+      # W-075: persist the turbo cache (.turbo/cache) across runs. The
+      # primary key is unique per run ON PURPOSE: actions/cache skips the
+      # save when the primary key hits, so a static lockfile-keyed cache
+      # would be written once and go stale as src evolves; a unique key
+      # re-saves every run and restore-keys pulls the nearest warm cache
+      # by prefix. Staleness cannot mask a broken build - turbo hashes
+      # the task inputs (src/**, tsconfig, package.json), and fork-PR
+      # poisoning is excluded by actions/cache branch scoping. GitHub
+      # evicts by LRU inside the 10GB repo budget.
+      - name: Turbo cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-node${{ matrix.node }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-node${{ matrix.node }}-turbo-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -101,7 +118,12 @@ jobs:
       - name: Phantom dependency gate
         run: pnpm run check-phantom-deps
 
+      # Runs on ubuntu only by design (same rationale as examples-smoke):
+      # the benchmarks measure framework logic the 3-OS matrix already
+      # covers; repeating them on macos/windows adds wall-time, not
+      # platform signal.
       - name: Benchmark smoke + cost regression + doc guards
+        if: matrix.os == 'ubuntu-latest'
         run: pnpm run benchmark:ci
 
   # Runs on ubuntu only by design: the examples exercise the framework's
