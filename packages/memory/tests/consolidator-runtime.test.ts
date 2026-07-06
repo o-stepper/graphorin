@@ -1004,3 +1004,85 @@ describe('consolidator/runtime - trigger() drains the DLQ (memory-consolidation-
     expect((await memory.consolidator.status()).dlqSize).toBe(0);
   });
 });
+
+describe('consolidator/runtime - W-142 per-scope DLQ slice capture', () => {
+  it('a failing dispatch enqueues its OWN captured batch, not a concurrent scope slice', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    let generateCalls = 0;
+    let signalParked!: () => void;
+    const parked = new Promise<void>((resolve) => {
+      signalParked = resolve;
+    });
+    let releaseParked!: () => void;
+    const released = new Promise<void>((resolve) => {
+      releaseParked = resolve;
+    });
+    const provider: Provider = {
+      name: 'fake',
+      modelId: 'fake:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        generateCalls += 1;
+        if (generateCalls === 1) {
+          // Scope A's extraction: park until scope B has dispatched over
+          // the shared instance, then fail - the pre-W-142 single field
+          // would by now hold scope B's slice.
+          signalParked();
+          await released;
+          throw new Error('extraction exploded for scope A');
+        }
+        return {
+          text: '{"facts":[]}',
+          usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex' },
+      },
+    });
+    const scopeA: SessionScope = { userId: 'alex', sessionId: 'session-a' };
+    const scopeB: SessionScope = { userId: 'alex', sessionId: 'session-b' };
+    await pushUserMessages(memory, scopeA, ['I will move to Lisbon in September.']);
+    const idsA = (await store.session.listMessagesSince(scopeA, null, 50)).map((r) => r.id);
+    expect(idsA.length).toBeGreaterThan(0);
+
+    await memory.consolidator.start();
+    const pendingA = memory.consolidator.fireNow('standard', scopeA);
+    await parked;
+    // While A is parked inside generate, scope B pushes its own slice and
+    // dispatches to completion - its batch overwrote the capture in the
+    // pre-fix single-field implementation.
+    await pushUserMessages(memory, scopeB, ['My dentist appointment is on Friday.']);
+    const outcomeB = await memory.consolidator.fireNow('standard', scopeB);
+    expect(outcomeB?.status).toBe('completed');
+    releaseParked();
+    const outcomeA = await pendingA;
+    expect(outcomeA?.status).toBe('failed');
+
+    const dlq = store.__consolidator?.dlq ?? [];
+    expect(dlq).toHaveLength(1);
+    // The DLQ row must carry the batch scope A actually failed on -
+    // exactly the ids captured at A's dispatch, none of B's later slice.
+    expect([...(dlq[0]?.messageIds ?? [])]).toEqual(idsA);
+  });
+});

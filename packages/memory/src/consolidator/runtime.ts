@@ -31,7 +31,7 @@ import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
 import { CustomTierMisconfiguredError, ProviderNotConfiguredError } from './errors.js';
 import { tipMessageId } from './idempotency.js';
-import { LockManager } from './lock.js';
+import { LockManager, scopeKey } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
 import { runLearnedContextPass } from './phases/learned-context.js';
@@ -151,12 +151,18 @@ class ConsolidatorImpl implements Consolidator {
   #manuallyPaused = false;
   #deferredRuns = 0;
   /**
-   * Message ids of the batch the most recent `#dispatch` operated on
-   * (MCON-10). Captured so a thrown phase can enqueue its DLQ row with
-   * the REAL failed slice instead of `[]` - replays must target the
-   * window that failed, not whatever the cursor points at later.
+   * Message ids of the batch the in-flight `#dispatch` operates on,
+   * keyed by {@link scopeKey} (MCON-10, W-142). Captured so a thrown
+   * phase can enqueue its DLQ row with the REAL failed slice instead of
+   * `[]` - replays must target the window that failed, not whatever the
+   * cursor points at later. Keyed per scope because the lock is
+   * per-scope: two scopes may run standard phases concurrently in one
+   * process, and a single instance field would let scope B overwrite
+   * the slice scope A is about to fail on. The per-scope lock bounds
+   * this map to one live entry per scope; entries are removed in the
+   * dispatch `finally`.
    */
-  #lastDispatchMessageIds: ReadonlyArray<string> = [];
+  readonly #dispatchMessageIdsByScope = new Map<string, ReadonlyArray<string>>();
   /**
    * Bumped when the runtime cannot persist a deferred run to the
    * audit log (e.g., adapter omits the consolidator surface). The
@@ -617,8 +623,10 @@ class ConsolidatorImpl implements Consolidator {
           scope,
           // MCON-10: capture the slice that actually failed so replays
           // can be audited against it; the cursor may move past this
-          // window before the replay fires.
-          messageIds: this.#lastDispatchMessageIds,
+          // window before the replay fires. W-142: read per scope - a
+          // concurrent dispatch on ANOTHER scope must not have replaced
+          // this scope's slice.
+          messageIds: this.#dispatchMessageIdsByScope.get(scopeKey(scope)) ?? [],
           errorKind: classifyError(err),
           errorMessage: describeError(err),
           failedAt: this.#now(),
@@ -635,6 +643,11 @@ class ConsolidatorImpl implements Consolidator {
           phase,
         });
       }
+    } finally {
+      // W-142: the entry must not outlive its dispatch (the catch above
+      // has already consumed it by the time finally runs); without this
+      // the map would leak one entry per scope forever.
+      this.#dispatchMessageIdsByScope.delete(scopeKey(scope));
     }
     if (outcome.emptyExtractions > 0) {
       this.#emptyExtractions += outcome.emptyExtractions;
@@ -669,8 +682,9 @@ class ConsolidatorImpl implements Consolidator {
 
   async #dispatch(phase: ConsolidatorPhase, scope: SessionScope): Promise<PhaseOutcome> {
     // MCON-10: reset the failed-slice capture per dispatch; the standard
-    // branch refills it from the batch it actually processes.
-    this.#lastDispatchMessageIds = [];
+    // branch refills it from the batch it actually processes. W-142:
+    // scoped to this dispatch's scope only.
+    this.#dispatchMessageIdsByScope.delete(scopeKey(scope));
     const state =
       this.#consolidatorStore !== null ? await this.#consolidatorStore.getState(scope) : null;
     const lastProcessedMessageId = state?.lastProcessedMessageId ?? null;
@@ -706,7 +720,10 @@ class ConsolidatorImpl implements Consolidator {
               this.#config.maxStandardBatchSize,
             )
           : [];
-      this.#lastDispatchMessageIds = rawBatch.map((r) => r.id);
+      this.#dispatchMessageIdsByScope.set(
+        scopeKey(scope),
+        rawBatch.map((r) => r.id),
+      );
       const out = await runStandardPhase({
         semantic: this.#semantic,
         episodic: this.#episodic,
