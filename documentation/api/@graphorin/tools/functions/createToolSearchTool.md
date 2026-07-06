@@ -10,7 +10,7 @@
 function createToolSearchTool(opts): Tool<ToolSearchInput, ToolSearchOutput>;
 ```
 
-Defined in: packages/tools/src/built-in/tool-search.ts:87
+Defined in: [packages/tools/src/built-in/tool-search.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L87)
 
 Build a `tool_search` tool bound to a specific registry.
 

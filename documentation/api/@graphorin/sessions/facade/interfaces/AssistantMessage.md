@@ -6,7 +6,7 @@
 
 # Interface: AssistantMessage
 
-Defined in: packages/core/dist/types/message.d.ts:144
+Defined in: [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts)
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/dist/types/message.d.ts:144
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | Multi-agent attribution: which agent produced this message. Required by the multi-agent crew acceptance criteria. | packages/core/dist/types/message.d.ts:152 |
-| <a id="property-content"></a> `content` | `readonly` | \| `string` \| readonly [`MessageContent`](/api/@graphorin/sessions/facade/type-aliases/MessageContent.md)[] | - | packages/core/dist/types/message.d.ts:146 |
-| <a id="property-role"></a> `role` | `readonly` | `"assistant"` | - | packages/core/dist/types/message.d.ts:145 |
-| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | - | packages/core/dist/types/message.d.ts:147 |
+| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | Multi-agent attribution: which agent produced this message. Required by the multi-agent crew acceptance criteria. | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-content"></a> `content` | `readonly` | \| `string` \| readonly [`MessageContent`](/api/@graphorin/sessions/facade/type-aliases/MessageContent.md)[] | - | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-role"></a> `role` | `readonly` | `"assistant"` | - | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |
+| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | - | [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts) |

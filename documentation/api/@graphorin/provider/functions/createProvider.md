@@ -10,7 +10,7 @@
 function createProvider(adapter, options?): Provider;
 ```
 
-Defined in: packages/provider/src/provider.ts:74
+Defined in: [packages/provider/src/provider.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/provider.ts#L74)
 
 Wrap an adapter in the canonical `Provider` shape. Adapters returned
 by the bundled factories already implement `Provider`; passing them

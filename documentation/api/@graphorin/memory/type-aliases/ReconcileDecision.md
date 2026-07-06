@@ -29,9 +29,9 @@ type ReconcileDecision =
 };
 ```
 
-Defined in: packages/memory/src/conflict/types.ts:221
+Defined in: [packages/memory/src/conflict/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L221)
 
-Outcome of reconcileCandidate. `add` is independent / unsure
+Outcome of `reconcileCandidate`. `add` is independent / unsure
 (a fresh fact); `noop` is a duplicate that adds nothing; `update` is
 a newer version of `targetId`; `conflict` contradicts `targetId` and
 closes it. The three neighbour-referencing variants carry the

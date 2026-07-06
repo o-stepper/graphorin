@@ -68,6 +68,8 @@ yarn add @graphorin/agent @graphorin/memory @graphorin/provider \
 
 `zod` is a non-optional peer dependency of every `@graphorin/*` package that touches a public schema. Bring whichever Zod version your application already uses (`^3.23` or `^4`).
 
+Heads-up on install size: `@graphorin/embedder-transformersjs` requires the `@huggingface/transformers` peer, which pulls in `onnxruntime-node` and `sharp` - on the order of 350 MB of native runtime on top of the roughly 58 MB framework stack. That is the price of a fully in-process default embedder. If you run a local [Ollama](https://ollama.com) daemon anyway, swap it for `@graphorin/embedder-ollama` and the install stays near the 58 MB baseline.
+
 ## What each package does
 
 See the [Packages reference](/reference/packages) for the full list and one-line summaries. The most common starting set:

@@ -6,7 +6,7 @@
 
 # Interface: RememberOutcome
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:403
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:403](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L403)
 
 Returned by [SemanticMemory.remember](/api/@graphorin/memory/classes/SemanticMemory.md#remember). The `fact` is the
 stored row (which may be the *existing* fact when the pipeline
@@ -19,6 +19,6 @@ distinguish silent dedups from active inserts.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | - | packages/memory/src/tiers/semantic-memory.ts:405 |
-| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | - | packages/memory/src/tiers/semantic-memory.ts:404 |
-| <a id="property-quarantinereason"></a> `quarantineReason?` | `readonly` | `"injection"` \| `"synthesized"` | Why this write landed quarantined, if it did (P1-4 / MRET-3). `'injection'` - the offline injection heuristics flagged the text (a memory-poisoning candidate). `'synthesized'` - a consolidator / reflection / induction write awaiting validation. Absent when the fact is `active` or when a dedup returned a pre-existing row. | packages/memory/src/tiers/semantic-memory.ts:413 |
+| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | - | [packages/memory/src/tiers/semantic-memory.ts:405](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L405) |
+| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | - | [packages/memory/src/tiers/semantic-memory.ts:404](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L404) |
+| <a id="property-quarantinereason"></a> `quarantineReason?` | `readonly` | `"injection"` \| `"synthesized"` | Why this write landed quarantined, if it did (P1-4 / MRET-3). `'injection'` - the offline injection heuristics flagged the text (a memory-poisoning candidate). `'synthesized'` - a consolidator / reflection / induction write awaiting validation. Absent when the fact is `active` or when a dedup returned a pre-existing row. | [packages/memory/src/tiers/semantic-memory.ts:413](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L413) |

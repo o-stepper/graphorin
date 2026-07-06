@@ -32,7 +32,7 @@ import {
 } from '@graphorin/agent';
 import type { AgentEvent, ProgressArtifactRef, Provider, Tracer } from '@graphorin/core';
 import { collect } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createProvider, ollamaAdapter } from '@graphorin/provider';
 /** Canonical version constant, derived from `package.json` at build time. */
 import pkg from '../package.json' with { type: 'json' };
@@ -538,7 +538,7 @@ export {
   WEB_SEARCH_REPLIES,
 };
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

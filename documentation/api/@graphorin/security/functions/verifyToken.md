@@ -13,7 +13,7 @@ function verifyToken(
 ctx?): Promise<VerifyResult>;
 ```
 
-Defined in: packages/security/src/auth/verify.ts:438
+Defined in: [packages/security/src/auth/verify.ts:438](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L438)
 
 Functional convenience wrapper around `TokenVerifier#verify`. The
 stateless variant constructs a one-shot verifier per call and is

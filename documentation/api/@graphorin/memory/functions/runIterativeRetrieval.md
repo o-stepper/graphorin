@@ -13,7 +13,7 @@ function runIterativeRetrieval<H>(
 options?): Promise<IterativeRetrievalResult<H>>;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:426
+Defined in: [packages/memory/src/search/iterative.ts:426](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L426)
 
 Run the gated grade-then-reformulate loop.
 

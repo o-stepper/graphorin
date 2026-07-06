@@ -6,7 +6,7 @@
 
 # Interface: AuthRoutesDeps
 
-Defined in: packages/server/src/routes/auth.ts:29
+Defined in: [packages/server/src/routes/auth.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/auth.ts#L29)
 
 Stable shape consumed by [createAuthRoutes](/api/@graphorin/server/functions/createAuthRoutes.md).
 
@@ -16,4 +16,4 @@ Stable shape consumed by [createAuthRoutes](/api/@graphorin/server/functions/cre
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-tickets"></a> `tickets` | `readonly` | [`WsTicketStore`](/api/@graphorin/server/interfaces/WsTicketStore.md) | packages/server/src/routes/auth.ts:30 |
+| <a id="property-tickets"></a> `tickets` | `readonly` | [`WsTicketStore`](/api/@graphorin/server/interfaces/WsTicketStore.md) | [packages/server/src/routes/auth.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/auth.ts#L30) |

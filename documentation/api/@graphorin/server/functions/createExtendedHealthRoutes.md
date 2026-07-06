@@ -12,7 +12,7 @@ function createExtendedHealthRoutes(options): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/health/routes.ts:42
+Defined in: [packages/server/src/health/routes.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/routes.ts#L42)
 
 Public health route (anonymous; mounted before auth middleware).
 Returns the rollup + per-check breakdown; HTTP 200 even when the

@@ -10,7 +10,7 @@
 type SandboxTrustLevel = "built-in" | "user-defined" | "trusted" | "untrusted";
 ```
 
-Defined in: packages/security/src/sandbox/tier-resolver.ts:38
+Defined in: [packages/security/src/sandbox/tier-resolver.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/tier-resolver.ts#L38)
 
 Trust level discriminator. The union mirrors the
 `graphorin-trust-level` frontmatter axis from the skills loader,

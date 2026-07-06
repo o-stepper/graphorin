@@ -10,7 +10,7 @@
 type NoneSandboxHandler<TInput, TOutput> = (input, signal) => Promise<TOutput> | TOutput;
 ```
 
-Defined in: packages/security/src/sandbox/none.ts:34
+Defined in: [packages/security/src/sandbox/none.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/none.ts#L34)
 
 Direct caller for `code.kind === 'handler'`. The handler is looked
 up in the supplied registry; built-in trusted tools register their

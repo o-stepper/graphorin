@@ -48,6 +48,12 @@ export interface ClientRequestHandlerOptions {
  * Compute the {@link ClientCapabilities} to advertise on `initialize`,
  * based on which server-initiated handlers the operator supplied.
  * Returns `undefined` when none are configured (advertise nothing).
+ *
+ * Elicitation is advertised as `{ form: {} }` (W-141): the handler
+ * supports form-mode only, and the 2025-11-25 spec expresses that as
+ * the `form` sub-capability. A bare `{}` is spec-equivalent through
+ * the backward-compat preprocess rule, but the explicit shape states
+ * what is actually supported (and matches the handler's contract).
  */
 export function computeClientCapabilities(opts: {
   readonly elicitation?: unknown;
@@ -55,7 +61,7 @@ export function computeClientCapabilities(opts: {
 }): ClientCapabilities | undefined {
   if (opts.elicitation === undefined && opts.sampling === undefined) return undefined;
   return {
-    ...(opts.elicitation === undefined ? {} : { elicitation: {} }),
+    ...(opts.elicitation === undefined ? {} : { elicitation: { form: {} } }),
     ...(opts.sampling === undefined ? {} : { sampling: {} }),
   };
 }

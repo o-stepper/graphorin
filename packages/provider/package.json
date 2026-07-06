@@ -35,6 +35,7 @@
     "local-first"
   ],
   "type": "module",
+  "sideEffects": false,
   "engines": {
     "node": ">=22.12.0"
   },
@@ -90,6 +91,7 @@
   },
   "files": [
     "dist",
+    "src",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"

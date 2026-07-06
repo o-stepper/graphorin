@@ -220,7 +220,7 @@ export class RunStateVersionUnsupportedError extends AgentRuntimeError {
 
 /**
  * Thrown by `runStateFromJSON(...)` when the supplied JSON does not
- * shape-match the documented {@link SerializedRunState}.
+ * shape-match the documented `SerializedRunState`.
  *
  * @stable
  */
@@ -232,7 +232,7 @@ export class RunStateMalformedError extends AgentRuntimeError {
 
 /**
  * Thrown by `Agent.fanOut(...)` when the configured
- * {@link MergeAgentSidewaysInjectionGuard} fires with strictness
+ * `MergeAgentSidewaysInjectionGuard` fires with strictness
  * `'detect-and-block'`.
  *
  * @stable

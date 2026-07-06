@@ -10,7 +10,7 @@
 function fromWireAgentEvent<TOutput>(ev): AgentEvent<TOutput>;
 ```
 
-Defined in: packages/core/src/types/agent-event-wire.ts:166
+Defined in: [packages/core/src/types/agent-event-wire.ts:166](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L166)
 
 Inverse of [toWireAgentEvent](/api/@graphorin/core/functions/toWireAgentEvent.md): decode base64 envelopes back
 into `Uint8Array` / `URL` instances. Exposed for `@graphorin/client`

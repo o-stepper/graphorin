@@ -10,7 +10,7 @@
 function base64Url(data): string;
 ```
 
-Defined in: packages/security/src/oauth/pkce.ts:21
+Defined in: [packages/security/src/oauth/pkce.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/pkce.ts#L21)
 
 **`Internal`**
 

@@ -10,7 +10,7 @@
 const withRetry: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-retry.ts:34
+Defined in: [packages/provider/src/middleware/with-retry.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-retry.ts#L34)
 
 ## Parameters
 

@@ -20,7 +20,7 @@ type AuditChainVerifyResult =
 };
 ```
 
-Defined in: packages/security/src/audit/types.ts:142
+Defined in: [packages/security/src/audit/types.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/types.ts#L142)
 
 Result of `verifyAuditChain(...)`. Walks the chain from `from` to
 `to` and returns either `{ ok: true, count }` or

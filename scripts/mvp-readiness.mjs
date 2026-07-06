@@ -188,9 +188,25 @@ async function workspaceAudit({ checkExports } = { checkExports: true }) {
       !Array.isArray(manifest.files) ||
       !manifest.files.includes('README.md') ||
       !manifest.files.includes('LICENSE') ||
-      !manifest.files.includes('CHANGELOG.md')
+      !manifest.files.includes('CHANGELOG.md') ||
+      // W-136: src ships in the tarball so the relative `../src/*.ts`
+      // paths inside dist/*.d.ts.map resolve for consumers
+      // (go-to-definition lands on real sources).
+      !manifest.files.includes('src')
     )
-      fail('files', '[..., README.md, LICENSE, CHANGELOG.md]', manifest.files);
+      fail('files', '[..., src, README.md, LICENSE, CHANGELOG.md]', manifest.files);
+    // W-137: every publishable package must DECLARE its tree-shaking
+    // contract - `false` (pure module scope), an array (specific
+    // effectful files, e.g. the cli bin), or an explicit `true` for a
+    // package with real import-time effects (security's resolver
+    // registration). Absence is the only failure: it silently opts the
+    // package out of bundler tree-shaking with no reviewable decision.
+    if (
+      manifest.sideEffects !== false &&
+      manifest.sideEffects !== true &&
+      !Array.isArray(manifest.sideEffects)
+    )
+      fail('sideEffects', 'false | true | string[]', manifest.sideEffects);
 
     for (const required of ['README.md', 'LICENSE', 'CHANGELOG.md']) {
       const filePath = join(PACKAGES_DIR, entry.name, required);

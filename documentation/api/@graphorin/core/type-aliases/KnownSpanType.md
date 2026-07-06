@@ -56,7 +56,7 @@ type KnownSpanType =
   | "mcp.list-tools";
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:11
+Defined in: [packages/core/src/contracts/tracer.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L11)
 
 Framework-known discriminators for typed observability spans.
 

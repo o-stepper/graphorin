@@ -10,7 +10,7 @@
 type CompactionSource = "auto-trigger" | "manual" | "pre-step";
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:17
+Defined in: [packages/memory/src/context-engine/compaction/types.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L17)
 
 Source classification for a compaction event. Surfaced on the
 `context.compacted` agent event AND on the

@@ -10,7 +10,7 @@
 function createNoGuard(tier): MemoryModificationGuard;
 ```
 
-Defined in: packages/security/src/guard/no-guard.ts:27
+Defined in: [packages/security/src/guard/no-guard.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/no-guard.ts#L27)
 
 Construct a `NO_GUARD` guard for the supplied tier (either
 `'pure'` or `'side-effecting-no-memory'`).

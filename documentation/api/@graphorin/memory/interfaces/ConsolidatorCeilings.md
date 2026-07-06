@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorCeilings
 
-Defined in: packages/memory/src/consolidator/types.ts:67
+Defined in: [packages/memory/src/consolidator/types.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L67)
 
 Daily cost ceilings, tracked per budget window. How a breach is
 handled depends on [OnBudgetExceed](/api/@graphorin/memory/type-aliases/OnBudgetExceed.md): `'pause'` / `'throw'`
@@ -23,8 +23,8 @@ ceiling shape per tier is captured in
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cooldownms"></a> `cooldownMs` | `readonly` | `number` | Minimum quiet period between non-manual runs per scope (MCON-8). After each run the runtime persists `nextEligibleAt = now + cooldownMs`; trigger-driven runs (`turn` / `idle` / `cron` / `event` / `budget`) inside that window defer with reason `'cooldown'`. Manual `fireNow(...)` and DLQ replays bypass it. | packages/memory/src/consolidator/types.ts:85 |
-| <a id="property-maxconcurrentruns"></a> `maxConcurrentRuns` | `readonly` | `number` | ADVISORY (MCON-8): the per-scope lock serializes runs, so effective concurrency is always 1 per scope regardless of this value. The field is retained for forward compatibility; it enforces nothing today. | packages/memory/src/consolidator/types.ts:76 |
-| <a id="property-maxcostperday"></a> `maxCostPerDay` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:69 |
-| <a id="property-maxrundurationms"></a> `maxRunDurationMs` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:77 |
-| <a id="property-maxtokensperday"></a> `maxTokensPerDay` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:68 |
+| <a id="property-cooldownms"></a> `cooldownMs` | `readonly` | `number` | Minimum quiet period between non-manual runs per scope (MCON-8). After each run the runtime persists `nextEligibleAt = now + cooldownMs`; trigger-driven runs (`turn` / `idle` / `cron` / `event` / `budget`) inside that window defer with reason `'cooldown'`. Manual `fireNow(...)` and DLQ replays bypass it. | [packages/memory/src/consolidator/types.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L85) |
+| <a id="property-maxconcurrentruns"></a> `maxConcurrentRuns` | `readonly` | `number` | ADVISORY (MCON-8): the per-scope lock serializes runs, so effective concurrency is always 1 per scope regardless of this value. The field is retained for forward compatibility; it enforces nothing today. | [packages/memory/src/consolidator/types.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L76) |
+| <a id="property-maxcostperday"></a> `maxCostPerDay` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L69) |
+| <a id="property-maxrundurationms"></a> `maxRunDurationMs` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L77) |
+| <a id="property-maxtokensperday"></a> `maxTokensPerDay` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L68) |

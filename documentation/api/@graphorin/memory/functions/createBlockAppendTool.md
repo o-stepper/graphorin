@@ -10,7 +10,7 @@
 function createBlockAppendTool(deps): Tool<BlockAppendInput, BlockAppendOutput>;
 ```
 
-Defined in: packages/memory/src/tools/block-tools.ts:96
+Defined in: [packages/memory/src/tools/block-tools.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/block-tools.ts#L96)
 
 `block_append` - append text (with a newline separator) to a working
 memory block.

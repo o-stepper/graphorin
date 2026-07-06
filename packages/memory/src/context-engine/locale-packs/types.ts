@@ -29,7 +29,7 @@ export interface AutoRecallTriggers {
 }
 
 /**
- * Layer 1 template fragments. The {@link composeTemplate} function
+ * Layer 1 template fragments. The `composeTemplate` function
  * picks the right fragment based on `memoryBaseMode`.
  *
  * @stable

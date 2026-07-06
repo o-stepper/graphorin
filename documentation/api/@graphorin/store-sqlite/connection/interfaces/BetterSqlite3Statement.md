@@ -6,7 +6,7 @@
 
 # Interface: BetterSqlite3Statement
 
-Defined in: packages/store-sqlite/src/driver-types.ts:51
+Defined in: [packages/store-sqlite/src/driver-types.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L51)
 
 **`Internal`**
 
@@ -21,7 +21,7 @@ the store.
 all<T>(...params): T[];
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:54
+Defined in: [packages/store-sqlite/src/driver-types.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L54)
 
 #### Type Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:54
 bind(...params): this;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:59
+Defined in: [packages/store-sqlite/src/driver-types.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L59)
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:59
 expand(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:58
+Defined in: [packages/store-sqlite/src/driver-types.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L58)
 
 #### Parameters
 
@@ -87,7 +87,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:58
 optional finalize(): void;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:60
+Defined in: [packages/store-sqlite/src/driver-types.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L60)
 
 #### Returns
 
@@ -101,7 +101,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:60
 get<T>(...params): T | undefined;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:53
+Defined in: [packages/store-sqlite/src/driver-types.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L53)
 
 #### Type Parameters
 
@@ -127,7 +127,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:53
 iterate<T>(...params): IterableIterator<T>;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:55
+Defined in: [packages/store-sqlite/src/driver-types.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L55)
 
 #### Type Parameters
 
@@ -153,7 +153,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:55
 pluck(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:56
+Defined in: [packages/store-sqlite/src/driver-types.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L56)
 
 #### Parameters
 
@@ -173,7 +173,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:56
 raw(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:57
+Defined in: [packages/store-sqlite/src/driver-types.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L57)
 
 #### Parameters
 
@@ -196,7 +196,7 @@ run(...params): {
 };
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:52
+Defined in: [packages/store-sqlite/src/driver-types.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L52)
 
 #### Parameters
 
@@ -215,5 +215,5 @@ Defined in: packages/store-sqlite/src/driver-types.ts:52
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `changes` | `number` | packages/store-sqlite/src/driver-types.ts:52 |
-| `lastInsertRowid` | `number` \| `bigint` | packages/store-sqlite/src/driver-types.ts:52 |
+| `changes` | `number` | [packages/store-sqlite/src/driver-types.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L52) |
+| `lastInsertRowid` | `number` \| `bigint` | [packages/store-sqlite/src/driver-types.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L52) |

@@ -10,7 +10,7 @@
 function getQueryParamAll(ref, key): readonly string[];
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:548
+Defined in: [packages/security/src/secrets/secret-ref.ts:548](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L548)
 
 Read every value associated with `key` in the original query string
 (multi-value support). Returns an empty array if the parameter is

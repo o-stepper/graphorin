@@ -10,7 +10,7 @@
 function createOAuthAuthorizationProvider(options): OAuthAuthorizationProvider;
 ```
 
-Defined in: packages/mcp/src/oauth/bridge.ts:75
+Defined in: [packages/mcp/src/oauth/bridge.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/bridge.ts#L75)
 
 Build a provider that resolves the `Authorization` header value the
 Streamable HTTP / SSE MCP transports send on every request.

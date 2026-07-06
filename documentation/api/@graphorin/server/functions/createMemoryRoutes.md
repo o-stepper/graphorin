@@ -12,7 +12,7 @@ function createMemoryRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/memory.ts:76
+Defined in: [packages/server/src/routes/memory.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L76)
 
 ## Parameters
 

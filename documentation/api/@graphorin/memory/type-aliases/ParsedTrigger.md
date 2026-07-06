@@ -35,7 +35,7 @@ type ParsedTrigger =
 };
 ```
 
-Defined in: packages/memory/src/consolidator/triggers.ts:25
+Defined in: [packages/memory/src/consolidator/triggers.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/triggers.ts#L25)
 
 Parsed trigger declaration. The `kind` discriminator drives the
 runtime dispatch; the `value` carries the spec-specific argument

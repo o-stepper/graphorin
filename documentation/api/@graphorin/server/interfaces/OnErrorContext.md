@@ -6,7 +6,7 @@
 
 # Interface: OnErrorContext
 
-Defined in: packages/server/src/lifecycle/hooks.ts:53
+Defined in: [packages/server/src/lifecycle/hooks.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L53)
 
 Snapshot passed to [LifecycleHooks.onError](/api/@graphorin/server/interfaces/LifecycleHooks.md#property-onerror). Errors raised
 outside the request hot path (lifecycle, audit append, etc.) flow
@@ -18,5 +18,5 @@ here so operators can fan them into Sentry / Datadog / etc.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error` | `readonly` | `unknown` | packages/server/src/lifecycle/hooks.ts:54 |
-| <a id="property-phase"></a> `phase` | `readonly` | `"beforeStart"` \| `"onReady"` \| `"beforeShutdown"` \| `"request"` \| `"background"` | packages/server/src/lifecycle/hooks.ts:55 |
+| <a id="property-error"></a> `error` | `readonly` | `unknown` | [packages/server/src/lifecycle/hooks.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L54) |
+| <a id="property-phase"></a> `phase` | `readonly` | `"beforeStart"` \| `"onReady"` \| `"beforeShutdown"` \| `"request"` \| `"background"` | [packages/server/src/lifecycle/hooks.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L55) |

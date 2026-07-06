@@ -6,7 +6,7 @@
 
 # Interface: ToolCassetteUnknownRecord
 
-Defined in: packages/sessions/src/cassette/types.ts:210
+Defined in: [packages/sessions/src/cassette/types.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L210)
 
 Forward-parse-resilient wrapper. Unknown record kinds are surfaced
 via this shape so callers can WARN + skip.
@@ -17,5 +17,5 @@ via this shape so callers can WARN + skip.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"unknown"` | packages/sessions/src/cassette/types.ts:211 |
-| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/cassette/types.ts:212 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"unknown"` | [packages/sessions/src/cassette/types.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L211) |
+| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/sessions/src/cassette/types.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L212) |

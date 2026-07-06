@@ -10,7 +10,7 @@
 function isSubjectAllowed(granted, subject): boolean;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:153
+Defined in: [packages/server/src/ws/subjects.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/subjects.ts#L153)
 
 Compatibility shim - re-exports `scopeMatches` so consumers don't
 have to learn the security package's surface.

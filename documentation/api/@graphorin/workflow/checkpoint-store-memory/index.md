@@ -6,7 +6,7 @@
 
 # checkpoint-store-memory
 
-In-memory CheckpointStore adapter. Useful in tests, REPL
+In-memory `CheckpointStore` adapter. Useful in tests, REPL
 sessions, and small examples where SQLite would be overkill. The
 production-grade adapter lives in `@graphorin/store-sqlite`.
 
@@ -14,4 +14,4 @@ production-grade adapter lives in `@graphorin/store-sqlite`.
 
 | Class | Description |
 | ------ | ------ |
-| [InMemoryCheckpointStore](/api/@graphorin/workflow/checkpoint-store-memory/classes/InMemoryCheckpointStore.md) | Pure in-memory CheckpointStore implementation. Thread-safe within a single Node.js event loop because every mutation is synchronous; concurrent runs that share the same instance will see a consistent view. |
+| [InMemoryCheckpointStore](/api/@graphorin/workflow/checkpoint-store-memory/classes/InMemoryCheckpointStore.md) | Pure in-memory `CheckpointStore` implementation. Thread-safe within a single Node.js event loop because every mutation is synchronous; concurrent runs that share the same instance will see a consistent view. |

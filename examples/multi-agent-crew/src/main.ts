@@ -32,7 +32,7 @@ import {
   type ToolExecutionContext,
   type Tracer,
 } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, type Memory } from '@graphorin/memory';
 import {
   type AgentRegistry,
@@ -454,7 +454,7 @@ function truncate(s: string, n: number): string {
   return `${s.slice(0, n - 1)}…`;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

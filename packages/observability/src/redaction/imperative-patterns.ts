@@ -1,7 +1,7 @@
 /**
  * Imperative-pattern catalogue for inbound prompt-injection defence.
  *
- * Sibling to {@link BUILT_IN_PATTERNS} (PII / secrets) - the two
+ * Sibling to `BUILT_IN_PATTERNS` (PII / secrets) - the two
  * catalogues are disjoint by construction. The imperative catalogue
  * is consumed by the inbound sanitization layer in `@graphorin/tools`
  * to scan tool / MCP results before they reach the agent's message
@@ -41,7 +41,7 @@ export type ImperativePatternName =
 
 /**
  * One entry in the imperative-pattern catalogue. The shape mirrors
- * {@link BUILT_IN_PATTERNS} so consumers can share scan / replace
+ * `BUILT_IN_PATTERNS` so consumers can share scan / replace
  * machinery, but the fields are typed as imperative-only so the two
  * catalogues do not accidentally merge.
  *

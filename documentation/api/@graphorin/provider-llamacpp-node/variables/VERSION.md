@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: src/index.ts:26
+Defined in: [packages/provider-llamacpp-node/src/index.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/index.ts#L26)

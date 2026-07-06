@@ -10,7 +10,7 @@
 type SupplyChainAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:27
+Defined in: [packages/security/src/supply-chain/audit-emitter.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L27)
 
 Discriminator for the outcome of a single audit event.
 

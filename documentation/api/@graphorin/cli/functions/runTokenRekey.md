@@ -14,7 +14,7 @@ function runTokenRekey(options?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:253
+Defined in: [packages/cli/src/commands/token.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L253)
 
 Re-issue every active token. Used after a known compromise.
 

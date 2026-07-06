@@ -6,7 +6,7 @@
 
 # Interface: ExportMigrator
 
-Defined in: packages/sessions/src/migrations/index.ts:22
+Defined in: [packages/sessions/src/migrations/index.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L22)
 
 Migrator entry. Both sides of the version pair are
 `'MAJOR.MINOR'` strings.
@@ -17,9 +17,9 @@ Migrator entry. Both sides of the version pair are
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/sessions/src/migrations/index.ts:25 |
-| <a id="property-fromversion"></a> `fromVersion` | `readonly` | `string` | packages/sessions/src/migrations/index.ts:23 |
-| <a id="property-toversion"></a> `toVersion` | `readonly` | `string` | packages/sessions/src/migrations/index.ts:24 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | [packages/sessions/src/migrations/index.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L25) |
+| <a id="property-fromversion"></a> `fromVersion` | `readonly` | `string` | [packages/sessions/src/migrations/index.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L23) |
+| <a id="property-toversion"></a> `toVersion` | `readonly` | `string` | [packages/sessions/src/migrations/index.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L24) |
 
 ## Methods
 
@@ -29,7 +29,7 @@ Migrator entry. Both sides of the version pair are
 migrate(records): readonly SessionExportRecord[];
 ```
 
-Defined in: packages/sessions/src/migrations/index.ts:26
+Defined in: [packages/sessions/src/migrations/index.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L26)
 
 #### Parameters
 

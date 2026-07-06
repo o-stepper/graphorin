@@ -27,7 +27,7 @@ type HandoffInputFilterStep =
 };
 ```
 
-Defined in: packages/skills/src/types/index.ts:222
+Defined in: [packages/skills/src/types/index.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L222)
 
 Composable step recognised inside `graphorin-handoff-input-filter:
 { compose: [...] }`. The runtime resolves named steps into actual

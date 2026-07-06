@@ -23,7 +23,7 @@ type GraphorinClientErrorKind =
   | "invalid-server-frame";
 ```
 
-Defined in: packages/client/src/errors.ts:45
+Defined in: [packages/client/src/errors.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/errors.ts#L45)
 
 Discriminator union of every error kind raised by the client.
 

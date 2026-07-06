@@ -68,7 +68,7 @@ export type SkillPublicKeyRef =
     };
 
 /**
- * Result of a {@link verifySkillSignature} call.
+ * Result of a `verifySkillSignature` call.
  *
  * @stable
  */

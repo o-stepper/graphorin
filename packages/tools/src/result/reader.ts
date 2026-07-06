@@ -70,6 +70,15 @@ export interface ResultReadOutcome {
   readonly producerSource?: import('@graphorin/core').ToolSource;
   /** Sensitivity of the produced content, when the reader knows it (tools-03). */
   readonly producerSensitivity?: import('@graphorin/core').Sensitivity;
+  /**
+   * W-156: `true` when the spill-time whole-artifact scan found a
+   * catalogued imperative pattern anywhere in the FULL artifact - a
+   * page-boundary-independent signal the per-page strip pass cannot
+   * derive from one page. Recovered from the taint sidecar by the file
+   * reader; the executor increments the cross-page operator counter on
+   * tainted reads that carry it.
+   */
+  readonly producerImperativeFlagged?: boolean;
 }
 
 /**
@@ -153,6 +162,7 @@ async function readSidecarTaint(artifactPath: string): Promise<{
   readonly producerTrustClass?: import('@graphorin/core').ToolTrustClass;
   readonly producerSource?: import('@graphorin/core').ToolSource;
   readonly producerSensitivity?: import('@graphorin/core').Sensitivity;
+  readonly producerImperativeFlagged?: boolean;
 }> {
   let raw: string;
   try {
@@ -165,6 +175,7 @@ async function readSidecarTaint(artifactPath: string): Promise<{
       readonly producerTrustClass?: unknown;
       readonly source?: unknown;
       readonly sensitivity?: unknown;
+      readonly imperativePatternsPresent?: unknown;
     };
     const sourceIsToolSource =
       typeof parsed.source === 'object' &&
@@ -183,6 +194,7 @@ async function readSidecarTaint(artifactPath: string): Promise<{
       ...(typeof parsed.sensitivity === 'string'
         ? { producerSensitivity: parsed.sensitivity as import('@graphorin/core').Sensitivity }
         : {}),
+      ...(parsed.imperativePatternsPresent === true ? { producerImperativeFlagged: true } : {}),
     };
   } catch {
     return {};

@@ -1311,3 +1311,133 @@ describe('consolidator/runtime - W-142 per-scope DLQ slice capture', () => {
     expect([...(dlq[0]?.messageIds ?? [])]).toEqual(idsA);
   });
 });
+
+// W-143: completion accounting must never leave the scope lock held.
+// Pre-fix, a transient storage error in recordRunFinish/upsertState
+// (or in the failure path's own enqueueFailedBatch) flew out of
+// #runPhase after the phase's work was committed: the lock stayed held
+// until staleness takeover, the run row stayed unfinished, and every
+// trigger of the window was deferred.
+describe('consolidator/runtime - exception-safe completion accounting (W-143)', () => {
+  function recordingTracer() {
+    const exceptions: Array<{ type: string; step: unknown; err: unknown }> = [];
+    const tracer = {
+      startSpan(opts: { type: string; attrs?: Record<string, unknown> }) {
+        return {
+          type: opts.type,
+          id: '',
+          traceId: '',
+          setAttributes() {},
+          addEvent() {},
+          recordException(err: unknown) {
+            exceptions.push({ type: opts.type, step: opts.attrs?.step, err });
+          },
+          setStatus() {},
+          end() {},
+        };
+      },
+      async span(opts: { type: string }, fn: (s: unknown) => unknown) {
+        return await fn(this.startSpan(opts));
+      },
+      async shutdown() {},
+    };
+    return { tracer, exceptions };
+  }
+
+  it('releases the lock and returns the outcome when recordRunFinish throws', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const { tracer, exceptions } = recordingTracer();
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      // biome-ignore lint/suspicious/noExplicitAny: minimal structural tracer for the test
+      tracer: tracer as any,
+      consolidator: { tier: 'free', defaultScope: { userId: 'alex' } },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    await memory.consolidator.start();
+
+    const consolidatorStore = store.consolidator;
+    if (consolidatorStore === undefined) throw new Error('fixture must expose consolidator');
+    const spy = vi
+      .spyOn(consolidatorStore, 'recordRunFinish')
+      .mockRejectedValueOnce(new Error('SQLITE_BUSY: database is locked'));
+
+    // (b) fireNow does not throw and returns the outcome.
+    const outcome = await memory.consolidator.fireNow('light', scope);
+    expect(outcome?.status).toBe('completed');
+    // (c) the swallowed accounting error is visible on a span.
+    expect(exceptions.some((e) => e.step === 'record-run-finish')).toBe(true);
+
+    // (a) the lock was released: the next run of the SAME scope is not
+    // deferred (a held lock reports status 'deferred').
+    spy.mockRestore();
+    const second = await memory.consolidator.fireNow('light', scope);
+    expect(second?.status).toBe('completed');
+  });
+
+  it('releases the lock when upsertState throws', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const { tracer, exceptions } = recordingTracer();
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      // biome-ignore lint/suspicious/noExplicitAny: minimal structural tracer for the test
+      tracer: tracer as any,
+      consolidator: { tier: 'free', defaultScope: { userId: 'alex' } },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    await memory.consolidator.start();
+    const consolidatorStore = store.consolidator;
+    if (consolidatorStore === undefined) throw new Error('fixture must expose consolidator');
+    const spy = vi
+      .spyOn(consolidatorStore, 'upsertState')
+      .mockRejectedValueOnce(new Error('SQLITE_BUSY'));
+
+    const outcome = await memory.consolidator.fireNow('light', scope);
+    expect(outcome?.status).toBe('completed');
+    expect(exceptions.some((e) => e.step === 'upsert-state')).toBe(true);
+
+    spy.mockRestore();
+    const second = await memory.consolidator.fireNow('light', scope);
+    expect(second?.status).toBe('completed');
+  });
+
+  it('still releases the lock when the DLQ enqueue of a FAILED phase throws', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const { tracer, exceptions } = recordingTracer();
+    const provider = fakeProvider([]);
+    vi.spyOn(provider, 'generate').mockRejectedValue(new Error('provider exploded'));
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      // biome-ignore lint/suspicious/noExplicitAny: minimal structural tracer for the test
+      tracer: tracer as any,
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    await pushUserMessages(memory, scope, ['I moved to Lisbon.', 'My cat is named Bo.']);
+    await memory.consolidator.start();
+    const consolidatorStore = store.consolidator;
+    if (consolidatorStore === undefined) throw new Error('fixture must expose consolidator');
+    const spy = vi
+      .spyOn(consolidatorStore, 'enqueueFailedBatch')
+      .mockRejectedValueOnce(new Error('SQLITE_BUSY'));
+
+    const outcome = await memory.consolidator.fireNow('standard', scope);
+    expect(outcome?.status).toBe('failed');
+    expect(exceptions.some((e) => e.step === 'enqueue-failed-batch')).toBe(true);
+
+    // Lock released: the next trigger is not deferred.
+    spy.mockRestore();
+    const second = await memory.consolidator.fireNow('light', scope);
+    expect(second?.status).toBe('completed');
+  });
+});

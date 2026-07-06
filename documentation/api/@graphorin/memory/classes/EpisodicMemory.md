@@ -6,7 +6,7 @@
 
 # Class: EpisodicMemory
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:107
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L107)
 
 `EpisodicMemory` - record + retrieve summarized stretches of past
 activity. Stored embeddings power triple-signal retrieval (recency
@@ -22,7 +22,7 @@ activity. Stored embeddings power triple-signal retrieval (recency
 new EpisodicMemory(args): EpisodicMemory;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:113
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L113)
 
 #### Parameters
 
@@ -49,7 +49,7 @@ archive(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:253
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L253)
 
 Soft-archive an episode. Storage adapters that implement
 `EpisodicMemoryStoreExt.archive(...)` mark the row archived in
@@ -78,7 +78,7 @@ manually).
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:176
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L176)
 
 Lookup a single episode by id.
 
@@ -103,7 +103,7 @@ listRecent(
 opts?): Promise<readonly Episode[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:277
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L277)
 
 Most-recent episodes by end time (newest first), with no embedding / FTS
 query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` - the default
@@ -131,7 +131,7 @@ quarantined episodes (the importance source for the reflection gate).
 recent(scope, opts?): Promise<readonly Episode[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:297
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:297](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L297)
 
 List the most recent episodes (no embedding required).
 
@@ -155,7 +155,7 @@ List the most recent episodes (no embedding required).
 record(scope, input): Promise<Episode>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:126
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L126)
 
 Persist an episode + its embedding (when an embedder is configured).
 
@@ -181,7 +181,7 @@ search(
 opts?): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:187
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L187)
 
 Triple-signal episode retrieval (`recency × relevance ×
 importance`). The vector signal is computed on demand when an
@@ -213,7 +213,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:308
+Defined in: [packages/memory/src/tiers/episodic-memory.ts:308](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/episodic-memory.ts#L308)
 
 Promote a quarantined episode into default recall (MCON-2). Mirrors
 [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the

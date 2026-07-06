@@ -16,6 +16,7 @@
  */
 
 import { defineInputGuardrail, defineOutputGuardrail } from '../builders.js';
+import { normalizeForPiiMatching } from '../normalize.js';
 import type {
   GuardrailDefinition,
   GuardrailResult,
@@ -103,17 +104,25 @@ export function containsPii(
   text: string,
   patterns: ReadonlyArray<PiiPattern> = DEFAULT_PII_PATTERNS,
 ): boolean {
+  // W-150: apply the shared obfuscation pre-pass (NFKC + zero-width
+  // strip, case-preserving - see normalizeForPiiMatching) so
+  // zero-width-split emails / fullwidth digits cannot dodge the
+  // sensitiveSeen taint leg the way they already cannot dodge the
+  // injection catalogue. Offsets are irrelevant here: this is a pure
+  // boolean predicate, unlike the guardrail's redaction path, which
+  // must keep matching the RAW text it rewrites.
+  const normalized = normalizeForPiiMatching(text);
   for (const pat of patterns) {
     const re = new RegExp(
       pat.pattern.source,
       pat.pattern.flags.includes('g') ? pat.pattern.flags : `${pat.pattern.flags}g`,
     );
-    let m = re.exec(text);
+    let m = re.exec(normalized);
     while (m !== null) {
       if (pat.validate === undefined || pat.validate(m[0])) return true;
       // Validator rejected this match (e.g. Luhn fail); the global regex has
       // already advanced lastIndex, so continue scanning for the next hit.
-      m = re.exec(text);
+      m = re.exec(normalized);
     }
   }
   return false;
@@ -121,6 +130,14 @@ export function containsPii(
 
 /**
  * Construct the PII detection guardrail.
+ *
+ * Note on normalization (W-150): the boolean detect predicate
+ * ({@link containsPii}) matches against the NFKC + zero-width-stripped
+ * form of the text, so cheap character-injection obfuscation cannot
+ * dodge detection. The guardrail's REWRITE path (`redactText` /
+ * `redactValue`) deliberately keeps matching the raw text: offset-based
+ * replacement needs the original string, and a normalized-offset remap
+ * is not worth the complexity for a best-effort redactor.
  *
  * @stable
  */

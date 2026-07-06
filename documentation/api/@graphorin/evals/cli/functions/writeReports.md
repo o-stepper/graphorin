@@ -10,7 +10,7 @@
 function writeReports<I, O>(options): Promise<readonly WrittenReport[]>;
 ```
 
-Defined in: evals/src/cli/index.ts:87
+Defined in: [packages/evals/src/cli/index.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L87)
 
 Render the report in every requested format and write each one to a
 file. Returns the manifest of written files.

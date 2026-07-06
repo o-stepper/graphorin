@@ -10,7 +10,7 @@
 function runTracesStatus(options?): Promise<TracesStatusResult>;
 ```
 
-Defined in: packages/cli/src/commands/traces.ts:51
+Defined in: [packages/cli/src/commands/traces.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/traces.ts#L51)
 
 ## Parameters
 

@@ -10,7 +10,7 @@
 const COMMENTARY_AUDIT_ACTION: "delivery:commentary:sanitized" = 'delivery:commentary:sanitized';
 ```
 
-Defined in: packages/server/src/commentary/audit-bridge.ts:26
+Defined in: [packages/server/src/commentary/audit-bridge.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L26)
 
 Audit action recorded for a delivery-commentary sanitization decision.
 

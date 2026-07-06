@@ -10,7 +10,7 @@
 function _resetLiteralResolverForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/literal.ts:60
+Defined in: [packages/security/src/secrets/resolvers/literal.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L60)
 
 **`Experimental`**
 

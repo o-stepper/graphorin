@@ -6,7 +6,7 @@
 
 # Interface: AgentCallOptions\&lt;TDeps\&gt;
 
-Defined in: packages/agent/src/types.ts:461
+Defined in: [packages/agent/src/types.ts:462](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L462)
 
 Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
 
@@ -22,10 +22,10 @@ Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | Per-run capability restriction (D2) - overrides [AgentConfig.capability](/api/@graphorin/agent/interfaces/AgentConfig.md#property-capability) for this invocation. See that field for semantics. Not persisted in `RunState`: re-supply it when resuming a suspended run. | packages/agent/src/types.ts:478 |
-| <a id="property-deps"></a> `deps?` | `readonly` | `TDeps` | - | packages/agent/src/types.ts:462 |
-| <a id="property-directive"></a> `directive?` | `readonly` | [`ResumeDirective`](/api/@graphorin/agent/interfaces/ResumeDirective.md) | HITL resume directive. Supplied alongside a `RunState` to resolve any approvals that were pending when the previous `agent.run(...)` call suspended. | packages/agent/src/types.ts:471 |
-| <a id="property-parentspan"></a> `parentSpan?` | `readonly` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; | W-036: parent span for this run's `agent.run` root span - a multi-agent invocation forms ONE trace tree (the child's run span parents under the caller's step/tool span). The runtime supplies it automatically for handoffs and `toTool` sub-agents. Like `capability`, it is NOT persisted in `RunState`: re-supply on resume when stitching matters. | packages/agent/src/types.ts:487 |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | - | packages/agent/src/types.ts:464 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/agent/src/types.ts:463 |
-| <a id="property-userid"></a> `userId?` | `readonly` | `string` | - | packages/agent/src/types.ts:465 |
+| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | Per-run capability restriction (D2) - overrides [AgentConfig.capability](/api/@graphorin/agent/interfaces/AgentConfig.md#property-capability) for this invocation. See that field for semantics. Not persisted in `RunState`: re-supply it when resuming a suspended run. | [packages/agent/src/types.ts:479](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L479) |
+| <a id="property-deps"></a> `deps?` | `readonly` | `TDeps` | - | [packages/agent/src/types.ts:463](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L463) |
+| <a id="property-directive"></a> `directive?` | `readonly` | [`ResumeDirective`](/api/@graphorin/agent/interfaces/ResumeDirective.md) | HITL resume directive. Supplied alongside a `RunState` to resolve any approvals that were pending when the previous `agent.run(...)` call suspended. | [packages/agent/src/types.ts:472](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L472) |
+| <a id="property-parentspan"></a> `parentSpan?` | `readonly` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; | W-036: parent span for this run's `agent.run` root span - a multi-agent invocation forms ONE trace tree (the child's run span parents under the caller's step/tool span). The runtime supplies it automatically for handoffs and `toTool` sub-agents. Like `capability`, it is NOT persisted in `RunState`: re-supply on resume when stitching matters. | [packages/agent/src/types.ts:488](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L488) |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | - | [packages/agent/src/types.ts:465](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L465) |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | [packages/agent/src/types.ts:464](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L464) |
+| <a id="property-userid"></a> `userId?` | `readonly` | `string` | - | [packages/agent/src/types.ts:466](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L466) |

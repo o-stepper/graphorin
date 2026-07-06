@@ -129,7 +129,7 @@ function defineConfig(input):
   | undefined;
 ```
 
-Defined in: packages/server/src/config.ts:451
+Defined in: [packages/server/src/config.ts:451](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L451)
 
 Helper for `graphorin.config.ts` files. Pure pass-through that
 provides editor autocomplete; the actual parsing happens at server

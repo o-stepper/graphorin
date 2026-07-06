@@ -10,7 +10,7 @@
 type PassageExtractor<TRecord> = (record) => string;
 ```
 
-Defined in: src/text-extraction.ts:12
+Defined in: [packages/reranker-llm/src/text-extraction.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/text-extraction.ts#L12)
 
 ## Type Parameters
 

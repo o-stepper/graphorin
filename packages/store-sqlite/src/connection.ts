@@ -99,7 +99,7 @@ export interface OpenConnectionOptions {
    * Optional cipher-driver loader override. When `encryption.enabled`
    * is `true` and the operator does not pass `driver`, this loader is
    * consulted instead of the canonical
-   * {@link import('./encryption/index.js').loadCipherDriver}. Used by
+   * `loadCipherDriver`. Used by
    * the test suite to simulate a missing cipher peer without
    * uninstalling the package from the workspace.
    *

@@ -10,7 +10,7 @@
 function trustDiscount(record, weights?): number;
 ```
 
-Defined in: packages/memory/src/search/trust.ts:48
+Defined in: [packages/memory/src/search/trust.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/trust.ts#L48)
 
 Rank-time trust multiplier for one record. `1` for first-party active
 facts (the common case - zero ranking change), `1 - quarantine` for

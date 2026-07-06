@@ -6,7 +6,7 @@
 
 # Class: SqliteCheckpointStore
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:23
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L23)
 
 Default `CheckpointStore` implementation (including the W-009
 `CheckpointStoreExt` retention primitives). Workflow state is
@@ -27,7 +27,7 @@ failure.
 new SqliteCheckpointStore(conn): SqliteCheckpointStore;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:25
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L25)
 
 #### Parameters
 
@@ -50,7 +50,7 @@ compactThread(
 keepLast): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:260
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:260](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L260)
 
 W-009 compaction: keep only the `keepLast` newest checkpoints (by
 step_number) of one `(thread_id, namespace)` pair. Resume reads the
@@ -83,7 +83,7 @@ latest id - safe, but time-travel/fork targets are gone.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:200
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L200)
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -117,7 +117,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:109
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L109)
 
 #### Parameters
 
@@ -148,7 +148,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:177
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L177)
 
 #### Parameters
 
@@ -177,7 +177,7 @@ listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:150
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L150)
 
 W-032: enumerate threads whose LATEST checkpoint in `namespace` is
 suspended with a due `wake_at`. Latest-per-thread is decided by max
@@ -212,7 +212,7 @@ newest checkpoint moved on (resumed / completed) never fires.
 pruneThreads(opts): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:222
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L222)
 
 W-009 retention sweep. Policy: a `(thread_id, namespace)` pair
 qualifies when its LATEST checkpoint (by step_number) is older than
@@ -255,7 +255,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:29
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L29)
 
 #### Parameters
 
@@ -288,7 +288,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:88
+Defined in: [packages/store-sqlite/src/checkpoint-store.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/checkpoint-store.ts#L88)
 
 #### Parameters
 

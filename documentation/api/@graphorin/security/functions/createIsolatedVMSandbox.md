@@ -10,7 +10,7 @@
 function createIsolatedVMSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: packages/security/src/sandbox/isolated-vm.ts:97
+Defined in: [packages/security/src/sandbox/isolated-vm.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/isolated-vm.ts#L97)
 
 Construct an `IsolatedVMSandbox`. The adapter resolves the peer
 lazily on the first `run(...)` call so the package can be imported

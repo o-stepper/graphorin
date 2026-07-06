@@ -10,7 +10,7 @@
 function _setDiscoveryFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/oauth/discovery.ts:35
+Defined in: [packages/security/src/oauth/discovery.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/discovery.ts#L35)
 
 **`Experimental`**
 

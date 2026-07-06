@@ -6,7 +6,7 @@
 
 # Interface: SplitSkillMd
 
-Defined in: packages/skills/src/frontmatter/index.ts:39
+Defined in: [packages/skills/src/frontmatter/index.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L39)
 
 Result of [splitSkillMd](/api/@graphorin/skills/frontmatter/functions/splitSkillMd.md).
 
@@ -14,5 +14,5 @@ Result of [splitSkillMd](/api/@graphorin/skills/frontmatter/functions/splitSkill
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-body"></a> `body` | `readonly` | `string` | packages/skills/src/frontmatter/index.ts:41 |
-| <a id="property-frontmatter"></a> `frontmatter` | `readonly` | `string` | packages/skills/src/frontmatter/index.ts:40 |
+| <a id="property-body"></a> `body` | `readonly` | `string` | [packages/skills/src/frontmatter/index.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L41) |
+| <a id="property-frontmatter"></a> `frontmatter` | `readonly` | `string` | [packages/skills/src/frontmatter/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L40) |

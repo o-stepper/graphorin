@@ -22,7 +22,7 @@
  *     button click resumes the run via
  *     `agent.run(savedState, { directive: { approvals: [...] } })`.
  *
- * The `if (import.meta.url === ...)` block at the bottom prints a one-
+ * The `isMainModule(...)`-gated block at the bottom prints a one-
  * line summary so `pnpm dev` stays useful as a quick local sanity check.
  */
 
@@ -31,7 +31,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import process from 'node:process';
 import { type Agent, createAgent } from '@graphorin/agent';
 import type { AgentEvent, Provider, RunState, SessionScope, ToolApproval } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, type Memory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
 import {
@@ -1053,7 +1053,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

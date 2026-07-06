@@ -13,11 +13,11 @@ const meta: {
 };
 ```
 
-Defined in: src/index.ts:37
+Defined in: [packages/eslint-plugin/src/index.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/index.ts#L37)
 
 ## Type Declaration
 
 | Name | Type | Default value | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `"@graphorin/eslint-plugin"` | `'@graphorin/eslint-plugin'` | src/index.ts:38 |
-| <a id="property-version"></a> `version` | `string` | `VERSION` | src/index.ts:39 |
+| <a id="property-name"></a> `name` | `"@graphorin/eslint-plugin"` | `'@graphorin/eslint-plugin'` | [packages/eslint-plugin/src/index.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/index.ts#L38) |
+| <a id="property-version"></a> `version` | `string` | `VERSION` | [packages/eslint-plugin/src/index.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/index.ts#L39) |

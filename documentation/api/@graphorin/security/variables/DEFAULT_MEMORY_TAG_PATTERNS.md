@@ -10,7 +10,7 @@
 const DEFAULT_MEMORY_TAG_PATTERNS: ReadonlyArray<RegExp>;
 ```
 
-Defined in: packages/security/src/guard/classifier.ts:44
+Defined in: [packages/security/src/guard/classifier.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/classifier.ts#L44)
 
 Set of regex patterns that hint at memory-related tools. The list
 is intentionally short and English-language; deployments that need

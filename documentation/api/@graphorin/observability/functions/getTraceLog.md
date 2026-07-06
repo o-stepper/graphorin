@@ -10,7 +10,7 @@
 function getTraceLog(filePath): AsyncIterable<SpanRecord<SpanType>>;
 ```
 
-Defined in: packages/observability/src/replay/log.ts:21
+Defined in: [packages/observability/src/replay/log.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/log.ts#L21)
 
 Read every span record from a JSONL trace log. Lines that fail to parse are
 skipped (the iterator keeps going); the generator only ever yields parsed

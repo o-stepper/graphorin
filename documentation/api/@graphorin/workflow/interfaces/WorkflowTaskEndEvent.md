@@ -6,7 +6,7 @@
 
 # Interface: WorkflowTaskEndEvent
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:38
+Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
 ## Stable
 
@@ -14,9 +14,9 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:38
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:44 |
-| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:42 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"paused"` | packages/core/dist/types/workflow-event.d.ts:43 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:40 |
-| <a id="property-taskid"></a> `taskId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:41 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.task.end"` | packages/core/dist/types/workflow-event.d.ts:39 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"paused"` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-taskid"></a> `taskId` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.task.end"` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |

@@ -15,7 +15,7 @@ function runPricingRefresh(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/pricing.ts:91
+Defined in: [packages/cli/src/commands/pricing.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L91)
 
 ## Parameters
 

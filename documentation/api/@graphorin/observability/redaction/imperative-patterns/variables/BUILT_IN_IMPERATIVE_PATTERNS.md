@@ -10,7 +10,7 @@
 const BUILT_IN_IMPERATIVE_PATTERNS: readonly ImperativePattern[] = PATTERNS;
 ```
 
-Defined in: packages/observability/src/redaction/imperative-patterns.ts:165
+Defined in: [packages/observability/src/redaction/imperative-patterns.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/imperative-patterns.ts#L165)
 
 The default-on imperative-pattern catalogue. Stable across patches;
 additions during the pre-1.0 window are minor-bumps because new

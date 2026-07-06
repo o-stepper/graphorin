@@ -10,7 +10,7 @@
 function _resetConsolidatorConfigWarningForTesting(): void;
 ```
 
-Defined in: packages/memory/src/facade.ts:727
+Defined in: [packages/memory/src/facade.ts:727](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/facade.ts#L727)
 
 **`Internal`**
 

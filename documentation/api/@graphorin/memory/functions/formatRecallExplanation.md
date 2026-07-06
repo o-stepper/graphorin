@@ -10,7 +10,7 @@
 function formatRecallExplanation(explanation): string;
 ```
 
-Defined in: packages/memory/src/search/explain.ts:108
+Defined in: [packages/memory/src/search/explain.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L108)
 
 Render a [RecallExplanation](/api/@graphorin/memory/interfaces/RecallExplanation.md) as a compact ASCII block - a
 header line plus one line per recalled memory with its signal

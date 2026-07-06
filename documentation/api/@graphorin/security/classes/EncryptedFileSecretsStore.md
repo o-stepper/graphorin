@@ -6,7 +6,7 @@
 
 # Class: EncryptedFileSecretsStore
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:60
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L60)
 
 `SecretsStore` backed by an AES-256-GCM bundle on disk.
 
@@ -24,7 +24,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:60
 new EncryptedFileSecretsStore(opts): EncryptedFileSecretsStore;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L76)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"encrypted-file"` | packages/security/src/secrets/stores/encrypted-file.ts:61 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"encrypted-file"` | [packages/security/src/secrets/stores/encrypted-file.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L61) |
 
 ## Methods
 
@@ -50,7 +50,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
 delete(key, _scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:148
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L148)
 
 #### Parameters
 
@@ -75,7 +75,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:148
 get(key, _scope?): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:96
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L96)
 
 Returns the secret if it exists, `null` otherwise.
 
@@ -102,7 +102,7 @@ Returns the secret if it exists, `null` otherwise.
 list(_scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:161
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L161)
 
 Returns metadata about every key - never the values themselves.
 
@@ -128,7 +128,7 @@ Returns metadata about every key - never the values themselves.
 require(key, _scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:118
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L118)
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -160,7 +160,7 @@ set(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:131
+Defined in: [packages/security/src/secrets/stores/encrypted-file.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/encrypted-file.ts#L131)
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

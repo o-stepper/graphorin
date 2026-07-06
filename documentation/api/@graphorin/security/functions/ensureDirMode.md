@@ -13,7 +13,7 @@ function ensureDirMode(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/hardening/file-modes.ts:77
+Defined in: [packages/security/src/hardening/file-modes.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/file-modes.ts#L77)
 
 Ensure a directory exists at the supplied POSIX mode. Creates the
 directory recursively when it does not exist.

@@ -42,7 +42,7 @@ type MCPContentPart =
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:313
+Defined in: [packages/mcp/src/client/types.ts:313](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L313)
 
 Discriminated union over MCP content parts.
 
@@ -115,10 +115,10 @@ Discriminated union over MCP content parts.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `description?` | `string` | - | packages/mcp/src/client/types.ts:338 |
-| `mimeType?` | `string` | - | packages/mcp/src/client/types.ts:339 |
-| `name` | `string` | - | packages/mcp/src/client/types.ts:336 |
-| `size?` | `number` | - | packages/mcp/src/client/types.ts:340 |
-| `title?` | `string` | - | packages/mcp/src/client/types.ts:337 |
-| `type` | `"resource_link"` | A link to a resource the server can serve on demand (MCP `resource_link`). Unlike an embedded `resource`, the body is **not** inlined: the adapter surfaces a preview + the `uri` as a result handle so the model fetches it via `read_result` only when needed (WI-13 / P2-2, ties to WI-10 result handles). | packages/mcp/src/client/types.ts:334 |
-| `uri` | `string` | - | packages/mcp/src/client/types.ts:335 |
+| `description?` | `string` | - | [packages/mcp/src/client/types.ts:338](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L338) |
+| `mimeType?` | `string` | - | [packages/mcp/src/client/types.ts:339](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L339) |
+| `name` | `string` | - | [packages/mcp/src/client/types.ts:336](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L336) |
+| `size?` | `number` | - | [packages/mcp/src/client/types.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L340) |
+| `title?` | `string` | - | [packages/mcp/src/client/types.ts:337](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L337) |
+| `type` | `"resource_link"` | A link to a resource the server can serve on demand (MCP `resource_link`). Unlike an embedded `resource`, the body is **not** inlined: the adapter surfaces a preview + the `uri` as a result handle so the model fetches it via `read_result` only when needed (WI-13 / P2-2, ties to WI-10 result handles). | [packages/mcp/src/client/types.ts:334](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L334) |
+| `uri` | `string` | - | [packages/mcp/src/client/types.ts:335](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L335) |

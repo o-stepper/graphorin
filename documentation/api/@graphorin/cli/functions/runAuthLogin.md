@@ -10,7 +10,7 @@
 function runAuthLogin(options): Promise<LoginInteractiveResult>;
 ```
 
-Defined in: packages/cli/src/commands/auth.ts:75
+Defined in: [packages/cli/src/commands/auth.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L75)
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: TriggerDeclaration
 
-Defined in: packages/triggers/src/index.ts:69
+Defined in: [packages/triggers/src/index.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L69)
 
 Public trigger declaration emitted by the helper functions
 (`cron(...)`, `interval(...)`, `idle(...)`, `event(...)`).
@@ -17,8 +17,8 @@ Public trigger declaration emitted by the helper functions
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-callback"></a> `callback` | `readonly` | [`TriggerCallback`](/api/@graphorin/triggers/type-aliases/TriggerCallback.md) | packages/triggers/src/index.ts:73 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/triggers/src/index.ts:70 |
-| <a id="property-kind"></a> `kind` | `readonly` | [`TriggerKind`](/api/@graphorin/triggers/type-aliases/TriggerKind.md) | packages/triggers/src/index.ts:71 |
-| <a id="property-options"></a> `options` | `readonly` | [`TriggerOptions`](/api/@graphorin/triggers/interfaces/TriggerOptions.md) | packages/triggers/src/index.ts:74 |
-| <a id="property-spec"></a> `spec` | `readonly` | `string` | packages/triggers/src/index.ts:72 |
+| <a id="property-callback"></a> `callback` | `readonly` | [`TriggerCallback`](/api/@graphorin/triggers/type-aliases/TriggerCallback.md) | [packages/triggers/src/index.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L73) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/triggers/src/index.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L70) |
+| <a id="property-kind"></a> `kind` | `readonly` | [`TriggerKind`](/api/@graphorin/triggers/type-aliases/TriggerKind.md) | [packages/triggers/src/index.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L71) |
+| <a id="property-options"></a> `options` | `readonly` | [`TriggerOptions`](/api/@graphorin/triggers/interfaces/TriggerOptions.md) | [packages/triggers/src/index.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L74) |
+| <a id="property-spec"></a> `spec` | `readonly` | `string` | [packages/triggers/src/index.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L72) |

@@ -14,7 +14,7 @@ function event(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:133
+Defined in: [packages/triggers/src/index.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L133)
 
 ## Parameters
 

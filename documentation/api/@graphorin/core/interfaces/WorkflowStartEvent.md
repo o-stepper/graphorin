@@ -6,7 +6,7 @@
 
 # Interface: WorkflowStartEvent
 
-Defined in: packages/core/src/types/workflow-event.ts:25
+Defined in: [packages/core/src/types/workflow-event.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L25)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/workflow-event.ts:25
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:27 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.start"` | packages/core/src/types/workflow-event.ts:26 |
-| <a id="property-workflowid"></a> `workflowId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:28 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | [packages/core/src/types/workflow-event.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L27) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.start"` | [packages/core/src/types/workflow-event.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L26) |
+| <a id="property-workflowid"></a> `workflowId` | `readonly` | `string` | [packages/core/src/types/workflow-event.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L28) |

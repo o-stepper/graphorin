@@ -12,7 +12,7 @@ type SpanType =
   | CustomSpanType;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:83
+Defined in: [packages/core/src/contracts/tracer.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L83)
 
 Discriminator union for typed observability spans: every
 [KnownSpanType](/api/@graphorin/core/type-aliases/KnownSpanType.md) literal plus the [CustomSpanType](/api/@graphorin/core/type-aliases/CustomSpanType.md)

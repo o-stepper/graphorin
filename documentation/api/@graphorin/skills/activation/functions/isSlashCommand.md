@@ -10,7 +10,7 @@
 function isSlashCommand(raw): boolean;
 ```
 
-Defined in: packages/skills/src/activation/index.ts:69
+Defined in: [packages/skills/src/activation/index.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/activation/index.ts#L69)
 
 Convenience predicate. Returns `true` when [parseSlashCommand](/api/@graphorin/skills/activation/functions/parseSlashCommand.md)
 would succeed against the supplied body.

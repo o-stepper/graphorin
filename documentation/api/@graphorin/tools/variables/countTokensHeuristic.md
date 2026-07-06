@@ -10,7 +10,7 @@
 const countTokensHeuristic: TokenCounter;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:39
+Defined in: [packages/tools/src/result/truncate.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/result/truncate.ts#L40)
 
 Heuristic token counter - 4 chars per token. Matches the
 fall-through behaviour the agent runtime applies when a per-

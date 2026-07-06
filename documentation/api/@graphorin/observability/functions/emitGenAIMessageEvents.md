@@ -13,7 +13,7 @@ function emitGenAIMessageEvents<T>(
    opts?): void;
 ```
 
-Defined in: packages/observability/src/gen-ai/emit.ts:93
+Defined in: [packages/observability/src/gen-ai/emit.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/emit.ts#L93)
 
 Emit per-message OpenTelemetry GenAI span events. The helper records
 one event per message - the per-message-event emission shape per the

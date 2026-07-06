@@ -10,6 +10,6 @@
 const INBOUND_SANITIZATION_PREAMBLE_EN: string = enLocalePack.inboundSanitizationPreamble.text;
 ```
 
-Defined in: packages/memory/src/context-engine/preambles/inbound-en.ts:19
+Defined in: [packages/memory/src/context-engine/preambles/inbound-en.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/preambles/inbound-en.ts#L19)
 
 English D4 preamble text (~80-120 tokens, cache-friendly).

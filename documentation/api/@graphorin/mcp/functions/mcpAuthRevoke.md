@@ -13,7 +13,7 @@ function mcpAuthRevoke(
 options?): Promise<void>;
 ```
 
-Defined in: packages/mcp/src/oauth/library.ts:50
+Defined in: [packages/mcp/src/oauth/library.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L50)
 
 Drive `graphorin auth revoke --mcp <id>`.
 

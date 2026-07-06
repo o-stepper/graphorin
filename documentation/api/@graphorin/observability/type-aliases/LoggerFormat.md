@@ -10,6 +10,6 @@
 type LoggerFormat = "json" | "pretty";
 ```
 
-Defined in: packages/observability/src/logger/logger.ts:26
+Defined in: [packages/observability/src/logger/logger.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/logger/logger.ts#L26)
 
 ## Stable

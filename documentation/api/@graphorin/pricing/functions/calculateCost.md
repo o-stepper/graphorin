@@ -15,7 +15,7 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:132
+Defined in: [packages/pricing/src/lookup.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L132)
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost

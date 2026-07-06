@@ -10,7 +10,7 @@
 into a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md). The adapter is the default cloud
 path: it speaks the AI SDK's `streamText` / `generateText` API and
 maps the resulting events onto the canonical
-import('@graphorin/core').ProviderEvent discriminated union.
+`ProviderEvent` discriminated union.
 
 Outbound, the adapter converts Graphorin messages / tools onto the
 AI SDK call contract (see `vercel-messages.ts`): tool definitions

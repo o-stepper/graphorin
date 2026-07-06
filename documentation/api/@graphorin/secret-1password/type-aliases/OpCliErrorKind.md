@@ -15,6 +15,6 @@ type OpCliErrorKind =
   | "unknown";
 ```
 
-Defined in: packages/secret-1password/src/op-cli.ts:95
+Defined in: [packages/secret-1password/src/op-cli.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/op-cli.ts#L95)
 
 ## Stable

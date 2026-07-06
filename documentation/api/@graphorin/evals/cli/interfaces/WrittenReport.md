@@ -6,7 +6,7 @@
 
 # Interface: WrittenReport
 
-Defined in: evals/src/cli/index.ts:75
+Defined in: [packages/evals/src/cli/index.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L75)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: evals/src/cli/index.ts:75
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-bytes"></a> `bytes` | `readonly` | `number` | evals/src/cli/index.ts:78 |
-| <a id="property-format"></a> `format` | `readonly` | [`ReporterFormat`](/api/@graphorin/evals/cli/type-aliases/ReporterFormat.md) | evals/src/cli/index.ts:76 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | evals/src/cli/index.ts:77 |
+| <a id="property-bytes"></a> `bytes` | `readonly` | `number` | [packages/evals/src/cli/index.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L78) |
+| <a id="property-format"></a> `format` | `readonly` | [`ReporterFormat`](/api/@graphorin/evals/cli/type-aliases/ReporterFormat.md) | [packages/evals/src/cli/index.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L76) |
+| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/evals/src/cli/index.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L77) |

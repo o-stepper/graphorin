@@ -10,7 +10,7 @@
 type OAuthAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/security/src/oauth/audit-emitter.ts:28
+Defined in: [packages/security/src/oauth/audit-emitter.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/audit-emitter.ts#L28)
 
 Discriminator for the outcome of a single audit event.
 

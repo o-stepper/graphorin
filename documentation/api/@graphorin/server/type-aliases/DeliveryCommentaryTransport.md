@@ -10,7 +10,7 @@
 type DeliveryCommentaryTransport = "ws" | "sse" | "rest";
 ```
 
-Defined in: packages/server/src/commentary/types.ts:42
+Defined in: [packages/server/src/commentary/types.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L42)
 
 Discriminator surfaced on audit rows + counter labels for the
 transport that produced the sanitization decision. The cardinality

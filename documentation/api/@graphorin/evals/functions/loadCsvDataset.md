@@ -10,7 +10,7 @@
 function loadCsvDataset(path, options?): Promise<Dataset<unknown, unknown, Readonly<Record<string, unknown>>>>;
 ```
 
-Defined in: evals/src/loaders/csv.ts:28
+Defined in: [packages/evals/src/loaders/csv.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/csv.ts#L28)
 
 ## Parameters
 

@@ -10,7 +10,7 @@
 function _resetCipherPeerCacheForTesting(): void;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/cipher-peer.ts:64
+Defined in: [packages/store-sqlite-encrypted/src/cipher-peer.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/cipher-peer.ts#L64)
 
 **`Internal`**
 

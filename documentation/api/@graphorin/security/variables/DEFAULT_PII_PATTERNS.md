@@ -10,7 +10,7 @@
 const DEFAULT_PII_PATTERNS: ReadonlyArray<PiiPattern>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:44
+Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L45)
 
 Default catalogue of PII patterns.
 

@@ -10,7 +10,7 @@
 function fetchAuthorizationServerMetadata(serverUrl, signal?): Promise<OAuthServerMetadata>;
 ```
 
-Defined in: packages/security/src/oauth/discovery.ts:89
+Defined in: [packages/security/src/oauth/discovery.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/discovery.ts#L89)
 
 Fetch authorization-server metadata (RFC 8414). Tries
 `/.well-known/oauth-authorization-server` first, then

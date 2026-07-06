@@ -10,7 +10,7 @@
 function createTimerDriver(options): TimerDriver;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:112
+Defined in: [packages/workflow/src/timer-driver.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L112)
 
 Build a polling driver over the supplied workflows (W-032). Call
 `start()` to begin polling; the next pass is scheduled at

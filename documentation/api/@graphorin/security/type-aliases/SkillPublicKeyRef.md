@@ -24,7 +24,7 @@ type SkillPublicKeyRef =
 };
 ```
 
-Defined in: packages/security/src/supply-chain/types.ts:54
+Defined in: [packages/security/src/supply-chain/types.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/types.ts#L54)
 
 Discriminator for the public-key resolution strategy.
 

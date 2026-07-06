@@ -10,7 +10,7 @@
 function rekeyDatabase(options): Promise<RekeyDatabaseResult>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/rekey.ts:61
+Defined in: [packages/store-sqlite-encrypted/src/rekey.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/rekey.ts#L61)
 
 Re-keys an encrypted SQLite database. Throws if the file is missing,
 the cipher peer cannot be loaded, the old passphrase is wrong (the

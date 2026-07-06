@@ -656,31 +656,39 @@ class ConsolidatorImpl implements Consolidator {
         typeof reason.value === 'string' &&
         reason.value.startsWith('dlq-replay:');
       if (this.#consolidatorStore !== null && !isDlqReplay) {
-        await this.#consolidatorStore.enqueueFailedBatch({
-          id: this.#randomId(),
-          consolidatorRunId: runId,
-          scope,
-          // MCON-10: capture the slice that actually failed so replays
-          // can be audited against it; the cursor may move past this
-          // window before the replay fires. W-142: read per scope - a
-          // concurrent dispatch on ANOTHER scope must not have replaced
-          // this scope's slice.
-          messageIds: this.#dispatchMessageIdsByScope.get(scopeKey(scope)) ?? [],
-          errorKind: classifyError(err),
-          errorMessage: describeError(err),
-          failedAt: this.#now(),
-          nextRetryAt:
-            this.#now() +
-            nextBackoffMs({
-              retryCount: 0,
-              baseMs: this.#config.dlqBaseBackoffMs,
-              maxMs: this.#config.dlqMaxBackoffMs,
-            }),
-          retryCount: 0,
-          // MCON-10: persist the failed phase - replays must re-run the
-          // SAME phase, not an inferred 'standard'.
-          phase,
-        });
+        // W-143: the phase's work is already done (and its failure
+        // captured in `outcome`); a transient storage error while
+        // ENQUEUEING the DLQ row must not skip run accounting or hold
+        // the scope lock until staleness takeover.
+        try {
+          await this.#consolidatorStore.enqueueFailedBatch({
+            id: this.#randomId(),
+            consolidatorRunId: runId,
+            scope,
+            // MCON-10: capture the slice that actually failed so replays
+            // can be audited against it; the cursor may move past this
+            // window before the replay fires. W-142: read per scope - a
+            // concurrent dispatch on ANOTHER scope must not have replaced
+            // this scope's slice.
+            messageIds: this.#dispatchMessageIdsByScope.get(scopeKey(scope)) ?? [],
+            errorKind: classifyError(err),
+            errorMessage: describeError(err),
+            failedAt: this.#now(),
+            nextRetryAt:
+              this.#now() +
+              nextBackoffMs({
+                retryCount: 0,
+                baseMs: this.#config.dlqBaseBackoffMs,
+                maxMs: this.#config.dlqMaxBackoffMs,
+              }),
+            retryCount: 0,
+            // MCON-10: persist the failed phase - replays must re-run the
+            // SAME phase, not an inferred 'standard'.
+            phase,
+          });
+        } catch (accountingErr) {
+          this.#recordAccountingFailure('enqueue-failed-batch', scope, phase, accountingErr);
+        }
       }
     } finally {
       // W-142: the entry must not outlive its dispatch (the catch above
@@ -691,32 +699,77 @@ class ConsolidatorImpl implements Consolidator {
     if (outcome.emptyExtractions > 0) {
       this.#emptyExtractions += outcome.emptyExtractions;
     }
-    if (this.#consolidatorStore !== null) {
-      await this.#consolidatorStore.recordRunFinish({
-        id: runId,
-        finishedAt: this.#now(),
-        status: outcome.status,
-        llmTokensUsed: outcome.llmTokensUsed,
-        llmCostUsd: outcome.llmCostUsd,
-        factsCreated: outcome.factsCreated,
-        factsUpdated: outcome.factsUpdated,
-        conflictsResolved: outcome.conflictsResolved,
-        noiseFilteredCount: outcome.noiseFilteredCount,
-        emptyExtractions: outcome.emptyExtractions,
-        // MCON-17: the P1-2 / P1-1 counters were computed on the outcome
-        // and then dropped - the run audit lost them.
-        episodesFormed: outcome.episodesFormed,
-        insightsCreated: outcome.insightsCreated,
-        errorMessage: outcome.errorMessage,
-      });
-      await this.#consolidatorStore.upsertState(scope, {
-        lastPhase: phase,
-        lastCompletedAt: this.#now(),
-        nextEligibleAt: this.#now() + this.#config.ceilings.cooldownMs,
-      });
+    // W-143: completion accounting is best-effort, the lock release is
+    // not. Pre-fix, a transient storage error (SQLITE_BUSY) in
+    // recordRunFinish/upsertState flew out of #runPhase, leaving the
+    // scope lock held until staleness takeover (5-15 minutes by tier),
+    // the consolidator_runs row forever unfinished, and every trigger
+    // of the window deferred - although the phase's work was already
+    // committed. Each accounting step now records its failure and
+    // continues; the release itself is guarded so a release error
+    // cannot mask the accounting one.
+    try {
+      if (this.#consolidatorStore !== null) {
+        try {
+          await this.#consolidatorStore.recordRunFinish({
+            id: runId,
+            finishedAt: this.#now(),
+            status: outcome.status,
+            llmTokensUsed: outcome.llmTokensUsed,
+            llmCostUsd: outcome.llmCostUsd,
+            factsCreated: outcome.factsCreated,
+            factsUpdated: outcome.factsUpdated,
+            conflictsResolved: outcome.conflictsResolved,
+            noiseFilteredCount: outcome.noiseFilteredCount,
+            emptyExtractions: outcome.emptyExtractions,
+            // MCON-17: the P1-2 / P1-1 counters were computed on the outcome
+            // and then dropped - the run audit lost them.
+            episodesFormed: outcome.episodesFormed,
+            insightsCreated: outcome.insightsCreated,
+            errorMessage: outcome.errorMessage,
+          });
+        } catch (accountingErr) {
+          this.#recordAccountingFailure('record-run-finish', scope, phase, accountingErr);
+        }
+        try {
+          await this.#consolidatorStore.upsertState(scope, {
+            lastPhase: phase,
+            lastCompletedAt: this.#now(),
+            nextEligibleAt: this.#now() + this.#config.ceilings.cooldownMs,
+          });
+        } catch (accountingErr) {
+          this.#recordAccountingFailure('upsert-state', scope, phase, accountingErr);
+        }
+      }
+    } finally {
+      try {
+        await this.#lockManager.release(scope, runId);
+      } catch (releaseErr) {
+        this.#recordAccountingFailure('lock-release', scope, phase, releaseErr);
+      }
     }
-    await this.#lockManager.release(scope, runId);
     return this.#emit(outcome, scope, reason);
+  }
+
+  /**
+   * W-143: surface a swallowed completion-accounting error as a
+   * dedicated error span. Swallowing is deliberate (the phase's work is
+   * committed; the lock must be released), but a systematic store
+   * problem must stay visible to operators.
+   */
+  #recordAccountingFailure(
+    step: string,
+    scope: SessionScope,
+    phase: ConsolidatorPhase,
+    err: unknown,
+  ): void {
+    const span = this.#tracer.startSpan({
+      type: 'x.memory.consolidator.accounting',
+      attrs: { step, phase, userId: scope.userId },
+    });
+    span.recordException(err);
+    span.setStatus('error');
+    span.end();
   }
 
   async #dispatch(phase: ConsolidatorPhase, scope: SessionScope): Promise<PhaseOutcome> {

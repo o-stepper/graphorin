@@ -10,6 +10,6 @@
 type JsonSchemaRecord = Record<string, unknown>;
 ```
 
-Defined in: packages/tools/src/schema/to-json-schema.ts:36
+Defined in: [packages/tools/src/schema/to-json-schema.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L36)
 
 A (loose) JSON Schema document produced by the projection.

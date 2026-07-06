@@ -10,7 +10,7 @@
 function composeLayer1(pack, mode): string;
 ```
 
-Defined in: packages/memory/src/context-engine/templates/composer.ts:26
+Defined in: [packages/memory/src/context-engine/templates/composer.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L26)
 
 Compose Layer 1 from the resolved locale pack.
 

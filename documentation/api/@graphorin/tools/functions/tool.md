@@ -10,7 +10,7 @@
 function tool<TInput, TOutput, TDeps>(spec): Tool<TInput, TOutput, TDeps>;
 ```
 
-Defined in: packages/tools/src/builder/tool.ts:57
+Defined in: [packages/tools/src/builder/tool.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/tool.ts#L57)
 
 Build a `Tool` instance from a spec. Type inference flows from the
 `inputSchema` / `outputSchema` Zod types into the `execute` callback

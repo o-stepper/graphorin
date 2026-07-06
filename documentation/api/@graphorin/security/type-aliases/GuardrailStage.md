@@ -10,7 +10,7 @@
 type GuardrailStage = "input" | "output";
 ```
 
-Defined in: packages/security/src/guardrails/types.ts:19
+Defined in: [packages/security/src/guardrails/types.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L19)
 
 Stage of the run a guardrail applies to.
 

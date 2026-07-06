@@ -12,7 +12,7 @@ function getDefaultAuditDbBinding():
   | undefined;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:181
+Defined in: [packages/security/src/audit/audit-db.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L181)
 
 Read the identifier of the active default binding. Returns
 `undefined` if no binding has been registered.

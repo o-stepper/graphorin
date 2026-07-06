@@ -6,7 +6,7 @@
 
 # Interface: SpanRecordEvent
 
-Defined in: packages/observability/src/exporters/types.ts:50
+Defined in: [packages/observability/src/exporters/types.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L50)
 
 Single span event carried alongside the span record.
 
@@ -16,7 +16,7 @@ Single span event carried alongside the span record.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-attributes"></a> `attributes` | `readonly` | [`SpanAttributes`](/api/@graphorin/core/type-aliases/SpanAttributes.md) | - | packages/observability/src/exporters/types.ts:53 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:51 |
-| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `"public"` \| `"internal"` \| `"secret"`\&gt;\> | W-094: per-attribute sensitivity map recorded by `addEvent(name, attrs, { sensitivity, sensitivityByAttribute })`. Consumed by the validation exporter; absent ⇒ every attribute is untagged (default-deny below the export floor). | packages/observability/src/exporters/types.ts:60 |
-| <a id="property-timeunixnano"></a> `timeUnixNano` | `readonly` | `number` | - | packages/observability/src/exporters/types.ts:52 |
+| <a id="property-attributes"></a> `attributes` | `readonly` | [`SpanAttributes`](/api/@graphorin/core/type-aliases/SpanAttributes.md) | - | [packages/observability/src/exporters/types.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L53) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/observability/src/exporters/types.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L51) |
+| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `"public"` \| `"internal"` \| `"secret"`\&gt;\> | W-094: per-attribute sensitivity map recorded by `addEvent(name, attrs, { sensitivity, sensitivityByAttribute })`. Consumed by the validation exporter; absent ⇒ every attribute is untagged (default-deny below the export floor). | [packages/observability/src/exporters/types.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L60) |
+| <a id="property-timeunixnano"></a> `timeUnixNano` | `readonly` | `number` | - | [packages/observability/src/exporters/types.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L52) |

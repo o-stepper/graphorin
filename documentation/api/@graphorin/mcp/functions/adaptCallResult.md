@@ -10,7 +10,7 @@
 function adaptCallResult(args): ToolReturn<unknown>;
 ```
 
-Defined in: packages/mcp/src/client/adapt-result.ts:54
+Defined in: [packages/mcp/src/client/adapt-result.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/adapt-result.ts#L54)
 
 **`Internal`**
 

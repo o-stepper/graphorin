@@ -10,7 +10,7 @@
 function toSpanAttributes(annotation): Readonly<Record<string, string>>;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:138
+Defined in: [packages/memory/src/context-engine/annotations.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L138)
 
 Convert a [ContentAnnotation](/api/@graphorin/memory/interfaces/ContentAnnotation.md) to a span-attributes record
 suitable for `AISpan.setAttributes(...)`.

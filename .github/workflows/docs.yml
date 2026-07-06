@@ -65,6 +65,37 @@ jobs:
       - name: Build documentation site (sync + TypeDoc + VitePress + llms.txt)
         run: pnpm --filter @graphorin/docs run build:site
 
+      # W-059: the benchmarks page is generated from the committed
+      # benchConfig-stamped reports; a hand-edited number (or a report
+      # change without regeneration) fails here.
+      - name: Benchmark results page freshness (regen + diff)
+        run: node documentation/scripts/build-benchmark-results.mjs
+
+      # W-128: documentation/api (the TypeDoc output) is COMMITTED for
+      # GitHub readers, code search, and LLM ingestion, but was only
+      # regenerated at version bumps - a PR changing public API or
+      # TSDoc between releases silently left the committed tree stale.
+      # build:site above just regenerated it (build:typedoc +
+      # build:sanitise normalize the output), so any diff or untracked
+      # page here means the PR forgot the regeneration. Release commits
+      # remain noisy (2826 files) - an accepted trade-off for a tree
+      # that is always fresh. The nightly cron catches drift on quiet
+      # branches.
+      - name: API reference freshness (regen + diff)
+        run: |
+          if ! git diff --exit-code --stat -- documentation/api; then
+            echo "--- first 200 lines of the content diff (for diagnosis) ---"
+            git diff -- documentation/api | head -200
+            echo "::error title=documentation/api is stale::Public API/TSDoc changed without regenerating the committed reference. Run: pnpm --filter @graphorin/docs run clean && pnpm --filter @graphorin/docs run build:typedoc && pnpm --filter @graphorin/docs run build:sanitise, then commit documentation/api."
+            exit 1
+          fi
+          untracked="$(git status --porcelain -- documentation/api)"
+          if [ -n "$untracked" ]; then
+            echo "$untracked"
+            echo "::error title=documentation/api has uncommitted pages::New generated pages must be committed (same regeneration command as above)."
+            exit 1
+          fi
+
       # E10 (docs-14): --include-fragments makes lychee validate #anchors
       # against the target page's heading ids - without it seven broken
       # in-site anchors (VitePress slugifies '_' to '-') sailed through.

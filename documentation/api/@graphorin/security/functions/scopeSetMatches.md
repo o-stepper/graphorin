@@ -10,7 +10,7 @@
 function scopeSetMatches(granted, required): boolean;
 ```
 
-Defined in: packages/security/src/auth/scope.ts:127
+Defined in: [packages/security/src/auth/scope.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L127)
 
 Match a granted set against a required scope. Strings inside
 `granted` that fail to parse are skipped (they cannot grant

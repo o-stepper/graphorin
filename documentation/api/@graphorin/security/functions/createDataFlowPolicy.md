@@ -10,7 +10,7 @@
 function createDataFlowPolicy(config): DataFlowPolicy;
 ```
 
-Defined in: packages/security/src/dataflow/policy.ts:56
+Defined in: [packages/security/src/dataflow/policy.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/policy.ts#L56)
 
 Build a [DataFlowPolicy](/api/@graphorin/security/interfaces/DataFlowPolicy.md) from config.
 

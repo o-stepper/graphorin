@@ -6,7 +6,7 @@
 
 # Interface: EmbedderProvider
 
-Defined in: packages/core/src/contracts/embedder.ts:14
+Defined in: [packages/core/src/contracts/embedder.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/embedder.ts#L14)
 
 Pluggable embedding provider. Implementations live in the embedder
 adapter packages (`@graphorin/embedder-transformersjs` (default),
@@ -28,7 +28,7 @@ lookup key.
 configHash(): string;
 ```
 
-Defined in: packages/core/src/contracts/embedder.ts:20
+Defined in: [packages/core/src/contracts/embedder.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/embedder.ts#L20)
 
 Stable hash of the embedder's configuration (model + revision + opts).
 
@@ -44,7 +44,7 @@ Stable hash of the embedder's configuration (model + revision + opts).
 dim(): number;
 ```
 
-Defined in: packages/core/src/contracts/embedder.ts:18
+Defined in: [packages/core/src/contracts/embedder.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/embedder.ts#L18)
 
 Output dimensionality of the embedding vectors.
 
@@ -60,7 +60,7 @@ Output dimensionality of the embedding vectors.
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/core/src/contracts/embedder.ts:22
+Defined in: [packages/core/src/contracts/embedder.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/embedder.ts#L22)
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -83,7 +83,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: packages/core/src/contracts/embedder.ts:16
+Defined in: [packages/core/src/contracts/embedder.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/embedder.ts#L16)
 
 Stable identifier (e.g. `'transformersjs:Xenova/multilingual-e5-base'`).
 

@@ -10,7 +10,7 @@
 function defaultPassageExtractor(record): string;
 ```
 
-Defined in: packages/reranker-transformersjs/src/text-extraction.ts:27
+Defined in: [packages/reranker-transformersjs/src/text-extraction.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/text-extraction.ts#L27)
 
 Returns the best-effort passage text for a [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md). The
 order of preference, top-down:

@@ -12,7 +12,7 @@ function getResolver(scheme):
   | undefined;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/registry.ts:72
+Defined in: [packages/security/src/secrets/resolvers/registry.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L72)
 
 Look up the resolver registered for `scheme`. Returns `undefined` if
 no resolver matches.

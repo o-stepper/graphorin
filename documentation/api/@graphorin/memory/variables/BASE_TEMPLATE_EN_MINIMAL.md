@@ -10,6 +10,6 @@
 const BASE_TEMPLATE_EN_MINIMAL: string = enLocalePack.baseTemplate.minimal;
 ```
 
-Defined in: packages/memory/src/context-engine/templates/base-en.ts:19
+Defined in: [packages/memory/src/context-engine/templates/base-en.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/base-en.ts#L19)
 
 English Layer 1 in `'minimal'` mode (~80-120 tokens).

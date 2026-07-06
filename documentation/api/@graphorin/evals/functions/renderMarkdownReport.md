@@ -10,7 +10,7 @@
 function renderMarkdownReport<I, O>(report): string;
 ```
 
-Defined in: evals/src/reporters/markdown.ts:12
+Defined in: [packages/evals/src/reporters/markdown.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/markdown.ts#L12)
 
 ## Type Parameters
 

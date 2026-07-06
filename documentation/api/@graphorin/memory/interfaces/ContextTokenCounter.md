@@ -6,7 +6,7 @@
 
 # Interface: ContextTokenCounter
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:27
+Defined in: [packages/memory/src/context-engine/token-counter.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L27)
 
 Pluggable text-token counter used inside the ContextEngine. The
 surface is narrower than [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) because the engine
@@ -19,7 +19,7 @@ phase - it operates on rendered text fragments.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/token-counter.ts:28 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/memory/src/context-engine/token-counter.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L28) |
 
 ## Methods
 
@@ -29,7 +29,7 @@ phase - it operates on rendered text fragments.
 countText(text): Promise<number>;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:29
+Defined in: [packages/memory/src/context-engine/token-counter.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L29)
 
 #### Parameters
 

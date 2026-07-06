@@ -10,7 +10,7 @@
 const FILTER_KIND_CUSTOM: HandoffInputFilterDescriptor;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:332
+Defined in: [packages/agent/src/filters/index.ts:332](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L332)
 
 Pure `HandoffInputFilterDescriptor` for callers that just need the
 descriptor without instantiating the runtime function (e.g. the

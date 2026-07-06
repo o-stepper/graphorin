@@ -10,7 +10,7 @@
 function splitFrontmatter(skillMd): SplitFrontmatter;
 ```
 
-Defined in: packages/security/src/supply-chain/frontmatter.ts:32
+Defined in: [packages/security/src/supply-chain/frontmatter.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L32)
 
 Split `skillMd` into the YAML frontmatter and the markdown body.
 Throws [SkillManifestParseError](/api/@graphorin/security/classes/SkillManifestParseError.md) when no frontmatter block is

@@ -10,7 +10,7 @@
 function withChildToolSecretsContext<T>(child, fn): T;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:114
+Defined in: [packages/security/src/secrets/acl.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L114)
 
 Convenience: run `fn` inside a child scope rooted at the current
 active context. Used by `@graphorin/agent` to wire sub-agent calls.

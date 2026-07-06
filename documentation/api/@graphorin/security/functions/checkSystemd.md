@@ -10,7 +10,7 @@
 function checkSystemd(opts): Promise<CheckResult[]>;
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:195
+Defined in: [packages/security/src/hardening/doctor.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L195)
 
 Linux-only systemd hardening check. Returns a `'skip'` row on
 non-Linux hosts. The body parses the structured output of

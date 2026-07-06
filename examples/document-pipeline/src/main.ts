@@ -21,7 +21,7 @@
 
 import process from 'node:process';
 import { type CheckpointStore, collect, dispatch, type WorkflowEvent } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import {
   anyValue,
   barrier,
@@ -323,7 +323,7 @@ function clamp(value: string, limit: number): string {
   return value.length > limit ? `${value.slice(0, limit - 3)}...` : value;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

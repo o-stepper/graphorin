@@ -22,7 +22,7 @@ type ToolCassetteSource =
 };
 ```
 
-Defined in: packages/sessions/src/cassette/types.ts:227
+Defined in: [packages/sessions/src/cassette/types.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L227)
 
 Discriminated union accepted by `Session.replay({ cassette })`.
 

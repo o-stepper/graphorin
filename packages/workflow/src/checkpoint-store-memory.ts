@@ -1,5 +1,5 @@
 /**
- * In-memory {@link CheckpointStore} adapter. Useful in tests, REPL
+ * In-memory `CheckpointStore` adapter. Useful in tests, REPL
  * sessions, and small examples where SQLite would be overkill. The
  * production-grade adapter lives in `@graphorin/store-sqlite`.
  *
@@ -26,7 +26,7 @@ interface StoredCheckpoint {
 }
 
 /**
- * Pure in-memory {@link CheckpointStore} implementation. Thread-safe
+ * Pure in-memory `CheckpointStore` implementation. Thread-safe
  * within a single Node.js event loop because every mutation is
  * synchronous; concurrent runs that share the same instance will see
  * a consistent view.

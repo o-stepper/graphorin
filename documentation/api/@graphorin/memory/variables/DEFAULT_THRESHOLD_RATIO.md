@@ -10,7 +10,7 @@
 const DEFAULT_THRESHOLD_RATIO: 0.85 = 0.85;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/thresholds.ts:37
+Defined in: [packages/memory/src/context-engine/compaction/thresholds.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/thresholds.ts#L37)
 
 Default ratio multiplied against the provider's context window
 when neither `thresholdTokens` nor `thresholdRatio` is supplied.

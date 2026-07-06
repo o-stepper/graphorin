@@ -22,7 +22,7 @@ type WorkflowEvent<TState> =
   | WorkflowCustomEvent;
 ```
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:11
+Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
 Discriminated union of every event produced by `Workflow.execute(...)`
 and `Workflow.resume(...)`.

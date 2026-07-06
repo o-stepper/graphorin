@@ -10,7 +10,7 @@
 function isForeignProvenance(provenance): boolean;
 ```
 
-Defined in: packages/memory/src/search/trust.ts:30
+Defined in: [packages/memory/src/search/trust.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/trust.ts#L30)
 
 `true` for provenance that did not originate first-party (P1-4) -
 mirrors the eviction-path classification: `null` (legacy / direct

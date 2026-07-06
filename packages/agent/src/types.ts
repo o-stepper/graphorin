@@ -167,7 +167,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly memory?: Memory;
   /**
    * Opt in to building the per-run system prompt from the memory
-   * {@link ContextEngine} (CE-1). When `true` **and** `memory` is wired, the
+   * `ContextEngine` (CE-1). When `true` **and** `memory` is wired, the
    * runtime calls `memory.contextEngine.assemble(...)` once at run start: the
    * agent's `instructions` become Layer 2 and the engine prepends the memory
    * base and appends working blocks, procedural rules, skill cards, the
@@ -399,8 +399,9 @@ export type VerifierResult =
  * to the model (as a user message prefixed `[verifier:<id>]`) and the
  * loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
  *
- * A verifier that THROWS is treated as passed (and logged): a buggy
- * verifier must never take down a run.
+ * A verifier that THROWS is treated as passed (the `verifier.result`
+ * event still fires with `ok: true`): a buggy verifier must never
+ * take down a run.
  *
  * @stable
  */

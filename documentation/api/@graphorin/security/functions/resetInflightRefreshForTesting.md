@@ -10,7 +10,7 @@
 function _resetInflightRefreshForTesting(): void;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:67
+Defined in: [packages/security/src/oauth/refresh.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L67)
 
 **`Experimental`**
 

@@ -6,7 +6,7 @@
 
 # Interface: CompactionConfig
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:227
+Defined in: [packages/memory/src/context-engine/compaction/types.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L227)
 
 Full compaction config. Either `false` (explicitly disabled),
 `'auto'` (resolved per-provider at warm-up) or a fully-specified
@@ -18,6 +18,6 @@ record.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-postcompactionhooks"></a> `postCompactionHooks?` | `readonly` | readonly [`PostCompactionHook`](/api/@graphorin/memory/type-aliases/PostCompactionHook.md)[] | packages/memory/src/context-engine/compaction/types.ts:230 |
-| <a id="property-strategy"></a> `strategy?` | `readonly` | [`CompactionStrategy`](/api/@graphorin/memory/type-aliases/CompactionStrategy.md) | packages/memory/src/context-engine/compaction/types.ts:229 |
-| <a id="property-trigger"></a> `trigger?` | `readonly` | \| [`CompactionTriggerConfig`](/api/@graphorin/memory/interfaces/CompactionTriggerConfig.md) \| `"never"` | packages/memory/src/context-engine/compaction/types.ts:228 |
+| <a id="property-postcompactionhooks"></a> `postCompactionHooks?` | `readonly` | readonly [`PostCompactionHook`](/api/@graphorin/memory/type-aliases/PostCompactionHook.md)[] | [packages/memory/src/context-engine/compaction/types.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L230) |
+| <a id="property-strategy"></a> `strategy?` | `readonly` | [`CompactionStrategy`](/api/@graphorin/memory/type-aliases/CompactionStrategy.md) | [packages/memory/src/context-engine/compaction/types.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L229) |
+| <a id="property-trigger"></a> `trigger?` | `readonly` | \| [`CompactionTriggerConfig`](/api/@graphorin/memory/interfaces/CompactionTriggerConfig.md) \| `"never"` | [packages/memory/src/context-engine/compaction/types.ts:228](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L228) |

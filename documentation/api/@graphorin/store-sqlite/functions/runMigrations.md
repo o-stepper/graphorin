@@ -10,7 +10,7 @@
 function runMigrations(conn, options?): readonly AppliedMigration[];
 ```
 
-Defined in: packages/store-sqlite/src/migrations/runner.ts:44
+Defined in: [packages/store-sqlite/src/migrations/runner.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/runner.ts#L44)
 
 Apply every pending migration in version order. Each migration runs
 inside its own transaction so a failure mid-sequence leaves the

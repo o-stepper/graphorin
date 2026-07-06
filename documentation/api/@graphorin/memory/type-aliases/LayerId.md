@@ -16,7 +16,7 @@ type LayerId =
   | "autoRecall";
 ```
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:34
+Defined in: [packages/memory/src/context-engine/token-budget.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-budget.ts#L34)
 
 Layer-id discriminator. Mirrors the documented Layer 1-6
 structure of the layered system prompt.

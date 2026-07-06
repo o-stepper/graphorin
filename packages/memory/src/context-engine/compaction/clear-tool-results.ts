@@ -26,7 +26,7 @@ export const DEFAULT_KEEP_TOOL_USES = 3;
 
 /** Knobs for {@link clearOldToolResults} (mirrors the strategy variant). */
 export interface ClearToolResultsOptions {
-  /** Most-recent tool results kept verbatim (default {@link DEFAULT_KEEP_TOOL_USES}). */
+  /** Most-recent tool results kept verbatim (default `DEFAULT_KEEP_TOOL_USES`). */
   readonly keepToolUses?: number;
   /** Only clear if at least this many tokens are reclaimable; else leave untouched (default 0). */
   readonly clearAtLeast?: number;

@@ -10,7 +10,7 @@
 function scheduleRetentionSweeps(options): () => void;
 ```
 
-Defined in: packages/server/src/runtime/retention.ts:186
+Defined in: [packages/server/src/runtime/retention.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/retention.ts#L186)
 
 W-010: schedule the periodic retention sweep. Same lifecycle shape
 as `scheduleRunPruning`: `unref`-ed `setInterval` + a stop function.

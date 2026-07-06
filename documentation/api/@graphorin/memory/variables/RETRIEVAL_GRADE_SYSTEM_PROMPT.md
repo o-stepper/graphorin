@@ -10,7 +10,7 @@
 const RETRIEVAL_GRADE_SYSTEM_PROMPT: string;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:224
+Defined in: [packages/memory/src/search/iterative.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L224)
 
 **`Internal`**
 

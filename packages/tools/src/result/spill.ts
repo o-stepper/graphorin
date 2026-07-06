@@ -109,6 +109,14 @@ export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}
             : {}),
           ...(opts.producerSource !== undefined ? { source: opts.producerSource } : {}),
           ...(opts.sensitivityTier !== undefined ? { sensitivity: opts.sensitivityTier } : {}),
+          // W-156: persist the whole-artifact imperative flag so a
+          // reader in another executor / a resumed process surfaces it
+          // on page reads. Only `true` is stored - a clean artifact's
+          // sidecar stays byte-identical to the pre-W-156 shape. The
+          // sidecar existence gate above is deliberately unchanged:
+          // the executor acts on the flag only for tainted reads, so
+          // an artifact without producer taint carries no flag.
+          ...(opts.imperativePatternsPresent === true ? { imperativePatternsPresent: true } : {}),
         };
         await fs.writeFile(sidecarPathFor(file), JSON.stringify(meta), { mode: 0o600 });
       }

@@ -23,7 +23,7 @@ type SubscribeResult =
 };
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:116
+Defined in: [packages/server/src/ws/dispatcher.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L116)
 
 Result of [WsDispatcher.subscribe](/api/@graphorin/server/interfaces/WsDispatcher.md#subscribe).
 

@@ -6,7 +6,7 @@
 
 # Interface: TokenCounter
 
-Defined in: packages/core/src/contracts/token-counter.ts:14
+Defined in: [packages/core/src/contracts/token-counter.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/token-counter.ts#L14)
 
 Pluggable token counter. Implementations live in `@graphorin/provider`
 (default `JsTiktokenCounter` for OpenAI/compatible, plus per-vendor
@@ -22,8 +22,8 @@ cached counts when the underlying tokenizer is upgraded.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/core/src/contracts/token-counter.ts:16 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/core/src/contracts/token-counter.ts:18 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/core/src/contracts/token-counter.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/token-counter.ts#L16) |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/core/src/contracts/token-counter.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/token-counter.ts#L18) |
 
 ## Methods
 
@@ -33,7 +33,7 @@ cached counts when the underlying tokenizer is upgraded.
 count(messages): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/token-counter.ts:20
+Defined in: [packages/core/src/contracts/token-counter.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/token-counter.ts#L20)
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -55,7 +55,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/token-counter.ts:22
+Defined in: [packages/core/src/contracts/token-counter.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/token-counter.ts#L22)
 
 Count tokens in a raw text string.
 

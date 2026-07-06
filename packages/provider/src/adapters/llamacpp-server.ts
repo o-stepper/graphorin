@@ -49,7 +49,7 @@ export interface LlamaCppServerAdapterOptions {
   /**
    * Acknowledge the risk of running over plaintext HTTP against a
    * public host. Without this flag the adapter throws
-   * {@link import('../errors/errors.js').LocalProviderInsecureTransportError}.
+   * `LocalProviderInsecureTransportError`.
    */
   readonly allowInsecureTransport?: boolean;
   /** Override for the default `acceptsSensitivity` value. */

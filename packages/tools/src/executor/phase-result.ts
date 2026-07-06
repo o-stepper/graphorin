@@ -122,6 +122,7 @@ export function assembleResultPhase(
       trustClass: effectiveTrustClass,
       source: effectiveSource,
       ...(effectiveSensitivity !== undefined ? { sensitivity: effectiveSensitivity } : {}),
+      ...(truncation.spillImperativePatternsPresent === true ? { imperativeFlagged: true } : {}),
     });
   }
   // Record this output's provenance so later sink gates can detect

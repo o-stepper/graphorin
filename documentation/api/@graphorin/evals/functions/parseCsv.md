@@ -10,7 +10,7 @@
 function parseCsv(text, options?): readonly Case<unknown, unknown, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: evals/src/loaders/csv.ts:48
+Defined in: [packages/evals/src/loaders/csv.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/csv.ts#L48)
 
 Pure parser. Exported separately so tests can exercise the
 column-mapping behaviour without touching the filesystem.

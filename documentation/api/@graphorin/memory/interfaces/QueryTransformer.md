@@ -6,7 +6,7 @@
 
 # Interface: QueryTransformer
 
-Defined in: packages/memory/src/search/query-transform.ts:47
+Defined in: [packages/memory/src/search/query-transform.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L47)
 
 Pluggable query-transformation seam consumed by
 `SemanticMemory.search(..., { multiQuery, hyde })`. The built-in
@@ -31,7 +31,7 @@ expand(
 options?): Promise<readonly string[]>;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:53
+Defined in: [packages/memory/src/search/query-transform.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L53)
 
 Rewrite a query into up to `count` **additional** reworded variants
 (the original query is retained by the caller). Returns `[]` when
@@ -57,7 +57,7 @@ transformation is unavailable or the model returns nothing usable.
 hypothetical(query, options?): Promise<string | null>;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:63
+Defined in: [packages/memory/src/search/query-transform.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L63)
 
 Generate a single short hypothetical-answer passage to embed (HyDE),
 or `null` when unavailable. The caller embeds the passage and fuses

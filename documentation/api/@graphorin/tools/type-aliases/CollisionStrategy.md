@@ -10,7 +10,7 @@
 type CollisionStrategy = "auto-prefix" | "priority" | "manual";
 ```
 
-Defined in: packages/tools/src/registry/types.ts:23
+Defined in: [packages/tools/src/registry/types.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L23)
 
 Strategy for resolving cross-source tool-name collisions.
 

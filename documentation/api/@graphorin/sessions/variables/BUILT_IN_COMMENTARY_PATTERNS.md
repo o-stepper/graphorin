@@ -10,7 +10,7 @@
 const BUILT_IN_COMMENTARY_PATTERNS: ReadonlyArray<CommentaryPattern>;
 ```
 
-Defined in: packages/sessions/src/commentary/built-in-patterns.ts:30
+Defined in: [packages/sessions/src/commentary/built-in-patterns.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/built-in-patterns.ts#L30)
 
 The framework-shipped catalogue. Snapshot bytes-equal across
 boundaries; idempotent on a single content part (the wrap envelope

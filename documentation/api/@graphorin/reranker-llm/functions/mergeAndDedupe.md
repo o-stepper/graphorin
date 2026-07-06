@@ -10,7 +10,7 @@
 function mergeAndDedupe<TRecord>(lists): readonly MergedEntry<TRecord>[];
 ```
 
-Defined in: src/reranker.ts:277
+Defined in: [packages/reranker-llm/src/reranker.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L277)
 
 Merge per-source lists, keeping the highest initial score per record
 id. Pure function; exported for the unit fixture.

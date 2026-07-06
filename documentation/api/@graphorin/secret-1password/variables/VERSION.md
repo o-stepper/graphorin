@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/secret-1password/src/index.ts:30
+Defined in: [packages/secret-1password/src/index.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/index.ts#L30)

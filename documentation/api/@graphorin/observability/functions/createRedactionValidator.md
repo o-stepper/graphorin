@@ -10,7 +10,7 @@
 function createRedactionValidator(opts?): RedactionValidatorInstance;
 ```
 
-Defined in: packages/observability/src/redaction/validator.ts:171
+Defined in: [packages/observability/src/redaction/validator.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/validator.ts#L171)
 
 Create a [RedactionValidator](/api/@graphorin/observability/interfaces/RedactionValidator.md) configured against the supplied
 options. The result implements both the `RedactionValidator`

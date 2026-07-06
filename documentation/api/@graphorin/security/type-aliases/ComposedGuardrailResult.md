@@ -25,7 +25,7 @@ type ComposedGuardrailResult<TValue> =
 };
 ```
 
-Defined in: packages/security/src/guardrails/types.ts:111
+Defined in: [packages/security/src/guardrails/types.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L111)
 
 Result of running a sequence of guardrails through `composeGuardrails(...)`.
 

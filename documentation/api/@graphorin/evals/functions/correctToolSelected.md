@@ -10,7 +10,7 @@
 function correctToolSelected<I>(options): Scorer<I, Trajectory>;
 ```
 
-Defined in: evals/src/scorers/trajectory/correct-tool-selected.ts:24
+Defined in: [packages/evals/src/scorers/trajectory/correct-tool-selected.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/correct-tool-selected.ts#L24)
 
 ## Type Parameters
 

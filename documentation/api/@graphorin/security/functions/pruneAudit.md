@@ -10,7 +10,7 @@
 function pruneAudit(db, options): Promise<PruneAuditResult>;
 ```
 
-Defined in: packages/security/src/audit/prune.ts:101
+Defined in: [packages/security/src/audit/prune.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/prune.ts#L101)
 
 Drop entries older than `before`, leaving at least `retain`
 entries. Maintains the chain integrity by rewriting the first

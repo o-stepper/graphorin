@@ -10,7 +10,7 @@
 function nextFireAfter(parsed, from): Date | null;
 ```
 
-Defined in: packages/triggers/src/cron.ts:179
+Defined in: [packages/triggers/src/cron.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/cron.ts#L179)
 
 Compute the next fire time strictly after `from` for the supplied
 cron schedule. Returns a UTC `Date` (the scheduler treats every

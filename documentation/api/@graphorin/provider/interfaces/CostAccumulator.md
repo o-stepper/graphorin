@@ -6,7 +6,7 @@
 
 # Interface: CostAccumulator
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:42
+Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L42)
 
 A process-local cost accumulator (PS-8). Wire [CostAccumulator.onUsage](/api/@graphorin/provider/interfaces/CostAccumulator.md#property-onusage)
 into [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md) and read the running totals - keyed by
@@ -19,7 +19,7 @@ into [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md) 
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-onusage"></a> `onUsage` | `readonly` | (`info`) => `void` | Pass this to [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md)'s `onUsage`. | packages/provider/src/middleware/with-cost-tracking.ts:44 |
+| <a id="property-onusage"></a> `onUsage` | `readonly` | (`info`) => `void` | Pass this to [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md)'s `onUsage`. | [packages/provider/src/middleware/with-cost-tracking.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L44) |
 
 ## Methods
 
@@ -29,7 +29,7 @@ into [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md) 
 reset(): void;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:50
+Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L50)
 
 Clear all accumulated totals.
 
@@ -45,7 +45,7 @@ Clear all accumulated totals.
 totalFor(providerName, modelId): CostTrackingTotals;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:48
+Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L48)
 
 Running totals for one `provider × model` (zeros when unseen).
 
@@ -68,7 +68,7 @@ Running totals for one `provider × model` (zeros when unseen).
 totals(): ReadonlyMap<string, CostTrackingTotals>;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:46
+Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L46)
 
 Snapshot of every tracked `provider::model` → totals.
 

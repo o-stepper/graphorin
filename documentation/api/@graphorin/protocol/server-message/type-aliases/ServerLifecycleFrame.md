@@ -10,6 +10,6 @@
 type ServerLifecycleFrame = z.infer<typeof LifecycleFrame>;
 ```
 
-Defined in: src/server-message.ts:180
+Defined in: [packages/protocol/src/server-message.ts:180](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L180)
 
 ## Stable

@@ -6,7 +6,7 @@
 
 # Interface: CommentaryAuditSink
 
-Defined in: packages/server/src/commentary/audit-bridge.ts:59
+Defined in: [packages/server/src/commentary/audit-bridge.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L59)
 
 A commentary sink that also exposes a `drain()` so callers (and tests) can
 await any in-flight audit writes.
@@ -21,7 +21,7 @@ await any in-flight audit writes.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | packages/server/src/commentary/audit-bridge.ts:61 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | [packages/server/src/commentary/audit-bridge.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L61) |
 
 ## Methods
 
@@ -31,7 +31,7 @@ await any in-flight audit writes.
 onDecision(decision): void;
 ```
 
-Defined in: packages/server/src/commentary/types.ts:106
+Defined in: [packages/server/src/commentary/types.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L106)
 
 Called once per applied decision. Implementations should be
 non-throwing; the sanitizer wraps the call in `try/catch` so a

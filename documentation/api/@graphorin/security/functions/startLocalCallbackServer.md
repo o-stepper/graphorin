@@ -10,7 +10,7 @@
 function startLocalCallbackServer(options?): Promise<LocalCallbackServer>;
 ```
 
-Defined in: packages/security/src/oauth/callback-server.ts:85
+Defined in: [packages/security/src/oauth/callback-server.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/callback-server.ts#L85)
 
 Bind a localhost callback server on a random port in
 `options.portRange`. The handle exposes the chosen redirect URI

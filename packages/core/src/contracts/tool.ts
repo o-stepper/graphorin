@@ -101,6 +101,12 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
    * the input-token cost bounded for installations with dozens of
    * MCP-derived tools.
    *
+   * Naming note (W-127): the snake_case is DELIBERATE - this field
+   * mirrors the wire-level `defer_loading` flag of the Anthropic
+   * tool-use surface one-to-one, so grep and serialized payloads
+   * match. It is the only snake_case field on `Tool` by design, not
+   * an oversight.
+   *
    * @default `false`
    */
   readonly defer_loading?: boolean;

@@ -10,7 +10,7 @@
 type CausalityMonitorStrictness = "off" | "detect" | "detect-and-flag" | "detect-and-block";
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:24
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L24)
 
 Operator-tunable strictness level. Default `'detect-and-flag'`
 for cloud-tier providers; `'detect'` for loopback providers;

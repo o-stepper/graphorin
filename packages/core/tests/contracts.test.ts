@@ -56,6 +56,7 @@ import type {
   Sensitivity,
   SessionScope,
   StopCondition,
+  ToolCall,
   ToolError,
   Usage,
   WorkflowEvent,
@@ -66,6 +67,12 @@ describe('public type surface', () => {
     expectTypeOf<Provider['stream']>().parameter(0).toEqualTypeOf<ProviderRequest>();
     expectTypeOf<ReturnType<Provider['stream']>>().toEqualTypeOf<AsyncIterable<ProviderEvent>>();
     expectTypeOf<ReturnType<Provider['generate']>>().toEqualTypeOf<Promise<ProviderResponse>>();
+  });
+
+  it('ProviderResponse.toolCalls reuses the canonical ToolCall (W-127)', () => {
+    expectTypeOf<ProviderResponse['toolCalls']>().toEqualTypeOf<
+      ReadonlyArray<ToolCall> | undefined
+    >();
   });
 
   it('MemoryStore exposes the six tier sub-namespaces', () => {

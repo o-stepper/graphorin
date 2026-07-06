@@ -10,7 +10,7 @@
 function defineBlock(spec): BlockDefinition;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:64
+Defined in: [packages/memory/src/tiers/working-memory.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L64)
 
 Build a frozen [BlockDefinition](/api/@graphorin/memory/interfaces/BlockDefinition.md). Surfaced as `blocks.define(...)`
 for ergonomic call-sites; the underlying object is the same shape

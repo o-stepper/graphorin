@@ -10,7 +10,7 @@
 function defaultPassageExtractor(record): string;
 ```
 
-Defined in: src/text-extraction.ts:22
+Defined in: [packages/reranker-llm/src/text-extraction.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/text-extraction.ts#L22)
 
 Walks `text → summary → value → label → id` to find the best
 passage representation of a memory record.

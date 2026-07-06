@@ -10,7 +10,7 @@
 function resolveSecret(ref, ctx?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/registry.ts:138
+Defined in: [packages/security/src/secrets/resolvers/registry.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L138)
 
 Resolve a `SecretRef` (string or parsed) into a `SecretValue` via
 the active resolver. Throws `UnknownSchemeError` if no resolver

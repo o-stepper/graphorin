@@ -10,7 +10,7 @@
 type ContextualRetrievalMode = "off" | "late-chunk" | "llm";
 ```
 
-Defined in: packages/memory/src/internal/contextualize.ts:31
+Defined in: [packages/memory/src/internal/contextualize.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/contextualize.ts#L31)
 
 Contextual-retrieval mode. `'late-chunk'` is the offline default;
 `'llm'` is the opt-in, consolidator-only enrichment. P1-3.

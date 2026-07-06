@@ -10,7 +10,7 @@
 function defineInputGuardrail<TValue>(spec): InputGuardrail<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builders.ts:28
+Defined in: [packages/security/src/guardrails/builders.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builders.ts#L28)
 
 Create a typed input guardrail. Thin wrapper around the
 declarative shape - the helper exists so call-sites stay

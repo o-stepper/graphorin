@@ -15,7 +15,7 @@ type CassetteReplayReason =
   | "idempotency-mismatch-fallback";
 ```
 
-Defined in: packages/sessions/src/cassette/replay.ts:27
+Defined in: [packages/sessions/src/cassette/replay.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/replay.ts#L27)
 
 Operator-facing reason surfaced on every cassette decision event.
 

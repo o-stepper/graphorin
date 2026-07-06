@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:197
+Defined in: [packages/memory/src/internal/storage-adapter.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L210)
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:226
+Defined in: [packages/memory/src/internal/storage-adapter.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L239)
 
 Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -50,7 +50,7 @@ counts instead of `list(...)`-materialising up to 1000 rows.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:99
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:216
+Defined in: [packages/memory/src/internal/storage-adapter.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L229)
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -105,7 +105,7 @@ idempotency cursor without rereading already-processed turns.
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:104
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -133,7 +133,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:98
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
 #### Parameters
 
@@ -161,7 +161,17 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:105
+Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
+
+Full-text search over the scoped session messages.
+
+Query precedence (W-127): the POSITIONAL `query` parameter is
+authoritative; when the caller also sets `opts.query` (the field
+exists because [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOptions.md) is shared with the
+option-object search surfaces), implementations MUST ignore it.
+The duplication is a known wart: narrowing `opts` to
+`Omit<MemorySearchOptions, 'query'>` is a candidate for the next
+major, not a change this line can make compatibly.
 
 #### Parameters
 
@@ -191,7 +201,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:198
+Defined in: [packages/memory/src/internal/storage-adapter.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L211)
 
 #### Parameters
 
@@ -214,7 +224,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:198
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:209
+Defined in: [packages/memory/src/internal/storage-adapter.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L222)
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

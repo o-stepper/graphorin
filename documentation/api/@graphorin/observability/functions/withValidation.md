@@ -10,7 +10,7 @@
 function withValidation<E>(exporter, opts?): TraceExporter;
 ```
 
-Defined in: packages/observability/src/exporters/with-validation.ts:43
+Defined in: [packages/observability/src/exporters/with-validation.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/with-validation.ts#L43)
 
 Wrap an exporter so every span flows through a [RedactionValidator](/api/@graphorin/observability/interfaces/RedactionValidator.md)
 before reaching the sink. Exporters that are not wrapped are rejected

@@ -6,7 +6,7 @@
 
 # Interface: EvaluatorOptimizerOutcome\&lt;TOutput\&gt;
 
-Defined in: packages/agent/src/evaluator-optimizer/index.ts:91
+Defined in: [packages/agent/src/evaluator-optimizer/index.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L91)
 
 Aggregate outcome of an `evaluatorOptimizer({...})` run.
 
@@ -22,7 +22,7 @@ Aggregate outcome of an `evaluatorOptimizer({...})` run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-finalscore"></a> `finalScore` | `readonly` | `number` | packages/agent/src/evaluator-optimizer/index.ts:102 |
-| <a id="property-iterations"></a> `iterations` | `readonly` | readonly \{ `candidate`: `TOutput`; `critique`: `string`; `durationMs`: `number`; `iteration`: `number`; `pass`: `boolean`; `score`: `number`; \}[] | packages/agent/src/evaluator-optimizer/index.ts:93 |
-| <a id="property-output"></a> `output` | `readonly` | `TOutput` | packages/agent/src/evaluator-optimizer/index.ts:92 |
-| <a id="property-terminationreason"></a> `terminationReason` | `readonly` | `"cancelled"` \| `"pass"` \| `"maxIterations"` \| `"generator-exhausted"` | packages/agent/src/evaluator-optimizer/index.ts:101 |
+| <a id="property-finalscore"></a> `finalScore` | `readonly` | `number` | [packages/agent/src/evaluator-optimizer/index.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L102) |
+| <a id="property-iterations"></a> `iterations` | `readonly` | readonly \{ `candidate`: `TOutput`; `critique`: `string`; `durationMs`: `number`; `iteration`: `number`; `pass`: `boolean`; `score`: `number`; \}[] | [packages/agent/src/evaluator-optimizer/index.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L93) |
+| <a id="property-output"></a> `output` | `readonly` | `TOutput` | [packages/agent/src/evaluator-optimizer/index.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L92) |
+| <a id="property-terminationreason"></a> `terminationReason` | `readonly` | `"cancelled"` \| `"pass"` \| `"maxIterations"` \| `"generator-exhausted"` | [packages/agent/src/evaluator-optimizer/index.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L101) |

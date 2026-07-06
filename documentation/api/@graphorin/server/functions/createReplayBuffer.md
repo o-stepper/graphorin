@@ -10,7 +10,7 @@
 function createReplayBuffer(options?): ReplayBuffer;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:82
+Defined in: [packages/server/src/ws/replay-buffer.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L82)
 
 Build an in-memory replay buffer.
 

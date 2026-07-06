@@ -21,7 +21,7 @@ type DetectedLanguage =
   | "unknown";
 ```
 
-Defined in: packages/security/src/guardrails/builtins/language-whitelist.ts:28
+Defined in: [packages/security/src/guardrails/builtins/language-whitelist.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/language-whitelist.ts#L28)
 
 Stable language codes the built-in detector recognises.
 

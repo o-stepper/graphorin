@@ -32,7 +32,7 @@ export type AuthState =
 /**
  * Request-scoped variables surfaced through `c.var` in Hono. The
  * server's middleware populates these fields incrementally; route
- * handlers consume them through {@link getRequestState}.
+ * handlers consume them through `getRequestState`.
  *
  * @stable
  */
@@ -52,7 +52,7 @@ export interface ServerRequestState {
  * Authentication / authorization middleware: "populates `c.var.token:
  * { id, label, scopes, env }`").
  *
- * Read this through {@link getRequestToken} so consumers do not have
+ * Read this through `getRequestToken` so consumers do not have
  * to remember the variable key.
  *
  * @stable

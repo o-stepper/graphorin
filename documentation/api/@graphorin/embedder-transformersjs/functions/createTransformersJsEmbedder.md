@@ -10,7 +10,7 @@
 function createTransformersJsEmbedder(options?): TransformersJsEmbedder;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:126
+Defined in: [packages/embedder-transformersjs/src/index.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L126)
 
 Build a `TransformersJsEmbedder` instance. Lazy: the underlying
 pipeline is constructed on the first `embed()` call so packaging

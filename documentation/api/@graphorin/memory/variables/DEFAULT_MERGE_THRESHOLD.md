@@ -10,6 +10,6 @@
 const DEFAULT_MERGE_THRESHOLD: 0.92 = 0.92;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:36
+Defined in: [packages/memory/src/graph/entity-resolver.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L36)
 
 Cosine `≥` this auto-reuses an existing entity (embedding match).

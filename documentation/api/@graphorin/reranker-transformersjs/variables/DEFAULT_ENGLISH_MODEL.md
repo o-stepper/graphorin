@@ -10,6 +10,6 @@
 const DEFAULT_ENGLISH_MODEL: "Xenova/bge-reranker-base" = 'Xenova/bge-reranker-base';
 ```
 
-Defined in: packages/reranker-transformersjs/src/model-selection.ts:24
+Defined in: [packages/reranker-transformersjs/src/model-selection.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/model-selection.ts#L24)
 
 ## Stable

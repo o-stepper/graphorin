@@ -10,7 +10,7 @@
 function stampSkillTool<TInput, TOutput, TDeps>(tool, skill): StampedSkillTool<TInput, TOutput, TDeps>;
 ```
 
-Defined in: packages/skills/src/registry/bridge.ts:53
+Defined in: [packages/skills/src/registry/bridge.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/registry/bridge.ts#L53)
 
 Stamp a skill-bundled tool with the metadata the
 `@graphorin/tools` registry expects:

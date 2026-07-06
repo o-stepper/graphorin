@@ -65,9 +65,12 @@ Every exported type is annotated with one of two TSDoc tags:
 - `@experimental` - may change between minor versions; a deprecation note
   in the `CHANGELOG.md` will accompany every removal.
 
-The vast majority of the surface ships as `@stable`; the deliberately
-loose `@experimental` corners exist because their underlying decision
-records are still being refined for v0.2.
+The whole `@graphorin/core` surface ships as `@stable` today - the
+`@experimental` tag is used in the packages where genuinely unsettled
+corners live (`mcp`, `tools`, `security`, `skills`), not here. The
+committed API report in `etc/core.api.md` is diffed in CI
+(`check-api-report`), so every change to this public surface is
+explicit in review.
 
 ## Versioning
 

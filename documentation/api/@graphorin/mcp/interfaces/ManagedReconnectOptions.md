@@ -6,7 +6,7 @@
 
 # Interface: ManagedReconnectOptions
 
-Defined in: packages/mcp/src/client/managed.ts:38
+Defined in: [packages/mcp/src/client/managed.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/managed.ts#L38)
 
 Reconnection tuning for [createManagedMCPClient](/api/@graphorin/mcp/functions/createManagedMCPClient.md).
 
@@ -16,6 +16,6 @@ Reconnection tuning for [createManagedMCPClient](/api/@graphorin/mcp/functions/c
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-initialdelayms"></a> `initialDelayMs?` | `readonly` | `number` | First backoff delay (doubles per attempt, jittered). Default `500` ms. | packages/mcp/src/client/managed.ts:42 |
-| <a id="property-maxattempts"></a> `maxAttempts?` | `readonly` | `number` | Attempts per outage before giving up. Default `5`. | packages/mcp/src/client/managed.ts:40 |
-| <a id="property-maxdelayms"></a> `maxDelayMs?` | `readonly` | `number` | Backoff ceiling. Default `30_000` ms. | packages/mcp/src/client/managed.ts:44 |
+| <a id="property-initialdelayms"></a> `initialDelayMs?` | `readonly` | `number` | First backoff delay (doubles per attempt, jittered). Default `500` ms. | [packages/mcp/src/client/managed.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/managed.ts#L42) |
+| <a id="property-maxattempts"></a> `maxAttempts?` | `readonly` | `number` | Attempts per outage before giving up. Default `5`. | [packages/mcp/src/client/managed.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/managed.ts#L40) |
+| <a id="property-maxdelayms"></a> `maxDelayMs?` | `readonly` | `number` | Backoff ceiling. Default `30_000` ms. | [packages/mcp/src/client/managed.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/managed.ts#L44) |

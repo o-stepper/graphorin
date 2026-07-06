@@ -36,9 +36,25 @@ const failures = [];
 
 // 1. Workspace manifests.
 for (const manifest of workspaceManifests()) {
-  const { name, version } = JSON.parse(readFileSync(join(ROOT, manifest), 'utf8'));
+  const parsed = JSON.parse(readFileSync(join(ROOT, manifest), 'utf8'));
+  const { name, version } = parsed;
   if (version !== canonical) {
     failures.push(`${manifest}: ${name ?? '<unnamed>'} is ${version}, expected ${canonical}`);
+  }
+  // 1b. Sibling peer floors (W-135): `workspace:>=X.Y.0 <1.0.0` peers
+  // must have X.Y == the current minor. bump-version --sync rewrites
+  // them AFTER `changeset version` (a static narrow range would
+  // re-trigger the fixed-group 1.0.0 escalation); this check catches a
+  // manual release pass that skipped the rewrite.
+  for (const [peer, range] of Object.entries(parsed.peerDependencies ?? {})) {
+    if (!peer.startsWith('@graphorin/')) continue;
+    const m = /^workspace:>=(\d+\.\d+)\.0 <1\.0\.0$/.exec(String(range));
+    if (m !== null && m[1] !== canonicalMinor) {
+      failures.push(
+        `${manifest}: peer ${peer} floor is >=${m[1]}.0, expected >=${canonicalMinor}.0 ` +
+          '(W-135; bump-version --sync rewrites it)',
+      );
+    }
   }
 }
 

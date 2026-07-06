@@ -47,7 +47,7 @@ type AgentEvent<TOutput> =
   | AgentErrorEvent;
 ```
 
-Defined in: packages/core/src/types/agent-event.ts:32
+Defined in: [packages/core/src/types/agent-event.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L32)
 
 Discriminated union of every event produced by `Agent.stream(...)`.
 

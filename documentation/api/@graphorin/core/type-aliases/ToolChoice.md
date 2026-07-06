@@ -16,7 +16,7 @@ type ToolChoice =
 };
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:276
+Defined in: [packages/core/src/contracts/provider.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L278)
 
 Tool selection strategy.
 

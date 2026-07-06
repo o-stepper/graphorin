@@ -6,7 +6,7 @@
 
 # Interface: WsDispatcher
 
-Defined in: packages/server/src/ws/dispatcher.ts:137
+Defined in: [packages/server/src/ws/dispatcher.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L137)
 
 Public surface of the dispatcher.
 
@@ -16,8 +16,8 @@ Public surface of the dispatcher.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-replaybuffer"></a> `replayBuffer` | `readonly` | [`ReplayBuffer`](/api/@graphorin/server/interfaces/ReplayBuffer.md) | packages/server/src/ws/dispatcher.ts:139 |
-| <a id="property-sanitizer"></a> `sanitizer` | `readonly` | [`DeliveryCommentarySanitizer`](/api/@graphorin/server/interfaces/DeliveryCommentarySanitizer.md) | packages/server/src/ws/dispatcher.ts:138 |
+| <a id="property-replaybuffer"></a> `replayBuffer` | `readonly` | [`ReplayBuffer`](/api/@graphorin/server/interfaces/ReplayBuffer.md) | [packages/server/src/ws/dispatcher.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L139) |
+| <a id="property-sanitizer"></a> `sanitizer` | `readonly` | [`DeliveryCommentarySanitizer`](/api/@graphorin/server/interfaces/DeliveryCommentarySanitizer.md) | [packages/server/src/ws/dispatcher.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L138) |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Public surface of the dispatcher.
 emit(subject, frame): void;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:163
+Defined in: [packages/server/src/ws/dispatcher.ts:163](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L163)
 
 Push an event into the dispatcher. Goes through the sanitizer,
 validates against the protocol schema, persists into the replay
@@ -55,7 +55,7 @@ emitLifecycle(
    reason?): void;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:165
+Defined in: [packages/server/src/ws/dispatcher.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L165)
 
 Push a lifecycle frame to a single subscription.
 
@@ -79,7 +79,7 @@ Push a lifecycle frame to a single subscription.
 listForSubscriber(subscriberId): readonly WsSubscriptionSnapshot[];
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:171
+Defined in: [packages/server/src/ws/dispatcher.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L171)
 
 List active subscriptions for a given subscriber (diagnostics).
 
@@ -103,7 +103,7 @@ registerSubscriber(handle): {
 };
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:144
+Defined in: [packages/server/src/ws/dispatcher.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L144)
 
 Register a subscriber (one per WebSocket connection).
 `unregister` is called on close.
@@ -124,7 +124,7 @@ Register a subscriber (one per WebSocket connection).
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `unregister()` | () => `void` | packages/server/src/ws/dispatcher.ts:144 |
+| `unregister()` | () => `void` | [packages/server/src/ws/dispatcher.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L144) |
 
 ***
 
@@ -134,7 +134,7 @@ Register a subscriber (one per WebSocket connection).
 shutdown(): void;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:175
+Defined in: [packages/server/src/ws/dispatcher.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L175)
 
 Clear in-memory state (used during graceful shutdown).
 
@@ -153,7 +153,7 @@ size(): {
 };
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:173
+Defined in: [packages/server/src/ws/dispatcher.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L173)
 
 #### Returns
 
@@ -166,8 +166,8 @@ Defined in: packages/server/src/ws/dispatcher.ts:173
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `subscribers` | `number` | packages/server/src/ws/dispatcher.ts:173 |
-| `subscriptions` | `number` | packages/server/src/ws/dispatcher.ts:173 |
+| `subscribers` | `number` | [packages/server/src/ws/dispatcher.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L173) |
+| `subscriptions` | `number` | [packages/server/src/ws/dispatcher.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L173) |
 
 ***
 
@@ -179,7 +179,7 @@ snapshotSubscription(subscriptionId):
   | undefined;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:172
+Defined in: [packages/server/src/ws/dispatcher.ts:172](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L172)
 
 #### Parameters
 
@@ -200,7 +200,7 @@ Defined in: packages/server/src/ws/dispatcher.ts:172
 subscribe(input): SubscribeResult;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:151
+Defined in: [packages/server/src/ws/dispatcher.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L151)
 
 Open a new subscription for an active subscriber. Returns either
 the subscription snapshot + replayed-event count or a typed
@@ -229,7 +229,7 @@ RPC error.
 unsubscribe(subscriptionId): boolean;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:157
+Defined in: [packages/server/src/ws/dispatcher.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L157)
 
 #### Parameters
 

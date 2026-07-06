@@ -65,8 +65,11 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     /** Include quarantined episodes (validation/inspector path). P1-4. */
     includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
-  /** Mark an episode archived. Soft-archive - the row stays for replay. */
-  archive?(id: string, reason?: string): Promise<void>;
+  /**
+   * Mark an episode archived. Soft-archive - the row stays for replay.
+   * W-154: with `scope`, adapters no-op unless the row belongs to it.
+   */
+  archive?(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
    * Most-recent episodes by end time (newest first), with no FTS / vector
    * query - recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
@@ -83,7 +86,12 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
    * (auto-formed) episode into default recall or re-quarantine an active one,
    * with a `memory_history` audit row. Powers {@link EpisodicMemory.validate}.
    */
-  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  setStatus?(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void>;
   /**
    * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`,
    * never materialising rows. Powers honest `metadata()` counts.
@@ -136,7 +144,12 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * Powers {@link SemanticMemory.validate}; the default
    * `@graphorin/store-sqlite` adapter implements it.
    */
-  setStatus?(factId: string, status: MemoryStatus, reason?: string): Promise<void>;
+  setStatus?(
+    factId: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void>;
   /**
    * Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
    * the default recall filters (live, non-archived, non-quarantined), never
@@ -148,7 +161,7 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * but the row itself + every per-embedder vec0 entry is removed.
    * Distinct from {@link SemanticMemoryStore.forget} (soft-delete).
    */
-  purge?(id: string, reason?: string): Promise<void>;
+  purge?(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
    * W-019: record a PENDING supersede link - set `newId.supersedes =
    * oldId` WITHOUT closing the old fact's validity interval. Used when
@@ -605,7 +618,7 @@ export interface DecayMemoryStoreExt {
    * Soft-archive a fact (sets `archived = 1`). The audit row in
    * `memory_history` records the archive event.
    */
-  archiveFact(id: string, reason?: string): Promise<void>;
+  archiveFact(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
    * Record a retrieval access for the given facts (MRET-7): stamp
    * `lastAccessedAt` and reinforce `strength` (implementation-capped).
@@ -613,7 +626,11 @@ export interface DecayMemoryStoreExt {
    * MUST treat failures as non-fatal (the read path never breaks on a
    * bookkeeping write).
    */
-  markAccessed?(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
+  markAccessed?(
+    ids: ReadonlyArray<string>,
+    accessedAt?: number,
+    scope?: SessionScope,
+  ): Promise<void>;
   /**
    * Narrow decay-column read for exactly the given fact ids (MRET-8) -
    * powers per-search decay re-ranking without the old O(scope)
@@ -677,7 +694,12 @@ export interface InsightMemoryStoreExt {
    * (reflection) insight or re-quarantine an active one, with a
    * `memory_history` audit row. Powers {@link InsightMemory.validate}.
    */
-  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  setStatus?(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void>;
   /**
    * Adjust an insight's ExpeL salience by `delta`, clamped at 0. The
    * floor is the value at which {@link prune} removes it.
@@ -703,7 +725,12 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
    * procedure into `activate()` or re-quarantine an active one, with a
    * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
    */
-  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  setStatus?(
+    id: string,
+    status: MemoryStatus,
+    reason?: string,
+    scope?: SessionScope,
+  ): Promise<void>;
   /**
    * Lexical runbook search over rule text (D3, migration 028) - content
    * recall for "find the procedure for this task", as opposed to

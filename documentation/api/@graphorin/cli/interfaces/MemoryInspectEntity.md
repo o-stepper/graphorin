@@ -6,7 +6,7 @@
 
 # Interface: MemoryInspectEntity
 
-Defined in: packages/cli/src/commands/memory.ts:213
+Defined in: [packages/cli/src/commands/memory.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L213)
 
 A canonical entity a fact links to (P2-1 / migration 016). `name` follows
 `merged_into` to the surviving entity, so a merged link shows its canonical.
@@ -17,7 +17,7 @@ A canonical entity a fact links to (P2-1 / migration 016). `name` follows
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-entityid"></a> `entityId` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:214 |
-| <a id="property-mergedfrom"></a> `mergedFrom` | `readonly` | `string` \| `null` | Set when the linked entity was merged into `entityId`/`name`. | packages/cli/src/commands/memory.ts:218 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:215 |
-| <a id="property-role"></a> `role` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:216 |
+| <a id="property-entityid"></a> `entityId` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:214](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L214) |
+| <a id="property-mergedfrom"></a> `mergedFrom` | `readonly` | `string` \| `null` | Set when the linked entity was merged into `entityId`/`name`. | [packages/cli/src/commands/memory.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L218) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L215) |
+| <a id="property-role"></a> `role` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L216) |

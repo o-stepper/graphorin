@@ -6,7 +6,7 @@
 
 # Interface: WsTicketStore
 
-Defined in: packages/server/src/ws/ticket.ts:69
+Defined in: [packages/server/src/ws/ticket.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L69)
 
 Pluggable in-memory ticket store used by the WS upgrade handler +
 the `POST /v1/session/ws-ticket` route.
@@ -17,7 +17,7 @@ the `POST /v1/session/ws-ticket` route.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-ttlms"></a> `ttlMs` | `readonly` | `number` | packages/server/src/ws/ticket.ts:70 |
+| <a id="property-ttlms"></a> `ttlMs` | `readonly` | `number` | [packages/server/src/ws/ticket.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L70) |
 
 ## Methods
 
@@ -27,7 +27,7 @@ the `POST /v1/session/ws-ticket` route.
 consume(value): WsTicketConsumeResult;
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:72
+Defined in: [packages/server/src/ws/ticket.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L72)
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/server/src/ws/ticket.ts:72
 issue(input): WsTicket;
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:71
+Defined in: [packages/server/src/ws/ticket.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L71)
 
 #### Parameters
 
@@ -69,7 +69,7 @@ Defined in: packages/server/src/ws/ticket.ts:71
 prune(): number;
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:74
+Defined in: [packages/server/src/ws/ticket.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L74)
 
 Drop expired entries; called on every `consume()`.
 
@@ -85,7 +85,7 @@ Drop expired entries; called on every `consume()`.
 size(): number;
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:75
+Defined in: [packages/server/src/ws/ticket.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L75)
 
 #### Returns
 

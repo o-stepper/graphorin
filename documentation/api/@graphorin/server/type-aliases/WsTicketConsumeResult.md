@@ -18,7 +18,7 @@ type WsTicketConsumeResult =
 };
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:41
+Defined in: [packages/server/src/ws/ticket.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L41)
 
 Stable result of [WsTicketStore.consume](/api/@graphorin/server/interfaces/WsTicketStore.md#consume).
 

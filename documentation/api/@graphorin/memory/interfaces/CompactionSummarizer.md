@@ -6,7 +6,7 @@
 
 # Interface: CompactionSummarizer
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:242
+Defined in: [packages/memory/src/context-engine/compaction/types.ts:242](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L242)
 
 Summarizer adapter - accepts a prompt and returns the produced
 summary. The Phase 06 `Provider` adapters implement this
@@ -20,7 +20,7 @@ does not take the heavier `Provider` dependency directly.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:254 |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | [packages/memory/src/context-engine/compaction/types.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L254) |
 
 ## Methods
 
@@ -33,7 +33,7 @@ summarize(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:248
+Defined in: [packages/memory/src/context-engine/compaction/types.ts:248](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L248)
 
 Produce a summary text for the supplied prompt. The prompt is
 built by the compactor using the configured section template;

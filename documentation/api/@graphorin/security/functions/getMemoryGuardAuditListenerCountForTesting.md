@@ -10,7 +10,7 @@
 function _getMemoryGuardAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:116
+Defined in: [packages/security/src/guard/audit-emitter.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L116)
 
 **`Experimental`**
 

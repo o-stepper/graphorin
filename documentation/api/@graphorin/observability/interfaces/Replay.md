@@ -6,7 +6,7 @@
 
 # Interface: Replay
 
-Defined in: packages/observability/src/replay/replay.ts:33
+Defined in: [packages/observability/src/replay/replay.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/replay.ts#L33)
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/observability/src/replay/replay.ts:33
 run(input): AsyncIterable<ReplayEvent>;
 ```
 
-Defined in: packages/observability/src/replay/replay.ts:34
+Defined in: [packages/observability/src/replay/replay.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/replay.ts#L34)
 
 #### Parameters
 

@@ -10,7 +10,7 @@
 function executeCompaction(input): Promise<CompactionResult>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/compactor.ts:142
+Defined in: [packages/memory/src/context-engine/compaction/compactor.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/compactor.ts#L142)
 
 Perform a compaction call. Returns the result envelope containing
 the produced summary, the dropped/preserved message slices, and

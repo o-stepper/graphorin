@@ -14,7 +14,7 @@ type WireRunState = Omit<RunState, "messages" | "steps" | "pendingSubRuns"> & {
 };
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:150
+Defined in: [packages/core/src/utils/binary-json.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L150)
 
 JSON-safe twin of [RunState](/api/@graphorin/core/interfaces/RunState.md): `messages`, every
 `steps[].toolCalls[].outcome.contentParts`, and each parked
@@ -29,8 +29,8 @@ walk them.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `messages` | readonly [`WireMessage`](/api/@graphorin/core/type-aliases/WireMessage.md)[] | packages/core/src/utils/binary-json.ts:151 |
-| `pendingSubRuns?` | readonly `WirePendingSubRun`[] | packages/core/src/utils/binary-json.ts:153 |
-| `steps` | readonly [`WireRunStep`](/api/@graphorin/core/type-aliases/WireRunStep.md)[] | packages/core/src/utils/binary-json.ts:152 |
+| `messages` | readonly [`WireMessage`](/api/@graphorin/core/type-aliases/WireMessage.md)[] | [packages/core/src/utils/binary-json.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L151) |
+| `pendingSubRuns?` | readonly `WirePendingSubRun`[] | [packages/core/src/utils/binary-json.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L153) |
+| `steps` | readonly [`WireRunStep`](/api/@graphorin/core/type-aliases/WireRunStep.md)[] | [packages/core/src/utils/binary-json.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L152) |
 
 ## Stable

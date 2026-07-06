@@ -17,7 +17,7 @@ type TokenFormatErrorKind =
   | "invalid-checksum";
 ```
 
-Defined in: packages/security/src/auth/errors.ts:17
+Defined in: [packages/security/src/auth/errors.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/errors.ts#L17)
 
 Discriminator union for `TokenFormatError`. Lets callers branch on
 the concrete failure mode without parsing the message string.

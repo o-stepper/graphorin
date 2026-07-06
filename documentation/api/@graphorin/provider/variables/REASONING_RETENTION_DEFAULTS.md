@@ -10,7 +10,7 @@
 const REASONING_RETENTION_DEFAULTS: Readonly<Record<ReasoningContract, ReasoningRetention>>;
 ```
 
-Defined in: packages/provider/src/reasoning/retention.ts:23
+Defined in: [packages/provider/src/reasoning/retention.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/reasoning/retention.ts#L23)
 
 Map from `ReasoningContract` to the conservative default
 `ReasoningRetention` value used when no override is supplied.

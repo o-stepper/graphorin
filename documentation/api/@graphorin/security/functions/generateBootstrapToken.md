@@ -10,7 +10,7 @@
 function generateBootstrapToken(): string;
 ```
 
-Defined in: packages/security/src/hardening/crypto.ts:38
+Defined in: [packages/security/src/hardening/crypto.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/crypto.ts#L38)
 
 Generate a 256-bit bootstrap token encoded with base62url. Always
 emits `BOOTSTRAP_TOKEN_LENGTH` (43) characters. Source entropy is

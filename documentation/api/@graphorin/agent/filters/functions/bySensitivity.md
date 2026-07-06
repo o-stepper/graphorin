@@ -10,7 +10,7 @@
 function bySensitivity(args?): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:186
+Defined in: [packages/agent/src/filters/index.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L186)
 
 Drop messages whose effective sensitivity ceiling exceeds
 `maxTier`. Messages without sensitivity metadata default to

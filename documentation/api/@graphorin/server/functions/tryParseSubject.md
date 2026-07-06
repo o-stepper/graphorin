@@ -10,7 +10,7 @@
 function tryParseSubject(raw): ParseSubjectResult;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:69
+Defined in: [packages/server/src/ws/subjects.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/subjects.ts#L69)
 
 Parse a subject string into the [ParsedSubject](/api/@graphorin/server/type-aliases/ParsedSubject.md) discriminator.
 

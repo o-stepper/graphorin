@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: src/index.ts:35
+Defined in: [packages/eslint-plugin/src/index.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/index.ts#L35)

@@ -10,7 +10,7 @@
 type MemoryProvenance = "user" | "tool" | "extraction" | "reflection" | "induction" | "imported";
 ```
 
-Defined in: packages/core/src/types/memory.ts:37
+Defined in: [packages/core/src/types/memory.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L37)
 
 Where a memory came from - the trust-provenance tag carried by every
 fact / episode / induced procedure. `user` (the human said it) and

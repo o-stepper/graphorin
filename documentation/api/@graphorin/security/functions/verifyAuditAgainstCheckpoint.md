@@ -22,7 +22,7 @@ function verifyAuditAgainstCheckpoint(
 }>;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:432
+Defined in: [packages/security/src/audit/merkle.ts:432](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L432)
 
 Full anchored verification: the checkpoint's signature is valid
 against the pinned key AND the current log is an append-only

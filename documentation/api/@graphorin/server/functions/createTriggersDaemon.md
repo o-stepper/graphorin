@@ -10,7 +10,7 @@
 function createTriggersDaemon(options): TriggersDaemon;
 ```
 
-Defined in: packages/server/src/triggers/daemon.ts:78
+Defined in: [packages/server/src/triggers/daemon.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L78)
 
 ## Parameters
 

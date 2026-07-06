@@ -6,7 +6,7 @@
 
 # Interface: ProgressArtifactRef
 
-Defined in: packages/core/src/types/agent-event.ts:471
+Defined in: [packages/core/src/types/agent-event.ts:471](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L471)
 
 Reference to a persisted progress artifact returned by
 `agent.progress.write(...)` and `agent.progress.read(...)`.
@@ -17,11 +17,11 @@ Reference to a persisted progress artifact returned by
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-path"></a> `path` | `readonly` | `string` | packages/core/src/types/agent-event.ts:472 |
-| <a id="property-role"></a> `role` | `readonly` | `string` | packages/core/src/types/agent-event.ts:473 |
-| <a id="property-sensitivity"></a> `sensitivity` | `readonly` | `"public"` \| `"internal"` \| `"secret"` | packages/core/src/types/agent-event.ts:476 |
-| <a id="property-seq"></a> `seq` | `readonly` | `number` | packages/core/src/types/agent-event.ts:474 |
-| <a id="property-sha256"></a> `sha256` | `readonly` | `string` | packages/core/src/types/agent-event.ts:479 |
-| <a id="property-sizebytes"></a> `sizeBytes` | `readonly` | `number` | packages/core/src/types/agent-event.ts:475 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/core/src/types/agent-event.ts:477 |
-| <a id="property-writtenatiso"></a> `writtenAtIso` | `readonly` | `string` | packages/core/src/types/agent-event.ts:478 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:472](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L472) |
+| <a id="property-role"></a> `role` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:473](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L473) |
+| <a id="property-sensitivity"></a> `sensitivity` | `readonly` | `"public"` \| `"internal"` \| `"secret"` | [packages/core/src/types/agent-event.ts:476](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L476) |
+| <a id="property-seq"></a> `seq` | `readonly` | `number` | [packages/core/src/types/agent-event.ts:474](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L474) |
+| <a id="property-sha256"></a> `sha256` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:479](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L479) |
+| <a id="property-sizebytes"></a> `sizeBytes` | `readonly` | `number` | [packages/core/src/types/agent-event.ts:475](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L475) |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | [packages/core/src/types/agent-event.ts:477](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L477) |
+| <a id="property-writtenatiso"></a> `writtenAtIso` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:478](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L478) |

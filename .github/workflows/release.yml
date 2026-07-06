@@ -5,37 +5,52 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Publishing authenticates with a long-lived **NPM_TOKEN** (decision C1): an npm
-# automation / granular-access token with publish rights to the `@graphorin`
-# scope, injected as `NPM_TOKEN` on the publish step only (CI-10) so the
-# workspace build/test steps never see it. Sigstore provenance is still attached
-# via OIDC (`id-token: write` below + `.npmrc` provenance=true + per-package
-# `publishConfig.provenance`); provenance uses OIDC regardless of the publish
-# auth method.
+# Publishing authenticates via **npm trusted publishing (OIDC)** - W-139
+# replaced the long-lived NPM_TOKEN of decision C1. `changeset publish`
+# shells out to `npm publish` per package; with npm >= 11.5.1 and a
+# trusted publisher configured registry-side, npm exchanges this
+# workflow's OIDC token (the `id-token: write` permission on the
+# publish job) for a short-lived publish credential. Sigstore
+# provenance continues to ride the same OIDC identity
+# (`.npmrc provenance=true` + per-package `publishConfig.provenance`).
 #
-# The publish step is gated on the `RELEASE_ENABLED` **repository variable** so
-# an accidental main-branch push never publishes before the registry side is
-# configured. Maintainer provisioning order:
+# Registry-side checklist (manual, one-time per package - all 27
+# `@graphorin/*` packages need it BEFORE the first OIDC release):
+#   npmjs.com -> package -> Settings -> Trusted publisher ->
+#     GitHub Actions / repository `o-stepper/graphorin` /
+#     workflow `release.yml` (no environment).
+# Rollback (first OIDC release only): the `NPM_TOKEN` secret stays in
+# repo settings until one OIDC release passes the C4 provenance smoke;
+# if the publish job goes red, re-add
+#   `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}`
+# to the changesets/action env below (one line) and re-run. Both
+# mechanisms must NEVER be active together: while the env is present,
+# changesets/action writes a token-based .npmrc and npm publishes by
+# token - the OIDC path would not be exercised at all. After the first
+# verified OIDC release: delete the NPM_TOKEN secret and this rollback
+# note's escape hatch.
 #
-#   1. Create an npm automation token with publish rights to the `@graphorin`
-#      scope (there is no unscoped `graphorin` package - the root manifest of
-#      that name is private) and add it as the repo secret `NPM_TOKEN`.
-#   2. Rehearse with a `workflow_dispatch` run (the dry-run step below fires
-#      whenever RELEASE_ENABLED is not yet 'true') to confirm auth + the set.
-#   3. Set the repository variable `RELEASE_ENABLED=true`. From then on
-#      `changesets/action` publishes via NPM_TOKEN on a push to main.
+# The publish step is gated on the `RELEASE_ENABLED` **repository
+# variable** so an accidental main-branch push never publishes before
+# the registry side is configured. A `workflow_dispatch` rehearsal with
+# RELEASE_ENABLED != 'true' exercises the environment (permissions, npm
+# version) but NOT the OIDC token exchange - only a real publish
+# verifies that, which is why the rollback above stays one line.
+#
+# W-139 part 2: the dependency-laden build+test (mvp-readiness) runs in
+# its own `readiness` job with `contents: read` and NO persisted git
+# credentials - a compromised dev dependency there can no longer push
+# to the repository. Only the `publish` job holds write permissions.
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write # Sigstore provenance attestation (works alongside NPM_TOKEN auth).
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Version & publish via Changesets
+  readiness:
+    name: MVP readiness (no write credentials)
     runs-on: ubuntu-latest
     timeout-minutes: 60
     # CI-15: a `workflow_dispatch` can be triggered from any branch that carries
@@ -43,6 +58,43 @@ jobs:
     # skipped (it would otherwise version/publish branch content). Mirrors the
     # `docs.yml` deploy gate.
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          # The full build+test of every workspace package runs here with
+          # ZERO write credentials in git config (W-139).
+          persist-credentials: false
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: MVP readiness gate
+        run: pnpm run mvp-readiness
+
+  release:
+    name: Version & publish via Changesets
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: readiness
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      # changesets/action pushes the Version Packages branch + tags and
+      # opens the release PR; OIDC publish + provenance need id-token.
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -50,6 +102,8 @@ jobs:
           fetch-depth: 0
           # changesets/action pushes the "Version Packages" branch + tags, so it
           # needs the checkout to retain the GITHUB_TOKEN git credentials (CI-6).
+          # Unlike the readiness job, this job runs only the version/publish
+          # machinery - no workspace test code executes here.
           persist-credentials: true
 
       - name: Enable Corepack
@@ -60,20 +114,25 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-          # No `registry-url:`; `changesets/action` writes its own publish
-          # `.npmrc` from the `NPM_TOKEN` env below; a setup-node registry-url
-          # would add a second, empty-token `.npmrc` that shadows it.
+          # No `registry-url:`; with OIDC trusted publishing npm needs no
+          # auth token in .npmrc at all, and a setup-node registry-url would
+          # write an empty-token .npmrc that breaks the exchange.
+
+      - name: Upgrade npm for OIDC trusted publishing
+        # Node 22 bundles npm 10.x; the OIDC token exchange requires
+        # npm >= 11.5.1. `changeset publish` shells to `npm publish`, so
+        # the global npm version is what authenticates.
+        run: |
+          npm install -g npm@11
+          npm --version
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: MVP readiness gate
-        run: pnpm run mvp-readiness
-
       - name: Dry-run publish (releases not enabled yet)
         if: ${{ vars.RELEASE_ENABLED != 'true' }}
         run: |
-          echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure NPM_TOKEN + the @graphorin scope first)."
+          echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure the npm trusted publishers first - see the checklist at the top of this workflow)."
           pnpm -r publish --dry-run --no-git-checks
 
       - name: Create Release PR or Publish
@@ -101,11 +160,12 @@ jobs:
           # (Alternative: enable "Allow GitHub Actions to create and approve
           # pull requests" in repo settings and keep GITHUB_TOKEN.)
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
-          # `changesets/action` reads the env var named exactly `NPM_TOKEN` to
-          # write its publish `.npmrc`; scoped to THIS step only (CI-10) so the
-          # workspace build/test steps never see it. (Passing it as
-          # NODE_AUTH_TOKEN makes the action miss it and fall back to OIDC.)
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # W-139: deliberately NO `NPM_TOKEN` here - publishing authenticates
+          # via OIDC trusted publishing (see the header). While an NPM_TOKEN
+          # env is present, changesets/action writes a token-based .npmrc and
+          # the OIDC path is never exercised; the secret remains in repo
+          # settings only as the documented one-line rollback until the first
+          # OIDC release passes the C4 smoke below.
           NPM_CONFIG_PROVENANCE: 'true'
 
       # C4 / Wave-4 acceptance gate: after a real publish, verify the release
@@ -116,9 +176,8 @@ jobs:
       # cleanly even when a release is partial/interrupted, and lockstep
       # versioning means it is always part of the published set. `npm audit
       # signatures` exits non-zero if any signature or attestation fails to
-      # verify, so a bad provenance chain fails the run. No NPM_TOKEN here:
-      # signature verification is a public-registry read, so the publish token
-      # stays scoped to the step above (CI-10).
+      # verify, so a bad provenance chain fails the run. No publish credential
+      # here: signature verification is a public-registry read.
       - name: Post-publish provenance smoke (C4)
         if: ${{ vars.RELEASE_ENABLED == 'true' && steps.changesets.outputs.published == 'true' }}
         run: |

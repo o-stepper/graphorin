@@ -10,7 +10,7 @@
 const TOOL_RETURN_BRAND: unique symbol;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:270
+Defined in: [packages/core/src/contracts/tool.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L276)
 
 W-115: cross-realm brand for the [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope
 (`SECRET_VALUE_BRAND` precedent - `Symbol.for` survives duplicate

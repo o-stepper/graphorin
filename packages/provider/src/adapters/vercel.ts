@@ -3,7 +3,7 @@
  * into a Graphorin {@link Provider}. The adapter is the default cloud
  * path: it speaks the AI SDK's `streamText` / `generateText` API and
  * maps the resulting events onto the canonical
- * {@link import('@graphorin/core').ProviderEvent} discriminated union.
+ * `ProviderEvent` discriminated union.
  *
  * Outbound, the adapter converts Graphorin messages / tools onto the
  * AI SDK call contract (see `vercel-messages.ts`): tool definitions
@@ -178,7 +178,7 @@ const DEFAULT_CAPABILITIES: Omit<ProviderCapabilities, 'reasoningContract'> = {
  * the AI SDK are translated back onto Graphorin `ProviderEvent`s.
  *
  * The adapter auto-detects the model's
- * {@link import('@graphorin/core').ReasoningContract} from its
+ * `ReasoningContract` from its
  * `modelId` (e.g. Anthropic Claude → `'round-trip-required'`,
  * OpenAI o1 / o3 → `'hidden'`, Gemini reasoning variants →
  * `'hidden'`, everything else → `'optional'`). Callers can override

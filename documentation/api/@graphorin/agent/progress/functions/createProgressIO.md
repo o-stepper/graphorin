@@ -10,7 +10,7 @@
 function createProgressIO(config?): ProgressIO;
 ```
 
-Defined in: packages/agent/src/progress/index.ts:106
+Defined in: [packages/agent/src/progress/index.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/progress/index.ts#L106)
 
 Build a [ProgressIO](/api/@graphorin/agent/progress/interfaces/ProgressIO.md) bound to a particular artifact root.
 

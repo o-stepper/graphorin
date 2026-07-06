@@ -10,7 +10,7 @@
 const RUN_STATE_SCHEMA_VERSION: "graphorin-run-state/1.2";
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:41
+Defined in: [packages/agent/src/run-state/index.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L41)
 
 Canonical schema id for serialized [RunState](/api/@graphorin/core/interfaces/RunState.md) payloads.
 

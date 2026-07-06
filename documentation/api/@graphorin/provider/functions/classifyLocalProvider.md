@@ -10,7 +10,7 @@
 function classifyLocalProvider(baseUrl): LocalProviderClassification;
 ```
 
-Defined in: packages/provider/src/trust/classify-local-provider.ts:63
+Defined in: [packages/provider/src/trust/classify-local-provider.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/trust/classify-local-provider.ts#L63)
 
 Classify a URL string into one of the four [LocalProviderTrust](/api/@graphorin/provider/type-aliases/LocalProviderTrust.md)
 tiers. Throws `TypeError` if the URL is unparseable so adapters

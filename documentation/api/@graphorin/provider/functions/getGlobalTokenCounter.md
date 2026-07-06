@@ -12,7 +12,7 @@ function getGlobalTokenCounter():
   | null;
 ```
 
-Defined in: packages/provider/src/counters/global.ts:28
+Defined in: [packages/provider/src/counters/global.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/global.ts#L28)
 
 Read the process-global counter, or `null` if unset.
 

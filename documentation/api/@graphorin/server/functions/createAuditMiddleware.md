@@ -12,7 +12,7 @@ function createAuditMiddleware(options): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/audit.ts:66
+Defined in: [packages/server/src/middleware/audit.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/audit.ts#L66)
 
 ## Parameters
 

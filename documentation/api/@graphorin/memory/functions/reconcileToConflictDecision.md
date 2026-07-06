@@ -10,7 +10,7 @@
 function reconcileToConflictDecision(decision): ConflictDecision;
 ```
 
-Defined in: packages/memory/src/conflict/types.ts:238
+Defined in: [packages/memory/src/conflict/types.ts:238](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L238)
 
 Map a [ReconcileDecision](/api/@graphorin/memory/type-aliases/ReconcileDecision.md) onto the existing [ConflictDecision](/api/@graphorin/memory/type-aliases/ConflictDecision.md)
 so reconcile outcomes land in `fact_conflicts` through the same audit

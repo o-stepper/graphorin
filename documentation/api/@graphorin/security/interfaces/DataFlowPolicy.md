@@ -6,7 +6,7 @@
 
 # Interface: DataFlowPolicy
 
-Defined in: packages/security/src/dataflow/types.ts:301
+Defined in: [packages/security/src/dataflow/types.ts:301](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L301)
 
 The data-flow policy engine. Stateless and pure: all run-scoped state
 lives in the [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md) the caller threads in via
@@ -18,7 +18,7 @@ lives in the [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md) t
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-mode"></a> `mode` | `readonly` | [`DataFlowMode`](/api/@graphorin/security/type-aliases/DataFlowMode.md) | The configured mode (mirrors the constructor input). | packages/security/src/dataflow/types.ts:303 |
+| <a id="property-mode"></a> `mode` | `readonly` | [`DataFlowMode`](/api/@graphorin/security/type-aliases/DataFlowMode.md) | The configured mode (mirrors the constructor input). | [packages/security/src/dataflow/types.ts:303](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L303) |
 
 ## Methods
 
@@ -28,7 +28,7 @@ lives in the [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md) t
 evaluate(evaluation): DataFlowDecision;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:305
+Defined in: [packages/security/src/dataflow/types.ts:305](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L305)
 
 Decide what to do about one candidate sink call.
 

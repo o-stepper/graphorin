@@ -10,7 +10,7 @@
 type MemoryGuardDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:48
+Defined in: [packages/security/src/guard/audit-emitter.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L48)
 
 Decision discriminator on a guard event.
 

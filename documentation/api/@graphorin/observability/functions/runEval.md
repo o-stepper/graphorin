@@ -10,7 +10,7 @@
 function runEval<I, O>(opts): Promise<EvalReport<I, O>>;
 ```
 
-Defined in: packages/observability/src/eval/runner.ts:25
+Defined in: [packages/observability/src/eval/runner.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/runner.ts#L25)
 
 ## Type Parameters
 

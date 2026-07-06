@@ -12,7 +12,7 @@
 
 export * from './builders.js';
 export * from './builtins/index.js';
-export { normalizeForMatching } from './normalize.js';
+export { normalizeForMatching, normalizeForPiiMatching } from './normalize.js';
 export type {
   ComposedGuardrailResult,
   GuardrailAction,

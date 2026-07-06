@@ -10,7 +10,7 @@
 function hashRegion(input, seed?): Promise<string>;
 ```
 
-Defined in: packages/security/src/guard/xxhash.ts:31
+Defined in: [packages/security/src/guard/xxhash.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/xxhash.ts#L31)
 
 Convenience: hash a snapshot region asynchronously. The wrapper
 exists so callers can micro-benchmark the helper without rewriting

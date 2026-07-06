@@ -6,7 +6,7 @@
 
 # Interface: LlamaModelInstance
 
-Defined in: src/runtime.ts:23
+Defined in: [packages/provider-llamacpp-node/src/runtime.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L23)
 
 **`Internal`**
 
@@ -16,7 +16,7 @@ Loaded GGUF model.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-traincontextsize"></a> `trainContextSize?` | `readonly` | `number` | src/runtime.ts:24 |
+| <a id="property-traincontextsize"></a> `trainContextSize?` | `readonly` | `number` | [packages/provider-llamacpp-node/src/runtime.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L24) |
 
 ## Methods
 
@@ -31,7 +31,7 @@ createContext(args?): Promise<{
 }>;
 ```
 
-Defined in: src/runtime.ts:26
+Defined in: [packages/provider-llamacpp-node/src/runtime.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L26)
 
 #### Parameters
 
@@ -57,7 +57,7 @@ Defined in: src/runtime.ts:26
 optional dispose(): Promise<void>;
 ```
 
-Defined in: src/runtime.ts:30
+Defined in: [packages/provider-llamacpp-node/src/runtime.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L30)
 
 #### Returns
 
@@ -74,7 +74,7 @@ tokenize(text):
   | readonly number[];
 ```
 
-Defined in: src/runtime.ts:25
+Defined in: [packages/provider-llamacpp-node/src/runtime.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L25)
 
 #### Parameters
 

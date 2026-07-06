@@ -6,7 +6,7 @@
 
 # Interface: Agent\&lt;TDeps, TOutput\&gt;
 
-Defined in: packages/agent/src/types.ts:646
+Defined in: [packages/agent/src/types.ts:647](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L647)
 
 Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/functions/createAgent.md).
 
@@ -23,10 +23,10 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:648 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:647 |
-| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:677 |
-| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:685 |
+| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | [packages/agent/src/types.ts:649](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L649) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | [packages/agent/src/types.ts:648](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L648) |
+| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | [packages/agent/src/types.ts:678](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L678) |
+| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | [packages/agent/src/types.ts:686](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L686) |
 
 ## Methods
 
@@ -36,7 +36,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 abort(options?): void;
 ```
 
-Defined in: packages/agent/src/types.ts:659
+Defined in: [packages/agent/src/types.ts:660](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L660)
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Defined in: packages/agent/src/types.ts:659
 compact(options?): Promise<CompactionApiResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:661
+Defined in: [packages/agent/src/types.ts:662](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L662)
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/agent/src/types.ts:661
 fanOut<TFanOutOutput>(options): Promise<FanOutResult<TFanOutOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:669
+Defined in: [packages/agent/src/types.ts:670](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L670)
 
 Convenience wrapper around the standalone `runFanOut(...)`. The
 returned `FanOutResult` carries per-child status + the merged
@@ -108,7 +108,7 @@ strategy decides whether to propagate).
 followUp(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:658
+Defined in: [packages/agent/src/types.ts:659](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L659)
 
 #### Parameters
 
@@ -128,7 +128,7 @@ Defined in: packages/agent/src/types.ts:658
 run(input, options?): Promise<AgentResult<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:653
+Defined in: [packages/agent/src/types.ts:654](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L654)
 
 #### Parameters
 
@@ -149,7 +149,7 @@ Defined in: packages/agent/src/types.ts:653
 steer(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:657
+Defined in: [packages/agent/src/types.ts:658](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L658)
 
 #### Parameters
 
@@ -169,7 +169,7 @@ Defined in: packages/agent/src/types.ts:657
 stream(input, options?): AsyncIterable<AgentEvent<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:649
+Defined in: [packages/agent/src/types.ts:650](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L650)
 
 #### Parameters
 
@@ -192,7 +192,7 @@ toTool(options?): Tool<{
 }, TOutput, TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:660
+Defined in: [packages/agent/src/types.ts:661](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L661)
 
 #### Parameters
 

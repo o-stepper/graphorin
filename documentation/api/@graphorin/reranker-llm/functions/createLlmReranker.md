@@ -10,7 +10,7 @@
 function createLlmReranker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: src/reranker.ts:85
+Defined in: [packages/reranker-llm/src/reranker.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L85)
 
 Build an LLM-as-reranker. The reranker is stateless past the
 provider reference - the provider's own session / connection

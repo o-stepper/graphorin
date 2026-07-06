@@ -14,7 +14,7 @@ type RevocationFetcher = (url, init) => Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:132
+Defined in: [packages/security/src/oauth/refresh.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L132)
 
 Strategy hook used by tests to stub the revoke request.
 

@@ -10,7 +10,7 @@
 const isTerminal: StopCondition;
 ```
 
-Defined in: packages/core/src/types/stop-condition.ts:68
+Defined in: [packages/core/src/types/stop-condition.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L68)
 
 Stop when the run reaches a terminal status.
 

@@ -18,7 +18,7 @@ type AuthAuditAction =
   | "auth:denied:lockout";
 ```
 
-Defined in: packages/security/src/auth/audit-emitter.ts:18
+Defined in: [packages/security/src/auth/audit-emitter.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/audit-emitter.ts#L18)
 
 Discriminator for `AuthAuditEvent`. The `token:*` actions cover the
 CRUD lifecycle; `auth:granted` / `auth:denied:*` cover verification

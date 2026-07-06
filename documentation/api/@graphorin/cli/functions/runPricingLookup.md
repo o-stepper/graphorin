@@ -12,7 +12,7 @@ function runPricingLookup(options):
   | null;
 ```
 
-Defined in: packages/cli/src/commands/pricing.ts:170
+Defined in: [packages/cli/src/commands/pricing.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L170)
 
 ## Parameters
 

@@ -10,7 +10,7 @@
 type BrowserOpener = (url, signal?) => Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/browser.ts:24
+Defined in: [packages/security/src/oauth/browser.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/browser.ts#L24)
 
 **`Experimental`**
 

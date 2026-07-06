@@ -10,7 +10,7 @@
 type IterativeRecallResult = IterativeRetrievalResult<MemoryHit<Fact>>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:359
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:359](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L359)
 
 Outcome of [SemanticMemory.searchIterative](/api/@graphorin/memory/classes/SemanticMemory.md#searchiterative). Beyond the ranked
 `hits`, `sufficient` / `abstained` tell the caller whether the memory

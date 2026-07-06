@@ -6,7 +6,7 @@
 
 # Interface: MigrateCommandResult
 
-Defined in: packages/cli/src/commands/migrate.ts:30
+Defined in: [packages/cli/src/commands/migrate.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L30)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/cli/src/commands/migrate.ts:30
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applied"></a> `applied` | `readonly` | readonly `string`[] | packages/cli/src/commands/migrate.ts:31 |
+| <a id="property-applied"></a> `applied` | `readonly` | readonly `string`[] | [packages/cli/src/commands/migrate.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L31) |

@@ -10,7 +10,7 @@
 type TokenEnvironment = "live" | "test" | "local";
 ```
 
-Defined in: packages/security/src/auth/token-format.ts:64
+Defined in: [packages/security/src/auth/token-format.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L64)
 
 Set of accepted environment labels. The library keeps a small,
 fixed set so deployments can rely on the label being a stable

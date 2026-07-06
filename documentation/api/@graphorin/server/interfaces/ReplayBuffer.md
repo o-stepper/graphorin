@@ -6,7 +6,7 @@
 
 # Interface: ReplayBuffer
 
-Defined in: packages/server/src/ws/replay-buffer.ts:57
+Defined in: [packages/server/src/ws/replay-buffer.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L57)
 
 Per-subject replay buffer. Stores up to `maxEvents` per subject
 with a TTL; thread-safe under the single-writer Node event loop
@@ -22,7 +22,7 @@ model.
 forget(subject): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:61
+Defined in: [packages/server/src/ws/replay-buffer.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L61)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:61
 prune(): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:62
+Defined in: [packages/server/src/ws/replay-buffer.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L62)
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:62
 push(subject, event): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:58
+Defined in: [packages/server/src/ws/replay-buffer.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L58)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:58
 replay(subject, sinceEventId): ReplayBufferSlice;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:59
+Defined in: [packages/server/src/ws/replay-buffer.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L59)
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:59
 size(subject): number;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:60
+Defined in: [packages/server/src/ws/replay-buffer.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L60)
 
 #### Parameters
 
@@ -125,7 +125,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:60
 optional stats(): ReplayBufferStats;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:69
+Defined in: [packages/server/src/ws/replay-buffer.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L69)
 
 Occupancy snapshot (W-028). OPTIONAL so external implementations
 of this `@stable` interface keep compiling; `createReplayBuffer`

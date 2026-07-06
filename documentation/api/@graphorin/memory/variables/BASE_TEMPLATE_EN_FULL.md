@@ -10,6 +10,6 @@
 const BASE_TEMPLATE_EN_FULL: string = enLocalePack.baseTemplate.full;
 ```
 
-Defined in: packages/memory/src/context-engine/templates/base-en.ts:16
+Defined in: [packages/memory/src/context-engine/templates/base-en.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/base-en.ts#L16)
 
 English Layer 1 in `'full'` mode (~250-350 tokens).

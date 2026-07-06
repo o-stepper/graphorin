@@ -11,7 +11,7 @@
  *   `listPrompts` / `callTool` / `readResource` / `getPrompt` /
  *   `close`) plus the strategy-aware {@link MCPClient.toTools}
  *   adapter that bridges MCP tool descriptors into Graphorin
- *   {@link Tool} records.
+ *   `Tool` records.
  * - The OAuth bridge that resolves bearer headers from the
  *   {@link OAuthAuthorizationProvider} backed by
  *   `@graphorin/security/oauth`.

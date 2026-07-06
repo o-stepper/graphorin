@@ -10,7 +10,7 @@
 function toolUsageValidator(opts?): OutputGuardrail<unknown>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/tool-usage-validator.ts:62
+Defined in: [packages/security/src/guardrails/builtins/tool-usage-validator.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/tool-usage-validator.ts#L62)
 
 Construct the tool-usage validator.
 

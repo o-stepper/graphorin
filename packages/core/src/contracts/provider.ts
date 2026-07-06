@@ -1,5 +1,6 @@
 import type { Message, ReasoningContentMeta } from '../types/message.js';
 import type { Sensitivity } from '../types/sensitivity.js';
+import type { ToolCall } from '../types/tool-call.js';
 import type { Usage } from '../types/usage.js';
 import type { ReasoningContract, ReasoningRetention } from './reasoning-retention.js';
 
@@ -138,11 +139,12 @@ export interface ProviderRequestMetadata {
  */
 export interface ProviderResponse {
   readonly text?: string;
-  readonly toolCalls?: ReadonlyArray<{
-    readonly toolCallId: string;
-    readonly toolName: string;
-    readonly args: unknown;
-  }>;
+  /**
+   * Tool invocations the model requested. W-127: reuses the canonical
+   * {@link ToolCall} (the inline shape here was structurally identical
+   * and only invited drift).
+   */
+  readonly toolCalls?: ReadonlyArray<ToolCall>;
   readonly usage: Usage;
   readonly finishReason: FinishReason;
   readonly providerMetadata?: Readonly<Record<string, unknown>>;

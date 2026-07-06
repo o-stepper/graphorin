@@ -177,7 +177,7 @@ export interface CreateSqliteStoreOptions {
   readonly skipFtsIntegrityCheck?: boolean;
   /**
    * Optional cipher-driver loader override (test-only seam). See
-   * {@link import('./connection.js').OpenConnectionOptions.cipherLoader}.
+   * `OpenConnectionOptions.cipherLoader`.
    *
    * @internal
    */

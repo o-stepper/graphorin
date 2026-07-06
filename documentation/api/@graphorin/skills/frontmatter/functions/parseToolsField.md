@@ -12,7 +12,7 @@ function parseToolsField(value):
   | null;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:530
+Defined in: [packages/skills/src/frontmatter/index.ts:530](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L530)
 
 Parse the `tools` field. Accepts either an array of strings (tool
 names - the loader resolves modules through naming convention) or

@@ -6,7 +6,7 @@
 
 # Interface: WorkingMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:75
+Defined in: [packages/core/src/contracts/memory-store.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L75)
 
 ## Stable
 
@@ -21,7 +21,7 @@ delete(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:79
+Defined in: [packages/core/src/contracts/memory-store.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L79)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:79
 get(scope, label): Promise<Block | null>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:77
+Defined in: [packages/core/src/contracts/memory-store.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L77)
 
 #### Parameters
 
@@ -64,7 +64,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:77
 list(scope): Promise<readonly Block[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:76
+Defined in: [packages/core/src/contracts/memory-store.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L76)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:76
 upsert(scope, block): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:78
+Defined in: [packages/core/src/contracts/memory-store.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L78)
 
 #### Parameters
 

@@ -13,7 +13,7 @@ type AuditDbBindingId =
 };
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:34
+Defined in: [packages/security/src/audit/audit-db.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L34)
 
 Stored binding identifier. The framework default is the
 `better-sqlite3-multiple-ciphers` package - registered by

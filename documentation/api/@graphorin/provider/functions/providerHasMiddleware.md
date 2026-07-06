@@ -10,7 +10,7 @@
 function providerHasMiddleware(provider, name): boolean;
 ```
 
-Defined in: packages/provider/src/middleware/compose.ts:117
+Defined in: [packages/provider/src/middleware/compose.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L117)
 
 Return `true` iff the chain rooted at `provider` contains a
 middleware whose kind matches `name`.

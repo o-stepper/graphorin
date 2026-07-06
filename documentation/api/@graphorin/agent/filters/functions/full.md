@@ -10,7 +10,7 @@
 function full(): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:147
+Defined in: [packages/agent/src/filters/index.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L147)
 
 The full unfiltered history. Discouraged - security-conscious
 callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead

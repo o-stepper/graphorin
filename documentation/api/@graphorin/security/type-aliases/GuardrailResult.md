@@ -20,7 +20,7 @@ type GuardrailResult<TValue> =
 };
 ```
 
-Defined in: packages/security/src/guardrails/types.ts:62
+Defined in: [packages/security/src/guardrails/types.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L62)
 
 Result of a single guardrail check.
 

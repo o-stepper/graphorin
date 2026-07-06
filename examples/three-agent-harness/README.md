@@ -136,7 +136,7 @@ The returned `EvaluatorOptimizerOutcome` carries `terminationReason: 'pass' | 'm
 
 `<seq>` is a 3-digit zero-padded counter that auto-increments per `(runId, role)`. The Planner's first write becomes `planner.001.txt`; subsequent Generator writes are `generator.001.txt`, `generator.002.txt`, … The harness atomic-writes via `.tmp + rename` so a crashed write does not leave half-written artifacts.
 
-`agent.progress.read({ role, runId? })` returns the same `ProgressArtifactRef[]` shape the writer emits. Cross-run reads require an explicit `runId` cursor (see `ProgressIO.read` in `@graphorin/agent`). This example surfaces that cursor as `runHarness({ priorRunId })` or **`GRAPHORIN_HARNESS_PRIOR_RUN_ID`** so a new Planner pass can load the prior session’s planner artifacts from the same `artifactRoot`. Listing prior runs without a cursor remains out of scope for this example.
+`agent.progress.read({ role, runId? })` returns the same `ProgressArtifactRef[]` shape the writer emits. Cross-run reads require an explicit `runId` cursor (see `ProgressIO.read` in `@graphorin/agent`). This example surfaces that cursor as `runHarness({ priorRunId })` or **`GRAPHORIN_HARNESS_PRIOR_RUN_ID`** so a new Planner pass can load the prior session's planner artifacts from the same `artifactRoot`. Listing prior runs without a cursor remains out of scope for this example.
 
 ### Sandbox-tier-aware path mapping
 

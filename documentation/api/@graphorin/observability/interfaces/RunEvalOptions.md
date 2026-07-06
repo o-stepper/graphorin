@@ -6,7 +6,7 @@
 
 # Interface: RunEvalOptions\&lt;I, O\&gt;
 
-Defined in: packages/observability/src/eval/types.ts:116
+Defined in: [packages/observability/src/eval/types.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L116)
 
 ## Stable
 
@@ -21,9 +21,9 @@ Defined in: packages/observability/src/eval/types.ts:116
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agent"></a> `agent` | `readonly` | \{ `run`: (`input`) => `Promise`\&lt;`O`\&gt;; \} | packages/observability/src/eval/types.ts:117 |
-| `agent.run` | `readonly` | (`input`) => `Promise`\&lt;`O`\&gt; | packages/observability/src/eval/types.ts:117 |
-| <a id="property-dataset"></a> `dataset` | `readonly` | [`Dataset`](/api/@graphorin/observability/interfaces/Dataset.md)\&lt;`I`, `O`\&gt; | packages/observability/src/eval/types.ts:118 |
-| <a id="property-iterations"></a> `iterations?` | `readonly` | `number` | packages/observability/src/eval/types.ts:120 |
-| <a id="property-scorers"></a> `scorers` | `readonly` | readonly [`Scorer`](/api/@graphorin/observability/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;[] | packages/observability/src/eval/types.ts:119 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/observability/src/eval/types.ts:121 |
+| <a id="property-agent"></a> `agent` | `readonly` | \{ `run`: (`input`) => `Promise`\&lt;`O`\&gt;; \} | [packages/observability/src/eval/types.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L117) |
+| `agent.run` | `readonly` | (`input`) => `Promise`\&lt;`O`\&gt; | [packages/observability/src/eval/types.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L117) |
+| <a id="property-dataset"></a> `dataset` | `readonly` | [`Dataset`](/api/@graphorin/observability/interfaces/Dataset.md)\&lt;`I`, `O`\&gt; | [packages/observability/src/eval/types.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L118) |
+| <a id="property-iterations"></a> `iterations?` | `readonly` | `number` | [packages/observability/src/eval/types.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L120) |
+| <a id="property-scorers"></a> `scorers` | `readonly` | readonly [`Scorer`](/api/@graphorin/observability/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;[] | [packages/observability/src/eval/types.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L119) |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | [packages/observability/src/eval/types.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L121) |

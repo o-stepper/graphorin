@@ -10,7 +10,7 @@
 type ReasoningRetention = "strip" | "pass-through-claude" | "pass-through-all";
 ```
 
-Defined in: packages/core/src/contracts/reasoning-retention.ts:23
+Defined in: [packages/core/src/contracts/reasoning-retention.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/reasoning-retention.ts#L23)
 
 How a provider treats reasoning content across consecutive
 `provider.stream(...)` calls of the same agent + same model + same

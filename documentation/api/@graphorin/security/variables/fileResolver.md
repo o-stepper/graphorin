@@ -10,7 +10,7 @@
 const fileResolver: SecretResolver;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/file.ts:56
+Defined in: [packages/security/src/secrets/resolvers/file.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/file.ts#L56)
 
 Resolver for the `file:` scheme. Reads a plaintext file and returns
 the trimmed content as a `SecretValue`.

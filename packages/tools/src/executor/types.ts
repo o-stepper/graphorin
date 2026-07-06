@@ -163,7 +163,7 @@ export interface ExecutorOptions {
    * Wall-clock limit applied to INLINE tool execution (TL-4). When set,
    * this executor-level value takes precedence; otherwise the resolved
    * per-tool sandbox-tier `timeoutMs` applies when > 0, else
-   * {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s). Expiry fails the call
+   * `DEFAULT_INLINE_TOOL_TIMEOUT_MS` (60s). Expiry fails the call
    * with `ToolError({ kind: 'timeout' })`; the run continues.
    */
   readonly inlineToolTimeoutMs?: number;
@@ -364,6 +364,14 @@ export interface HandleProducerTaint {
   readonly trustClass: ToolTrustClass;
   readonly source: ToolSource;
   readonly sensitivity?: Sensitivity;
+  /**
+   * W-156: the spill-time whole-artifact scan found an imperative
+   * pattern somewhere in the FULL artifact. On a tainted handle read
+   * the executor increments the cross-page operator counter - the
+   * per-page strip pass cannot see a pattern split by a page boundary,
+   * this flag can.
+   */
+  readonly imperativeFlagged?: boolean;
 }
 
 /**

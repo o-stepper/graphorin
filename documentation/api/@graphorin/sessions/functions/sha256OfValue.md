@@ -10,7 +10,7 @@
 function sha256OfValue(value): string;
 ```
 
-Defined in: packages/sessions/src/cassette/replay.ts:247
+Defined in: [packages/sessions/src/cassette/replay.ts:247](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/replay.ts#L247)
 
 Compute the canonical SHA-256 of any value the cassette layer
 accepts as `args`. Mirrors what the writer records under

@@ -6,7 +6,7 @@
 
 # Interface: RenderedTemplate
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:58
+Defined in: [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L58)
 
 Preamble + section-headers payload extracted from a locale pack.
 Surfaced as a separate type so test fixtures can assert against
@@ -18,5 +18,5 @@ the resolved template independently from the locale pack.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:59 |
-| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:60 |
+| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L59) |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L60) |

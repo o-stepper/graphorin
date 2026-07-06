@@ -442,6 +442,184 @@ describe('createSqliteStore', () => {
     expect(hits.some((h) => h.record.id === 'ep-x')).toBe(false);
   });
 
+  it('mutators are scope-guarded: a foreign scope is a deterministic no-op (W-154)', async () => {
+    const mkFact = (id: string, userId: string) => ({
+      id,
+      kind: 'semantic' as const,
+      userId,
+      sensitivity: 'internal' as const,
+      text: `owned by ${userId} (${id})`,
+      createdAt: new Date().toISOString(),
+    });
+    await store.memory.semantic.remember(mkFact('vic-f1', 'victim'));
+    await store.memory.semantic.remember(mkFact('vic-f2', 'victim'));
+    const semantic = store.memory.semantic as unknown as {
+      get(id: string): Promise<{ status?: string; archived?: boolean } | null>;
+      forget(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+      archiveFact(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      purge(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      markAccessed(
+        ids: ReadonlyArray<string>,
+        accessedAt?: number,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    const attacker = { userId: 'attacker' };
+    const victim = { userId: 'victim' };
+
+    // Foreign-scope mutations: all no-ops.
+    await semantic.forget('vic-f1', 'evil', attacker);
+    expect(await semantic.get('vic-f1')).not.toBeNull();
+    await semantic.setStatus('vic-f1', 'quarantined', 'evil', attacker);
+    expect((await semantic.get('vic-f1'))?.status ?? 'active').not.toBe('quarantined');
+    await semantic.archiveFact('vic-f1', 'evil', attacker);
+    const archivedRow = store.connection.get<{ archived: number }>(
+      'SELECT archived FROM facts WHERE id = ?',
+      ['vic-f1'],
+    );
+    expect(archivedRow?.archived).toBe(0);
+    await semantic.purge('vic-f1', 'evil', attacker);
+    expect(await semantic.get('vic-f1')).not.toBeNull();
+    // A foreign purge writes NOTHING - not even the PURGE audit row.
+    const purgeRows = store.connection.all(
+      "SELECT 1 FROM memory_history WHERE memory_kind = 'fact' AND memory_id = ? AND event = 'PURGE'",
+      ['vic-f1'],
+    );
+    expect(purgeRows.length).toBe(0);
+    await semantic.markAccessed(['vic-f1'], undefined, attacker);
+    const accessRow = store.connection.get<{ access_count: number }>(
+      'SELECT access_count FROM facts WHERE id = ?',
+      ['vic-f1'],
+    );
+    expect(accessRow?.access_count).toBe(0);
+
+    // Correct scope: the same calls mutate.
+    await semantic.markAccessed(['vic-f1'], undefined, victim);
+    expect(
+      store.connection.get<{ access_count: number }>(
+        'SELECT access_count FROM facts WHERE id = ?',
+        ['vic-f1'],
+      )?.access_count,
+    ).toBe(1);
+    await semantic.setStatus('vic-f1', 'quarantined', 'ok', victim);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM facts WHERE id = ?', ['vic-f1'])
+        ?.status,
+    ).toBe('quarantined');
+    await semantic.purge('vic-f1', 'gdpr', victim);
+    expect(await semantic.get('vic-f1')).toBeNull();
+
+    // No scope: historical unscoped behaviour (trusted internal callers).
+    await semantic.forget('vic-f2');
+    expect(await semantic.get('vic-f2')).toBeNull();
+
+    // Episodes: archive + setStatus.
+    const ep = {
+      id: 'vic-e1',
+      kind: 'episodic' as const,
+      userId: 'victim',
+      summary: 'victim episode',
+      startedAt: new Date(0).toISOString(),
+      endedAt: new Date(1000).toISOString(),
+      sensitivity: 'internal' as const,
+      createdAt: new Date().toISOString(),
+    };
+    const episodic = store.memory.episodic as unknown as {
+      put(e: typeof ep): Promise<void>;
+      archive(id: string, reason?: string, scope?: { userId: string }): Promise<void>;
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    await episodic.put(ep);
+    await episodic.archive('vic-e1', 'evil', attacker);
+    expect(
+      store.connection.get<{ archived: number }>('SELECT archived FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.archived,
+    ).toBe(0);
+    await episodic.setStatus('vic-e1', 'quarantined', 'evil', attacker);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.status,
+    ).not.toBe('quarantined');
+    await episodic.archive('vic-e1', 'ok', victim);
+    expect(
+      store.connection.get<{ archived: number }>('SELECT archived FROM episodes WHERE id = ?', [
+        'vic-e1',
+      ])?.archived,
+    ).toBe(1);
+
+    // Rules + insights setStatus.
+    await store.memory.procedural.add({
+      id: 'vic-r1',
+      kind: 'procedural' as const,
+      userId: 'victim',
+      text: 'victim rule',
+      priority: 10,
+      sensitivity: 'internal' as const,
+      status: 'quarantined' as const,
+      createdAt: new Date().toISOString(),
+    });
+    const procedural = store.memory.procedural as unknown as {
+      setStatus(
+        id: string,
+        status: string,
+        reason?: string,
+        scope?: { userId: string },
+      ): Promise<void>;
+    };
+    await procedural.setStatus('vic-r1', 'active', 'evil', attacker);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM rules WHERE id = ?', ['vic-r1'])
+        ?.status,
+    ).toBe('quarantined');
+    await procedural.setStatus('vic-r1', 'active', 'ok', victim);
+    expect(
+      store.connection.get<{ status: string }>('SELECT status FROM rules WHERE id = ?', ['vic-r1'])
+        ?.status,
+    ).toBe('active');
+  });
+
+  it('episodic memory: count() applies the archived filter of its contract (W-155)', async () => {
+    const base = {
+      kind: 'episodic' as const,
+      userId: 'w155',
+      startedAt: new Date(0).toISOString(),
+      endedAt: new Date(60_000).toISOString(),
+      sensitivity: 'internal' as const,
+      createdAt: new Date().toISOString(),
+    };
+    const episodic = store.memory.episodic as unknown as {
+      put(e: Record<string, unknown>): Promise<void>;
+      archive(id: string): Promise<void>;
+      setStatus(id: string, status: string): Promise<void>;
+      count(scope: { userId: string }): Promise<number>;
+    };
+    await episodic.put({ ...base, id: 'w155-a', summary: 'stays live' });
+    await episodic.put({ ...base, id: 'w155-b', summary: 'gets archived' });
+    await episodic.put({ ...base, id: 'w155-c', summary: 'gets quarantined' });
+    expect(await episodic.count({ userId: 'w155' })).toBe(3);
+
+    // Archived episodes leave the count (they left FTS/vector recall).
+    await episodic.archive('w155-b');
+    expect(await episodic.count({ userId: 'w155' })).toBe(2);
+
+    // The quarantined filter does not regress.
+    await episodic.setStatus('w155-c', 'quarantined');
+    expect(await episodic.count({ userId: 'w155' })).toBe(1);
+  });
+
   it('session memory: totalCachedTokens (DEC-131 cache surface)', async () => {
     const scope = { userId: 'alex', sessionId: 's1' };
     const r = await store.memory.session.push(scope, {
@@ -511,6 +689,25 @@ describe('createSqliteStore', () => {
     expect(handoffs[0]?.toAgentId).toBe('helper');
   });
 
+  it('session search: the positional query is authoritative over opts.query (W-127)', async () => {
+    const scope = { userId: 'alex', sessionId: 's-prio' };
+    const alphaRef = await store.memory.session.push(scope, {
+      role: 'user',
+      content: 'the alpha topic',
+    });
+    const betaRef = await store.memory.session.push(scope, {
+      role: 'user',
+      content: 'the beta topic',
+    });
+    const hits = await store.memory.session.search(scope, 'alpha', {
+      query: 'beta',
+      topK: 5,
+    });
+    expect(hits.length).toBe(1);
+    expect(hits[0]?.record.id).toBe(alphaRef.messageId);
+    expect(hits[0]?.record.id).not.toBe(betaRef.messageId);
+  });
+
   it('trigger store: upsert + recordFire + list', async () => {
     const t = {
       id: 't-cron-1',
@@ -531,6 +728,59 @@ describe('createSqliteStore', () => {
     expect((await store.triggers.list()).length).toBe(1);
     await store.triggers.remove('t-cron-1');
     expect((await store.triggers.list()).length).toBe(0);
+  });
+
+  it('trigger store: recordFire is fenced monotonically (W-133)', async () => {
+    const t = {
+      id: 't-fence-1',
+      kind: 'interval' as const,
+      spec: 'PT5M',
+      callbackRef: 'tools.sync',
+      missedFires: 0,
+      disabled: false,
+      catchupPolicy: 'last' as const,
+      maxCatchupRuns: 1,
+      catchupWindowMs: 24 * 60 * 60 * 1000,
+      createdAt: new Date().toISOString(),
+    };
+    await store.triggers.upsert(t);
+
+    // Fresh trigger (last_fired_at NULL): the first fire lands.
+    const late = new Date('2026-07-06T12:10:00.000Z').toISOString();
+    const lateNext = new Date('2026-07-06T12:15:00.000Z').toISOString();
+    await store.triggers.recordFire('t-fence-1', late, lateNext);
+    const afterLate = await store.triggers.get('t-fence-1');
+    expect(afterLate?.lastFiredAt).toBe(late);
+    expect(afterLate?.nextFireAt).toBe(lateNext);
+
+    // A second (unsupported second-scheduler) fixation with an EARLIER
+    // firedAt is a no-op: state keeps the later fire.
+    const earlier = new Date('2026-07-06T12:05:00.000Z').toISOString();
+    await store.triggers.recordFire(
+      't-fence-1',
+      earlier,
+      new Date('2026-07-06T12:07:00.000Z').toISOString(),
+    );
+    const afterEarlier = await store.triggers.get('t-fence-1');
+    expect(afterEarlier?.lastFiredAt).toBe(late);
+    expect(afterEarlier?.nextFireAt).toBe(lateNext);
+
+    // Same firedAt: also a no-op (strict fence).
+    await store.triggers.recordFire(
+      't-fence-1',
+      late,
+      new Date('2026-07-06T12:20:00.000Z').toISOString(),
+    );
+    expect((await store.triggers.get('t-fence-1'))?.nextFireAt).toBe(lateNext);
+
+    // A strictly later fire still advances normally.
+    const later = new Date('2026-07-06T12:15:00.000Z').toISOString();
+    const laterNext = new Date('2026-07-06T12:20:00.000Z').toISOString();
+    await store.triggers.recordFire('t-fence-1', later, laterNext);
+    const afterLater = await store.triggers.get('t-fence-1');
+    expect(afterLater?.lastFiredAt).toBe(later);
+    expect(afterLater?.nextFireAt).toBe(laterNext);
+    await store.triggers.remove('t-fence-1');
   });
 
   it('auth-token store: put / get / revoke / record', async () => {

@@ -10,7 +10,7 @@
 function listCheckedFtsTables(): readonly string[];
 ```
 
-Defined in: packages/store-sqlite/src/fts-integrity.ts:46
+Defined in: [packages/store-sqlite/src/fts-integrity.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L46)
 
 **`Internal`**
 

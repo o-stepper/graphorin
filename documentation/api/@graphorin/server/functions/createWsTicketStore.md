@@ -10,7 +10,7 @@
 function createWsTicketStore(options?): WsTicketStore;
 ```
 
-Defined in: packages/server/src/ws/ticket.ts:91
+Defined in: [packages/server/src/ws/ticket.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/ticket.ts#L91)
 
 Build the default in-memory ticket store. Production deployments
 use exactly one store per process (multiple processes would each

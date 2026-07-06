@@ -10,11 +10,11 @@
 function sleep(durationMs, signal?): Promise<void>;
 ```
 
-Defined in: packages/client/src/reconnect.ts:65
+Defined in: [packages/client/src/reconnect.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/reconnect.ts#L65)
 
 Resolve when the requested number of milliseconds elapsed, or
-reject (with a DOMException-style abort error) when the
-supplied AbortSignal fires first.
+reject (with a `DOMException`-style abort error) when the
+supplied `AbortSignal` fires first.
 
 ## Parameters
 

@@ -10,6 +10,6 @@
 type LabelSet = Readonly<Record<string, string | number | boolean>>;
 ```
 
-Defined in: packages/server/src/metrics/registry.ts:20
+Defined in: [packages/server/src/metrics/registry.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L20)
 
 ## Stable

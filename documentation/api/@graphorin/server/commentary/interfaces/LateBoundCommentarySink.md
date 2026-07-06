@@ -6,7 +6,7 @@
 
 # Interface: LateBoundCommentarySink
 
-Defined in: packages/server/src/commentary/audit-bridge.ts:111
+Defined in: [packages/server/src/commentary/audit-bridge.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L111)
 
 A [DeliveryCommentarySink](/api/@graphorin/server/interfaces/DeliveryCommentarySink.md) whose real target is installed later. The WS
 dispatcher is created before the audit DB opens (IP-21); the server hands it
@@ -29,7 +29,7 @@ the audit DB, if configured, has opened and bound).
 bind(target): void;
 ```
 
-Defined in: packages/server/src/commentary/audit-bridge.ts:113
+Defined in: [packages/server/src/commentary/audit-bridge.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L113)
 
 Install the real sink. Replaces any previously-bound target.
 
@@ -51,7 +51,7 @@ Install the real sink. Replaces any previously-bound target.
 onDecision(decision): void;
 ```
 
-Defined in: packages/server/src/commentary/types.ts:106
+Defined in: [packages/server/src/commentary/types.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L106)
 
 Called once per applied decision. Implementations should be
 non-throwing; the sanitizer wraps the call in `try/catch` so a

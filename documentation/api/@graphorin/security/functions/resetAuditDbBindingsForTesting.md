@@ -10,7 +10,7 @@
 function _resetAuditDbBindingsForTesting(): void;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:190
+Defined in: [packages/security/src/audit/audit-db.ts:190](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L190)
 
 **`Experimental`**
 

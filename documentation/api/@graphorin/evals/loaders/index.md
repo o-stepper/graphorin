@@ -7,7 +7,7 @@
 # loaders
 
 Dataset loaders. Every loader returns a fully-materialised
-Dataset that the runner can iterate over without further
+`Dataset` that the runner can iterate over without further
 I/O. Streaming loaders are a post-MVP follow-up.
 
 ## Functions

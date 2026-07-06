@@ -12,7 +12,7 @@ function createRateLimitMiddleware(config, options?): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/rate-limit.ts:23
+Defined in: [packages/server/src/middleware/rate-limit.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/rate-limit.ts#L23)
 
 ## Parameters
 

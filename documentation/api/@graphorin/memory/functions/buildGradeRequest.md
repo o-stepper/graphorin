@@ -13,7 +13,7 @@ function buildGradeRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:241
+Defined in: [packages/memory/src/search/iterative.ts:241](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L241)
 
 Build the grade request. Pure - no I/O. Temperature 0 so the verdict
 is as stable as the model allows.

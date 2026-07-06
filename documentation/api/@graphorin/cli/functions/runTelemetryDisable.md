@@ -10,7 +10,7 @@
 function runTelemetryDisable(options?): TelemetryStatusResult;
 ```
 
-Defined in: packages/cli/src/commands/telemetry.ts:71
+Defined in: [packages/cli/src/commands/telemetry.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L71)
 
 ## Parameters
 

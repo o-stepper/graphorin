@@ -93,6 +93,20 @@ export function runSanitizePhase(
     effectiveOutput = { ...(effectiveOutput as object), content: contentSanitization.body };
   }
 
+  // W-156: the producer's spill-time whole-artifact scan flagged an
+  // imperative pattern somewhere in the FULL artifact. This page may
+  // show no hit of its own (the pattern can be split by the page
+  // boundary), so surface the artifact-level fact to operators here.
+  // The page's envelope wrap is already unconditional for tainted
+  // reads (wrap does not depend on per-page hits) - the counter is
+  // the added signal, not the defense.
+  if (producerTaint?.imperativeFlagged === true) {
+    incrementCounter('tool.inbound.sanitization.cross-page-flag.total', {
+      trustClass: producerTaint.trustClass,
+      toolName: tool.name,
+    });
+  }
+
   // Inbound sanitization.
   const sanitization = applyInboundSanitization({
     body: truncatedBody,

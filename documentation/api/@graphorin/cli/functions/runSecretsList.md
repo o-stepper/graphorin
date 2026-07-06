@@ -10,7 +10,7 @@
 function runSecretsList(options?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:58
+Defined in: [packages/cli/src/commands/secrets.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L58)
 
 ## Parameters
 

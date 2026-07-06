@@ -10,7 +10,7 @@
 type CrossEncoderPipelineFactory = (task, model, options) => Promise<CrossEncoderPipeline>;
 ```
 
-Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:45
+Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L45)
 
 **`Internal`**
 

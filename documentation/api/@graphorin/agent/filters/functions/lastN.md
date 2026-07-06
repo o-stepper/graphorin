@@ -10,7 +10,7 @@
 function lastN(n?): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:89
+Defined in: [packages/agent/src/filters/index.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L89)
 
 Keep the parent's system prompt and the last `n` non-system
 messages. Default `n = 10` per DEC-146 / RB-40 security-first

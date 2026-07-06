@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: src/index.ts:33
+Defined in: [packages/reranker-llm/src/index.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/index.ts#L33)

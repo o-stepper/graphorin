@@ -10,7 +10,7 @@
 function normaliseTool<TInput, TOutput, TDeps>(tool, source): NormaliseOutcome<TInput, TOutput, TDeps>;
 ```
 
-Defined in: packages/tools/src/registry/normalize.ts:104
+Defined in: [packages/tools/src/registry/normalize.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L104)
 
 Normalise a tool registration. Throws on programming errors
 (invalid examples, invalid `preferredModel`, invalid

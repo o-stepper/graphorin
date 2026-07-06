@@ -6,7 +6,7 @@
 
 # Interface: DataFlowEvaluation
 
-Defined in: packages/security/src/dataflow/types.ts:247
+Defined in: [packages/security/src/dataflow/types.ts:247](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L247)
 
 The signal a [DataFlowPolicy](/api/@graphorin/security/interfaces/DataFlowPolicy.md) evaluates for one candidate sink
 call. Populated by the enforcement point from the resolved tool's
@@ -18,9 +18,9 @@ metadata plus the run's [TaintLedger](/api/@graphorin/security/interfaces/TaintL
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-carriesuntrustedverbatim"></a> `carriesUntrustedVerbatim` | `readonly` | `boolean` | `true` when the sink's arguments carry untrusted content verbatim. | packages/security/src/dataflow/types.ts:253 |
-| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` when secret-tier content has entered the run. | packages/security/src/dataflow/types.ts:257 |
-| <a id="property-sideeffectclass"></a> `sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | The sink's resolved side-effect class. | packages/security/src/dataflow/types.ts:251 |
-| <a id="property-sourcekinds"></a> `sourceKinds` | `readonly` | readonly `string`[] | Untrusted source kinds relevant to this flow (matched + observed). | packages/security/src/dataflow/types.ts:259 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | Name of the sink tool about to run. | packages/security/src/dataflow/types.ts:249 |
-| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` when untrusted content has entered the run. | packages/security/src/dataflow/types.ts:255 |
+| <a id="property-carriesuntrustedverbatim"></a> `carriesUntrustedVerbatim` | `readonly` | `boolean` | `true` when the sink's arguments carry untrusted content verbatim. | [packages/security/src/dataflow/types.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L253) |
+| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` when secret-tier content has entered the run. | [packages/security/src/dataflow/types.ts:257](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L257) |
+| <a id="property-sideeffectclass"></a> `sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | The sink's resolved side-effect class. | [packages/security/src/dataflow/types.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L251) |
+| <a id="property-sourcekinds"></a> `sourceKinds` | `readonly` | readonly `string`[] | Untrusted source kinds relevant to this flow (matched + observed). | [packages/security/src/dataflow/types.ts:259](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L259) |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | Name of the sink tool about to run. | [packages/security/src/dataflow/types.ts:249](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L249) |
+| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` when untrusted content has entered the run. | [packages/security/src/dataflow/types.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L255) |

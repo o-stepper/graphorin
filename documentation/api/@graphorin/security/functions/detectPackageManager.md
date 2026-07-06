@@ -10,7 +10,7 @@
 function detectPackageManager(env?): PackageManagerKind;
 ```
 
-Defined in: packages/security/src/supply-chain/package-manager.ts:83
+Defined in: [packages/security/src/supply-chain/package-manager.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L83)
 
 Detect the available package manager. Prefers `pnpm` (project
 default) and falls back to `npm` and `yarn`.

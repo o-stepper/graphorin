@@ -10,7 +10,7 @@
 function jsonPath<I>(options): Scorer<I, unknown>;
 ```
 
-Defined in: evals/src/scorers/code/json-path.ts:22
+Defined in: [packages/evals/src/scorers/code/json-path.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L22)
 
 ## Type Parameters
 

@@ -10,7 +10,7 @@
 type AuditDecision = "success" | "denied" | "error" | "not-found";
 ```
 
-Defined in: packages/security/src/audit/types.ts:81
+Defined in: [packages/security/src/audit/types.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/types.ts#L81)
 
 Decision recorded by the audit entry.
 

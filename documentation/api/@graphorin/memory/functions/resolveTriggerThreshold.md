@@ -10,7 +10,7 @@
 function resolveTriggerThreshold(input): number;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/thresholds.ts:56
+Defined in: [packages/memory/src/context-engine/compaction/thresholds.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/thresholds.ts#L56)
 
 Resolve the effective threshold (in tokens) at which the
 auto-trigger fires. The implementation matches the suggested

@@ -10,7 +10,7 @@
 function parseJsonl(text, mapper?): readonly Case<unknown, unknown, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: evals/src/loaders/jsonl.ts:52
+Defined in: [packages/evals/src/loaders/jsonl.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/jsonl.ts#L52)
 
 Pure parser. Exported separately so tests can exercise the line-by-
 line behaviour without touching the filesystem.

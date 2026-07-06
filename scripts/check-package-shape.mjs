@@ -194,6 +194,84 @@ leg('dts-no-concrete-zod-generics', () => {
   }
 });
 
+// ------------------------------------------------ map integrity (W-136)
+// Shipped .d.ts.map files used to reference ../src/*.ts that was NOT in
+// the tarball (files = [dist, ...]), so go-to-definition fell back to
+// the .d.ts and the maps were dead weight. src now ships; this leg
+// proves, per tarball, that (a) every map source resolves INSIDE the
+// package (or the map is self-contained via sourcesContent), and
+// (b) ANTI-VACUOUS: a package whose tsdown config emits declaration
+// maps (dts + sourcemap) must actually CONTAIN .d.ts.map files - zero
+// means the pack ran against a dist restored from a cache that
+// dropped maps (the W-075 exclusion-pattern regression) or emission
+// was silently disabled, which is a gate error, not a pass.
+leg('map-integrity', () => {
+  const problems = [];
+  for (const pkg of packages) {
+    const tarball = tarballs.get(pkg.name);
+    const extractDir = join(scratch, 'map-integrity', pkg.name.replace('/', '__'));
+    mkdirSync(extractDir, { recursive: true });
+    execFileSync('tar', ['-xzf', tarball, '-C', extractDir], { stdio: 'pipe' });
+    const packageRoot = join(extractDir, 'package');
+    if (!existsSync(join(packageRoot, 'src'))) {
+      problems.push(`${pkg.name}: tarball has no src/ (W-136 files entry missing?)`);
+    }
+    const maps = [];
+    const stack = [join(packageRoot, 'dist')];
+    while (stack.length > 0) {
+      const dir = stack.pop();
+      if (!existsSync(dir)) continue;
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) stack.push(full);
+        else if (entry.name.endsWith('.map')) maps.push(full);
+      }
+    }
+    const tsdownConfig = join(pkg.dir, 'tsdown.config.ts');
+    const emitsDeclarationMaps =
+      existsSync(tsdownConfig) &&
+      /dts:\s*true/.test(readFileSync(tsdownConfig, 'utf8')) &&
+      /sourcemap:\s*true/.test(readFileSync(tsdownConfig, 'utf8'));
+    const dtsMaps = maps.filter((m) => m.endsWith('.d.ts.map'));
+    if (emitsDeclarationMaps && dtsMaps.length === 0) {
+      problems.push(
+        `${pkg.name}: tsdown emits declaration maps but the tarball has ZERO .d.ts.map - ` +
+          'cache-restored dist without maps, or emission silently disabled (vacuous-pass guard)',
+      );
+    }
+    for (const mapFile of maps) {
+      let parsed;
+      try {
+        parsed = JSON.parse(readFileSync(mapFile, 'utf8'));
+      } catch {
+        problems.push(`${pkg.name}: unparsable source map ${relative(packageRoot, mapFile)}`);
+        continue;
+      }
+      const sources = Array.isArray(parsed.sources) ? parsed.sources : [];
+      const contents = Array.isArray(parsed.sourcesContent) ? parsed.sourcesContent : [];
+      for (let i = 0; i < sources.length; i += 1) {
+        // A map entry is fine when the content is EMBEDDED (js maps:
+        // tsdown inlines sourcesContent) or the referenced file exists
+        // inside the tarball (d.ts maps after W-136).
+        if (typeof contents[i] === 'string') continue;
+        const resolved = join(dirname(mapFile), sources[i]);
+        if (!resolved.startsWith(packageRoot)) {
+          problems.push(
+            `${pkg.name}: ${relative(packageRoot, mapFile)} source escapes the package: ${sources[i]}`,
+          );
+        } else if (!existsSync(resolved)) {
+          problems.push(
+            `${pkg.name}: ${relative(packageRoot, mapFile)} source missing from tarball: ${sources[i]}`,
+          );
+        }
+      }
+    }
+  }
+  if (problems.length > 0) {
+    throw new Error(`map integrity violations (W-136):\n  ${problems.join('\n  ')}`);
+  }
+});
+
 // -------------------------------------------- scratch consumer (one-shot)
 const consumerDir = join(scratch, 'consumer');
 mkdirSync(consumerDir, { recursive: true });

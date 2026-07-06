@@ -10,6 +10,6 @@
 type DeleteAgentOptions = RetireAgentOptions;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:57
+Defined in: [packages/sessions/src/agent-registry.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L57)
 
 Same shape as [RetireAgentOptions](/api/@graphorin/sessions/agent-registry/interfaces/RetireAgentOptions.md) for `delete(...)`.

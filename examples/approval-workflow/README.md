@@ -1,8 +1,8 @@
 # approval-workflow
 
-> Workflow HITL durable-resume acceptance demo for **graphorin** - wires `@graphorin/workflow`'s step-graph engine to a four-node expense-approval pipeline that pauses on high-value submissions, survives a simulated server restart, and resumes from the persisted SQLite checkpoint with `new Directive({ resume: { approved: true, reason: 'OK' } })`.
+> Workflow HITL durable-resume acceptance demo for **graphorin** - wires `@graphorin/workflow`'s step-graph engine to a four-node expense-approval pipeline that pauses on high-value submissions, survives a simulated server restart, and resumes from the persisted SQLite checkpoint with `new Directive({ resume: { approved: true, reason: 'OK' } })`. A companion `expense-settlement` workflow showcases the remaining durable primitives: `sleepFor(...)` (a durable timer fired through `createTimerDriver`) and `awaitExternal(...)` (an awakeable resolved by `workflow.resolveAwakeable(...)`).
 
-The example is small (≈300 lines of source, two files) but it exercises every stream mode, every `WorkflowEvent` tag, and the full `pause(...)` / `Directive(resume)` lifecycle against the real `SqliteCheckpointStore` so CI never depends on a live LLM.
+The example is small (≈800 lines of source, two files) but it exercises every stream mode, every `WorkflowEvent` tag, the full `pause(...)` / `Directive(resume)` lifecycle, and the durable timer + awakeable primitives against the real `SqliteCheckpointStore` so CI never depends on a live LLM.
 
 ---
 
@@ -23,15 +23,25 @@ Expected dev output:
 graphorin v0.6.1 approval-workflow auto - status=completed, approved=true, notifications=4.
 graphorin v0.6.1 approval-workflow manual - status=suspended, suspendedAtNode='auto-approve-or-pause'.
 graphorin v0.6.1 approval-workflow resume - status=completed, approved=true, processedAt='2026-…', notifications=4.
+graphorin v0.6.1 approval-workflow settle - parked on durable timer, status=suspended, node='hold-for-settlement', wakeAt=2026-07-04T12:00:00.080Z.
+graphorin v0.6.1 approval-workflow settle - durable timer fired via tick, fired=1, sweeps=5.
+graphorin v0.6.1 approval-workflow settle - parked on awakeable 'settlement-confirmed', status=suspended.
+graphorin v0.6.1 approval-workflow settle - awakeable resolved, status=completed, confirmedBy=finance-ops, reference=SET-2026-0117, log=2.
+graphorin v0.6.1 approval-workflow durable primitives: OK.
 ```
+
+(Timestamps and the `sweeps=` count vary per run.)
 
 **What just happened?**
 
 1. The auto-approve demo submitted a $50 expense; the `auto-approve-or-pause` node fast-pathed under the $100 threshold; the workflow ran `process-approved` → `notify` → `__end__` without ever pausing.
 2. The manual-review demo submitted a $500 expense; the `auto-approve-or-pause` node called `pause({ reason: 'manual-review', amount, submitter })`; the workflow suspended and persisted the full state to SQLite.
 3. The resume demo discarded the in-flight `Workflow` handle, built a brand-new `Workflow` instance from the same `SqliteCheckpointStore`, and called `workflow.resume(threadId, new Directive({ resume: { approved: true, reason: 'OK' } }))` to drive the paused thread to completion.
+4. The settlement demo started the companion `expense-settlement` workflow; its `hold-for-settlement` node called `sleepFor(80)` and the thread parked on a durable timer whose `wakeAt` is persisted on the checkpoint.
+5. `fireSettlementTimer(...)` drove `createTimerDriver` sweeps until the SQLite store reported the thread due and `workflow.tick(...)` fired the timer; the node body re-executed and re-parked on the `settlement-confirmed` awakeable.
+6. `confirmSettlement(...)` called `workflow.resolveAwakeable(threadId, 'settlement-confirmed', confirmation)`; the suspended `awaitExternal(...)` call returned the confirmation, `archive-batch` ran, and the workflow completed - hence `durable primitives: OK`.
 
-That is the full HITL pattern. The advanced section below walks through every acceptance scenario.
+That is the full HITL pattern plus the durable-primitives lifecycle. The advanced sections below walk through every acceptance scenario.
 
 ---
 
@@ -40,10 +50,10 @@ That is the full HITL pattern. The advanced section below walks through every ac
 ```
 examples/approval-workflow/
 ├── src/
-│   ├── main.ts              # createApprovalWorkflow + runApprovalDemo + simulateServerRestart + CLI
-│   └── types.ts             # ExpenseInput / ExpenseState / ApprovalDecision / NODE_NAMES
+│   ├── main.ts              # createApprovalWorkflow + createSettlementWorkflow + demo helpers + CLI
+│   └── types.ts             # ExpenseInput / ExpenseState / ApprovalDecision / NODE_NAMES + settlement types
 ├── tests/
-│   └── smoke.test.ts        # 6 vitest cases covering durability, events, stream modes
+│   └── smoke.test.ts        # 8 vitest cases covering durability, events, stream modes, durable primitives
 ├── package.json
 ├── tsconfig.json
 ├── tsdown.config.ts
@@ -142,6 +152,49 @@ expect(resumed.finalState.processedAt).toBeDefined();
 
 ---
 
+## Durable primitives: timer + awakeable (the settlement stage)
+
+The HITL pause is one of three durable suspension primitives in `@graphorin/workflow` - all riding the same `pause(...)` substrate, all persisted in the checkpointed frontier. The CLI's final stage runs a compact second workflow, `expense-settlement`, whose `hold-for-settlement` node exercises the other two:
+
+```ts
+import { awaitExternal, createNode, sleepFor } from '@graphorin/workflow';
+
+const hold = createNode<SettlementState>({
+  name: 'hold-for-settlement',
+  run: (state, ctx) => {
+    // Durable timer: suspends with a persisted wakeAt (epoch ms). It is
+    // not a setTimeout - the deadline lives in the checkpoint, so it
+    // survives restarts and fresh Workflow instances.
+    sleepFor(SETTLEMENT_HOLD_MS);
+
+    // Awakeable (durable promise): suspends under a caller-chosen name
+    // until an external system resolves it with a value.
+    const confirmation = awaitExternal<SettlementConfirmation>('settlement-confirmed');
+
+    // Runs exactly once - every earlier pass threw a PauseSignal above.
+    ctx.emit('settlement.confirmed', { batchId: state.batchId, ...confirmation });
+    return {
+      settledAt: new Date().toISOString(),
+      confirmedBy: confirmation.confirmedBy,
+      reference: confirmation.reference,
+      log: [`settlement window closed for ${state.batchId}`],
+    };
+  },
+});
+```
+
+The demo drives the stage in three steps, each on a **fresh `Workflow` instance** rebuilt from the same `SqliteCheckpointStore` - the timer and the awakeable cross the same simulated-restart boundary as the manual-review pause:
+
+1. **Park on the timer** - `runSettlementDemo(...)` executes the workflow. `getState(threadId).pendingPauses` reports the suspension; the timer entry carries the persisted `wakeAt`. (The compat `pendingPause` record only carries the node name and pause value - read the full `pendingPauses` set for the durable-primitive fields.)
+2. **Fire the timer** - `fireSettlementTimer(...)` builds the production poll loop with `createTimerDriver({ workflows: [{ workflow, checkpointStore }] })` and paces it via `driver.sweep()`: each sweep asks the store for due suspended threads (`CheckpointStore.listSuspended`, driven by the `wakeAt` the engine stamps on the suspended checkpoint) and fires them with `workflow.tick(threadId)`. Once due, the node body re-executes from the top, the satisfied timer pause replays its delivered value, and the thread re-parks on the awakeable (`pendingPauses[0].name === 'settlement-confirmed'`).
+3. **Resolve the awakeable** - `confirmSettlement(...)` calls `workflow.resolveAwakeable(threadId, 'settlement-confirmed', confirmation)`. The suspended `awaitExternal(...)` call returns the confirmation object, the node writes it to the channels, and `archive-batch` runs to `__end__`.
+
+Because both primitives are plain pauses underneath, the re-execution contract from the previous section applies unchanged: the node body re-runs from the top on every resume, earlier pauses replay their already-delivered values in order, and each delivered value is journaled with the identity of the pause it answered - a body whose pause order changed fails loudly with `pause-replay-divergence` instead of handing the confirmation to the timer.
+
+`SETTLEMENT_HOLD_MS` is deliberately short (80 ms): the demo and the smoke test wait the timer out for real - the timer is durable, not mocked - while keeping the CLI run fast. In production you would call `driver.start()` (or mount the driver on `@graphorin/server`'s lifecycle daemon) instead of pacing sweeps by hand; the driver's poll loop re-arms at `min(pollIntervalMs, earliest nextWakeAt)`.
+
+---
+
 ## Stream-mode walkthrough
 
 `workflow.execute(...)` and `workflow.resume(...)` accept a `stream:` option that controls which event kinds the engine emits:
@@ -218,13 +271,16 @@ The smoke test stays at the workflow-library layer because spinning a server is 
 pnpm --filter ./examples/approval-workflow dev
 ```
 
-The CLI runs both demos in sequence against an in-process `:memory:` SQLite store:
+The CLI runs the demos in sequence against an in-process `:memory:` SQLite store:
 
 1. `runApprovalDemo({ amount: 50, submitter: 'alice', threadId: 'demo-auto-approve' })` - completes without pausing.
 2. `runApprovalDemo({ amount: 500, submitter: 'bob', threadId: 'demo-manual-review' })` - pauses at `auto-approve-or-pause`.
 3. `simulateServerRestart({ threadId: 'demo-manual-review', directive: new Directive({ resume: { approved: true, reason: 'OK' } }) })` - drains the paused thread to completion.
+4. `runSettlementDemo({ batchId: 'expenses-2026-07', threadId: 'demo-settlement' })` - parks on the durable timer (persisted `wakeAt`).
+5. `fireSettlementTimer({ threadId: 'demo-settlement' })` - `createTimerDriver` sweeps until `workflow.tick(...)` fires the due timer; the thread re-parks on the `settlement-confirmed` awakeable.
+6. `confirmSettlement({ threadId: 'demo-settlement', confirmation: { confirmedBy: 'finance-ops', reference: 'SET-2026-0117' } })` - `workflow.resolveAwakeable(...)` delivers the confirmation and the workflow completes; the CLI then prints the `durable primitives: OK` line (and exits non-zero if the stage did not complete).
 
-There are no environment variables required. The example is hermetic by design: zero network I/O, zero external processes.
+There are no environment variables required. The example is hermetic by design: zero network I/O, zero external processes - the durable timer adds roughly 100 ms of real wall time because it is waited out, not mocked.
 
 ---
 
@@ -234,6 +290,8 @@ There are no environment variables required. The example is hermetic by design: 
 - **`workflow.suspended` event missing on the auto-approve path** - that's expected. The `auto-approve-or-pause` node only calls `pause(...)` when `state.amount >= 100`. The smoke test asserts the absence on the $50 case as a regression guard.
 - **`Stream mode 'values' returns no checkpoint events`** - also expected. `'values'` is a high-level mode; use `'debug'` to see every checkpoint write or `'checkpoints'` to see only those events.
 - **`SqliteCheckpointStore` survives across `Workflow` instances?** - yes. The store is a stateful `better-sqlite3` connection; closing the store closes the database. The simulated-server-restart helper deliberately re-uses the same store reference to demonstrate that the workflow object is the only thing reconstructed.
+- **`resolveAwakeable` fails with `pause-not-found`** - the thread is not currently parked on that name: either the durable timer has not fired yet (the awakeable suspension only exists after the tick resumes the node body) or the name is misspelled. Inspect `getState(threadId).pendingPauses` - timer entries carry `wakeAt`, awakeable entries carry `name`.
+- **`settlement timer did not fire within ...ms`** - `fireSettlementTimer(...)` bounds its `driver.sweep()` loop with a wall-clock budget (default 5000 ms) so a broken store can never hang the demo. Seeing it usually means the checkpoint store was swapped for one without `listSuspended` support; `createTimerDriver` itself rejects such stores up front with `TimerDriverStoreUnsupportedError`.
 
 ---
 

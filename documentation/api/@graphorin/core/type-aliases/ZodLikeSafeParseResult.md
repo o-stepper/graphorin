@@ -18,7 +18,7 @@ type ZodLikeSafeParseResult<TOutput, TInput> =
 };
 ```
 
-Defined in: packages/core/src/utils/validation.ts:19
+Defined in: [packages/core/src/utils/validation.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L19)
 
 ## Type Parameters
 

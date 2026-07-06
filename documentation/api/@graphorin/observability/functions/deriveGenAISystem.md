@@ -12,7 +12,7 @@ function deriveGenAISystem(providerClassName):
   | null;
 ```
 
-Defined in: packages/observability/src/gen-ai/system-derivation.ts:66
+Defined in: [packages/observability/src/gen-ai/system-derivation.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/system-derivation.ts#L66)
 
 Derive the canonical `gen_ai.system` value from a provider class
 name. Returns `null` when the name does not match any known

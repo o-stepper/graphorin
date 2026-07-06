@@ -10,7 +10,7 @@
 function pairedPassSignificance(current, baseline): PairedSignificance;
 ```
 
-Defined in: evals/src/stats.ts:146
+Defined in: [packages/evals/src/stats.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L146)
 
 McNemar's paired test on per-case pass outcomes of two eval runs.
 Only cases present in both maps are compared (by base case id).

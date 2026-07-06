@@ -10,7 +10,7 @@
 function scopeMatches(granted, required): boolean;
 ```
 
-Defined in: packages/security/src/auth/scope.ts:107
+Defined in: [packages/security/src/auth/scope.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L107)
 
 Match a single granted scope against a single required scope.
 

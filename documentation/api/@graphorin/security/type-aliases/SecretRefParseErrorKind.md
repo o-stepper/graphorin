@@ -19,7 +19,7 @@ type SecretRefParseErrorKind =
   | "naked-string";
 ```
 
-Defined in: packages/security/src/secrets/errors.ts:37
+Defined in: [packages/security/src/secrets/errors.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/errors.ts#L37)
 
 Discriminator union for `SecretRefParseError`. Lets callers branch on
 the failure mode without parsing the message string.

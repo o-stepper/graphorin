@@ -81,7 +81,7 @@
   "modifierTags": ["@hidden", "@internal", "@override", "@stable", "@experimental"],
   "validation": {
     "notExported": false,
-    "invalidLink": false,
+    "invalidLink": true,
     "notDocumented": false
   },
   "sidebar": {
@@ -89,5 +89,13 @@
     "format": "vitepress",
     "pretty": true,
     "collapsed": true
-  }
+  },
+  "disableGit": true,
+  "basePath": "..",
+  "packageOptions": {
+    "disableGit": true,
+    "basePath": "../..",
+    "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
+  },
+  "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
 }

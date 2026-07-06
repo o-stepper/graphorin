@@ -23,6 +23,31 @@ describe('FIDES-lattice: containsPii', () => {
   it('does not flag plain prose', () => {
     expect(containsPii('the quick brown fox jumps over the lazy dog')).toBe(false);
   });
+
+  // W-150: the PII catalogue applies the same obfuscation pre-pass
+  // (NFKC + zero-width strip) the injection catalogue already uses -
+  // cheap character-injection must not dodge the sensitiveSeen leg.
+  // Obfuscated fixtures are built from escapes so this file itself
+  // stays free of invisible characters.
+  it('detects a zero-width-split email (W-150)', () => {
+    expect(containsPii('reach me at ali\u200bce@exam\u200bple.com')).toBe(true);
+  });
+
+  it('detects an SSN written with fullwidth digits (W-150)', () => {
+    const fullwidth = (t: string) =>
+      t.replace(/\d/g, (d) => String.fromCodePoint(0xff10 + Number(d)));
+    expect(containsPii(`SSN ${fullwidth('123-45-6789')} on file`)).toBe(true);
+  });
+
+  it('still detects an uppercase IBAN (case-preserving normalization)', () => {
+    expect(containsPii('wire to DE89370400440532013000 today')).toBe(true);
+  });
+
+  it('flips sensitiveSeen for obfuscated PII through the ledger (W-150)', () => {
+    const ledger = createTaintLedger({ piiSensitivity: containsPii });
+    ledger.recordOutput(internalLabel, 'customer SSN 1\u200b23-45-6789');
+    expect(ledger.sensitiveSeen).toBe(true);
+  });
 });
 
 describe('FIDES-lattice: PII feeds the ledger sensitive leg', () => {

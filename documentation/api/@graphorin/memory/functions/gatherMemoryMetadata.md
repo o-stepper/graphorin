@@ -10,7 +10,7 @@
 function gatherMemoryMetadata(scope, deps): Promise<MemoryMetadata>;
 ```
 
-Defined in: packages/memory/src/context-engine/metadata.ts:37
+Defined in: [packages/memory/src/context-engine/metadata.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/metadata.ts#L37)
 
 Build the [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md) block. Pure async - no side
 effects beyond the storage reads.

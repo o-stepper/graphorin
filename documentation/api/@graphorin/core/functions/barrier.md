@@ -10,7 +10,7 @@
 function barrier<T>(from, opts?): Barrier<T>;
 ```
 
-Defined in: packages/core/src/channels/channels.ts:188
+Defined in: [packages/core/src/channels/channels.ts:188](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L188)
 
 Construct a `Barrier` channel.
 

@@ -10,7 +10,7 @@
 function loadCipherPeer(): Promise<BetterSqlite3Constructor>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/cipher-peer.ts:39
+Defined in: [packages/store-sqlite-encrypted/src/cipher-peer.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/cipher-peer.ts#L39)
 
 Loads `better-sqlite3-multiple-ciphers`. The result is cached for
 the lifetime of the process so repeat callers (encrypt + rekey +

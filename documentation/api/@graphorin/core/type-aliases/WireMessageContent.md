@@ -17,7 +17,7 @@ type WireMessageContent =
   | WireFileContent;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:83
+Defined in: [packages/core/src/utils/binary-json.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L83)
 
 JSON-safe twin of [MessageContent](/api/@graphorin/core/type-aliases/MessageContent.md): binary-bearing variants
 carry [EncodedBinary](/api/@graphorin/core/type-aliases/EncodedBinary.md) envelopes, text/reasoning variants pass

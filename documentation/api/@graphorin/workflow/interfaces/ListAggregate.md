@@ -6,7 +6,7 @@
 
 # Interface: ListAggregate\&lt;T\&gt;
 
-Defined in: packages/core/dist/channels/channels.d.ts:62
+Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
 Specialization of `Reducer<T[]>` that appends each write to a list.
 
@@ -22,5 +22,5 @@ Specialization of `Reducer<T[]>` that appends each write to a list.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | readonly `T`[] | packages/core/dist/channels/channels.d.ts:64 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"list-aggregate"` | packages/core/dist/channels/channels.d.ts:63 |
+| <a id="property-default"></a> `default?` | `readonly` | readonly `T`[] | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"list-aggregate"` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |

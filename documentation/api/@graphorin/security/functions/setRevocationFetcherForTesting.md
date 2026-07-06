@@ -10,7 +10,7 @@
 function _setRevocationFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:144
+Defined in: [packages/security/src/oauth/refresh.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L144)
 
 **`Experimental`**
 

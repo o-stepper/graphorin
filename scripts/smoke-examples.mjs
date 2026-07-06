@@ -27,7 +27,7 @@ const TIMEOUT_MS = 90_000;
 
 /** @type {Case[]} */
 const CASES = [
-  { name: 'approval-workflow' },
+  { name: 'approval-workflow', expectOutput: 'durable primitives: OK' },
   { name: 'document-pipeline' },
   { name: 'background-consolidator' },
   { name: 'multi-agent-crew' },
@@ -45,6 +45,12 @@ const CASES = [
   // `ollama` recipe (the `stub` recipe needs no network, so it would
   // never trip the offline guard) and assert the actionable offline
   // error + exit 2 rather than the (unreachable) happy path.
+  // W-099: the 0.3-0.6 feature-line examples. Each asserts its final
+  // summary line; secure-replay-agent additionally pins the enforce
+  // stage's blocked sink.
+  { name: 'tools-harness-tour', expectOutput: 'tools-harness-tour: OK' },
+  { name: 'memory-graph-recall', expectOutput: 'memory-graph-recall: OK' },
+  { name: 'secure-replay-agent', expectOutput: 'sink blocked' },
   {
     name: 'local-stack-cli',
     env: { GRAPHORIN_LLM_RECIPE: 'ollama', GRAPHORIN_OFFLINE: '1' },

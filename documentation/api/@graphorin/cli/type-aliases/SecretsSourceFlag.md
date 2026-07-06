@@ -10,7 +10,7 @@
 type SecretsSourceFlag = "auto" | "keyring" | "encrypted-file" | "env";
 ```
 
-Defined in: packages/cli/src/commands/start.ts:25
+Defined in: [packages/cli/src/commands/start.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/start.ts#L25)
 
 Selector for which `SecretsStore` flavour the server activates at
 startup. Mirrors `--secrets-source` from DEC-136.

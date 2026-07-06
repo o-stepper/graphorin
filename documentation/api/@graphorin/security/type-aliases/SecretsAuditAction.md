@@ -16,7 +16,7 @@ type SecretsAuditAction =
   | "secrets:downgrade";
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:17
+Defined in: [packages/security/src/secrets/audit-emitter.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L17)
 
 Discriminator for `SecretsAuditEvent`. Every variant follows the
 `<resource>:<action>` convention used throughout the audit log.

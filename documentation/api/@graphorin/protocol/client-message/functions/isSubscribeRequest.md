@@ -10,7 +10,7 @@
 function isSubscribeRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "subscription.subscribe"; params: { sinceEventId?: string; subject: string }; v: "1" };
 ```
 
-Defined in: src/client-message.ts:170
+Defined in: [packages/protocol/src/client-message.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L170)
 
 ## Parameters
 

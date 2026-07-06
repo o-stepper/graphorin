@@ -144,7 +144,7 @@ export interface ConsolidatorConfig {
   /**
    * Weights for the multi-signal salience score (X-1) that orders both
    * threshold archiving and capacity eviction. Defaults to
-   * {@link DEFAULT_SALIENCE_WEIGHTS}; with neutral importance, active
+   * `DEFAULT_SALIENCE_WEIGHTS`; with neutral importance, active
    * status, and first-party provenance salience equals plain retention.
    */
   readonly salienceWeights: SalienceWeights;

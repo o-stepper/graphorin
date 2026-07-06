@@ -10,7 +10,7 @@
 function verifyAuditCheckpointSignature(checkpoint, publicKeyPem): boolean;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:408
+Defined in: [packages/security/src/audit/merkle.ts:408](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L408)
 
 Verify a signed checkpoint's Ed25519 signature against a pinned
 public key (pure - no database access).

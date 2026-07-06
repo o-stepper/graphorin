@@ -13,7 +13,7 @@ function migrateExport(
    toVersion): readonly SessionExportRecord[];
 ```
 
-Defined in: packages/sessions/src/migrations/index.ts:60
+Defined in: [packages/sessions/src/migrations/index.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L60)
 
 Walk the registered migrators to advance `records` from
 `fromVersion` to `toVersion`. Throws when no chain exists.

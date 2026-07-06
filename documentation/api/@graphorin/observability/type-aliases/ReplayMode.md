@@ -10,7 +10,7 @@
 type ReplayMode = "sanitized" | "raw";
 ```
 
-Defined in: packages/observability/src/replay/types.ts:20
+Defined in: [packages/observability/src/replay/types.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/types.ts#L20)
 
 Replay scope hint. Server mode requires `'raw'` to be backed by a
 token carrying the `traces:read:raw` scope. The library mode uses

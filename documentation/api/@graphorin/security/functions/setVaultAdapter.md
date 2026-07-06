@@ -10,7 +10,7 @@
 function setVaultAdapter(adapter): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/vault.ts:31
+Defined in: [packages/security/src/secrets/resolvers/vault.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/vault.ts#L31)
 
 Register a runtime adapter for the `vault://` scheme. Calling this
 twice replaces the previous adapter - matching the documented

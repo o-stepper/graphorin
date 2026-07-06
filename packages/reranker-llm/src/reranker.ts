@@ -294,22 +294,24 @@ export function mergeAndDedupe<TRecord extends MemoryRecord>(
   return arr;
 }
 
-/**
- * Parse the model's reply into a non-negative integer. Accepts:
- *
- *  - `'7'` - bare integer.
- *  - `'7\n'` / `' 7 '` - surrounding whitespace stripped.
- *  - `'Score: 7'` / `'7/10'` - first integer in the string is taken.
- *
- * Returns `null` when no integer can be extracted; the reranker
- * substitutes the fallback score.
- *
- * @stable
- */
 function isAbortError(err: unknown): boolean {
   return err instanceof Error && err.name === 'AbortError';
 }
 
+/**
+ * Parse the model's reply into a non-negative integer score.
+ *
+ * PS-14 contract: ONLY a bare integer occupying the whole (trimmed)
+ * reply is accepted (`/^-?\d+$/`) - `'7'`, `'7\n'`, `' 7 '`. Every
+ * verbose form (`'Score: 7'`, `'7/10'`, prose around a number) returns
+ * `null` and the reranker substitutes the fallback score. This is a
+ * deliberate anti-prompt-injection hardening, not a convenience
+ * parser: a passage that steers the model into prose around a chosen
+ * number must not smuggle that number through first-integer
+ * extraction. Negative integers also return `null`.
+ *
+ * @stable
+ */
 export function parseIntegerResponse(text: string): number | null {
   const trimmed = text.trim();
   if (trimmed.length === 0) return null;

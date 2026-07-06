@@ -10,7 +10,7 @@
 function reanchorPinnedFacts(options): NamedPostCompactionHook;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/reanchor-pinned-facts.ts:19
+Defined in: [packages/memory/src/context-engine/compaction/hooks/reanchor-pinned-facts.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/reanchor-pinned-facts.ts#L19)
 
 Build a `reanchorPinnedFacts` hook.
 

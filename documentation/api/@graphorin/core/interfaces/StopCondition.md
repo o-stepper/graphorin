@@ -6,7 +6,7 @@
 
 # Interface: StopCondition
 
-Defined in: packages/core/src/types/stop-condition.ts:14
+Defined in: [packages/core/src/types/stop-condition.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L14)
 
 Predicate consulted by the agent runtime after every step to decide
 whether the loop should stop.
@@ -22,5 +22,5 @@ rely on the obvious left-to-right semantics.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`state`) => `boolean` | Returns `true` when the run should stop on this state. | packages/core/src/types/stop-condition.ts:18 |
-| <a id="property-description"></a> `description` | `readonly` | `string` | Human-friendly label included in observability spans. | packages/core/src/types/stop-condition.ts:16 |
+| <a id="property-check"></a> `check` | `readonly` | (`state`) => `boolean` | Returns `true` when the run should stop on this state. | [packages/core/src/types/stop-condition.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L18) |
+| <a id="property-description"></a> `description` | `readonly` | `string` | Human-friendly label included in observability spans. | [packages/core/src/types/stop-condition.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L16) |

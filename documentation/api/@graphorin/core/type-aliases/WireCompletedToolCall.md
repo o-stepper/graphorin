@@ -12,7 +12,7 @@ type WireCompletedToolCall<TOutput> = Omit<CompletedToolCall<TOutput>, "outcome"
 };
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:121
+Defined in: [packages/core/src/utils/binary-json.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L121)
 
 Wire twin of [CompletedToolCall](/api/@graphorin/core/interfaces/CompletedToolCall.md).
 
@@ -20,7 +20,7 @@ Wire twin of [CompletedToolCall](/api/@graphorin/core/interfaces/CompletedToolCa
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `outcome` | [`WireToolOutcome`](/api/@graphorin/core/type-aliases/WireToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/utils/binary-json.ts:125 |
+| `outcome` | [`WireToolOutcome`](/api/@graphorin/core/type-aliases/WireToolOutcome.md)\&lt;`TOutput`\&gt; | [packages/core/src/utils/binary-json.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L125) |
 
 ## Type Parameters
 

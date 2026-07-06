@@ -10,7 +10,7 @@
 function parseAdjudication(text): boolean;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:213
+Defined in: [packages/memory/src/graph/entity-resolver.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L213)
 
 Parse a yes/no adjudication reply. Conservative: only a clear yes is `true`.
 

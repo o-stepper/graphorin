@@ -12,7 +12,7 @@ function createReplayRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/replay/routes.ts:81
+Defined in: [packages/server/src/replay/routes.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/replay/routes.ts#L81)
 
 ## Parameters
 

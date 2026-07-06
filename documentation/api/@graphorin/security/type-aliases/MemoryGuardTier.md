@@ -15,7 +15,7 @@ type MemoryGuardTier =
   | "untrusted";
 ```
 
-Defined in: packages/security/src/guard/types.ts:22
+Defined in: [packages/security/src/guard/types.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L22)
 
 Discriminator for memory-tier classification per DEC-153.
 

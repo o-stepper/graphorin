@@ -39,7 +39,7 @@ export type WireContentChunk =
   | Exclude<ContentChunk, { readonly kind: 'image' }>
   | { readonly kind: 'image'; readonly data: EncodedBytes; readonly mediaType: string };
 
-/** Wire twin of {@link FileGeneratedEvent}. @stable */
+/** Wire twin of `FileGeneratedEvent`. @stable */
 export interface WireFileGeneratedEvent extends Omit<FileGeneratedEvent, 'data'> {
   readonly data: EncodedBytes;
 }

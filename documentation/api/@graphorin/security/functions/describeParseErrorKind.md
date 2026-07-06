@@ -10,7 +10,7 @@
 function describeParseErrorKind(kind): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:696
+Defined in: [packages/security/src/secrets/secret-ref.ts:696](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L696)
 
 Map `SecretRefParseErrorKind` to a human-friendly string. Useful for
 diagnostic messages in `graphorin doctor --check-secrets`.

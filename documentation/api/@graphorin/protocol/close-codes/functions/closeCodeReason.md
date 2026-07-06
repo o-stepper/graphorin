@@ -12,7 +12,7 @@ function closeCodeReason(code):
   | undefined;
 ```
 
-Defined in: src/close-codes.ts:65
+Defined in: [packages/protocol/src/close-codes.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/close-codes.ts#L65)
 
 Resolve a numeric close code back to its Graphorin reason
 discriminator. Returns `undefined` for codes outside the

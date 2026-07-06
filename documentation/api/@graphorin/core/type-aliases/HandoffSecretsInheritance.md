@@ -10,7 +10,7 @@
 type HandoffSecretsInheritance = "inherit-allowlist" | "isolated" | "forward-explicit";
 ```
 
-Defined in: packages/core/src/types/handoff.ts:74
+Defined in: [packages/core/src/types/handoff.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/handoff.ts#L74)
 
 How the parent's secrets surface is propagated to the sub-agent
 during a handoff. The default - `'inherit-allowlist'` with an empty

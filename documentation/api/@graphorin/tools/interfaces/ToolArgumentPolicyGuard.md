@@ -6,7 +6,7 @@
 
 # Interface: ToolArgumentPolicyGuard
 
-Defined in: packages/tools/src/executor/types.ts:315
+Defined in: [packages/tools/src/executor/types.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L315)
 
 Structural adapter for the D4 tool-argument policy (Progent). The
 agent runtime wires `evaluateToolArgumentPolicy` from
@@ -30,7 +30,7 @@ evaluate(input):
 };
 ```
 
-Defined in: packages/tools/src/executor/types.ts:316
+Defined in: [packages/tools/src/executor/types.ts:316](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L316)
 
 #### Parameters
 

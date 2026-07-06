@@ -6,6 +6,13 @@ import type { SqliteConnection } from './connection.js';
  * scheduler with persistent rows so cron / interval / idle / event
  * triggers survive process restarts (DEC-150).
  *
+ * Concurrency contract (W-133): two scheduler PROCESSES over one
+ * database file are not a supported deployment (see the storage guide's
+ * concurrency matrix). `recordFire` still carries a monotonic
+ * wall-clock fence as best-effort defense in depth for that
+ * unsupported case - a duplicate fixation with the same-or-earlier
+ * `firedAt` is a no-op instead of rewinding trigger state.
+ *
  * @stable
  */
 export class SqliteTriggerStore implements TriggerStore {
@@ -54,10 +61,28 @@ export class SqliteTriggerStore implements TriggerStore {
     this.#conn.run('DELETE FROM trigger_state WHERE id = ?', [id]);
   }
 
+  /**
+   * Persist a fire. W-133: the update carries a monotonic fence -
+   * a call whose `firedAt` is not strictly later than the stored
+   * `last_fired_at` changes nothing, so a second (unsupported)
+   * scheduler process re-fixing an old fire cannot rewind
+   * `next_fire_at`/`missed_fires`. The fence is wall-clock ms:
+   * two processes with the IDENTICAL `firedAt` both pass - accepted
+   * as best-effort for a deployment the docs already exclude. The
+   * in-process scheduler always calls this once per fire with a fresh
+   * timestamp, so supported behaviour is unchanged.
+   */
   async recordFire(id: string, firedAt: string, nextFireAt?: string): Promise<void> {
     this.#conn.run(
-      `UPDATE trigger_state SET last_fired_at = ?, next_fire_at = ?, updated_at = ?, missed_fires = 0 WHERE id = ?`,
-      [Date.parse(firedAt), nextFireAt ? Date.parse(nextFireAt) : null, Date.parse(firedAt), id],
+      `UPDATE trigger_state SET last_fired_at = ?, next_fire_at = ?, updated_at = ?, missed_fires = 0
+       WHERE id = ? AND (last_fired_at IS NULL OR last_fired_at < ?)`,
+      [
+        Date.parse(firedAt),
+        nextFireAt ? Date.parse(nextFireAt) : null,
+        Date.parse(firedAt),
+        id,
+        Date.parse(firedAt),
+      ],
     );
   }
 }

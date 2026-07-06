@@ -6,7 +6,7 @@
 
 # Interface: InitCommandResult
 
-Defined in: packages/cli/src/commands/init.ts:50
+Defined in: [packages/cli/src/commands/init.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L50)
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/init.ts:50
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | packages/cli/src/commands/init.ts:53 |
-| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | packages/cli/src/commands/init.ts:51 |
-| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | packages/cli/src/commands/init.ts:52 |
-| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | packages/cli/src/commands/init.ts:54 |
+| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | [packages/cli/src/commands/init.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L53) |
+| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | [packages/cli/src/commands/init.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L51) |
+| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | [packages/cli/src/commands/init.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L52) |
+| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | [packages/cli/src/commands/init.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L54) |

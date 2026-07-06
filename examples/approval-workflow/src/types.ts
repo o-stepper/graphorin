@@ -5,7 +5,10 @@
  * expense-approval state shape, the input contract accepted by
  * `runApprovalDemo(...)`, the resume-time decision payload threaded
  * through `Directive({ resume })`, plus the canonical node-name and
- * threshold constants the workflow factory references.
+ * threshold constants the workflow factory references. Also carries
+ * the types of the companion `expense-settlement` workflow - the
+ * durable-primitives stage built on `sleepFor(...)` (durable timer)
+ * and `awaitExternal(...)` (awakeable).
  */
 
 /** Submission inputs accepted by the workflow's first execute call. */
@@ -62,3 +65,55 @@ export type NodeName = (typeof NODE_NAMES)[keyof typeof NODE_NAMES];
 
 /** Auto-approve fast-path threshold (in dollars). */
 export const AUTO_APPROVE_THRESHOLD = 100 as const;
+
+/** Submission input accepted by the settlement workflow's execute call. */
+export interface SettlementInput {
+  readonly batchId: string;
+}
+
+/**
+ * State carried by the `expense-settlement` workflow - the durable-
+ * primitives stage. `batchId` echoes the input; `settledAt`,
+ * `confirmedBy`, and `reference` are populated by the `hold-for-
+ * settlement` node once the durable timer has fired and the awakeable
+ * has been resolved; `log` mirrors the approval pipeline's append-only
+ * audit trail.
+ */
+export interface SettlementState {
+  batchId: string;
+  settledAt?: string;
+  confirmedBy?: string;
+  reference?: string;
+  log: ReadonlyArray<string>;
+}
+
+/**
+ * Payload an external system (the demo's stand-in payment provider)
+ * delivers via `workflow.resolveAwakeable(threadId,
+ * SETTLEMENT_AWAKEABLE, confirmation)`. The suspended
+ * `awaitExternal(...)` call inside `hold-for-settlement` returns it
+ * verbatim as the call's value.
+ */
+export interface SettlementConfirmation {
+  readonly confirmedBy: string;
+  readonly reference: string;
+}
+
+/** Canonical node names of the settlement workflow. */
+export const SETTLEMENT_NODE_NAMES = {
+  hold: 'hold-for-settlement',
+  archive: 'archive-batch',
+} as const;
+
+export type SettlementNodeName = (typeof SETTLEMENT_NODE_NAMES)[keyof typeof SETTLEMENT_NODE_NAMES];
+
+/** Awakeable name the external settlement confirmation resolves. */
+export const SETTLEMENT_AWAKEABLE = 'settlement-confirmed' as const;
+
+/**
+ * Durable-timer hold applied before a settlement batch may be
+ * confirmed. Deliberately short: the CLI demo and the smoke test wait
+ * the timer out for real (it is durable, not mocked) while keeping the
+ * added wall time well under a second.
+ */
+export const SETTLEMENT_HOLD_MS = 80 as const;

@@ -6,7 +6,7 @@
 
 # Interface: Workflow\&lt;TState, TInput\&gt;
 
-Defined in: packages/workflow/src/types.ts:431
+Defined in: [packages/workflow/src/types.ts:431](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L431)
 
 Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/functions/createWorkflow.md).
 
@@ -23,8 +23,8 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:435 |
-| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:436 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/workflow/src/types.ts:435](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L435) |
+| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | [packages/workflow/src/types.ts:436](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L436) |
 
 ## Methods
 
@@ -38,7 +38,7 @@ approve(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:478
+Defined in: [packages/workflow/src/types.ts:478](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L478)
 
 Resolve a named persisted approval (D1) - sugar over
 [resolveAwakeable](/api/@graphorin/workflow/interfaces/Workflow.md#resolveawakeable) for `requestApproval(name)` suspensions.
@@ -64,7 +64,7 @@ Resolve a named persisted approval (D1) - sugar over
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/types.ts:493
+Defined in: [packages/workflow/src/types.ts:493](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L493)
 
 Delete every checkpoint and pending write of `threadId` across all
 namespaces (W-005) - the operator lever for per-thread hygiene and
@@ -90,7 +90,7 @@ timer / awakeable) destroys its resume state - the caller decides.
 execute(input, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:437
+Defined in: [packages/workflow/src/types.ts:437](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L437)
 
 #### Parameters
 
@@ -113,7 +113,7 @@ fork(threadId, fromCheckpointId): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:494
+Defined in: [packages/workflow/src/types.ts:494](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L494)
 
 #### Parameters
 
@@ -136,7 +136,7 @@ Defined in: packages/workflow/src/types.ts:494
 getState(threadId): Promise<WorkflowState<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:484
+Defined in: [packages/workflow/src/types.ts:484](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L484)
 
 #### Parameters
 
@@ -156,7 +156,7 @@ Defined in: packages/workflow/src/types.ts:484
 listCheckpoints(threadId): Promise<readonly Checkpoint[]>;
 ```
 
-Defined in: packages/workflow/src/types.ts:485
+Defined in: [packages/workflow/src/types.ts:485](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L485)
 
 #### Parameters
 
@@ -180,7 +180,7 @@ resolveAwakeable(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:468
+Defined in: [packages/workflow/src/types.ts:468](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L468)
 
 Resolve a named awakeable (durable promise, D1): the suspended
 `awaitExternal(name)` call returns `value` and the thread resumes.
@@ -210,7 +210,7 @@ resume(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:438
+Defined in: [packages/workflow/src/types.ts:438](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L438)
 
 #### Parameters
 
@@ -232,7 +232,7 @@ Defined in: packages/workflow/src/types.ts:438
 retry(threadId, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:448
+Defined in: [packages/workflow/src/types.ts:448](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L448)
 
 Restart a `'failed'` thread from its last failure checkpoint
 (WF-3/WF-6): successful sibling tasks of the failed step replay
@@ -260,7 +260,7 @@ tick(threadId, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:456
+Defined in: [packages/workflow/src/types.ts:456](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L456)
 
 Fire due durable timers (D1). Scans the thread's pending pauses for
 `sleepUntil` records whose `wakeAt` has passed; when one is due the

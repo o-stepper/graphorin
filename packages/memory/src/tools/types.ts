@@ -20,7 +20,7 @@ export type ScopeResolver = (
 
 /**
  * Dependency bundle threaded into every memory tool. Exposed
- * separately from the {@link Tool} surface so the executor can scope
+ * separately from the `Tool` surface so the executor can scope
  * the dependencies per call without leaking the wider memory facade
  * into the tool author surface.
  *

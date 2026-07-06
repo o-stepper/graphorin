@@ -10,7 +10,7 @@
 function isOfflineMode(env?): boolean;
 ```
 
-Defined in: packages/cli/src/internal/offline.ts:21
+Defined in: [packages/cli/src/internal/offline.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/offline.ts#L21)
 
 `true` when `process.env.GRAPHORIN_OFFLINE` is set to `'1'` or
 `'true'` (case-insensitive). Mirrors the documented contract.

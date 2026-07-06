@@ -10,7 +10,7 @@
 function ensureStoreAuditBinding(): void;
 ```
 
-Defined in: packages/server/src/app-audit-binding.ts:40
+Defined in: [packages/server/src/app-audit-binding.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-audit-binding.ts#L40)
 
 ## Returns
 

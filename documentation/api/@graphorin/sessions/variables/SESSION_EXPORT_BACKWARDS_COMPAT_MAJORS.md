@@ -10,7 +10,7 @@
 const SESSION_EXPORT_BACKWARDS_COMPAT_MAJORS: 2 = 2;
 ```
 
-Defined in: packages/sessions/src/export/types.ts:42
+Defined in: [packages/sessions/src/export/types.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L42)
 
 Reader compatibility band: the writer accepts the current MAJOR
 minus 0..N inclusive, where N is set by this constant. v0.1 only

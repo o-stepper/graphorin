@@ -1,6 +1,6 @@
 # Changesets
 
-This folder contains [Changesets](https://github.com/changesets/changesets) — the source of truth for which `@graphorin/*` packages will receive a version bump on the next release, and what the changelog entry should say.
+This folder contains [Changesets](https://github.com/changesets/changesets) - the source of truth for which `@graphorin/*` packages will receive a version bump on the next release, and what the changelog entry should say.
 
 All `@graphorin/*` packages are released **lockstep** at the same version while the framework is on the `0.x` line (configured via the `fixed` setting in [`config.json`](./config.json)).
 

@@ -13,7 +13,7 @@ function ndcgAtK(
    k): number;
 ```
 
-Defined in: packages/memory/src/search/fit-weights.ts:55
+Defined in: [packages/memory/src/search/fit-weights.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L55)
 
 Binary-gain nDCG@k over a ranked id list.
 

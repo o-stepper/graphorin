@@ -10,7 +10,7 @@
 const REASONING_CONTRACT_RULES: readonly ReasoningContractRule[];
 ```
 
-Defined in: packages/provider/src/reasoning/classify-contract.ts:35
+Defined in: [packages/provider/src/reasoning/classify-contract.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/reasoning/classify-contract.ts#L35)
 
 Static rule table. Higher-specificity entries come first. Mirrors
 the per-family matrix documented for the provider layer.

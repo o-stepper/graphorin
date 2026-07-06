@@ -10,7 +10,7 @@
 function evaluateSupplyChainPolicy(packageName, policy?): SupplyChainDecision;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:53
+Defined in: [packages/security/src/supply-chain/policy.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/policy.ts#L53)
 
 Evaluate the supply-chain policy for the supplied package name.
 

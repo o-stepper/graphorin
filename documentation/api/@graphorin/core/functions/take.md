@@ -13,7 +13,7 @@ function take<T>(
 signal?): AsyncIterable<T>;
 ```
 
-Defined in: packages/core/src/utils/streams.ts:71
+Defined in: [packages/core/src/utils/streams.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L71)
 
 Take the first `n` items.
 

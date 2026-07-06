@@ -10,7 +10,7 @@
 const CLASSIFIER_RULES: readonly ClassifierRule[];
 ```
 
-Defined in: packages/provider/src/model-tier/classify.ts:39
+Defined in: [packages/provider/src/model-tier/classify.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/model-tier/classify.ts#L39)
 
 The static rule table. Order matters - higher-specificity entries
 come first (e.g. `claude-haiku` before `claude-`). Tests assert

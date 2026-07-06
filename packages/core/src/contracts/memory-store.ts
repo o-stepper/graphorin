@@ -117,6 +117,17 @@ export interface SessionMemoryStore {
     scope: SessionScope,
     opts?: SessionListOptions,
   ): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
+  /**
+   * Full-text search over the scoped session messages.
+   *
+   * Query precedence (W-127): the POSITIONAL `query` parameter is
+   * authoritative; when the caller also sets `opts.query` (the field
+   * exists because {@link MemorySearchOptions} is shared with the
+   * option-object search surfaces), implementations MUST ignore it.
+   * The duplication is a known wart: narrowing `opts` to
+   * `Omit<MemorySearchOptions, 'query'>` is a candidate for the next
+   * major, not a change this line can make compatibly.
+   */
   search(
     scope: SessionScope,
     query: string,
@@ -147,7 +158,18 @@ export interface SemanticMemoryStore {
   remember(fact: Fact): Promise<void>;
   search(scope: SessionScope, opts: MemorySearchOptions): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   supersede(oldId: string, newFact: Fact, reason?: string): Promise<void>;
-  forget(id: string, reason?: string): Promise<void>;
+  /**
+   * Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+   * support tenant isolation MUST treat a fact outside the scope as a
+   * deterministic no-op (0 rows changed) - defense in depth so a
+   * leaked / cross-user id reaching a mutator cannot touch another
+   * user's memory. Omitting `scope` preserves the historical unscoped
+   * behaviour (trusted internal callers: consolidator, erasure
+   * cascades). The parameter is additive - existing adapter
+   * implementations with the narrower arity remain structurally
+   * compatible.
+   */
+  forget(id: string, reason?: string, scope?: SessionScope): Promise<void>;
 }
 
 /** @stable */

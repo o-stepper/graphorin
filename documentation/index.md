@@ -5,8 +5,8 @@ titleTemplate: Guides, examples, and API reference
 
 hero:
   name: Graphorin
-  text: Stop demoing. Ship assistants that earn their keep.
-  tagline: "Your competitors are still tuning vanity metrics. You are here to sell outcomes. Graphorin stacks tiered memory, checkpointed workflows, typed tools, MCP, OpenTelemetry for every model and tool call, and secret handling that does not flinch. Follow the guides, paste the examples, embed in Node now, turn on the standalone server when load spikes, and push nothing across the wire unless you choose."
+  text: A TypeScript framework for long-living personal AI assistants.
+  tagline: "Six-tier memory, checkpointed workflows that survive restarts, typed tools with Agent Skills and MCP, OpenTelemetry traces for every model and tool call, and secret handling with a tamper-evident audit chain. Local-first and private by default: nothing leaves your process unless your code sends it. Embed in Node.js today; add the standalone server when you need REST, WebSocket, and triggers."
   image:
     src: /logo.svg
     alt: Graphorin

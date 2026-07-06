@@ -10,7 +10,7 @@
 function exactMatch<I, O>(options?): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/code/exact-match.ts:26
+Defined in: [packages/evals/src/scorers/code/exact-match.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/exact-match.ts#L26)
 
 Build an exact-match scorer.
 

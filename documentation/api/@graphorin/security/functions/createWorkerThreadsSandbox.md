@@ -10,7 +10,7 @@
 function createWorkerThreadsSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: packages/security/src/sandbox/worker-threads.ts:268
+Defined in: [packages/security/src/sandbox/worker-threads.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/worker-threads.ts#L268)
 
 Construct a `WorkerThreadsSandbox` instance.
 

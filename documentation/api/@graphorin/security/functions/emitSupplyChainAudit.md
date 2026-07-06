@@ -10,7 +10,7 @@
 function emitSupplyChainAudit(event): void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:80
+Defined in: [packages/security/src/supply-chain/audit-emitter.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L80)
 
 Emit an event to every subscriber. Listeners that throw are
 isolated.

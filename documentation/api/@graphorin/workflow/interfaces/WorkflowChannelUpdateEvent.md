@@ -6,7 +6,7 @@
 
 # Interface: WorkflowChannelUpdateEvent\&lt;TState\&gt;
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:47
+Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
 ## Stable
 
@@ -20,8 +20,8 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:47
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-channel"></a> `channel` | `readonly` | keyof `TState` & `string` | - | packages/core/dist/types/workflow-event.d.ts:50 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/core/dist/types/workflow-event.d.ts:49 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.channel.update"` | - | packages/core/dist/types/workflow-event.d.ts:48 |
-| <a id="property-value"></a> `value?` | `readonly` | `unknown` | The merged value, carried ONLY for `ephemeral` channels (workflow-07): their values are wiped from state before the next planning round, so this event is the one place a consumer can observe them. Persistent channels omit it - read the state instead. | packages/core/dist/types/workflow-event.d.ts:58 |
-| <a id="property-version"></a> `version` | `readonly` | `number` | - | packages/core/dist/types/workflow-event.d.ts:51 |
+| <a id="property-channel"></a> `channel` | `readonly` | keyof `TState` & `string` | - | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.channel.update"` | - | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-value"></a> `value?` | `readonly` | `unknown` | The merged value, carried ONLY for `ephemeral` channels (workflow-07): their values are wiped from state before the next planning round, so this event is the one place a consumer can observe them. Persistent channels omit it - read the state instead. | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-version"></a> `version` | `readonly` | `number` | - | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |

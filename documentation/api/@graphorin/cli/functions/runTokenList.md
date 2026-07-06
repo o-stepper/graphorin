@@ -10,7 +10,7 @@
 function runTokenList(options?): Promise<readonly TokenMetadata[]>;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:131
+Defined in: [packages/cli/src/commands/token.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L131)
 
 List token metadata.
 

@@ -10,7 +10,7 @@
 function installSkillFromGit(options): Promise<SkillInstallationStatus>;
 ```
 
-Defined in: packages/security/src/supply-chain/installer.ts:229
+Defined in: [packages/security/src/supply-chain/installer.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/installer.ts#L229)
 
 Install a skill from a git repository (shallow clone). The
 resulting clone lives in the OS temp directory; consumers are

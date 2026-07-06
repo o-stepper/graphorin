@@ -13,7 +13,7 @@ function refreshOAuthSession(
 options?): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:152
+Defined in: [packages/security/src/oauth/library.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/library.ts#L152)
 
 Refresh the OAuth session for `serverId`. Throws when the session
 has no refresh token or when the authorization server rejects the

@@ -2,7 +2,7 @@
  * Typed error union for the `@graphorin/mcp` package.
  *
  * Every error carries a stable lowercase {@link MCPErrorKind}
- * discriminator, an actionable {@link MCPError.hint} field where
+ * discriminator, an actionable {@link GraphorinMCPError.hint} field where
  * applicable, and an optional structured `metadata` bag the audit
  * emitter persists alongside the standard `runId` / `sessionId`
  * context.
@@ -31,7 +31,7 @@ export type MCPErrorKind =
   | 'transport-not-supported'
   | 'transport-resumable-not-supported';
 
-/** Common metadata bag attached to every {@link MCPError}. */
+/** Common metadata bag attached to every {@link GraphorinMCPError}. */
 export interface MCPErrorMetadata {
   readonly server?: string;
   readonly tool?: string;
@@ -88,7 +88,7 @@ export class MCPAuthError extends GraphorinMCPError {
   public readonly kind = 'auth-error' as const;
 }
 
-/** Raised when {@link MCPClient.callTool} is invoked for an unknown tool. */
+/** Raised when `MCPClient.callTool` is invoked for an unknown tool. */
 export class MCPToolNotFoundError extends GraphorinMCPError {
   public readonly kind = 'tool-not-found' as const;
 }

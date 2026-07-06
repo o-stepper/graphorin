@@ -10,7 +10,7 @@
 function createSessionReplayer(opts?): SessionReplayer;
 ```
 
-Defined in: packages/sessions/src/replay/replayer.ts:92
+Defined in: [packages/sessions/src/replay/replayer.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/replay/replayer.ts#L92)
 
 Build a session-level replayer.
 

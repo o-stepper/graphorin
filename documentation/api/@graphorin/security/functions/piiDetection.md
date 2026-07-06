@@ -10,9 +10,17 @@
 function piiDetection<TValue>(opts?): GuardrailDefinition<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:127
+Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L144)
 
 Construct the PII detection guardrail.
+
+Note on normalization (W-150): the boolean detect predicate
+([containsPii](/api/@graphorin/security/functions/containsPii.md)) matches against the NFKC + zero-width-stripped
+form of the text, so cheap character-injection obfuscation cannot
+dodge detection. The guardrail's REWRITE path (`redactText` /
+`redactValue`) deliberately keeps matching the raw text: offset-based
+replacement needs the original string, and a normalized-offset remap
+is not worth the complexity for a best-effort redactor.
 
 ## Type Parameters
 

@@ -10,7 +10,7 @@
 function createSkillRegistry(options?): SkillRegistry;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:151
+Defined in: [packages/skills/src/registry/index.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/registry/index.ts#L151)
 
 Build a fresh, empty registry. Multiple registries can co-exist
 within a single process; the framework defaults to a single shared

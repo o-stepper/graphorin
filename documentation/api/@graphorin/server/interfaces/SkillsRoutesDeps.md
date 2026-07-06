@@ -6,7 +6,7 @@
 
 # Interface: SkillsRoutesDeps
 
-Defined in: packages/server/src/routes/skills.ts:40
+Defined in: [packages/server/src/routes/skills.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/skills.ts#L40)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/routes/skills.ts:40
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-skills"></a> `skills` | `readonly` | [`SkillsApi`](/api/@graphorin/server/interfaces/SkillsApi.md) | packages/server/src/routes/skills.ts:41 |
+| <a id="property-skills"></a> `skills` | `readonly` | [`SkillsApi`](/api/@graphorin/server/interfaces/SkillsApi.md) | [packages/server/src/routes/skills.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/skills.ts#L41) |

@@ -10,7 +10,7 @@
 function runMemoryActivity(options?): Promise<MemoryActivityResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:471
+Defined in: [packages/cli/src/commands/memory.ts:471](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L471)
 
 `graphorin memory activity` - a store-wide view of what the
 consolidator and reflection passes have been doing: how many facts /

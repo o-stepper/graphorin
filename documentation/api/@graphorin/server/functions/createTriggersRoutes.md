@@ -12,7 +12,7 @@ function createTriggersRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/triggers/routes.ts:37
+Defined in: [packages/server/src/triggers/routes.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/routes.ts#L37)
 
 ## Parameters
 

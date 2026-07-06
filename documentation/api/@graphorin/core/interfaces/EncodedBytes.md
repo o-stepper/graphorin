@@ -6,7 +6,7 @@
 
 # Interface: EncodedBytes
 
-Defined in: packages/core/src/utils/binary-json.ts:38
+Defined in: [packages/core/src/utils/binary-json.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L38)
 
 Base64-encoded binary payload as it appears on the wire.
 
@@ -16,5 +16,5 @@ Base64-encoded binary payload as it appears on the wire.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-data"></a> `data` | `readonly` | `string` | packages/core/src/utils/binary-json.ts:40 |
-| <a id="property-enc"></a> `enc` | `readonly` | `"base64"` | packages/core/src/utils/binary-json.ts:39 |
+| <a id="property-data"></a> `data` | `readonly` | `string` | [packages/core/src/utils/binary-json.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L40) |
+| <a id="property-enc"></a> `enc` | `readonly` | `"base64"` | [packages/core/src/utils/binary-json.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L39) |

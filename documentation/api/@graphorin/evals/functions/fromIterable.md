@@ -10,7 +10,7 @@
 function fromIterable<I, O>(cases, options?): Dataset<I, O>;
 ```
 
-Defined in: evals/src/loaders/iterable.ts:11
+Defined in: [packages/evals/src/loaders/iterable.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/iterable.ts#L11)
 
 ## Type Parameters
 

@@ -24,7 +24,11 @@ import type { CollisionStrategy } from '@graphorin/tools/registry';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
-import { ToolListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
+import {
+  ErrorCode,
+  McpError,
+  ToolListChangedNotificationSchema,
+} from '@modelcontextprotocol/sdk/types.js';
 import {
   MCPCallTimeoutError,
   MCPCancelledError,
@@ -321,7 +325,7 @@ export async function createMCPClientFromSdkTransport(
       try {
         result = await sdkClient.listTools(cursor === undefined ? {} : { cursor }, requestOptions);
       } catch (cause) {
-        throw mapSdkError(cause, {});
+        throw mapSdkError(cause, { aborted: opts?.signal?.aborted === true });
       }
       tools.push(...((result.tools ?? []) as ReadonlyArray<SdkTool>));
       cursor = (result as { nextCursor?: string }).nextCursor;
@@ -372,7 +376,7 @@ export async function createMCPClientFromSdkTransport(
           requestOptions,
         );
       } catch (cause) {
-        throw mapSdkError(cause, {});
+        throw mapSdkError(cause, { aborted: opts?.signal?.aborted === true });
       }
       items.push(...((result.resources ?? []) as ReadonlyArray<SdkResource>));
       cursor = (result as { nextCursor?: string }).nextCursor;
@@ -413,7 +417,7 @@ export async function createMCPClientFromSdkTransport(
           requestOptions,
         );
       } catch (cause) {
-        throw mapSdkError(cause, {});
+        throw mapSdkError(cause, { aborted: opts?.signal?.aborted === true });
       }
       items.push(...((result.prompts ?? []) as ReadonlyArray<SdkPrompt>));
       cursor = (result as { nextCursor?: string }).nextCursor;
@@ -465,7 +469,10 @@ export async function createMCPClientFromSdkTransport(
         requestOptions,
       );
     } catch (cause) {
-      const mapped = mapSdkError(cause, { tool: name });
+      const mapped = mapSdkError(cause, {
+        tool: name,
+        aborted: opts?.signal?.aborted === true,
+      });
       if (mapped instanceof MCPCancelledError) {
         incrementCounter('mcp.call.cancelled.total', { server: serverIdentity.id, tool: name });
       } else {
@@ -492,7 +499,7 @@ export async function createMCPClientFromSdkTransport(
     try {
       result = await sdkClient.readResource({ uri }, requestOptions);
     } catch (cause) {
-      throw mapSdkError(cause, {});
+      throw mapSdkError(cause, { aborted: opts?.signal?.aborted === true });
     }
     const contents = (result.contents ?? []) as ReadonlyArray<MCPResourceContent>;
     if (contents.length === 0) {
@@ -541,7 +548,7 @@ export async function createMCPClientFromSdkTransport(
         requestOptions,
       );
     } catch (cause) {
-      throw mapSdkError(cause, {});
+      throw mapSdkError(cause, { aborted: opts?.signal?.aborted === true });
     }
     const messages = (result.messages ?? []).map(
       (m): MCPPromptMessage =>
@@ -623,16 +630,66 @@ function resolveTransportAuth(options: CreateMCPClientOptions): TransportAuthSou
   return undefined;
 }
 
-function mapSdkError(cause: unknown, ctx: { readonly tool?: string }): Error {
+function mapSdkError(
+  cause: unknown,
+  ctx: { readonly tool?: string; readonly aborted?: boolean },
+): Error {
   const metadata = ctx.tool === undefined ? {} : { tool: ctx.tool };
+  // W-141: cancellation is classified from OUR OWN AbortSignal state
+  // (ctx.aborted), never from error text. SDK 1.29 wraps a local abort
+  // as McpError(RequestTimeout, String(reason)) (protocol.js cancel()),
+  // so neither the code nor the message distinguishes it - but the
+  // caller's signal does, and it cannot be forged by a server.
+  if (ctx.aborted === true) {
+    return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
+  }
+  // Classify McpError by JSON-RPC CODE. The message is server-
+  // controlled text: matching it would let a malicious server forge
+  // the typed timeout/cancelled classes (and the operator counters
+  // keyed on them) by phrasing an ordinary error as 'request timed
+  // out'. Codes are the protocol's typed channel; the SDK raises its
+  // own client-side timeout as -32001 (RequestTimeout).
+  if (cause instanceof McpError) {
+    if (cause.code === ErrorCode.RequestTimeout) {
+      return new MCPCallTimeoutError(
+        `MCP request timed out${ctx.tool ? ` (tool: ${ctx.tool})` : ''}.`,
+        { metadata, cause },
+      );
+    }
+    if (
+      cause.code === ErrorCode.MethodNotFound ||
+      // Tool-not-found stays message-matched as a fallback: real
+      // servers signal an unknown tool via InvalidParams/InternalError
+      // text at least as often as via MethodNotFound. This class is
+      // benign to forge - it feeds no cancelled/timeout counter and
+      // triggers no retry semantics, so DX wins over strictness here.
+      /unknown\s+tool|tool\s+not\s+found|method\s+not\s+found/i.test(cause.message)
+    ) {
+      return new MCPToolNotFoundError(`MCP tool not found${ctx.tool ? `: ${ctx.tool}` : ''}.`, {
+        metadata,
+        cause,
+      });
+    }
+    return new MCPProtocolError(cause.message.length === 0 ? cause.toString() : cause.message, {
+      metadata,
+      cause,
+    });
+  }
   if (cause instanceof Error) {
     const name = cause.name;
     const message = cause.message ?? '';
-    if (name === 'AbortError' || /aborted|cancell/i.test(message)) {
+    // Local cancellation can also surface as an AbortError (transport
+    // paths); the name check is trustworthy for plain errors.
+    if (name === 'AbortError') {
       return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
     }
-    // MC-3: the SDK reports request-timeout as a plain McpError - map it
-    // onto the advertised typed class instead of MCPProtocolError.
+    // Last-resort message fallbacks for PLAIN Errors thrown by
+    // transports or SDK paths outside JSON-RPC (no code to go by).
+    // Server-authored error text cannot reach this branch: RPC-level
+    // failures arrive as McpError and are classified above.
+    if (/aborted|cancell/i.test(message)) {
+      return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
+    }
     if (/request timed out|timed out/i.test(message)) {
       return new MCPCallTimeoutError(
         `MCP request timed out${ctx.tool ? ` (tool: ${ctx.tool})` : ''}.`,

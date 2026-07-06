@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryFacade
 
-Defined in: packages/sessions/src/facade.ts:83
+Defined in: [packages/sessions/src/facade.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L83)
 
 Subset of the `Memory.session` surface this package consumes. Kept
 structural so callers can pass either the `Memory` facade from
@@ -26,7 +26,7 @@ optional compact(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:102
+Defined in: [packages/sessions/src/facade.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L102)
 
 #### Parameters
 
@@ -54,7 +54,7 @@ optional flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:101
+Defined in: [packages/sessions/src/facade.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L101)
 
 #### Parameters
 
@@ -78,7 +78,7 @@ Defined in: packages/sessions/src/facade.ts:101
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:85
+Defined in: [packages/sessions/src/facade.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L85)
 
 #### Parameters
 
@@ -99,7 +99,7 @@ Defined in: packages/sessions/src/facade.ts:85
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:92
+Defined in: [packages/sessions/src/facade.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L92)
 
 List messages with their persisted identity (RP-5): the stored message id,
 sequence, and `createdAt`. Optional - when absent, export falls back to
@@ -125,7 +125,7 @@ fabricating those fields (the legacy behaviour). Implemented by
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:84
+Defined in: [packages/sessions/src/facade.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L84)
 
 #### Parameters
 
@@ -149,7 +149,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:96
+Defined in: [packages/sessions/src/facade.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L96)
 
 #### Parameters
 

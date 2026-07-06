@@ -10,7 +10,7 @@
 function createReplayProvider(state, options?): Provider;
 ```
 
-Defined in: packages/agent/src/testing/replay-provider.ts:37
+Defined in: [packages/agent/src/testing/replay-provider.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/testing/replay-provider.ts#L37)
 
 Build a Provider that serves the journaled step responses in order.
 

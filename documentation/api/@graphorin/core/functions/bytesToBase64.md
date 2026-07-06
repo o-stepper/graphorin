@@ -10,7 +10,7 @@
 function bytesToBase64(bytes): string;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:168
+Defined in: [packages/core/src/utils/binary-json.ts:168](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L168)
 
 Encode bytes as standard (padded) base64 without relying on `Buffer`
 or `btoa`.

@@ -5,7 +5,7 @@ description: End-to-end example apps that exercise Graphorin against a determini
 
 # Examples
 
-Eight end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
+Eleven end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
 
 ::: tip Run any example
 From the repository root:
@@ -42,9 +42,9 @@ A three-agent crew driving the `evaluatorOptimizer({...})` loop with a typed Zod
 
 ## `approval-workflow`
 
-A durable HITL workflow built on `@graphorin/workflow`. The flow validates an order, pauses for human approval (`pause(...)`), and ships once the approver resumes the thread - even on a different process.
+A durable HITL workflow built on `@graphorin/workflow`. The flow validates an order, pauses for human approval (`pause(...)`), and ships once the approver resumes the thread - even on a different process. A second, compact settlement workflow shows the durable primitives: the thread parks on a `sleepFor(...)` timer, `createTimerDriver` fires it, the thread parks again on an `awaitExternal(...)` awakeable, and `resolveAwakeable(...)` completes it - every park crossing a simulated restart.
 
-- Demonstrates: durable workflow, `pause(value)` / `resume(directive)`, checkpoint store.
+- Demonstrates: durable workflow, `pause(value)` / `resume(directive)`, checkpoint store, durable timers (`sleepFor` + `createTimerDriver`), awakeables (`awaitExternal` / `resolveAwakeable`).
 - Source: [`examples/approval-workflow/`](https://github.com/o-stepper/graphorin/tree/main/examples/approval-workflow).
 
 ## `document-pipeline`
@@ -68,6 +68,27 @@ An adapter sketch showing how to mount Graphorin as the brain behind a Slack bot
 - Demonstrates: library-mode embedding, event-driven UI, sensitivity-aware payload filtering.
 - Source: [`examples/slack-bot-integration/`](https://github.com/o-stepper/graphorin/tree/main/examples/slack-bot-integration).
 
+## `tools-harness-tour`
+
+A guided tour of the tools harness, fully offline: an in-process MCP server adapted through `@graphorin/mcp` into the tool registry, a folder skill loaded and stamped with untrusted defaults, a deferred tool found via the built-in `tool_search`, one `code_execute` call chaining tools inside the sandbox, and a >100 KB result spilling to a handle that `read_result` pages back byte-exact.
+
+- Demonstrates: MCP client + `toTools`, skills loader, `defer_loading` + `tool_search`, code mode, spill + `read_result` paging.
+- Source: [`examples/tools-harness-tour/`](https://github.com/o-stepper/graphorin/tree/main/examples/tools-harness-tour).
+
+## `memory-graph-recall`
+
+The memory deep-dive: an entity graph over SQLite recalls a fact reachable only through an entity hop (`expandHops: 1`), iterative deep recall grades its own evidence and abstains on an unanswerable question, a synthesized fact lands quarantined and becomes recallable after `validate`, and the insights read tier surfaces a reflection-shaped insight - all on a scripted stub provider and a deterministic hash embedder.
+
+- Demonstrates: entity graph + hop recall, graded deep recall with abstention, quarantine / `validate`, insights read tier.
+- Source: [`examples/memory-graph-recall/`](https://github.com/o-stepper/graphorin/tree/main/examples/memory-graph-recall).
+
+## `secure-replay-agent`
+
+The security and replay showcase: the same scripted agent flow runs three times to show `dataFlowPolicy` in shadow (sink allowed, violation audited), enforce (sink blocked with `dataflow_policy_blocked`), and enforce with a declassified sink; prompt-cache anchors flow through `Usage` cache legs; `recordProviderResponses` + `createReplayProvider` re-drive the run offline with an identical transcript; and a `toTool` sub-agent under `capability: 'read-only'` blocks its writer tool.
+
+- Demonstrates: `dataFlowPolicy` shadow -> enforce -> declassify, `cachePolicy` anchors, deterministic replay, read-only sub-agents.
+- Source: [`examples/secure-replay-agent/`](https://github.com/o-stepper/graphorin/tree/main/examples/secure-replay-agent).
+
 ## `local-stack-cli`
 
 A single-binary CLI that wires the standalone server, the triggers daemon, the encrypted-file secrets store, and a couple of skills into a turnkey local stack - useful as a starting point for production-shaped local deployments.
@@ -84,7 +105,7 @@ GRAPHORIN_TRACE=console GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
 ```
 
-The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the eight apps.
+The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the eleven apps.
 
 ## Production deployment templates
 

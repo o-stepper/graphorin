@@ -10,7 +10,7 @@
 function parseAllowedToolsValue(value): readonly string[] | null;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:437
+Defined in: [packages/skills/src/frontmatter/index.ts:437](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L437)
 
 Parse the `allowed-tools` field. Accepts either a string (with
 whitespace-separated entries) or a string array. Returns `null` for

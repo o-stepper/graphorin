@@ -169,6 +169,23 @@ async function* walkMarkdown(dir) {
   }
 }
 
+/**
+ * W-128 determinism: 'Defined in' references that point into a
+ * sibling package's BUILT dist/*.d.ts carry line numbers that are not
+ * stable across operating systems (tsdown/rolldown emits declaration
+ * member order differently on linux vs macos - observed as swapped
+ * #L100/#L102 pairs in protocol's server-message.d.ts). A line number
+ * into a generated bundle is useless to a reader anyway, so the
+ * sanitiser drops it: link text keeps the file path, the href keeps
+ * the file URL without the #L anchor.
+ */
+function stripDistLineAnchors(text) {
+  return text.replace(
+    /\[((?:packages\/[^\]]*?\/dist\/[^\]:]+?\.d\.ts)):\d+\]\(([^)#]+)#L\d+\)/g,
+    '[$1]($2)',
+  );
+}
+
 async function main() {
   try {
     await stat(apiRoot);
@@ -179,7 +196,7 @@ async function main() {
   let count = 0;
   for await (const file of walkMarkdown(apiRoot)) {
     const before = await readFile(file, 'utf8');
-    const after = rewriteLicenseLinks(sanitise(before));
+    const after = rewriteLicenseLinks(stripDistLineAnchors(sanitise(before)));
     if (after !== before) {
       await writeFile(file, after, 'utf8');
       count += 1;

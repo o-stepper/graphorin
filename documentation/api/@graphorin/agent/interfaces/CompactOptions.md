@@ -6,7 +6,7 @@
 
 # Interface: CompactOptions
 
-Defined in: packages/agent/src/types.ts:586
+Defined in: [packages/agent/src/types.ts:587](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L587)
 
 `agent.compact({...})` options.
 
@@ -16,5 +16,5 @@ Defined in: packages/agent/src/types.ts:586
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:588 |
-| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:587 |
+| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | [packages/agent/src/types.ts:589](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L589) |
+| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | [packages/agent/src/types.ts:588](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L588) |

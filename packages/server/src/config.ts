@@ -22,7 +22,7 @@ import { ConfigInvalidError } from './errors/index.js';
  * server's pre-bind step resolves every `*Ref` field through the
  * `@graphorin/security` resolver registry before binding the
  * listener; an unresolvable ref fails fast with
- * {@link import('./errors/index.js').PrebindSecretUnresolvableError}.
+ * `PrebindSecretUnresolvableError`.
  *
  * @stable
  */

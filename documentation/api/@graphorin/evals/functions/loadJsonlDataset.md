@@ -10,7 +10,7 @@
 function loadJsonlDataset(path, options?): Promise<Dataset<unknown, unknown, Readonly<Record<string, unknown>>>>;
 ```
 
-Defined in: evals/src/loaders/jsonl.ts:32
+Defined in: [packages/evals/src/loaders/jsonl.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/jsonl.ts#L32)
 
 Read a JSONL file and return a fully-materialised [Dataset](/api/@graphorin/evals/interfaces/Dataset.md).
 Empty lines are skipped; malformed lines throw with the line

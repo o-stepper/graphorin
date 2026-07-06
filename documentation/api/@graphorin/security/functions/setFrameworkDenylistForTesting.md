@@ -10,7 +10,7 @@
 function _setFrameworkDenylistForTesting(patterns): void;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:44
+Defined in: [packages/security/src/supply-chain/policy.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/policy.ts#L44)
 
 **`Experimental`**
 

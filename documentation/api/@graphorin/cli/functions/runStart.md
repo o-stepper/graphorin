@@ -13,7 +13,7 @@ function runStart(options?): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/start.ts:54
+Defined in: [packages/cli/src/commands/start.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/start.ts#L54)
 
 Programmatic entry - used both by the CLI binary and by tests so
 the spawn cost of running the binary is paid only when an operator

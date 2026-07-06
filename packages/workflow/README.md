@@ -138,8 +138,9 @@ for await (const event of stream) {
 - **Durable primitives.** `sleepFor(ms)` / `sleepUntil(iso)` suspend a
   thread on a durable timer; `awaitExternal(name)` parks the thread on
   an awakeable that `workflow.resolveAwakeable(threadId, name, value)`
-  completes; `requestApproval(payload)` + `workflow.approve(threadId,
-  approvalId, decision)` persist a typed approval round-trip.
+  completes; `requestApproval(name, payload?)` + `workflow.approve(
+  threadId, name, decision)` persist a typed approval round-trip
+  resolved by name.
 - **Firing durable timers (W-032).** `createTimerDriver({ workflows:
   [{ workflow, checkpointStore }] })` polls each store's
   `listSuspended(namespace, { dueBefore })` (the engine stamps
@@ -153,8 +154,12 @@ for await (const event of stream) {
   `timeoutMs` / `retry` (via `nodeDefaults` or per node) bound flaky
   steps with `node-timeout`; `WorkflowConfig.version` pins a
   definition to its checkpoints (`workflow-version-mismatch` /
-  `workflow-divergence` on drift), and `journalSteps` gives
-  crash-recovery an exactly-once step journal.
+  `workflow-divergence` on drift), and `journalSteps` journals each
+  completed task's channel writes so crash recovery replays them
+  exactly once and re-runs only unfinished tasks. The task's SIDE
+  EFFECTS stay at-least-once: the journal entry lands after the task
+  finishes, so a crash inside that window re-runs the task - keep
+  effects idempotent for strict once-semantics.
 - **Dynamic parallelism via `Dispatch(node, args)`.** A node returns
   one or more `Dispatch('processOrder', { orderId })` directives;
   the engine schedules each as a parallel task in the next execution

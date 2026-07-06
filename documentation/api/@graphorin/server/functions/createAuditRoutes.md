@@ -12,7 +12,7 @@ function createAuditRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/audit.ts:89
+Defined in: [packages/server/src/routes/audit.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/audit.ts#L89)
 
 ## Parameters
 

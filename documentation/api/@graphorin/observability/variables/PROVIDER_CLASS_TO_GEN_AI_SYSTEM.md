@@ -10,7 +10,7 @@
 const PROVIDER_CLASS_TO_GEN_AI_SYSTEM: ReadonlyArray<readonly [RegExp, GenAISystem]>;
 ```
 
-Defined in: packages/observability/src/gen-ai/system-derivation.ts:16
+Defined in: [packages/observability/src/gen-ai/system-derivation.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/system-derivation.ts#L16)
 
 Canonical mapping from a provider class name (or substring) to the
 `gen_ai.system` enum value. The table is an export so consumers

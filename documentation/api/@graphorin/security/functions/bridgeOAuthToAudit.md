@@ -10,7 +10,7 @@
 function bridgeOAuthToAudit(opts): OAuthBridgeTeardown;
 ```
 
-Defined in: packages/security/src/audit/oauth-bridge.ts:39
+Defined in: [packages/security/src/audit/oauth-bridge.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/oauth-bridge.ts#L39)
 
 Subscribe the audit-log subsystem to the OAuth audit emitter.
 

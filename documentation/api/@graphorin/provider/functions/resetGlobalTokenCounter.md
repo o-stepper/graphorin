@@ -10,7 +10,7 @@
 function __resetGlobalTokenCounter(): void;
 ```
 
-Defined in: packages/provider/src/counters/global.ts:37
+Defined in: [packages/provider/src/counters/global.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/global.ts#L37)
 
 **`Internal`**
 

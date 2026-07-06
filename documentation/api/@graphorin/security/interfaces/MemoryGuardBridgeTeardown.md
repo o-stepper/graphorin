@@ -6,7 +6,7 @@
 
 # Interface: MemoryGuardBridgeTeardown()
 
-Defined in: packages/security/src/audit/memory-guard-bridge.ts:39
+Defined in: [packages/security/src/audit/memory-guard-bridge.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/memory-guard-bridge.ts#L39)
 
 Teardown function returned by `bridgeMemoryGuardToAudit(...)`.
 
@@ -21,7 +21,7 @@ closing the audit database.
 MemoryGuardBridgeTeardown(): void;
 ```
 
-Defined in: packages/security/src/audit/memory-guard-bridge.ts:40
+Defined in: [packages/security/src/audit/memory-guard-bridge.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/memory-guard-bridge.ts#L40)
 
 Teardown function returned by `bridgeMemoryGuardToAudit(...)`.
 
@@ -40,4 +40,4 @@ closing the audit database.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/memory-guard-bridge.ts:41 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | [packages/security/src/audit/memory-guard-bridge.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/memory-guard-bridge.ts#L41) |

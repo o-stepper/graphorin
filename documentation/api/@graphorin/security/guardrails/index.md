@@ -166,6 +166,12 @@ Re-exports [normalizeForMatching](/api/@graphorin/security/functions/normalizeFo
 
 ***
 
+### normalizeForPiiMatching
+
+Re-exports [normalizeForPiiMatching](/api/@graphorin/security/functions/normalizeForPiiMatching.md)
+
+***
+
 ### ObservedToolCall
 
 Re-exports [ObservedToolCall](/api/@graphorin/security/interfaces/ObservedToolCall.md)

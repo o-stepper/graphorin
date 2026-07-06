@@ -6,7 +6,7 @@
 
 # Interface: BeforeShutdownContext
 
-Defined in: packages/server/src/lifecycle/hooks.ts:40
+Defined in: [packages/server/src/lifecycle/hooks.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L40)
 
 Snapshot passed to [LifecycleHooks.beforeShutdown](/api/@graphorin/server/interfaces/LifecycleHooks.md#property-beforeshutdown).
 
@@ -16,6 +16,6 @@ Snapshot passed to [LifecycleHooks.beforeShutdown](/api/@graphorin/server/interf
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`ServerConfigSpec`](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md) | packages/server/src/lifecycle/hooks.ts:41 |
-| <a id="property-draintimeoutms"></a> `drainTimeoutMs` | `readonly` | `number` | packages/server/src/lifecycle/hooks.ts:43 |
-| <a id="property-inflight"></a> `inflight` | `readonly` | `number` | packages/server/src/lifecycle/hooks.ts:42 |
+| <a id="property-config"></a> `config` | `readonly` | [`ServerConfigSpec`](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md) | [packages/server/src/lifecycle/hooks.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L41) |
+| <a id="property-draintimeoutms"></a> `drainTimeoutMs` | `readonly` | `number` | [packages/server/src/lifecycle/hooks.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L43) |
+| <a id="property-inflight"></a> `inflight` | `readonly` | `number` | [packages/server/src/lifecycle/hooks.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/hooks.ts#L42) |

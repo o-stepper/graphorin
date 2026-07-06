@@ -10,7 +10,7 @@
 function parseLocomo(text): readonly Case<MemoryEvalInput, string, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: evals/src/loaders/locomo.ts:93
+Defined in: [packages/evals/src/loaders/locomo.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/locomo.ts#L93)
 
 Pure parser. Exported so tests can exercise the mapping without
 touching the filesystem.

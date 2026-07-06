@@ -10,7 +10,7 @@
 type TransportKind = "ws" | "sse";
 ```
 
-Defined in: packages/client/src/transport/types.ts:17
+Defined in: [packages/client/src/transport/types.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L17)
 
 Discriminator used by the public client API + diagnostics.
 

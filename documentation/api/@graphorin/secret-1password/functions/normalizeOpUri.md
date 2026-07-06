@@ -10,7 +10,7 @@
 function normalizeOpUri(raw): string;
 ```
 
-Defined in: packages/secret-1password/src/resolver.ts:164
+Defined in: [packages/secret-1password/src/resolver.ts:164](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/resolver.ts#L164)
 
 Lowercase the authority + path segments of an `op://` URI so two
 configs that differ only in case resolve to the same value (matching

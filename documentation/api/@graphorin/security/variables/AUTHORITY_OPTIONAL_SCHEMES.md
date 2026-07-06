@@ -10,7 +10,7 @@
 const AUTHORITY_OPTIONAL_SCHEMES: ReadonlySet<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:43
+Defined in: [packages/security/src/secrets/secret-ref.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L43)
 
 Schemes whose authority component is optional. `file:` and
 `encrypted-file:` accept either `file:///abs/path` (authority empty)

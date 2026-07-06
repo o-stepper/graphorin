@@ -10,6 +10,6 @@
 type FieldStability = "stable" | "standardized" | "experimental";
 ```
 
-Defined in: packages/skills/src/spec/index.ts:29
+Defined in: [packages/skills/src/spec/index.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L29)
 
 Stability classification of a known upstream field.

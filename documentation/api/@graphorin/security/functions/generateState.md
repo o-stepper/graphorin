@@ -10,7 +10,7 @@
 function generateState(byteLength?): string;
 ```
 
-Defined in: packages/security/src/oauth/pkce.ts:55
+Defined in: [packages/security/src/oauth/pkce.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/pkce.ts#L55)
 
 Generate a cryptographically random `state` parameter.
 

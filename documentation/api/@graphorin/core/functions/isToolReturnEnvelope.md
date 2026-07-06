@@ -10,7 +10,7 @@
 function isToolReturnEnvelope<TOutput>(value): value is ToolReturn<TOutput>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:304
+Defined in: [packages/core/src/contracts/tool.ts:310](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L310)
 
 W-115: the ONE guard for the ToolReturn envelope (the executor and
 the registry example-normalizer both consume it). Brand first; the

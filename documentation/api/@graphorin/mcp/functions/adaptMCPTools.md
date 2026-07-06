@@ -10,7 +10,7 @@
 function adaptMCPTools(args): AdaptedToolsResult;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:83
+Defined in: [packages/mcp/src/client/to-tools.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/to-tools.ts#L83)
 
 Build the [Tool](/api/@graphorin/core/interfaces/Tool.md) array for the supplied MCP tool catalogue.
 

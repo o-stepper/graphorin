@@ -10,7 +10,7 @@
 function passByBaseCase(outcomes): ReadonlyMap<string, boolean>;
 ```
 
-Defined in: evals/src/stats.ts:175
+Defined in: [packages/evals/src/stats.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L175)
 
 Collapse per-iteration outcomes to per-base-case pass (a base case
 passes when EVERY iteration passed) - the paired unit for

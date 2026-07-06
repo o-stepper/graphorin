@@ -6,7 +6,7 @@
 
 # Interface: McpResourceReaderOptions
 
-Defined in: packages/mcp/src/client/mcp-resource-reader.ts:29
+Defined in: [packages/mcp/src/client/mcp-resource-reader.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/mcp-resource-reader.ts#L29)
 
 Configuration for [createMcpResourceReader](/api/@graphorin/mcp/functions/createMcpResourceReader.md).
 
@@ -14,6 +14,6 @@ Configuration for [createMcpResourceReader](/api/@graphorin/mcp/functions/create
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-allowcrossserver"></a> `allowCrossServer?` | `readonly` | `boolean` | mcp-skills-06: allow a BARE (unscoped) resource URI to be tried against every configured client. Default `false` - handles minted by the adapter are scoped (`mcp:<serverId>:<uri>`) and resolve ONLY against their originating server, so a malicious server's link (or a prompt-injected model) cannot fetch a resource from a different, more-trusted server (the cross-server confused-deputy hop). Enable only when you accept that risk for legacy handles. | packages/mcp/src/client/mcp-resource-reader.ts:43 |
-| <a id="property-clients"></a> `clients` | `readonly` | readonly [`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)[] | Clients consulted (in order) to resolve a resource URI. | packages/mcp/src/client/mcp-resource-reader.ts:31 |
-| <a id="property-defaultmaxbytes"></a> `defaultMaxBytes?` | `readonly` | `number` | Default `maxBytes` when `read(...)` is called without one. Default `65536`. | packages/mcp/src/client/mcp-resource-reader.ts:33 |
+| <a id="property-allowcrossserver"></a> `allowCrossServer?` | `readonly` | `boolean` | mcp-skills-06: allow a BARE (unscoped) resource URI to be tried against every configured client. Default `false` - handles minted by the adapter are scoped (`mcp:<serverId>:<uri>`) and resolve ONLY against their originating server, so a malicious server's link (or a prompt-injected model) cannot fetch a resource from a different, more-trusted server (the cross-server confused-deputy hop). Enable only when you accept that risk for legacy handles. | [packages/mcp/src/client/mcp-resource-reader.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/mcp-resource-reader.ts#L43) |
+| <a id="property-clients"></a> `clients` | `readonly` | readonly [`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)[] | Clients consulted (in order) to resolve a resource URI. | [packages/mcp/src/client/mcp-resource-reader.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/mcp-resource-reader.ts#L31) |
+| <a id="property-defaultmaxbytes"></a> `defaultMaxBytes?` | `readonly` | `number` | Default `maxBytes` when `read(...)` is called without one. Default `65536`. | [packages/mcp/src/client/mcp-resource-reader.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/mcp-resource-reader.ts#L33) |

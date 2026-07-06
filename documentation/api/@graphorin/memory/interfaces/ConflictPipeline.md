@@ -6,7 +6,7 @@
 
 # Interface: ConflictPipeline
 
-Defined in: packages/memory/src/conflict/types.ts:179
+Defined in: [packages/memory/src/conflict/types.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L179)
 
 Pre-built pipeline returned by [createConflictPipeline](/api/@graphorin/memory/functions/createConflictPipeline.md). The
 `run` method is what `SemanticMemory.remember(...)` calls to make
@@ -18,9 +18,9 @@ the conflict decision.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-localepack"></a> `localePack` | `readonly` | [`LocalePack`](/api/@graphorin/memory/interfaces/LocalePack.md) | packages/memory/src/conflict/types.ts:181 |
-| <a id="property-mode"></a> `mode` | `readonly` | `"on"` \| `"off"` | packages/memory/src/conflict/types.ts:180 |
-| <a id="property-thresholds"></a> `thresholds` | `readonly` | [`ConflictThresholds`](/api/@graphorin/memory/interfaces/ConflictThresholds.md) | packages/memory/src/conflict/types.ts:182 |
+| <a id="property-localepack"></a> `localePack` | `readonly` | [`LocalePack`](/api/@graphorin/memory/interfaces/LocalePack.md) | [packages/memory/src/conflict/types.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L181) |
+| <a id="property-mode"></a> `mode` | `readonly` | `"on"` \| `"off"` | [packages/memory/src/conflict/types.ts:180](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L180) |
+| <a id="property-thresholds"></a> `thresholds` | `readonly` | [`ConflictThresholds`](/api/@graphorin/memory/interfaces/ConflictThresholds.md) | [packages/memory/src/conflict/types.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L182) |
 
 ## Methods
 
@@ -30,7 +30,7 @@ the conflict decision.
 run(deps, candidate): Promise<ConflictDecision>;
 ```
 
-Defined in: packages/memory/src/conflict/types.ts:183
+Defined in: [packages/memory/src/conflict/types.ts:183](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L183)
 
 #### Parameters
 

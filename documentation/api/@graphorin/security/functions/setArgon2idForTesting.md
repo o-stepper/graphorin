@@ -10,7 +10,7 @@
 function _setArgon2idForTesting(fn): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:105
+Defined in: [packages/security/src/secrets/resolvers/encrypted-file.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/encrypted-file.ts#L105)
 
 **`Experimental`**
 

@@ -6,7 +6,7 @@
 
 # Interface: AsyncContext\&lt;T\&gt;
 
-Defined in: packages/core/src/utils/async-context.ts:17
+Defined in: [packages/core/src/utils/async-context.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L17)
 
 Thin typed wrapper around Node's `AsyncLocalStorage`. Used to thread a
 tool-execution / request-scoped context through the async stack
@@ -35,7 +35,7 @@ The wrapper exists because:
 disable(): void;
 ```
 
-Defined in: packages/core/src/utils/async-context.ts:27
+Defined in: [packages/core/src/utils/async-context.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L27)
 
 Exit any in-flight scope (advanced; rarely needed).
 
@@ -51,7 +51,7 @@ Exit any in-flight scope (advanced; rarely needed).
 enterWith(value): void;
 ```
 
-Defined in: packages/core/src/utils/async-context.ts:25
+Defined in: [packages/core/src/utils/async-context.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L25)
 
 Replace the value of the current scope (advanced; rarely needed).
 
@@ -73,7 +73,7 @@ Replace the value of the current scope (advanced; rarely needed).
 get(): T | undefined;
 ```
 
-Defined in: packages/core/src/utils/async-context.ts:23
+Defined in: [packages/core/src/utils/async-context.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L23)
 
 Get the value of the current scope, or `undefined` outside one.
 
@@ -89,7 +89,7 @@ Get the value of the current scope, or `undefined` outside one.
 run<R>(value, fn): R;
 ```
 
-Defined in: packages/core/src/utils/async-context.ts:19
+Defined in: [packages/core/src/utils/async-context.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L19)
 
 Run `fn` inside a fresh scope carrying `value`.
 
@@ -118,7 +118,7 @@ Run `fn` inside a fresh scope carrying `value`.
 runAsync<R>(value, fn): Promise<R>;
 ```
 
-Defined in: packages/core/src/utils/async-context.ts:21
+Defined in: [packages/core/src/utils/async-context.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/async-context.ts#L21)
 
 Run `fn` inside a fresh scope carrying `value` (async-friendly).
 

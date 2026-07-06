@@ -10,7 +10,7 @@
 function _setSpecSnapshotForTesting(snapshot): void;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:71
+Defined in: [packages/skills/src/spec/index.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L71)
 
 **`Experimental`**
 

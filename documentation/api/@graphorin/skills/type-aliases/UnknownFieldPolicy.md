@@ -10,7 +10,7 @@
 type UnknownFieldPolicy = "preserve" | "reject" | "warn";
 ```
 
-Defined in: packages/skills/src/types/index.ts:49
+Defined in: [packages/skills/src/types/index.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L49)
 
 Policy applied to frontmatter fields that are present but recognised
 neither by the bundled spec snapshot nor by the `graphorin-*`

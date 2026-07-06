@@ -10,7 +10,7 @@
 function onSecretValueAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:60
+Defined in: [packages/security/src/secrets/secret-value.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L60)
 
 Subscribe to `SecretValue` lifecycle events (construct / reveal / use /
 dispose). The audit-log sub-package uses this to record every unwrap

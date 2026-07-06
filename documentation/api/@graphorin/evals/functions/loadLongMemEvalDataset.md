@@ -10,7 +10,7 @@
 function loadLongMemEvalDataset(options): Promise<Dataset<MemoryEvalInput, string, Readonly<Record<string, unknown>>>>;
 ```
 
-Defined in: evals/src/loaders/longmemeval.ts:61
+Defined in: [packages/evals/src/loaders/longmemeval.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/longmemeval.ts#L61)
 
 Read a LongMemEval JSON file and return a fully-materialised
 [Dataset](/api/@graphorin/evals/interfaces/Dataset.md) of [MemoryEvalInput](/api/@graphorin/evals/interfaces/MemoryEvalInput.md) cases scored against the

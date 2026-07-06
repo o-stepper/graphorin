@@ -13,7 +13,7 @@ function runWithPauseResume<R>(
 meta?): Promise<R>;
 ```
 
-Defined in: packages/core/src/channels/pause.ts:157
+Defined in: [packages/core/src/channels/pause.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/pause.ts#L157)
 
 **`Internal`**
 

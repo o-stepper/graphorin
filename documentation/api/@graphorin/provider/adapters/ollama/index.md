@@ -10,8 +10,8 @@ Direct adapter for the Ollama HTTP API. The adapter speaks the
 native Ollama streaming JSON protocol (`POST /api/chat` returning
 newline-delimited JSON objects). For operators who prefer the
 OpenAI-compatible variant exposed by recent Ollama releases, the
-generic openAICompatibleAdapter is the better choice - both
-adapters share the same LocalProviderTrust classifier and
+generic `openAICompatibleAdapter` is the better choice - both
+adapters share the same `LocalProviderTrust` classifier and
 [LocalProviderInsecureTransportError](/api/@graphorin/provider/classes/LocalProviderInsecureTransportError.md) startup behaviour.
 
 ## Interfaces

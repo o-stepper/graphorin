@@ -10,7 +10,7 @@
 function fitFusionWeights<TRecord>(cases, options?): FitFusionResult;
 ```
 
-Defined in: packages/memory/src/search/fit-weights.ts:77
+Defined in: [packages/memory/src/search/fit-weights.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L77)
 
 Grid-search fusion weights against labelled cases (C5).
 

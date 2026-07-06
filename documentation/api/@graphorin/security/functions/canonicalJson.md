@@ -10,7 +10,7 @@
 function canonicalJson(value): string;
 ```
 
-Defined in: packages/security/src/audit/canonical-json.ts:25
+Defined in: [packages/security/src/audit/canonical-json.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/canonical-json.ts#L25)
 
 Serialise `value` into the framework's canonical JSON byte sequence.
 The result is a UTF-8-safe string suitable for SHA-256 hashing.

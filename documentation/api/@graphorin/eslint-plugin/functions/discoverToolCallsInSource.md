@@ -10,7 +10,7 @@
 function discoverToolCallsInSource(file, source): DiscoveredTool[];
 ```
 
-Defined in: src/tool-discovery.ts:209
+Defined in: [packages/eslint-plugin/src/tool-discovery.ts:209](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L209)
 
 Discover every `tool({...})` invocation in a source string. The
 returned findings are stable + frozen so callers can pass them

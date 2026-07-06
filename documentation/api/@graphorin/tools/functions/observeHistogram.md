@@ -13,7 +13,7 @@ function observeHistogram(
    labels?): void;
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:93
+Defined in: [packages/tools/src/audit/counters.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L93)
 
 Record an observation in a histogram. Stored as the raw observation
 list so consumers can compute their own quantiles; the host

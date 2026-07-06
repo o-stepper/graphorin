@@ -10,7 +10,7 @@
 const SUMMARY_TEMPLATE_NAME: "summary-sections" = 'summary-sections';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:49
+Defined in: [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L49)
 
 Stable identifier of the bundled template.
 

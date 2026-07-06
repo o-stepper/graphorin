@@ -10,7 +10,7 @@
 function runStorageCleanupBackups(options?): Promise<StorageCleanupBackupsResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:474
+Defined in: [packages/cli/src/commands/storage.ts:474](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L474)
 
 Drop stale `.bak`, `.bak.<ts>`, and `.tmp.<ts>` siblings of the
 configured storage path. Useful after `encrypt` / `rekey` runs that

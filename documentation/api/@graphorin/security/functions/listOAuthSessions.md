@@ -10,7 +10,7 @@
 function listOAuthSessions(storage, options?): Promise<readonly OAuthSessionMetadata[]>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:105
+Defined in: [packages/security/src/oauth/library.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/library.ts#L105)
 
 List the audit-safe metadata of every persisted OAuth session.
 

@@ -6,7 +6,7 @@
 
 # Interface: SecretsBridgeTeardown()
 
-Defined in: packages/security/src/audit/secrets-bridge.ts:45
+Defined in: [packages/security/src/audit/secrets-bridge.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L45)
 
 Teardown function returned by `bridgeSecretsToAudit(...)`.
 
@@ -21,7 +21,7 @@ closing the audit database.
 SecretsBridgeTeardown(): void;
 ```
 
-Defined in: packages/security/src/audit/secrets-bridge.ts:46
+Defined in: [packages/security/src/audit/secrets-bridge.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L46)
 
 Teardown function returned by `bridgeSecretsToAudit(...)`.
 
@@ -40,4 +40,4 @@ closing the audit database.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/secrets-bridge.ts:47 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | [packages/security/src/audit/secrets-bridge.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L47) |

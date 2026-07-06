@@ -10,7 +10,7 @@
 function spanNameFor(type, attrs?): string;
 ```
 
-Defined in: packages/observability/src/tracer/span-names.ts:33
+Defined in: [packages/observability/src/tracer/span-names.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/span-names.ts#L33)
 
 ## Parameters
 

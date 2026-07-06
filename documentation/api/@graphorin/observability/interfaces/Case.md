@@ -6,7 +6,7 @@
 
 # Interface: Case\&lt;I, O, M\&gt;
 
-Defined in: packages/observability/src/eval/types.ts:14
+Defined in: [packages/observability/src/eval/types.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L14)
 
 One sample from an eval dataset.
 
@@ -24,7 +24,7 @@ One sample from an eval dataset.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-expected"></a> `expected?` | `readonly` | `O` | packages/observability/src/eval/types.ts:17 |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/observability/src/eval/types.ts:15 |
-| <a id="property-input"></a> `input` | `readonly` | `I` | packages/observability/src/eval/types.ts:16 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `M` | packages/observability/src/eval/types.ts:18 |
+| <a id="property-expected"></a> `expected?` | `readonly` | `O` | [packages/observability/src/eval/types.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L17) |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | [packages/observability/src/eval/types.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L15) |
+| <a id="property-input"></a> `input` | `readonly` | `I` | [packages/observability/src/eval/types.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L16) |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `M` | [packages/observability/src/eval/types.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/types.ts#L18) |

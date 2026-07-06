@@ -10,7 +10,7 @@
 function emitMemoryGuardAudit(event): void;
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:126
+Defined in: [packages/security/src/guard/audit-emitter.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L126)
 
 Emit an event to every subscriber. Listeners that throw are
 isolated - a faulty listener never tears down the guard.

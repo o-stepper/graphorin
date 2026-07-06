@@ -17,7 +17,7 @@ type MemoryKind =
   | "insight";
 ```
 
-Defined in: packages/core/src/types/memory.ts:13
+Defined in: [packages/core/src/types/memory.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L13)
 
 Kinds of memory record in the Graphorin model. The first six are the
 storage tiers the [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) contract exposes as 1:1

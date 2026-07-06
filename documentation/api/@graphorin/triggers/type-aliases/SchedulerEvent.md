@@ -46,7 +46,7 @@ type SchedulerEvent =
 };
 ```
 
-Defined in: packages/triggers/src/index.ts:157
+Defined in: [packages/triggers/src/index.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L157)
 
 Lifecycle event emitted by [Scheduler.events](/api/@graphorin/triggers/interfaces/Scheduler.md#events). Useful for
 tests and for piping into observability without monkey-patching.

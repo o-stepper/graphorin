@@ -6,7 +6,7 @@
 
 # Interface: EvalCaseResult\&lt;I, O\&gt;
 
-Defined in: observability/dist/eval/types.d.ts:59
+Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
 Per-case result.
 
@@ -23,8 +23,8 @@ Per-case result.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | observability/dist/eval/types.d.ts:60 |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | observability/dist/eval/types.d.ts:63 |
-| <a id="property-input"></a> `input` | `readonly` | `I` | observability/dist/eval/types.d.ts:61 |
-| <a id="property-output"></a> `output` | `readonly` | `O` | observability/dist/eval/types.d.ts:62 |
-| <a id="property-scores"></a> `scores` | `readonly` | readonly \{ `result`: [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md); `scorer`: `string`; \}[] | observability/dist/eval/types.d.ts:64 |
+| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-input"></a> `input` | `readonly` | `I` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-output"></a> `output` | `readonly` | `O` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-scores"></a> `scores` | `readonly` | readonly \{ `result`: [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md); `scorer`: `string`; \}[] | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |

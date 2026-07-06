@@ -10,7 +10,7 @@
 function sleepUntil(at): void;
 ```
 
-Defined in: packages/core/dist/channels/durable.d.ts:67
+Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
 Durably sleep until an absolute instant. Suspends the workflow thread
 with a persisted wake-at timestamp; `workflow.tick(threadId)` resumes

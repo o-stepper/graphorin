@@ -10,7 +10,7 @@
 function getTelemetryStatus(env?): TelemetryStatus;
 ```
 
-Defined in: packages/observability/src/telemetry/index.ts:40
+Defined in: [packages/observability/src/telemetry/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/telemetry/index.ts#L40)
 
 Snapshot of the telemetry posture. Reads from `process.env` once
 unless `env` is provided.

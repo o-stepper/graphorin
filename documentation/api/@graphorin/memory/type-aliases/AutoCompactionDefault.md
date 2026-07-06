@@ -10,7 +10,7 @@
 type AutoCompactionDefault = "enabled" | "disabled";
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/thresholds.ts:88
+Defined in: [packages/memory/src/context-engine/compaction/thresholds.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/thresholds.ts#L88)
 
 Resolve the default `compaction` mode (ON / OFF) per the active
 provider's trust class. Default ON for cloud-tier providers

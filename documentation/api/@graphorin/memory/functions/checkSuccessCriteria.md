@@ -10,7 +10,7 @@
 function checkSuccessCriteria(procedure, observed): VerificationResult;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:323
+Defined in: [packages/memory/src/consolidator/phases/induce.ts:323](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L323)
 
 Self-verify a reuse against an induced procedure's success criteria. A
 criterion is met when any observed signal contains it (case-insensitive

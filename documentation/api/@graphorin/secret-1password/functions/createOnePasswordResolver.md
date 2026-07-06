@@ -10,7 +10,7 @@
 function createOnePasswordResolver(options?): SecretResolver;
 ```
 
-Defined in: packages/secret-1password/src/resolver.ts:68
+Defined in: [packages/secret-1password/src/resolver.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/resolver.ts#L68)
 
 Build a `SecretResolver` that honours the `op://` scheme. Register
 with `registerResolver(...)` from `@graphorin/security` at app

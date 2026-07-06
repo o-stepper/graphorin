@@ -381,6 +381,16 @@ export class SqliteConsolidatorStateStore {
     );
   }
 
+  /**
+   * W-133: despite the name, this is a plain SELECT of due DLQ batches
+   * WITHOUT any lease/claim semantics - two concurrent callers see the
+   * same rows. Serializing concurrent drains is the CALLER's job via
+   * the CS-8 consolidator scope lock (the runtime always drains under
+   * it); the worst case of a bypassed lock is duplicated LLM replay
+   * spend, not corruption. The name is kept because the method sits on
+   * the stable contract surface - renaming would be a breaking change
+   * with no behavioural gain.
+   */
   async claimReadyBatches(
     scope: SessionScope,
     now: number,

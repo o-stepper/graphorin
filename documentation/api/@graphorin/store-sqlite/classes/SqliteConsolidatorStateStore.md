@@ -6,7 +6,7 @@
 
 # Class: SqliteConsolidatorStateStore
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:155
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L155)
 
 SQLite-backed consolidator state store. Constructed by
 [SqliteMemoryStore](/api/@graphorin/store-sqlite/classes/SqliteMemoryStore.md); never instantiated directly by
@@ -22,7 +22,7 @@ application code.
 new SqliteConsolidatorStateStore(conn): SqliteConsolidatorStateStore;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:158
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L158)
 
 #### Parameters
 
@@ -46,7 +46,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:235
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L235)
 
 #### Parameters
 
@@ -72,7 +72,16 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:384
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:394](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L394)
+
+W-133: despite the name, this is a plain SELECT of due DLQ batches
+WITHOUT any lease/claim semantics - two concurrent callers see the
+same rows. Serializing concurrent drains is the CALLER's job via
+the CS-8 consolidator scope lock (the runtime always drains under
+it); the worst case of a bypassed lock is duplicated LLM replay
+spend, not corruption. The name is kept because the method sits on
+the stable contract surface - renaming would be a breaking change
+with no behavioural gain.
 
 #### Parameters
 
@@ -94,7 +103,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:384
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:362
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L362)
 
 #### Parameters
 
@@ -116,7 +125,7 @@ getState(scope): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:162
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L162)
 
 #### Parameters
 
@@ -138,7 +147,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:162
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:464
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:474](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L474)
 
 #### Parameters
 
@@ -169,7 +178,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:324
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:324](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L324)
 
 #### Parameters
 
@@ -203,7 +212,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:414
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:424](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L424)
 
 #### Parameters
 
@@ -225,7 +234,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:414
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:401
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:411](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L411)
 
 #### Parameters
 
@@ -245,7 +254,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:401
 pruneExhaustedBatches(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:456
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:466](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L466)
 
 W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
 batches (`next_retry_at IS NULL` - parked forever by
@@ -273,7 +282,7 @@ awaiting a retry are never touched (they belong to
 pruneRuns(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:439
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:449](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L449)
 
 W-065: retention for the per-tick run log. Deletes terminal runs
 that started before the cutoff; in-flight rows
@@ -299,7 +308,7 @@ that started before the cutoff; in-flight rows
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:295
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:295](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L295)
 
 #### Parameters
 
@@ -319,7 +328,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:295
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:278
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L278)
 
 #### Parameters
 
@@ -339,7 +348,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:278
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:266
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:266](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L266)
 
 #### Parameters
 
@@ -363,7 +372,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:405
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:415](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L415)
 
 #### Parameters
 
@@ -385,7 +394,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:405
 upsertState(scope, patch): Promise<ConsolidatorStateRow>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:173
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L173)
 
 #### Parameters
 

@@ -10,7 +10,7 @@
 function projectToolApi(tools): CodeApiProjection;
 ```
 
-Defined in: packages/tools/src/code-mode/project.ts:177
+Defined in: [packages/tools/src/code-mode/project.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/project.ts#L177)
 
 Project a set of resolved tools as a typed code API. See the module
 docstring.

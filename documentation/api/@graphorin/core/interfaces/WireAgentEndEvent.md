@@ -6,7 +6,7 @@
 
 # Interface: WireAgentEndEvent\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event-wire.ts:58
+Defined in: [packages/core/src/types/agent-event-wire.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L58)
 
 Wire twin of [AgentEndEvent](/api/@graphorin/core/interfaces/AgentEndEvent.md): `result.state` is the JSON-safe
 [WireRunState](/api/@graphorin/core/type-aliases/WireRunState.md) projection.
@@ -27,6 +27,6 @@ Wire twin of [AgentEndEvent](/api/@graphorin/core/interfaces/AgentEndEvent.md): 
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-result"></a> `result` | `readonly` | `Omit`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;, `"state"`\> & \{ `state`: [`WireRunState`](/api/@graphorin/core/type-aliases/WireRunState.md); \} | - | packages/core/src/types/agent-event-wire.ts:60 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | `Omit.runId` | packages/core/src/types/agent-event.ts:315 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | `Omit.type` | packages/core/src/types/agent-event.ts:314 |
+| <a id="property-result"></a> `result` | `readonly` | `Omit`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;, `"state"`\> & \{ `state`: [`WireRunState`](/api/@graphorin/core/type-aliases/WireRunState.md); \} | - | [packages/core/src/types/agent-event-wire.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L60) |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | `Omit.runId` | [packages/core/src/types/agent-event.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L315) |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | `Omit.type` | [packages/core/src/types/agent-event.ts:314](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L314) |

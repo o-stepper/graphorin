@@ -10,7 +10,7 @@
 type SpanAttributes = Readonly<Record<string, SpanAttributeValue>>;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:98
+Defined in: [packages/core/src/contracts/tracer.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L98)
 
 Free-form attributes attached to a span.
 

@@ -10,7 +10,7 @@
 function parseDmr(text): readonly Case<MemoryEvalInput, string, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: evals/src/loaders/dmr.ts:74
+Defined in: [packages/evals/src/loaders/dmr.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/dmr.ts#L74)
 
 Pure parser. Exported so tests can exercise the mapping without
 touching the filesystem.

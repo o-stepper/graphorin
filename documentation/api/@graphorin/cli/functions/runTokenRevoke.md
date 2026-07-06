@@ -12,7 +12,7 @@ function runTokenRevoke(options): Promise<
 | undefined>;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:169
+Defined in: [packages/cli/src/commands/token.ts:169](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L169)
 
 Revoke a single token.
 

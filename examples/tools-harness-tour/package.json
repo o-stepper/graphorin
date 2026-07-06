@@ -1,0 +1,51 @@
+{
+  "name": "@graphorin/example-tools-harness-tour",
+  "version": "0.6.1",
+  "private": true,
+  "description": "Tools-harness tour for the Graphorin framework: MCP client against an in-process server, skills loader, defer-loading + tool_search, one code-mode call, and spill + read_result paging - fully offline on deterministic stubs. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/tools-harness-tour",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/tools-harness-tour"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/tools": "workspace:*",
+    "@graphorin/mcp": "workspace:*",
+    "@graphorin/skills": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.25.0"
+  },
+  "bin": {
+    "graphorin-example-tools-harness-tour": "./dist/main.js"
+  }
+}

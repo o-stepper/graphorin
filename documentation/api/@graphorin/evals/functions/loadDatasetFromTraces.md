@@ -10,7 +10,7 @@
 function loadDatasetFromTraces<I, O>(path, options): Promise<Dataset<I, O, Readonly<Record<string, unknown>>>>;
 ```
 
-Defined in: evals/src/loaders/from-traces.ts:34
+Defined in: [packages/evals/src/loaders/from-traces.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L34)
 
 ## Type Parameters
 
