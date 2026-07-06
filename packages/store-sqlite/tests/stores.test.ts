@@ -533,6 +533,59 @@ describe('createSqliteStore', () => {
     expect((await store.triggers.list()).length).toBe(0);
   });
 
+  it('trigger store: recordFire is fenced monotonically (W-133)', async () => {
+    const t = {
+      id: 't-fence-1',
+      kind: 'interval' as const,
+      spec: 'PT5M',
+      callbackRef: 'tools.sync',
+      missedFires: 0,
+      disabled: false,
+      catchupPolicy: 'last' as const,
+      maxCatchupRuns: 1,
+      catchupWindowMs: 24 * 60 * 60 * 1000,
+      createdAt: new Date().toISOString(),
+    };
+    await store.triggers.upsert(t);
+
+    // Fresh trigger (last_fired_at NULL): the first fire lands.
+    const late = new Date('2026-07-06T12:10:00.000Z').toISOString();
+    const lateNext = new Date('2026-07-06T12:15:00.000Z').toISOString();
+    await store.triggers.recordFire('t-fence-1', late, lateNext);
+    const afterLate = await store.triggers.get('t-fence-1');
+    expect(afterLate?.lastFiredAt).toBe(late);
+    expect(afterLate?.nextFireAt).toBe(lateNext);
+
+    // A second (unsupported second-scheduler) fixation with an EARLIER
+    // firedAt is a no-op: state keeps the later fire.
+    const earlier = new Date('2026-07-06T12:05:00.000Z').toISOString();
+    await store.triggers.recordFire(
+      't-fence-1',
+      earlier,
+      new Date('2026-07-06T12:07:00.000Z').toISOString(),
+    );
+    const afterEarlier = await store.triggers.get('t-fence-1');
+    expect(afterEarlier?.lastFiredAt).toBe(late);
+    expect(afterEarlier?.nextFireAt).toBe(lateNext);
+
+    // Same firedAt: also a no-op (strict fence).
+    await store.triggers.recordFire(
+      't-fence-1',
+      late,
+      new Date('2026-07-06T12:20:00.000Z').toISOString(),
+    );
+    expect((await store.triggers.get('t-fence-1'))?.nextFireAt).toBe(lateNext);
+
+    // A strictly later fire still advances normally.
+    const later = new Date('2026-07-06T12:15:00.000Z').toISOString();
+    const laterNext = new Date('2026-07-06T12:20:00.000Z').toISOString();
+    await store.triggers.recordFire('t-fence-1', later, laterNext);
+    const afterLater = await store.triggers.get('t-fence-1');
+    expect(afterLater?.lastFiredAt).toBe(later);
+    expect(afterLater?.nextFireAt).toBe(laterNext);
+    await store.triggers.remove('t-fence-1');
+  });
+
   it('auth-token store: put / get / revoke / record', async () => {
     const created = new Date().toISOString();
     await store.authTokens.put({
