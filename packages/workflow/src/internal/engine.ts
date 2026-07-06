@@ -304,6 +304,30 @@ export async function* resumeEngine<TState extends object>(
   lock?.add(threadId);
 
   try {
+    // W-121: directive payloads round-trip through the frontier exactly
+    // like state does - a Date resume value would come back as an ISO
+    // string on the NEXT resume. Fail the operator NOW, before the node
+    // body runs, with the same WF-10 walker and error.
+    if (directive?.resume !== undefined) {
+      const offender = findNonJsonSafe(directive.resume, '<directive>.resume');
+      if (offender !== null) {
+        yield emitError<TState>(
+          threadId,
+          new StateNotSerializableError('<directive>', offender.path, offender.kind),
+        );
+        return;
+      }
+    }
+    if (directive?.update !== undefined) {
+      const offender = findNonJsonSafe(directive.update, '<directive>.update');
+      if (offender !== null) {
+        yield emitError<TState>(
+          threadId,
+          new StateNotSerializableError('<directive>', offender.path, offender.kind),
+        );
+        return;
+      }
+    }
     const tuple = await config.checkpointStore.getTuple(threadId, namespace);
     if (!tuple) {
       yield emitError<TState>(threadId, new ThreadNotFoundError(threadId));
@@ -1632,6 +1656,9 @@ async function persistCheckpoint<TState extends object>(
   const { config, namespace, threadId, internal, durability, status, nodeName } = args;
   const checkpointId = newId('cp');
   const now = new Date().toISOString();
+  // W-121: everything that rides the frontier tags must survive the
+  // JSON round-trip - same fail-fast as `serializeState` (WF-10).
+  if (args.frontier !== undefined) assertFrontierJsonSafe(args.frontier);
   const tags = args.frontier ? encodeFrontier(args.frontier) : undefined;
 
   const skipPut = durability === 'exit' && status === 'running';
@@ -2033,6 +2060,47 @@ function frontierFromInternal<TState extends object>(
     })),
     completed: [...internal.lastCompletedNodes],
   };
+}
+
+/**
+ * W-121: fail-fast walk of every frontier payload that will be
+ * `JSON.stringify`-ed into checkpoint tags: pause values (incl.
+ * approval payloads), dispatchArgs, satisfied resume values and their
+ * metas, dynamic-task args, and the failure-frontier stepTasks args.
+ * Offenders throw the same typed `state-not-serializable` as channel
+ * state, with a pseudo-channel naming the pause/task.
+ */
+function assertFrontierJsonSafe(frontier: FrontierEnvelope): void {
+  const fail = (channel: string, offender: { path: string; kind: string }): never => {
+    throw new StateNotSerializableError(channel, offender.path, offender.kind);
+  };
+  for (const p of frontier.pauses) {
+    const channel = `<pause:${p.nodeName}>`;
+    let offender = findNonJsonSafe(p.value, `${channel}.value`);
+    if (offender !== null) fail(channel, offender);
+    offender = findNonJsonSafe(p.dispatchArgs, `${channel}.dispatchArgs`);
+    if (offender !== null) fail(channel, offender);
+    const satisfied = p.satisfied ?? [];
+    for (let i = 0; i < satisfied.length; i += 1) {
+      offender = findNonJsonSafe(satisfied[i], `${channel}.satisfied[${i}]`);
+      if (offender !== null) fail(channel, offender);
+    }
+    const satisfiedMeta = p.satisfiedMeta ?? [];
+    for (let i = 0; i < satisfiedMeta.length; i += 1) {
+      offender = findNonJsonSafe(satisfiedMeta[i], `${channel}.satisfiedMeta[${i}]`);
+      if (offender !== null) fail(channel, offender);
+    }
+  }
+  for (const d of frontier.dynamic) {
+    const channel = `<dispatch:${d.nodeName}>`;
+    const offender = findNonJsonSafe(d.dispatchArgs, `${channel}.dispatchArgs`);
+    if (offender !== null) fail(channel, offender);
+  }
+  for (const task of frontier.stepTasks ?? []) {
+    const channel = `<task:${task.nodeName}>`;
+    const offender = findNonJsonSafe(task.dispatchArgs, `${channel}.dispatchArgs`);
+    if (offender !== null) fail(channel, offender);
+  }
 }
 
 function encodeFrontier(frontier: FrontierEnvelope): string[] {

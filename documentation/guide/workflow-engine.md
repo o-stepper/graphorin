@@ -139,6 +139,8 @@ Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Te
 
 Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path - instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
 
+The same gate covers everything else that rides the checkpoint (W-121): pause values and approval payloads, `Dispatch` args, satisfied resume values, and operator directives. A `Date` passed as `Directive({ resume })` fails at resume ENTRY (pseudo-channel `<directive>`), before the node body runs - previously it persisted as an ISO string and the body silently received a string on the next replay.
+
 ### Durability modes
 
 `durability: 'sync'` persists every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) - under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked. (The former `'async'` mode was removed: it was byte-identical to `'sync'`; a legacy `'async'` input is coerced to `'sync'` with a one-time warning.)

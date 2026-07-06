@@ -331,9 +331,15 @@ export class DeadEndError extends WorkflowError {
 }
 
 /**
- * Thrown at checkpoint time when a channel value would not survive a
+ * Thrown when a value that rides the checkpoint would not survive a
  * JSON round-trip (WF-10) - Map/Set/Date/class instances silently
  * degrade with the SQLite store, so every store rejects them eagerly.
+ * Covers EVERYTHING that round-trips through the checkpoint (W-121):
+ * channel state, pause values and approval payloads, dispatchArgs,
+ * satisfied resume values, and operator directives (validated at
+ * resume entry, before the node body runs). The pseudo-channels
+ * `<pause:node>` / `<dispatch:node>` / `<task:node>` / `<directive>`
+ * name the offending surface.
  */
 export class StateNotSerializableError extends WorkflowError {
   readonly channel: string;
