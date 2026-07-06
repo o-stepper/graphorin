@@ -82,3 +82,82 @@ describe('gradeTool', () => {
     expect(score.score).toBeLessThan(60);
   });
 });
+
+describe('W-044 - comment-awareness', () => {
+  it('a commented-out tool({...}) is not discovered (both comment kinds)', () => {
+    const src = `
+// export const dead = tool({
+//   name: 'dead_tool',
+//   description: 'this is commented out entirely and must not be graded',
+// });
+/*
+export const alsoDead = tool({
+  name: 'also_dead',
+  description: 'block-commented tool, equally invisible',
+});
+*/
+export const live = tool({
+  name: 'live_tool',
+  description: 'a real, uncommented registration that must be found normally',
+  inputSchema: z.object({ queryText: z.string() }),
+});
+`;
+    const tools = discoverToolCallsInSource('mixed.ts', src);
+    expect(tools.map((t) => t.name)).toEqual(['live_tool']);
+  });
+
+  it("a 'tool(' inside a string literal is not discovered (blanker leaves strings intact)", () => {
+    const src = `
+const doc = "call tool({ name: 'fake' }) to register";
+const tpl = \`tool({ name: 'also-fake' })\`;
+`;
+    expect(discoverToolCallsInSource('strings.ts', src)).toEqual([]);
+  });
+
+  it('a commented-out description inside a LIVE literal does not count', () => {
+    const src = `
+export const t = tool({
+  name: 'partial_tool',
+  // description: 'this line is commented out and must not be extracted',
+  inputSchema: z.object({ queryText: z.string() }),
+});
+`;
+    const [toolInfo] = discoverToolCallsInSource('partial.ts', src);
+    if (toolInfo === undefined) throw new Error('not discovered');
+    expect(toolInfo.description).toBeUndefined();
+  });
+
+  it('a commented email inside a live examples block does not penalize the axis; source stays original', () => {
+    const src = `
+export const t = tool({
+  name: 'mail_tool',
+  description: 'Send a transactional notification email through the configured gateway service.',
+  inputSchema: z.object({ recipientEmail: z.string() }),
+  examples: [
+    // was: { input: { recipientEmail: 'real.person@gmail.com' } },
+    { input: { recipientTag: 'primary-contact' }, output: { ok: true } },
+  ],
+});
+`;
+    const [toolInfo] = discoverToolCallsInSource('mail.ts', src);
+    if (toolInfo === undefined) throw new Error('not discovered');
+    const findings = runToolRules(toolInfo);
+    expect(findings.filter((f) => f.kind === 'examples-pii-detected')).toEqual([]);
+    // The report blob keeps the ORIGINAL text, comment included.
+    expect(toolInfo.source).toContain('real.person@gmail.com');
+    expect(toolInfo.gradingSource).not.toContain('real.person@gmail.com');
+  });
+
+  it('regex literals are conservatively preserved (a // inside one is not a comment)', () => {
+    const src = `
+const splitter = /[/]{2}/;
+export const t = tool({
+  name: 'regex_neighbor',
+  description: 'A registration that follows a regex literal containing double slashes.',
+  inputSchema: z.object({ queryText: z.string() }),
+});
+`;
+    const tools = discoverToolCallsInSource('regex.ts', src);
+    expect(tools.map((t) => t.name)).toEqual(['regex_neighbor']);
+  });
+});

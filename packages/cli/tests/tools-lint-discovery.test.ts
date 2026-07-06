@@ -221,4 +221,34 @@ describe('graphorin tools lint - RB-49 acceptance', () => {
     expect(joined).toMatch(/\[FAIL\] do_thing/);
     expect(joined).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
   });
+
+  it('W-044: a file with only a commented-out tool yields an empty report and exit 0', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'graphorin-tools-lint-w044-'));
+    await writeFile(
+      join(root, 'tsconfig.json'),
+      JSON.stringify({ include: ['src/**/*.ts'], compilerOptions: { strict: true } }, null, 2),
+      'utf8',
+    );
+    await mkdir(join(root, 'src', 'tools'), { recursive: true });
+    await writeFile(
+      join(root, 'src', 'tools', 'dead.ts'),
+      [
+        '// export const dead = tool({',
+        "//   name: 'dead_tool',",
+        "//   description: 'commented out entirely',",
+        '// });',
+        'export const nothing = 1;',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+    const report = (await runToolsLint({
+      cwd: root,
+      threshold: 60,
+      format: 'json',
+      print: () => {},
+    })) as ToolsLintReport;
+    expect(report.tools).toEqual([]);
+    expect(process.exitCode === 0 || process.exitCode === undefined).toBe(true);
+  });
 });

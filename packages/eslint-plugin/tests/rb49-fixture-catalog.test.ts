@@ -105,4 +105,28 @@ describe('RB-49 fixture catalog - calibrated scores', () => {
     expect(kinds).toContain('examples-pii-detected');
     expect(kinds).toContain('parameter-ambiguous');
   });
+
+  it('W-044: loremRepeatTool - 80+ chars of repeated filler caps the description axis at 16', () => {
+    const LOREM_REPEAT = `
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
+
+export const loremRepeatTool = tool({
+  name: 'lorem_tool',
+  description: 'lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem lorem',
+  inputSchema: z.object({
+    queryText: z.string(),
+  }),
+  examples: [
+    { input: { queryText: 'x' }, output: { ok: true } },
+  ],
+});
+`;
+    const [toolInfo] = discoverToolCallsInSource('lorem.ts', LOREM_REPEAT);
+    if (toolInfo === undefined) throw new Error('fixture not discovered');
+    expect((toolInfo.description ?? '').length).toBeGreaterThanOrEqual(80);
+    const score = gradeTool(toolInfo, runToolRules(toolInfo));
+    // Pre-W-044 this scored the full 40 on length alone.
+    expect(score.axes.description).toBe(16);
+  });
 });

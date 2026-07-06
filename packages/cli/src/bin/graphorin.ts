@@ -1316,7 +1316,7 @@ function registerToolsCommands(program: Command): void {
         'Text-based static scan of every tool({...}) registration; per-tool grader + threshold gate (RB-49).',
         '',
         'Grader rubric (40 + 30 + 30 = 100 points):',
-        '  description axis (0..40): 0 if missing/placeholder/<20 chars; 16/24/32/40 by length.',
+        '  description axis (0..40): 0 if missing/placeholder/<20 chars; 16/24/32/40 by length; degenerate text (under 4 unique words or one word over half the text) caps at 16 (W-044).',
         '  examples axis    (0..30): 0 if none or >5; 12 base + 6 per additional, cap 30; -6 per PII.',
         '  parameter naming (0..30): 30 base; -30/N per ambiguous name; -10/N per numeric suffix.',
         '',
