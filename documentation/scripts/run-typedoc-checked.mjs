@@ -45,6 +45,14 @@ process.stdout.write(result.stdout ?? '');
 process.stderr.write(result.stderr ?? '');
 
 if (result.status !== 0) {
+  // CI log viewers truncate long streams from the middle, and the
+  // interesting lines (typedoc's [error] entries + the run summary)
+  // sit at the END - re-print them compactly so a failure is
+  // diagnosable from the visible tail.
+  if (result.error) console.error(`[run-typedoc-checked] spawn error: ${result.error}`);
+  const tail = output.split('\n').slice(-120).join('\n');
+  console.error('[run-typedoc-checked] last 120 lines of typedoc output:');
+  console.error(tail);
   console.error(`[run-typedoc-checked] typedoc exited ${result.status}.`);
   process.exit(result.status ?? 1);
 }
