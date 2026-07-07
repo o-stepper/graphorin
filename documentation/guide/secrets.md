@@ -22,16 +22,21 @@ import { SecretValue } from '@graphorin/security';
 const apiKey = SecretValue.fromString('sk-...redacted...');
 
 // Logging or serialising a SecretValue prints a fixed redaction marker:
-console.log(apiKey);
-console.log(JSON.stringify({ apiKey })); // { "apiKey": "<redacted SecretValue>" }
+console.log(apiKey);                     // SecretValue([REDACTED])
+console.log(JSON.stringify({ apiKey })); // {"apiKey":"[SECRET]"}
 
 // `length` is safe to log; the raw bytes are kept on a private buffer.
 console.log(apiKey.length);
 
-// Reading the raw value is explicit and audited.
-const raw = apiKey.reveal();      // returns the UTF-8 string
-// or
-const raw2 = apiKey.unwrap();     // alias for reveal()
+// Reading the raw value is explicit and audited. Prefer the scoped
+// form, which never leaves a raw string lingering in your code:
+const receipt = await apiKey.use(async (raw) => {
+  // `raw` is the UTF-8 string, live only inside this callback.
+  return raw.length;
+});
+// One-shot reads also exist:
+const raw = apiKey.reveal(); // returns the UTF-8 string
+const raw2 = apiKey.unwrap(); // deprecated alias for reveal()
 
 // When you no longer need the secret, dispose() zero-fills the buffer.
 apiKey.dispose();
@@ -72,10 +77,10 @@ const raw = value.reveal();
 
 ## Per-tool secrets ACL
 
-Tools never see the application's full secret scope. The agent runtime calls `withChildToolSecretsContext({...})` from `@graphorin/security/secrets` to narrow the visible refs **per tool execution**:
+Tools never see the application's full secret scope. A tool declares its allowlist in the `secretsAllowed` field, the executor wraps every execution in a scope built with `withChildToolSecretsContext(...)` from `@graphorin/security/secrets`, and the tool reads secrets through the enforced accessor `ctx.secrets.require(...)`:
 
 ```ts
-import { resolveSecret, withChildToolSecretsContext, type SecretValue } from '@graphorin/security';
+import type { SecretValue } from '@graphorin/core';
 import { tool } from '@graphorin/tools';
 import { z } from 'zod';
 
@@ -93,19 +98,17 @@ const refundTool = tool({
   description: 'Issue a refund for a previously placed order.',
   inputSchema: refundSchema,
   outputSchema: receiptSchema,
+  // Per-tool ACL: the only keys ctx.secrets.require() will resolve.
+  // The agent's default backend treats each key as a SecretRef.
+  secretsAllowed: ['keyring:payments_api_key'],
   async execute(input, ctx) {
-    return withChildToolSecretsContext(
-      { toolName: 'refund.create', secretsAllowed: ['keyring:payments_api_key'] },
-      async () => {
-        const apiKey = await resolveSecret('keyring:payments_api_key');
-        return callPaymentApi(input, apiKey);
-      },
-    );
+    const apiKey = await ctx.secrets.require('keyring:payments_api_key');
+    return callPaymentApi(input, apiKey);
   },
 });
 ```
 
-A tool that asks for a secret outside its declared ACL fails closed with `SecretAccessDeniedError` and writes one row to the audit log.
+A tool that asks for a secret outside its declared ACL fails closed with `SecretAccessDeniedError` and writes one row to the audit log. An empty / omitted `secretsAllowed` means the tool may not request any secret. Store-backed reads inside the scope are gated the same way: `SecretsStore.require(...)` throws, and the non-throwing `SecretsStore.get(...)` reads a denied key as absent (SPL-14). Note that the gate lives in the accessor and the stores - a direct `resolveSecret(...)` call resolves the ref without consulting the ACL, so route tool code through `ctx.secrets`.
 
 ## Sub-agent inheritance
 
@@ -189,7 +192,8 @@ fresh process resolves the refresh token back from the store, so
 `graphorin auth refresh` / `auth revoke` and the MCP bridge's
 `Authorization` header all work across restarts. `auth status` reports
 `hasRefreshToken` only when the ref actually resolves. Without a usable
-secrets store the tokens live in process memory only (the command warns).
+secrets store the tokens live in process memory only and do not survive
+a restart (the pre-SPL-1 behaviour, kept as the documented fallback).
 
 ## Telemetry redaction for `SecretValue`s
 
@@ -201,9 +205,9 @@ Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory.
 |---|---|---|---|
 | Read | yes | yes | yes |
 | Write | yes | yes | no (read-only) |
-| List | yes | yes | yes |
-| Per-tool ACL | yes | yes | yes |
-| Audit log | yes | yes | yes |
+| List | yes | yes | no (resolver-only, no store surface) |
+| Per-tool ACL (`ctx.secrets`) | yes | yes | yes |
+| Audit log | yes | yes | reveal/use audit only (no store rows) |
 | Headless / CI | no | yes | yes |
 
 ## Next steps

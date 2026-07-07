@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-local-stack-cli",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "private": true,
   "description": "Fully local-stack CLI personal assistant for the Graphorin framework. Demonstrates Ollama LLM + Ollama embeddings + SQLite + sqlite-vec end-to-end, with a GRAPHORIN_OFFLINE=1 smoke check that emits zero non-localhost network packets. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

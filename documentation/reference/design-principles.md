@@ -23,7 +23,7 @@ Every operation is an `AsyncIterable<...>` of typed events. Nothing happens behi
 
 ### 4. ESM-only
 
-Every package ships ESM only and runs on Node.js 22+. CommonJS has no native ESM-async story; we don't ship the worse half of an interop story.
+Every package ships ESM only and runs on Node.js 22.12+. There is no parallel CommonJS build - we don't ship the worse half of an interop story; CommonJS consumers plain `require()` the same ESM instance instead (stable `require(esm)` is why the floor is 22.12).
 
 ### 5. Type-safe public surface
 
@@ -43,7 +43,7 @@ The audit log is encrypted-at-rest and SHA-256 hash-chained. Tampering breaks th
 
 ### 9. The runtime is durable
 
-Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine. (One current limit: a granted approval resumed on another machine is recorded but the approved tool is not re-executed yet - see the caveat in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).)
+Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine: on resume a granted approval dispatches the approved call for real through the same executor as any other tool call - see the exactly-once contract in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).
 
 ### 10. Human-in-the-loop is a primitive
 
@@ -59,11 +59,11 @@ From the model's point of view, every callable is a typed `Tool` with input / ou
 
 ### 13. Handoffs are explicit
 
-Multi-agent transfers go through a typed input filter that produces a serialisable descriptor. The default filter is `lastN(10)`. Replays reproduce the boundary byte-equal.
+Multi-agent transfers go through a typed input filter that produces a serialisable descriptor. The default filter is `lastN(10)` composed with `stripSensitiveOutputs()`. Replays reproduce the boundary byte-equal.
 
 ### 14. Sub-agents inherit by allowlist
 
-The default `secretsInheritance: 'inherit-allowlist'` with an empty `inheritSecrets` array enforces the **principle of least authority** across multi-agent boundaries.
+The default `secretsInheritance: 'inherit-allowlist'` with an empty `inheritedSecrets` array enforces the **principle of least authority** across multi-agent boundaries.
 
 ### 15. No proprietary names borrowed
 
@@ -97,7 +97,7 @@ The principles encode the framework's promise. They show up in:
 A few principles imply real costs:
 
 - Local-first means embedder model downloads on first use and a slightly larger install footprint than a cloud-only framework.
-- ESM-only means CommonJS consumers have to migrate. We picked clarity over compatibility.
+- ESM-only means no dedicated CommonJS build. CommonJS consumers can still plain `require()` the ESM packages, but only on Node 22.12+ - we picked clarity over a wider Node range.
 - Mandatory redaction means an extra wrap call for every exporter. The tracer factory throws at runtime so the friction is paid once at startup, not as a silent regression.
 - Lockstep versioning means a no-op patch may bump packages that did not change. We picked predictable upgrades over minimum churn.
 

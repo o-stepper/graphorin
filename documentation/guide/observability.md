@@ -41,8 +41,8 @@ The tracer **auto-wraps every exporter** with `withValidation(...)` by default -
 
 The validation layer enforces:
 
-- **Sensitivity-aware filtering.** Spans with sensitivity `'secret'` never leave the process. `'internal'` spans are passed through only if the operator opted in.
-- **PII redaction.** 14 built-in default-on patterns cover credit-card numbers, US SSNs, emails, E.164 phone numbers, JWTs, bearer and basic-auth headers, private-key PEM blocks, AWS access keys, GitHub tokens, OpenAI / Anthropic / Graphorin tokens, and IBANs. IPv4 / IPv6 address patterns ship opt-in (enable them via `validation.enabledPatterns`).
+- **Sensitivity-aware filtering.** The export floor defaults to `public`: an attribute tagged above the floor (untagged attributes default to `'internal'`) is stripped, attribute by attribute, unless the operator explicitly raises `validation.minTier`. String values matching the secret-pattern catalogue are masked regardless of tier.
+- **PII redaction.** 14 built-in default-on patterns cover credit-card numbers, US SSNs, emails, E.164 phone numbers, JWTs, bearer and basic-auth headers, private-key PEM blocks, AWS access keys, GitHub tokens, OpenAI / Anthropic / Graphorin tokens, and IBANs. IPv4 / IPv6 address patterns and a `gcp-service-account` label variant ship opt-in (enable them via `validation.enabledPatterns`).
 - **Per-attribute allowlists.** Configurable per exporter for advanced setups.
 
 ## Sensitivity-aware redaction

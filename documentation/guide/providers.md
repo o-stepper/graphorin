@@ -32,13 +32,13 @@ The optional middleware composer (`composeProviderMiddleware([...])`) wraps the 
 withTracing → withRetry → withRateLimit → withCostLimit → withCostTracking → withFallback → withRedaction → adapter
 ```
 
-A `MiddlewareOrderingError` is thrown the moment the array argument violates the canonical order, and a separate production-startup hook refuses to boot a server that does not include `withRedaction` in the chain. Each middleware has a focused responsibility:
+A `MiddlewareOrderingError` is thrown the moment the array argument violates the canonical order, and a separate production-startup hook - `assertProductionMiddleware(provider)`, called from your own boot path - throws `MissingProductionMiddlewareError` when `NODE_ENV=production` (or `force: true`) and the chain does not include `withRedaction`. Each middleware has a focused responsibility:
 
 | Middleware | What it does |
 |---|---|
-| `withTracing` | Attaches `provider.stream` spans through `@graphorin/observability`. |
+| `withTracing` | Attaches `provider.stream` / `provider.generate` spans through `@graphorin/observability`. |
 | `withRetry` | Exponential backoff + jitter on transient failures. |
-| `withRateLimit` | Per-bucket rate limiting before the request leaves the process: requests per minute, plus an optional `tokensPerMinute` budget (with a pluggable `estimateTokens`) so long-context steps queue on the real binding limit instead of surfacing as provider 429s. |
+| `withRateLimit` | Per-bucket rate limiting before the request leaves the process: requests per minute, plus an optional `tokensPerMinute` budget (with a pluggable `estimateTokens`) so long-context steps are throttled at the real binding limit instead of surfacing as provider 429s. |
 | `withCostLimit` | Refuses requests that would breach the configured budget. |
 | `withCostTracking` | Records per-call cost for auditing. |
 | `withFallback` | Composes a chain of fallback providers. |
@@ -141,7 +141,7 @@ Some providers expose internal reasoning content (extended thinking, scratch pad
 | `'pass-through-claude'` | Round-trip Anthropic-shaped thinking blocks byte-equal to the previous assistant message. Default for round-trip-required providers (Claude tool-use with thinking). |
 | `'pass-through-all'` | Round-trip every reasoning content part the provider returns, regardless of vendor shape. Useful for custom providers with `reasoningContract: 'optional'` that still benefit from preserving the chain. |
 
-Handoffs always strip reasoning - `filters.stripReasoning()` is unconditional at the boundary.
+Handoffs strip reasoning by default - the default handoff filter and every `filters.compose(...)` chain append `filters.stripReasoning()` unconditionally at the boundary.
 
 ## Request timeouts & structured output
 

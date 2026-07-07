@@ -42,7 +42,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
 
 ## Streaming-first
 
-Every operation returns `AsyncIterable<AgentEvent<TOutput>>`. `agent.run(...)` is a thin "collect" helper that exhausts the stream. The discriminated `AgentEvent<TOutput>` union is exhaustive - every event type is its own typed interface - and the runtime uses an `assertNever(...)` default branch so the compile fails the moment a new event type lands without a handler:
+Every operation returns `AsyncIterable<AgentEvent<TOutput>>`. `agent.run(...)` is a thin "collect" helper that exhausts the stream. The discriminated `AgentEvent<TOutput>` union is exhaustive - every event type is its own typed interface - so an `assertNever(...)` default branch in YOUR handler (the helper ships in `@graphorin/core`; the example below defines it inline) turns an unhandled new event type into a compile error:
 
 ```ts twoslash
 // A simplified shape that mirrors the @graphorin/core
@@ -60,9 +60,9 @@ type AgentEvent<TOutput> =
   | { type: 'tool.call.end'; toolCallId: string }
   | { type: 'tool.execute.start'; toolCallId: string }
   | { type: 'tool.execute.end'; toolCallId: string }
-  | { type: 'tool.approval.requested'; toolCallId: string }
+  | { type: 'tool.approval.requested'; toolCallId: string; reason?: string }
   | { type: 'context.compacted'; beforeTokens: number; afterTokens: number }
-  | { type: 'agent.model.fellback'; previousModel: string; nextModel: string }
+  | { type: 'agent.model.fellback'; from: string; to: string }
   | { type: 'agent.end'; runId: string; result: AgentResult<TOutput> };
 
 function assertNever(value: never): never {
@@ -84,7 +84,7 @@ function handle<TOutput>(event: AgentEvent<TOutput>): void {
       console.log('approval needed for', event.toolCallId);
       return;
     case 'agent.model.fellback':
-      console.log('fellback', event.previousModel, '->', event.nextModel);
+      console.log('fellback', event.from, '->', event.to);
       return;
     case 'agent.start':
     case 'step.start':
@@ -149,13 +149,13 @@ A tool declared `defer_loading: true` is **withheld** from the per-step catalogu
 
 ### Result handles and `read_result`
 
-A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint - so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) - and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root - never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. Reads also carry the **producer's taint** (TL-6): content read back from a handle whose producing tool was untrusted (MCP / web-search / untrusted skill) is re-sanitized with the producer's policy and recorded in the dataflow ledger under the producer's trust class - `read_result`'s own built-in trust never launders it. See [result handles](/guide/tools#result-handles-and-read-result) in the tools guide.
+A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint - so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) - and auto-registers the built-in **`read_result`** tool whenever a registered tool **declares** `truncationStrategy: 'spill-to-file'` (or when `resultReaders` / code-mode are wired) - registration keys on the declared strategy, not on a runtime spill event. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root - never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. Reads also carry the **producer's taint** (TL-6): content read back from a handle whose producing tool was untrusted (MCP / web-search / untrusted skill) is re-sanitized with the producer's policy and recorded in the dataflow ledger under the producer's trust class - `read_result`'s own built-in trust never launders it. See [result handles](/guide/tools#result-handles-and-read-result) in the tools guide.
 
 The same `read_result` path resolves **external** handles too. An MCP `resource_link` tool result surfaces a handle (the resource URI) rather than inlining the body; wire `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` and the loop composes those readers after the spill reader (tried in order, each rejecting handles it does not own), so the model pages an MCP resource on demand exactly like a spilled artifact. Supplying any `resultReaders` force-registers `read_result`. See the [MCP client guide](/guide/mcp-client#large-resources-and-result-handles).
 
 ### Code-mode (`toolInvocation: 'code-mode'`)
 
-By default (`toolInvocation: 'direct'`) the model emits one provider tool-call per tool and each result is inlined into the conversation. Set `toolInvocation: 'code-mode'` to flip the model into **programmatic tool calling**: the agent advertises only two meta-tools - `code_execute` and `code_search` - and the model reaches every real tool by writing a script.
+By default (`toolInvocation: 'direct'`) the model emits one provider tool-call per tool and each result is inlined into the conversation. Set `toolInvocation: 'code-mode'` to flip the model into **programmatic tool calling**: the agent advertises the meta-tools `code_execute` and `code_search` plus the built-in `read_result` (for paging spilled results out of scripts), and the model reaches every real tool by writing a script.
 
 ```ts no-check
 const agent = createAgent({
@@ -263,7 +263,7 @@ Isolation at this boundary is **structural least authority**: without an `inputF
 
 ### Read-only capability (single-writer constraint)
 
-`createAgent({ capability: 'read-only' })` - or per invocation, `agent.run(input, { capability: 'read-only' })` - makes a run side-effect-free **by construction** (D2): writer tools (`side-effecting` / `external-stateful`) and handoff tools are never advertised to the model, and the tool executor deterministically blocks any writer call the model fabricates anyway with a `capability_blocked` outcome (`recoveryHint: 'report_to_user'`). This is the single-writer constraint from multi-agent practice: run N parallel research workers read-only while exactly one agent in the topology holds the write pen. In code-mode a read-only run advertises `code_search` only - `code_execute` is itself side-effecting. The capability is per-invocation state, not persisted in `RunState`: re-supply it when resuming.
+`createAgent({ capability: 'read-only' })` - or per invocation, `agent.run(input, { capability: 'read-only' })` - makes a run side-effect-free **by construction** (D2): writer tools (`side-effecting` / `external-stateful`) and handoff tools are never advertised to the model, and the tool executor deterministically blocks any writer call the model fabricates anyway with a `capability_blocked` outcome (`recoveryHint: 'report_to_user'`). This is the single-writer constraint from multi-agent practice: run N parallel research workers read-only while exactly one agent in the topology holds the write pen. In code-mode a read-only run advertises only the read-safe surface (`code_search` and `read_result`) - `code_execute` is itself side-effecting and is filtered out. The capability is per-invocation state, not persisted in `RunState`: re-supply it when resuming.
 
 ### Context folding and taint propagation across the sub-agent boundary
 
@@ -289,9 +289,9 @@ Handoffs use a built-in filter library to shape the payload that crosses the bou
 | Filter | What it does |
 |---|---|
 | `filters.lastN(n)` | Keep only the last N messages. |
-| `filters.lastUser` | Keep only the latest user turn. |
-| `filters.summary({...})` | Replace history with a summary. |
-| `filters.bySensitivity({...})` | Keep / drop / require by `Sensitivity`. |
+| `filters.lastUser()` | Keep only the latest user turn. |
+| `filters.summary(text)` | Replace history with a caller-supplied summary. |
+| `filters.bySensitivity({ maxTier? })` | Drop message parts above the `maxTier` sensitivity ceiling (default `'public'`). |
 | `filters.stripReasoning()` | Drop reasoning content parts. |
 | `filters.stripSensitiveOutputs()` | Drop sensitive tool outputs. |
 | `filters.stripToolCalls()` | Drop tool calls. |
@@ -321,7 +321,7 @@ An `Agent` instance carries exactly **one in-flight run**: `steer`, `followUp`, 
 
 ## Reasoning preservation
 
-Tool-use loops round-trip `reasoning` content parts (with opaque `meta` such as `signature` / `data`) into the next provider call when the effective `reasoningRetention` is not `'strip'`. The handoff boundary is independent: `filters.stripReasoning()` is always applied to messages forwarded to a sub-agent regardless of the intra-loop policy.
+Tool-use loops round-trip `reasoning` content parts (with opaque `meta` such as `signature` / `data`) into the next provider call when the effective `reasoningRetention` is not `'strip'`. The handoff boundary is independent of the intra-loop policy: the default handoff filter and every `filters.compose(...)` chain append `filters.stripReasoning()` unconditionally, so reasoning crosses to a sub-agent only if you pass a bare, non-composed filter that keeps it.
 
 ## Agent-level model fallback
 
@@ -611,7 +611,7 @@ Modes: **`'shadow'`** audits a tripped flow (`tool:dataflow:flagged` audit row +
 
 ## Inbound sanitisation preamble
 
-When the assembled message list contains any non-trusted `MessageContent` part, the runtime appends the locale-resolved preamble fragment to the system prompt **after** the cache breakpoint so the trusted-only cache prefix is not invalidated.
+The preamble is a `ContextEngine` feature: when `assemble({ upstreamAnnotations })` receives any non-trusted content annotation, the engine appends the locale-resolved preamble fragment to the system prompt **after** the cache breakpoint so the trusted-only cache prefix is not invalidated. The agent loop's own run-start assembly passes no `upstreamAnnotations`, so the fragment fires only for callers that assemble with them explicitly (untrusted tool results are instead defended per-result by the `<<<untrusted_content>>>` envelope).
 
 ## Next steps
 

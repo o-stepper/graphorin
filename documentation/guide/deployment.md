@@ -45,7 +45,7 @@ Before promoting a Graphorin deployment to production:
    - Document who holds which token in your incident-response runbook.
 
 4. **Observability**
-   - Wire `OTLP_URL` (or another supported exporter). The default is **no remote export**.
+   - Wire the OTLP-HTTP exporter to your collector URL (the [observability guide's](/guide/observability) example reads it from an `OTLP_URL` environment variable your app owns) or another supported exporter. The default is **no remote export**.
    - Confirm `withValidation(...)` is in the exporter chain - the tracer factory throws if it is missing, so this is a soft check.
    - Configure the redaction allowlist for any high-cardinality attribute that's safe to ship un-redacted.
 
@@ -139,7 +139,7 @@ WantedBy=multi-user.target
 The `examples/docker/` template ships a multi-stage build that produces a slim image with only the runtime dependencies. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
-docker build -t graphorin:0.6.1 -f examples/docker/Dockerfile .
+docker build -t graphorin:0.7.0 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
   --read-only --tmpfs /tmp \
   --security-opt no-new-privileges \
@@ -148,7 +148,7 @@ docker run -d --name graphorin \
   -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
   -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
   -p 8080:8080 \
-  graphorin:0.6.1
+  graphorin:0.7.0
 ```
 
 The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.

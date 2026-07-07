@@ -1,5 +1,0 @@
----
-'@graphorin/tools': patch
----
-
-Security hardening (W-030): `wrapEnvelope` now neutralizes untrusted-content envelope delimiters embedded in the wrapped body before interpolation. An untrusted MCP / web-search / skill result containing a literal `<<</untrusted_content>>>` (or a fabricated nested `<<<untrusted_content ...>>>` opening) can no longer prematurely close or spoof the trust envelope: embedded markers are rewritten with the same visible bracket-substitution the memory package's CE-15 compaction path uses (`[[/untrusted_content]]` / `[[untrusted_content`), tolerant to case and whitespace variations. Marker-free bodies pass through bytes-equal (Python doctest `>>>` and heredoc `<<<` fragments are untouched; a generalized angle-run collapse exists only behind the opt-in `neutralizeAngleRuns` flag). New exports on `@graphorin/tools/inbound`: `neutralizeEnvelopeDelimiters`, `UNTRUSTED_CONTENT_OPEN_PREFIX`, `UNTRUSTED_CONTENT_CLOSE`. Zero-width insertion was explicitly rejected as a mechanism because models read through zero-width splits.

@@ -48,9 +48,9 @@ Every message, memory row, tool result, and trace attribute carries a `Sensitivi
 |---|---|---|
 | `public` | No restrictions. | Anywhere. |
 | `internal` | Operator-private but not user-secret. | Local trace + opt-in collectors; never to providers without `acceptsSensitivity: ['internal']`. |
-| `secret` | User secret. | Never leaves the process. Memory rows tagged `secret` are filtered before any payload reaches a provider. |
+| `secret` | User secret. | Never leaves the machine. Memory rows tagged `secret` are filtered before any payload reaches a provider; the single exception is a provider that explicitly accepts `'secret'` **and** whose trust class is `'loopback'` (in-process / localhost). |
 
-The default for an unfamiliar provider is **deny everything except `public`** until you opt in. The default for an exporter is **never `secret`**, and you cannot override it.
+The default for an unfamiliar provider is **deny everything except `public`** until you opt in. The default export floor for an exporter is `public` - anything above it is stripped attribute-by-attribute until the operator explicitly raises `validation.minTier`, and values matching the secret-pattern catalogue are masked regardless of tier.
 
 ## Server-token authentication
 
@@ -249,7 +249,7 @@ Three additional propagation legs close gaps the run-local shingle probe cannot 
 - **Memory recall** - the recall tools (`fact_search`, `deep_recall`, `recall_episodes`) attach a taint override when any returned item is quarantined or foreign-provenance, so poisoned memory written in an earlier session re-arms the ledger at recall (the cross-session MINJA leg). Overrides only ever WIDEN a label; nothing can launder an untrusted tool's output.
 - **Suspend/resume** - the persisted `RunState.taintSummary` now carries one-way FNV-1a hashes of the tracked spans' tiles alongside the coarse flags, so a resumed run re-detects verbatim copies of pre-suspend untrusted content (at tile granularity) without any untrusted text ever being persisted.
 
-**Pattern catalogues are signal, not gates.** The injection/PII regex catalogues (guardrails, the memory quarantine heuristics, the imperative-pattern strip) now share a Unicode pre-pass (`normalizeForMatching`: NFKC + zero-width strip) so cheap character-injection - zero-width splits, fullwidth homoglyphs - no longer slips past them. They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate - memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
+**Pattern catalogues are signal, not gates.** The injection regex catalogues (the guardrails heuristics and the memory quarantine heuristics) share a Unicode pre-pass - `normalizeForMatching`: NFKC + zero-width strip + lowercase - and the PII catalogue's boolean detector (`containsPii`) applies the case-preserving variant `normalizeForPiiMatching` (W-150; IBAN-style patterns are case-sensitive by design), so cheap character-injection - zero-width splits, fullwidth homoglyphs - no longer slips past either family. Spilled oversized tool results are additionally scanned **whole** at spill time; when that artifact-level scan flagged a pattern, every later page read surfaces the fact via the `tool.inbound.sanitization.cross-page-flag.total` counter, even when the pattern straddles a page boundary that hides it from the per-page scan (W-156). They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate - memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
 
 Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` - see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
 
@@ -339,7 +339,7 @@ Context compaction is a trust boundary in its own right: the summarizer LLM read
 The compactor closes this structurally (CE-15), not just with summarizer prompt wording:
 
 - **Window detection.** If any message in the compacted window carries an `<<<untrusted_content>>>` envelope, the LLM-authored summary body is committed **inside a `trust="derived"` envelope** (`<<<untrusted_content trust="derived" tool="compaction-summarizer">>>`), so the model's standing rule for untrusted blocks - data, not instructions - keeps applying to the summary.
-- **Output scan.** Independently of the window, the summarizer's output is run through the offline injection heuristics (the same `ignore previous instructions`-family patterns used by the tool-result sanitizer); a hit degrades the summary to the derived envelope too.
+- **Output scan.** Independently of the window, the summarizer's output is run through the offline injection heuristics (the same `ignore previous instructions`-family patterns used by the tool-result sanitizer); a hit degrades the summary to the derived envelope too. The scan **fails closed**: if it cannot complete within its time budget, the summary is committed inside the derived envelope as well.
 - **No break-out.** Envelope marker sequences inside the summary body are neutralized before wrapping, so summarizer output influenced by injected text cannot close the envelope early and smuggle "system text" after it.
 - **Sticky across re-compaction.** A derived summary still carries the envelope when it is itself compacted later, which re-triggers the window detection - taint does not wash out with repeated summarization, consistent with the [data-flow policy](#provenance-data-flow-policy)'s no-laundering rule.
 

@@ -76,7 +76,7 @@ Sub-paths:
 ### Tier 6 - Standalone server + DX
 
 - **`@graphorin/server`** - optional standalone server with REST + WebSocket + SSE fallback, durable triggers, replay endpoints, Prometheus metrics, health checks.
-- **`@graphorin/cli`** - operator CLI (`graphorin start`, `graphorin doctor`, `graphorin token`, `graphorin secrets`, `graphorin storage`, `graphorin audit`, `graphorin memory`, `graphorin consolidator`, `graphorin triggers`, `graphorin auth`, `graphorin pricing`, `graphorin skills`, `graphorin traces`, `graphorin migrate-export`, `graphorin guard`, `graphorin telemetry`).
+- **`@graphorin/cli`** - operator CLI (`graphorin start`, `graphorin init`, `graphorin migrate`, `graphorin migrate-config`, `graphorin doctor`, `graphorin token`, `graphorin secrets`, `graphorin storage`, `graphorin audit`, `graphorin memory`, `graphorin consolidator`, `graphorin triggers`, `graphorin auth`, `graphorin pricing`, `graphorin skills`, `graphorin traces`, `graphorin migrate-export`, `graphorin guard`, `graphorin telemetry`, `graphorin tools lint`).
 - **`@graphorin/protocol`** - the WebSocket protocol contract - `graphorin.protocol.v1`.
 - **`@graphorin/client`** - browser-friendly client for the standalone server.
 

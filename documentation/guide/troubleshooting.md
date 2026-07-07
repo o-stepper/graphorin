@@ -20,8 +20,9 @@ not `pnpm -r ...`, so the `dependsOn: ["^build"]` ordering is honoured.
 Install it in the consuming app.
 
 **Node version errors.**
-Graphorin requires **Node 22+** and is ESM-only. Ensure your app is `"type":
-"module"` (or uses `.mjs`).
+Graphorin requires **Node 22.12+** (`engines.node: '>=22.12.0'`) and ships
+ESM-only. ESM apps `import` it; CommonJS apps can plain `require()` it on
+Node 22.12+ (`require(esm)`).
 
 ## Providers & models
 
@@ -78,7 +79,9 @@ the `graphorin.protocol.v1` and a `ticket.<value>` subprotocol token. See
 ## Examples
 
 **An example exits immediately / `GRAPHORIN_OFFLINE` error.**
-Examples default to a deterministic `stub` recipe
-(`GRAPHORIN_LLM_RECIPE=stub`). `local-stack-cli` needs a real Ollama daemon;
-with `GRAPHORIN_OFFLINE=1` it fails fast with an actionable message and exit
-code 2 - that is expected. See the [example apps](/guide/examples).
+Most examples default to a deterministic `stub` recipe
+(`GRAPHORIN_LLM_RECIPE=stub`); `local-stack-cli` and `personal-assistant-cli`
+default to a real Ollama daemon (`GRAPHORIN_LLM_RECIPE=ollama`). With
+`GRAPHORIN_OFFLINE=1` and no reachable daemon, `local-stack-cli` fails fast
+with an actionable message and exit code 2 - that is expected. See the
+[example apps](/guide/examples).

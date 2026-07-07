@@ -8,14 +8,14 @@ description: Install the @graphorin/* packages from the npm registry. Node.js 22
 Graphorin is published as a set of focused packages on the npm registry under the `@graphorin/*` scope. Packages are released **lockstep** at the same version while the framework is on the `0.x` line.
 
 ::: tip Status
-The `@graphorin/*` packages are published on the npm registry since `v0.6.0`. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for new versions.
+The `@graphorin/*` packages are published on the npm registry since `v0.5.0`. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for new versions.
 :::
 
 ## Prerequisites
 
 - **Node.js 22.12 or newer** (the project pins `>=22.12.0` - the first line where `require(esm)` is stable, so the packages are ESM-first but consumable from CommonJS via plain `require()`).
 - A package manager - **pnpm** is the project default; **npm** and **yarn** work too for consumers of the published packages.
-- ESM-only modules. Your project must be `"type": "module"` (or use `.mjs` files) - Graphorin ships ESM.
+- ESM-only modules. Graphorin ships ESM with no separate CommonJS build. ESM projects (`"type": "module"` or `.mjs` files) `import` it; CommonJS projects can plain `require()` it on Node 22.12+ (`require(esm)` returns the same ESM instance - no dual-package hazard).
 
 ## Supported platforms
 

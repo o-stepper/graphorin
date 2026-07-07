@@ -18,7 +18,7 @@ A skill written to the public `SKILL.md` packaging format loads in Graphorin wit
 - **Conflict policy.** Direct collisions (upstream-base + matching `graphorin-*` set) honour the operator-resolved `conflictPolicy: 'warn' | 'error' | 'silent'`. The default is `'warn'`. The validator returns a typed `FrontmatterDiagnostic[]` so callers can route the report to logs, audit, or CI.
 - **Spec-snapshot tracking.** A bundled `anthropic-spec-snapshot.json` records the upstream fields the framework recognises and the migration policy for every `graphorin-*` extension. The `pnpm run check-anthropic-spec` helper diffs the snapshot against a maintainer-supplied upstream snapshot (`--upstream <path>`); it runs manually or via the release `mvp-readiness` gate, which without an upstream snapshot only confirms the bundled file parses - there is no scheduled job and no auto-refresh.
 - **Supply-chain aware.** Loading from `npm-package` and `git-repo` sources delegates to the supply-chain helpers in `@graphorin/security`. Untrusted skills install with `--ignore-scripts` enforced and a verifiable Ed25519 signature is required before the loader trusts the bytes.
-- **Slash-command activation.** `/skill:<name>` parses into a structured activation request the agent runtime consumes alongside the model-emitted auto-activation requests.
+- **Slash-command activation.** `/skill:<name>` parses into a structured activation request; the skill registry's `resolveTrigger(...)` / `activate(...)` resolve it alongside model-emitted auto-activation triggers.
 - **Migration library.** `migrateFrontmatter()` is idempotent and dry-run by default.
 
 ## Stable sub-paths
@@ -48,12 +48,11 @@ license: MIT
 authors:
   - Oleksiy Stepurenko
 disable-model-invocation: false
-graphorin-tags:
-  - travel
-  - planning
+graphorin-version: "1.2.0"
 metadata:
   graphorin:
-    sandbox: isolated-vm
+    sandbox:
+      kind: isolated-vm
     sensitivity: internal
 ---
 
@@ -89,8 +88,8 @@ The loader supports four source kinds:
 |---|---|---|
 | `inline` | `{ kind: 'inline', skill }` | Programmatic, fully trusted (the host process supplies the code). |
 | `folder` | `{ kind: 'folder', path, trustLevel? }` | A directory on disk **cannot self-promote**: its frontmatter `graphorin-trust-level: trusted` / `trusted-with-scripts` is capped at `unknown` (sandbox forced, outputs taint-marked) unless the operator passes an explicit `trustLevel`. Trust is granted by the integrator, never the artifact. |
-| `npm-package` | `{ kind: 'npm-package', packageName, version?, trustLevel? }` | Untrusted by default; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. An operator `trustLevel` overrides the default. |
-| `git-repo` | `{ kind: 'git-repo', url, ref?, trustLevel? }` | Untrusted by default; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. An operator `trustLevel` overrides the default. |
+| `npm-package` | `{ kind: 'npm-package', packageName, version?, trustLevel? }` | Untrusted by default; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. An operator `trustLevel: 'trusted'` relaxes the signature requirement but keeps `--ignore-scripts`; `'trusted-with-scripts'` is rejected for this source (`TrustLevelEscalationError`). |
+| `git-repo` | `{ kind: 'git-repo', url, ref?, trustLevel? }` | Untrusted by default; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. An operator `trustLevel` follows the same rules as `npm-package` (`'trusted-with-scripts'` rejected). |
 
 ## Field-resolution precedence
 
@@ -139,7 +138,7 @@ flowchart LR
     Sandbox --> Registry[Register tools]
 ```
 
-The skill installer never runs `npm postinstall` scripts on untrusted packages. The signature verifier resolves the publisher key over the configured well-known URL (or an inline key in the manifest). Verification reads `SKILL.md` from the install path, so a default `loadSkills([{ kind: 'npm-package', … }])` works without a pre-fetched manifest; callers that need offline verification can still pass `skillMd` to the installer directly.
+The skill installer never runs npm lifecycle scripts for `npm-package` / `git-repo` installs: `--ignore-scripts` is mandatory at every trust level reachable for these sources, and requesting `trusted-with-scripts` throws `TrustLevelEscalationError`. The signature verifier resolves the publisher key over the configured well-known URL (or an inline key in the manifest). Verification reads `SKILL.md` from the install path, so a default `loadSkills([{ kind: 'npm-package', … }])` works without a pre-fetched manifest; callers that need offline verification can still pass `skillMd` to the installer directly.
 
 ## Next steps
 

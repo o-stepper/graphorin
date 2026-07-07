@@ -51,11 +51,11 @@ Only if you configure it to. The default storage adapter writes to a local SQLit
 
 ## What's the minimum Node.js version?
 
-**22.x LTS or newer.** Older versions are not supported. See [Installation](/guide/installation).
+**22.12 or newer** (`engines.node: '>=22.12.0'` - the first line where `require(esm)` is stable). Older versions are not supported. See [Installation](/guide/installation).
 
 ## ESM only? Why?
 
-ESM is Node.js' native module system, and async-flow primitives behave correctly under it. Maintaining a parallel CommonJS surface would double the test matrix and force compromises that contradict the framework's "no `any` in the public surface" principle.
+ESM is Node.js' native module system, and async-flow primitives behave correctly under it. Maintaining a parallel CommonJS surface would double the test matrix and force compromises that contradict the framework's "no `any` in the public surface" principle. CommonJS applications are not locked out: on Node 22.12+ a plain `require()` loads the same ESM instance (`require(esm)`), so no CJS build is needed.
 
 ## Can I use Graphorin in a browser?
 
@@ -88,7 +88,7 @@ OpenTelemetry-native. Every span follows the published GenAI Semantic Convention
 
 ## Where do skills live?
 
-Skills can come from a local folder, an npm package, or a Git repository. Untrusted sources require a verifiable Ed25519 signature, run with `--ignore-scripts`, and are sandboxed per the skill's frontmatter. See [Skills](/guide/skills).
+Skills can come from a local folder, an npm package, or a Git repository. Untrusted sources require a verifiable Ed25519 signature, install with `--ignore-scripts`, and run under a mandatory sandbox (`worker-threads` + no network + no filesystem) that the skill's own frontmatter cannot relax - only the integrator can grant a higher trust level. See [Skills](/guide/skills).
 
 ## What is MCP, exactly?
 
@@ -129,5 +129,5 @@ See the [Security policy](/contributing/security). **Please do not** open a publ
 
 ## What's on the roadmap?
 
-The framework is currently on the `v0.6.1` pre-release line. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for milestones; the [Changelog](/reference/changelog) has the rolled-up history.
+The framework is currently on the `v0.7.0` pre-release line. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for milestones; the [Changelog](/reference/changelog) has the rolled-up history.
 

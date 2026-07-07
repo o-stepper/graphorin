@@ -80,9 +80,13 @@ vector rows by that id, so swapping models or upgrading the underlying model
 triggers the configured migration policy rather than silently mixing
 incompatible vectors:
 
-- **`lock-on-first`** - the first embedder id wins; a mismatch refuses to start.
-- **`multi-active`** - multiple embedder ids coexist (read across, write newest).
-- **`auto-migrate`** - re-embed existing rows into the new id in the background.
+- **`lock-on-first`** (the default) - the first embedder id wins; registering a
+  different one refuses to start until you migrate.
+- **`multi-active`** - multiple embedder ids coexist (read across, write to the
+  active one).
+- **`auto-migrate`** - re-embed existing rows into the new id batch by batch via
+  the migration runner (`graphorin memory migrate` / `migrateEmbedder(...)`),
+  then retire the old id.
 
 See the [Memory system](/guide/memory-system) guide for how vector search,
 the RRF fusion step, and [rerankers](/guide/rerankers) fit together.

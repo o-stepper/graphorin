@@ -25,7 +25,7 @@ flowchart LR
     Adapter --> Triggers[Triggers state]
 ```
 
-A single SQLite database file holds every Graphorin table. The adapter exposes typed sub-stores for `memory`, `checkpoints`, `sessions`, `triggers`, `embeddings`, `authTokens`, `oauthServers`, and `idempotency`. (The audit log is **not** a sub-store - it lives in its own, always-encrypted database; see below.) Each sub-store is the implementation of a contract declared in `@graphorin/core/contracts` - your application can swap in a different adapter without touching the rest of the framework.
+A single SQLite database file holds every Graphorin table. The adapter exposes typed sub-stores for `memory`, `checkpoints`, `sessions`, `triggers`, `embeddings`, `authTokens`, `oauthServers`, and `idempotency`. (The audit log is **not** a sub-store - it lives in its own, always-encrypted database; see below.) Each sub-store is the implementation of a contract declared in `@graphorin/core/contracts` (the one exception is `idempotency`, whose `IdempotencyStore` contract is declared in the adapter package itself) - your application can swap in a different adapter without touching the rest of the framework.
 
 ## Wiring the default
 
@@ -43,7 +43,7 @@ await sqlite.init(); // run pending migrations
 
 ## Migrations
 
-Every Graphorin package owns its own SQL migrations and registers them through the **migration registry** convention. On `sqlite.init()` the registry runs pending migrations in dependency order; each migration is wrapped in a transaction and recorded in the `schema_migrations` table.
+Every Graphorin package owns its own SQL migrations and registers them through the **migration registry** convention. On `sqlite.init()` the registry runs pending migrations in version order; each migration is wrapped in a transaction and recorded in the `schema_migrations` table.
 
 Migrations are **forward-only**. Down-migrations are not supported until the framework reaches `1.0`.
 
@@ -62,7 +62,7 @@ flowchart LR
 The default is **Reciprocal Rank Fusion** with `k=60`. A different reranker (e.g. cross-encoder, LLM judge) is one call away - see [Memory system](/guide/memory-system) for the swap.
 
 ::: warning Never `VACUUM` the database
-FTS5 hits map back to base rows by implicit `rowid`, and `VACUUM` can renumber rowids - silently corrupting search. Use the `graphorin storage encrypt` / `rekey` maintenance path (it copies the file byte-for-byte, preserving rowids); each open also runs a cheap FTS↔rowid integrity check and warns on drift. See [Storage](/guide/storage).
+FTS5 hits map back to base rows by implicit `rowid`, and `VACUUM` can renumber rowids - silently corrupting search. Use the `graphorin storage encrypt` / `rekey` maintenance path (it copies the database through the online page-level backup, preserving rowids); each open also runs a cheap FTS↔rowid integrity check and warns on drift. See [Storage](/guide/storage).
 :::
 
 ## Bi-temporal storage
@@ -113,7 +113,7 @@ const sqlite = await createSqliteStore({
 await sqlite.init();
 ```
 
-Installing `@graphorin/store-sqlite-encrypted` registers the cipher peer driver. The package also exposes `encryptDatabase(...)`, `rekeyDatabase(...)`, and `cipherIntegrityCheck(...)` - the runners that back `graphorin storage encrypt` / `rekey` (the integrity check also runs automatically on every open). The passphrase is resolved through the same `SecretRef` pipeline as every other secret. See [Secrets](/guide/secrets).
+Installing `@graphorin/store-sqlite-encrypted` registers the cipher peer driver. The package also exposes `encryptDatabase(...)`, `rekeyDatabase(...)`, and `cipherIntegrityCheck(...)` - the runners that back `graphorin storage encrypt` / `rekey` (both runners finish with an automatic integrity check of the result). The passphrase is resolved through the same `SecretRef` pipeline as every other secret. See [Secrets](/guide/secrets).
 
 ## Embedder model storage
 
@@ -125,23 +125,21 @@ Embeddings produced by `@graphorin/embedder-transformersjs` are tagged with the 
 ./assistant.db           - main database (memory, sessions, checkpoints, triggers, embeddings)
 ./assistant.db-wal       - write-ahead log
 ./assistant.db-shm       - shared-memory file
-./.graphorin/audit.db    - encrypted audit log
-./.graphorin/secrets.db  - encrypted-file secrets store (when used)
-./.graphorin/triggers/   - trigger artifacts
-./.graphorin/replays/    - replay artifacts
+./audit.db               - encrypted audit log (derived next to the main database)
+./secrets.kse            - encrypted-file secrets store (when used; its path comes from the secret ref)
 ```
 
-`.graphorin/` lives next to the database by default; the path is configurable per sub-store.
+The audit log defaults to `audit.db` in the main database's directory (`audit.path` overrides it). Server deployments default the main database itself to `./.graphorin/data.db`, so there everything above lands inside `./.graphorin/`.
 
 ## Process hardening
 
-The CLI command `graphorin doctor` audits POSIX file modes on the database, the audit log, the secrets store, and the systemd unit template (where applicable):
+The CLI command `graphorin doctor` audits POSIX file modes on the `.graphorin` home - the config file, the database, the audit log, and the secrets store - and additionally checks the systemd unit hardening where applicable:
 
 ```bash
 graphorin doctor
 ```
 
-Recommended defaults are `0600` for the secrets store and the audit log, and `0640` for the main database when running as a daemon under a dedicated service account.
+Recommended defaults are `0700` for the `.graphorin` home directory and `0600` for the config file, the main database, the audit log, and the secrets store.
 
 ## Pluggable adapters
 

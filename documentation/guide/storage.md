@@ -7,7 +7,8 @@ description: The store contracts behind Graphorin persistence - memory, sessions
 
 Graphorin persists everything - memory tiers, sessions, workflow checkpoints,
 triggers, auth tokens, OAuth server records, and idempotency keys - through a
-small set of store contracts defined in `@graphorin/core/contracts`. The
+small set of store contracts, defined in `@graphorin/core/contracts` (the
+idempotency-key contract is the one adapter-local exception). The
 default implementation is SQLite; encryption-at-rest is an opt-in sub-package.
 
 This page complements [Persistence](/guide/persistence), which covers the
@@ -17,14 +18,15 @@ store contracts themselves.
 
 A single `better-sqlite3`-backed package satisfies **all** the store
 contracts: `MemoryStore`, `CheckpointStore`, `SessionStore`, `TriggerStore`,
-`AuthTokenStore`, `OAuthServerStore`, and `IdempotencyStore`, plus embedding
-metadata.
+`AuthTokenStore`, `OAuthServerStore` (from `@graphorin/core/contracts`), and
+its own package-local `IdempotencyStore`, plus embedding metadata.
 
 - **WAL hardening** - every connection opens with a fixed pragma set
   (`journal_mode=WAL`, `synchronous=NORMAL`, `busy_timeout`, `foreign_keys=ON`,
   …). Deviations must be documented at the call site.
 - **Vector search** - `sqlite-vec` (`vec0`) virtual tables, one per embedder
-  id, so switching embedders never mixes incompatible vectors.
+  id per indexed tier (facts / episodes / session messages), so switching
+  embedders never mixes incompatible vectors.
 - **Keyword search** - FTS5 with the `unicode61` tokenizer
   (`remove_diacritics 2`, tokenchars `-_.@/`) and `bm25()` ranking, fused with
   vector results via Reciprocal Rank Fusion by default, or calibrated weighted
@@ -71,8 +73,9 @@ implications.
 The FTS5 keyword indexes are keyed to each base row's implicit `rowid`.
 `VACUUM` may renumber implicit rowids, which would silently re-point every
 search hit at the wrong record. Graphorin never issues `VACUUM`, and the
-encrypted `encrypt` / `rekey` maintenance commands copy the database file
-byte-for-byte (preserving rowids) - so use those, never a hand-run `VACUUM`.
+encrypted `encrypt` / `rekey` maintenance commands copy the database through
+the online page-level backup (preserving rowids) - so use those, never a
+hand-run `VACUUM`.
 Each open runs a cheap FTS↔rowid integrity check and warns on drift; the same
 check is exposed as `checkFtsIntegrity(connection)` (pass
 `skipFtsIntegrityCheck: true` to `createSqliteStore` to disable the open-time
@@ -102,14 +105,15 @@ SQLCipher v4 compatible) and adds:
   pragmas are applied **before** `PRAGMA key`, so SQLCipher-v4 databases open
   correctly against the chacha20-defaulting peer).
 - `encryptDatabase` / `rekeyDatabase` - back `graphorin storage encrypt` and
-  `graphorin storage rekey`. The export is a **checkpoint → byte-copy →
-  in-place `PRAGMA rekey`** sequence (CS-7): sqlite3mc ships no
-  `sqlcipher_export`, and the byte-copy trivially preserves rowids so FTS5
-  mappings stay intact. Rekey drops to `journal_mode = DELETE` for the
+  `graphorin storage rekey`. The export is an **online page-level `backup()`
+  copy → in-place `PRAGMA rekey`** sequence (CS-7): sqlite3mc ships no
+  `sqlcipher_export`, and the page-level backup preserves implicit rowids so
+  FTS5 mappings stay intact. Rekey drops to `journal_mode = DELETE` for the
   rotation (sqlite3mc refuses to rekey in WAL) and restores WAL after.
 - `cipherIntegrityCheck` - runs the standard `PRAGMA integrity_check`
   through the keyed connection (sqlite3mc has no `cipher_integrity_check`);
-  backs the daily verification cron and `/v1/health/storage`.
+  it runs automatically as the final verification step of both `encrypt`
+  and `rekey`.
 
 Defaults (ADR-030): cipher `sqlcipher` (`legacy=4`), **off by default** -
 enable with `graphorin init --encrypted`. The audit DB is **always** encrypted
