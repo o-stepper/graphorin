@@ -19,20 +19,19 @@ There is **no telemetry**, **no version pings**, **no analytics**, **no crash up
 
 ## Verified by CI
 
-The repository ships a `pnpm run check-no-network` script that scans every published package's source tree for forbidden network primitives (`fetch`, `http.request`, `https.request`, `http.get`, `https.get`, `net.createConnection`, `net.connect`, `tls.connect`, `dgram.createSocket`, `WebSocket`, plus imports of `node-fetch` / `undici` / `got` / `axios` / `ky`). The check fails the build the moment a non-allow-listed network call is introduced.
+The repository ships a `pnpm run check-no-network` script that scans every published package's source tree for forbidden network primitives (`fetch`, `http.request`, `https.request`, `http.get`, `https.get`, `net.createConnection`, `net.connect`, `tls.connect`, `dgram.createSocket`, `WebSocket`, `XMLHttpRequest`, `EventSource`, plus imports of `node-fetch` / `undici` / `got` / `axios` / `ky` / `ws` and their namespaced call forms). The check fails the build the moment a non-allow-listed network call is introduced.
 
-The allow-list is small and explicit:
+The allow-list is small and explicit - five file-level entries (W-074):
 
 | Allow-listed area | Why |
 |---|---|
-| Provider adapters (`packages/provider/`) | Explicit user-initiated LLM calls. |
-| MCP transports (`packages/mcp/`) | Explicit user-initiated MCP connections. |
 | OAuth flows (`packages/security/src/oauth/`) | Explicit user-initiated authorisation. |
-| Skill installer + signature verifier | Explicit user-initiated skill install. |
-| Embedder model downloads (`packages/embedder-*/`) | Explicit user-initiated embedder bootstrap. |
-| Storage backends (`packages/store-*/`) | Explicit user-configured external storage. |
-| OTLP-HTTP exporter | Only when the operator wires a collector URL. |
-| Pricing refresh | Only on `graphorin pricing refresh` invocation. |
+| Skill installer (`packages/security/src/supply-chain/installer.ts`) | Explicit user-initiated skill install. |
+| Signature verifier (`packages/security/src/supply-chain/signature.ts`) | Well-known publisher-key fetch during that install. |
+| OTLP-HTTP exporter (`packages/observability/src/exporters/otlp-http.ts`) | Only when the operator wires a collector URL. |
+| Pricing refresh (`packages/pricing/src/refresh.ts`) | Only on `graphorin pricing refresh` invocation. |
+
+Provider adapters, MCP transports, embedders, and storage backends are **not** allow-listed: since W-074 they take an injected fetch (`fetchImpl ?? globalThis.fetch`) instead of naming a network primitive in their own source, so their user-initiated traffic (the bullet list above) exists without any scanner exemption.
 
 The CI workflow that runs the check is [`.github/workflows/check-no-network.yml`](https://github.com/o-stepper/graphorin/blob/main/.github/workflows/check-no-network.yml).
 
@@ -56,7 +55,7 @@ Sensitivity governs *who may see* a memory. It is orthogonal to **provenance / q
 
 ## Verifying the contract yourself
 
-Set `GRAPHORIN_OFFLINE=1` and run any of the example apps in the repository. The runtime refuses to phone home; recipes that try to reach a configured local endpoint (e.g. an Ollama daemon) emit a typed `OfflineRecipeUnreachableError` with a helpful remediation message.
+Set `GRAPHORIN_OFFLINE=1` and run any of the example apps in the repository. The runtime refuses to phone home; the example harness turns a recipe that tries to reach a configured local endpoint (e.g. an Ollama daemon) into a typed `OfflineRecipeUnreachableError` with a helpful remediation message.
 
 ```bash
 GRAPHORIN_OFFLINE=1 GRAPHORIN_LLM_RECIPE=stub \
@@ -76,7 +75,7 @@ Deletion in a memory-bearing framework spans roughly a dozen persistence surface
 | `memory_history` | audit trail of memory mutations | values are scrubbed to event skeletons by the cascade and by `purge()`; row skeletons remain | full row deletion (use `graphorin memory prune-history --older-than`) |
 | `workflow_checkpoints`, `workflow_pending_writes` | suspended-run snapshots (full serialized conversation) | session cascade (via the `sessionId` metadata stamped on HITL suspends and the workflow-run mapping); age-based: `CheckpointStoreExt.pruneThreads`; per-thread: `deleteThread` / `compactThread` | - |
 | `spans` | run traces (tool names, error strings, memory-search ids) | session cascade; age-based: `graphorin traces prune --before` / `pruneSpans` | spans with no session id are only deleted by age |
-| `idempotency_records` | request-replay keys | the server's hourly sweep (expired rows) | - |
+| `idempotency_records` | request-replay keys | the server's unified retention scheduler (expired rows; default sweep interval 6 h) | - |
 | `consolidator_runs`, `consolidator_failed_batches` | consolidation run log + dead-letter queue | `pruneRuns` / `pruneExhaustedBatches`; `graphorin consolidator dlq-clear` | batches still awaiting retry (explicit flag required) |
 | `session_audit` / `audit.db` | lifecycle + security audit chains | `pruneAuditEntries(beforeEpochMs)`; `graphorin audit prune` (re-anchors the Merkle chain - see the runbook in [Security](/guide/security)) | - |
 | spill artifacts (`graphorin-spill:...`) | oversized tool results | cleared on terminal runs; startup TTL sweep (7 days) for orphans | - |

@@ -141,7 +141,7 @@ Some providers expose internal reasoning content (extended thinking, scratch pad
 | `'pass-through-claude'` | Round-trip Anthropic-shaped thinking blocks byte-equal to the previous assistant message. Default for round-trip-required providers (Claude tool-use with thinking). |
 | `'pass-through-all'` | Round-trip every reasoning content part the provider returns, regardless of vendor shape. Useful for custom providers with `reasoningContract: 'optional'` that still benefit from preserving the chain. |
 
-Handoffs always strip reasoning - `filters.stripReasoning()` is unconditional at the boundary.
+Handoffs strip reasoning by default - the default handoff filter and every `filters.compose(...)` chain append `filters.stripReasoning()` unconditionally at the boundary.
 
 ## Request timeouts & structured output
 

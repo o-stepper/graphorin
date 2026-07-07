@@ -46,19 +46,18 @@ graphorin start --config ./graphorin.config.mjs
 graphorin start --host 127.0.0.1 --port 8787
 ```
 
-Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration) (the config loader reads `.ts` / `.js` / `.mjs` / `.json` files, not TOML). The process emits a single startup line with the resolved configuration (with secrets redacted).
+Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration) (the config loader reads `.ts` / `.js` / `.mjs` / `.json` files, not TOML). At startup the process logs the resolved config file path and a single listening line (`@graphorin/server v<version> listening on http://<host>:<port><basePath>`); secret values are never printed.
 
 ## `graphorin doctor`
 
 Runs a sanity audit:
 
-- POSIX file modes on the database, audit log, secrets store.
-- The `engines.node` requirement.
+- POSIX file modes on the data directory, config, database, audit log, and secrets store (repairable with `--fix-perms`).
 - The presence + readability of the configured secrets backend.
-- Optional systemd unit template validation.
-- Provider reachability (only on configured base URLs; never opens new outbound connections beyond the configured surface).
+- The audit-log encryption binding (the SQLite cipher peer).
+- Optional systemd unit validation (Linux).
 
-Failures are categorised by severity (`error`, `warning`, `info`) and emit actionable remediation steps.
+Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it never opens a network connection.
 
 ## `graphorin token`
 

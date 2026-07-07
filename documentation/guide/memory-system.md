@@ -28,7 +28,7 @@ flowchart LR
 
 | Tier | What it stores | Read surface | Write surface |
 |---|---|---|---|
-| **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `append`, `replace`, `rethink`, `attach`, `detach` |
+| **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `append`, `replace`, `rethink`, `attach`, `detach`, `forget` |
 | **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant`, `compact` |
 | **episodic** | Things that happened - decisions, events, milestones - captured with proper bi-temporal validity. | `recent`, `search` | `record` |
 | **semantic** | Facts about you, the world, the task. Conflicts resolved through a multi-stage pipeline. | `search`, `searchIterative`, `history` | `remember`, `supersede`, `forget`, `validate` |
@@ -373,7 +373,7 @@ A background pipeline (`Consolidator`) distils long conversations into long-term
 | Phase | What it does |
 |---|---|
 | **Light** | Zero-LLM housekeeping: **multi-signal forgetting** - low-salience facts are soft-archived (recoverable) - plus the opt-in capacity-bounded eviction pass. |
-| **Standard** | One LLM extraction pass over new session slices (**temporally anchored** - per-message timestamps + "today is" so relative dates resolve), **neighbour-aware** reconciliation (add / supersede / defer-to-deep), an embedder-independent exact-duplicate guard, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. Extracted facts land **quarantined** until validated. |
+| **Standard** | One LLM extraction pass over new session slices (**temporally anchored** - per-message timestamps + "today is" so relative dates resolve), **neighbour-aware** reconciliation (add / update / noop / conflict), an embedder-independent exact-duplicate guard, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. Extracted facts land **quarantined** until validated. |
 | **Deep** | An LLM judge drains the pending CONFLICT-CHECK queue (supersede / soft dedup / admit) and, at the `full` tier, runs **reflection / insight synthesis**. |
 
 Procedural induction is **not** phase-scheduled - call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself; there is no cross-agent shared-tier promotion.
@@ -385,7 +385,7 @@ In library mode the consolidator is **dormant until you start and trigger it** -
 1. `await memory.consolidator.start()` - arms the runtime (idempotent).
 2. Something must fire it: pass `triggers` (a `ConsolidatorTriggerSpec[]` consumed by the `@graphorin/triggers` scheduler inside `graphorin start`), or call `memory.consolidator.fireNow('standard', scope)` / `.trigger({ kind: 'turn' }, scope)` from your own loop.
 
-Every `trigger(...)` dispatch first replays ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
+Every `trigger(...)` dispatch first replays the triggering scope's ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
 
 Two safeguards keep a single bad slice from wedging a scope forever:
 
@@ -400,7 +400,7 @@ Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 | `'cheap'` | `light + standard` | `50 000` | `0.20` | `'pause'` |
 | `'standard'` | `light + standard + deep` | `200 000` | `1.00` | `'log'` |
 | `'full'` | `light + standard + deep` | `1 000 000` | `5.00` | `'log'` |
-| `'custom'` | operator-defined | operator must set | operator must set | operator must set |
+| `'custom'` | operator-defined | operator must set | operator must set | `'pause'` |
 
 Two things the table does not say by itself. `'log'` is **observability, not enforcement**: the consolidator keeps spending past the ceiling and only WARNs - the advisory default on the paid tiers is deliberate (a paused background pipeline silently stops forming memories), and hard enforcement is one config key away (`onExceed: 'pause' | 'throw'`). And the USD leg (`maxCostPerDay`) can only trip when you supply `priceUsage` - without a price callback every call is metered at $0 and only the token ceiling is live. See the `ConsolidatorCeilings` / `OnBudgetExceed` API docs for the exact semantics.
 
@@ -419,7 +419,7 @@ createMemory({
 });
 ```
 
-`'custom'` requires explicit `ceilings.maxTokensPerDay` + `ceilings.maxCostPerDay` (and `cheapModel` / `deepModel` if those phases are enabled) - `CustomTierMisconfiguredError` is thrown otherwise. The full `CONSOLIDATOR_TIER_DEFAULTS` table is exported from `@graphorin/memory`.
+`'custom'` requires explicit `ceilings.maxTokensPerDay` + `ceilings.maxCostPerDay` and a non-empty `phases` list - `CustomTierMisconfiguredError` is thrown otherwise (its hint also points at `cheapModel` / `deepModel`, but model labels are not validated). The full `CONSOLIDATOR_TIER_DEFAULTS` table is exported from `@graphorin/memory`.
 
 ### Reflection & insight synthesis
 
@@ -435,7 +435,7 @@ Use-it-or-lose-it decay (ExpeL) applies to **validated** insights only: each ref
 
 Forgetting is **cost / staleness control, not an accuracy lever**. The light phase scores each fact with `salience(...)` - the Ebbinghaus `retention` curve (recency + access frequency) combined with the fact's `importance` hint and a security-risk negative term (a quarantined or foreign-provenance fact is evicted sooner). With neutral importance on an active, first-party fact, `salience === retention`, so behaviour is unchanged until you opt in. Setting `decayCapacity` bounds storage: the lowest-salience facts are **soft-archived** (recoverable - `archived = 1`, never deleted) until the window fits.
 
-Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt`, bumps their `strength` (capped at 2.0), and increments a monotonic `access_count` (D3), so recently-recalled facts genuinely decay slower (MRET-7) - the bookkeeping write is best-effort and never breaks the read path. The counter feeds an opt-in **retrieval-frequency reinforcement** term: set `salienceWeights: { ...DEFAULT_SALIENCE_WEIGHTS, accessReinforcement: 0.3 }` and a heavily-used fact keeps up to 1.3x its retention (log1p-saturating at 32 accesses); at the default weight `0` the factor is exactly `1` and salience is byte-identical. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
+Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt`, bumps their `strength` (capped at 2.0), and increments a monotonic `access_count` (D3), so recently-recalled facts genuinely decay slower (MRET-7) - the bookkeeping write is best-effort and never breaks the read path. The counter feeds an opt-in **retrieval-frequency reinforcement** term: raise the consolidator's `salienceWeights.accessReinforcement` above its default `0` (for example to `0.3`) and a heavily-used fact keeps up to 1.3x its retention (log1p-saturating at 32 accesses); at the default weight `0` the factor is exactly `1` and salience is byte-identical. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
 
 Separately from fact decay, the `memory_history` audit trail grows **by design**: every supersede, purge, and quarantine transition appends a row (seven insert sites in the sqlite adapter), and nothing prunes it automatically. `purge()` already scrubs sensitive text from history rows, so the retained rows are event skeletons - keeping them is a storage-cost question, not a privacy one. The supported retention lever is `graphorin memory prune-history --older-than 90d` (or `store.memory.pruneHistory(olderThanMs)` on the `MemoryStoreExt` facade of the sqlite store); the argument is an AGE in milliseconds, not an epoch cutoff.
 
@@ -526,7 +526,7 @@ At [context-assembly](#context-assembly-the-six-layers) time the tag becomes an 
 
 | `PrivacyConfig` field | Default | Meaning |
 |---|---|---|
-| `providerTrust` | `'public-tls'` | Trust class of the active provider: `'loopback'` / `'private'` / `'public-tls'` / `'public-cleartext'`. |
+| `providerTrust` | `'public-tls'` | Trust class of the active provider (`LocalProviderTrust`): `'loopback'` / `'private'` / `'public-tls'` / `'public-cleartext'`. |
 | `providerAcceptsSensitivity` | derived from `providerTrust` | Explicit override of the sensitivity tiers the provider may receive. |
 | `cloudUploadConsent` | `false` | Per-user opt-in for sending `'internal'`-tier content to a cloud provider. |
 | `defaultSensitivity` | `'internal'` | Tier applied to records missing a tag. |
@@ -539,7 +539,7 @@ Each record yields a `pass` or `drop` decision with a reason (`allowed`, `provid
 | `internal` | The provider accepts `'internal'` **and** the trust class is `'loopback'` / `'private'`, or `cloudUploadConsent: true`. |
 | `secret` | The provider accepts `'secret'` **and** the trust class is `'loopback'`. It never leaves the machine otherwise. |
 
-Without an explicit `providerAcceptsSensitivity`, the accepted set derives from the trust class: `'loopback'` accepts all three tiers, `'private'` accepts `public` + `internal`, and both public classes accept `public` only. The filter trusts the record-level tag it was given; content it cannot see (raw user input, tool results, agent instructions) is covered by the outbound prompt-redaction middleware (D3), the universal backstop.
+Without an explicit `providerAcceptsSensitivity`, the accepted set derives from the trust class: `'loopback'` accepts all three tiers, `'private'` accepts `public` + `internal`, and both public classes (`'public-tls'` / `'public-cleartext'`) accept `public` only. The filter trusts the record-level tag it was given; content it cannot see (raw user input, tool results, agent instructions) is covered by the outbound prompt-redaction middleware (D3), the universal backstop.
 
 ## Next steps
 

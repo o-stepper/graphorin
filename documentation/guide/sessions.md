@@ -82,10 +82,9 @@ const plannerTurns = await session.list({ agentId: 'planner' });
 When `Agent A` hands off to `Agent B`, the session records:
 
 - the `from` and `to` agent ids;
-- the active handoff input filter (e.g. `lastN(10)`);
-- the timestamp;
-- the truncated message snapshot the receiver sees;
-- the resolved sub-agent secrets inheritance posture.
+- the active handoff input filter as a serializable descriptor (e.g. `lastN(10)`) - no message snapshot is duplicated onto the record;
+- the step number and timestamp;
+- the resolved sub-agent secrets inheritance posture (the policy plus the inherited key names - never the values).
 
 ```ts
 import { session } from './session-setup.js';
@@ -94,7 +93,7 @@ const all = await session.listHandoffs();
 const incoming = await session.handoffsByAgent('planner', 'to');
 ```
 
-The `lastN(10)` default plus the filter library from `@graphorin/agent` mean the boundary payload is **always** explicit.
+The default filter (`lastN(10)` composed with `stripSensitiveOutputs()`) plus the filter library from `@graphorin/agent` mean the boundary payload is **always** explicit.
 
 ## JSONL export schema 1.0
 
@@ -102,15 +101,15 @@ The `lastN(10)` default plus the filter library from `@graphorin/agent` mean the
 
 | Record kind | When emitted |
 |---|---|
-| `meta` | Once at the start (schema id, writer label, hash mode). |
+| `meta` | Once at the start (schema id, writer label, minimum runtime version, active embedder ids). |
 | `session` | The exported session's descriptor. |
-| `agent` | One per agent known to the registry. |
+| `agent` | One per agent the session references (its primary agent, message authors, handoff participants). |
 | `message` | Every user / assistant / system message. |
 | `handoff` | Every handoff between agents. |
 | `audit` | Audit entries included in the export. |
 | `footer` | Once at the end (record counts, optional hash / cipher stamps). |
 
-Tool calls and results travel in the separate **tool cassette** stream (schema `graphorin-tool-cassette/1.0`), not in the session export. The schema is byte-stable - replays always produce the same payload byte-for-byte for the same input.
+Tool calls and results travel in the separate **tool cassette** stream (schema `graphorin-tool-cassette/1.0`), not in the session export. The serialization is deterministic - the same input produces the same body records byte-for-byte; only the meta header and footer carry wall-clock timestamps (from the manager's injectable clock).
 
 ### Encryption (opt-in)
 
@@ -160,9 +159,9 @@ for await (const event of session.replay({
 
 `session.replay()` reads its spans from the `traceSource` you pass, or - when you construct the manager with `replayTraceSource: (id) => traceSourceForSession(store.connection, id)` (the durable span sink from `@graphorin/store-sqlite`, migration 024) - from the persisted spans for that session. With no source wired, replay falls back to the empty source and emits only `replay.start` / `replay.end`. See [Observability § Replay](/guide/observability#replay).
 
-By default, replays are **sanitised** - sensitive content is redacted, and external side-effects (real provider calls, real tool executions with side-effects) are stubbed against recorded "tool cassettes" (`graphorin-tool-cassette/1.0`). The `toolReplayMode` knob honours per-tool `sideEffectClass` so `'pure'` and `'read-only'` tools may be re-executed live while `'side-effecting'` and `'external-stateful'` tools default to the recorded cassette.
+By default, replays are **sanitised** - sensitive content is redacted - and tool calls are decided against the recorded "tool cassettes" (`graphorin-tool-cassette/1.0`) per the `toolReplayMode` policy. The default `'auto'` policy honours per-tool `sideEffectClass`: `'pure'` and `'read-only'` calls are **substituted from the recorded cassette** (after idempotency and output-schema checks), while `'side-effecting'` and `'external-stateful'` calls surface a **live re-execution decision** for the runtime to act on - `'external-stateful'` with a non-silenceable warning. `'recorded'` forces substitution for every tool; `'live'` bypasses the cassette entirely; `'mixed'` follows per-tool overrides.
 
-Every replay writes one audit row.
+Every replay writes two audit rows: `session.replay.requested` and `session.replay.completed`.
 
 ## Tool cassettes
 

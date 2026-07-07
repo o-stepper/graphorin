@@ -81,7 +81,7 @@ weighting that measurably wins. Feed the result to the per-call
 ::: warning Do not install a raw `WeightedRRFReranker` as the process default
 `WeightedRRFReranker` takes a **positional** weights array. The built-in search
 fans candidate lists out conditionally (`fts_0, vector_0, fts_1, …, hyde,
-graph` under `multiQuery`/`hyde`/`expandHops`), so position N no longer means
+graph, entity` under `multiQuery`/`hyde`/`expandHops`/`entityMatch`), so position N no longer means
 "FTS" or "vector" - `search()` makes weights safe only by rebuilding a per-call
 reranker from the *kind-keyed* `fusion.weights`. A fixed positional array
 installed via `setReranker(...)` / `createMemory({ reranker })` silently

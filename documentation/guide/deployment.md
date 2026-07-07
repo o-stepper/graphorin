@@ -45,7 +45,7 @@ Before promoting a Graphorin deployment to production:
    - Document who holds which token in your incident-response runbook.
 
 4. **Observability**
-   - Wire `OTLP_URL` (or another supported exporter). The default is **no remote export**.
+   - Wire the OTLP-HTTP exporter to your collector URL (the [observability guide's](/guide/observability) example reads it from an `OTLP_URL` environment variable your app owns) or another supported exporter. The default is **no remote export**.
    - Confirm `withValidation(...)` is in the exporter chain - the tracer factory throws if it is missing, so this is a soft check.
    - Configure the redaction allowlist for any high-cardinality attribute that's safe to ship un-redacted.
 

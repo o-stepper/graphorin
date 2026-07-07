@@ -14,6 +14,227 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.7.0 - 2026-07-07
+
+The third framework-wide **remediation release** - all six waves of the
+2026-07-05 project review of v0.6.1 (157 findings, a 151-work-item plan
+across 16 clusters). Headlines: durable HITL now composes across the
+sub-agent boundary, workflow timers fire on their own, session
+hard-delete erases everything session-scoped, the server prunes derived
+data by default, CommonJS consumers can plain `require()` every package
+(Node floor 22.12), and zod 4 consumers typecheck. Per-package details
+live in each package's `CHANGELOG.md`; upgrade notes are in the
+migration guide (`documentation/guide/migration.md`).
+
+### Security & data flow
+
+- **Untrusted-content envelopes can no longer be spoofed or escaped**:
+  `wrapEnvelope` neutralizes embedded `<<<untrusted_content>>>`
+  delimiters, the memory consolidation + compaction prompts delimit
+  stored memory text as data the same way, a new
+  `untrusted-content-delimiter-injection` redaction pattern turns
+  break-out attempts into an audit signal, and MCP `isError` text plus
+  tool-schema annotations (the tool-poisoning class) are sanitized at
+  the boundary.
+- **The Rule-of-Two `untrustedInput` leg is actually enforced** (a
+  profile that gives the leg up now forbids untrusted-source tools),
+  the dataflow sink gate inspects post-repair arguments, spill handles
+  are run-scoped with taint sidecars unreadable through `read_result`,
+  cross-page imperative payloads are caught at spill time, and
+  `containsPii` sees through Unicode obfuscation.
+- **Server auth is attenuation-only and symmetric**: `POST /v1/tokens`
+  refuses to mint scopes the minter's own grant does not cover;
+  session REST/SSE reads honour per-resource scopes; run control binds
+  to the run's owning agent/workflow; a malformed `/stream` body
+  answers 400 instead of silently burning tokens; WS replay frames
+  pass the same sanitizer as live delivery.
+- **Audit chain**: cross-process fencing for append + prune, the
+  `audit.cipher` setting is finally honoured (default pinned
+  `chacha20`), `pruneAudit` survives the real driver and prompts
+  re-anchoring, the skill trust root's `publishers` leg is
+  cryptographically bound to the key-serving domain, and
+  security-relevant tool events flow into the tamper-evident audit
+  log by default (`audit.toolEvents`).
+
+### Memory pipeline
+
+- **Consolidation stops silently losing facts**: truncated
+  (`finishReason: 'length'`) extractions split-and-retry or salvage
+  the complete prefix, over-budget transcripts split before the
+  provider call, a poison slice can no longer wedge the cursor forever
+  (bounded skip), DLQ slice-capture is per-scope, and completion
+  accounting is exception-safe (no more stuck scope locks).
+- **Supersede keeps knowledge visible**: while a quarantined successor
+  awaits validation the old fact stays recall-visible; quarantined
+  insights no longer pass-decay before review; compaction
+  summary-trust fails closed on scanner timeout.
+- **Retrieval**: construction-time `searchDefaults` bring the advanced
+  stack (multi-query, HyDE, graph expansion, fusion tuning) to
+  `fact_search`, auto-recall and `deep_recall`; the trust discount
+  applies before the final top-k cut; HyDE honours
+  `includeSuperseded`/`owner`; multi-query fan-out embeds in one
+  batch; the iterative-retrieval difficulty gate is tunable.
+- **Scope-guarded mutators**: `forget`, `setStatus`, `archive`,
+  `purge` and `markAccessed` accept a scope and no-op on foreign ids,
+  symmetric with the read-side isolation.
+
+### Workflow durability
+
+- **Durable timers fire without user polling code**: suspended
+  checkpoints carry `wakeAt` (migration 032), `createTimerDriver`
+  ticks due threads, and the server binds it as a lifecycle daemon
+  reported on `/v1/health`.
+- **Replay is safer**: positional `pause()` replay detects divergence
+  (typed `pause-replay-divergence`), the JSON-safety gate covers
+  pause / approval / `Dispatch` / directive values, `maxSteps` caps
+  per invocation (with an opt-in `maxTotalSteps` lifetime quota), and
+  the docs stop calling side effects exactly-once (journaled channel
+  writes replay once; effects are at-least-once).
+- **The HTTP workflow surface exposes every durable primitive**: named
+  awakeable `resume`, `retry`, `tick`, a real `fork`, per-thread
+  `deleteThread` erasure, and machine-readable failure `code`s on the
+  wire.
+
+### Agent runtime & HITL
+
+- **Durable HITL composes across the sub-agent boundary**: a handoff
+  or `toTool` child suspending on an approval-gated tool parks on the
+  parent (`RunState.pendingSubRuns`) instead of failing the run;
+  decisions route on a composite key, the granted call executes
+  exactly once, and nested parks recurse - serialized snapshots carry
+  children version-stamped and secret-redacted.
+- Delegated usage folds into the parent's accounting,
+  `currentAgentId` is restored after a handoff, step numbers stay
+  monotonic across suspend/resume, and the `onPendingApprovals` abort
+  policy is reachable and consistent (`'fail'` only when approvals are
+  actually pending).
+- **One trace tree with child transparency**: the new `subagent.event`
+  forwards child lifecycle events per `forwardEvents`, and
+  handoff/`toTool` runs parent under the live step span.
+- **Thinking-block signatures round-trip** (new `reasoning-end`
+  provider event), so multi-step tool use with Anthropic extended
+  thinking replays each block byte-equal; `RunContext.state` becomes a
+  read-only projection; `AnyTool` and the exported `HandoffEntry` end
+  the collection-seam casts.
+
+### Storage & retention
+
+- **The server prunes derived data by default**: a unified retention
+  sweep (every 6 hours) deletes spans (30 d), consolidator run
+  counters (90 d), exhausted DLQ batches (30 d) and expired
+  idempotency records; primary content (sessions, audit, memory
+  history, workflow threads) stays strictly opt-in;
+  `retention: { enabled: false }` disables it.
+- **Hard-delete means hard-delete**: session deletion erases every
+  session-scoped surface via the schema-gated `SESSION_SCOPED_PURGES`
+  registry (facts, insights, spans, working blocks) plus
+  suspended-run checkpoints (migration 029).
+- **Reachable retention levers**: `pruneSpans` and a real
+  `graphorin traces prune` (previously a no-op against a phantom
+  table), `graphorin memory prune-history`, checkpoint
+  `pruneThreads`/`compactThread`, an opt-in agent
+  `checkpointPolicy: 'delete-on-terminal'`, consolidator
+  `dlq-list`/`dlq-clear`, and `graphorin storage compact` (incremental
+  vacuum, FTS-safe).
+- **Concurrency + integrity**: a migration-runner TOCTOU fence,
+  read-only CLI commands stop auto-migrating live databases, a
+  data-repair preflight on migration 022, typed `SqliteBusyError`,
+  `encryptDatabase({ swap: true })` refuses under a live writer,
+  `Float32Array` views serialize correctly, and `rules_fts` joins the
+  FTS integrity guard. The schema advances to migration 032.
+
+### MCP & tools
+
+- **MCP server identity is transport-derived** - a server renaming
+  itself can no longer mint fresh TOFU pins or claim a trusted handle
+  scope; the pin lifecycle covers post-approval tool additions
+  (rejected by default; `'accept-and-update'` for legitimate catalogue
+  changes); the new `createManagedMCPClient` survives dead transports
+  and re-screens the catalogue on reconnect.
+- The ReDoS guard rejects the alternation-overlap family, SDK error
+  classification is code-based (server-controlled text cannot forge
+  timeout/cancel classes), and operator side-effect-class downgrades
+  are visible (WARN + `downgradedTools`).
+- **Executor honesty**: an inline timeout actually aborts the tool
+  (and stops inviting unsafe retries of side-effecting calls), the
+  `ToolReturn` envelope gains a symbol brand (extra result fields
+  reach the model instead of being silently stripped), auto-prefix
+  collision losers are always renamed or observably suppressed,
+  streaming aggregation is bounded (8 MiB default), and tool
+  discovery/grading is comment-aware.
+- Tools/MCP counters land on `/v1/metrics` as Prometheus series.
+
+### Provider adapters, pricing & observability
+
+- **Streaming provider errors join the canonical taxonomy**: a
+  pre-content 429/500/529 throws a typed retryable `ProviderHttpError`
+  (retry and fallback finally engage on streaming steps); a mid-stream
+  error classifies and finishes as `finishReason: 'error'`.
+- Local adapters put images on the wire (`capabilities.multimodal`)
+  and warn instead of silently dropping parts; `llamaCppNodeAdapter`
+  speaks real chat history with an opt-in persistent session;
+  `withRateLimit` gains a `tokensPerMinute` budget.
+- `graphorin pricing refresh` works against the published
+  `@pydantic/genai-prices` dataset, the `Cost.amount` units contract
+  is pinned (whole currency units), and `CostTracker` tracks
+  prompt-cache legs under bounded memory.
+- Per-type sampling rules finally thin child spans, span events carry
+  sensitivity tiers (`recordException` exports `exception.type`), and
+  the phantom `@opentelemetry/*` peers are gone - with them the
+  `ERESOLVE` trap of the stale caret pins.
+
+### Server, wire & clients
+
+- **Binary payloads survive the wire**: run-state schema 1.2 with
+  `WireRunState`/`WireMessage` codecs (an image in a run checkpointed
+  at `awaiting_approval` no longer corrupts on resume) and JSON-safe
+  `WireAgentEvent` projections on the server WS path.
+- The WS replay buffer is TTL-pruned (memory-leak fix), the client's
+  per-subscription queue is bounded (typed `flow-overflow`), and a
+  WS-to-SSE fallback closes unresumable subscriptions
+  deterministically instead of hanging them.
+
+### CLI
+
+- `--json` mode honours exit codes (a broken audit hash chain no
+  longer exits 0), `graphorin init` stops printing a dead bootstrap
+  token and walks the real pepper -> `migrate` -> `token create` path
+  (stdin, never argv), help text stops promising unimplemented
+  persistence, and the `check-cli-docs` gate now validates required
+  options.
+
+### Packaging, types & release pipeline
+
+- **Node floor 22.12; CommonJS consumers can plain `require()` every
+  package** - export maps moved from the `import` condition to
+  `default` (stable `require(esm)`), gated by attw `node16` and a
+  require-smoke against packed tarballs.
+- **zod ^4 actually typechecks** at `skipLibCheck: false` (the
+  `ZodLikeError` shim widens to `PropertyKey`; shipped d.ts no longer
+  bake concrete zod v3 generics). Phantom workspace dependencies are
+  removed, every package declares `sideEffects`, tarballs ship `src/`
+  so declaration maps resolve, and the server's sibling peer floors
+  track the current minor.
+- The core public API is snapshot-gated (api-extractor report + CI
+  gate), and publishing moves to **npm trusted publishing (OIDC)** -
+  no long-lived registry token; Sigstore provenance rides the same
+  workflow identity.
+
+### Documentation, evals & examples
+
+- LOCOMO / LongMemEval loader fidelity (speaker names rendered,
+  numeric reference answers kept, empty-reference questions skipped),
+  a TSDoc `{@link}` sweep behind a validation gate, honesty fixes
+  across READMEs and guides (WorkerPool, HITL event shapes, journal
+  semantics, retention stories), and friendlier lint:
+  `no-implicit-network-call` scopes to `@graphorin/` packages by
+  default and `no-secret-unwrap` gains an `allowReceiverPattern`
+  escape for Zod's `.unwrap()`.
+- Doc gates go deny-by-default: snippet typechecking auto-discovers
+  every page, a character-rules gate pins ASCII punctuation,
+  `llms.txt` is compact again (the API index moves to `llms-api.txt`),
+  and the examples' run-direct guard works on Windows.
+
 ## 0.6.1 - 2026-07-05
 
 Patch release.

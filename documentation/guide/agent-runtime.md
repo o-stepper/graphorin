@@ -60,9 +60,9 @@ type AgentEvent<TOutput> =
   | { type: 'tool.call.end'; toolCallId: string }
   | { type: 'tool.execute.start'; toolCallId: string }
   | { type: 'tool.execute.end'; toolCallId: string }
-  | { type: 'tool.approval.requested'; toolCallId: string }
+  | { type: 'tool.approval.requested'; toolCallId: string; reason?: string }
   | { type: 'context.compacted'; beforeTokens: number; afterTokens: number }
-  | { type: 'agent.model.fellback'; previousModel: string; nextModel: string }
+  | { type: 'agent.model.fellback'; from: string; to: string }
   | { type: 'agent.end'; runId: string; result: AgentResult<TOutput> };
 
 function assertNever(value: never): never {
@@ -84,7 +84,7 @@ function handle<TOutput>(event: AgentEvent<TOutput>): void {
       console.log('approval needed for', event.toolCallId);
       return;
     case 'agent.model.fellback':
-      console.log('fellback', event.previousModel, '->', event.nextModel);
+      console.log('fellback', event.from, '->', event.to);
       return;
     case 'agent.start':
     case 'step.start':
@@ -289,8 +289,8 @@ Handoffs use a built-in filter library to shape the payload that crosses the bou
 | Filter | What it does |
 |---|---|
 | `filters.lastN(n)` | Keep only the last N messages. |
-| `filters.lastUser` | Keep only the latest user turn. |
-| `filters.summary({...})` | Replace history with a summary. |
+| `filters.lastUser()` | Keep only the latest user turn. |
+| `filters.summary(text)` | Replace history with a caller-supplied summary. |
 | `filters.bySensitivity({...})` | Keep / drop / require by `Sensitivity`. |
 | `filters.stripReasoning()` | Drop reasoning content parts. |
 | `filters.stripSensitiveOutputs()` | Drop sensitive tool outputs. |
@@ -321,7 +321,7 @@ An `Agent` instance carries exactly **one in-flight run**: `steer`, `followUp`, 
 
 ## Reasoning preservation
 
-Tool-use loops round-trip `reasoning` content parts (with opaque `meta` such as `signature` / `data`) into the next provider call when the effective `reasoningRetention` is not `'strip'`. The handoff boundary is independent: `filters.stripReasoning()` is always applied to messages forwarded to a sub-agent regardless of the intra-loop policy.
+Tool-use loops round-trip `reasoning` content parts (with opaque `meta` such as `signature` / `data`) into the next provider call when the effective `reasoningRetention` is not `'strip'`. The handoff boundary is independent of the intra-loop policy: the default handoff filter and every `filters.compose(...)` chain append `filters.stripReasoning()` unconditionally, so reasoning crosses to a sub-agent only if you pass a bare, non-composed filter that keeps it.
 
 ## Agent-level model fallback
 

@@ -79,10 +79,12 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/tokens` | Issue a token. |
 | `DELETE` | `/v1/tokens/:id` | Revoke a token. |
 | `GET` | `/v1/triggers` | List configured triggers. |
+| `GET` | `/v1/triggers/:id` | Single-trigger detail (`404` when the id does not exist). |
 | `POST` | `/v1/triggers/:id/fire` | Fire a trigger immediately. |
 | `POST` | `/v1/triggers/:id/disable` | **Flag flip** - pause the trigger; it stays registered and persisted. |
 | `POST` | `/v1/triggers/:id/enable` | Re-enable a paused trigger (the next fire is recomputed from now). |
 | `DELETE` | `/v1/triggers/:id` | **Destructive** - unregister and remove the trigger. |
+| `POST` | `/v1/triggers/prune` | **Destructive** - unregister every disabled trigger (no cutoff; the CLI `graphorin triggers prune` adds `--before`). |
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
 | | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
@@ -187,7 +189,7 @@ The triggers daemon (mounted by `@graphorin/server`) owns the schedule, persists
 
 ### Background consolidation
 
-When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them in `beforeStart`: it registers the consolidator's `cron` / `idle` triggers with the scheduler so background distillation actually runs - no manual `registerConsolidatorTriggers` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
+When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them during startup (the consolidator daemon starts first and registers its `cron` / `idle` triggers with the scheduler before the scheduler begins firing) so background distillation actually runs - no manual `registerWithScheduler` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
 
 ## Idempotency
 
