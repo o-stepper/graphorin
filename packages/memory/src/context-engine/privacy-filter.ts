@@ -72,8 +72,7 @@ export type PrivacyDecisionReason =
  *
  * - `'loopback'`  → `['public', 'internal', 'secret']`.
  * - `'private'`   → `['public', 'internal']`.
- * - `'public-tls'` / `'public-mtls'` → `['public']`.
- * - `'public-cleartext'` → `['public']`.
+ * - `'public-tls'` / `'public-cleartext'` → `['public']`.
  *
  * Per-provider overrides always win over the defaults - pass
  * `providerAcceptsSensitivity` explicitly to override.

@@ -78,7 +78,7 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 | `@graphorin/reranker-transformersjs` | optional | Cross-encoder reranker via `@huggingface/transformers`. |
 | `@graphorin/reranker-llm` | optional | LLM-judge reranker. |
 | `@graphorin/eslint-plugin` | optional | ESLint rules for projects that build on Graphorin. |
-| `@graphorin/evals` | optional | Evaluation primitives. |
+| `@graphorin/evals` | optional | Eval framework - scorers, dataset loaders, reporters, parallel runner, regression detection (builds on the eval primitives in `@graphorin/observability`). |
 
 ## Direct dependencies
 

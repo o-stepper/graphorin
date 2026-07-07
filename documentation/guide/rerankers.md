@@ -53,7 +53,8 @@ calibration paths.
 RRF treats the keyword ranking and the vector ranking as equally trustworthy.
 Once you have labelled data - for example from the `@graphorin/evals` harness - a
 **calibrated weighting** often does better. Weight each retriever's contribution
-by its *kind* (FTS vs. vector) per call:
+by its *kind* per call - `fts` and `vector`, plus `graph` / `entity` legs when
+graph expansion or entity matching is enabled:
 
 ```ts
 import { memory, scope } from './setup.js';
@@ -125,9 +126,11 @@ const memory = createMemory({
   non-positive or non-integer value throws `RangeError`) and evicts the model
   after an idle window when `idleEvictionMs` is set. Lower `batchSize` if large
   passages pressure memory.
-- **`reranker-llm`** scores in batches (default `5`). On an unparseable model
-  response it falls back to a neutral score (`fallbackScore`, default `0`)
-  rather than failing the whole query - tune this for your provider. The
+- **`reranker-llm`** scores in batches (default `5`). The score parser
+  deliberately accepts only a bare, whole-string integer reply
+  (anti-prompt-injection hardening) - a verbose response like `Score: 7` is
+  unparseable and falls back to a neutral score (`fallbackScore`, default `0`)
+  rather than failing the whole query; tune this for your provider. The
   scoring prompt is English by default; pass a `scoringPrompt` builder for
   other locales.
 

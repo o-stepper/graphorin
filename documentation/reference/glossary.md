@@ -19,7 +19,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Approval.** A blocking gate raised when a tool's `needsApproval` predicate (or constant `true`) fires. Surfaces as the `tool.approval.requested` agent event; resolved through `tool.approval.granted` / `tool.approval.denied`.
 
-**Audit log.** Tamper-evident SQLite log of every privileged operation. SHA-256 hash chain; encrypted-at-rest by default.
+**Audit log.** Tamper-evident SQLite log of every privileged operation. SHA-256 hash chain; always encrypted at rest (the audit database refuses to open without the cipher peer).
 
 ## B
 

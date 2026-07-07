@@ -85,13 +85,14 @@ The LongMemEval runner measures the REAL search path - the old harness-side
 keyword fan-out booster is gone - and every report stamps a `benchConfig`
 block, so a number always says what configuration produced it:
 
-- `--retrieval default|multi-query|hyde|iterative|graph` and
+- `--retrieval default|multi-query|hyde|iterative|graph|ppr|entity` and
   `--embedder none|fake` A/B the library's actual retrieval features
   (`multiQuery`/`hyde` wire a query transformer, `iterative` wires the graded
   `searchIterative` loop and reports its abstentions, `graph` enables entity
-  resolution + one-hop expansion). `fake` is a deterministic bag-of-words
-  hash embedder for exercising the vector leg offline; real quality needs a
-  real embedder.
+  resolution + one-hop expansion, `ppr` two-hop expansion with PPR scoring,
+  `entity` the exact entity-match candidate leg). `fake` is a deterministic
+  bag-of-words hash embedder for exercising the vector leg offline; real
+  quality needs a real embedder.
 - `--judge-provider/--judge-model/--judge-base-url` (or
   `GRAPHORIN_BENCH_JUDGE_*`) grade with a model that is NOT the system under
   test. A self-judged real-provider run WARNs, stamps `selfJudged: true`,
