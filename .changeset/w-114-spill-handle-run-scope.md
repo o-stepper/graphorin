@@ -1,5 +1,0 @@
----
-'@graphorin/tools': minor
----
-
-Spill result handles are run-scoped (W-114). `read_result` now rejects handles belonging to another run by default (`tool.result.read.cross-run-denied.total` counter; resume of the same run keeps working since the runId is stable) - `createReadResultTool({ allowCrossRun: true })` is the explicit opt-out for deliberate cross-run flows such as folding a sub-agent's handle. The file reader adds defense in depth for every consumer including code-mode: taint sidecars (`.meta.json`) are never readable through handles, and a handle must be exactly `graphorin-spill:<runId>/<file>` (deep or flat shapes are refused, which also subsumes most path traversal). The executor's in-memory `handleProducerTaint` map is bounded (FIFO eviction, `ExecutorOptions.handleProducerTaintCap`, default 1024) - evicted handles restore their producer taint from the on-disk sidecar, so eviction never launders taint. Direct users of `createFileResultReader` outside `read_result` get the shape/sidecar guards but not the run scope (that lives at the tool level).

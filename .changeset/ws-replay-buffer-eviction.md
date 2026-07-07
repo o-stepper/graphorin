@@ -1,5 +1,0 @@
----
-'@graphorin/server': patch
----
-
-WS replay-buffer memory-leak fix (W-028): a periodic prune sweep (`scheduleReplayBufferPruning`, default every 60 s, `stream.replayBuffer.pruneIntervalSeconds` config) now applies the already-documented TTL to every subject, so finished-run subjects (a fresh runId per run, never touched again by push/replay) no longer retain up to 1000 full payloads forever on a long-living server. Emptied subjects release their `dropped`-map entry too; a resume whose cursor misses the buffer still reports `droppedCount >= 1` (the miss itself proves the gap), so the replay-marker keeps firing. The `@stable` `ReplayBuffer` interface gains an OPTIONAL `stats?(): { subjects, events }` (external implementations keep compiling; `createReplayBuffer` always provides it), and the `graphorin_replay_buffer_events` gauge now reports buffered EVENTS as its name says - previously it was filled with the subscription count (dashboards reading it will see the corrected semantics). Replay semantics inside the TTL window are unchanged; servers without WS are unaffected.

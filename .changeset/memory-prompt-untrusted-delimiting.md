@@ -1,5 +1,0 @@
----
-'@graphorin/memory': patch
----
-
-Security hardening (W-083): the background consolidation prompts that take state-changing actions from model output over stored memory text now delimit that text as data. Reconcile (candidate + neighbours), the deep-phase conflict judge (candidate + existing), and the reflection pass (episode summaries + evidence) wrap interpolated memory text in `<<<untrusted_content trust="memory-derived">>>` envelopes with embedded markers neutralized, apply a read-time strip of the high-precision injection markers (`stripMemoryInjectionMarkers`, new `@internal` helper next to `detectMemoryInjection` - covers user-provenance and pre-existing rows the write-time gate never screened), and instruct the system prompts to treat the blocks as data. The CE-15 neutralization logic moved from `compactor.ts` into the shared `internal/envelope.ts` helper (`neutralizeEnvelopeMarkers` / `wrapUntrusted`) with byte-identical output on the historical inputs and the same bracket-substitution scheme as `@graphorin/tools`; the `targetId` membership guard in reconcile stays intact as the blast-radius limit.

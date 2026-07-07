@@ -1,6 +1,0 @@
----
-'@graphorin/store-sqlite': minor
-'@graphorin/cli': minor
----
-
-Database-file compaction path (W-064). `openConnection` now declares `PRAGMA auto_vacuum = INCREMENTAL` on every database it CREATES (checked via `page_count == 0`, right after the cipher pragmas, so encrypted databases opened through the `store-sqlite-encrypted` delegate get it automatically; pre-existing databases are untouched - the pragma is a spec-guaranteed no-op there). New `graphorin storage compact` command: `wal_checkpoint(TRUNCATE)` + batched `PRAGMA incremental_vacuum` (`--batch-pages`, default 1000, keeps writer locks short) + a final checkpoint, reporting freelist before/after and reclaimed bytes. Unlike the forbidden `VACUUM`, incremental vacuum relocates free pages through the pointer map without renumbering implicit rowids, so FTS5 external-content mappings survive - covered by an integrity + search test. On a database created before this version (`auto_vacuum=0`) the command reports the high-water-mark limitation honestly and exits 0 without modifying the file; reclaiming disk there requires recreating the store. Docs: storage guide danger-block extended with the incremental-vacuum contrast, cli + deployment guides gain the command.

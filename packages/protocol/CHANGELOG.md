@@ -1,5 +1,23 @@
 # @graphorin/protocol
 
+## 0.7.0
+
+### Minor Changes
+
+- [#154](https://github.com/o-stepper/graphorin/pull/154) [`fe98522`](https://github.com/o-stepper/graphorin/commit/fe98522ce2477c9a7dc09029f9dcfdb1f7c9aa04) Thanks [@o-stepper](https://github.com/o-stepper)! - W-072: every export map's `import` condition becomes `default`, and the Node floor rises to `>=22.12.0`.
+
+  CJS consumers previously hit a bewildering `ERR_PACKAGE_PATH_NOT_EXPORTED` instead of a clear ESM-only signal. With the `default` condition, plain `require('@graphorin/core')` works via Node's stable `require(esm)` - which shipped in 22.12, hence the engines bump across every workspace manifest (packages, examples, benchmarks, docs; enforced by the widened mvp-readiness sweep). No dual-instance hazard: there is no CJS build, `require()` returns the same ESM module instance. ESM consumers are unaffected (`default` serves both paths; `types` stays first). The pack gate now runs attw under the full `node16` profile (was `esm-only`) and adds a runtime `require(esm)` smoke against the packed tarballs. Installs on Node 22.0-22.11 with `engine-strict` will refuse - upgrade Node (see the migration guide).
+
+### Patch Changes
+
+- [#160](https://github.com/o-stepper/graphorin/pull/160) [`4ee256e`](https://github.com/o-stepper/graphorin/commit/4ee256e30fe9190cef6c48dc6785464757707156) Thanks [@o-stepper](https://github.com/o-stepper)! - W-109: the package doc no longer promises forward-compatible negotiation that does not exist. It now states the actual contract: the frame ENVELOPE (kind set, control-frame fields, the `v: '1'` literal) is validated strictly on both sides and evolves only lockstep (the 0.x deployment model; `v: '2'` frames are rejected), while the deliberate additive extension points live inside the envelope (event `type` + `payload: z.unknown()`, RPC `result: z.unknown()`, the `initialize` capabilities record - which the shipped client currently does not consume). New contract tests pin both classes of behaviour: unknown event types and arbitrary payload/result values pass; extra envelope fields, unknown kinds and `v: '2'` fail. No schema or wire behaviour changed.
+
+- [#164](https://github.com/o-stepper/graphorin/pull/164) [`764239b`](https://github.com/o-stepper/graphorin/commit/764239b97e0e0202442e91272583f13adeb12d00) Thanks [@o-stepper](https://github.com/o-stepper)! - Tarballs now ship `src/` so the published `dist/**/*.d.ts.map` files actually work (W-136): the maps referenced `../src/*.ts` that the `files` whitelist excluded, so go-to-definition fell back into `.d.ts` and the shipped maps were dead weight. The pack gate gains a `map-integrity` leg: every source referenced by a shipped map must resolve inside the tarball (or be embedded via `sourcesContent`), with an anti-vacuous guard - a package whose tsdown config emits declaration maps must contain a non-zero number of `.d.ts.map` files, so a cache-restored dist that silently dropped maps fails the gate instead of passing vacuously. `mvp-readiness` now requires `src` in every publishable `files` array.
+
+- [#154](https://github.com/o-stepper/graphorin/pull/154) [`fe98522`](https://github.com/o-stepper/graphorin/commit/fe98522ce2477c9a7dc09029f9dcfdb1f7c9aa04) Thanks [@o-stepper](https://github.com/o-stepper)! - W-046: JSON-safe `WireAgentEvent` projection for all binary-bearing event variants, applied on the server WS path.
+
+  `@graphorin/core` gains `WireFileGeneratedEvent`, `WireToolExecutePartialEvent`, `WireAgentEndEvent` (whose `result.state` is the `WireRunState` projection) plus the `WireAgentEvent` union and pure `toWireAgentEvent`/`fromWireAgentEvent` codecs. The `AgentEvent` TSDoc now documents the real two-layer wire contract (envelope `{eventId, subject, type, payload}` with `payload = WireAgentEvent`) instead of the false claim that `@graphorin/protocol` re-exports the union; protocol stays zod-only with a doc pointer. The server's `backgroundStreamAgent` projects every streamed event before emitting, so `file.generated`, binary `tool.execute.partial` chunks and a multimodal `agent.end` state arrive at WS clients decodable instead of as numeric-key mush. An exhaustive `Record<AgentEvent['type'], ...>` fixture gate in core forces a wire decision for every future event variant.
+
 ## 0.6.1
 
 ### Patch Changes

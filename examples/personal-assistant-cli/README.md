@@ -38,7 +38,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/personal-assistant-cli dev
 Expected first-run output:
 
 ```
-graphorin v0.6.1 personal-assistant-cli - recipe='stub', model='stub-echo'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.7.0 personal-assistant-cli - recipe='stub', model='stub-echo'. Type a message and press Enter; Ctrl+C to exit.
 > hello there
 stub-echo: hello there
 >
@@ -63,7 +63,7 @@ GRAPHORIN_LLM_MODEL=qwen2.5:7b-instruct-q4_K_M \
 Expected first-run banner:
 
 ```
-graphorin v0.6.1 personal-assistant-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.7.0 personal-assistant-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
 > remember I prefer metric units
 Got it - I'll keep that in mind.
 > what's the weather in San Francisco?
@@ -88,7 +88,7 @@ GRAPHORIN_LLM_BASEURL=http://127.0.0.1:8080 \
 Expected banner:
 
 ```
-graphorin v0.6.1 personal-assistant-cli - recipe='llamacpp-server', model='llama'. ...
+graphorin v0.7.0 personal-assistant-cli - recipe='llamacpp-server', model='llama'. ...
 ```
 
 The HTTP shape is OpenAI-compatible; graphorin's `llamaCppServerAdapter(...)` handles the wire translation.
@@ -225,4 +225,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.6.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.7.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

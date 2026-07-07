@@ -1,5 +1,0 @@
----
-"@graphorin/eslint-plugin": minor
----
-
-`no-implicit-network-call` now activates in two stages: the linted file path must match `packages/*/src` AND the nearest `package.json` name must start with a prefix from the new `packagePrefixes` option (default `['@graphorin/']`). Downstream pnpm monorepos with the standard layout stop getting errors on their own `fetch()` calls just for adopting `flat/recommended`; a consumer that wants the rule to police their own scope passes `['error', { packagePrefixes: ['@myorg/'] }]`. When no package.json resolves above the file (virtual paths, programmatic Linter runs) the rule fails OPEN to the old path-only activation, so resolution hiccups can only over-flag, never silently disable the guard. The rule is now also dogfooded against the framework's own source in tests (sharing the check-no-network ALLOW_LIST as the single source of exemptions), and a lockstep contract test pins both matchers' verdicts over a shared corpus - closing the known axios asymmetry (the CI script now flags `axios(...)`/`axios.get(...)` call sites, not just imports).

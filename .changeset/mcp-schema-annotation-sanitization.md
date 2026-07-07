@@ -1,5 +1,0 @@
----
-'@graphorin/mcp': minor
----
-
-Security hardening (W-018, Invariant Labs tool-poisoning class): annotation strings inside MCP tool JSON Schemas (`description`, `title`, `$comment`, string `examples` - at any nesting depth: `properties`, `items` including tuples, `additionalProperties`, `oneOf`/`anyOf`/`allOf`, `$defs`/`definitions`, `patternProperties` and friends) are now stripped of imperative payloads before the schema reaches `buildJsonSchemaValidator`, whose `toJSON()` feeds the provider wire and the `tool_search` projection. Semantic keywords (`enum`, `const`, `pattern`, `required`, property names) are never modified, so input validation is byte-identical. The TOFU fingerprint (`computeToolDefinitionHash`) keeps hashing the RAW definition: existing pins stay valid, and two differently-poisoned schemas cannot collapse into one redacted hash. New counter `mcp.tool-schema.injection-flagged.total` (server/tool) signals hits at registration. An operator's `pass-through` override skips the pass, mirroring `sanitizeDescription`. Minor bump: model-facing schemas may change bytes and new counter increments may appear on existing deployments.

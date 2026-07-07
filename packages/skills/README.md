@@ -82,7 +82,7 @@ import { loadSkillFromSource, createSkillRegistry } from '@graphorin/skills';
 
 const skill = await loadSkillFromSource(
   { kind: 'folder', path: './skills/finance-helper' },
-  { conflictPolicy: 'warn', runtimeVersion: '0.6.1' },
+  { conflictPolicy: 'warn', runtimeVersion: '0.7.0' },
 );
 
 const registry = createSkillRegistry();
@@ -111,7 +111,7 @@ license: MIT
 disable-model-invocation: false
 
 # === Graphorin extensions (namespaced) ===
-graphorin-runtime-compat: ^0.6.1
+graphorin-runtime-compat: ^0.7.0
 graphorin-trust-level: trusted
 graphorin-sensitivity: internal
 graphorin-handoff-input-filter: lastUser
@@ -168,4 +168,4 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.6.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.7.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
