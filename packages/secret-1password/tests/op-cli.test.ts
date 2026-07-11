@@ -70,6 +70,88 @@ describe('createDefaultOpCli', () => {
   });
 });
 
+/**
+ * Fake `spawn` that emits the given stderr and exits with the given code.
+ * Lets the exit-classifier be exercised with realistic `op` stderr lines
+ * without a real subprocess (cross-platform, deterministic).
+ */
+function spawnWithStderr(stderr: string, exitCode = 1): typeof import('node:child_process').spawn {
+  return ((..._args: unknown[]) => {
+    const proc = new EventEmitter() as EventEmitter & {
+      stdout: EventEmitter;
+      stderr: EventEmitter;
+      kill: (signal?: string) => boolean;
+    };
+    proc.stdout = new EventEmitter();
+    proc.stderr = new EventEmitter();
+    proc.kill = () => true;
+    setImmediate(() => {
+      proc.stderr.emit('data', Buffer.from(stderr));
+      proc.emit('close', exitCode);
+    });
+    return proc;
+  }) as unknown as typeof import('node:child_process').spawn;
+}
+
+describe('createOpCli - exit-error classification', () => {
+  it("classifies the op CLI v2 'not currently signed in' message as signed-out (E-15)", async () => {
+    const cli = createOpCli({
+      spawn: spawnWithStderr(
+        '[ERROR] 2026/07/11 14:00:00 you are not currently signed in. Please run `op signin --help` for instructions\n',
+      ),
+    });
+    await expect(cli.read('op://Personal/Item/field', { timeoutMs: 5000 })).rejects.toMatchObject({
+      name: 'OpCliError',
+      kind: 'signed-out',
+      hint: "run 'eval $(op signin)' (interactive) or set OP_SERVICE_ACCOUNT_TOKEN (headless).",
+    });
+  });
+
+  it("still classifies the legacy 'not signed in' message as signed-out", async () => {
+    const cli = createOpCli({
+      spawn: spawnWithStderr('[ERROR] you are not signed in, please run `op signin`\n'),
+    });
+    await expect(cli.read('op://Personal/Item/field', { timeoutMs: 5000 })).rejects.toMatchObject({
+      name: 'OpCliError',
+      kind: 'signed-out',
+    });
+  });
+
+  it('classifies a session-expired message as signed-out', async () => {
+    const cli = createOpCli({
+      spawn: spawnWithStderr(
+        '[ERROR] 2026/07/11 14:00:00 session expired, sign in to create a new session\n',
+      ),
+    });
+    await expect(cli.read('op://Personal/Item/field', { timeoutMs: 5000 })).rejects.toMatchObject({
+      name: 'OpCliError',
+      kind: 'signed-out',
+    });
+  });
+
+  it('classifies the op CLI v2 "couldn\'t find" message as reference-not-found', async () => {
+    const cli = createOpCli({
+      spawn: spawnWithStderr(
+        '[ERROR] 2026/07/11 14:00:00 could not read secret \'op://Personal/Item/field\': couldn\'t find item "Item" in vault "Personal"\n',
+      ),
+    });
+    await expect(cli.read('op://Personal/Item/field', { timeoutMs: 5000 })).rejects.toMatchObject({
+      name: 'OpCliError',
+      kind: 'reference-not-found',
+    });
+  });
+
+  it('keeps unrecognized stderr as unknown', async () => {
+    const cli = createOpCli({
+      spawn: spawnWithStderr('[ERROR] 2026/07/11 14:00:00 something inscrutable happened\n'),
+    });
+    await expect(cli.read('op://Personal/Item/field', { timeoutMs: 5000 })).rejects.toMatchObject({
+      name: 'OpCliError',
+      kind: 'unknown',
+    });
+  });
+});
+
 describe('createOpCli - SPL-22 timeout escalation', () => {
   it('escalates to SIGKILL and rejects when the child ignores SIGTERM', async () => {
     const signals: string[] = [];

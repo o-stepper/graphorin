@@ -59,6 +59,12 @@ Re-exports [getMiddlewareKind](/api/@graphorin/provider/functions/getMiddlewareK
 
 ***
 
+### listMiddlewareKinds
+
+Re-exports [listMiddlewareKinds](/api/@graphorin/provider/functions/listMiddlewareKinds.md)
+
+***
+
 ### MIDDLEWARE\_KIND
 
 Re-exports [MIDDLEWARE_KIND](/api/@graphorin/provider/variables/MIDDLEWARE_KIND.md)

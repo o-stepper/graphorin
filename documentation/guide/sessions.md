@@ -69,7 +69,7 @@ The registry exposes `register`, `retire`, `delete`, `resolveOrPlaceholder` for 
 
 ## Multi-agent attribution
 
-Every session message persisted by the agent runtime can carry an optional `agentId`. Filter per-agent on read:
+Every session message pushed through `session.push(...)` can carry an optional `agentId` (the agent runtime does not auto-persist turns - your loop owns the pushes). Filter per-agent on read:
 
 ```ts
 import { session } from './session-setup.js';

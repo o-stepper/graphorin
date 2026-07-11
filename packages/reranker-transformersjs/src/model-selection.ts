@@ -2,7 +2,7 @@
  * Locale-aware default model selector. Mirrors ADR-024 / DEC-120 § BGE
  * model family:
  *
- *  - English-only deployments → `Xenova/bge-reranker-base` (278M, FP16).
+ *  - English-only deployments → `Xenova/bge-reranker-base` (278M).
  *  - Every other locale → `BAAI/bge-reranker-v2-m3` (568M, multilingual).
  *
  * The selector deliberately stays language-pair-agnostic outside the

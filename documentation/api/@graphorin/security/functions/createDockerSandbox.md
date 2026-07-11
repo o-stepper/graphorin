@@ -10,7 +10,7 @@
 function createDockerSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: [packages/security/src/sandbox/docker.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/docker.ts#L104)
+Defined in: [packages/security/src/sandbox/docker.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/docker.ts#L105)
 
 Construct a `DockerSandbox` instance. The adapter resolves the
 peer dependency lazily on the first `run(...)` call.

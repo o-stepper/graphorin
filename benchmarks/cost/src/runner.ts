@@ -63,11 +63,20 @@ function createCapturingProvider(): { provider: Provider; captured: ProviderRequ
   return { provider, captured };
 }
 
-/** A trivial offline `Tool` whose only purpose is to enlarge the advertised schema. */
-function makeTool(name: string, description: string): Tool<unknown, unknown, unknown> {
+/** A trivial offline `Tool` that advertises a real JSON-Schema input shape. */
+function makeTool(
+  name: string,
+  description: string,
+  inputJsonSchema: Record<string, unknown>,
+): Tool<unknown, unknown, unknown> {
+  // `toJSON()` lets the agent's schema projection ship the actual JSON
+  // Schema on the wire body. A bare {parse, safeParse} validator degrades
+  // to a permissive {} with an 'unprojectable-schema' WARN, and the
+  // schema-body tokens this harness must count never reach the request.
   const inputSchema = {
     parse: (v: unknown) => v,
     safeParse: (v: unknown) => ({ success: true as const, data: v }),
+    toJSON: () => inputJsonSchema,
   } as Tool<unknown, unknown, unknown>['inputSchema'];
   return {
     name,
@@ -80,7 +89,7 @@ function makeTool(name: string, description: string): Tool<unknown, unknown, unk
   };
 }
 
-interface Scenario {
+export interface Scenario {
   readonly id: string;
   readonly instructions: string;
   readonly tools: ReadonlyArray<Tool<unknown, unknown, unknown>>;
@@ -111,11 +120,36 @@ const SCENARIOS: ReadonlyArray<Scenario> = [
       makeTool(
         'memory.search',
         'Search the user long-term memory by keyword and return matching facts.',
+        {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Keyword query to match against stored facts.' },
+            limit: { type: 'integer', description: 'Maximum number of facts.', minimum: 1 },
+          },
+          required: ['query'],
+          additionalProperties: false,
+        },
       ),
-      makeTool('memory.write', 'Persist a new salient fact to the user long-term memory store.'),
+      makeTool('memory.write', 'Persist a new salient fact to the user long-term memory store.', {
+        type: 'object',
+        properties: {
+          fact: { type: 'string', description: 'The salient fact to persist verbatim.' },
+          tags: { type: 'array', items: { type: 'string' }, description: 'Optional topic tags.' },
+        },
+        required: ['fact'],
+        additionalProperties: false,
+      }),
       makeTool(
         'calendar.lookup',
         'Look up the user calendar for a given day and return scheduled events.',
+        {
+          type: 'object',
+          properties: {
+            day: { type: 'string', format: 'date', description: 'Day to look up (YYYY-MM-DD).' },
+          },
+          required: ['day'],
+          additionalProperties: false,
+        },
       ),
     ],
     input: PINNED_INPUT,
@@ -228,6 +262,26 @@ export async function measureAllScenarios(): Promise<Record<string, number>> {
 
 export const SCENARIO_IDS: ReadonlyArray<string> = SCENARIOS.map((s) => s.id);
 
+/** The pinned scenarios - exported so tests can assert the fixtures' shape. */
+export const SCENARIO_FIXTURES: ReadonlyArray<Scenario> = SCENARIOS;
+
+/**
+ * One line per scenario over tolerance, NAMING the scenario - a single-line
+ * CI log grep must identify the culprit even when several scenarios regress.
+ */
+export function formatRegressionFailures(
+  results: ReadonlyArray<ScenarioResult>,
+  maxGrowth: number,
+): string[] {
+  return results
+    .filter((r) => r.ratio > maxGrowth)
+    .map(
+      (r) =>
+        `[benchmark-cost] regression: scenario '${r.id}' grew by ${(r.ratio * 100).toFixed(2)}% ` +
+        `(tokens=${String(r.tokens)} baseline=${String(r.baseline)}, tolerance ${(maxGrowth * 100).toFixed(0)}%)`,
+    );
+}
+
 async function updateBaseline(): Promise<void> {
   const scenarios = await measureAllScenarios();
   const prior = await loadBaseline().catch(() => undefined);
@@ -295,9 +349,9 @@ export async function main(): Promise<void> {
 
   const strict = process.env.COST_REGRESSION_STRICT !== '0' && !smoke;
   if (bad && strict) {
-    console.error(
-      `[benchmark-cost] regression: a scenario grew by ${(report.worstRatio * 100).toFixed(2)}% (> ${(maxGrowth * 100).toFixed(0)}%)`,
-    );
+    for (const line of formatRegressionFailures(report.results, maxGrowth)) {
+      console.error(line);
+    }
     process.exitCode = 1;
   }
 }

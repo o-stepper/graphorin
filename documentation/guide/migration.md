@@ -107,10 +107,10 @@ the groups that touch your deployment.
   invisible to the new timer driver until one manual `tick` or a
   resume re-persists them.
 - Read-only CLI commands (`memory inspect`/`activity`,
-  `traces status|prune`, `triggers list`, `consolidator status`,
-  `dlq-list`) no longer auto-migrate: pointed at a behind-schema or
-  never-migrated database they refuse with instructions instead of
-  upgrading the schema under a live server.
+  `traces status|prune`, `triggers list|status|fire|disable|prune`,
+  `consolidator status`, `dlq-list`) no longer auto-migrate: pointed
+  at a behind-schema or never-migrated database they refuse with
+  instructions instead of upgrading the schema under a live server.
 
 **Retention: the server now deletes old data by default.**
 

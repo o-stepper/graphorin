@@ -17,8 +17,19 @@
 - **Published:** v0.7.0 (optional sub-pack)
 - **Default model:** locale-aware (`Xenova/bge-reranker-base` for
   English, `BAAI/bge-reranker-v2-m3` for everything else).
-- **Default precision:** FP16 (`'fp16'` dtype).
+- **Default precision:** device-aware (`defaultRerankerDtype`) - `'q8'`
+  on CPU, `'fp16'` on accelerated devices such as `'webgpu'`. The fp16
+  ONNX exports of the default models fail session initialisation on the
+  onnxruntime-node CPU execution provider, so fp16 is not offered as a
+  CPU default; pass an explicit `dtype` to override.
 - **Default device:** CPU.
+- **Scoring:** raw `AutoModelForSequenceClassification` logits -
+  sigmoid for single-logit heads (the default BGE exports), positive
+  label softmax probability for multi-logit heads. The
+  text-classification pipeline is deliberately bypassed: it softmaxes
+  each row, which collapses a single-logit head to a constant `1.0`
+  for every pair. Injected `pipelineFactory` stubs keep the
+  classifier-pipeline contract.
 
 ---
 

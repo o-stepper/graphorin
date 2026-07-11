@@ -10,6 +10,6 @@
 const RERANKER_ID: "transformersjs-cross-encoder";
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L81)
+Defined in: [packages/reranker-transformersjs/src/reranker.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L82)
 
 ## Stable

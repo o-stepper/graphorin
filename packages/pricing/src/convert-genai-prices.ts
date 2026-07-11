@@ -31,6 +31,10 @@
  * }
  * ```
  *
+ * The published `data.json` ships as a bare top-level ARRAY of those
+ * provider objects (no `providers` wrapper); both forms are accepted
+ * and normalized to the wrapped shape above (E-09).
+ *
  * Per-Mtok figures divide by 1e6 into per-token USD. Model entries
  * whose `prices` is an ARRAY (conditional / time-tiered pricing) are
  * used only when the array holds exactly one usable record; everything
@@ -53,15 +57,26 @@ export interface GenaiPricesConversion {
 }
 
 /**
+ * E-09: the upstream repository publishes `data.json` as a bare
+ * top-level array of provider objects; normalize it into the wrapped
+ * `{ providers: [...] }` form the converter was written against.
+ */
+function normalizeGenaiPricesBody(body: unknown): unknown {
+  return Array.isArray(body) ? { providers: body } : body;
+}
+
+/**
  * Cheap structural detector: does this body look like the
  * genai-prices dataset (a `providers` array of objects carrying
- * `models` arrays)?
+ * `models` arrays, or the published bare top-level array of those
+ * provider objects)?
  *
  * @stable
  */
 export function isGenaiPricesShape(body: unknown): boolean {
-  if (body === null || typeof body !== 'object' || Array.isArray(body)) return false;
-  const providers = (body as { providers?: unknown }).providers;
+  const normalized = normalizeGenaiPricesBody(body);
+  if (normalized === null || typeof normalized !== 'object') return false;
+  const providers = (normalized as { providers?: unknown }).providers;
   if (!Array.isArray(providers) || providers.length === 0) return false;
   return providers.every(
     (p) => typeof p === 'object' && p !== null && Array.isArray((p as { models?: unknown }).models),
@@ -76,9 +91,14 @@ export function isGenaiPricesShape(body: unknown): boolean {
  */
 export function convertGenaiPrices(body: unknown): GenaiPricesConversion {
   if (!isGenaiPricesShape(body)) {
-    throw new Error('convertGenaiPrices: body does not match the genai-prices dataset shape');
+    throw new Error(
+      'convertGenaiPrices: body does not match the genai-prices dataset shape - ' +
+        'expected `{ providers: [...] }` or the published bare top-level array of ' +
+        'provider objects, each carrying a `models` array',
+    );
   }
-  const providers = (body as { providers: ReadonlyArray<unknown> }).providers;
+  const providers = (normalizeGenaiPricesBody(body) as { providers: ReadonlyArray<unknown> })
+    .providers;
   const entries: ModelPrice[] = [];
   let skipped = 0;
   for (const rawProvider of providers) {

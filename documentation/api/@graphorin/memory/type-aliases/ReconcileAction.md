@@ -10,7 +10,7 @@
 type ReconcileAction = "add" | "update" | "noop" | "conflict";
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L210)
+Defined in: [packages/memory/src/conflict/types.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L232)
 
 The four actions the neighbour-aware reconcile loop (P0-3) may choose
 for a candidate fact once the LLM has the most-similar existing

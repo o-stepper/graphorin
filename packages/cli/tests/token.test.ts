@@ -72,6 +72,7 @@ describe('token CRUD against a real SQLite store', () => {
       label: 'integration',
       env: 'live',
       print: () => undefined,
+      stdoutPrint: () => undefined,
     });
     expect(created.id).toMatch(/^[0-9a-f-]+$/);
     expect(created.raw).toMatch(/^gph_live_v1_/);
@@ -88,10 +89,27 @@ describe('token CRUD against a real SQLite store', () => {
     expect(revoked?.revokedAt).toBeDefined();
   });
 
+  it('S-14b: create prints the raw token on STDOUT and keeps the chatter on stderr', async () => {
+    const stderrLines: string[] = [];
+    const stdoutLines: string[] = [];
+    const created = await runTokenCreate({
+      config: cfg,
+      scopes: ['agent:run'],
+      label: 'stdout-contract',
+      print: (l) => stderrLines.push(l),
+      stdoutPrint: (l) => stdoutLines.push(l),
+    });
+    // The raw value is the machine-consumable output - stdout only.
+    expect(stdoutLines).toEqual([created.raw]);
+    expect(stderrLines.some((l) => l.includes(created.raw))).toBe(false);
+    expect(stderrLines.some((l) => l.includes('token created'))).toBe(true);
+  });
+
   it('rotates a token + reports the new raw value', async () => {
     const created = await runTokenCreate({
       config: cfg,
       scopes: ['agent:run'],
+      stdoutPrint: () => undefined,
       print: () => undefined,
     });
     const rotated = await runTokenRotate({

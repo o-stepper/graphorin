@@ -10,7 +10,7 @@
 function runDoctor(options?): Promise<DoctorReport>;
 ```
 
-Defined in: [packages/cli/src/commands/doctor.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/doctor.ts#L99)
+Defined in: [packages/cli/src/commands/doctor.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/doctor.ts#L111)
 
 Programmatic entry point. Returns the [DoctorReport](/api/@graphorin/cli/interfaces/DoctorReport.md) so tests
 and downstream automations consume the structured payload directly.

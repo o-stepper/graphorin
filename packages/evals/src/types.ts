@@ -38,7 +38,26 @@ export interface AgentLike<I, O> {
  * @stable
  */
 export interface RunOptions<I, O> {
-  readonly agent: AgentLike<I, O>;
+  /**
+   * Single agent shared by every worker. Safe only when the object
+   * tolerates overlapping `run()` calls (stubs, stateless wrappers) or
+   * `concurrency` is `1`: a Graphorin `Agent` instance allows one run
+   * in flight and throws `ConcurrentRunError` on overlap, which the
+   * runner surfaces as an `EvalConcurrencyError` instead of
+   * recording per-case scorer failures (E-19). For a framework agent
+   * at `concurrency > 1`, pass {@link agentFactory} instead.
+   */
+  readonly agent?: AgentLike<I, O>;
+  /**
+   * Per-worker agent constructor - invoked once per worker (at most
+   * `min(concurrency, total cases)` times, with the worker index)
+   * before that worker takes its first case, so every worker drives
+   * its own instance. This is the supported way to run a Graphorin
+   * `Agent` at `concurrency > 1` (one run in flight per instance).
+   * Takes precedence over {@link agent} when both are set; at least
+   * one of the two is required.
+   */
+  readonly agentFactory?: (workerIndex: number) => AgentLike<I, O> | Promise<AgentLike<I, O>>;
   readonly dataset: {
     readonly cases: ReadonlyArray<{
       readonly id?: string;

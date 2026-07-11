@@ -42,7 +42,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/v1/health` | Liveness + readiness summary (probes for storage, embedder, secrets, encryption, consolidator, triggers, replay buffer). |
+| `GET` | `/v1/health` | Liveness + readiness summary (probes for storage, embedder, secrets, encryption, consolidator, triggers, workflow timers, replay buffer). |
 | `GET` | `/v1/health/secrets` | Authenticated drilldown of the active `SecretsStore`. |
 | `GET` | `/v1/metrics` | Prometheus exposition (path configurable; auth optional). |
 | `GET` | `/v1/agents` | List registered agents. |
@@ -89,7 +89,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
 | | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
 | `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). An optional `name` targets a specific awakeable/approval among parallel pauses (W-119; approvals resolve through the same primitive). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement the needed method. Scope `workflows:resume:<id>`. |
-| `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
+| `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`; an unknown or deleted thread answers `404` with the `{ "error": "thread-not-found" }` envelope. Scope `workflows:read:<id>`. |
 | `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
 | `DELETE` | `/v1/workflows/:id/threads/:threadId` | Delete every checkpoint + pending write of one thread (idempotent; `204` on success, `400` when the entry does not expose `deleteThread()`). Scope `workflows:delete:<id>`. |
 | `POST` | `/v1/workflows/:id/fork` | Fork a new thread from a checkpoint (W-119): body `{ fromThreadId, fromCheckpointId? }`, defaulting to the thread's latest checkpoint; answers `201 { newThreadId }`. Scope `workflows:execute:<id>`. |
@@ -193,7 +193,7 @@ When you pass **both** a `consolidator` and a triggers scheduler to `createServe
 
 ## Idempotency
 
-Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute. Expired idempotency records (each stores the full response body) are swept from the database automatically on an hourly timer; the read path already refuses to replay them, so the sweep changes no replay semantics.
+Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute. Expired idempotency records (each stores the full response body) are swept from the database automatically by the unified [retention sweep](#retention); the read path already refuses to replay them, so the sweep changes no replay semantics.
 
 ## Disconnects and reconnection
 
@@ -237,7 +237,7 @@ windows.
 
 ## Prometheus metrics
 
-`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted.
+`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted. With `metrics.requireAuth = true` the endpoint mounts behind the standard auth boundary and requires the `admin:metrics:read` scope (an `admin:*` grant matches); with `requireAuth = false` (the default) it is served unauthenticated.
 
 ## Configuration
 

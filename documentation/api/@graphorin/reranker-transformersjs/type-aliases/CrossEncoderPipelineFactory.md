@@ -10,7 +10,7 @@
 type CrossEncoderPipelineFactory = (task, model, options) => Promise<CrossEncoderPipeline>;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L45)
+Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L69)
 
 **`Internal`**
 
@@ -20,11 +20,7 @@ Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:45](https://g
 | ------ | ------ |
 | `task` | `"text-classification"` |
 | `model` | `string` |
-| `options` | \{ `cache_dir?`: `string`; `device?`: `string`; `dtype?`: [`RerankerDtype`](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md); `revision?`: `string`; \} |
-| `options.cache_dir?` | `string` |
-| `options.device?` | `string` |
-| `options.dtype?` | [`RerankerDtype`](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md) |
-| `options.revision?` | `string` |
+| `options` | [`CrossEncoderLoadOptions`](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderLoadOptions.md) |
 
 ## Returns
 

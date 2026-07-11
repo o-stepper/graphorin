@@ -10,7 +10,7 @@
 function runPricingDiff(options): Promise<readonly PricingDiffEntry[]>;
 ```
 
-Defined in: [packages/cli/src/commands/pricing.ts:143](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L143)
+Defined in: [packages/cli/src/commands/pricing.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L144)
 
 ## Parameters
 

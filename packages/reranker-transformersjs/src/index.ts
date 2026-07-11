@@ -19,10 +19,13 @@
  *
  * Locale-aware default model:
  *
- *  - `'en'` / `'en-*'` → `Xenova/bge-reranker-base` (278M parameters,
- *    FP16 quantized).
+ *  - `'en'` / `'en-*'` → `Xenova/bge-reranker-base` (278M parameters).
  *  - Every other locale → `BAAI/bge-reranker-v2-m3` (568M parameters,
  *    multilingual baseline).
+ *
+ * Default precision is device-aware: `'q8'` on CPU (the fp16 ONNX
+ * exports fail session init on the onnxruntime-node CPU execution
+ * provider), `'fp16'` on accelerated devices.
  *
  * Operators that want a narrower / language-specific cross-encoder
  * pass an explicit `model` option - the package's defaults
@@ -40,11 +43,15 @@ export {
   _resetPipelineFactoryCacheForTesting,
   type ClassifierResult,
   CrossEncoderLoadError,
+  type CrossEncoderLoadOptions,
   type CrossEncoderPipeline,
   type CrossEncoderPipelineFactory,
+  defaultRerankerDtype,
   extractPairScores,
   loadDefaultPipelineFactory,
+  type PairScorer,
   type RerankerDtype,
+  scoresFromLogits,
 } from './cross-encoder.js';
 export {
   DEFAULT_ENGLISH_MODEL,

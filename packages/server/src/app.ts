@@ -113,7 +113,12 @@ export interface CreateServerOptions {
    * `graphorin migrate` CLI command which bypasses the listener.
    */
   readonly validatedConfig?: ServerConfigSpec;
-  /** Pre-built SQLite store. Tests inject an in-memory store. */
+  /**
+   * Pre-built SQLite store. Tests inject an in-memory store. The
+   * caller retains ownership: `stop()` never closes an injected store
+   * (E-21), so it can be shared across server restarts. Omit the
+   * option to let the server create - and close - its own store.
+   */
   readonly store?: GraphorinSqliteStore;
   /** Optional pre-built tracker. Tests inject deterministic timing. */
   readonly runs?: RunStateTracker;
@@ -267,6 +272,8 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     options,
     config,
     store,
+    // E-21 (S-24/16): stop() only closes stores this factory created.
+    ownsStore: options.store === undefined,
     app,
     metricRegistry,
     runs,

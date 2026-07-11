@@ -65,7 +65,10 @@ import {
  *  - `'agent'`/`<id>` + `runId` ⇒ `'agent:<id>/runs/<runId>/events'`
  *  - `'run'`/`<runId>` ⇒ `'session:<sessionId>/runs/<runId>/events'`
  *    (when `sessionId` is provided)
- *  - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'`
+ *  - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'`, or
+ *    `'workflow:<id>/runs/<runId>/events'` when the optional `runId`
+ *    is present (the run-scoped subject advertised by the workflow
+ *    execute/resume routes)
  *
  * @stable
  */
@@ -81,7 +84,18 @@ export type SubscriptionTarget =
       readonly runId: string;
       readonly sessionId?: string;
     }
-  | { readonly target: 'workflow'; readonly id: string };
+  | {
+      readonly target: 'workflow';
+      readonly id: string;
+      /**
+       * E-12: the server emits workflow run events ONLY on the
+       * run-scoped subject (`workflow:<id>/runs/<runId>/events`)
+       * advertised by `POST /v1/workflows/:id/execute` (and resume),
+       * never on the base `workflow:<id>/events` subject - pass the
+       * advertised `runId` to receive them.
+       */
+      readonly runId?: string;
+    };
 
 /**
  * Transport selector. `'auto'` (default) attempts a WebSocket
@@ -212,6 +226,16 @@ export class GraphorinClient {
   readonly #options: GraphorinClientOptions;
   readonly #pending: Map<ClientMessageId, PendingRpc> = new Map();
   readonly #subscriptions: Map<string, SubscriptionInternal> = new Map();
+  /**
+   * E-02: frames the server tagged with a subscriptionId the client
+   * has not mapped yet. The server dispatches replayed frames (and can
+   * interleave live ones) BEFORE the subscribe RPC reply lands, so
+   * dropping unknown-id frames loses exactly the replay the caller
+   * asked for. Held only while a subscribe RPC is in flight; flushed
+   * in arrival order once the reply maps the id.
+   */
+  readonly #preMapBuffers: Map<string, PreMapFrame[]> = new Map();
+  #pendingSubscribes = 0;
   /** IP-3: the synthetic single subscription an SSE connection carries. */
   #sseSubscription: SubscriptionInternal | undefined;
   #transport: Transport | undefined;
@@ -320,25 +344,34 @@ export class GraphorinClient {
       subject,
     };
     if (lastEventId !== undefined) params.sinceEventId = lastEventId;
-    const reply = await this.#sendRpc('subscription.subscribe', params);
-    const result = reply as { subscriptionId?: unknown; snapshotEventId?: unknown };
-    const subscriptionId =
-      typeof result.subscriptionId === 'string' && result.subscriptionId.length > 0
-        ? result.subscriptionId
-        : undefined;
-    if (subscriptionId === undefined) {
-      throw new ProtocolViolationError('Server subscribe reply missing subscriptionId.');
+    this.#pendingSubscribes += 1;
+    try {
+      const reply = await this.#sendRpc('subscription.subscribe', params);
+      const result = reply as { subscriptionId?: unknown; snapshotEventId?: unknown };
+      const subscriptionId =
+        typeof result.subscriptionId === 'string' && result.subscriptionId.length > 0
+          ? result.subscriptionId
+          : undefined;
+      if (subscriptionId === undefined) {
+        throw new ProtocolViolationError('Server subscribe reply missing subscriptionId.');
+      }
+      const snapshotEventId =
+        typeof result.snapshotEventId === 'string' ? result.snapshotEventId : undefined;
+      const sub = this.#createSubscription({
+        subscriptionId,
+        subject,
+        target,
+        snapshotEventId,
+      });
+      this.#subscriptions.set(subscriptionId, sub);
+      this.#flushPreMapFrames(subscriptionId, sub);
+      return sub;
+    } finally {
+      this.#pendingSubscribes -= 1;
+      // E-02: with no subscribe in flight the buffered ids can never
+      // become known - drop them instead of leaking the buffers.
+      if (this.#pendingSubscribes === 0) this.#preMapBuffers.clear();
     }
-    const snapshotEventId =
-      typeof result.snapshotEventId === 'string' ? result.snapshotEventId : undefined;
-    const sub = this.#createSubscription({
-      subscriptionId,
-      subject,
-      target,
-      snapshotEventId,
-    });
-    this.#subscriptions.set(subscriptionId, sub);
-    return sub;
   }
 
   /**
@@ -458,6 +491,7 @@ export class GraphorinClient {
       sub.__close('aborted', new ClientAbortedError('Client disconnected.'));
     }
     this.#subscriptions.clear();
+    this.#preMapBuffers.clear();
     if (transport !== undefined) {
       try {
         transport.close(1000, 'client-disconnect');
@@ -597,16 +631,19 @@ export class GraphorinClient {
     if (isLifecycleFrame(frame)) {
       const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__pushLifecycle(frame);
+      else this.#bufferPreMapFrame(frame.subscriptionId, frame);
       return;
     }
     if (isReplayMarkerFrame(frame)) {
       const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__pushReplayMarker(frame);
+      else this.#bufferPreMapFrame(frame.subscriptionId, frame);
       return;
     }
     if (isEventFrame(frame)) {
       const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__push(frame);
+      else this.#bufferPreMapFrame(frame.subscriptionId, frame);
       return;
     }
     if (isErrorFrame(frame)) {
@@ -632,6 +669,40 @@ export class GraphorinClient {
    */
   #sseFallback(): SubscriptionInternal | undefined {
     return this.#transport?.kind === 'sse' ? this.#sseSubscription : undefined;
+  }
+
+  /**
+   * E-02: hold a frame whose subscriptionId has no mapping yet. Only
+   * meaningful while a subscribe RPC is outstanding - the server tags
+   * replayed frames with the NEW subscriptionId and dispatches them
+   * before the RPC reply. With no subscribe in flight the id can never
+   * become known, so the frame is dropped (the pre-fix behavior).
+   */
+  #bufferPreMapFrame(subscriptionId: string, frame: PreMapFrame): void {
+    if (this.#pendingSubscribes === 0) return;
+    const buffer = this.#preMapBuffers.get(subscriptionId);
+    if (buffer === undefined) {
+      this.#preMapBuffers.set(subscriptionId, [frame]);
+      return;
+    }
+    // Bound: one frame beyond the W-152 per-subscription cap, so the
+    // flush trips the same deterministic flow-overflow close instead
+    // of silently truncating the replay.
+    const limit = this.#options.subscriptionQueueLimit ?? 10_000;
+    if (limit > 0 && buffer.length > limit) return;
+    buffer.push(frame);
+  }
+
+  /** E-02: deliver frames buffered before the id→subscription mapping existed. */
+  #flushPreMapFrames(subscriptionId: string, sub: SubscriptionInternal): void {
+    const buffered = this.#preMapBuffers.get(subscriptionId);
+    if (buffered === undefined) return;
+    this.#preMapBuffers.delete(subscriptionId);
+    for (const frame of buffered) {
+      if (isEventFrame(frame)) sub.__push(frame);
+      else if (isLifecycleFrame(frame)) sub.__pushLifecycle(frame);
+      else sub.__pushReplayMarker(frame);
+    }
   }
 
   #handleTransportError(err: Error, _kind: TransportKind): void {
@@ -725,6 +796,7 @@ export class GraphorinClient {
         }
         for (const [oldId, sub] of [...this.#subscriptions]) {
           this.#subscriptions.delete(oldId);
+          this.#pendingSubscribes += 1;
           try {
             // IP-7: re-establish the server-side subscription with the
             // SUBSCRIPTION's own replay cursor, then re-point the SAME
@@ -749,8 +821,15 @@ export class GraphorinClient {
             }
             sub.__rebind(newId);
             this.#subscriptions.set(newId, sub);
+            // E-02: the server replays missed frames (tagged with the
+            // new id) BEFORE the RPC reply - deliver the ones buffered
+            // while the mapping did not exist yet.
+            this.#flushPreMapFrames(newId, sub);
           } catch (err) {
             sub.__close('aborted', err instanceof Error ? err : new Error(String(err)));
+          } finally {
+            this.#pendingSubscribes -= 1;
+            if (this.#pendingSubscribes === 0) this.#preMapBuffers.clear();
           }
         }
         return;
@@ -966,6 +1045,9 @@ interface PendingRpc {
   readonly reject: (reason: Error) => void;
 }
 
+/** E-02: frame kinds the server can dispatch before the subscribe RPC reply. */
+type PreMapFrame = ServerEventFrame | ServerLifecycleFrame | ServerReplayMarkerFrame;
+
 function subjectFor(target: SubscriptionTarget): string {
   switch (target.target) {
     case 'session':
@@ -991,6 +1073,10 @@ function subjectFor(target: SubscriptionTarget): string {
       );
     case 'workflow':
       assertNonEmpty(target.id, 'workflow.id');
+      if (target.runId !== undefined) {
+        assertNonEmpty(target.runId, 'workflow.runId');
+        return `workflow:${target.id}/runs/${target.runId}/events`;
+      }
       return `workflow:${target.id}/events`;
   }
 }

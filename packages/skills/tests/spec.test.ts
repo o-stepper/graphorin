@@ -24,6 +24,42 @@ describe('getSpecSnapshot', () => {
   });
 });
 
+// Regression guard for e2e finding N-03/20 (E-22): the bundled snapshot
+// drifted from the live agentskills.io specification, claiming
+// disable-model-invocation as a stable upstream field and allowed-tools
+// as string-or-array.
+describe('bundled snapshot tracks the live agentskills.io specification', () => {
+  it('lists exactly the six public spec fields', () => {
+    expect(Object.keys(getSpecSnapshot().knownFields)).toEqual([
+      'name',
+      'description',
+      'license',
+      'compatibility',
+      'metadata',
+      'allowed-tools',
+    ]);
+  });
+
+  it('records allowed-tools as a space-separated string (the spec defines no array form)', () => {
+    const entry = getKnownField('allowed-tools');
+    expect(entry?.type).toBe('string');
+    expect(entry?.stability).toBe('experimental');
+  });
+
+  it('does not claim disable-model-invocation as an upstream field', () => {
+    expect(getKnownField('disable-model-invocation')).toBeUndefined();
+  });
+
+  it('tags both disable-model-invocation spellings as graphorin-only extensions', () => {
+    const prefixed = getGraphorinMapping('graphorin-disable-model-invocation');
+    expect(prefixed?.policy).toBe('graphorin-only');
+    expect(prefixed?.anthropicEquivalent).toBeNull();
+    const bare = getGraphorinMapping('disable-model-invocation');
+    expect(bare?.policy).toBe('graphorin-only');
+    expect(bare?.anthropicEquivalent).toBeNull();
+  });
+});
+
 describe('compareAuthorSpecHint', () => {
   afterEach(() => {
     _setSpecSnapshotForTesting(null);

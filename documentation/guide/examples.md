@@ -23,7 +23,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/<name> dev
 A 30-minute hands-on tour through Graphorin - wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
 
 - Recipes: `stub`, `ollama`, `llamacpp-server`, `llamacpp-node`.
-- Demonstrates: agent loop, memory, sensitivity gating, durable HITL, the `GRAPHORIN_OFFLINE=1` contract.
+- Demonstrates: agent loop, per-turn memory persistence + consolidator turn triggers, `factsAutoRecall` + `autoAssembleContext`, sensitivity gating, the `GRAPHORIN_OFFLINE=1` contract.
 - Source: [`examples/personal-assistant-cli/`](https://github.com/o-stepper/graphorin/tree/main/examples/personal-assistant-cli).
 
 ## `multi-agent-crew`
@@ -63,9 +63,9 @@ Drives `@graphorin/memory`'s background consolidator across a long-running sessi
 
 ## `slack-bot-integration`
 
-An adapter sketch showing how to mount Graphorin as the brain behind a Slack bot - without making channel adapters part of the framework. The Slack bot is the consumer; Graphorin emits typed events the bot turns into messages.
+A server-mode acceptance demo that mounts Graphorin as the brain behind a Slack bot - without making channel adapters part of the framework. `startSlackBotApp` binds a real HTTP listener; inbound webhook payloads are HMAC-verified before they reach the agent, the reply streams back to Slack as typed agent events turned into `chat.postMessage` calls, and a high-amount expense suspends the run on a durable HITL approval that survives a process restart.
 
-- Demonstrates: library-mode embedding, event-driven UI, sensitivity-aware payload filtering.
+- Demonstrates: real webhook listener, HMAC-SHA256 signature verification, typed-event streaming replies, durable HITL approval across restart.
 - Source: [`examples/slack-bot-integration/`](https://github.com/o-stepper/graphorin/tree/main/examples/slack-bot-integration).
 
 ## `tools-harness-tour`
@@ -91,9 +91,9 @@ The security and replay showcase: the same scripted agent flow runs three times 
 
 ## `local-stack-cli`
 
-A single-binary CLI that wires the standalone server, the triggers daemon, the encrypted-file secrets store, and a couple of skills into a turnkey local stack - useful as a starting point for production-shaped local deployments.
+A fully-local REPL assistant: an Ollama-served LLM, an Ollama-served embedder, and SQLite + sqlite-vec on disk - zero non-loopback packets, provable with `GRAPHORIN_OFFLINE=1`. Every turn is persisted through `memory.session.push(...)` and a consolidator turn trigger distills facts in the background, so a fact taught in one session is recalled in the next.
 
-- Demonstrates: standalone server, `graphorin doctor`, `graphorin secrets`, triggers, skills.
+- Demonstrates: Ollama provider + embedder, per-turn session persistence, consolidator turn triggers, `factsAutoRecall` + `autoAssembleContext`, the `GRAPHORIN_OFFLINE=1` contract.
 - Source: [`examples/local-stack-cli/`](https://github.com/o-stepper/graphorin/tree/main/examples/local-stack-cli).
 
 ## Tracing across every example

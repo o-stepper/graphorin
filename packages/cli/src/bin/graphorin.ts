@@ -187,9 +187,13 @@ function registerLifecycleCommands(program: Command): void {
   program
     .command('init')
     .description(
-      '[Bootstrap] Generate a fresh graphorin.config.ts + the server pepper (mint tokens afterwards with token create).',
+      '[Bootstrap] Generate a fresh graphorin.config.ts (or .json via --format json) + the server pepper (mint tokens afterwards with token create).',
     )
-    .option('-o, --out <path>', 'Output path; defaults to ./graphorin.config.ts.')
+    .option('-o, --out <path>', 'Output path; defaults to ./graphorin.config.<format>.')
+    .option(
+      '--format <fmt>',
+      'Config flavour: ts | json (default ts; a .ts config later needs a TS-capable Node/loader plus @graphorin/server resolvable next to it - json loads anywhere).',
+    )
     .option('--non-interactive', 'Accept defaults / env vars without prompting.', false)
     .option(
       '--cloud-consent <tier>',
@@ -200,6 +204,7 @@ function registerLifecycleCommands(program: Command): void {
     .action(
       async (opts: {
         out?: string;
+        format?: 'ts' | 'json';
         nonInteractive?: boolean;
         cloudConsent?: 'public-only' | 'public-and-internal' | 'all-with-warnings';
         encrypted?: boolean;
@@ -211,6 +216,7 @@ function registerLifecycleCommands(program: Command): void {
         }
         await runInit({
           ...(opts.out !== undefined ? { out: opts.out } : {}),
+          ...(opts.format !== undefined ? { format: opts.format } : {}),
           ...(opts.nonInteractive !== undefined ? { nonInteractive: opts.nonInteractive } : {}),
           ...(opts.cloudConsent !== undefined ? { cloudConsent: opts.cloudConsent } : {}),
           ...(opts.encrypted !== undefined ? { encrypted: opts.encrypted } : {}),
@@ -242,6 +248,10 @@ function registerDoctorCommand(program: Command): void {
   program
     .command('doctor')
     .description('[Diagnostics] Health check (perms + secrets + encryption + systemd).')
+    .option(
+      '-c, --config <path>',
+      'Check the storage/audit paths resolved from this config instead of ~/.graphorin.',
+    )
     .option('--fix-perms', 'Repair drifted POSIX file modes.')
     .option('--check-perms', 'Run the file-perms check.')
     .option('--check-secrets', 'Run the secrets-store check.')
@@ -251,6 +261,7 @@ function registerDoctorCommand(program: Command): void {
     .option('--json', 'Emit a structured JSON report on stdout.')
     .action(
       async (opts: {
+        config?: string;
         fixPerms?: boolean;
         checkPerms?: boolean;
         checkSecrets?: boolean;
@@ -260,6 +271,7 @@ function registerDoctorCommand(program: Command): void {
         json?: boolean;
       }) => {
         await runDoctor({
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
           ...(opts.fixPerms !== undefined ? { fixPerms: opts.fixPerms } : {}),
           ...(opts.checkPerms !== undefined ? { checkPerms: opts.checkPerms } : {}),
           ...(opts.checkSecrets !== undefined ? { checkSecrets: opts.checkSecrets } : {}),
@@ -276,7 +288,7 @@ function registerTokenCommands(program: Command): void {
   const token = program.command('token').description('[Auth] Manage server auth tokens.');
   token
     .command('create')
-    .description('Mint a new token. Prints the raw value once.')
+    .description('Mint a new token. Prints the raw value once, on stdout.')
     .requiredOption('--scopes <list>', 'Comma-separated scope list.')
     .option('--label <name>', 'Optional label.')
     .option('--expires-in <duration>', 'Duration string: 30d, 12h, 90m, 45s.')
@@ -1382,6 +1394,10 @@ function registerToolsCommands(program: Command): void {
 }
 
 main().catch((err) => {
-  process.stderr.write(`[graphorin/cli] ${(err as Error).message}\n`);
+  // S-14b: many command errors already embed the '[graphorin/cli] '
+  // brand - do not double it.
+  const message = String((err as Error).message ?? err);
+  const line = message.startsWith('[graphorin/cli] ') ? message : `[graphorin/cli] ${message}`;
+  process.stderr.write(`${line}\n`);
   process.exit(1);
 });

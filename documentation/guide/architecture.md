@@ -127,7 +127,7 @@ sequenceDiagram
     Agent-->>Agent: next step or done
 ```
 
-> The agent builds the run's system prompt from `instructions`; it does not auto-compile a memory-aware prompt per step. The model reaches memory only through the memory tools it calls (registered via `tools: memory.tools`). The `ContextEngine` runs separately for [auto-compaction](/guide/agent-runtime#context-management-in-the-loop).
+> The agent builds the run's system prompt from `instructions`; it does not auto-compile a memory-aware prompt per step. By default the model reaches memory only through the memory tools it calls (registered via `tools: memory.tools`); `autoAssembleContext: true` opts in to compiling the memory context engine into the per-run prompt once at run start (see [memory-aware system prompt](/guide/agent-runtime#memory-aware-system-prompt-opt-in)). The `ContextEngine` runs separately for [auto-compaction](/guide/agent-runtime#context-management-in-the-loop).
 
 ## Privacy, security, observability - built in
 

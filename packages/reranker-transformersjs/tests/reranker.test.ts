@@ -78,6 +78,26 @@ describe('createCrossEncoderReranker', () => {
     expect(reranker.model).toBe('cross-encoder/ms-marco-MiniLM-L-6-v2');
   });
 
+  it("defaults dtype to 'q8' on the (default) CPU device (N-01/22 regression)", () => {
+    expect(createCrossEncoderReranker({ locale: 'en' }).dtype).toBe('q8');
+    expect(createCrossEncoderReranker({ locale: 'en', device: 'cpu' }).dtype).toBe('q8');
+  });
+
+  it("defaults dtype to 'fp16' on accelerated devices and honours explicit overrides", () => {
+    expect(createCrossEncoderReranker({ locale: 'en', device: 'webgpu' }).dtype).toBe('fp16');
+    expect(createCrossEncoderReranker({ locale: 'en', dtype: 'fp32' }).dtype).toBe('fp32');
+  });
+
+  it('passes the device-derived default dtype to an injected pipeline factory', async () => {
+    const { factory, calls } = buildStubFactory(new Map([['apple', 0.7]]));
+    const reranker = createCrossEncoderReranker({
+      locale: 'en',
+      pipelineFactory: factory,
+    });
+    await reranker.rerank('apple', [[hit('r1', 'apple', 0.9)]]);
+    expect(calls[0]?.options).toMatchObject({ dtype: 'q8' });
+  });
+
   it('applies the dtype / device / cacheDir / revision options when loading the pipeline', async () => {
     const { factory, calls } = buildStubFactory(new Map([['apple', 0.7]]));
     const reranker = createCrossEncoderReranker({

@@ -44,7 +44,7 @@ import {
 
 const dataset = await loadJsonlDataset('./fixtures/golden.jsonl');
 const report = await runEvals({
-  agent,                       // anything with `run(input)`
+  agent,                       // anything with `run(input)` that tolerates parallel calls
   dataset,
   scorers: [exactMatch({ caseInsensitive: true })],
   concurrency: 4,
@@ -52,6 +52,11 @@ const report = await runEvals({
 console.log(renderTerminalReport(report));
 exitOnFailures(report);
 ```
+
+A Graphorin `Agent` instance allows **one run in flight** - shared
+across workers at `concurrency > 1` it throws `ConcurrentRunError`.
+Pass `agentFactory: () => createAgent({...})` (one agent per worker)
+instead of a shared `agent`; see [Parallel runner](#parallel-runner).
 
 ---
 
@@ -93,7 +98,9 @@ exitOnFailures(report);
 
 ```ts
 const report = await runEvals({
-  agent,
+  // One agent per worker: a framework `Agent` allows a single run in
+  // flight per instance, so parallel workers each need their own.
+  agentFactory: () => createAgent({ /* ...your agent config */ }),
   dataset,
   scorers,
   iterations: 3,            // each case run 3 times for variance estimation
@@ -102,6 +109,15 @@ const report = await runEvals({
   onProgress: (e) => console.log(`${e.index}/${e.total} ${e.caseId}`),
 });
 ```
+
+Provide either `agent` (one shared instance) or `agentFactory`
+(invoked once per worker, with the worker index; it wins when both are
+set). A shared `agent` is only safe when the object tolerates
+overlapping `run()` calls - a plain stub, a stateless wrapper, or
+`concurrency: 1`. A Graphorin `Agent` enforces one run in flight per
+instance (`ConcurrentRunError`); when a shared instance trips that
+guard the runner fails fast with an `EvalConcurrencyError` naming the
+remedy, instead of recording the whole dataset as scorer failures.
 
 Every report summary carries a Wilson 95% confidence interval for the
 pass rate (`summary.passRateCi`), and, when `iterations > 1`,

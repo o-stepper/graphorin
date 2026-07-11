@@ -78,6 +78,8 @@ export async function runTriggersStatus(
   options: TriggersStatusOptions,
 ): Promise<TriggerState | null> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -115,6 +117,9 @@ export async function runTriggersFire(
   options: TriggersFireOptions,
 ): Promise<{ readonly fired: false; readonly unsupported: true }> {
   const ctx = await openStoreContext({
+    // W-068: read-only (IP-4 - the fire itself is UNSUPPORTED) - never
+    // auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -152,6 +157,9 @@ export async function runTriggersDisable(
   options: TriggersDisableOptions,
 ): Promise<TriggerState | null> {
   const ctx = await openStoreContext({
+    // W-068: writes one column, but never auto-migrates a live database
+    // (the `traces prune` precedent).
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -195,6 +203,9 @@ export async function runTriggersPrune(
 ): Promise<TriggersPruneResult> {
   const cutoff = options.before === undefined ? 0 : parseCutoff(options.before);
   const ctx = await openStoreContext({
+    // W-068: deletes rows, but never auto-migrates a live database
+    // (the `traces prune` precedent).
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {

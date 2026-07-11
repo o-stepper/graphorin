@@ -141,6 +141,8 @@ graphorin doctor
 
 Recommended defaults are `0700` for the `.graphorin` home directory and `0600` for the config file, the main database, the audit log, and the secrets store.
 
+For project-local deployments, `graphorin doctor --config ./graphorin.config.json` audits the config file plus the storage and audit paths it resolves to, instead of the `~/.graphorin` layout.
+
 ## Pluggable adapters
 
 The contracts in `@graphorin/core/contracts` are deliberately small. Build a non-SQLite adapter (Postgres, libSQL, DuckDB, in-memory) by implementing the `MemoryStore`, `SessionStore`, `CheckpointStore`, `TriggerStore`, `AuthTokenStore`, `OAuthServerStore`, and `SecretsStore` interfaces (embedding metadata and the audit database are store-sqlite internals, not core contracts). Existing packages depend only on the contracts.

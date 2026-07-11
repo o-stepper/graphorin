@@ -40,6 +40,7 @@ import {
   type SlackBotApp,
   type SlackEventEnvelope,
   simulateApprovalLifecycle,
+  startSlackBotApp,
   VERSION,
 } from '../src/main.js';
 import { createInMemorySlackClient } from '../src/slack-stub.js';
@@ -185,6 +186,26 @@ describe('examples/slack-bot-integration - smoke', () => {
     expect(after).toHaveLength(0);
   }, 15_000);
 
+  it('startSlackBotApp binds a real HTTP listener by default (E-06 regression)', async () => {
+    const { host, port, app } = await startSlackBotApp({
+      recipe: 'stub',
+      dbPath: ':memory:',
+      slackClient: createInMemorySlackClient(),
+      // Ephemeral port so parallel CI runs never collide.
+      server: { port: 0 },
+    });
+    cleanups.push(() => app.close());
+    // The returned address must be a live socket, not a fabricated
+    // config echo: before the fix `skipListen: true` was hardcoded and
+    // this fetch died with ECONNREFUSED.
+    expect(port).toBeGreaterThan(0);
+    const res = await fetch(`http://${host}:${port}/v1/health`);
+    expect(res.status).toBe(200);
+    // Clean shutdown releases the socket.
+    await app.close();
+    await expect(fetch(`http://${host}:${port}/v1/health`)).rejects.toThrow();
+  }, 15_000);
+
   it('rejects requests to /v1/agents/:id/run without a valid bearer token, accepts with one', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
@@ -209,7 +230,9 @@ describe('examples/slack-bot-integration - smoke', () => {
     const { app } = await buildApp({
       sessionId: 'auth-flow',
       store: sharedStore,
-      server: { auth: { enabled: true, pepperEnvVar: PEPPER_ENV_VAR } },
+      // `listen: false` keeps this scenario in-process (no socket) - the
+      // point is the bearer-token path, not the listener.
+      server: { auth: { enabled: true, pepperEnvVar: PEPPER_ENV_VAR }, listen: false },
     });
     await app.server.start();
 

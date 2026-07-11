@@ -209,14 +209,17 @@ The CLI command `graphorin auth login` walks the operator through the flow once;
 
 ```ts
 import { createOAuthAuthorizationProvider, createMCPClient } from '@graphorin/mcp';
-import { createInMemoryOAuthServerStore } from '@graphorin/security';
+import { createInMemoryOAuthServerStore, createSecretsStore } from '@graphorin/security';
 
 // In production: the persistent OAuthServerStore the login flow wrote to.
 const storage = createInMemoryOAuthServerStore();
+// The SecretsStore holding the persisted token material (SPL-1).
+const secretsStore = await createSecretsStore();
 
 const authProvider = createOAuthAuthorizationProvider({
   serverId: 'example-mcp',
   storage, // the OAuthServerStore the login flow persisted to
+  secretsStore, // resolves the persisted tokens across process restarts
 });
 
 const httpClient = await createMCPClient({
@@ -227,6 +230,8 @@ const httpClient = await createMCPClient({
   authProvider,
 });
 ```
+
+With `secretsStore` supplied, a fresh process serves the persisted access token directly for as long as the stored session is provably fresh (outside the `refreshAheadMs` window, default 5 minutes) - the first `resolveHeader()` does not burn a refresh-token rotation. Without it the provider has no token source across restarts: the `OAuthServerStore` record carries only refs, so the first request has to refresh (and fails when no refresh token is resolvable). The programmatic wrappers `mcpAuthRefresh` / `mcpAuthRevoke` / `mcpAuthStatus` / `mcpAuthListSessions` accept and forward the same `secretsStore` option, so refresh and revoke also work across processes.
 
 Do **not** resolve the token once into static `headers` - that pins a single token and defeats the refresh-ahead window. For a rare pre-shared token, pass `bearerToken` instead; `authProvider` and `bearerToken` are mutually exclusive and supplying both throws `MCPInvalidConfigError`.
 

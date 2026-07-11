@@ -38,10 +38,18 @@ import { loadConfig } from '../internal/load-config.js';
 import {
   brand,
   type CommonOutputOptions,
+  defaultJsonSink,
   defaultPrintSink,
   emitReport,
   statusMarker,
 } from '../internal/output.js';
+
+/** Error messages historically embed the brand; keep JSON payloads clean. */
+function stripCliPrefix(message: string): string {
+  return message.startsWith('[graphorin/cli] ')
+    ? message.slice('[graphorin/cli] '.length)
+    : message;
+}
 
 /** @stable */
 export interface AuditCommonOptions extends CommonOutputOptions {
@@ -63,7 +71,19 @@ export interface AuditVerifyResult {
  * @stable
  */
 export async function runAuditVerify(options: AuditCommonOptions = {}): Promise<AuditVerifyResult> {
-  const ctx = await openAuditContext(options);
+  let ctx: AuditContext;
+  try {
+    ctx = await openAuditContext(options);
+  } catch (err) {
+    // S-14b: --json consumers parse stdout - before the non-zero exit,
+    // emit a structured error document instead of nothing (an empty
+    // stdout was indistinguishable from a crash).
+    if (options.json === true) {
+      const sink = options.jsonPrint ?? defaultJsonSink;
+      sink({ ok: false, error: stripCliPrefix((err as Error).message) });
+    }
+    throw err;
+  }
   try {
     const result: AuditChainVerifyResult = await verifyAuditChain(ctx.auditDb);
     const out: AuditVerifyResult = result.ok

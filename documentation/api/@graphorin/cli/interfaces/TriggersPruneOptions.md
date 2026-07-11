@@ -6,7 +6,7 @@
 
 # Interface: TriggersPruneOptions
 
-Defined in: [packages/cli/src/commands/triggers.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L179)
+Defined in: [packages/cli/src/commands/triggers.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L187)
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: [packages/cli/src/commands/triggers.ts:179](https://github.com/o-ste
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-before"></a> `before?` | `readonly` | `string` | ISO date / epoch ms - drop disabled triggers whose `lastFiredAt` (or `createdAt`, when never fired) is older than this cutoff. | - | [packages/cli/src/commands/triggers.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L184) |
+| <a id="property-before"></a> `before?` | `readonly` | `string` | ISO date / epoch ms - drop disabled triggers whose `lastFiredAt` (or `createdAt`, when never fired) is older than this cutoff. | - | [packages/cli/src/commands/triggers.ts:192](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L192) |
 | <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-config) | [packages/cli/src/commands/triggers.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L37) |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-json) | [packages/cli/src/internal/output.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L71) |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-jsonprint) | [packages/cli/src/internal/output.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L77) |

@@ -6,7 +6,7 @@
 
 # Interface: PricingCommonOptions
 
-Defined in: [packages/cli/src/commands/pricing.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L46)
+Defined in: [packages/cli/src/commands/pricing.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L47)
 
 ## Stable
 

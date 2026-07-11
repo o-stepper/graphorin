@@ -30,6 +30,7 @@ import {
   BACKGROUND_TICK_TRIGGER_ID,
   createBackgroundConsolidatorApp,
   IDLE_PROBE_TRIGGER_ID,
+  resolveContextWindow,
   runConsolidatorCycle,
   VERSION,
 } from '../src/main.js';
@@ -38,6 +39,22 @@ describe('examples/background-consolidator - smoke', () => {
   it('exposes the package.json version', () => {
     expect(VERSION).toBe(pkgVersion);
   });
+
+  it('arms auto-compaction with a provider context window (CE-12 regression)', async () => {
+    expect(resolveContextWindow({})).toBe(8_192);
+    expect(resolveContextWindow({ GRAPHORIN_CONTEXT_WINDOW: '4096' })).toBe(4_096);
+    expect(() => resolveContextWindow({ GRAPHORIN_CONTEXT_WINDOW: 'nope' })).toThrow(
+      /GRAPHORIN_CONTEXT_WINDOW/,
+    );
+    const app = await createBackgroundConsolidatorApp({ dbPath: ':memory:' });
+    try {
+      const config = app.memory.contextEngine.config();
+      expect(config.providerContextWindow).toBe(8_192);
+      expect(config.compactionEffective).toBe(true);
+    } finally {
+      await app.close();
+    }
+  }, 15_000);
 
   it('runConsolidatorCycle drives turns + fires the light-tick deterministically', async () => {
     _resetLibModeWarningForTesting();

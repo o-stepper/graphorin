@@ -2,8 +2,11 @@
  * HTTP route mounting for `createServer({...})` - health, metrics,
  * the authenticated middleware boundary, every REST domain surface,
  * the WebSocket upgrade, and SSE. Mount order is part of the
- * documented contract (unauthenticated health/metrics first, then the
- * auth boundary, then the domain routes) - do not reorder.
+ * documented contract (unauthenticated health first, then the auth
+ * boundary, then metrics + the domain routes; metrics sits behind the
+ * boundary so `metrics.requireAuth=true` sees a verified token, while
+ * the requireAuth=false path is exempted via the middleware skip
+ * list) - do not reorder.
  *
  * @packageDocumentation
  */
@@ -123,6 +126,10 @@ export function mountRoutes(
     );
   }
 
+  // Auth + audit + idempotency for everything below this line - see
+  // `app-middleware.ts` for the boundary semantics and skip list.
+  const { anonymousAuth } = attachProtectedMiddleware(app, config, ctx);
+
   if (config.metrics.enabled) {
     // IP-23: an unauthenticated /metrics endpoint leaks operational intel
     // (trigger ids in labels, consolidator budgets). It is fine on a loopback
@@ -135,6 +142,10 @@ export function mountRoutes(
           `loopback host.`,
       );
     }
+    // E-03 (S-14b/17): mounted AFTER the auth middleware so the
+    // `admin:metrics:read` scope check sees a verified token when
+    // metrics.requireAuth=true. The requireAuth=false path stays
+    // unauthenticated via the middleware's skip list.
     const metricsRoute = createMetricsRoutes({
       registry: ctx.metricRegistry,
       requireAuth: config.metrics.requireAuth,
@@ -154,10 +165,6 @@ export function mountRoutes(
     });
     app.route(`${base}${config.metrics.path}`, metricsRoute);
   }
-
-  // Auth + audit + idempotency for everything below this line - see
-  // `app-middleware.ts` for the boundary semantics and skip list.
-  const { anonymousAuth } = attachProtectedMiddleware(app, config, ctx);
 
   // Mounted AFTER the auth middleware so the scope check has a
   // verified token to inspect; the unauthenticated `/v1/health` GET

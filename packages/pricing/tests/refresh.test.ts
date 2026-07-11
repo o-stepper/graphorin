@@ -127,6 +127,35 @@ describe('W-097 - refreshPricing genai-prices auto-detection', () => {
     expect(cost).toEqual({ amount: 3, currency: 'USD' });
   });
 
+  it('E-09: auto-detects the published bare top-level array of providers', async () => {
+    // The live genai-prices data.json ships WITHOUT the `providers`
+    // wrapper; previously this threw the misleading native
+    // 'missing provider / model' error in auto mode.
+    const snapshot = await refreshPricing({
+      url: 'https://example.com/genai-prices/data.json',
+      fetchImpl: fetchBody(GENAI_BODY.providers),
+      snapshotDate: '2026-07-11',
+    });
+    expect(snapshot.version).toBe('genai-prices+converted');
+    expect(snapshot.conversion).toEqual({ format: 'genai-prices', skipped: 1 });
+    expect(snapshot.entries).toHaveLength(1);
+    expect(snapshot.entries[0]).toMatchObject({
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-5',
+      inputUsdPerToken: 3e-6,
+    });
+  });
+
+  it("E-09: format 'genai-prices' accepts the bare array form too", async () => {
+    const snapshot = await refreshPricing({
+      url: 'https://example.com/genai-prices/data.json',
+      fetchImpl: fetchBody(GENAI_BODY.providers),
+      format: 'genai-prices',
+    });
+    expect(snapshot.entries).toHaveLength(1);
+    expect(snapshot.conversion?.format).toBe('genai-prices');
+  });
+
   it("format: 'graphorin' pins the native shape (a genai body fails fast)", async () => {
     await expect(
       refreshPricing({

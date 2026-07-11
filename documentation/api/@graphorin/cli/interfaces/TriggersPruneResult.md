@@ -6,7 +6,7 @@
 
 # Interface: TriggersPruneResult
 
-Defined in: [packages/cli/src/commands/triggers.ts:188](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L188)
+Defined in: [packages/cli/src/commands/triggers.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L196)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: [packages/cli/src/commands/triggers.ts:188](https://github.com/o-ste
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | [packages/cli/src/commands/triggers.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L189) |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | [packages/cli/src/commands/triggers.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L197) |

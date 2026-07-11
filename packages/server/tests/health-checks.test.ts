@@ -1,3 +1,6 @@
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -53,6 +56,28 @@ describe('health/checks', () => {
       subscribers: 3,
       subscriptions: 5,
     });
+  });
+
+  it('clamps walSizeBytes to 0 when the database is not in WAL mode (S-09)', async () => {
+    // A file-backed store with WAL hardening disabled stays in the
+    // default journal mode; `wal_checkpoint(PASSIVE)` then reports
+    // log=-1, which used to surface as walSizeBytes: -4096.
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-health-wal-'));
+    const fileStore = await createSqliteStore({
+      path: join(dir, 'data.db'),
+      mode: 'lib',
+      skipSqliteVec: true,
+      disableWalHardening: true,
+    });
+    await fileStore.init();
+    try {
+      const summary = await collectHealth({ store: fileStore });
+      expect(summary.checks.storage?.status).toBe('ok');
+      expect(summary.checks.storage?.walSizeBytes).toBe(0);
+    } finally {
+      await fileStore.close().catch(() => {});
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 
   it('flags encryption fail when encryption enabled but cipher peer missing', async () => {

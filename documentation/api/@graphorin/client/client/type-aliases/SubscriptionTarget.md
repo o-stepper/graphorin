@@ -24,11 +24,12 @@ type SubscriptionTarget =
 }
   | {
   id: string;
+  runId?: string;
   target: "workflow";
 };
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L72)
+Defined in: [packages/client/src/graphorin-client.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L75)
 
 Discriminator for the subscription target. Mirrors the strict
 subject grammar enforced by the server:
@@ -36,6 +37,62 @@ subject grammar enforced by the server:
  - `'agent'`/`<id>` + `runId` ⇒ `'agent:<id>/runs/<runId>/events'`
  - `'run'`/`<runId>` ⇒ `'session:<sessionId>/runs/<runId>/events'`
    (when `sessionId` is provided)
- - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'`
+ - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'`, or
+   `'workflow:<id>/runs/<runId>/events'` when the optional `runId`
+   is present (the run-scoped subject advertised by the workflow
+   execute/resume routes)
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  target: "session";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  runId: string;
+  target: "agent";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  runId: string;
+  sessionId?: string;
+  target: "run";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  runId?: string;
+  target: "workflow";
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `id` | `string` | - | [packages/client/src/graphorin-client.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L89) |
+| `runId?` | `string` | E-12: the server emits workflow run events ONLY on the run-scoped subject (`workflow:<id>/runs/<runId>/events`) advertised by `POST /v1/workflows/:id/execute` (and resume), never on the base `workflow:<id>/events` subject - pass the advertised `runId` to receive them. | [packages/client/src/graphorin-client.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L97) |
+| `target` | `"workflow"` | - | [packages/client/src/graphorin-client.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L88) |
 
 ## Stable

@@ -640,7 +640,8 @@ async function loadDataset(
   });
 }
 
-interface CliArgs {
+/** CLI argument shape produced by {@link parseArgs}. */
+export interface CliArgs {
   dataset: string;
   loader: LoaderName;
   variant?: 'S' | 'M';
@@ -669,13 +670,66 @@ interface CliArgs {
   embedder?: EmbedderMode;
   /** C8 (evals-05): repeat cases for variance. */
   iterations?: number;
+  /** `--help`/`-h`: print usage and exit without running anything. */
+  help: boolean;
+  /**
+   * `true` when NO flag except `--results`/`--help` was given: the
+   * out-of-the-box smoke. `main()` then gates on regressions against the
+   * committed stub baseline instead of failing on the fixture's
+   * known-failing abstention case (stub answers never abstain).
+   */
+  bareRun: boolean;
 }
+
+/** A bad invocation (unknown flag, missing value) - report usage, never run. */
+export class CliUsageError extends Error {}
+
+/** Printed by `--help`; kept in sync with {@link parseArgs} by test. */
+export const USAGE = `Usage: node dist/runner.js [flags]
+
+LongMemEval (+ LOCOMO / DMR) memory-quality benchmark runner.
+A bare run (no flags) is the offline stub smoke: it runs the committed
+fixture and gates on regressions against baselines/longmemeval.fixture.stub.json.
+
+Flags:
+  --dataset <path>            Dataset file (default: data/fixture.json)
+  --loader <name>             longmemeval | locomo | dmr (default: longmemeval)
+  --variant <S|M>             LongMemEval variant
+  --ability <name>            Restrict to a single ability
+  --smoke                     First 3 cases only
+  --results <path>            RESULTS markdown output (default: RESULTS.md)
+  --baseline <path>           Baseline JSON report to gate against
+  --json <path>               Write the JSON report (baseline seed)
+  --top-k <n>                 Recall depth (default: ${DEFAULT_TOP_K})
+  --consolidate               Run the consolidator's standard phase after ingest
+  --gate-on <all|regressions> Fail on any failed case, or only on baseline
+                              regressions (default: all; bare runs: regressions)
+  --provider <name>           stub | ollama | llamacpp | openai-compatible
+  --model <id>                Model id (required for real providers)
+  --base-url <url>            Provider base URL
+  --mode <memory|full-context> System under test (default: memory)
+  --judge-provider <name>     Dedicated judge provider (never grade yourself)
+  --judge-model <id>          Judge model id
+  --judge-base-url <url>      Judge base URL
+  --allow-self-judge          Permit a --json baseline from a self-judged run
+  --retrieval <mode>          default | multi-query | hyde | iterative | graph | ppr | entity
+  --embedder <none|fake>      Embedder under test (default: none)
+  --iterations <n>            Repeat cases for variance reporting
+  --help, -h                  Show this help
+
+Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
+GRAPHORIN_BENCH_JUDGE_* configure the judge. Secrets are env-only.`;
 
 function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');
 }
 
-function parseArgs(argv: ReadonlyArray<string>): CliArgs {
+/**
+ * Parse `argv` (from index 2). Throws {@link CliUsageError} on an unknown
+ * flag or a missing flag value - a typo must never silently run the full
+ * benchmark with defaults and overwrite RESULTS.md.
+ */
+export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
   const args: CliArgs = {
     dataset: join(pkgRoot(), 'data', 'fixture.json'),
     loader: 'longmemeval',
@@ -684,66 +738,77 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     consolidate: false,
     gateOn: 'all',
     allowSelfJudge: false,
+    help: false,
+    bareRun: true,
+  };
+  const value = (flag: string, next: string | undefined): string => {
+    if (next === undefined) throw new CliUsageError(`flag '${flag}' requires a value`);
+    return next;
   };
   for (let i = 2; i < argv.length; i++) {
-    const a = argv[i];
+    const a = argv[i] as string;
     const next = argv[i + 1];
-    if (a === '--dataset' && next !== undefined) {
-      args.dataset = next;
+    // pnpm 10 forwards the literal `--` separator into argv; skip it.
+    if (a === '--') continue;
+    // Only --results/--help keep a run "bare": redirecting the report does
+    // not change what is measured, so the smoke defaults still apply.
+    if (a !== '--results' && a !== '--help' && a !== '-h') args.bareRun = false;
+    if (a === '--dataset') {
+      args.dataset = value(a, next);
       i++;
-    } else if (a === '--loader' && next !== undefined) {
-      args.loader = next as LoaderName;
+    } else if (a === '--loader') {
+      args.loader = value(a, next) as LoaderName;
       i++;
-    } else if (a === '--variant' && next !== undefined) {
-      args.variant = next as 'S' | 'M';
+    } else if (a === '--variant') {
+      args.variant = value(a, next) as 'S' | 'M';
       i++;
-    } else if (a === '--ability' && next !== undefined) {
-      args.ability = next as MemoryEvalAbility;
+    } else if (a === '--ability') {
+      args.ability = value(a, next) as MemoryEvalAbility;
       i++;
-    } else if (a === '--results' && next !== undefined) {
-      args.results = next;
+    } else if (a === '--results') {
+      args.results = value(a, next);
       i++;
-    } else if (a === '--baseline' && next !== undefined) {
-      args.baseline = next;
+    } else if (a === '--baseline') {
+      args.baseline = value(a, next);
       i++;
-    } else if (a === '--json' && next !== undefined) {
-      args.json = next;
+    } else if (a === '--json') {
+      args.json = value(a, next);
       i++;
-    } else if (a === '--top-k' && next !== undefined) {
-      args.topK = Number.parseInt(next, 10);
+    } else if (a === '--top-k') {
+      args.topK = Number.parseInt(value(a, next), 10);
       i++;
-    } else if (a === '--gate-on' && next !== undefined) {
-      args.gateOn = next === 'regressions' ? 'regressions' : 'all';
+    } else if (a === '--gate-on') {
+      args.gateOn = value(a, next) === 'regressions' ? 'regressions' : 'all';
       i++;
-    } else if (a === '--provider' && next !== undefined) {
-      args.providerName = next;
+    } else if (a === '--provider') {
+      args.providerName = value(a, next);
       i++;
-    } else if (a === '--model' && next !== undefined) {
-      args.model = next;
+    } else if (a === '--model') {
+      args.model = value(a, next);
       i++;
-    } else if (a === '--base-url' && next !== undefined) {
-      args.baseUrl = next;
+    } else if (a === '--base-url') {
+      args.baseUrl = value(a, next);
       i++;
-    } else if (a === '--mode' && next !== undefined) {
-      args.mode = next === 'full-context' ? 'full-context' : 'memory';
+    } else if (a === '--mode') {
+      args.mode = value(a, next) === 'full-context' ? 'full-context' : 'memory';
       i++;
-    } else if (a === '--judge-provider' && next !== undefined) {
-      args.judgeProviderName = next;
+    } else if (a === '--judge-provider') {
+      args.judgeProviderName = value(a, next);
       i++;
-    } else if (a === '--judge-model' && next !== undefined) {
-      args.judgeModel = next;
+    } else if (a === '--judge-model') {
+      args.judgeModel = value(a, next);
       i++;
-    } else if (a === '--judge-base-url' && next !== undefined) {
-      args.judgeBaseUrl = next;
+    } else if (a === '--judge-base-url') {
+      args.judgeBaseUrl = value(a, next);
       i++;
-    } else if (a === '--retrieval' && next !== undefined) {
-      args.retrieval = next as RetrievalMode;
+    } else if (a === '--retrieval') {
+      args.retrieval = value(a, next) as RetrievalMode;
       i++;
-    } else if (a === '--embedder' && next !== undefined) {
-      args.embedder = next as EmbedderMode;
+    } else if (a === '--embedder') {
+      args.embedder = value(a, next) as EmbedderMode;
       i++;
-    } else if (a === '--iterations' && next !== undefined) {
-      args.iterations = Number.parseInt(next, 10);
+    } else if (a === '--iterations') {
+      args.iterations = Number.parseInt(value(a, next), 10);
       i++;
     } else if (a === '--allow-self-judge') {
       args.allowSelfJudge = true;
@@ -751,6 +816,12 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       args.smoke = true;
     } else if (a === '--consolidate') {
       args.consolidate = true;
+    } else if (a === '--help' || a === '-h') {
+      args.help = true;
+    } else {
+      throw new CliUsageError(
+        `unknown ${a.startsWith('-') ? 'flag' : 'argument'} '${a}'. Run with --help for usage.`,
+      );
     }
   }
   return args;
@@ -867,7 +938,32 @@ export function resolveJudgeSpec(
 }
 
 export async function main(): Promise<void> {
-  const args = parseArgs(process.argv);
+  let args: CliArgs;
+  try {
+    args = parseArgs(process.argv);
+  } catch (error) {
+    if (error instanceof CliUsageError) {
+      console.error(`[benchmark-longmemeval] ${error.message}`);
+      process.exitCode = 1;
+      return;
+    }
+    throw error;
+  }
+  if (args.help) {
+    console.log(USAGE);
+    return;
+  }
+  if (args.bareRun) {
+    // Out-of-the-box smoke: the shipped fixture intentionally contains one
+    // abstention case the stub can never pass, so gate the bare run on
+    // regressions against the committed stub baseline instead of exiting 1.
+    args.baseline = join(pkgRoot(), 'baselines', 'longmemeval.fixture.stub.json');
+    args.gateOn = 'regressions';
+    console.log(
+      '[benchmark-longmemeval] bare run: gating on regressions against ' +
+        'baselines/longmemeval.fixture.stub.json (pass --gate-on all for the strict gate).',
+    );
+  }
   // CLI flags win; env (GRAPHORIN_BENCH_*) fills the gaps. The API key is
   // env-only - never put a secret on the command line.
   const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;

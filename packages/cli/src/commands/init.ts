@@ -1,8 +1,9 @@
 /**
  * `graphorin init` - interactive bootstrap.
  *
- * Writes a fresh `graphorin.config.ts` to the current working
- * directory (or `--out`), prompts the operator for the cloud-upload
+ * Writes a fresh `graphorin.config.ts` (or, with `--format json`, a
+ * plain `graphorin.config.json`) to the current working directory
+ * (or `--out`), prompts the operator for the cloud-upload
  * sensitivity tier + storage encryption opt-in, prints the server
  * pepper hex ONCE, and walks the operator through the working
  * credential path: persist the pepper (stdin, never argv), migrate,
@@ -34,6 +35,16 @@ import { confirm, select } from '../internal/prompts.js';
  */
 export interface InitCommandOptions {
   readonly out?: string;
+  /**
+   * F-05: config flavour. `'ts'` (default) writes a `defineConfig`
+   * `graphorin.config.ts` - loading it later requires a Node that can
+   * import TypeScript (23.6+/22.18+ type stripping or a registered
+   * loader like tsx) AND `@graphorin/server` resolvable from the
+   * config's directory. `'json'` writes a plain `graphorin.config.json`
+   * with the same content (the docker-template flavour) that loads
+   * anywhere with zero runtime requirements.
+   */
+  readonly format?: 'ts' | 'json';
   readonly nonInteractive?: boolean;
   readonly cloudConsent?: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly encrypted?: boolean;
@@ -59,7 +70,8 @@ export interface InitCommandResult {
  */
 export async function runInit(options: InitCommandOptions = {}): Promise<InitCommandResult> {
   const cwd = options.cwd ?? process.cwd();
-  const target = resolveOutPath(cwd, options.out);
+  const format = resolveFormat(options);
+  const target = resolveOutPath(cwd, options.out, format);
   const print = options.print ?? ((line: string) => process.stderr.write(`${line}\n`));
 
   const cloudConsent = await resolveCloudConsent(options);
@@ -75,7 +87,11 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
       );
     }
     await mkdir(dirname(target), { recursive: true });
-    await writeFile(target, renderConfig({ cloudConsent, storageEncrypted }), { mode: 0o600 });
+    const content =
+      format === 'json'
+        ? renderConfigJson({ cloudConsent, storageEncrypted })
+        : renderConfig({ cloudConsent, storageEncrypted });
+    await writeFile(target, content, { mode: 0o600 });
   }
 
   print(`[graphorin/cli] wrote ${target}`);
@@ -103,8 +119,35 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   });
 }
 
-function resolveOutPath(cwd: string, out: string | undefined): string {
-  if (out === undefined || out.length === 0) return resolve(cwd, 'graphorin.config.ts');
+function resolveFormat(options: InitCommandOptions): 'ts' | 'json' {
+  if (options.format !== undefined) {
+    if (options.format !== 'ts' && options.format !== 'json') {
+      throw new Error(`[graphorin/cli] --format must be 'ts' or 'json' (got '${options.format}').`);
+    }
+    // A --format that contradicts the --out extension would write a
+    // config the loader mis-parses (the loader picks the parser by
+    // extension) - refuse instead of writing a landmine.
+    if (options.out !== undefined && options.out.length > 0) {
+      const jsonOut = options.out.endsWith('.json');
+      if (options.format === 'json' && !jsonOut) {
+        throw new Error(
+          `[graphorin/cli] --format json requires an --out ending in '.json' (got '${options.out}').`,
+        );
+      }
+      if (options.format === 'ts' && jsonOut) {
+        throw new Error(
+          `[graphorin/cli] --format ts conflicts with the '.json' --out '${options.out}'.`,
+        );
+      }
+    }
+    return options.format;
+  }
+  if (options.out?.endsWith('.json')) return 'json';
+  return 'ts';
+}
+
+function resolveOutPath(cwd: string, out: string | undefined, format: 'ts' | 'json'): string {
+  if (out === undefined || out.length === 0) return resolve(cwd, `graphorin.config.${format}`);
   return isAbsolute(out) ? out : resolve(cwd, out);
 }
 
@@ -191,4 +234,42 @@ export default defineConfig({
   // cloudUploadConsent: ${JSON.stringify(input.cloudConsent)}
 });
 `;
+}
+
+// F-05: the defineConfig-free flavour (same shape as the docker
+// template). JSON cannot carry the cloudUploadConsent comment the .ts
+// render embeds; the chosen tier still lands in the command's return
+// payload + stderr next-steps.
+function renderConfigJson(input: {
+  readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
+  readonly storageEncrypted: boolean;
+}): string {
+  const config = {
+    server: {
+      host: '127.0.0.1',
+      port: 8080,
+    },
+    auth: {
+      kind: 'token',
+      pepperRef: 'keyring:graphorin_server_pepper',
+    },
+    storage: {
+      path: './.graphorin/data.db',
+      mode: 'server',
+      encryption: input.storageEncrypted
+        ? { enabled: true, passphraseRef: 'keyring:graphorin_db_passphrase' }
+        : { enabled: false },
+    },
+    audit: {
+      enabled: input.storageEncrypted,
+    },
+    secrets: {
+      source: 'auto',
+      strict: false,
+    },
+    observability: {
+      logger: 'json',
+    },
+  };
+  return `${JSON.stringify(config, null, 2)}\n`;
 }

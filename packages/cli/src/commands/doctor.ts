@@ -24,7 +24,7 @@ import pkg from '../../package.json' with { type: 'json' };
  */
 
 import { homedir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
 
 import {
@@ -36,8 +36,10 @@ import {
   ensureDirMode,
   ensureFileMode,
 } from '@graphorin/security';
+import { parseServerConfig, type ServerConfigSpec } from '@graphorin/server';
 
 import { EXIT_CODES } from '../internal/exit.js';
+import { loadConfig } from '../internal/load-config.js';
 import {
   brand,
   type CommonOutputOptions,
@@ -55,6 +57,14 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
    * `~/.graphorin/`. Tests inject a fresh tmp dir.
    */
   readonly home?: string;
+  /**
+   * F-06: check the storage / audit paths resolved from this
+   * `graphorin.config.*` file instead of the hardcoded `~/.graphorin`
+   * layout, so doctor and `graphorin init` (which writes a PROJECT
+   * config) live in the same world. Without the flag the default
+   * `~/.graphorin` layout is checked, as before.
+   */
+  readonly config?: string;
   /** Run the file-perms repair. */
   readonly fixPerms?: boolean;
   /** Run the file-perms check. Implied by `--all`. */
@@ -79,6 +89,8 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
 export interface DoctorReport {
   readonly version: string;
   readonly home: string;
+  /** Resolved config path when `--config` drove the perms check. */
+  readonly configPath?: string;
   readonly platform: NodeJS.Platform;
   readonly checks: ReadonlyArray<CheckResult>;
   readonly summary: {
@@ -98,7 +110,15 @@ export interface DoctorReport {
  */
 export async function runDoctor(options: DoctorCommandOptions = {}): Promise<DoctorReport> {
   const home = options.home ?? join(homedir(), '.graphorin');
-  const expected = expectedFileModes(home);
+  let expected: Readonly<Record<string, number>>;
+  let configPath: string | undefined;
+  if (options.config !== undefined) {
+    const loaded = await loadConfig(options.config);
+    configPath = loaded.path;
+    expected = expectedFileModesForConfig(loaded.path, parseServerConfig(loaded.config));
+  } else {
+    expected = expectedFileModes(home);
+  }
 
   const enable = expandFlags(options);
   const checks: CheckResult[] = [];
@@ -167,6 +187,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   const report: DoctorReport = Object.freeze({
     version: pkg.version,
     home,
+    ...(configPath !== undefined ? { configPath } : {}),
     platform: process.platform,
     checks: Object.freeze(checks),
     summary: Object.freeze(summary),
@@ -196,6 +217,34 @@ export function expectedFileModes(home: string): Readonly<Record<string, number>
     [`${home}/audit.db`]: 0o600,
     [`${home}/secrets.kse`]: 0o600,
   });
+}
+
+/**
+ * F-06: expected file modes for a `--config`-driven check - the config
+ * file itself plus the storage / audit paths it resolves to. Relative
+ * paths resolve against the CWD (the IP-20 rule every other store-
+ * opening command uses). The secrets backend has no configured path
+ * (`secrets.source` picks a resolver, not a file), so it stays covered
+ * by `--check-secrets` only.
+ *
+ * @internal
+ */
+export function expectedFileModesForConfig(
+  configPath: string,
+  config: ServerConfigSpec,
+): Readonly<Record<string, number>> {
+  const storagePath = isAbsolute(config.storage.path)
+    ? config.storage.path
+    : resolve(config.storage.path);
+  const expected: Record<string, number> = {
+    [configPath]: 0o600,
+    [storagePath]: 0o600,
+  };
+  if (config.audit.enabled) {
+    const auditPath = config.audit.path ?? join(dirname(storagePath), 'audit.db');
+    expected[isAbsolute(auditPath) ? auditPath : resolve(auditPath)] = 0o600;
+  }
+  return Object.freeze(expected);
 }
 
 interface DoctorChecks {
@@ -228,11 +277,9 @@ function expandFlags(options: DoctorCommandOptions): DoctorChecks {
 
 function emitHumanReport(report: DoctorReport, options: DoctorCommandOptions): void {
   const print = options.print ?? defaultPrintSink;
-  print(
-    brand(
-      `graphorin doctor v${report.version} (host: ${report.home}, platform: ${report.platform})`,
-    ),
-  );
+  const target =
+    report.configPath !== undefined ? `config: ${report.configPath}` : `host: ${report.home}`;
+  print(brand(`graphorin doctor v${report.version} (${target}, platform: ${report.platform})`));
   if (report.fixedPerms !== undefined) {
     print(brand(`--fix-perms repaired:`));
     for (const path of report.fixedPerms) print(`  - ${path}`);

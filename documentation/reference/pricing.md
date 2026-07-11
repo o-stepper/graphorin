@@ -154,7 +154,7 @@ const cost = calculateCost(
 
 ## Cost telemetry
 
-When `@graphorin/observability` and `@graphorin/pricing` are both installed, the tracer attaches `gen_ai.usage.cost.usd` to every provider span automatically - provided the model is in the active snapshot.
+Cost figures ride the provider middleware, not a span attribute: `withCostTracking`'s `priceLookup` bills each call against the active snapshot and surfaces `costUsd` on its `onUsage` hook, and `@graphorin/observability`'s `costTrackerUsageDelegate(...)` routes those figures into a `CostTracker` for per-run / per-session rollups. A model missing from the snapshot never gets an invented number - `lookupPrice` returns `null` and warns once per process per (provider, model) pair.
 
 ## Privacy
 
@@ -165,6 +165,6 @@ When `@graphorin/observability` and `@graphorin/pricing` are both installed, the
 ## Next steps
 
 - [Providers](/guide/providers) - how the pricing snapshot integrates with the provider middleware.
-- [Observability](/guide/observability) - `gen_ai.usage.cost.usd` attribute.
-- [CLI](/guide/cli) - `graphorin pricing status / refresh / diff`.
+- [Observability](/guide/observability) - provider spans and the GenAI usage attributes cost tracking reads.
+- [CLI](/guide/cli) - `graphorin pricing status / refresh / diff / lookup / missing`.
 

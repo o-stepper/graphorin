@@ -27,7 +27,7 @@
  * @packageDocumentation
  */
 
-import { readdir, stat, unlink } from 'node:fs/promises';
+import { chmod, readdir, stat, unlink } from 'node:fs/promises';
 import { dirname, isAbsolute, join, basename as pathBasename, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -175,6 +175,11 @@ export async function runStorageBackup(
       throw new Error('[graphorin/cli] backup destination must differ from the store path.');
     }
     await ctx.store.connection.raw().backup(dest);
+    // S-14b: mirror the source file mode - the driver writes the copy
+    // with the umask default (0644), silently downgrading a 0600 live
+    // store's posture in a file doctor never checks.
+    const sourceStat = await stat(source);
+    await chmod(dest, sourceStat.mode & 0o777);
   } finally {
     await ctx.close();
   }
@@ -540,9 +545,23 @@ async function probeCipherPeer(): Promise<{
   readonly installed: boolean;
   readonly hint?: string;
 }> {
+  // S-07/1: a bare import of 'better-sqlite3-multiple-ciphers' probes
+  // the CLI's own resolution scope, which lies under pnpm's strict
+  // node_modules layout - the peer is declared by the encrypted
+  // sub-pack, not by the CLI. Load it through the sub-pack's own
+  // loader so `storage status` agrees with what `encrypt` / `rekey`
+  // (which resolve via the sub-pack) can actually do.
   try {
-    const moduleName = 'better-sqlite3-multiple-ciphers';
-    await import(/* @vite-ignore */ moduleName);
+    // Computed module name keeps TypeScript's resolution off the
+    // build-time graph (same trick as loadEncryptedSubpack).
+    const moduleName = '@graphorin/store-sqlite-encrypted';
+    const mod = (await import(/* @vite-ignore */ moduleName)) as {
+      loadCipherPeer?: () => Promise<unknown>;
+    };
+    if (typeof mod.loadCipherPeer !== 'function') {
+      throw new Error('sub-pack does not expose loadCipherPeer');
+    }
+    await mod.loadCipherPeer();
     return Object.freeze({ installed: true });
   } catch {
     return Object.freeze({

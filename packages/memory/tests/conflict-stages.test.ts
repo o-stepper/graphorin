@@ -86,25 +86,31 @@ describe('@graphorin/memory - conflict stage 1 (exact dedup)', () => {
 describe('@graphorin/memory - conflict stage 2 (embedding three-zone)', () => {
   const candidate = fact('cand', 'lives in Boston');
 
+  // Hit scores below are on the storage-adapter scale (`(1 + cos) / 2`,
+  // CS-3); Stage 2 maps them back to raw cosine before the DEC-130
+  // threshold comparison (N-01/21).
+
   it('admits when no candidates were found', async () => {
     const out = await stage2EmbeddingThreeZone.evaluate(ctx(candidate, []));
     expect(out.kind).toBe('admit');
   });
 
   it('dedups in the HOT zone', async () => {
+    // Store score 0.99 => raw cosine 0.98 >= hot 0.95.
     const out = await stage2EmbeddingThreeZone.evaluate(
-      ctx(candidate, [hit('lives in Boston', 0.97)]),
+      ctx(candidate, [hit('lives in Boston', 0.99)]),
     );
     expect(out.kind).toBe('dedup');
     if (out.kind === 'dedup') {
       expect(out.reason).toBe('embedding-hot-zone');
-      expect(out.similarity).toBeCloseTo(0.97);
+      expect(out.similarity).toBeCloseTo(0.98);
     }
   });
 
   it('dedups in the NEAR-DUP zone', async () => {
+    // Store score 0.94 => raw cosine 0.88 in [nearDup 0.85, hot 0.95).
     const out = await stage2EmbeddingThreeZone.evaluate(
-      ctx(candidate, [hit('Boston is where they live', 0.88)]),
+      ctx(candidate, [hit('Boston is where they live', 0.94)]),
     );
     expect(out.kind).toBe('dedup');
     if (out.kind === 'dedup') {
@@ -113,20 +119,33 @@ describe('@graphorin/memory - conflict stage 2 (embedding three-zone)', () => {
   });
 
   it('continues in the CONFLICT-CHECK zone', async () => {
+    // Store score 0.8 => raw cosine 0.6 in (cold 0.4, nearDup 0.85).
     const out = await stage2EmbeddingThreeZone.evaluate(
-      ctx(candidate, [hit('used to live in Boston', 0.6)]),
+      ctx(candidate, [hit('used to live in Boston', 0.8)]),
     );
     expect(out.kind).toBe('continue');
   });
 
   it('admits in the COLD zone', async () => {
+    // Store score 0.6 => raw cosine 0.2 <= cold 0.4.
     const out = await stage2EmbeddingThreeZone.evaluate(
-      ctx(candidate, [hit('totally unrelated', 0.2)]),
+      ctx(candidate, [hit('totally unrelated', 0.6)]),
     );
     expect(out.kind).toBe('admit');
     if (out.kind === 'admit') {
       expect(out.reason).toBe('embedding-cold-zone');
     }
+  });
+
+  it('regression N-01/21: a store score in [0.85, 0.925) no longer dedupes', async () => {
+    // Raw cosine 0.75 => store score 0.875. Before the scale fix the
+    // stage compared 0.875 straight against nearDup 0.85 and deduped a
+    // clearly distinct pair; on the raw-cosine scale 0.75 < 0.85 is the
+    // ambiguous CONFLICT-CHECK zone.
+    const out = await stage2EmbeddingThreeZone.evaluate(
+      ctx(candidate, [hit('works as a data engineer', 0.875)]),
+    );
+    expect(out.kind).toBe('continue');
   });
 });
 
@@ -200,10 +219,11 @@ describe('@graphorin/memory - conflict stage 4 (subject/predicate)', () => {
 
 describe('@graphorin/memory - conflict stage 5 (defer-to-deep)', () => {
   it('returns pending with every CONFLICT-CHECK candidate id', async () => {
+    // Store scores 0.85 / 0.825 => raw cosines 0.7 / 0.65 (mid-zone).
     const out = await stage5DeferToDeep.evaluate(
       ctx(fact('c', 'I love hiking', { id: 'cand-1' }), [
-        hit('I enjoy walking', 0.7, 'old-1'),
-        hit('I prefer running', 0.65, 'old-2'),
+        hit('I enjoy walking', 0.85, 'old-1'),
+        hit('I prefer running', 0.825, 'old-2'),
       ]),
     );
     expect(out.kind).toBe('pending');

@@ -6,8 +6,9 @@
  *
  * The adapter is intentionally minimal - it spawns a one-shot
  * container from an operator-supplied image, mounts an empty tmpfs at
- * `/work`, writes the `input` payload as JSON onto stdin, reads JSON
- * back from stdout, and tears the container down. Production
+ * `/work`, embeds the `input` payload as JSON inside the `node -e`
+ * wrapper script, reads JSON back from the container's demultiplexed
+ * stdout log stream, and tears the container down. Production
  * deployments that need volume mounts, custom networking, GPU
  * devices, or persistent containers should configure the adapter
  * accordingly via a custom `peerLoader`.
@@ -211,12 +212,13 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
         }
 
         const logs = await container.logs({ stdout: true, stderr: false });
-        const text =
+        const raw =
           typeof logs === 'string'
-            ? logs
+            ? Buffer.from(logs, 'utf8')
             : Buffer.isBuffer(logs)
-              ? logs.toString('utf8')
+              ? logs
               : await readStream(logs);
+        const text = demuxDockerLogs(raw);
 
         if (result.StatusCode !== 0) {
           return {
@@ -288,12 +290,45 @@ function wrapperScript(code: SandboxCode, input: unknown): string {
   return '';
 }
 
-async function readStream(stream: NodeJS.ReadableStream): Promise<string> {
+async function readStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
   const chunks: Buffer[] = [];
   for await (const chunk of stream as AsyncIterable<Buffer | string>) {
     chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
-  return Buffer.concat(chunks).toString('utf8');
+  return Buffer.concat(chunks);
+}
+
+/**
+ * With `Tty: false` (D-02) the daemon multiplexes the log stream into
+ * 8-byte-framed records - `[streamType, 0, 0, 0, payloadSizeBE32]`
+ * followed by the payload, where type 1 is stdout and type 2 stderr -
+ * so the raw bytes must be demultiplexed before `JSON.parse`. Strips
+ * the frame headers and concatenates the stdout payloads. Buffers that
+ * do not start with a well-formed frame header (TTY containers, test
+ * stubs returning plain text) pass through unchanged; JSON output can
+ * never be mistaken for a frame because it cannot start with a byte in
+ * the 0x00-0x02 range.
+ */
+function demuxDockerLogs(raw: Buffer): string {
+  const stdout: Buffer[] = [];
+  let offset = 0;
+  while (offset + 8 <= raw.length) {
+    const streamType = raw[offset];
+    const framed =
+      (streamType === 0 || streamType === 1 || streamType === 2) &&
+      raw[offset + 1] === 0 &&
+      raw[offset + 2] === 0 &&
+      raw[offset + 3] === 0;
+    if (!framed) return raw.toString('utf8');
+    const size = raw.readUInt32BE(offset + 4);
+    const start = offset + 8;
+    if (streamType === 1) {
+      stdout.push(raw.subarray(start, Math.min(start + size, raw.length)));
+    }
+    offset = start + size;
+  }
+  // offset === 0: shorter than one frame header - treat as plain text.
+  return offset === 0 ? raw.toString('utf8') : Buffer.concat(stdout).toString('utf8');
 }
 
 async function defaultPeerLoader(): Promise<DockerodeModule> {

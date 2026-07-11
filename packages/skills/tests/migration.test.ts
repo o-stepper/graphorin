@@ -56,6 +56,28 @@ describe('migrateFrontmatter', () => {
     expect(second.migratedSkillMd).toBe(first.migratedSkillMd);
   });
 
+  // Regression guard for e2e finding N-03/20 (E-22): the mapping used to
+  // deprecate graphorin-disable-model-invocation toward an unprefixed
+  // field the public agentskills.io specification does not define.
+  it('does not rewrite graphorin-disable-model-invocation (graphorin-only extension)', () => {
+    const skillMd = [
+      '---',
+      'name: t',
+      'description: d',
+      'graphorin-disable-model-invocation: true',
+      '---',
+      'BODY',
+    ].join('\n');
+    const result = migrateFrontmatter(skillMd, { apply: true });
+    expect(result.changed).toBe(false);
+    expect(result.migratedSkillMd).toContain('graphorin-disable-model-invocation: true');
+    const rewrite = result.rewrites.find(
+      (r) => r.fromField === 'graphorin-disable-model-invocation',
+    );
+    expect(rewrite?.reason).toBe('graphorin-only-noop');
+    expect(rewrite?.applied).toBe(false);
+  });
+
   it('does not overwrite an already-set Anthropic-base field', () => {
     const skillMd = [
       '---',

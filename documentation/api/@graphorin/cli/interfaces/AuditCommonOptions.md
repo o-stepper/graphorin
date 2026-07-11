@@ -6,7 +6,7 @@
 
 # Interface: AuditCommonOptions
 
-Defined in: [packages/cli/src/commands/audit.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L47)
+Defined in: [packages/cli/src/commands/audit.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L55)
 
 ## Stable
 
@@ -23,7 +23,7 @@ Defined in: [packages/cli/src/commands/audit.ts:47](https://github.com/o-stepper
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | [packages/cli/src/commands/audit.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L48) |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | `CommonOutputOptions.json` | [packages/cli/src/internal/output.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L71) |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | `CommonOutputOptions.jsonPrint` | [packages/cli/src/internal/output.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L77) |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | `CommonOutputOptions.nonInteractive` | [packages/cli/src/internal/output.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L73) |

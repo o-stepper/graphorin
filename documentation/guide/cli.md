@@ -48,6 +48,19 @@ graphorin start --host 127.0.0.1 --port 8787
 
 Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration) (the config loader reads `.ts` / `.js` / `.mjs` / `.json` files, not TOML). At startup the process logs the resolved config file path and a single listening line (`@graphorin/server v<version> listening on http://<host>:<port><basePath>`); secret values are never printed.
 
+## `graphorin init`
+
+```bash
+graphorin init                       # writes ./graphorin.config.ts + prints the pepper once
+graphorin init --format json         # writes ./graphorin.config.json (defineConfig-free)
+graphorin init --non-interactive --encrypted --out ./deploy/graphorin.config.json
+```
+
+Two config flavours (`--format ts|json`, default `ts`; a `.json` `--out` implies `json`):
+
+- **`.ts`** uses `defineConfig` for editor type-checking, but loading it later requires a Node that can import TypeScript (23.6+/22.18+ native type stripping, or a registered loader such as `tsx`) **and** `@graphorin/server` resolvable from the config file's directory. Outside such a project tree the `.ts` config will not load.
+- **`.json`** is plain data with the same content (the docker-template flavour) and loads anywhere with zero runtime requirements.
+
 ## `graphorin doctor`
 
 Runs a sanity audit:
@@ -57,7 +70,14 @@ Runs a sanity audit:
 - The audit-log encryption binding (the SQLite cipher peer).
 - Optional systemd unit validation (Linux).
 
-Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it never opens a network connection.
+A bare `graphorin doctor` runs the perms check only; opt in to the others with `--check-secrets` / `--check-encryption` / `--check-systemd`, or run everything with `--all`. Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it never opens a network connection.
+
+By default the perms check targets the `~/.graphorin` layout. Pass `--config <path>` to check a project deployment instead - the config file itself plus the storage and audit database paths it resolves to:
+
+```bash
+graphorin doctor --config ./graphorin.config.json
+graphorin doctor --config ./graphorin.config.json --fix-perms
+```
 
 ## `graphorin token`
 
@@ -71,6 +91,8 @@ graphorin token verify <token>          # offline checksum check - never consult
 ```
 
 Tokens are HMAC-SHA256 over a deployment-wide pepper. The pepper is a `SecretRef` resolved at server boot. See [Security § Server-token authentication](/guide/security#server-token-authentication).
+
+`token create` prints the raw token exactly once, on **stdout** (so `TOKEN=$(graphorin token create ...)` works); the log lines around it go to stderr.
 
 `token rotate` revokes one token and reissues it with the same scopes; `token rekey` does that for **every** active token and is the post-compromise lever. Both accept `--env live|test` (default `live`). `token verify` is fully offline: it confirms the structural shape, the environment marker, and the CRC checksum without touching the store - a malformed token exits with code `1`. Verifying that a token is *active* (not revoked, not expired) still requires the server or `token list`.
 
@@ -108,7 +130,7 @@ graphorin skills install npm:@org/skill --version 1.2.0 --trust-level trusted
 graphorin skills install git:https://github.com/org/skill --ref v1.2.0 --dry-run
 graphorin skills inspect <path-or-package>
 graphorin skills audit                       # checks signatures + sandbox tier
-graphorin skills migrate-frontmatter <path>  # idempotent dry-run by default
+graphorin skills migrate-frontmatter --path <dir>  # dry-run by default: lists the files --apply would rewrite
 ```
 
 ## `graphorin auth`
@@ -191,7 +213,7 @@ graphorin triggers prune --before 2026-06-01  # drop disabled triggers older tha
 graphorin triggers fire <id>                  # exit 2 - use the server route instead
 ```
 
-Operates directly on the durable trigger registry in the store; all subcommands accept `--config` and `--json`. `status` exits `1` when the id does not exist. `prune` removes **disabled** rows only; without `--before` it drops every disabled row. `triggers fire` is honest about not being wired: a daemon-side poll does not exist yet, so it exits with code `2` (UNSUPPORTED) and prints the working alternative - `POST /v1/triggers/:id/fire` (scope `triggers:fire`) on the running server.
+Operates directly on the durable trigger registry in the store; all subcommands accept `--config` and `--json`. `status` exits `1` when the id does not exist. `prune` removes **disabled** rows only, and only those whose last activity (`lastFiredAt`, or `createdAt` when never fired) is older than the `--before` cutoff - always pass `--before`; without it no dated row qualifies. `triggers fire` is honest about not being wired: a daemon-side poll does not exist yet, so it exits with code `2` (UNSUPPORTED) and prints the working alternative - `POST /v1/triggers/:id/fire` (scope `triggers:fire`) on the running server.
 
 ## `graphorin migrate-export`
 
@@ -231,6 +253,16 @@ graphorin guard explain my-tool --tags web,write --trust-level user-defined
 ```
 
 Inspection surface for the memory-modification guard (no store access, purely the classifier). `status` prints the four tiers and the variants each accepts. `explain <toolName>` derives the tier the classifier **would** assign to a tool with the supplied metadata - feed it `--tags`, `--secrets-allowed`, `--trust-level built-in|user-defined|trusted|untrusted`, or `--explicit-tier` to answer "why did my tool end up memory-aware?" before wiring it. Both accept `--json`.
+
+## `graphorin tools lint`
+
+```bash
+graphorin tools lint                             # scan src/**/*.{ts,tsx} for tool({...}) registrations
+graphorin tools lint --config ./tsconfig.json    # scan the tsconfig's include[0] glob instead
+graphorin tools lint --source "src/skills/**/tools/*.ts" --threshold 80 --format json
+```
+
+Text-based static scan (no runtime probe, no `tsc`): discovers every `tool({...})` registration, runs the RB-49 rules from `@graphorin/eslint-plugin`, and grades each tool out of 100 (description 40 + examples 30 + parameter naming 30). Exit codes are CI-friendly: `0` when every tool meets `--threshold` (default `60`), `1` when at least one tool falls below it, and `2` when the invocation could not start - an unreadable or invalid `--config`, or one whose `include` carries no usable glob, refuses loudly instead of silently scanning nothing. Globs follow `minimatch` semantics: `**/` also matches zero directories, so `src/**/*.ts` sees files directly in `src/`.
 
 ## Privacy
 

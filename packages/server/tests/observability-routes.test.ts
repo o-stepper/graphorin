@@ -118,7 +118,7 @@ function buildReplayApi(): TestReplayApi {
 let store: GraphorinSqliteStore | undefined;
 let server: GraphorinServer | undefined;
 
-async function bootServer(): Promise<BootResult> {
+async function bootServer(opts?: { readonly metricsRequireAuth?: boolean }): Promise<BootResult> {
   _resetResolversForTesting();
   installBuiltinResolvers();
   _resetLibModeWarningForTesting();
@@ -159,6 +159,7 @@ async function bootServer(): Promise<BootResult> {
     config: {
       auth: { kind: 'token', pepperRef: `env:${PEPPER_ENV}` },
       storage: { path: ':memory:', mode: 'lib' },
+      metrics: { enabled: true, requireAuth: opts?.metricsRequireAuth === true },
       server: {
         rateLimit: { enabled: false },
         csrf: { enabled: false },
@@ -312,6 +313,36 @@ describe('Phase 14c - /v1/metrics Prometheus exposition', () => {
     expect(body).toContain('# TYPE graphorin_agent_runs_total counter');
     expect(body).toContain('# TYPE graphorin_storage_wal_size_bytes gauge');
     expect(body).toContain(`graphorin_build_info{version="${pkgVersion}"} 1`);
+  });
+
+  it('serves metrics behind bearer auth when requireAuth=true (E-03)', async () => {
+    // Regression: the metrics route used to mount BEFORE the auth
+    // middleware, so the scope check never saw a verified token and
+    // every bearer answered 401 - requireAuth=true was unusable.
+    const { server, anonBearer } = await bootServer({ metricsRequireAuth: true });
+    if (store === undefined) throw new Error('store missing');
+    const pepper = await resolveSecret(`env:${PEPPER_ENV}`);
+    const minted = await createToken({
+      tokenStore: store.authTokens,
+      pepper,
+      env: 'live',
+      scopes: ['admin:metrics:read'],
+    });
+    const metricsBearer = await minted.raw.use((v) => v);
+
+    const ok = await server.app.request('/v1/metrics', {
+      headers: { Authorization: `Bearer ${metricsBearer}` },
+    });
+    expect(ok.status).toBe(200);
+    expect(await ok.text()).toContain('# TYPE graphorin_agent_runs_total counter');
+
+    const anonymous = await server.app.request('/v1/metrics');
+    expect(anonymous.status).toBe(401);
+
+    const wrongScope = await server.app.request('/v1/metrics', {
+      headers: { Authorization: `Bearer ${anonBearer}` },
+    });
+    expect(wrongScope.status).toBe(403);
   });
 });
 

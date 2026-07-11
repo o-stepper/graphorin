@@ -52,7 +52,7 @@ import {
   type ToolGraderScore,
 } from '@graphorin/eslint-plugin';
 
-import { EXIT_CODES } from '../internal/exit.js';
+import { EXIT_CODES, fail } from '../internal/exit.js';
 import {
   brand,
   type CommonOutputOptions,
@@ -291,8 +291,20 @@ async function collectSources(
 ): Promise<ReadonlyArray<{ readonly file: string; readonly source: string }>> {
   if (options.inlineSources !== undefined) return options.inlineSources;
 
-  const glob = options.source ?? (await loadIncludeGlob(cwd, options.config)) ?? DEFAULT_GLOB;
-  const files = await walkGlob(cwd, glob);
+  const glob =
+    options.source ?? (await loadIncludeGlob(cwd, options.config, options)) ?? DEFAULT_GLOB;
+  let files: string[];
+  try {
+    files = await walkGlob(cwd, glob);
+  } catch (err) {
+    // Documented exit contract: 2 = invocation could not start (config
+    // missing, walker failed). Walker / compileGlob failures used to
+    // bubble to main().catch and exit 1.
+    fail(err, {
+      code: EXIT_CODES.UNSUPPORTED,
+      ...(options.print !== undefined ? { print: options.print } : {}),
+    });
+  }
   const out: Array<{ file: string; source: string }> = [];
   for (const file of files) {
     try {
@@ -308,28 +320,93 @@ async function collectSources(
 async function loadIncludeGlob(
   cwd: string,
   configPath: string | undefined,
+  options: ToolsLintOptions,
 ): Promise<string | undefined> {
   if (configPath === undefined) return undefined;
+  // Documented exit contract: 2 = invocation could not start. A broken
+  // or missing --config used to be swallowed here and the scan silently
+  // fell back to the default glob (exit 0 with zero tools).
+  const failOptions = {
+    code: EXIT_CODES.UNSUPPORTED,
+    ...(options.print !== undefined ? { print: options.print } : {}),
+  };
   const abs = isAbsolute(configPath) ? configPath : resolve(cwd, configPath);
   let raw: string;
   try {
     raw = await readFile(abs, 'utf8');
-  } catch {
-    return undefined;
+  } catch (err) {
+    fail(
+      new Error(`tools lint: cannot read --config '${abs}': ${(err as Error).message}`, {
+        cause: err,
+      }),
+      failOptions,
+    );
   }
   let parsed: { readonly include?: ReadonlyArray<string> };
   try {
     parsed = JSON.parse(stripJsonComments(raw)) as { readonly include?: ReadonlyArray<string> };
-  } catch {
-    return undefined;
+  } catch (err) {
+    fail(
+      new Error(`tools lint: --config '${abs}' is not valid JSON: ${(err as Error).message}`, {
+        cause: err,
+      }),
+      failOptions,
+    );
   }
-  return parsed.include?.[0];
+  const include = parsed.include?.[0];
+  if (include === undefined) {
+    fail(
+      new Error(
+        `tools lint: --config '${abs}' carries no include[0] glob; drop --config or pass --source <pattern>.`,
+      ),
+      failOptions,
+    );
+  }
+  return include;
 }
 
 function stripJsonComments(raw: string): string {
-  // Lightweight block-comment + line-comment stripper. tsconfig.json
-  // commonly carries `//` comments which JSON.parse rejects.
-  return raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+  // tsconfig.json commonly carries `//` and `/* */` comments which
+  // JSON.parse rejects. The stripper is string-aware: comment-like
+  // sequences inside JSON strings (e.g. an include glob "lib/**/*.ts"
+  // or a URL) must survive verbatim - the old regex pass mangled
+  // "lib/**/*.ts" into "lib*.ts".
+  let out = '';
+  let i = 0;
+  let inString = false;
+  while (i < raw.length) {
+    const ch = raw[i] as string;
+    if (inString) {
+      out += ch;
+      if (ch === '\\' && i + 1 < raw.length) {
+        out += raw[i + 1];
+        i += 2;
+        continue;
+      }
+      if (ch === '"') inString = false;
+      i += 1;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      out += ch;
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && raw[i + 1] === '/') {
+      while (i < raw.length && raw[i] !== '\n') i += 1;
+      continue;
+    }
+    if (ch === '/' && raw[i + 1] === '*') {
+      i += 2;
+      while (i < raw.length && !(raw[i] === '*' && raw[i + 1] === '/')) i += 1;
+      i += 2;
+      continue;
+    }
+    out += ch;
+    i += 1;
+  }
+  return out;
 }
 
 async function walkGlob(cwd: string, pattern: string): Promise<string[]> {
@@ -356,9 +433,8 @@ function compileGlob(pattern: string): (rel: string) => boolean {
   // brace-expansion output (which includes literal `(?:...)`) does not
   // collide with the `?` glob translation:
   //
-  //   1. Tokenize the four glob constructs into ASCII placeholders
-  //      that are guaranteed not to appear in any host project's
-  //      filename.
+  //   1. Tokenize the glob constructs into ASCII placeholders that
+  //      are guaranteed not to appear in any host project's filename.
   //   2. Escape every regex meta-character on the remaining literal
   //      text.
   //   3. Substitute the placeholders for the equivalent regex
@@ -372,13 +448,25 @@ function compileGlob(pattern: string): (rel: string) => boolean {
   const GLOBSTAR = '\u0004';
   const STAR = '\u0005';
   const QUESTION = '\u0006';
+  const GLOBSTAR_SLASH = '\u0007';
+  const SLASH_GLOBSTAR = '\u0008';
 
-  // Phase 1: tokenize.
+  // Phase 1: tokenize. `**/` and a trailing `/**` are tokenized as
+  // units so the globstar can match ZERO directory segments - standard
+  // globstar semantics (bash, minimatch, node fs.glob, tsconfig
+  // include). Translating `**` alone left the adjacent `/` as a
+  // required literal, so `src/**/*.ts` never matched files directly
+  // in `src/`.
   let tokenized = pattern.replace(
     /\{([^}]+)\}/g,
     (_m, group: string) => `${BRACE_OPEN}${group.split(',').join(BRACE_SEP)}${BRACE_CLOSE}`,
   );
-  tokenized = tokenized.replace(/\*\*/g, GLOBSTAR).replace(/\*/g, STAR).replace(/\?/g, QUESTION);
+  tokenized = tokenized
+    .replace(/\*\*\//g, GLOBSTAR_SLASH)
+    .replace(/\/\*\*$/, SLASH_GLOBSTAR)
+    .replace(/\*\*/g, GLOBSTAR)
+    .replace(/\*/g, STAR)
+    .replace(/\?/g, QUESTION);
 
   // Phase 2: escape every remaining regex meta-char on the literal
   // text. The placeholders are non-printable and never collide.
@@ -389,6 +477,8 @@ function compileGlob(pattern: string): (rel: string) => boolean {
     .replace(new RegExp(BRACE_OPEN, 'g'), '(?:')
     .replace(new RegExp(BRACE_CLOSE, 'g'), ')')
     .replace(new RegExp(BRACE_SEP, 'g'), '|')
+    .replace(new RegExp(GLOBSTAR_SLASH, 'g'), '(?:.*/)?')
+    .replace(new RegExp(SLASH_GLOBSTAR, 'g'), '(?:/.*)?')
     .replace(new RegExp(GLOBSTAR, 'g'), '.*')
     .replace(new RegExp(STAR, 'g'), '[^/]*')
     .replace(new RegExp(QUESTION, 'g'), '[^/]');

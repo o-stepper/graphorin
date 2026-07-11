@@ -7,7 +7,9 @@
  *    rate-limit, mounted on `*` at app construction time.
  * 2. {@link attachProtectedMiddleware} - auth + audit + idempotency
  *    for the authenticated subtree, mounted by `mountRoutes` after
- *    the unauthenticated health / metrics endpoints.
+ *    the unauthenticated health endpoint (metrics mounts behind the
+ *    boundary; the requireAuth=false path is exempted via the skip
+ *    list below).
  *
  * The relative order of these layers is part of the documented
  * contract - do not reorder.

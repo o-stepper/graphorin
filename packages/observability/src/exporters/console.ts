@@ -69,7 +69,24 @@ export function serializableRecord(record: SpanRecord): Record<string, unknown> 
     status: record.status,
     ...(record.statusMessage === undefined ? {} : { statusMessage: record.statusMessage }),
     attributes: record.attributes,
-    events: record.events,
+    // S-20/9: carry the per-attribute tier map (already pruned by the
+    // validation wrapper) so JSONL-sourced replay applies the same
+    // minSensitivity floors as store-backed sources.
+    ...(record.sensitivityByAttribute === undefined
+      ? {}
+      : { sensitivityByAttribute: record.sensitivityByAttribute }),
+    events: record.events.map(serializableEvent),
     ...(record.droppedReason === undefined ? {} : { droppedReason: record.droppedReason }),
+  };
+}
+
+function serializableEvent(event: SpanRecord['events'][number]): Record<string, unknown> {
+  return {
+    name: event.name,
+    timeUnixNano: event.timeUnixNano,
+    attributes: event.attributes,
+    ...(event.sensitivityByAttribute === undefined
+      ? {}
+      : { sensitivityByAttribute: event.sensitivityByAttribute }),
   };
 }

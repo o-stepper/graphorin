@@ -190,7 +190,9 @@ every other secret) under `oauth:<serverId>:<kind>` keys; the
 `OAuthServerStore` record carries only the **refs**, never token material. A
 fresh process resolves the refresh token back from the store, so
 `graphorin auth refresh` / `auth revoke` and the MCP bridge's
-`Authorization` header all work across restarts. `auth status` reports
+`Authorization` header all work across restarts (pass the store as
+`secretsStore` to `createOAuthAuthorizationProvider` and the
+`mcpAuth*` helpers). `auth status` reports
 `hasRefreshToken` only when the ref actually resolves. Without a usable
 secrets store the tokens live in process memory only and do not survive
 a restart (the pre-SPL-1 behaviour, kept as the documented fallback).

@@ -13,6 +13,8 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const TIMEOUT_MS = 90_000;
 
@@ -51,9 +53,17 @@ const CASES = [
   { name: 'tools-harness-tour', expectOutput: 'tools-harness-tour: OK' },
   { name: 'memory-graph-recall', expectOutput: 'memory-graph-recall: OK' },
   { name: 'secure-replay-agent', expectOutput: 'sink blocked' },
+  // F-02: pin the case to a throwaway DB and a guaranteed-dead loopback
+  // port so a live local Ollama daemon or a stale dev database in
+  // examples/local-stack-cli/.graphorin cannot change its path.
   {
     name: 'local-stack-cli',
-    env: { GRAPHORIN_LLM_RECIPE: 'ollama', GRAPHORIN_OFFLINE: '1' },
+    env: {
+      GRAPHORIN_LLM_RECIPE: 'ollama',
+      GRAPHORIN_OFFLINE: '1',
+      GRAPHORIN_OLLAMA_BASE_URL: 'http://127.0.0.1:59999',
+      GRAPHORIN_DB_PATH: join(tmpdir(), `graphorin-smoke-local-stack-${process.pid}.db`),
+    },
     expectExit: 2,
     expectOutput: 'GRAPHORIN_OFFLINE',
   },

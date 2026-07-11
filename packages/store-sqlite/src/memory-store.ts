@@ -1060,8 +1060,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    * `WHERE embedder_id = ?` guard from ADR-023 / DEC-116 so multi-active
    * migrations never bleed cross-embedder hits.
    *
-   * Returns `MemoryHit<Fact>` with `score` populated as
-   * `1 - distance` (cosine distance → cosine similarity).
+   * Returns `MemoryHit<Fact>` with `score` populated via
+   * `scoreFromDistance` (CS-3): a normalized `[0, 1]` similarity,
+   * `(1 + cos) / 2` for the cosine metric.
    *
    * @stable
    */

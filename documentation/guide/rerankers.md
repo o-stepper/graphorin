@@ -126,6 +126,11 @@ const memory = createMemory({
   non-positive or non-integer value throws `RangeError`) and evicts the model
   after an idle window when `idleEvictionMs` is set. Lower `batchSize` if large
   passages pressure memory.
+- **Precision & scoring** - the default precision is device-aware
+  (`defaultRerankerDtype`): `'q8'` on CPU (the default device), `'fp16'` on
+  accelerated devices; pass an explicit `dtype` to override. Scores are the
+  raw cross-encoder logits passed through a sigmoid (the default BGE heads
+  are single-logit), so relevant and irrelevant pairs separate cleanly.
 - **`reranker-llm`** scores in batches (default `5`). The score parser
   deliberately accepts only a bare, whole-string integer reply
   (anti-prompt-injection hardening) - a verbose response like `Score: 7` is

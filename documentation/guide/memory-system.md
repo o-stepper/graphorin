@@ -261,12 +261,12 @@ flowchart LR
 Every `semantic.remember(...)` call flows through five stages in order:
 
 1. **Exact dedup.** MD5 hash on the canonical (lowercase, collapsed-whitespace, trimmed) candidate body short-circuits on a hit.
-2. **Embedding three-zone.** Top-K neighbours from `searchVector` classify the candidate into HOT (`>= 0.95`), NEAR-DUP (`>= 0.85`), CONFLICT-CHECK (`> 0.4`), or COLD. HOT zone always dedups (semantic identity outranks every other signal).
+2. **Embedding three-zone.** Top-K neighbours from `searchVector` classify the candidate into HOT (`>= 0.95`), NEAR-DUP (`>= 0.85`), CONFLICT-CHECK (`> 0.4`), or COLD. The thresholds are **raw cosine** similarities - the store's normalized `[0, 1]` hit scores are mapped back to raw cosine before the zone comparison. HOT zone always dedups (semantic identity outranks every other signal).
 3. **Heuristic regex.** The active locale pack's supersede + negation markers fire when the candidate has an explicit change signal (`moved to`, `no longer`, `got promoted`, …).
 4. **Subject / predicate.** Naive `(subject, predicate, object)` split using the locale pack's predicate normalisers; matching subject + predicate with a different object is a strong supersede signal.
 5. **Defer to deep LLM judge.** Stages 1-4 yielded no decision but the candidate sits in CONFLICT-CHECK zone - the row is admitted `pending` and queued for the consolidator's deep phase.
 
-Every decision lands one row in the `fact_conflicts` table with the producing stage, the detection zone, the cosine similarity (where applicable), and a reason string. A `memory.conflict` span is emitted per call. The English locale pack ships by default; additional locales plug in via `defineLocalePack({...})`.
+Every decision lands one row in the `fact_conflicts` table with the producing stage, the detection zone, the raw cosine similarity (where applicable), and a reason string. A `memory.conflict` span is emitted per call. The English locale pack ships by default; additional locales plug in via `defineLocalePack({...})`.
 
 The consolidator's standard phase reuses this same machinery for **neighbour-aware write reconciliation**: extracted facts are checked against their nearest neighbours by a cheap pre-filter (exact-dedup + embedding zones), and only the genuinely ambiguous mid-zone spends one reconcile pass choosing *add / update / noop / conflict*. Updates and conflicts route through bi-temporal supersede - never a delete.
 

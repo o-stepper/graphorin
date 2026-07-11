@@ -127,4 +127,45 @@ describe('graphorin skills migrate-frontmatter', () => {
       expect(written).toContain('---');
     }
   });
+
+  it('S-12/2: dry-run LISTS the files --apply would rewrite, without touching bytes', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-skills-'));
+    await mkdir(join(dir, 'skill-b'), { recursive: true });
+    const skillPath = join(dir, 'skill-b', 'SKILL.md');
+    // graphorin-allowed-tools -> allowed-tools is a pinned
+    // deprecate-graphorin-prefix mapping in the bundled spec snapshot.
+    const original = `---\nname: legacy-skill\ndescription: dry-run regression\ngraphorin-allowed-tools:\n  - Read\n---\nBody.\n`;
+    await writeFile(skillPath, original, 'utf8');
+
+    const lines: string[] = [];
+    const dryRun = await runSkillsMigrateFrontmatter({
+      path: dir,
+      recursive: true,
+      print: (l) => lines.push(l),
+    });
+    // The old behavior keyed off result.changed (always false in a
+    // dry-run) and reported "no rewrites required".
+    expect(dryRun.migrated.map((m) => m.file)).toEqual([skillPath]);
+    expect(lines.some((l) => l.includes('would be rewritten (dry-run)'))).toBe(true);
+    expect(await readFile(skillPath, 'utf8')).toBe(original);
+
+    const applied = await runSkillsMigrateFrontmatter({
+      path: dir,
+      recursive: true,
+      apply: true,
+      print: () => undefined,
+    });
+    expect(applied.migrated.map((m) => m.file)).toEqual([skillPath]);
+    const written = await readFile(skillPath, 'utf8');
+    expect(written).toContain('allowed-tools');
+    expect(written).not.toContain('graphorin-allowed-tools');
+
+    // Idempotent: a second dry-run after --apply reports nothing.
+    const after = await runSkillsMigrateFrontmatter({
+      path: dir,
+      recursive: true,
+      print: () => undefined,
+    });
+    expect(after.migrated).toEqual([]);
+  });
 });

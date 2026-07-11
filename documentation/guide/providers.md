@@ -32,7 +32,7 @@ The optional middleware composer (`composeProviderMiddleware([...])`) wraps the 
 withTracing → withRetry → withRateLimit → withCostLimit → withCostTracking → withFallback → withRedaction → adapter
 ```
 
-A `MiddlewareOrderingError` is thrown the moment the array argument violates the canonical order, and a separate production-startup hook - `assertProductionMiddleware(provider)`, called from your own boot path - throws `MissingProductionMiddlewareError` when `NODE_ENV=production` (or `force: true`) and the chain does not include `withRedaction`. Each middleware has a focused responsibility:
+A `MiddlewareOrderingError` is thrown the moment the array argument violates the canonical order, and a separate production-startup hook - `assertProductionMiddleware(provider)`, called from your own boot path - throws `MissingProductionMiddlewareError` when `NODE_ENV=production` (or `force: true`) and the chain does not include `withRedaction`. `listMiddlewareKinds(provider)` walks a composed chain and returns the declared kinds outermost-first, so your own startup checks can assert the chain's shape. Each middleware has a focused responsibility:
 
 | Middleware | What it does |
 |---|---|

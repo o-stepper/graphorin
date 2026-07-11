@@ -34,6 +34,7 @@ import type { AgentEvent, Provider, RunState, SessionScope, ToolApproval } from 
 import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, type Memory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
+import { JsTiktokenCounter } from '@graphorin/provider/counters';
 import {
   type CreateServerOptions,
   createServer,
@@ -65,6 +66,8 @@ const DEFAULT_AGENT_ID = 'slack-bot';
 const DEFAULT_SESSION_TITLE = 'Slack bridge';
 const DEFAULT_CHANNEL = 'C-default';
 const SLACK_ROUTING_NS = 'agent';
+/** Matches the stub provider's declared `capabilities.contextWindow`. */
+const STUB_CONTEXT_WINDOW = 8_192;
 
 /** Bookkeeping table the example owns directly. Idempotent (`IF NOT EXISTS`). */
 const SLACK_ROUTING_DDL = `
@@ -140,6 +143,23 @@ export interface ServerOverrides {
     /** Env-var name the server resolves the pepper from. Defaults to `GRAPHORIN_SLACK_BOT_PEPPER`. */
     readonly pepperEnvVar?: string;
   };
+  /**
+   * Whether `server.start()` binds a real HTTP listener. Defaults to
+   * `true` - {@link startSlackBotApp} returns the actually-bound
+   * address. Set `false` for in-process callers that drive
+   * `server.app.request(...)` without a socket (the smoke test's
+   * bearer-auth scenario); with `false` the address reported by
+   * `server.start()` is the configured host/port, not a bound socket.
+   */
+  readonly listen?: boolean;
+  /** Listener host. Defaults to the framework default (`127.0.0.1`). */
+  readonly host?: string;
+  /**
+   * Listener port. Defaults to the framework default (`8080`); pass
+   * `0` for an ephemeral port (the bound port is returned by
+   * `server.start()`).
+   */
+  readonly port?: number;
 }
 
 /** Pending-approval record surfaced by {@link SlackBotApp.listPendingApprovals}. */
@@ -268,8 +288,10 @@ export function buildProvider(recipe: Recipe): Provider {
 /**
  * Build the Slack-bot example handle. The server is created but inert;
  * call {@link startSlackBotApp} (or `app.server.start()`) to bind the
- * HTTP listener. Library-mode callers can drive
- * {@link SlackBotApp.processSlackEvent} directly without the listener.
+ * HTTP listener - a real socket by default, or in-process only when
+ * `server: { listen: false }` is set. Library-mode callers can drive
+ * {@link SlackBotApp.processSlackEvent} directly without ever calling
+ * `start()`.
  */
 export async function createSlackBotApp(
   options: CreateSlackBotAppOptions = {},
@@ -304,6 +326,15 @@ export async function createSlackBotApp(
   const memory: Memory = createMemory({
     store: store.memory,
     embeddings: store.embeddings,
+    contextEngine: {
+      // CE-12: without a context window the auto-compaction threshold is
+      // Infinity and the framework WARNs at startup. Matches the stub
+      // provider's declared `capabilities.contextWindow`.
+      providerContextWindow: STUB_CONTEXT_WINDOW,
+      // CE-13: budget with a real tokenizer instead of the chars/4
+      // heuristic (js-tiktoken is offline - no network).
+      tokenCounter: new JsTiktokenCounter(),
+    },
     resolveScope: () => scope,
   });
 
@@ -424,9 +455,12 @@ export async function createSlackBotApp(
 }
 
 /**
- * Convenience wrapper - calls `app.server.start()` to bind the HTTP
- * listener. Returns the `{ host, port }` address from the underlying
- * `GraphorinServer.start()`.
+ * Convenience wrapper - calls `app.server.start()` to bind a real HTTP
+ * listener (pass `server: { port: 0 }` for an ephemeral port) and
+ * returns the actually-bound `{ host, port }` address. Only
+ * `server: { listen: false }` (tests-only) skips the socket; the
+ * returned address is then the configured host/port with nothing
+ * listening on it.
  */
 export async function startSlackBotApp(
   options: CreateSlackBotAppOptions = {},
@@ -866,32 +900,34 @@ async function buildServer(input: BuildServerInput): Promise<GraphorinServer> {
   const overrides = input.serverOverrides;
   const authEnabled = overrides?.auth?.enabled === true;
   const pepperEnvVar = overrides?.auth?.pepperEnvVar ?? 'GRAPHORIN_SLACK_BOT_PEPPER';
+  // Real listener by default: `server.start()` binds a socket and
+  // returns the actually-bound address. `listen: false` keeps the old
+  // in-process (tests-only) behavior.
+  const listen = overrides?.listen ?? true;
+  const serverBlock = {
+    rateLimit: { enabled: false },
+    csrf: { enabled: false },
+    ws: { enabled: false },
+    sse: { enabled: false },
+    ...(overrides?.host !== undefined ? { host: overrides.host } : {}),
+    ...(overrides?.port !== undefined ? { port: overrides.port } : {}),
+  };
   const baseConfig: CreateServerOptions['config'] = authEnabled
     ? {
         auth: { kind: 'token' as const, pepperRef: `env:${pepperEnvVar}` },
         audit: { enabled: false },
-        server: {
-          rateLimit: { enabled: false },
-          csrf: { enabled: false },
-          ws: { enabled: false },
-          sse: { enabled: false },
-        },
+        server: serverBlock,
       }
     : {
         auth: { kind: 'none' as const },
         audit: { enabled: false },
-        server: {
-          rateLimit: { enabled: false },
-          csrf: { enabled: false },
-          ws: { enabled: false },
-          sse: { enabled: false },
-        },
+        server: serverBlock,
       };
 
   const server = await createServer({
     store: input.store,
     skipHardening: true,
-    skipListen: true,
+    ...(listen ? {} : { skipListen: true }),
     config: baseConfig,
   });
   const adapter: ServerAgentLike = {
@@ -1011,19 +1047,25 @@ function isInMemorySlackClient(client: SlackClient): client is InMemorySlackClie
 export type { Message } from '@graphorin/core';
 
 /**
- * CLI entry point. Boots the app against an in-memory store, runs both
- * the happy-path and approval flows end-to-end with the deterministic
- * stub Slack client, and prints a one-line summary.
+ * CLI entry point. Binds a real HTTP listener on an ephemeral loopback
+ * port, probes `/v1/health` over the socket, runs both the happy-path
+ * and approval flows end-to-end with the deterministic stub Slack
+ * client, prints a one-line summary, and shuts the listener down
+ * cleanly.
  */
 export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Promise<number> {
   const env = args.env ?? process.env;
   const slack = createInMemorySlackClient();
-  const app = await createSlackBotApp({
+  const { host, port, app } = await startSlackBotApp({
     env,
     dbPath: ':memory:',
     slackClient: slack,
+    // Port 0 = ephemeral: the OS picks a free port and `startSlackBotApp`
+    // returns the actually-bound address.
+    server: { port: 0 },
   });
   try {
+    const health = await fetch(`http://${host}:${port}/v1/health`);
     const happy = await app.processSlackEvent({
       event: {
         type: 'event_callback' as const,
@@ -1043,11 +1085,12 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
     });
     process.stdout.write(
       `graphorin v${VERSION} slack-bot-integration - ` +
-        `recipe='${app.recipe}', happy='${happy.status}', ` +
+        `recipe='${app.recipe}', listener=${host}:${port} (health ${health.status}), ` +
+        `happy='${happy.status}', ` +
         `approval='${approval.resume.status}', ` +
         `slackMessages=${approval.slackMessages.length}.\n`,
     );
-    return 0;
+    return health.status === 200 ? 0 : 1;
   } finally {
     await app.close();
   }

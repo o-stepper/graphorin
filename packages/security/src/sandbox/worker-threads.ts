@@ -374,16 +374,22 @@ async function runOnce<TInput, TOutput>(
     });
 
     worker.once('exit', (exitCode) => {
-      if (exitCode !== 0) {
-        settle({
-          ok: false,
-          error: {
-            kind: 'execution-failed',
-            message: `worker exited with code ${exitCode}`,
-          },
-          durationMs: performance.now() - startedAt,
-        });
-      }
+      // Settle on ANY exit that beats the 'message' handler: a worker
+      // whose event loop drains without posting a result exits 0, and
+      // without this settle the run would hang until the wall-clock
+      // timeout (or forever when timeoutMs <= 0). Node emits queued
+      // 'message' events before 'exit', so a posted result always wins.
+      settle({
+        ok: false,
+        error: {
+          kind: 'execution-failed',
+          message:
+            exitCode === 0
+              ? 'worker exited before producing a result'
+              : `worker exited with code ${exitCode}`,
+        },
+        durationMs: performance.now() - startedAt,
+      });
     });
 
     if (timeoutMs > 0) {
@@ -398,7 +404,9 @@ async function runOnce<TInput, TOutput>(
         });
         void worker.terminate();
       }, timeoutMs);
-      timer.unref?.();
+      // Deliberately ref'd: while a run is pending the timer must be
+      // able to keep a draining host event loop alive so the timeout
+      // can still settle; it is cleared as soon as the run settles.
     }
 
     if (runOpts.signal) {

@@ -5,7 +5,8 @@
  * token-verifier construction, route mounting, daemon start order
  * (consolidator first, scheduler last), listener bind, onReady, and
  * the mirrored shutdown sequence (drain, force-abort, dispatcher
- * shutdown, listener close, audit close, store close).
+ * shutdown, listener close, audit close, owned-store close -
+ * caller-injected stores are never closed).
  *
  * The sequencing in this module is part of the documented contract -
  * pure movement only, do not reorder.
@@ -69,6 +70,13 @@ export interface ServerLifecycleDeps {
   readonly options: ServerLifecycleOptions;
   readonly config: ServerConfigSpec;
   readonly store: GraphorinSqliteStore;
+  /**
+   * E-21 (S-24/16): true when `createServer` built the store itself.
+   * `stop()` only closes owned stores - a caller-injected store stays
+   * open so it can be reused (e.g. the documented restartFactory
+   * pattern).
+   */
+  readonly ownsStore: boolean;
   readonly app: Hono<{ Variables: ServerVariables }>;
   readonly metricRegistry: MetricRegistry;
   readonly runs: RunStateTracker;
@@ -101,6 +109,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
     options,
     config,
     store,
+    ownsStore,
     app,
     metricRegistry,
     runs,
@@ -260,7 +269,8 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         // Sample a couple of gauges immediately so the very first
         // `/v1/metrics` scrape after start carries non-zero data.
         try {
-          const wal = readWalSize(store.connection);
+          // S-09: readWalSize is negative when the DB is not in WAL mode.
+          const wal = Math.max(0, readWalSize(store.connection));
           metricRegistry.set(SERVER_METRIC_NAMES.storageWalSize, wal);
         } catch {
           // Best-effort.
@@ -428,7 +438,11 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         await auditDb.close();
         auditDb = undefined;
       }
-      await store.close();
+      // E-21 (S-24/16): only close a store this server created -
+      // caller-injected stores stay open for reuse across restarts.
+      if (ownsStore) {
+        await store.close();
+      }
       listening = undefined;
       verifier = undefined;
       started = false;
