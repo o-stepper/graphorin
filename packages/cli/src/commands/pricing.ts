@@ -24,6 +24,7 @@ import {
   BUNDLED_SNAPSHOT,
   computeEntriesDigest,
   diffPricing,
+  type LookupPriceResult,
   listMissingModels,
   lookupPrice,
   type PricingDiffEntry,
@@ -166,6 +167,43 @@ export interface PricingLookupOptions extends PricingCommonOptions {
   readonly region?: string;
 }
 
+/**
+ * S-05: snapshot rates are stored as `x / 1_000_000` doubles, so a
+ * verbatim `JSON.stringify` prints IEEE754 artifacts (the $0.10/Mtok
+ * cache-read rate serializes as `1.0000000000000001e-7`). Re-quantize
+ * a rate to the shortest decimal whose parsed value stays within
+ * 1e-15 RELATIVE of the stored double - an artifact is at most one
+ * ulp (~2.2e-16 relative), so the cleaned number is value-identical
+ * for any cost purpose while printing as `1e-7`. Presentation only:
+ * `lookupPrice` / `calculateCost` keep the raw doubles.
+ */
+function stableRate(value: number): number {
+  for (let digits = 1; digits <= 17; digits += 1) {
+    const candidate = Number(value.toPrecision(digits));
+    if (candidate === value || Math.abs(candidate - value) <= Math.abs(value) * 1e-15) {
+      return candidate;
+    }
+  }
+  return value;
+}
+
+function withStableRates(result: LookupPriceResult): LookupPriceResult {
+  return {
+    ...result,
+    inputUsdPerToken: stableRate(result.inputUsdPerToken),
+    outputUsdPerToken: stableRate(result.outputUsdPerToken),
+    ...(result.cachedReadUsdPerToken !== undefined
+      ? { cachedReadUsdPerToken: stableRate(result.cachedReadUsdPerToken) }
+      : {}),
+    ...(result.cacheWriteUsdPerToken !== undefined
+      ? { cacheWriteUsdPerToken: stableRate(result.cacheWriteUsdPerToken) }
+      : {}),
+    ...(result.reasoningUsdPerToken !== undefined
+      ? { reasoningUsdPerToken: stableRate(result.reasoningUsdPerToken) }
+      : {}),
+  };
+}
+
 /** @stable */
 export function runPricingLookup(options: PricingLookupOptions) {
   const result = lookupPrice({
@@ -173,15 +211,16 @@ export function runPricingLookup(options: PricingLookupOptions) {
     model: options.model,
     ...(options.region !== undefined ? { region: options.region } : {}),
   });
-  emitReport(options, result, () => {
+  const display = result === null ? null : withStableRates(result);
+  emitReport(options, display, () => {
     const print = options.print ?? defaultPrintSink;
-    if (result === null) {
+    if (display === null) {
       print(brand(`no pricing entry for ${options.provider}/${options.model}.`));
       return;
     }
     print(
       brand(
-        `${options.provider}/${options.model}: input=${result.inputUsdPerToken} / output=${result.outputUsdPerToken} USD per token (source=${result.source}, snapshot=${result.snapshotDate})`,
+        `${options.provider}/${options.model}: input=${display.inputUsdPerToken} / output=${display.outputUsdPerToken} USD per token (source=${display.source}, snapshot=${display.snapshotDate})`,
       ),
     );
   });
