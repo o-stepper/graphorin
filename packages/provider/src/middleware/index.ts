@@ -10,6 +10,7 @@ export {
   composeProviderMiddleware,
   defineProviderMiddleware,
   getMiddlewareKind,
+  listMiddlewareKinds,
   MIDDLEWARE_KIND,
   providerHasMiddleware,
 } from './compose.js';
