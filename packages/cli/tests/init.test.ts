@@ -100,6 +100,67 @@ describe('runInit', () => {
     });
     await expect(readFile(result.configPath, 'utf8')).rejects.toThrow();
   });
+
+  it('F-05: --format json writes a defineConfig-free graphorin.config.json', async () => {
+    const dir = await fixtureDir();
+    const result = await runInit({
+      cwd: dir,
+      format: 'json',
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: true,
+      print: () => {},
+    });
+    expect(result.configPath).toBe(join(dir, 'graphorin.config.json'));
+    const raw = await readFile(result.configPath, 'utf8');
+    expect(raw).not.toContain('defineConfig');
+    const cfg = JSON.parse(raw);
+    expect(cfg.storage.encryption.enabled).toBe(true);
+    expect(cfg.audit.enabled).toBe(true);
+    const { parseServerConfig } = await import('@graphorin/server');
+    expect(() => parseServerConfig(cfg)).not.toThrow();
+  });
+
+  it('F-05: the json flavour is inferred from a .json --out', async () => {
+    const dir = await fixtureDir();
+    const result = await runInit({
+      cwd: dir,
+      out: 'custom.json',
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      print: () => {},
+    });
+    expect(result.configPath).toBe(join(dir, 'custom.json'));
+    const raw = await readFile(result.configPath, 'utf8');
+    expect(() => JSON.parse(raw)).not.toThrow();
+  });
+
+  it('F-05: refuses a --format that contradicts the --out extension', async () => {
+    const dir = await fixtureDir();
+    await expect(
+      runInit({
+        cwd: dir,
+        format: 'json',
+        out: 'graphorin.config.ts',
+        nonInteractive: true,
+        cloudConsent: 'public-only',
+        encrypted: false,
+        print: () => {},
+      }),
+    ).rejects.toThrow(/--format json requires an --out ending in '\.json'/);
+    await expect(
+      runInit({
+        cwd: dir,
+        format: 'ts',
+        out: 'graphorin.config.json',
+        nonInteractive: true,
+        cloudConsent: 'public-only',
+        encrypted: false,
+        print: () => {},
+      }),
+    ).rejects.toThrow(/--format ts conflicts/);
+  });
 });
 
 describe('IP-5 - init output parses through the strict server schema', () => {

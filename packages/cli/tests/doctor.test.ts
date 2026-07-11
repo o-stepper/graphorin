@@ -58,4 +58,45 @@ describe('runDoctor', () => {
     const report = await runDoctor({ home, print: () => undefined });
     expect(report.summary.warn + report.summary.skip + report.summary.ok).toBeGreaterThan(0);
   });
+
+  it('F-06: --config checks the configured storage/audit paths, not ~/.graphorin', async () => {
+    const dir = await fixtureDir();
+    const dbPath = join(dir, 'project.db');
+    const auditPath = join(dir, 'project-audit.db');
+    const cfg = join(dir, 'graphorin.config.json');
+    await writeFile(
+      cfg,
+      JSON.stringify({
+        storage: { path: dbPath, mode: 'lib' },
+        audit: { enabled: true, path: auditPath, passphraseRef: 'env:DOCTOR_TEST_PASS' },
+        auth: { kind: 'none' },
+      }),
+      { mode: 0o600 },
+    );
+    await writeFile(dbPath, '', { mode: 0o600 });
+    await writeFile(auditPath, '', { mode: 0o644 });
+
+    const home = join(tmpdir(), `graphorin-cli-doctor-unused-home-${Date.now()}`);
+    const report = await runDoctor({ home, config: cfg, checkPerms: true, print: () => undefined });
+    expect(report.configPath).toBe(cfg);
+    const checked = report.checks.map((c) => c.check);
+    expect(checked).toContain(cfg);
+    expect(checked).toContain(dbPath);
+    expect(checked).toContain(auditPath);
+    // The hardcoded home layout must NOT drive the check under --config.
+    expect(checked.some((c) => c.startsWith(home))).toBe(false);
+    if (process.platform !== 'win32') {
+      const audit = report.checks.find((c) => c.check === auditPath);
+      expect(audit?.status).toBe('fail');
+      const db = report.checks.find((c) => c.check === dbPath);
+      expect(db?.status).toBe('ok');
+    }
+  });
+
+  it('F-06: default behavior without --config is unchanged', async () => {
+    const home = await fixtureDir();
+    const report = await runDoctor({ home, checkPerms: true, print: () => undefined });
+    expect(report.configPath).toBeUndefined();
+    expect(report.checks.some((c) => c.check.startsWith(home))).toBe(true);
+  });
 });

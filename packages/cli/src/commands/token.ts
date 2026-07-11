@@ -22,6 +22,7 @@
  * @packageDocumentation
  */
 
+import process from 'node:process';
 import {
   createToken,
   listTokens,
@@ -38,6 +39,7 @@ import {
   type CommonOutputOptions,
   defaultPrintSink,
   emitReport,
+  type PrintSink,
   statusMarker,
 } from '../internal/output.js';
 import { openStoreContext } from '../internal/store-context.js';
@@ -57,6 +59,8 @@ export interface TokenCreateOptions extends TokenCommonOptions {
   /** Duration string: `30d`, `12h`, `90m`, `45s`. */
   readonly expiresIn?: string;
   readonly env?: 'live' | 'test';
+  /** Test seam - capture the raw-token stdout line. */
+  readonly stdoutPrint?: PrintSink;
 }
 
 /** @stable */
@@ -106,8 +110,13 @@ export async function runTokenCreate(options: TokenCreateOptions): Promise<Token
     emitReport(options, out, () => {
       const print = options.print ?? defaultPrintSink;
       print(brand(`token created (id=${out.id}, scopes=${out.scopes.join(',')})`));
-      print(brand(`raw token (shown ONCE):`));
-      print(`  ${out.raw}`);
+      print(brand(`raw token (shown ONCE, printed to stdout):`));
+      // S-14b: the raw value is the machine-consumable output of this
+      // command - it goes to STDOUT (pipe/capture-friendly), while the
+      // log chatter above stays on stderr.
+      const stdoutPrint =
+        options.stdoutPrint ?? ((line: string) => process.stdout.write(`${line}\n`));
+      stdoutPrint(out.raw);
       if (out.expiresAt !== undefined) {
         print(brand(`expires at: ${out.expiresAt}`));
       }

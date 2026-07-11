@@ -4,7 +4,7 @@ import pkg from '../../package.json' with { type: 'json' };
  * migration for `graphorin-session-export/N.N` JSONL files (DEC-155 /
  * ADR-042).
  *
- * The exporter ships schema 1.0 in v0.1; the migrator's main job today
+ * The exporter currently ships schema 1.0; the migrator's main job
  * is to validate that the supplied input file is a well-formed session
  * export with a schema in the framework's N-2 backwards-compat band
  * and to round-trip the records through the writer with the desired
@@ -75,7 +75,7 @@ export async function runMigrateExport(
     const print = options.print ?? defaultPrintSink;
     print(
       brand(
-        `requested target schema '${targetSchema}' is not the writer's current schema (${SESSION_EXPORT_SCHEMA_CURRENT}); v0.1 supports the current schema only.`,
+        `requested target schema '${targetSchema}' is not the writer's current schema (${SESSION_EXPORT_SCHEMA_CURRENT}); the migrator supports the current schema only.`,
       ),
     );
     process.exit(EXIT_CODES.UNSUPPORTED);
@@ -87,6 +87,10 @@ export async function runMigrateExport(
   const buffer = createBufferSink();
   const writer = createSessionExportWriter(buffer.sink, {
     writer: options.writer ?? `graphorin-cli@${pkg.version}`,
+    // S-11: an input exported with `--hash` carries a footer checksum -
+    // the migrated copy must keep the integrity protection, not
+    // silently drop it.
+    ...(parsed.footer.checksum !== undefined ? { hash: true } : {}),
     ...(parsed.meta.embedderIds !== undefined ? { embedderIds: parsed.meta.embedderIds } : {}),
   });
   for (const record of parsed.records) {

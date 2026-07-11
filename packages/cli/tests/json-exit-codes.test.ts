@@ -95,6 +95,25 @@ describe('W-002 - failures set exit code 1 in --json mode (and emit the payload)
     expect(process.exitCode).toBe(1);
   });
 
+  it('S-14b: audit verify --json with audit DISABLED emits an error document, not silence', async () => {
+    const { cfg } = await fixture();
+    const payloads: unknown[] = [];
+    await expect(
+      runAuditVerify({
+        config: cfg,
+        json: true,
+        jsonPrint: (p) => payloads.push(p),
+        print: () => undefined,
+      }),
+    ).rejects.toThrow(/audit\.enabled/);
+    expect(payloads).toHaveLength(1);
+    const doc = payloads[0] as { ok: boolean; error: string };
+    expect(doc.ok).toBe(false);
+    // The JSON payload carries the reason WITHOUT the log-line brand.
+    expect(doc.error).toContain('audit.enabled = true');
+    expect(doc.error).not.toContain('[graphorin/cli]');
+  });
+
   it('pricing lookup --json miss exits 1 with the payload emitted', () => {
     const payloads: unknown[] = [];
     process.exitCode = 0;

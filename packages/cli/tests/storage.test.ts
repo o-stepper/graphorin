@@ -61,6 +61,25 @@ describe('graphorin storage status', () => {
     // Must NOT resolve against the config-file directory (the old behaviour).
     expect(out.path).not.toBe(resolve(dir, 'data.db'));
   });
+
+  it('S-07/1: the cipherPeer probe agrees with the encrypted sub-pack', async () => {
+    // The old probe bare-imported the peer from the CLI's own
+    // resolution scope, which fails under pnpm's strict node_modules
+    // layout even though encrypt/rekey (loading via the sub-pack)
+    // work. status must report what the sub-pack can actually do.
+    let subpackLoads = true;
+    try {
+      const mod = (await import('@graphorin/store-sqlite-encrypted')) as {
+        loadCipherPeer: () => Promise<unknown>;
+      };
+      await mod.loadCipherPeer();
+    } catch {
+      subpackLoads = false;
+    }
+    const cfg = await fixture();
+    const out = await runStorageStatus({ config: cfg, print: () => {} });
+    expect(out.cipherPeer.installed).toBe(subpackLoads);
+  });
 });
 
 describe('graphorin storage encrypt', () => {
@@ -124,6 +143,27 @@ describe('graphorin storage cleanup-backups', () => {
     // dry-run must not delete anything
     const { readFile } = await import('node:fs/promises');
     await expect(readFile(`${dbPath}.bak`, 'utf8')).resolves.toBe('stale');
+  });
+});
+
+describe('graphorin storage backup', () => {
+  it('S-14b: the copy mirrors the source file mode (a 0600 store stays 0600)', async () => {
+    const cfg = await fixture();
+    const dbPath = join(dirname(cfg), 'data.db');
+    const { createSqliteStore } = await import('@graphorin/store-sqlite');
+    const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+    await store.init();
+    await store.close();
+    const { chmod } = await import('node:fs/promises');
+    await chmod(dbPath, 0o600);
+
+    const { runStorageBackup } = await import('../src/commands/storage.js');
+    const dest = join(dirname(cfg), 'backup.db');
+    const out = await runStorageBackup({ config: cfg, dest, print: () => {} });
+    expect(out.dest).toBe(dest);
+    // The driver writes the copy with the umask default (0644 on most
+    // hosts) - the CLI must not downgrade the live store's posture.
+    expect((await stat(dest)).mode & 0o777).toBe(0o600);
   });
 });
 

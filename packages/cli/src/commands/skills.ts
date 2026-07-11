@@ -193,12 +193,21 @@ export async function runSkillsMigrateFrontmatter(
   for (const file of files) {
     const raw = await readFile(file, 'utf8');
     let result: MigrationResult;
+    let wouldChange: boolean;
     try {
       result = migrateFrontmatter(raw, { apply, skillId: file });
+      // S-12/2: `changed` is false for EVERY dry-run by contract (the
+      // library never mutates without `apply`), so keying the report
+      // off it made dry-run always print "no rewrites required". Probe
+      // an in-memory apply instead - dry-run lists exactly the files
+      // --apply would rewrite.
+      wouldChange = apply
+        ? result.changed
+        : migrateFrontmatter(raw, { apply: true, skillId: file }).changed;
     } catch {
       continue;
     }
-    if (result.changed) {
+    if (wouldChange) {
       if (apply) {
         await writeFile(file, result.migratedSkillMd, { mode: 0o600 });
       }

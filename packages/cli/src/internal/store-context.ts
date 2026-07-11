@@ -126,7 +126,7 @@ export async function openStoreContext(
         await store.close();
         throw new Error(
           `[graphorin/cli] the database schema is ${pendingCount} migration(s) behind this CLI. ` +
-            'This is a read-only command and will not upgrade a live database. ' +
+            'This command will not upgrade a live database. ' +
             "Run 'graphorin migrate' (with the server stopped) or use a CLI version matching the server.",
         );
       }
