@@ -10,12 +10,12 @@
 function _resetPipelineFactoryCacheForTesting(): void;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L92)
+Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L165)
 
 **`Internal`**
 
-Test-only helper. Drops the cached pipeline factory so the next
-loader call re-imports the peer.
+Test-only helper. Drops the cached module so the next loader call
+re-imports the peer.
 
 ## Returns
 

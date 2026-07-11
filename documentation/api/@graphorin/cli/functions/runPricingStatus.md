@@ -10,7 +10,7 @@
 function runPricingStatus(options?): PricingStatusResult;
 ```
 
-Defined in: [packages/cli/src/commands/pricing.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L57)
+Defined in: [packages/cli/src/commands/pricing.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L58)
 
 ## Parameters
 

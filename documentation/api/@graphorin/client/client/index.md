@@ -24,5 +24,5 @@
 
 | Type Alias | Description |
 | ------ | ------ |
-| [SubscriptionTarget](/api/@graphorin/client/client/type-aliases/SubscriptionTarget.md) | Discriminator for the subscription target. Mirrors the strict subject grammar enforced by the server: - `'session'`/`<id>` ⇒ `'session:<id>/events'` - `'agent'`/`<id>` + `runId` ⇒ `'agent:<id>/runs/<runId>/events'` - `'run'`/`<runId>` ⇒ `'session:<sessionId>/runs/<runId>/events'` (when `sessionId` is provided) - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'` |
+| [SubscriptionTarget](/api/@graphorin/client/client/type-aliases/SubscriptionTarget.md) | Discriminator for the subscription target. Mirrors the strict subject grammar enforced by the server: - `'session'`/`<id>` ⇒ `'session:<id>/events'` - `'agent'`/`<id>` + `runId` ⇒ `'agent:<id>/runs/<runId>/events'` - `'run'`/`<runId>` ⇒ `'session:<sessionId>/runs/<runId>/events'` (when `sessionId` is provided) - `'workflow'`/`<id>` ⇒ `'workflow:<id>/events'`, or `'workflow:<id>/runs/<runId>/events'` when the optional `runId` is present (the run-scoped subject advertised by the workflow execute/resume routes) |
 | [TransportPreference](/api/@graphorin/client/client/type-aliases/TransportPreference.md) | Transport selector. `'auto'` (default) attempts a WebSocket handshake first and falls back to SSE on failure. |

@@ -6,7 +6,7 @@
 
 # Interface: TokenVerifyResult
 
-Defined in: [packages/cli/src/commands/token.ts:299](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L299)
+Defined in: [packages/cli/src/commands/token.ts:308](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L308)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: [packages/cli/src/commands/token.ts:299](https://github.com/o-steppe
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | [packages/cli/src/commands/token.ts:300](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L300) |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | [packages/cli/src/commands/token.ts:301](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L301) |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | [packages/cli/src/commands/token.ts:309](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L309) |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | [packages/cli/src/commands/token.ts:310](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L310) |

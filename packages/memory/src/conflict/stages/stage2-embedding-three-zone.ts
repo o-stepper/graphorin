@@ -16,7 +16,7 @@
  *
  * `sim` is the **raw cosine** similarity (DEC-130): the store's
  * normalized `[0, 1]` hit score (`(1 + cos) / 2`, CS-3) is mapped back
- * through {@link rawCosineFromStoreScore} before the zone comparison so
+ * through `rawCosineFromStoreScore` before the zone comparison so
  * the thresholds keep their calibrated raw-cosine semantics.
  *
  * @packageDocumentation

@@ -6,7 +6,7 @@
 
 # Interface: AuditExportOptions
 
-Defined in: [packages/cli/src/commands/audit.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L154)
+Defined in: [packages/cli/src/commands/audit.ts:174](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L174)
 
 ## Stable
 
@@ -18,11 +18,11 @@ Defined in: [packages/cli/src/commands/audit.ts:154](https://github.com/o-steppe
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-config) | [packages/cli/src/commands/audit.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L48) |
-| <a id="property-fromseq"></a> `fromSeq?` | `readonly` | `number` | - | - | [packages/cli/src/commands/audit.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L156) |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-config) | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
+| <a id="property-fromseq"></a> `fromSeq?` | `readonly` | `number` | - | - | [packages/cli/src/commands/audit.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L176) |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-json) | [packages/cli/src/internal/output.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L71) |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-jsonprint) | [packages/cli/src/internal/output.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L77) |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-noninteractive) | [packages/cli/src/internal/output.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L73) |
 | <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | [`AuditCommonOptions`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/AuditCommonOptions.md#property-print) | [packages/cli/src/internal/output.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L75) |
-| <a id="property-to"></a> `to` | `readonly` | `string` | - | - | [packages/cli/src/commands/audit.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L155) |
-| <a id="property-toseq"></a> `toSeq?` | `readonly` | `number` | - | - | [packages/cli/src/commands/audit.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L157) |
+| <a id="property-to"></a> `to` | `readonly` | `string` | - | - | [packages/cli/src/commands/audit.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L175) |
+| <a id="property-toseq"></a> `toSeq?` | `readonly` | `number` | - | - | [packages/cli/src/commands/audit.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L177) |

@@ -10,7 +10,7 @@
 function extractPairScores(raw, pairCount): number[];
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L120)
+Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:258](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L258)
 
 **`Internal`**
 

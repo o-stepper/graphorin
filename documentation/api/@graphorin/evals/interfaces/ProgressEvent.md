@@ -6,7 +6,7 @@
 
 # Interface: ProgressEvent
 
-Defined in: [packages/evals/src/types.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L71)
+Defined in: [packages/evals/src/types.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L90)
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: [packages/evals/src/types.ts:71](https://github.com/o-stepper/grapho
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | [packages/evals/src/types.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L74) |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | [packages/evals/src/types.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L75) |
-| <a id="property-index"></a> `index` | `readonly` | `number` | [packages/evals/src/types.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L72) |
-| <a id="property-passed"></a> `passed` | `readonly` | `boolean` | [packages/evals/src/types.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L76) |
-| <a id="property-total"></a> `total` | `readonly` | `number` | [packages/evals/src/types.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L73) |
+| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | [packages/evals/src/types.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L93) |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | [packages/evals/src/types.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L94) |
+| <a id="property-index"></a> `index` | `readonly` | `number` | [packages/evals/src/types.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L91) |
+| <a id="property-passed"></a> `passed` | `readonly` | `boolean` | [packages/evals/src/types.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L95) |
+| <a id="property-total"></a> `total` | `readonly` | `number` | [packages/evals/src/types.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L92) |

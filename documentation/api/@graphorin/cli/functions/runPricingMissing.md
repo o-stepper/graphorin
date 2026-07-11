@@ -10,7 +10,7 @@
 function runPricingMissing(options): Promise<readonly MissingModelEntry[]>;
 ```
 
-Defined in: [packages/cli/src/commands/pricing.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L204)
+Defined in: [packages/cli/src/commands/pricing.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L243)
 
 ## Parameters
 

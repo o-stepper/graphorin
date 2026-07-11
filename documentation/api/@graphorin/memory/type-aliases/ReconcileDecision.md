@@ -29,7 +29,7 @@ type ReconcileDecision =
 };
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L221)
+Defined in: [packages/memory/src/conflict/types.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L243)
 
 Outcome of `reconcileCandidate`. `add` is independent / unsure
 (a fresh fact); `noop` is a duplicate that adds nothing; `update` is

@@ -10,11 +10,12 @@
 function isGenaiPricesShape(body): boolean;
 ```
 
-Defined in: [packages/pricing/src/convert-genai-prices.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/convert-genai-prices.ts#L62)
+Defined in: [packages/pricing/src/convert-genai-prices.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/convert-genai-prices.ts#L76)
 
 Cheap structural detector: does this body look like the
 genai-prices dataset (a `providers` array of objects carrying
-`models` arrays)?
+`models` arrays, or the published bare top-level array of those
+provider objects)?
 
 ## Parameters
 

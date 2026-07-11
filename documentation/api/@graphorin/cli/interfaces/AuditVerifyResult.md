@@ -6,7 +6,7 @@
 
 # Interface: AuditVerifyResult
 
-Defined in: [packages/cli/src/commands/audit.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L52)
+Defined in: [packages/cli/src/commands/audit.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L60)
 
 ## Stable
 
@@ -14,10 +14,10 @@ Defined in: [packages/cli/src/commands/audit.ts:52](https://github.com/o-stepper
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-broken"></a> `broken?` | `readonly` | \{ `actual`: `string`; `expected`: `string`; `seq`: `number`; \} | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
-| `broken.actual` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
-| `broken.expected` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
-| `broken.seq` | `readonly` | `number` | [packages/cli/src/commands/audit.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L56) |
-| <a id="property-entries"></a> `entries` | `readonly` | `number` | [packages/cli/src/commands/audit.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L55) |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | [packages/cli/src/commands/audit.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L53) |
-| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L54) |
+| <a id="property-broken"></a> `broken?` | `readonly` | \{ `actual`: `string`; `expected`: `string`; `seq`: `number`; \} | [packages/cli/src/commands/audit.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L64) |
+| `broken.actual` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L64) |
+| `broken.expected` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L64) |
+| `broken.seq` | `readonly` | `number` | [packages/cli/src/commands/audit.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L64) |
+| <a id="property-entries"></a> `entries` | `readonly` | `number` | [packages/cli/src/commands/audit.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L63) |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | [packages/cli/src/commands/audit.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L61) |
+| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L62) |

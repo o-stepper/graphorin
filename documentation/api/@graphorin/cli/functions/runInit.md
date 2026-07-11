@@ -10,7 +10,7 @@
 function runInit(options?): Promise<InitCommandResult>;
 ```
 
-Defined in: [packages/cli/src/commands/init.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L60)
+Defined in: [packages/cli/src/commands/init.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L71)
 
 ## Parameters
 

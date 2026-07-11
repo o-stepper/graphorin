@@ -6,7 +6,7 @@
 
 # Interface: Subscription
 
-Defined in: [packages/client/src/graphorin-client.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L184)
+Defined in: [packages/client/src/graphorin-client.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L198)
 
 Public surface returned by [GraphorinClient.subscribe](/api/@graphorin/client/client/classes/GraphorinClient.md#subscribe).
 
@@ -16,8 +16,8 @@ Public surface returned by [GraphorinClient.subscribe](/api/@graphorin/client/cl
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-subject"></a> `subject` | `readonly` | `string` | [packages/client/src/graphorin-client.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L186) |
-| <a id="property-subscriptionid"></a> `subscriptionId` | `readonly` | `string` | [packages/client/src/graphorin-client.ts:185](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L185) |
+| <a id="property-subject"></a> `subject` | `readonly` | `string` | [packages/client/src/graphorin-client.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L200) |
+| <a id="property-subscriptionid"></a> `subscriptionId` | `readonly` | `string` | [packages/client/src/graphorin-client.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L199) |
 
 ## Methods
 
@@ -35,7 +35,7 @@ events(): AsyncIterable<{
 }>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L187)
+Defined in: [packages/client/src/graphorin-client.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L201)
 
 #### Returns
 
@@ -57,7 +57,7 @@ Defined in: [packages/client/src/graphorin-client.ts:187](https://github.com/o-s
 metadata(): SubscriptionMetadata;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:192](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L192)
+Defined in: [packages/client/src/graphorin-client.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L206)
 
 #### Returns
 
@@ -71,7 +71,7 @@ Defined in: [packages/client/src/graphorin-client.ts:192](https://github.com/o-s
 unsubscribe(): Promise<void>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L191)
+Defined in: [packages/client/src/graphorin-client.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L205)
 
 Close the subscription on the server. Idempotent.
 

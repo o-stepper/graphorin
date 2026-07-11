@@ -13,18 +13,19 @@ function mcpAuthRefresh(
 options?): Promise<OAuthSession>;
 ```
 
-Defined in: [packages/mcp/src/oauth/library.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L41)
+Defined in: [packages/mcp/src/oauth/library.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L42)
 
 Drive `graphorin auth refresh --mcp <id>`.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
-| `serverId` | `string` |
-| `options` | \{ `signal?`: `AbortSignal`; \} |
-| `options.signal?` | `AbortSignal` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | - |
+| `serverId` | `string` | - |
+| `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); `signal?`: `AbortSignal`; \} | - |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | SPL-1: resolves the persisted refresh token across processes. |
+| `options.signal?` | `AbortSignal` | - |
 
 ## Returns
 

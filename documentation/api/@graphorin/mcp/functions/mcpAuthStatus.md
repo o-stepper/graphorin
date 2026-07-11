@@ -7,10 +7,10 @@
 # Function: mcpAuthStatus()
 
 ```ts
-function mcpAuthStatus(storage): Promise<OAuthStatusSnapshot>;
+function mcpAuthStatus(storage, options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: [packages/mcp/src/oauth/library.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L59)
+Defined in: [packages/mcp/src/oauth/library.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L69)
 
 Drive `graphorin auth status --mcp`.
 
@@ -19,6 +19,8 @@ Drive `graphorin auth status --mcp`.
 | Parameter | Type |
 | ------ | ------ |
 | `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
+| `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); \} |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) |
 
 ## Returns
 

@@ -10,7 +10,7 @@
 function convertGenaiPrices(body): GenaiPricesConversion;
 ```
 
-Defined in: [packages/pricing/src/convert-genai-prices.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/convert-genai-prices.ts#L77)
+Defined in: [packages/pricing/src/convert-genai-prices.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/convert-genai-prices.ts#L92)
 
 Convert a genai-prices dataset body. Tolerant: unrepresentable model
 entries are counted in `skipped`, never thrown on.
