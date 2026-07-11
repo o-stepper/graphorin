@@ -1,7 +1,7 @@
 {
   "scenarios": {
     "bare": 31,
-    "with-tools": 111,
+    "with-tools": 248,
     "rich-instructions": 68
   },
   "toleranceRatio": 0.1,
