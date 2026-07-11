@@ -407,6 +407,9 @@ describe('GraphorinClient - RPC + subscriptions', () => {
       [{ target: 'session', id: 'abc' } as const, 'session:abc/events'],
       [{ target: 'agent', id: 'a', runId: 'r' } as const, 'agent:a/runs/r/events'],
       [{ target: 'workflow', id: 'w' } as const, 'workflow:w/events'],
+      // E-12: the run-scoped workflow subject the execute route
+      // advertises - the server emits workflow run events ONLY there.
+      [{ target: 'workflow', id: 'w', runId: 'wr' } as const, 'workflow:w/runs/wr/events'],
       [{ target: 'run', runId: 'r', sessionId: 's' } as const, 'session:s/runs/r/events'],
     ];
     for (const [target, expected] of cases) {
@@ -423,6 +426,10 @@ describe('GraphorinClient - RPC + subscriptions', () => {
     await expect(client.subscribe({ target: 'run', runId: 'r' })).rejects.toThrow(
       /requires `sessionId`/,
     );
+    // E-12: an explicitly empty workflow runId is a caller bug.
+    await expect(
+      client.subscribe({ target: 'workflow', id: 'w', runId: '' }),
+    ).rejects.toBeInstanceOf(TypeError);
     await client.disconnect();
   });
 });
@@ -453,7 +460,7 @@ describe('IP-7 - the same iterator survives a reconnect with the replay cursor',
     const consumer = (async () => {
       for await (const ev of sub.events()) {
         received.push(ev.eventId);
-        if (received.length === 2) break;
+        if (received.length === 3) break;
       }
     })();
     socket1.fireMessage({
@@ -496,16 +503,10 @@ describe('IP-7 - the same iterator survives a reconnect with the replay cursor',
     // replay buffer is consulted (the old code read the fresh
     // transport's lastEventId - always undefined).
     expect(resub.params?.sinceEventId).toBe('evt-1');
-    socket2.fireMessage({
-      v: '1',
-      jsonrpc: '2.0',
-      id: resub.id,
-      result: { subscriptionId: 'sub-2' },
-    });
-    // Let the rebind continuation (map re-key) land before the event.
-    await new Promise((r) => setTimeout(r, 20));
-    // The replayed/missed event arrives on the NEW server id but the
-    // SAME client-side subscription - the consumer's for-await lives.
+    // E-02: REAL wire order - the server dispatches the replayed frame
+    // (tagged with the NEW subscriptionId) BEFORE the RPC reply. The
+    // client must buffer it while the rebind is pending and flush it
+    // into the SAME consumer once the reply lands.
     socket2.fireMessage({
       v: '1',
       kind: 'event',
@@ -515,9 +516,156 @@ describe('IP-7 - the same iterator survives a reconnect with the replay cursor',
       type: 'text.delta',
       payload: { delta: 'b' },
     });
+    socket2.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: resub.id,
+      result: { subscriptionId: 'sub-2' },
+    });
+    // Let the rebind continuation (map re-key + flush) land, then send
+    // a LIVE post-reply event - both orders must reach the consumer.
+    await new Promise((r) => setTimeout(r, 20));
+    socket2.fireMessage({
+      v: '1',
+      kind: 'event',
+      eventId: 'evt-3',
+      subscriptionId: 'sub-2',
+      subject: 'session:rc/events',
+      type: 'text.delta',
+      payload: { delta: 'c' },
+    });
     await consumer;
-    expect(received).toEqual(['evt-1', 'evt-2']);
+    expect(received).toEqual(['evt-1', 'evt-2', 'evt-3']);
     expect(sub.subscriptionId).toBe('sub-2');
+    await client.disconnect();
+  });
+});
+
+describe('E-02 - frames dispatched before the subscribe RPC reply', () => {
+  function newClient(subscriptionQueueLimit?: number): GraphorinClient {
+    return new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      ...(subscriptionQueueLimit !== undefined ? { subscriptionQueueLimit } : {}),
+    });
+  }
+
+  function eventFrame(n: number, subscriptionId: string): ServerMessage {
+    return {
+      v: '1',
+      kind: 'event',
+      eventId: `evt-${n}`,
+      subscriptionId,
+      subject: 'session:hist/events',
+      type: 'text.delta',
+      payload: { delta: String(n) },
+    };
+  }
+
+  it('buffers replayed events arriving BEFORE the subscribe reply and delivers them in order', async () => {
+    const client = newClient();
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'hist' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    // Real server wire order: the dispatcher replays buffered frames
+    // (tagged with the NEW subscriptionId) synchronously, BEFORE
+    // sendRpcSuccess - the old client dropped every one of them.
+    for (let n = 1; n <= 3; n += 1) socket.fireMessage(eventFrame(n, 'sub-h'));
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      result: { subscriptionId: 'sub-h', snapshotEventId: 'evt-3' },
+    });
+    const sub = await subPromise;
+    expect(sub.metadata().queuedEvents).toBe(3);
+    const got: string[] = [];
+    for await (const ev of sub.events()) {
+      got.push(ev.eventId);
+      if (got.length === 3) break;
+    }
+    expect(got).toEqual(['evt-1', 'evt-2', 'evt-3']);
+    expect(sub.metadata().lastEventId).toBe('evt-3');
+    await client.disconnect();
+  });
+
+  it('flushes a pre-reply terminal lifecycle frame after the buffered events', async () => {
+    const client = newClient();
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'hist' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    socket.fireMessage(eventFrame(1, 'sub-c'));
+    socket.fireMessage({
+      v: '1',
+      kind: 'lifecycle',
+      subscriptionId: 'sub-c',
+      status: 'completed',
+    });
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      result: { subscriptionId: 'sub-c' },
+    });
+    const sub = await subPromise;
+    const collected: unknown[] = [];
+    for await (const ev of sub.events()) collected.push(ev);
+    expect(collected.length).toBe(1);
+    expect(sub.metadata().closed).toBe(true);
+    await client.disconnect();
+  });
+
+  it('drops unknown-id frames when NO subscribe is in flight (no stale delivery later)', async () => {
+    const client = newClient();
+    await connectAndAck(client);
+    const socket = lastSocket();
+    // No subscribe pending: this id can never become known - drop it.
+    socket.fireMessage(eventFrame(99, 'sub-stale'));
+    const subPromise = client.subscribe({ target: 'session', id: 'hist' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      result: { subscriptionId: 'sub-stale' },
+    });
+    const sub = await subPromise;
+    expect(sub.metadata().queuedEvents).toBe(0);
+    await client.disconnect();
+  });
+
+  it('bounds the pre-reply buffer at subscriptionQueueLimit and surfaces flow-overflow on flush', async () => {
+    const client = newClient(3);
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'hist' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    for (let n = 1; n <= 5; n += 1) socket.fireMessage(eventFrame(n, 'sub-b'));
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      result: { subscriptionId: 'sub-b' },
+    });
+    const sub = await subPromise;
+    // The flush obeys the W-152 cap: 3 buffered frames drain, then the
+    // deterministic flow-overflow close surfaces (never silent loss of
+    // an unbounded buffer).
+    expect(sub.metadata().queuedEvents).toBeLessThanOrEqual(3);
+    expect(sub.metadata().closed).toBe(true);
+    const iter = sub.events()[Symbol.asyncIterator]();
+    for (let n = 1; n <= 3; n += 1) {
+      const item = await iter.next();
+      expect(item.done).toBe(false);
+    }
+    await expect(iter.next()).rejects.toMatchObject({ kind: 'flow-overflow' });
     await client.disconnect();
   });
 });
