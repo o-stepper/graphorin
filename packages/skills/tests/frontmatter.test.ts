@@ -250,6 +250,19 @@ describe('validateFrontmatter - unknown-field policy', () => {
     const diag = v.diagnostics.find((d) => d.kind === 'unknown-field');
     expect(diag?.severity).toBe('error');
   });
+
+  // Regression guard for e2e finding N-03/20 (E-22): after the snapshot
+  // refresh dropped disable-model-invocation from knownFields, the bare
+  // spelling must stay recognised (via the graphorinMapping catalogue) so
+  // documented SKILL.md examples keep loading clean under strict policies.
+  it('keeps the unprefixed disable-model-invocation extension recognised', () => {
+    const v = validateFrontmatter(
+      { name: 'n', description: 'd', 'disable-model-invocation': true },
+      { unknownFieldPolicy: 'reject' },
+    );
+    expect(v.diagnostics.find((d) => d.kind === 'unknown-field')).toBeUndefined();
+    expect(v.resolved.disableModelInvocation.value).toBe(true);
+  });
 });
 
 describe('parseAllowedToolsValue', () => {

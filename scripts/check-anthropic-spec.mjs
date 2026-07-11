@@ -64,8 +64,16 @@ function daysBetween(a, b) {
 }
 
 function parseInvocation() {
+  // pnpm forwards the literal '--' separator from
+  // `pnpm run check-anthropic-spec -- --upstream <path>`. '--' is
+  // Node's option terminator, so parseArgs would demote '--upstream'
+  // to a rejected positional. Strip a single leading '--' so both
+  // documented invocation forms parse identically; real positionals
+  // are still rejected below.
+  const args = process.argv.slice(2);
+  if (args[0] === '--') args.shift();
   const { values } = parseArgs({
-    args: process.argv.slice(2),
+    args,
     options: {
       upstream: { type: 'string' },
     },

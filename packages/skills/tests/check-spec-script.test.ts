@@ -50,6 +50,68 @@ describe('check-anthropic-spec script', () => {
     expect(result.stderr.toString('utf8')).toMatch(/drift detected/u);
   });
 
+  // Regression guard for e2e finding N-03/19 (E-24): pnpm forwards the
+  // literal '--' separator from the documented
+  // `pnpm run check-anthropic-spec -- --upstream <path>` form, and the
+  // script used to reject '--upstream' as an unexpected positional.
+  it("strips a single leading literal '--' before parsing flags", async () => {
+    const dir = join(tmpdir(), `graphorin-skills-spec-dashdash-${Date.now()}`);
+    await mkdir(dir, { recursive: true });
+    const upstream = {
+      snapshotDate: '2099-01-01',
+      specSource: 'test://upstream',
+      specCommit: null,
+      knownFields: {
+        'new-experimental-field': {
+          since: '2099-01-01',
+          required: false,
+          type: 'string',
+          stability: 'experimental',
+        },
+      },
+      graphorinMapping: {},
+    };
+    const upstreamPath = join(dir, 'upstream.json');
+    await writeFile(upstreamPath, JSON.stringify(upstream), 'utf8');
+    const result = spawnSync(process.execPath, [SCRIPT, '--', '--upstream', upstreamPath]);
+    // The upstream flag must be honoured (drift diff, exit 1), not
+    // rejected as a positional (exit 2).
+    expect(result.status).toBe(1);
+    expect(result.stdout.toString('utf8')).toMatch(/new-experimental-field/u);
+  });
+
+  it('still rejects true positional arguments', () => {
+    const result = spawnSync(process.execPath, [SCRIPT, 'stray-positional']);
+    expect(result.status).toBe(2);
+  });
+
+  // Regression guard for e2e finding N-03/20 (E-22): the bundled snapshot
+  // must not drift from the six-field frontmatter table published at
+  // https://agentskills.io/specification (transcribed 2026-07-11).
+  it('reports no drift against the live agentskills.io six-field spec', async () => {
+    const dir = join(tmpdir(), `graphorin-skills-spec-live-${Date.now()}`);
+    await mkdir(dir, { recursive: true });
+    const upstream = {
+      snapshotDate: '2026-07-11',
+      specSource: 'https://agentskills.io/specification',
+      specCommit: null,
+      knownFields: {
+        name: { required: true, type: 'string', stability: 'stable' },
+        description: { required: true, type: 'string', stability: 'stable' },
+        license: { required: false, type: 'string', stability: 'standardized' },
+        compatibility: { required: false, type: 'string', stability: 'standardized' },
+        metadata: { required: false, type: 'object', stability: 'standardized' },
+        'allowed-tools': { required: false, type: 'string', stability: 'experimental' },
+      },
+      graphorinMapping: {},
+    };
+    const upstreamPath = join(dir, 'upstream.json');
+    await writeFile(upstreamPath, JSON.stringify(upstream), 'utf8');
+    const result = spawnSync(process.execPath, [SCRIPT, '--upstream', upstreamPath]);
+    expect(result.stdout.toString('utf8')).toMatch(/no drift/u);
+    expect(result.status).toBe(0);
+  });
+
   it('exits 0 when bundled covers every upstream field', async () => {
     const dir = join(tmpdir(), `graphorin-skills-spec-passthrough-${Date.now()}`);
     await mkdir(dir, { recursive: true });

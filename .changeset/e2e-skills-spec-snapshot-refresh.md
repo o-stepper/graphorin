@@ -1,0 +1,5 @@
+---
+'@graphorin/skills': patch
+---
+
+Refresh `anthropic-spec-snapshot.json` to the live agentskills.io specification (E-22, N-03/20): the bundled snapshot claimed `disable-model-invocation` as a stable upstream field and `allowed-tools` as `string-or-array`, but the public spec lists exactly six frontmatter fields with `allowed-tools` as a space-separated string. `knownFields` now mirrors the six-field table, and `graphorin-disable-model-invocation` is retagged `graphorin-only` (the migrator no longer rewrites it toward a field the public spec does not define). The unprefixed `disable-model-invocation` spelling stays recognised as a Graphorin extension via a new `graphorinMapping` catalogue entry, so documented SKILL.md examples keep loading clean under `unknownFieldPolicy: 'warn' | 'reject'` and registry auto-activation exclusion is unchanged. Companion repo-tooling fix (E-24, N-03/19): `scripts/check-anthropic-spec.mjs` now strips the single leading literal `--` that pnpm forwards, so the documented `pnpm run check-anthropic-spec -- --upstream <path>` form works; true positionals are still rejected.

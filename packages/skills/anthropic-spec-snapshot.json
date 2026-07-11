@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/o-stepper/graphorin/main/packages/skills/anthropic-spec-snapshot.json",
-  "snapshotDate": "2026-04-19",
+  "snapshotDate": "2026-07-11",
   "specSource": "https://agentskills.io/specification",
   "specCommit": null,
   "rationale": "Bundled snapshot of the publicly published `SKILL.md` file-format specification used to determine which frontmatter fields are recognised by the upstream loader. Updated manually: `pnpm run check-anthropic-spec -- --upstream <snapshot>` diffs this file against a maintainer-fetched upstream snapshot (no scheduled CI job refreshes it).",
@@ -39,14 +39,8 @@
     "allowed-tools": {
       "since": "2025-12-01",
       "required": false,
-      "type": "string-or-array",
+      "type": "string",
       "stability": "experimental"
-    },
-    "disable-model-invocation": {
-      "since": "2025-09-01",
-      "required": false,
-      "type": "boolean",
-      "stability": "stable"
     }
   },
   "graphorinMapping": {
@@ -91,11 +85,15 @@
       "anthropicEquivalent": null,
       "policy": "graphorin-only"
     },
+    "disable-model-invocation": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only",
+      "rationale": "Unprefixed extension spelling honoured for compatibility with Anthropic product loaders (Claude Code documents it), but the public agentskills.io specification does not list it, so it is tracked here instead of knownFields."
+    },
     "graphorin-disable-model-invocation": {
-      "anthropicEquivalent": "disable-model-invocation",
-      "policy": "deprecate-graphorin-prefix",
-      "deprecateAt": "graphorin@0.5",
-      "removeAt": "graphorin@1.0"
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only",
+      "rationale": "The public agentskills.io specification does not define disable-model-invocation, so this stays a Graphorin-only extension and the migrator no longer rewrites it toward the unprefixed spelling (which the loader still honours as an alias; see the disable-model-invocation entry)."
     },
     "graphorin-signature": {
       "anthropicEquivalent": null,
