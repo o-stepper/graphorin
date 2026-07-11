@@ -258,7 +258,9 @@ export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli
 function classifyExitError(_code: number, stderr: string): OpCliErrorKind {
   const lower = stderr.toLowerCase();
   if (
-    lower.includes('not signed in') ||
+    // op CLI v2 says 'you are not currently signed in.'; the optional
+    // 'currently' keeps both the v2 and the legacy 'not signed in' phrasing.
+    /not (currently )?signed in/.test(lower) ||
     lower.includes('please sign in') ||
     lower.includes('not authenticated') ||
     lower.includes('session expired')
