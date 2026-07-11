@@ -158,6 +158,27 @@ describe('runBridgedSource', () => {
     }
   });
 
+  // Regression for the exit-0 settle gap (same pattern as e2e finding
+  // S-19/7): a script that calls process.exit(0) makes the worker exit
+  // without posting 'done'; the run must settle on that exit instead
+  // of hanging until the (previously unref'd) 30 s default timeout.
+  it('settles promptly when the script exits 0 without producing a result', async () => {
+    const { dispatch } = recordingDispatch({});
+    const startedAt = performance.now();
+    const result = await runBridgedSource({
+      source: 'process.exit(0);',
+      allowedTools: [],
+      dispatch,
+      timeoutMs: 60_000,
+    });
+    expect(performance.now() - startedAt).toBeLessThan(4_000);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe('execution-failed');
+      expect(result.error.message).toContain('exited before producing a result');
+    }
+  }, 5_000);
+
   it('enforces a wall-clock timeout on a non-terminating script', async () => {
     const { dispatch } = recordingDispatch({});
     const result = await runBridgedSource({

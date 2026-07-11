@@ -27,6 +27,37 @@ describe('WorkerThreadsSandbox', () => {
     if (!result.ok) expect(result.error.kind).toBe('timeout');
   }, 5_000);
 
+  // Regression for e2e finding S-19/7: a worker whose event loop
+  // drains without posting a result exits 0; run() must settle on that
+  // exit instead of hanging until the (previously unref'd) timeout.
+  it('settles promptly when the worker exits 0 without posting a result', async () => {
+    const sandbox = createWorkerThreadsSandbox({ defaultTimeoutMs: 60_000 });
+    const startedAt = performance.now();
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'neverSettles' },
+      { input: undefined },
+    );
+    // Well before the 60 s tier timeout - the exit handler settled.
+    expect(performance.now() - startedAt).toBeLessThan(4_000);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe('execution-failed');
+      expect(result.error.message).toContain('worker exited before producing a result');
+    }
+  }, 5_000);
+
+  it('settles via the exit handler even when the timeout timer is disabled', async () => {
+    const sandbox = createWorkerThreadsSandbox();
+    // timeoutMs 0 disables the wall-clock timer entirely: the exit
+    // handler is then the only settle path for a drained worker.
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'neverSettles' },
+      { input: undefined, timeoutMs: 0 },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.kind).toBe('execution-failed');
+  }, 5_000);
+
   it('blocks node:fs/promises when noFilesystem is set', async () => {
     const sandbox = createWorkerThreadsSandbox({ noFilesystem: true });
     const result = await sandbox.run(

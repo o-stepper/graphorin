@@ -404,17 +404,23 @@ export async function runBridgedSource(opts: BridgedSourceOptions): Promise<Brid
     });
 
     worker.once('exit', (exitCode) => {
-      if (exitCode !== 0) {
-        settle({
-          ok: false,
-          error: {
-            kind: 'execution-failed',
-            message: `code-mode worker exited with code ${exitCode}`,
-          },
-          toolCalls,
-          durationMs: elapsed(),
-        });
-      }
+      // Settle on ANY exit that beats the 'done' message: a script that
+      // calls process.exit(0) (or a worker that drains without posting)
+      // exits 0, and without this settle the run would hang until the
+      // wall-clock timeout (or forever when timeoutMs <= 0). Node emits
+      // queued 'message' events before 'exit', so a posted result wins.
+      settle({
+        ok: false,
+        error: {
+          kind: 'execution-failed',
+          message:
+            exitCode === 0
+              ? 'code-mode worker exited before producing a result'
+              : `code-mode worker exited with code ${exitCode}`,
+        },
+        toolCalls,
+        durationMs: elapsed(),
+      });
     });
 
     if (timeoutMs > 0) {
@@ -428,7 +434,9 @@ export async function runBridgedSource(opts: BridgedSourceOptions): Promise<Brid
         });
         void worker.terminate();
       }, timeoutMs);
-      timer.unref?.();
+      // Deliberately ref'd: while a run is pending the timer must be
+      // able to keep a draining host event loop alive so the timeout
+      // can still settle; it is cleared as soon as the run settles.
     }
 
     if (opts.signal) {

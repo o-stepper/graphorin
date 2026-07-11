@@ -10,10 +10,18 @@ export async function addOne(input) {
 }
 
 export async function sleepForever() {
-  await new Promise(() => {
-    // Never resolves — the test asserts the worker's wall-clock
-    // timeout terminates the run.
-  });
+  // A live timer handle keeps the worker's event loop alive, so the
+  // run can only end via the sandbox timeout / abort terminate(). A
+  // handle-less never-resolving promise would instead drain the loop
+  // and exit 0 (see neverSettles below).
+  await new Promise((resolve) => setTimeout(resolve, 2 ** 31 - 1));
+}
+
+export async function neverSettles() {
+  // No handles at all: the worker's event loop drains and the worker
+  // exits 0 without ever posting a result. Regression fixture for the
+  // exit-0 settle path (e2e finding S-19/7).
+  return new Promise(() => {});
 }
 
 export async function readPackageJson() {
@@ -49,7 +57,7 @@ export async function trySpawnEsm() {
 }
 
 export async function trySpawnRequire() {
-  // The CJS require() escape — the ESM resolve hook does not see this.
+  // The CJS require() escape - the ESM resolve hook does not see this.
   const { createRequire } = await import('node:module');
   const require = createRequire(import.meta.url);
   const cp = require('node:child_process');
