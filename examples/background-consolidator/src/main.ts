@@ -37,6 +37,7 @@ import {
   registerConsolidatorTriggers,
 } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
+import { JsTiktokenCounter } from '@graphorin/provider/counters';
 import { type ConsolidatorLike, createServer, type GraphorinServer } from '@graphorin/server';
 import { createSessionManager, type Session, type SessionManager } from '@graphorin/sessions';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
@@ -69,6 +70,27 @@ const ALL_RECIPES: ReadonlyArray<Recipe> = ['stub'];
 const DEFAULT_USER_ID = 'background-operator';
 const DEFAULT_AGENT_ID = 'background-consolidator';
 const DEFAULT_SESSION_TITLE = 'background-consolidator demo';
+/** Matches the stub provider's declared `capabilities.contextWindow`. */
+const DEFAULT_CONTEXT_WINDOW = 8_192;
+
+/**
+ * Resolve the provider context window (tokens) that arms the context
+ * engine's auto-compaction (CE-12: enabled-without-a-window would WARN
+ * that compaction can never fire). `GRAPHORIN_CONTEXT_WINDOW`
+ * overrides; defaults to the stub provider's declared 8192.
+ */
+export function resolveContextWindow(env: NodeJS.ProcessEnv = process.env): number {
+  const raw = env.GRAPHORIN_CONTEXT_WINDOW?.trim();
+  if (raw !== undefined && raw.length > 0) {
+    const parsed = Number.parseInt(raw, 10);
+    if (Number.isFinite(parsed) && parsed > 0) return parsed;
+    throw new TypeError(
+      `[graphorin/example-background-consolidator] Invalid GRAPHORIN_CONTEXT_WINDOW='${raw}' ` +
+        `(positive integer expected).`,
+    );
+  }
+  return DEFAULT_CONTEXT_WINDOW;
+}
 
 /**
  * Default consolidator trigger declarations. The mix demonstrates
@@ -227,6 +249,14 @@ export async function createBackgroundConsolidatorApp(
       triggers,
       provider,
       defaultScope: scope,
+    },
+    contextEngine: {
+      // CE-12: without a context window the auto-compaction threshold is
+      // Infinity and the framework WARNs at startup.
+      providerContextWindow: resolveContextWindow(env),
+      // CE-13: budget with a real tokenizer instead of the chars/4
+      // heuristic (js-tiktoken is offline - no network).
+      tokenCounter: new JsTiktokenCounter(),
     },
     resolveScope: () => scope,
   });

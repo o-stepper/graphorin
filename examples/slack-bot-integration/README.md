@@ -208,7 +208,10 @@ tiers without per-client divergence.
 ## Token-based auth (HMAC + pepper)
 
 The smoke test exercises the framework's bearer-token path end-to-end
-against the in-process Hono app - no port binding required.
+against the in-process Hono app - `listen: false` skips the socket, so
+no port binding is required. (By default `server.start()` binds a real
+listener; `startSlackBotApp` returns the actually-bound `{ host, port }`
+address - pass `server: { port: 0 }` for an ephemeral port.)
 
 ```ts
 import { createSlackBotApp } from '@graphorin/example-slack-bot-integration';
@@ -218,7 +221,7 @@ import { resolveSecret } from '@graphorin/security/secrets';
 process.env.GRAPHORIN_SLACK_BOT_PEPPER = '<32-byte-random-pepper>';
 
 const app = await createSlackBotApp({
-  server: { auth: { enabled: true, pepperEnvVar: 'GRAPHORIN_SLACK_BOT_PEPPER' } },
+  server: { auth: { enabled: true, pepperEnvVar: 'GRAPHORIN_SLACK_BOT_PEPPER' }, listen: false },
 });
 await app.server.start();
 

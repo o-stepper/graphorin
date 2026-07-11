@@ -91,9 +91,9 @@ The security and replay showcase: the same scripted agent flow runs three times 
 
 ## `local-stack-cli`
 
-A single-binary CLI that wires the standalone server, the triggers daemon, the encrypted-file secrets store, and a couple of skills into a turnkey local stack - useful as a starting point for production-shaped local deployments.
+A fully-local REPL assistant: an Ollama-served LLM, an Ollama-served embedder, and SQLite + sqlite-vec on disk - zero non-loopback packets, provable with `GRAPHORIN_OFFLINE=1`. Every turn is persisted through `memory.session.push(...)` and a consolidator turn trigger distills facts in the background, so a fact taught in one session is recalled in the next.
 
-- Demonstrates: standalone server, `graphorin doctor`, `graphorin secrets`, triggers, skills.
+- Demonstrates: Ollama provider + embedder, per-turn session persistence, consolidator turn triggers, `factsAutoRecall` + `autoAssembleContext`, the `GRAPHORIN_OFFLINE=1` contract.
 - Source: [`examples/local-stack-cli/`](https://github.com/o-stepper/graphorin/tree/main/examples/local-stack-cli).
 
 ## Tracing across every example

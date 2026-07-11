@@ -2,7 +2,7 @@
 
 > A 30-minute hands-on tour through **graphorin** - wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
 
-This example is the smallest end-to-end graphorin assistant. Everything runs on your laptop: SQLite for storage, transformers.js for embeddings, and your choice of Ollama, llama.cpp HTTP server, or in-process llama.cpp for the language model. No API keys, no telemetry, no phone-home.
+This example is the smallest end-to-end graphorin assistant. Everything runs on your laptop: SQLite for storage, transformers.js for embeddings (the `stub` recipe swaps in a deterministic stub embedder so CI needs no model download), and your choice of Ollama, llama.cpp HTTP server, or in-process llama.cpp for the language model. No API keys, no telemetry, no phone-home.
 
 ---
 
@@ -141,6 +141,18 @@ pnpm --filter ./examples/personal-assistant-cli exec tsx src/hello-world.ts
 
 ---
 
+## Memory that survives restarts
+
+Graphorin's agent runtime never auto-persists turns - the example owns the wiring:
+
+- Every REPL turn pushes the user line and the assistant reply through `memory.session.push(...)`, then advances the consolidator with `memory.consolidator.trigger({ kind: 'turn' }, scope)`. `autoPromoteExtraction: true` (MCON-2 opt-in) admits injection-clean extraction facts as `active` so they surface in default recall.
+- `tools: memory.tools` exposes the memory tools to the model; `autoAssembleContext: true` + `factsAutoRecall` (with an every-turn trigger strategy) assemble a memory-aware system prompt per run, injecting the top consolidated facts relevant to your message. The context engine's privacy filter classifies the configured endpoint (`providerTrust`), so a loopback daemon receives internal-sensitivity memory while a remote one does not.
+- The startup procedural rule is seeded idempotently (the exact rule text is the dedupe key), so restarts do not accumulate duplicate rules.
+
+The default store is `:memory:` - set `GRAPHORIN_DB_PATH=./assistant.db` to keep memory across launches. Teach the assistant a fact, `Ctrl+C`, relaunch with the same `GRAPHORIN_DB_PATH`, and ask for the fact back.
+
+`GRAPHORIN_CONTEXT_WINDOW` (default `32768`, `8192` for the `stub` recipe) tells the context engine your model's token window so auto-compaction can actually fire.
+
 ## Why `tier: 'cheap'` on the consolidator?
 
 The default `tier: 'free'` consolidator pins zero-token ceilings - useful for CI but unsatisfying for an actual assistant: memory consolidation never runs, so facts never get summarised and rules never settle. The example overrides this with:
@@ -148,11 +160,11 @@ The default `tier: 'free'` consolidator pins zero-token ceilings - useful for CI
 ```ts
 createMemory({
   // ...
-  consolidator: { tier: 'cheap', enabled: true, provider },
+  consolidator: { tier: 'cheap', enabled: true, provider, defaultScope: scope },
 })
 ```
 
-`'cheap'` enables the `light` + `standard` phases with a 50k-token / day ceiling, runs against the same local LLM you already chose, and keeps memory feeling alive after the first conversation. To revert to the safe default, pass `consolidator: { tier: 'free', enabled: false }` (or omit the field entirely).
+`'cheap'` enables the `light` + `standard` phases with a 50k-token / day ceiling and runs against the same local LLM you already chose. Combined with the per-turn `trigger({ kind: 'turn' }, scope)` calls above, it keeps memory feeling alive after the first conversation. To revert to the safe default, pass `consolidator: { tier: 'free', enabled: false }` (or omit the field entirely).
 
 See `CONSOLIDATOR_TIER_DEFAULTS` exported from `@graphorin/memory` for the full per-tier ceiling table.
 
@@ -202,9 +214,10 @@ examples/personal-assistant-cli/
 ├── src/
 │   ├── main.ts              # REPL entry point + createAssistant({...}) helper
 │   ├── stub-provider.ts     # Deterministic Provider (no network)
+│   ├── stub-embedder.ts     # Deterministic 8-dim Embedder (no network)
 │   └── hello-world.ts       # < 20-line snippet embedded above
 ├── tests/
-│   └── smoke.test.ts        # vitest coverage (stub provider + offline path)
+│   └── smoke.test.ts        # vitest coverage (stub stack + offline path)
 ├── package.json
 ├── tsconfig.json
 ├── tsdown.config.ts

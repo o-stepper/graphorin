@@ -66,30 +66,68 @@ const embedder = createOllamaEmbedder({ baseUrl, model: 'nomic-embed-text' });
 const store = await createSqliteStore({ path: './.graphorin/local-stack-cli.db', mode: 'lib' });
 await store.init();
 
+const scope = { userId, sessionId, agentId: 'local-stack-assistant' };
+
 const memory = createMemory({
   store: store.memory,
   embeddings: store.embeddings,
   embedder,
   workingBlocks: [/* persona, local_setup */],
-  consolidator: { tier: 'cheap', enabled: true, provider },
-  resolveScope: () => ({ userId, sessionId, agentId: 'local-stack-assistant' }),
+  consolidator: {
+    tier: 'cheap',
+    enabled: true,
+    provider,
+    defaultScope: scope,
+    autoPromoteExtraction: true, // distilled facts land active, not quarantined (MCON-2 opt-in)
+  },
+  contextEngine: {
+    providerContextWindow: 32_768, // arms auto-compaction (GRAPHORIN_CONTEXT_WINDOW overrides)
+    compaction: {},                // loopback trust would default auto-compaction off
+    tokenCounter: new JsTiktokenCounter(),
+    factsAutoRecall: { topK: 5, strategy: everyUserTurn }, // facts surface in the system prompt
+    privacy: { providerTrust: 'loopback', providerAcceptsSensitivity: provider.acceptsSensitivity },
+  },
+  resolveScope: () => scope,
 });
+await memory.consolidator.start();
 
 const agent = createAgent({
   name: 'local-stack-assistant',
   instructions: 'You are graphorin running on a fully-local stack…',
   provider,
+  tools: memory.tools,        // model-driven memory reads/writes
   memory,
+  autoAssembleContext: true,  // 6-layer memory-aware system prompt per run
   sessionId,
   userId,
 });
 
+// Turn persistence is consumer-emitted (the agent runtime never
+// auto-persists): push both sides of the turn, then advance the
+// consolidator so facts distill in the background.
+await memory.session.push(scope, { role: 'user', content: input });
 for await (const ev of agent.stream(input, { sessionId, userId })) {
   if (ev.type === 'text.delta') process.stdout.write(ev.delta);
 }
+await memory.session.push(scope, { role: 'assistant', content: reply });
+await memory.consolidator.trigger({ kind: 'turn', value: turn }, scope);
 ```
 
 The full source is in [`src/main.ts`](./src/main.ts). The stub provider + stub embedder used by `tests/smoke.test.ts` live in [`src/stub-provider.ts`](./src/stub-provider.ts) and [`src/stub-embedder.ts`](./src/stub-embedder.ts) - both are network-free.
+
+---
+
+## Memory that survives restarts
+
+Graphorin's agent runtime never auto-persists turns (see the quickstart's memory contract) - the example owns all three write paths and both read paths:
+
+- **Session log** - every REPL turn pushes the user line and the assistant reply through `memory.session.push(...)` into the `session_messages` table.
+- **Consolidation** - after each turn the example calls `memory.consolidator.trigger({ kind: 'turn' }, scope)`; the `tier: 'cheap'` consolidator distills the session log into semantic facts using the same local LLM. `autoPromoteExtraction: true` (MCON-2 opt-in) admits injection-clean extraction facts as `active` so they surface in default recall - injection-flagged facts still quarantine.
+- **Procedural rule** - seeded once per database (startup checks for the exact rule text before calling `procedural.define`, so restarts do not accumulate duplicates).
+- **Model-driven access** - `tools: memory.tools` exposes the memory tools to the model.
+- **Auto-recall** - `autoAssembleContext: true` + `factsAutoRecall` (with an every-turn trigger strategy) assemble a memory-aware system prompt per run, injecting the top consolidated facts relevant to your message. The context engine's privacy filter is pinned to `providerTrust: 'loopback'` to match the loopback-only daemon - without it, internal-sensitivity facts would be silently dropped from the prompt.
+
+Try it: tell the assistant a fact, `Ctrl+C`, relaunch with the same `GRAPHORIN_DB_PATH`, and ask for the fact back. Inspect the tables directly with `sqlite3 ./.graphorin/local-stack-cli.db 'SELECT COUNT(*) FROM session_messages; SELECT text FROM facts;'`.
 
 ---
 
@@ -174,6 +212,7 @@ If you need durable HITL (`runStateToJSON` round-trips, `agent.abort({ drain: tr
 | `GRAPHORIN_EMBED_MODEL`      | `nomic-embed-text`                   | Ollama embedding model tag.                         |
 | `GRAPHORIN_DB_PATH`          | `./.graphorin/local-stack-cli.db`    | SQLite database path. Use `:memory:` for tests.     |
 | `GRAPHORIN_USER_ID`          | `local-operator`                     | Memory scope user id.                               |
+| `GRAPHORIN_CONTEXT_WINDOW`   | `32768` (`8192` for `stub`)          | Provider context window (tokens) for auto-compaction. |
 | `GRAPHORIN_OFFLINE`          | unset                                | When `1`, probe the daemon URL and fail fast.       |
 
 ---
