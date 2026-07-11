@@ -10,11 +10,12 @@ import type { MemoryHit, MemoryRecord } from '@graphorin/core';
 import type { ReRanker, ReRankOptions } from '@graphorin/memory/search';
 
 import {
+  buildPipelineScorer,
   CrossEncoderLoadError,
-  type CrossEncoderPipeline,
   type CrossEncoderPipelineFactory,
-  extractPairScores,
-  loadDefaultPipelineFactory,
+  defaultRerankerDtype,
+  loadRawCrossEncoderScorer,
+  type PairScorer,
   type RerankerDtype,
 } from './cross-encoder.js';
 import {
@@ -35,7 +36,7 @@ export interface CrossEncoderRerankerOptions<TRecord extends MemoryRecord = Memo
   readonly model?: string;
   /** BCP 47 locale tag used to select the default model. Default `'en'`. */
   readonly locale?: LocaleTag;
-  /** Default `'fp16'`. */
+  /** Default: `'q8'` on CPU, `'fp16'` on non-CPU devices. */
   readonly dtype?: RerankerDtype;
   /** Optional revision pin (`'main'` if unset). */
   readonly revision?: string;
@@ -115,8 +116,8 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
   readonly #pipelineFactory: CrossEncoderPipelineFactory | undefined;
   readonly #passageExtractor: PassageExtractor<TRecord>;
   readonly #now: () => number;
-  #pipeline: CrossEncoderPipeline | null = null;
-  #loading: Promise<CrossEncoderPipeline> | null = null;
+  #scorer: PairScorer | null = null;
+  #loading: Promise<PairScorer> | null = null;
   #lastUsedAt: number = 0;
   #idleTimer: ReturnType<typeof setTimeout> | null = null;
   #invocationCount = 0;
@@ -124,7 +125,7 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
   constructor(options: CrossEncoderRerankerOptions<TRecord>) {
     this.locale = options.locale ?? 'en';
     this.model = options.model ?? pickRerankerModel(this.locale);
-    this.dtype = options.dtype ?? 'fp16';
+    this.dtype = options.dtype ?? defaultRerankerDtype(options.device);
     this.batchSize = options.batchSize ?? 32;
     if (!Number.isInteger(this.batchSize) || this.batchSize <= 0) {
       throw new RangeError(
@@ -154,23 +155,23 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
   }
 
   /**
-   * Whether the underlying ONNX pipeline is currently loaded in
+   * Whether the underlying ONNX model is currently loaded in
    * memory. Surfaced for the idle-eviction integration test.
    *
    * @stable
    */
   get pipelineLoaded(): boolean {
-    return this.#pipeline !== null;
+    return this.#scorer !== null;
   }
 
   /**
-   * Drop the loaded pipeline. Equivalent to letting the idle-eviction
+   * Drop the loaded model. Equivalent to letting the idle-eviction
    * timer fire. Idempotent.
    *
    * @stable
    */
   unload(): void {
-    this.#pipeline = null;
+    this.#scorer = null;
     this.#loading = null;
     if (this.#idleTimer !== null) {
       clearTimeout(this.#idleTimer);
@@ -189,11 +190,11 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
     this.#invocationCount += 1;
     const merged = mergeAndDedupe(lists);
     if (merged.length === 0) return [];
-    const pipeline = await this.#getPipeline();
+    const scorer = await this.#getScorer();
     const passages = merged.map((entry) =>
       this.#passageExtractor(entry.hit.record as unknown as TRecord),
     );
-    const scores = await this.#scoreInBatches(pipeline, query, passages, options.signal);
+    const scores = await this.#scoreInBatches(scorer, query, passages, options.signal);
     const fused: MemoryHit<TInputRecord>[] = merged.map((entry, idx) => {
       const score = scores[idx] ?? 0;
       const baseSignals = entry.hit.signals ?? {};
@@ -213,7 +214,7 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
   }
 
   async #scoreInBatches(
-    pipeline: CrossEncoderPipeline,
+    scorer: PairScorer,
     query: string,
     passages: ReadonlyArray<string>,
     signal: AbortSignal | undefined,
@@ -225,32 +226,36 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
       }
       const batch = passages.slice(i, i + this.batchSize);
       const pairs = batch.map((text_pair) => ({ text: query, text_pair }));
-      const raw = await pipeline(pairs, {
-        topk: 1,
-        ...(signal !== undefined ? { signal } : {}),
-      });
-      const scores = extractPairScores(raw, batch.length);
+      const scores = await scorer(pairs, signal);
       for (const s of scores) out.push(s);
     }
     return out;
   }
 
-  async #getPipeline(): Promise<CrossEncoderPipeline> {
+  async #getScorer(): Promise<PairScorer> {
     this.#lastUsedAt = this.#now();
     this.#scheduleIdleEviction();
-    if (this.#pipeline !== null) return this.#pipeline;
+    if (this.#scorer !== null) return this.#scorer;
     if (this.#loading !== null) return this.#loading;
-    const factory = this.#pipelineFactory ?? (await loadDefaultPipelineFactory());
-    this.#loading = factory('text-classification', this.model, {
+    const loadOptions = {
       ...(this.#revision !== undefined ? { revision: this.#revision } : {}),
       ...(this.#cacheDir !== undefined ? { cache_dir: this.#cacheDir } : {}),
       ...(this.dtype !== undefined ? { dtype: this.dtype } : {}),
       ...(this.#device !== undefined ? { device: this.#device } : {}),
-    })
-      .then((pipe) => {
-        this.#pipeline = pipe;
+    };
+    // Injected factories (tests) keep the classifier-pipeline contract;
+    // the default real path scores raw logits because the library's
+    // text-classification pipeline softmaxes the single logit of the
+    // default bge rerankers into a constant 1.0 (N-01/23).
+    const load =
+      this.#pipelineFactory !== undefined
+        ? buildPipelineScorer(this.#pipelineFactory, this.model, loadOptions)
+        : loadRawCrossEncoderScorer(this.model, loadOptions);
+    this.#loading = load
+      .then((scorer) => {
+        this.#scorer = scorer;
         this.#loading = null;
-        return pipe;
+        return scorer;
       })
       .catch((err) => {
         this.#loading = null;
@@ -270,7 +275,7 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
     this.#idleTimer = setTimeout(() => {
       const elapsed = this.#now() - this.#lastUsedAt;
       if (elapsed >= (this.idleEvictionMs ?? 0)) {
-        this.#pipeline = null;
+        this.#scorer = null;
         this.#loading = null;
       }
       this.#idleTimer = null;
