@@ -1105,8 +1105,9 @@ export class SemanticMemory {
   /**
    * Raw vector KNN neighbours for the consolidator's reconcile
    * pre-filter (P0-3). Unlike {@link search} this skips FTS, reranking,
-   * and decay so the cosine scores survive intact (the conflict-pipeline
-   * zone thresholds are calibrated against them), and it **includes
+   * and decay so the store's normalized `[0, 1]` similarity scores
+   * survive intact (Stage 2 maps them back to raw cosine before
+   * applying the conflict-pipeline zone thresholds), and it **includes
    * quarantined facts** so prior synthesized memories are visible to
    * reconciliation. Returns `[]` when no embedder / vector adapter is
    * configured - the consolidator then treats every candidate as a

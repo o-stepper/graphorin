@@ -42,6 +42,13 @@ export interface ConflictThresholds {
  * Hard-coded defaults for the three-zone thresholds. Imported by the
  * pipeline + the test suite so call sites stay aligned.
  *
+ * The values are **raw cosine** similarities (DEC-130). Storage
+ * adapters normalize KNN scores into `[0, 1]` (`(1 + cos) / 2` for the
+ * cosine metric - CS-3, `scoreFromDistance` in
+ * `@graphorin/store-sqlite`), so Stage 2 / Stage 5 first map incoming
+ * hit scores back to raw cosine via {@link rawCosineFromStoreScore}
+ * before comparing against these thresholds.
+ *
  * @stable
  */
 export const DEFAULT_CONFLICT_THRESHOLDS: ConflictThresholds = Object.freeze({
@@ -49,6 +56,21 @@ export const DEFAULT_CONFLICT_THRESHOLDS: ConflictThresholds = Object.freeze({
   nearDup: 0.85,
   cold: 0.4,
 });
+
+/**
+ * Map a storage adapter's normalized vector `score` back to raw cosine
+ * similarity. Inverse of `@graphorin/store-sqlite`'s `scoreFromDistance`
+ * for the cosine metric (`score = (1 + cos) / 2`, CS-3): `cos = 2 *
+ * score - 1`, clamped to `[-1, 1]` against adapters that overshoot the
+ * `[0, 1]` contract. Applied at the Stage 2 / Stage 5 boundary so the
+ * DEC-130 threshold semantics ({@link DEFAULT_CONFLICT_THRESHOLDS})
+ * stay on the raw-cosine scale they were calibrated for.
+ *
+ * @internal
+ */
+export function rawCosineFromStoreScore(score: number): number {
+  return Math.min(1, Math.max(-1, 2 * score - 1));
+}
 
 /**
  * Final pipeline outcome - discriminated union returned by

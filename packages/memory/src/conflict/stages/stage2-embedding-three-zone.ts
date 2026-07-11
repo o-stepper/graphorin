@@ -14,10 +14,15 @@
  *    candidate sounds related; defer decision to Stages 3 → 4 → 5.
  *  - COLD (`sim ≤ thresholds.cold`): no conflict - admit the candidate.
  *
+ * `sim` is the **raw cosine** similarity (DEC-130): the store's
+ * normalized `[0, 1]` hit score (`(1 + cos) / 2`, CS-3) is mapped back
+ * through {@link rawCosineFromStoreScore} before the zone comparison so
+ * the thresholds keep their calibrated raw-cosine semantics.
+ *
  * @packageDocumentation
  */
 
-import type { PipelineStage, StageOutcome } from '../types.js';
+import { type PipelineStage, rawCosineFromStoreScore, type StageOutcome } from '../types.js';
 
 export const stage2EmbeddingThreeZone: PipelineStage = {
   id: 'embedding-three-zone',
@@ -29,7 +34,7 @@ export const stage2EmbeddingThreeZone: PipelineStage = {
     if (top === undefined) {
       return { kind: 'admit', reason: 'no-existing-candidates' };
     }
-    const similarity = top.score;
+    const similarity = rawCosineFromStoreScore(top.score);
     if (similarity >= ctx.thresholds.hot) {
       return {
         kind: 'dedup',

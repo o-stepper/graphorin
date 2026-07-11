@@ -729,7 +729,7 @@ export function createInMemoryStore(
           if (includeQuarantined !== true && episode.status === 'quarantined') continue;
           const vec = episodeVectors.get(episode.id);
           if (vec === undefined) continue;
-          out.push({ record: episode, score: cosine(vec, embedding) });
+          out.push({ record: episode, score: storeScore(cosine(vec, embedding)) });
         }
         out.sort((a, b) => b.score - a.score);
         return out.slice(0, topK);
@@ -851,7 +851,7 @@ export function createInMemoryStore(
           // - mirror that here so the multi-active strategy can be
           // exercised without a SQL engine.
           if (factEmbedderById.get(fact.id) !== embedderId) continue;
-          out.push({ record: fact, score: cosine(vec, embedding) });
+          out.push({ record: fact, score: storeScore(cosine(vec, embedding)) });
         }
         out.sort((a, b) => b.score - a.score);
         return out.slice(0, topK);
@@ -1133,6 +1133,16 @@ function factValidAt(fact: Fact, asOf: string): boolean {
 /** Sort key for `historyOf` - `validFrom`, falling back to `createdAt`. */
 function factOrderEpoch(fact: Fact): number {
   return Date.parse(fact.validFrom ?? fact.createdAt);
+}
+
+/**
+ * Mirror `@graphorin/store-sqlite`'s `scoreFromDistance` for the cosine
+ * metric (CS-3): normalize raw cosine into the `[0, 1]` score scale the
+ * production adapter returns (`(1 + cos) / 2`), so fixture-driven tests
+ * exercise the same score contract as the real store (N-01/21).
+ */
+function storeScore(cos: number): number {
+  return Math.min(1, Math.max(0, (1 + cos) / 2));
 }
 
 function cosine(a: Float32Array, b: Float32Array): number {

@@ -14,7 +14,7 @@
  * @packageDocumentation
  */
 
-import type { PipelineStage, StageOutcome } from '../types.js';
+import { type PipelineStage, rawCosineFromStoreScore, type StageOutcome } from '../types.js';
 
 export const stage5DeferToDeep: PipelineStage = {
   id: 'defer-to-deep',
@@ -27,7 +27,9 @@ export const stage5DeferToDeep: PipelineStage = {
     return {
       kind: 'pending',
       conflictingIds,
-      ...(top !== undefined ? { similarity: top.score } : {}),
+      // Report on the same raw-cosine scale Stage 2 uses (DEC-130) so
+      // `fact_conflicts.similarity` stays comparable across stages.
+      ...(top !== undefined ? { similarity: rawCosineFromStoreScore(top.score) } : {}),
       reason: 'awaiting-deep-llm-judge',
     };
   },

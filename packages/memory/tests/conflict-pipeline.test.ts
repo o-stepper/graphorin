@@ -210,7 +210,7 @@ describe('runConflictPipeline - outcomes', () => {
     const conflicts = recordingConflictStore();
     const candidate = fact('I just moved to Tbilisi for work.', { id: 'new-loc' });
     const deps = fakeStore(
-      [{ record: fact('Lives in Boston.', { id: 'old-loc' }), score: 0.55 }],
+      [{ record: fact('Lives in Boston.', { id: 'old-loc' }), score: 0.775 }],
       conflicts,
     );
     const decision = await pipeline.run(deps, candidate);
@@ -229,7 +229,7 @@ describe('runConflictPipeline - outcomes', () => {
     const conflicts = recordingConflictStore();
     const candidate = fact('Atlas lives in Tbilisi.', { id: 'cand' });
     const deps = fakeStore(
-      [{ record: fact('Atlas lives in Boston.', { id: 'old' }), score: 0.55 }],
+      [{ record: fact('Atlas lives in Boston.', { id: 'old' }), score: 0.775 }],
       conflicts,
     );
     const decision = await pipeline.run(deps, candidate);
@@ -243,10 +243,11 @@ describe('runConflictPipeline - outcomes', () => {
     const pipeline = createConflictPipeline();
     const conflicts = recordingConflictStore();
     const candidate = fact('I have been thinking about a sabbatical.', { id: 'cand' });
+    // Store scores 0.825 / 0.775 => raw cosines 0.65 / 0.55 (mid-zone).
     const deps = fakeStore(
       [
-        { record: fact('Considering a long break.', { id: 'old-1' }), score: 0.65 },
-        { record: fact('Maybe a year off would help.', { id: 'old-2' }), score: 0.55 },
+        { record: fact('Considering a long break.', { id: 'old-1' }), score: 0.825 },
+        { record: fact('Maybe a year off would help.', { id: 'old-2' }), score: 0.775 },
       ],
       conflicts,
     );
@@ -384,12 +385,13 @@ describe('runConflictPipeline - free-function helper', () => {
       [
         {
           record: fact('Mochi prefers short morning runs.', { id: 'old' }),
-          score: 0.5,
+          score: 0.65,
         },
       ],
       conflicts,
     );
-    // Lower the COLD threshold so a 0.5 hit registers as CONFLICT-CHECK.
+    // Lower the COLD threshold so a 0.65 store-scale hit (raw cosine
+    // 0.3) registers as CONFLICT-CHECK.
     const decision = await runConflictPipeline({
       candidate,
       deps,

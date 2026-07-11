@@ -83,20 +83,27 @@ describe('preFilterCandidate - cheap, LLM-free routing (stage 1 + stage 2)', () 
     expect(out).toMatchObject({ route: 'noop', targetId: 'f1' });
   });
 
+  // Neighbour scores are on the storage-adapter scale (`(1 + cos) / 2`,
+  // CS-3); stage 2 maps them back to raw cosine before the zone check.
+
   it('routes to noop in the hot/near-dup zone - stage 2', async () => {
-    const hot = await preFilterCandidate('q', [hit('f1', 'a', 0.97)]);
+    // Store score 0.99 => raw cosine 0.98 (hot).
+    const hot = await preFilterCandidate('q', [hit('f1', 'a', 0.99)]);
     expect(hot).toMatchObject({ route: 'noop', targetId: 'f1' });
-    const near = await preFilterCandidate('q', [hit('f1', 'a', 0.88)]);
+    // Store score 0.94 => raw cosine 0.88 (near-dup).
+    const near = await preFilterCandidate('q', [hit('f1', 'a', 0.94)]);
     expect(near).toMatchObject({ route: 'noop', targetId: 'f1' });
   });
 
   it('routes to add in the cold zone - stage 2', async () => {
-    const out = await preFilterCandidate('q', [hit('f1', 'a', 0.2)]);
+    // Store score 0.6 => raw cosine 0.2 (cold).
+    const out = await preFilterCandidate('q', [hit('f1', 'a', 0.6)]);
     expect(out.route).toBe('add');
   });
 
   it('routes to reconcile in the CONFLICT-CHECK mid-zone - stage 2', async () => {
-    const out = await preFilterCandidate('q', [hit('f1', 'a', 0.6)]);
+    // Store score 0.8 => raw cosine 0.6 (mid-zone).
+    const out = await preFilterCandidate('q', [hit('f1', 'a', 0.8)]);
     expect(out.route).toBe('reconcile');
   });
 });
