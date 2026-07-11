@@ -1,5 +1,14 @@
 # @graphorin/security
 
+## 0.8.0
+
+### Patch Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix two sandbox defects found in the 2026-07-11 e2e pass (E-17/S-19 and E-05/D-02). WorkerThreadsSandbox (and the code-mode runBridgedSource runner, which had the same pattern) now settles on ANY worker exit that beats the result message: a worker whose event loop drains and exits 0 without posting yields `execution-failed` "worker exited before producing a result" immediately, instead of hanging until the wall-clock timeout misreports it as `timeout` (or hanging forever when `timeoutMs <= 0`, killing bare-Node hosts with an unsettled top-level await). The timeout timer is also no longer `unref()`'d, so a pending run can keep a draining host loop alive. DockerSandbox now demultiplexes the `Tty: false` container log stream (8-byte frame headers stripped, stdout payloads concatenated) before `JSON.parse`, so every live docker-tier run no longer fails with "Unexpected token 0x01"; plain-text buffers from TTY containers or test stubs still pass through, and the module docstring no longer claims the input is written to stdin (it is embedded in the `node -e` wrapper script). Adds regression tests for the drained-worker exit, the disabled-timer exit path, a `process.exit(0)` code-mode script, and synthetic multiplexed log buffers.
+
+- Updated dependencies []:
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.7.0](https://img.shields.io/badge/version-v0.7.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.8.0](https://img.shields.io/badge/version-v0.8.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.7.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.8.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.7.0** (2026-07-07) - the third framework-wide remediation release, landing all six waves of the 2026-07-05 project review (157 findings). Highlights: durable HITL now composes across the sub-agent boundary, workflow timers fire on their own, session hard-delete erases everything session-scoped, the server prunes derived data by default, CommonJS consumers can plain `require()` every package (Node floor 22.12), and zod 4 consumers typecheck. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#06x---070) for upgrade notes.
+Latest release: **0.8.0** (2026-07-11) - the behavioral audit release: a 33-scenario end-to-end campaign (stub, live Ollama, billed Anthropic, Docker, real network) confirmed 30 defects and this release fixes every one, independently re-validated against the original reproductions. Highlights: the memory conflict pipeline no longer silently dedupes distinct facts under real embedders, WebSocket replay survives subscribe/reconnect races, `/v1/metrics` auth works, the cross-encoder reranker actually reranks, the Docker sandbox runs, and the flagship local examples genuinely remember across sessions. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#07x---080) for upgrade notes.
 
 ## Use cases
 
@@ -323,7 +323,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.7.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.8.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

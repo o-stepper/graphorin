@@ -1,5 +1,18 @@
 # @graphorin/mcp
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Wire `secretsStore` through the `@graphorin/mcp/oauth` helpers and stop burning a refresh rotation on every new authorization provider (S-18/13, E-16). `mcpAuthRefresh` and `mcpAuthRevoke` now declare a `readonly secretsStore?` option and forward it into the underlying OAuth client, so a refresh can resolve the persisted refresh token across processes (previously the typed API could never succeed and always threw `has no refresh token`) and a revoke actually fires RFC 7009 against the authorization server instead of silently tearing down only the local record; `mcpAuthListSessions` and `mcpAuthStatus` gain the same option so `hasAccessToken` / `hasRefreshToken` reflect the store. `createOAuthAuthorizationProvider` no longer forces a token refresh on the first `resolveHeader()` of a new instance: when the stored session is provably fresh (outside `refreshAheadMs`) it rehydrates the persisted access token from the secrets store and only refreshes when the token is expired, near expiry, or unresolvable - restart-heavy consumers of single-use rotated refresh tokens no longer invalidate concurrent sessions. Adds happy-path wrapper tests (refresh, RFC 7009 revoke, token-presence resolution) and bridge tests covering the fresh-serve, near-expiry-refresh, forced-refresh, and missing-token-fallback paths.
+
+### Patch Changes
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/security@0.8.0
+  - @graphorin/tools@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

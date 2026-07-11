@@ -1,5 +1,17 @@
 # @graphorin/reranker-transformersjs
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the two MAJOR defects that made the documented zero-config reranker path unusable (E-07 / N-01/22 and E-08 / N-01/23). First, the default dtype is now device-aware via the new exported `defaultRerankerDtype(device)`: `'q8'` on CPU (the default device) and `'fp16'` on accelerated devices - the fp16 ONNX exports of the default BGE models fail onnxruntime-node session initialisation on the CPU execution provider (`SimplifiedLayerNormFusion` cast error), so `createCrossEncoderReranker({ locale: 'en' })` previously threw `CrossEncoderLoadError` on first `rerank()`. Second, the default real scoring path now runs the raw `AutoModelForSequenceClassification` + `AutoTokenizer` and converts logits itself (new `scoresFromLogits`: sigmoid for single-logit heads, positive-label softmax probability for multi-logit heads via `config.id2label` with a `LABEL_1` binary fallback) instead of the text-classification pipeline, whose per-row softmax collapsed the single logit of the default BGE rerankers to a constant `1.0` for every pair, making reranking a no-op that preserved merge order. Injected `pipelineFactory` stubs keep the exact classifier-pipeline contract (`topk: 1` + `extractPairScores`), and batching, caching, `unload()`, idle eviction and `mergeAndDedupe` behave as before. Adds a network-gated regression test (`RUN_NETWORK_TESTS=1`) asserting the default en model loads with all-default options and scores a relevant pair strictly higher than an irrelevant one.
+
+### Patch Changes
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/memory@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

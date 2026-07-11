@@ -1,5 +1,17 @@
 # @graphorin/evals
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Make parallel eval runs work with framework agents (E-19 / S-21): `runEvals` gains an `agentFactory` option, invoked once per worker (with the worker index) so each worker drives its own agent instance - the supported way to run a Graphorin `Agent` (one run in flight per instance) at `concurrency > 1`. `agent` is now optional and stays for objects that tolerate overlapping `run()` calls; `agentFactory` wins when both are set, and passing neither is a `TypeError`. When a shared instance still trips the agent's concurrent-run guard, the runner now fails fast with a new exported `EvalConcurrencyError` naming the remedy (original error preserved as `cause`) instead of recording every remaining case as a generic `agent.run threw` scorer failure. The README quickstart and the evals guide, which previously steered users into the guard (shared `agent` + `concurrency: 4`), now document the single-run constraint and the `agentFactory` pattern.
+
+### Patch Changes
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/observability@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

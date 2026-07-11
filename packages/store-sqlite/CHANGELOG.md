@@ -1,5 +1,15 @@
 # @graphorin/store-sqlite
 
+## 0.8.0
+
+### Patch Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the stale `searchVector` doc comment (part of E-01, N-01/21): the fact KNN search documented its `score` as `1 - distance` (raw cosine similarity), but since CS-3 it is populated via `scoreFromDistance`, a normalized `[0, 1]` similarity (`(1 + cos) / 2` for the cosine metric). Doc-only change, no runtime behavior change.
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/observability@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

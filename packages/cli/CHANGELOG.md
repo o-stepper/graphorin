@@ -1,5 +1,26 @@
 # @graphorin/cli
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - CLI e2e remediation cluster (2026-07-11). `tools lint` now honours its documented exit-2 contract: a missing/unreadable/unparseable `--config` (and one without `include[0]`) fails hard with a clear stderr message instead of silently falling back to the default glob, walker/compileGlob failures exit 2 instead of 1, the tsconfig comment stripper is string-aware (an include such as `"lib/**/*.ts"` is no longer mangled into `lib*.ts`), and the glob compiler translates `**/` and trailing `/**` with standard globstar semantics so `src/**/*.ts` matches files directly in `src/` (E-04, E-20). All `triggers` subcommands (`status`/`fire`/`disable`/`prune`) now run with migrationPolicy `check` like `list`, so they refuse instead of auto-migrating a behind-schema database (E-13). `skills migrate-frontmatter` dry-run now lists the files `--apply` would rewrite instead of always printing "no rewrites required" (E-14). `storage status` probes the cipher peer through the `@graphorin/store-sqlite-encrypted` sub-pack's own loader, so it agrees with what `encrypt`/`rekey` can actually do under pnpm's strict layout (E-10). `doctor` gains `--config <path>` to check the configured storage/audit paths instead of only the hardcoded `~/.graphorin` layout (F-06), and `init` gains `--format ts|json` (default `ts`; a `.json` `--out` implies `json`) emitting a defineConfig-free plain JSON config, with the `.ts` resolution constraint documented (F-05). Minor fixes: `audit verify` with audit disabled no longer doubles the `[graphorin/cli]` prefix and emits a structured `{ ok: false, error }` JSON document on the `--json` error path; `storage backup` mirrors the source file mode onto the copy (a 0600 store no longer yields a 0644 backup); BEHAVIOR CHANGE: `token create` prints the raw token line to stdout (log chatter stays on stderr) so `TOKEN=$(graphorin token create ...)` works; `migrate-export` preserves the `--hash` body checksum of hashed exports and its unsupported-schema error no longer claims "v0.1".
+
+### Patch Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Serialize per-token USD rates in `graphorin pricing lookup --json` in a stable decimal form (S-05): the snapshot stores rates as `x / 1_000_000` doubles, so the $0.10/Mtok cache-read rate printed as `1.0000000000000001e-7`. The JSON document now re-quantizes each rate to the shortest decimal whose parsed value stays within 1e-15 relative of the stored double (it prints as `1e-7`), presentation only - `lookupPrice` / `calculateCost` and the command's return value keep the raw doubles used in cost math. Adds a regression test for the `claude-haiku-4-5` entry plus a sweep asserting clean, value-identical serialization for every bundled snapshot entry.
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/memory@0.8.0
+  - @graphorin/pricing@0.8.0
+  - @graphorin/security@0.8.0
+  - @graphorin/server@0.8.0
+  - @graphorin/skills@0.8.0
+  - @graphorin/store-sqlite@0.8.0
+  - @graphorin/sessions@0.8.0
+  - @graphorin/core@0.8.0
+  - @graphorin/eslint-plugin@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

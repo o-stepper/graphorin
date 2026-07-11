@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/docs",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Public documentation site for the Graphorin framework. Built with VitePress + TypeDoc, deployed to Cloudflare Pages.",
   "license": "MIT",

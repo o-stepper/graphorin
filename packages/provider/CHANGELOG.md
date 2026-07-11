@@ -1,5 +1,17 @@
 # @graphorin/provider
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Export `listMiddlewareKinds` from the package barrel (e2e 2026-07-11 minor finding): the `@stable`-documented chain walker existed in `src/middleware/compose.ts` but was omitted from the middleware barrel, so it never reached the built dist and `import { listMiddlewareKinds } from '@graphorin/provider'` failed while its siblings `getMiddlewareKind` and `providerHasMiddleware` worked. The function is now re-exported alongside them; a regression test pins the public surface and walks a composed `withTracing` + `withRetry` chain through the public import.
+
+### Patch Changes
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/observability@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

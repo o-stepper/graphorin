@@ -6,5 +6,5 @@
   },
   "toleranceRatio": 0.1,
   "encoding": "cl100k_base",
-  "frameworkVersion": "0.7.0"
+  "frameworkVersion": "0.8.0"
 }
