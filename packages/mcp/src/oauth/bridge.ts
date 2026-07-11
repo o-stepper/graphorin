@@ -11,13 +11,14 @@
  * @packageDocumentation
  */
 
-import type { OAuthServerStore } from '@graphorin/core/contracts';
+import type { OAuthServerRecord, OAuthServerStore } from '@graphorin/core/contracts';
 import type { OAuthSession } from '@graphorin/security/oauth';
 import {
   emitOAuthLifecycle,
   GraphorinOAuthError,
   refreshOAuthSession,
 } from '@graphorin/security/oauth';
+import { SecretValue } from '@graphorin/security/secrets';
 
 import { MCPAuthError } from '../errors/index.js';
 
@@ -78,6 +79,28 @@ export function createOAuthAuthorizationProvider(
   const refreshAheadMs = options.refreshAheadMs ?? 5 * 60_000;
   let activeSession: OAuthSession | undefined;
 
+  // Rehydrate the persisted access token instead of refreshing: every
+  // rotation-hostile refresh burnt on process restart can invalidate a
+  // concurrent consumer of the same (single-use) refresh token. The
+  // token lives in the secrets store under the scheme-stripped key the
+  // OAuth client persists it with (SPL-1, `keyring:oauth:<id>:access`).
+  async function loadPersistedSession(record: OAuthServerRecord): Promise<OAuthSession | null> {
+    if (options.secretsStore === undefined || record.accessTokenRef === undefined) return null;
+    const stored = await options.secretsStore.get(`oauth:${options.serverId}:access`);
+    if (stored === null) return null;
+    // Rewrap into the security-level SecretValue the OAuthSession
+    // contract requires (same normalization the OAuth client applies).
+    const accessToken = SecretValue.fromString(await stored.use((v) => v));
+    return Object.freeze({
+      serverId: options.serverId,
+      accessToken,
+      tokenType: 'Bearer',
+      ...(record.scope === undefined ? {} : { scope: record.scope }),
+      ...(record.expiresAt === undefined ? {} : { expiresAt: record.expiresAt }),
+      issuedAt: record.lastRefreshedAt ?? record.createdAt,
+    });
+  }
+
   async function loadOrRefresh(force: boolean): Promise<OAuthSession> {
     const record = await options.storage.get(options.serverId);
     if (record === null) {
@@ -88,11 +111,18 @@ export function createOAuthAuthorizationProvider(
     }
     const expiresAt = record.expiresAt;
     const now = Date.now();
-    const stale =
-      force ||
-      activeSession === undefined ||
-      (expiresAt !== undefined && expiresAt - now < refreshAheadMs);
+    const stale = force || (expiresAt !== undefined && expiresAt - now < refreshAheadMs);
     if (!stale && activeSession !== undefined) return activeSession;
+    if (!stale && expiresAt !== undefined) {
+      // The stored session is provably fresh - serve the persisted
+      // token; fall through to a refresh only when it cannot be
+      // resolved (no secrets store / token missing).
+      const persisted = await loadPersistedSession(record);
+      if (persisted !== null) {
+        activeSession = persisted;
+        return persisted;
+      }
+    }
     try {
       const session = await refreshOAuthSession(options.storage, options.serverId, {
         ...(options.signal === undefined ? {} : { signal: options.signal }),
