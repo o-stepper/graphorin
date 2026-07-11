@@ -20,8 +20,11 @@ import {
   exitOnFailures,
 } from '@graphorin/evals';
 
-// Anything with a `run(input)` method is an agent to the runner -
-// here a trivial offline stub; pass your real agent in production.
+// Anything with a `run(input)` method is an agent to the runner - here a
+// trivial offline stub that tolerates parallel calls. A real Graphorin
+// `Agent` allows only ONE run in flight per instance: at `concurrency > 1`
+// pass `agentFactory: () => createAgent({...})` (one agent per worker)
+// instead of a shared `agent`.
 const agent = { run: async (input: unknown) => input };
 
 const dataset = await loadJsonlDataset('./fixtures/golden.jsonl');
@@ -36,6 +39,23 @@ exitOnFailures(report); // exit non-zero if any case failed
 ```
 
 `runEvals` drives `agent.run(...)` per case, runs every scorer against the result, and aggregates pass-rate, mean score, and duration into an `EvalReport`. Cases run with the configured `concurrency`; on abort it still returns the completed results as a partial report.
+
+A shared `agent` must tolerate overlapping `run()` calls. A framework `Agent` does not (one run in flight per instance, guarded by `ConcurrentRunError`), so for parallel runs pass `agentFactory` instead - the runner invokes it once per worker so every worker drives its own instance. If a shared instance trips the guard anyway, the runner fails fast with an `EvalConcurrencyError` that names the remedy, rather than recording the whole dataset as scorer failures.
+
+```ts
+import { exactMatch, fromIterable, runEvals } from '@graphorin/evals';
+
+// One agent per worker - required for a real Graphorin `Agent`, which
+// permits a single run in flight per instance. The stub stands in for
+// `() => createAgent({...})`.
+const report = await runEvals({
+  agentFactory: () => ({ run: async (input: string) => input }),
+  dataset: fromIterable([{ input: 'ping', expected: 'ping' }]),
+  scorers: [exactMatch()],
+  concurrency: 4,
+});
+console.log(report.summary.passed);
+```
 
 ## Scorers
 

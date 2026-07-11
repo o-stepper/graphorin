@@ -17,7 +17,10 @@
  *
  * const dataset = await loadJsonlDataset('./fixtures/golden.jsonl');
  * const report = await runEvals({
- *   agent,
+ *   // A Graphorin `Agent` allows one run in flight per instance, so
+ *   // `concurrency > 1` takes a per-worker factory (a shared `agent`
+ *   // is fine for objects that tolerate parallel `run()` calls).
+ *   agentFactory: () => createAgent(config),
  *   dataset,
  *   scorers: [exactMatch()],
  *   concurrency: 4,
@@ -77,7 +80,7 @@ export {
   renderMarkdownReport,
   renderTerminalReport,
 } from './reporters/index.js';
-export { runEvals } from './runner.js';
+export { EvalConcurrencyError, runEvals } from './runner.js';
 export {
   type ArgumentValidityOptions,
   argumentValidity,

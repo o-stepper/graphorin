@@ -1,8 +1,33 @@
 import { describe, expect, it } from 'vitest';
 
 import { fromIterable } from '../src/loaders/iterable.js';
-import { runEvals } from '../src/runner.js';
+import { EvalConcurrencyError, runEvals } from '../src/runner.js';
 import { exactMatch } from '../src/scorers/code/exact-match.js';
+import type { AgentLike } from '../src/types.js';
+
+// Mirrors @graphorin/agent's ConcurrentRunError shape (AG-11) without a
+// package dependency: stable `code` discriminator + class name.
+class FakeConcurrentRunError extends Error {
+  readonly code = 'concurrent-run';
+  constructor() {
+    super('This Agent instance already has a run in flight.');
+    this.name = 'ConcurrentRunError';
+  }
+}
+
+// A one-run-per-instance agent, like a real Graphorin Agent.
+function singleRunAgent(): AgentLike<unknown, unknown> {
+  let inFlight = false;
+  return {
+    async run(input) {
+      if (inFlight) throw new FakeConcurrentRunError();
+      inFlight = true;
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight = false;
+      return input;
+    },
+  };
+}
 
 describe('runEvals', () => {
   it('runs every case sequentially by default and aggregates the report', async () => {
@@ -143,6 +168,80 @@ describe('runEvals', () => {
     expect(report.results).toHaveLength(2);
     expect(report.summary.total).toBe(2);
     expect(report.results.map((r) => r.caseId)).toEqual(['case-0', 'case-1']);
+  });
+
+  it('fails fast with EvalConcurrencyError when a shared single-run agent meets concurrency > 1 (E-19)', async () => {
+    const cases = Array.from({ length: 8 }, (_, i) => ({ input: i, expected: i }));
+    const promise = runEvals({
+      agent: singleRunAgent(),
+      dataset: fromIterable(cases),
+      scorers: [exactMatch()],
+      concurrency: 4,
+    });
+    // Old behavior: resolved with 7 of 8 cases recorded as generic scorer
+    // failures ('agent.run threw: ...run in flight...'). Now the misconfig
+    // surfaces distinctly, with the remedy in the message.
+    await expect(promise).rejects.toThrow(EvalConcurrencyError);
+    await expect(promise).rejects.toThrow(/agentFactory|concurrency: 1/);
+  });
+
+  it('preserves the original agent error as `cause` on EvalConcurrencyError', async () => {
+    const err = await runEvals({
+      agent: singleRunAgent(),
+      dataset: fromIterable([
+        { input: 'a', expected: 'a' },
+        { input: 'b', expected: 'b' },
+      ]),
+      scorers: [exactMatch()],
+      concurrency: 2,
+    }).then(
+      () => undefined,
+      (e: unknown) => e,
+    );
+    expect(err).toBeInstanceOf(EvalConcurrencyError);
+    expect((err as EvalConcurrencyError).cause).toBeInstanceOf(FakeConcurrentRunError);
+  });
+
+  it('agentFactory builds one agent per worker so single-run agents pass at concurrency > 1 (E-19)', async () => {
+    const cases = Array.from({ length: 8 }, (_, i) => ({ input: i, expected: i }));
+    const workerIndexes: number[] = [];
+    const report = await runEvals({
+      agentFactory: (workerIndex) => {
+        workerIndexes.push(workerIndex);
+        return singleRunAgent();
+      },
+      dataset: fromIterable(cases),
+      scorers: [exactMatch()],
+      concurrency: 4,
+    });
+    expect(report.summary.total).toBe(8);
+    expect(report.summary.passed).toBe(8);
+    expect(report.summary.failed).toBe(0);
+    // Once per worker, not per case.
+    expect(workerIndexes.sort()).toEqual([0, 1, 2, 3]);
+  });
+
+  it('supports an async agentFactory and prefers it over a shared agent', async () => {
+    const report = await runEvals({
+      agent: {
+        async run() {
+          throw new Error('shared agent must not be used when agentFactory is set');
+        },
+      },
+      agentFactory: async () => singleRunAgent(),
+      dataset: fromIterable([{ input: 'a', expected: 'a' }]),
+      scorers: [exactMatch()],
+    });
+    expect(report.summary.passed).toBe(1);
+  });
+
+  it('rejects with a TypeError when neither agent nor agentFactory is provided', async () => {
+    await expect(
+      runEvals({
+        dataset: fromIterable([{ input: 'a', expected: 'a' }]),
+        scorers: [exactMatch()],
+      }),
+    ).rejects.toThrow(TypeError);
   });
 
   it('returns an empty summary when the dataset is empty', async () => {
