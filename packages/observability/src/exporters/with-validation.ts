@@ -83,6 +83,18 @@ export function sanitizeRecord(
     ...record,
     attributes: sanitizedAttrs,
     events: sanitizedEvents,
+    // S-20/9: drop tier entries for attributes stripped above. A stale
+    // 'secret' entry for a value that never reached the sink would
+    // otherwise make replay's minSensitivity skip the whole span on the
+    // store-backed path while the JSONL path emits it.
+    ...(record.sensitivityByAttribute === undefined
+      ? {}
+      : {
+          sensitivityByAttribute: pruneSensitivityMap(
+            record.sensitivityByAttribute,
+            sanitizedAttrs,
+          ),
+        }),
   };
 }
 
@@ -144,9 +156,35 @@ export function sanitizeEvents(
       spanType,
       `event:${event.name}`,
     );
-    out.push({ name: event.name, timeUnixNano: event.timeUnixNano, attributes: sanitizedAttrs });
+    out.push({
+      name: event.name,
+      timeUnixNano: event.timeUnixNano,
+      attributes: sanitizedAttrs,
+      // S-20/9: keep the (pruned) event tier map so replay re-sanitization
+      // sees the same tags from every source instead of default-denying
+      // every event attribute on the JSONL path.
+      ...(event.sensitivityByAttribute === undefined
+        ? {}
+        : {
+            sensitivityByAttribute: pruneSensitivityMap(
+              event.sensitivityByAttribute,
+              sanitizedAttrs,
+            ),
+          }),
+    });
   }
   return out;
+}
+
+function pruneSensitivityMap<V>(
+  map: Readonly<Record<string, V>>,
+  survivors: SpanAttributes,
+): Readonly<Record<string, V>> {
+  const out: Record<string, V> = {};
+  for (const [key, tier] of Object.entries(map)) {
+    if (key in survivors) out[key] = tier;
+  }
+  return Object.freeze(out);
 }
 
 function readTier(value: SpanAttributeValue | undefined): Sensitivity {
