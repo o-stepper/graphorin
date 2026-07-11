@@ -343,8 +343,19 @@ export function createWorkflowRoutes(
           400,
         );
       }
-      const state = await workflow.getState(threadId);
-      return c.json({ workflowId: id, threadId, state });
+      // E-11 (S-09/4): map workflow errors to the wire envelope like
+      // tick does - an unknown/deleted thread must answer a 404 JSON
+      // envelope, not escape as a plain-text 500.
+      try {
+        const state = await workflow.getState(threadId);
+        return c.json({ workflowId: id, threadId, state });
+      } catch (err) {
+        const wire = toWireError(err);
+        return c.json(
+          { error: wire.code, message: wire.message },
+          wire.code === 'thread-not-found' ? 404 : 400,
+        );
+      }
     },
   );
 

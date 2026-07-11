@@ -119,6 +119,13 @@ export type SubscribeResult =
       readonly subscription: WsSubscriptionSnapshot;
       readonly replayedCount: number;
       readonly snapshotEventId: string | undefined;
+      /**
+       * E-02 (S-15/8): deliver the replay frames captured at subscribe
+       * time. Idempotent - the second call is a no-op. When
+       * `deferReplay` was not requested the frames were already
+       * dispatched inside `subscribe()` and this is a no-op too.
+       */
+      dispatchReplay(): void;
     }
   | {
       readonly ok: false;
@@ -147,12 +154,19 @@ export interface WsDispatcher {
    * the subscription snapshot + replayed-event count or a typed
    * failure reason the caller maps to the appropriate close code /
    * RPC error.
+   *
+   * E-02 (S-15/8): with `deferReplay: true` the buffered frames are
+   * captured but NOT delivered; the caller must invoke the returned
+   * `dispatchReplay()` once its acknowledgement (e.g. the subscribe
+   * RPC reply) is on the wire, so clients that key their subscription
+   * map off that reply do not drop the replayed frames.
    */
   subscribe(input: {
     readonly subscriberId: string;
     readonly subject: string;
     readonly subscriptionId: string;
     readonly sinceEventId?: string;
+    readonly deferReplay?: boolean;
   }): SubscribeResult;
   unsubscribe(subscriptionId: string): boolean;
   /**
@@ -335,6 +349,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     readonly subject: string;
     readonly subscriptionId: string;
     readonly sinceEventId?: string;
+    readonly deferReplay?: boolean;
   }): SubscribeResult {
     const subscriber = subscribers.get(input.subscriberId);
     if (subscriber === undefined) {
@@ -364,35 +379,46 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     subscriber.subscriptions.add(input.subscriptionId);
     indexSubject(input.subject, input.subscriptionId);
     const replay = replayBuffer.replay(input.subject, input.sinceEventId);
-    let replayed = 0;
-    let snapshotEventId: string | undefined = replay.nextEventIdHint;
-    for (const event of replay.events) {
-      // W-027: the buffer stores RAW frames, so the replay path (fresh
-      // subscription or reconnect-resume) must sanitize per delivery
-      // exactly like the live path and the SSE replay do - otherwise
-      // the commentary policy is defeated precisely on the reconnect
-      // scenario the buffer exists for.
-      dispatchSanitized(record, { ...event, subscriptionId: input.subscriptionId });
-      replayed += 1;
-    }
-    if (replay.droppedCount > 0) {
-      // The replay-marker is dispatcher-authored (no payload to
-      // sanitize) and deliberately does NOT advance lastEventId.
-      validateAndDispatch(record, {
-        v: '1',
-        kind: 'replay-marker',
-        subscriptionId: input.subscriptionId,
-        eventId: snapshotEventId ?? `evt-replay-${now().toString(36)}`,
-        droppedCount: replay.droppedCount,
-        note: `Replay buffer dropped ${replay.droppedCount} events before resume.`,
-      });
-      snapshotEventId = snapshotEventId ?? `evt-replay-${now().toString(36)}`;
-    }
+    const snapshotEventId: string | undefined =
+      replay.nextEventIdHint ??
+      (replay.droppedCount > 0 ? `evt-replay-${now().toString(36)}` : undefined);
+    // E-02 (S-15/8): the replay frames are captured here but delivery
+    // can be deferred until the caller has acknowledged the
+    // subscription on the wire (the subscribe RPC reply must precede
+    // the replayed frames, otherwise clients that key their
+    // subscription map off the reply drop every one of them).
+    let replayDispatched = false;
+    const dispatchReplay = (): void => {
+      if (replayDispatched) return;
+      replayDispatched = true;
+      for (const event of replay.events) {
+        // W-027: the buffer stores RAW frames, so the replay path (fresh
+        // subscription or reconnect-resume) must sanitize per delivery
+        // exactly like the live path and the SSE replay do - otherwise
+        // the commentary policy is defeated precisely on the reconnect
+        // scenario the buffer exists for.
+        dispatchSanitized(record, { ...event, subscriptionId: input.subscriptionId });
+      }
+      if (replay.droppedCount > 0) {
+        // The replay-marker is dispatcher-authored (no payload to
+        // sanitize) and deliberately does NOT advance lastEventId.
+        validateAndDispatch(record, {
+          v: '1',
+          kind: 'replay-marker',
+          subscriptionId: input.subscriptionId,
+          eventId: snapshotEventId ?? `evt-replay-${now().toString(36)}`,
+          droppedCount: replay.droppedCount,
+          note: `Replay buffer dropped ${replay.droppedCount} events before resume.`,
+        });
+      }
+    };
+    if (input.deferReplay !== true) dispatchReplay();
     return {
       ok: true,
       subscription: snapshotForRecord(record),
-      replayedCount: replayed,
+      replayedCount: replay.events.length,
       snapshotEventId,
+      dispatchReplay,
     };
   }
 

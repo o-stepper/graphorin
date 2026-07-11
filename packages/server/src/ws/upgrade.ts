@@ -225,6 +225,9 @@ export async function createWsUpgradeEvents(
       }
       if (isSubscribeRequest(message)) {
         const subscriptionId = newSubscriptionId();
+        // E-02 (S-15/8): defer the replay so the RPC reply reaches the
+        // wire FIRST - the client keys its subscription map off the
+        // reply, so replayed frames sent before it are dropped.
         const result = options.dispatcher.subscribe({
           subscriberId,
           subject: message.params.subject,
@@ -232,6 +235,7 @@ export async function createWsUpgradeEvents(
           ...(message.params.sinceEventId !== undefined
             ? { sinceEventId: message.params.sinceEventId }
             : {}),
+          deferReplay: true,
         });
         if (!result.ok) {
           sendRpcError(
@@ -259,6 +263,9 @@ export async function createWsUpgradeEvents(
               : {}),
           } satisfies ServerMessage),
         );
+        // Replayed frames follow the reply + `subscribed` notification,
+        // preserving buffer order and lastEventId semantics.
+        result.dispatchReplay();
         return;
       }
       if (isUnsubscribeRequest(message)) {

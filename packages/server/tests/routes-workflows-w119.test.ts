@@ -155,7 +155,7 @@ async function boot(): Promise<void> {
     tokenStore: store.authTokens,
     pepper,
     env: 'live',
-    scopes: ['workflows:read', 'workflows:execute', 'workflows:resume'],
+    scopes: ['workflows:read', 'workflows:execute', 'workflows:resume', 'workflows:delete'],
   });
   bearer = await minted.raw.use((v) => v);
 }
@@ -260,6 +260,35 @@ describe('W-119 - server workflow surface', () => {
     // Unknown thread maps to 404 through the wire envelope.
     const missing = await post('/v1/workflows/timers/tick', { threadId: 'nope' });
     expect(missing.status).toBe(404);
+  });
+
+  it('GET /:id/state answers a 404 JSON envelope for unknown and deleted threads (E-11)', async () => {
+    if (server === undefined || bearer === undefined) throw new Error('not booted');
+    const wf = pairWorkflow();
+    server.workflows.register({ id: 'pair', workflow: wf as never });
+    const getState = (threadId: string) =>
+      server?.app.request(`/v1/workflows/pair/state?threadId=${threadId}`, {
+        headers: { Authorization: `Bearer ${bearer}` },
+      }) as Promise<Response>;
+
+    // Unknown thread: previously the ThreadNotFoundError escaped as a
+    // plain-text 500 - it must map to the wire envelope like tick does.
+    const unknown = await getState('never-was');
+    expect(unknown.status).toBe(404);
+    expect(((await unknown.json()) as { error: string }).error).toBe('thread-not-found');
+
+    // Deleted-thread polling: execute, read state, erase the thread,
+    // then poll again - the poll after a legitimate delete must 404 too.
+    await drain(wf.execute({} as never, { threadId: 't-del' }));
+    expect((await getState('t-del')).status).toBe(200);
+    const del = await server.app.request('/v1/workflows/pair/threads/t-del', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(del.status).toBe(204);
+    const afterDelete = await getState('t-del');
+    expect(afterDelete.status).toBe(404);
+    expect(((await afterDelete.json()) as { error: string }).error).toBe('thread-not-found');
   });
 
   it('POST /:id/fork forks a real thread and leaves the source untouched', async () => {

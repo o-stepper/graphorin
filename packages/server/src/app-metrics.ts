@@ -35,7 +35,8 @@ export async function refreshLiveMetrics(options: RefreshLiveMetricsOptions): Pr
   syncToolCounters(registry);
 
   try {
-    const wal = readWalSize(store.connection);
+    // S-09: readWalSize is negative when the DB is not in WAL mode.
+    const wal = Math.max(0, readWalSize(store.connection));
     registry.set(SERVER_METRIC_NAMES.storageWalSize, wal);
   } catch {
     // Best-effort.

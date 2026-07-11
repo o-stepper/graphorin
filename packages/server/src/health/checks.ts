@@ -315,7 +315,10 @@ export function rollup(checks: HealthChecks): HealthRollup {
 
 function readWalSizeSafely(store: GraphorinSqliteStore): number {
   try {
-    return readWalSize(store.connection);
+    // S-09: `wal_checkpoint(PASSIVE)` reports log=-1 when the database
+    // is not in WAL journal mode (e.g. disableWalHardening), which
+    // would surface as a negative byte count - clamp to 0.
+    return Math.max(0, readWalSize(store.connection));
   } catch {
     return 0;
   }
