@@ -1,5 +1,0 @@
----
-'@graphorin/memory': patch
----
-
-Fix the conflict pipeline's Stage 2 score-scale drift (E-01, N-01/21, CRITICAL): since CS-3 the storage adapters return vector scores normalized to `(1 + cos) / 2` in `[0, 1]`, but the three-zone thresholds (`0.95 / 0.85 / 0.4`, DEC-130) stayed calibrated for raw cosine, so the NEAR-DUP zone fired at raw cosine `0.70` and nearly every distinct e5-family sentence pair silently deduped into the first written fact. Stage 2 (and Stage 5's reported `similarity`) now map the incoming store score back to raw cosine (`2 * score - 1`, clamped to `[-1, 1]`) at the pipeline boundary, restoring the documented raw-cosine threshold semantics for both the inline write path and the consolidator's reconcile pre-filter. The in-memory test fixture now models the production adapter's normalized score contract, and new regression tests against the real `@graphorin/store-sqlite` adapter prove a raw-cosine `0.96` pair still dedupes while a distinct raw-cosine `0.75` pair (store score `0.875`, which used to dedupe) commits as a separate fact.

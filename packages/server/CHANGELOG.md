@@ -1,5 +1,27 @@
 # @graphorin/server
 
+## 0.8.0
+
+### Minor Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Server e2e remediation cluster (2026-07-11):
+
+  - E-02 (S-15/8): the WebSocket subscribe RPC reply now reaches the wire BEFORE any replayed frames. `WsDispatcher.subscribe` accepts `deferReplay: true` and the ok result exposes an idempotent `dispatchReplay()`, so the upgrade handler acknowledges the subscription first and then delivers the captured replay in buffer order (lastEventId semantics unchanged). Previously clients that key their subscription map off the reply dropped every replayed frame on fresh subscribe and reconnect-resume.
+  - E-03 (S-14b/17): `/v1/metrics` mounts AFTER the auth middleware, so `metrics.requireAuth = true` finally works - a bearer with `admin:metrics:read` (or `admin:*`) gets 200, no token gets 401, wrong scope gets 403. The `requireAuth = false` path stays unauthenticated via the existing middleware skip list.
+  - E-11 (S-09/4): `GET /v1/workflows/:id/state` maps workflow errors through the wire envelope like tick does - an unknown or deleted thread answers `404 {"error":"thread-not-found"}` instead of escaping as a plain-text 500.
+  - E-21 (S-24/16): `stop()` only closes stores the server created itself. A caller-injected `createServer({ store })` store stays open so it can be shared across restarts (the documented restartFactory pattern); `ServerLifecycleDeps` gains an `ownsStore` flag.
+  - S-09 (minor): `/v1/health` clamps `walSizeBytes` to 0 when the database is not in WAL journal mode (SQLite reports log=-1, which surfaced as -4096); the `graphorin_storage_wal_size_bytes` gauge is clamped the same way.
+
+### Patch Changes
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b), [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/security@0.8.0
+  - @graphorin/store-sqlite@0.8.0
+  - @graphorin/tools@0.8.0
+  - @graphorin/triggers@0.8.0
+  - @graphorin/core@0.8.0
+  - @graphorin/protocol@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

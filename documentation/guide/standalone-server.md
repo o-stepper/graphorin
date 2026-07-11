@@ -206,7 +206,7 @@ Runs are **not** tied to the client connection: a background run started via `PO
 ```json
 {
   "status": "ok",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "uptimeSeconds": 4711,
   "checks": {
     "storage": { "status": "ok" },

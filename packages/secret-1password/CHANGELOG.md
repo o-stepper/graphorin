@@ -1,5 +1,15 @@
 # @graphorin/secret-1password
 
+## 0.8.0
+
+### Patch Changes
+
+- [#166](https://github.com/o-stepper/graphorin/pull/166) [`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b) Thanks [@o-stepper](https://github.com/o-stepper)! - Recognize the 1Password CLI v2 signed-out message (E-15, S-17/6): `classifyExitError` now matches `not (currently )?signed in`, so the canonical op v2 stderr line "you are not currently signed in. Please run `op signin --help` for instructions" classifies as `kind: 'signed-out'` with the actionable signin / `OP_SERVICE_ACCOUNT_TOKEN` hint instead of degrading to `unknown` with the generic hint. Adds classifier regression tests driven by realistic op stderr lines (v2 signed-out, legacy signed-out, session expired, v2 not-found, unknown).
+
+- Updated dependencies [[`d6a0414`](https://github.com/o-stepper/graphorin/commit/d6a041402fa33d7695379c7536ed2311a7c0fd5b)]:
+  - @graphorin/security@0.8.0
+  - @graphorin/core@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes

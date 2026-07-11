@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-personal-assistant-cli",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "description": "Single-agent local CLI personal assistant for the Graphorin framework. Library-mode walkthrough that wires createAgent({...}) to memory + sensitivity tiers + first-run prompt + optional encryption-at-rest, with three opt-in local-LLM recipes (Ollama HTTP, llama.cpp HTTP, in-process llama.cpp). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
