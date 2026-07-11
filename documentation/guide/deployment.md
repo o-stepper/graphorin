@@ -60,11 +60,11 @@ Before promoting a Graphorin deployment to production:
    - Audit `graphorin auth status` periodically.
 
 7. **Hardening**
-   - Run `graphorin doctor` after every deployment. Fix every error before traffic is enabled.
+   - Run `graphorin doctor --config <path>` after every deployment so the check covers the deployed config's storage and audit paths (without the flag it checks the default `~/.graphorin` layout). Fix every error before traffic is enabled.
    - Run as a dedicated service account.
    - Confine the secrets store to mode `0600`.
    - Confine the audit log to mode `0600`.
-   - Confine the database to mode `0640`.
+   - Confine the database to mode `0600` (what `graphorin doctor` expects).
    - Disable core dumps for the service account.
 
 ### Retention and database growth
@@ -106,7 +106,7 @@ User=graphorin
 Group=graphorin
 WorkingDirectory=/var/lib/graphorin
 # The config loader reads .ts / .js / .mjs / .json files (not TOML).
-ExecStart=/usr/bin/node /usr/lib/graphorin/cli/dist/cli.js start --config /etc/graphorin/graphorin.config.mjs
+ExecStart=/usr/bin/graphorin start --config /etc/graphorin/graphorin.config.mjs
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

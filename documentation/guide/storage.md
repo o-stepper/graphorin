@@ -55,7 +55,7 @@ a live server.
 
 | While the server is live | Commands |
 |---|---|
-| Safe (read-only) | `memory status/inspect/activity/why/review` (listing), `traces status`, `triggers list/status`, `audit verify/export`, `storage status`, `storage backup` (online page-level copy, safe under a live writer) |
+| Safe (read-only) | `memory status/inspect/activity/why/review` (listing), `traces status`, `triggers list/status`, `audit verify/export`, `storage status`, `storage backup` (online page-level copy, safe under a live writer; the copy inherits the source file's mode) |
 | Works, but contends for the write lock | `memory review --promote`, `memory prune-history`, `traces prune`, `triggers disable/prune`, `consolidator dlq-clear`, `token create/revoke/rotate/rekey`, `secrets set/rotate/delete`, `audit prune`, `storage compact` |
 | Requires a stopped server | `storage rekey` (fails fast with `database is locked`), `storage encrypt --swap` (refuses while another process holds the file), `graphorin migrate` when the CLI and server versions disagree |
 

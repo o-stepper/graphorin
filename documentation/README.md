@@ -39,13 +39,13 @@ documentation/
   guide/             narrative documentation
   reference/         packages list, design principles, glossary, FAQ
   contributing/      mirrored project Markdown (CONTRIBUTING / SECURITY / …)
-  api/               TypeDoc-generated API reference (gitignored)
+  api/               TypeDoc-generated API reference (committed; regenerated on build)
   scripts/           sync + llms.txt + helper scripts
 ```
 
 ## Deployment
 
-The [`docs`](../.github/workflows/docs.yml) GitHub Actions workflow builds the site on every pull request and deploys to Cloudflare Pages on every push to `main`. The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets - when they are not yet provisioned, the job emits a warning and exits cleanly, matching the existing `release.yml` `NPM_TOKEN` pattern.
+The [`docs`](../.github/workflows/docs.yml) GitHub Actions workflow builds the site on every pull request and deploys to Cloudflare Pages on every push to `main`. The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets - when they are not yet provisioned, the job emits a warning and exits cleanly.
 
 ## License
 

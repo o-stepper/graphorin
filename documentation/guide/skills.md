@@ -118,7 +118,7 @@ const activation: SlashCommandActivation = parseSlashCommand(
 // }
 ```
 
-Skills that opt out via `disable-model-invocation: true` are excluded from auto-activation but remain reachable through the slash command - useful for human-only workflows.
+Skills that opt out via `disable-model-invocation: true` are excluded from auto-activation but remain reachable through the slash command - useful for human-only workflows. The unprefixed spelling is honoured for compatibility with Anthropic's product loaders (Claude Code documents it); the public agentskills.io specification does not list the field, so the bundled snapshot tracks it as a Graphorin extension alongside the `graphorin-disable-model-invocation` alias.
 
 ## Composition with `@graphorin/tools`
 

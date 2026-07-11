@@ -11,7 +11,7 @@ Graphorin makes **zero implicit network calls**. The only outbound traffic the f
 - MCP server connections (`@graphorin/mcp`).
 - OAuth flows (`@graphorin/security/oauth`).
 - The opt-in pricing-snapshot refresh (`graphorin pricing refresh`).
-- Embedder model downloads on first use (`@graphorin/embedder-transformersjs`).
+- Embedder / reranker model downloads on first use (`@graphorin/embedder-transformersjs`, `@graphorin/reranker-transformersjs`).
 - Storage backend connections (only when an external store is configured).
 - The optional OTLP-HTTP exporter (only when the operator wires a collector URL).
 

@@ -59,7 +59,7 @@ ESM is Node.js' native module system, and async-flow primitives behave correctly
 
 ## Can I use Graphorin in a browser?
 
-The `@graphorin/client` package is the browser-friendly client for the standalone server. It depends only on `@graphorin/protocol`. The runtime packages (memory, agent, workflow, server) are Node.js-only - they assume `better-sqlite3` and OS-level facilities.
+The `@graphorin/client` package is the browser-friendly client for the standalone server. Its only runtime dependencies are `@graphorin/protocol` and `zod`. The runtime packages (memory, agent, workflow, server) are Node.js-only - they assume `better-sqlite3` and OS-level facilities.
 
 ## How does the memory system handle conflicts?
 

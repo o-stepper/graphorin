@@ -85,8 +85,9 @@ incompatible vectors:
 - **`multi-active`** - multiple embedder ids coexist (read across, write to the
   active one).
 - **`auto-migrate`** - re-embed existing rows into the new id batch by batch via
-  the migration runner (`graphorin memory migrate` / `migrateEmbedder(...)`),
-  then retire the old id.
+  the migration runner (`migrateEmbedder(...)` from `@graphorin/memory/migration`;
+  the `graphorin memory migrate` CLI form is not yet supported and exits with
+  code `2`), then retire the old id.
 
 See the [Memory system](/guide/memory-system) guide for how vector search,
 the RRF fusion step, and [rerankers](/guide/rerankers) fit together.
