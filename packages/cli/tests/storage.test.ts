@@ -147,24 +147,30 @@ describe('graphorin storage cleanup-backups', () => {
 });
 
 describe('graphorin storage backup', () => {
-  it('S-14b: the copy mirrors the source file mode (a 0600 store stays 0600)', async () => {
-    const cfg = await fixture();
-    const dbPath = join(dirname(cfg), 'data.db');
-    const { createSqliteStore } = await import('@graphorin/store-sqlite');
-    const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
-    await store.init();
-    await store.close();
-    const { chmod } = await import('node:fs/promises');
-    await chmod(dbPath, 0o600);
+  // POSIX file modes are not representable on win32 (chmod is a no-op
+  // and stat reports the umask default), so the mode-mirroring
+  // contract is only testable on POSIX hosts.
+  it.skipIf(process.platform === 'win32')(
+    'S-14b: the copy mirrors the source file mode (a 0600 store stays 0600)',
+    async () => {
+      const cfg = await fixture();
+      const dbPath = join(dirname(cfg), 'data.db');
+      const { createSqliteStore } = await import('@graphorin/store-sqlite');
+      const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+      await store.init();
+      await store.close();
+      const { chmod } = await import('node:fs/promises');
+      await chmod(dbPath, 0o600);
 
-    const { runStorageBackup } = await import('../src/commands/storage.js');
-    const dest = join(dirname(cfg), 'backup.db');
-    const out = await runStorageBackup({ config: cfg, dest, print: () => {} });
-    expect(out.dest).toBe(dest);
-    // The driver writes the copy with the umask default (0644 on most
-    // hosts) - the CLI must not downgrade the live store's posture.
-    expect((await stat(dest)).mode & 0o777).toBe(0o600);
-  });
+      const { runStorageBackup } = await import('../src/commands/storage.js');
+      const dest = join(dirname(cfg), 'backup.db');
+      const out = await runStorageBackup({ config: cfg, dest, print: () => {} });
+      expect(out.dest).toBe(dest);
+      // The driver writes the copy with the umask default (0644 on most
+      // hosts) - the CLI must not downgrade the live store's posture.
+      expect((await stat(dest)).mode & 0o777).toBe(0o600);
+    },
+  );
 });
 
 describe('graphorin storage compact (W-064)', () => {
