@@ -25,6 +25,119 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.8.0 - 2026-07-11
+
+The first **behavioral audit release**. A full end-to-end campaign ran
+the framework the way consumers do - 33 scenarios across five tiers
+(deterministic stub, live Ollama models, billed Anthropic API, Docker,
+real network) - and adversarially confirmed 30 defects with file-level
+root causes. This release fixes all of them; every fix carries a
+regression test, and an independent re-validation pass re-ran every
+original reproduction against the fixed tree (24/24 resolved, zero
+regressions). Per-package details live in each package's
+`CHANGELOG.md`; upgrade notes are in the migration guide.
+
+### Memory (critical)
+
+- **The conflict pipeline no longer destroys distinct facts under real
+  embedders**: storage adapters return vector scores normalized to
+  `(1 + cos) / 2`, but the three-zone thresholds stayed calibrated for
+  raw cosine, so the NEAR-DUP zone fired at raw cosine `0.70` and
+  nearly every distinct e5-family sentence pair silently deduped into
+  the first written fact. Stage 2 (and Stage 5's reported
+  `similarity`, hence `fact_conflicts.similarity`) now map store
+  scores back to raw cosine at the pipeline boundary; regression tests
+  run against the real sqlite-vec adapter, and the in-memory test
+  fixture now models the production score contract so this class of
+  drift cannot ship silently again.
+
+### Server & client
+
+- WebSocket subscribe replies now reach the wire **before** replayed
+  frames, and the client buffers frames that arrive for a
+  not-yet-mapped subscription - replayed events are no longer silently
+  dropped on fresh subscribes and reconnect resumes.
+- `/v1/metrics` mounts behind the auth boundary, so
+  `metrics.requireAuth: true` works with `admin:metrics:read` (it was
+  a permanent 401); `GET /v1/workflows/:id/state` answers 404
+  `thread-not-found` for unknown/deleted threads instead of a plain
+  500; `stop()` no longer closes caller-injected stores; `/v1/health`
+  clamps `walSizeBytes` to 0 off WAL mode.
+- The client's workflow subscription target gains an optional `runId`
+  to subscribe to the run-scoped subjects the execute/resume routes
+  advertise - previously workflow run events were unreachable through
+  `GraphorinClient`.
+
+### Local model stack
+
+- `@graphorin/reranker-transformersjs` works out of the box: the
+  default dtype is device-aware (`q8` on CPU - the fp16 ONNX exports
+  fail session init there) and real scoring reads raw model logits
+  (sigmoid / positive-label softmax) instead of the
+  text-classification pipeline, whose softmax collapsed single-logit
+  BGE rerankers to a constant `1.0` (reranking was a no-op). A
+  network-gated regression test pins the real default model.
+
+### CLI
+
+- `tools lint` honours its exit-2 contract (broken `--config` no
+  longer silently passes with the default glob) and its globstar
+  matches zero directories; `triggers status/fire/disable/prune` run
+  with migrationPolicy `check` and refuse to auto-migrate a
+  behind-schema database (W-068); `skills migrate-frontmatter` dry-run
+  lists what `--apply` would rewrite; `storage status` probes the
+  cipher peer through the encrypted sub-pack (agreeing with what
+  `encrypt`/`rekey` can do); `storage backup` mirrors the source file
+  mode; `doctor` gains `--config <path>`; `init` gains
+  `--format ts|json`; `audit verify` honours `--json` on the error
+  path. **Behavior change**: `token create` prints the raw token to
+  stdout (log chatter stays on stderr), so
+  `TOKEN=$(graphorin token create ...)` works.
+
+### Security & integrations
+
+- The worker-threads sandbox settles (`execution-failed`) when a
+  worker exits 0 without producing a result, instead of hanging the
+  run; the Docker sandbox demuxes multiplexed container logs (the
+  live path failed every run).
+- The 1Password resolver classifies the op CLI v2 signed-out message;
+  the `@graphorin/mcp` OAuth helpers accept and forward
+  `secretsStore` (refresh/revoke can actually succeed across
+  processes), and the authorization provider no longer burns a
+  refresh rotation on its first `resolveHeader()`.
+- The bundled Anthropic Skills spec snapshot matches the live
+  six-field upstream spec; `graphorin-disable-model-invocation` is
+  retagged as a Graphorin-only extension.
+
+### Observability, evals, pricing
+
+- Replay sensitivity decisions are identical across trace sources:
+  exporters serialize `sensitivityByAttribute` (spans and events) and
+  prune entries for stripped attributes.
+- `runEvals` gains `agentFactory` (one agent per worker) - the
+  supported way to run framework agents at `concurrency > 1` - and a
+  shared instance tripping the concurrent-run guard fails fast with
+  `EvalConcurrencyError` instead of masquerading as scorer failures.
+- `pricing refresh` accepts the live genai-prices bare-array
+  `data.json`; `pricing lookup --json` serializes rates as clean
+  decimals; `@graphorin/provider` exports `listMiddlewareKinds`.
+
+### Examples & repo hygiene
+
+- The flagship local examples (`local-stack-cli`,
+  `personal-assistant-cli`) now genuinely persist and recall memory
+  (per-turn session writes, consolidator turn triggers with
+  auto-promotion, memory tools, context assembly, loopback provider
+  trust) - their READMEs were true in spirit and are now true in
+  fact; `slack-bot-integration` binds a real HTTP listener; the
+  startup rule seeding is idempotent.
+- The turbo `test` task depends on the package's own `build` (fixes a
+  dist race under forced runs); the docs went through a seven-cluster
+  verification sweep against the fixed tree (33 drift fixes, from a
+  stale changelog mirror to a nonexistent systemd `ExecStart` path).
+
+---
+
 ## 0.7.0 - 2026-07-07
 
 The third framework-wide **remediation release** - all six waves of the

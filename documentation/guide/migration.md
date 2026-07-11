@@ -52,6 +52,47 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.7.x -> 0.8.0
+
+0.8.0 fixes the 30 defects confirmed by the 2026-07-11 end-to-end
+audit. Everything is a fix or an additive option; the upgrade is a
+lockstep bump with a handful of observable behavior changes:
+
+- **`graphorin token create` prints the raw token to stdout** (log
+  chatter stays on stderr). Scripts that captured the token from
+  stderr must capture stdout instead:
+  `TOKEN=$(graphorin token create ...)` now works as written.
+- **Conflict-pipeline thresholds compare raw cosine again.** If you
+  passed custom `conflictPipeline.thresholds`, they are interpreted as
+  raw cosine (the documented DEC-130 scale). Thresholds you tuned
+  against the drifted 0.5.x-0.7.x behavior (store-scale `(1+cos)/2`)
+  should be re-derived: `raw = 2 * tuned - 1`. New
+  `fact_conflicts.similarity` rows record raw cosine; rows written by
+  older versions keep the store scale.
+- **Distinct facts persist again under real embedders.** If your
+  application relied on the (buggy) aggressive dedup to keep fact
+  counts low, expect more facts to commit; the deliberate knobs are
+  `conflictPipeline.thresholds` and the consolidator.
+- **`runEvals` at `concurrency > 1` with a shared framework agent now
+  fails fast** with `EvalConcurrencyError` instead of recording every
+  case as a scorer failure. Pass the new `agentFactory` (one agent per
+  worker) or set `concurrency: 1`.
+- **Cross-encoder reranker defaults changed**: CPU loads use `q8`
+  (fp16 failed to initialize) and scores are real logit-derived values
+  instead of a constant `1.0`. Injected `pipelineFactory` test stubs
+  keep the old classifier-pipeline contract.
+- **`GraphorinServer.stop()` no longer closes stores you injected**
+  via `createServer({ store })`; close your own store when you own its
+  lifecycle. Server-created stores are still closed.
+- **CLI contract tightening**: `tools lint` exits 2 on a
+  missing/broken `--config` (previously silent exit 0 on the default
+  glob), and `triggers status/fire/disable/prune` refuse a
+  behind-schema database instead of auto-migrating it - run
+  `graphorin migrate` first.
+- **`/v1/metrics` with `metrics.requireAuth: true`** now actually
+  accepts a bearer with `admin:metrics:read` (it answered 401 for
+  every token before); scrapers need the scope, not workarounds.
+
 ### 0.6.x -> 0.7.0
 
 0.7.0 lands the full 2026-07 project-review remediation train (six

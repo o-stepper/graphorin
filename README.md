@@ -67,7 +67,7 @@ Graphorin is currently on the **`v0.8.0`** pre-release line, **published on the 
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.8.0** (2026-07-07) - the third framework-wide remediation release, landing all six waves of the 2026-07-05 project review (157 findings). Highlights: durable HITL now composes across the sub-agent boundary, workflow timers fire on their own, session hard-delete erases everything session-scoped, the server prunes derived data by default, CommonJS consumers can plain `require()` every package (Node floor 22.12), and zod 4 consumers typecheck. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#06x---070) for upgrade notes.
+Latest release: **0.8.0** (2026-07-11) - the behavioral audit release: a 33-scenario end-to-end campaign (stub, live Ollama, billed Anthropic, Docker, real network) confirmed 30 defects and this release fixes every one, independently re-validated against the original reproductions. Highlights: the memory conflict pipeline no longer silently dedupes distinct facts under real embedders, WebSocket replay survives subscribe/reconnect races, `/v1/metrics` auth works, the cross-encoder reranker actually reranks, the Docker sandbox runs, and the flagship local examples genuinely remember across sessions. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#07x---080) for upgrade notes.
 
 ## Use cases
 
