@@ -382,6 +382,72 @@ Re-exports [or](/api/@graphorin/core/functions/or.md)
 
 ***
 
+### PROACTIVE\_OUTCOME\_LADDER
+
+Re-exports [PROACTIVE_OUTCOME_LADDER](/api/@graphorin/core/variables/PROACTIVE_OUTCOME_LADDER.md)
+
+***
+
+### ProactiveActOutcome
+
+Re-exports [ProactiveActOutcome](/api/@graphorin/core/interfaces/ProactiveActOutcome.md)
+
+***
+
+### ProactiveGrant
+
+Re-exports [ProactiveGrant](/api/@graphorin/core/type-aliases/ProactiveGrant.md)
+
+***
+
+### ProactiveNotifyOutcome
+
+Re-exports [ProactiveNotifyOutcome](/api/@graphorin/core/interfaces/ProactiveNotifyOutcome.md)
+
+***
+
+### ProactiveOutcome
+
+Re-exports [ProactiveOutcome](/api/@graphorin/core/type-aliases/ProactiveOutcome.md)
+
+***
+
+### ProactiveOutcomeBase
+
+Re-exports [ProactiveOutcomeBase](/api/@graphorin/core/interfaces/ProactiveOutcomeBase.md)
+
+***
+
+### ProactiveOutcomeKind
+
+Re-exports [ProactiveOutcomeKind](/api/@graphorin/core/type-aliases/ProactiveOutcomeKind.md)
+
+***
+
+### ProactiveOutcomeOption
+
+Re-exports [ProactiveOutcomeOption](/api/@graphorin/core/interfaces/ProactiveOutcomeOption.md)
+
+***
+
+### proactiveOutcomeWithinGrant
+
+Re-exports [proactiveOutcomeWithinGrant](/api/@graphorin/core/functions/proactiveOutcomeWithinGrant.md)
+
+***
+
+### ProactiveQuestionOutcome
+
+Re-exports [ProactiveQuestionOutcome](/api/@graphorin/core/interfaces/ProactiveQuestionOutcome.md)
+
+***
+
+### ProactiveReviewOutcome
+
+Re-exports [ProactiveReviewOutcome](/api/@graphorin/core/interfaces/ProactiveReviewOutcome.md)
+
+***
+
 ### ProgressArtifactRef
 
 Re-exports [ProgressArtifactRef](/api/@graphorin/core/interfaces/ProgressArtifactRef.md)

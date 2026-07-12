@@ -10,7 +10,7 @@
 type AgentCapability = "read-only";
 ```
 
-Defined in: [packages/agent/src/types.ts:536](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L536)
+Defined in: [packages/agent/src/types.ts:614](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L614)
 
 Run-level capability restriction (D2 - the single-writer constraint
 from multi-agent practice). `'read-only'` makes the run

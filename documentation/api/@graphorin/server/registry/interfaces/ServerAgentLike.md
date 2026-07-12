@@ -32,13 +32,15 @@ Defined in: [packages/server/src/registry/index.ts:30](https://github.com/o-step
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | `unknown` |
-| `options?` | \{ `sessionId?`: `string`; `signal?`: `AbortSignal`; `userId?`: `string`; \} |
-| `options.sessionId?` | `string` |
-| `options.signal?` | `AbortSignal` |
-| `options.userId?` | `string` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | `unknown` | - |
+| `options?` | \{ `directive?`: \{ `approvals?`: readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[]; \}; `sessionId?`: `string`; `signal?`: `AbortSignal`; `userId?`: `string`; \} | - |
+| `options.directive?` | \{ `approvals?`: readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[]; \} | C3/W-119: HITL resume directive forwarded by `POST /runs/:runId/resume`. Mirrors the agent package's `ResumeDirective` structurally. |
+| `options.directive.approvals?` | readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[] | - |
+| `options.sessionId?` | `string` | - |
+| `options.signal?` | `AbortSignal` | - |
+| `options.userId?` | `string` | - |
 
 #### Returns
 
@@ -52,7 +54,7 @@ Defined in: [packages/server/src/registry/index.ts:30](https://github.com/o-step
 optional stream(input, options?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L44)
+Defined in: [packages/server/src/registry/index.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L57)
 
 Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
 structurally; `POST /agents/:id/stream` consumes it and emits

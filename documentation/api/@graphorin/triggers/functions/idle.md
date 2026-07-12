@@ -14,7 +14,7 @@ function idle(
    options?): TriggerDeclaration;
 ```
 
-Defined in: [packages/triggers/src/index.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L138)
+Defined in: [packages/triggers/src/index.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L205)
 
 ## Parameters
 

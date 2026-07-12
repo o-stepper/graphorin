@@ -304,7 +304,7 @@ export class ProgressWriteError extends AgentRuntimeError {
 }
 
 /**
- * Thrown when a run crosses its {@link RunBudget} ceiling under
+ * Thrown when a run crosses its `RunBudget` ceiling under
  * `onExceed: 'throw'` (C5). The run's promise REJECTS with this error
  * after an `agent.error` event; graceful finalization is skipped. The
  * default `onExceed: 'stop'` never throws - it resolves the run as

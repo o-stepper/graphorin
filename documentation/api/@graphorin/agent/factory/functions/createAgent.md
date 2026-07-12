@@ -10,7 +10,7 @@
 function createAgent<TDeps, TOutput>(config): Agent<TDeps, TOutput>;
 ```
 
-Defined in: [packages/agent/src/factory.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/factory.ts#L127)
+Defined in: [packages/agent/src/factory.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/factory.ts#L129)
 
 Build a fresh [Agent](/api/@graphorin/agent/interfaces/Agent.md) from the supplied configuration.
 

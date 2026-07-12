@@ -10,7 +10,7 @@
 function createScheduler(options): Scheduler;
 ```
 
-Defined in: [packages/triggers/src/index.ts:265](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L265)
+Defined in: [packages/triggers/src/index.ts:369](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L369)
 
 ## Parameters
 

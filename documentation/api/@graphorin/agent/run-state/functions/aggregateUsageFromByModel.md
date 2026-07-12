@@ -10,7 +10,7 @@
 function aggregateUsageFromByModel(byModel): Usage;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:582](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L582)
+Defined in: [packages/agent/src/run-state/index.ts:593](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L593)
 
 Recompute the aggregate usage from `usageByModel`. Returns the
 sum that callers can compare against `state.usage` to verify the

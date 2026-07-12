@@ -76,6 +76,12 @@ Re-exports [normaliseTool](/api/@graphorin/tools/functions/normaliseTool.md)
 
 ***
 
+### NormaliseToolOptions
+
+Re-exports [NormaliseToolOptions](/api/@graphorin/tools/interfaces/NormaliseToolOptions.md)
+
+***
+
 ### NormaliseWarning
 
 Re-exports [NormaliseWarning](/api/@graphorin/tools/type-aliases/NormaliseWarning.md)
