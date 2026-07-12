@@ -6,9 +6,21 @@
  */
 
 import type { TriggerState, TriggerStore } from '@graphorin/core/contracts';
-import { nextFireAfter, type ParsedCron, parseCron } from './cron.js';
+import {
+  CronParseError,
+  isValidTimeZone,
+  nextFireAfter,
+  type ParsedCron,
+  parseCron,
+} from './cron.js';
 
-export { CronParseError, nextFireAfter, type ParsedCron, parseCron } from './cron.js';
+export {
+  CronParseError,
+  isValidTimeZone,
+  nextFireAfter,
+  type ParsedCron,
+  parseCron,
+} from './cron.js';
 
 /** Canonical version constant, derived from `package.json` at build time. */
 import pkg from '../package.json' with { type: 'json' };
@@ -49,6 +61,15 @@ export interface TriggerOptions {
    * process lives pass `true` here.
    */
   readonly acknowledgeLibMode?: boolean;
+  /**
+   * IANA timezone the cron expression's wall clock is evaluated in
+   * (W-124). `cron(...)` validates it eagerly - an unknown zone throws
+   * at declaration time. DST transitions follow Vixie semantics (see
+   * the cron module doc). Applies to `cron` triggers only; the other
+   * kinds ignore it (like the catch-up fields they do not use).
+   * Default: UTC.
+   */
+  readonly timezone?: string;
 }
 
 /**
@@ -87,7 +108,10 @@ export function cron(
   callback: TriggerCallback,
   options: TriggerOptions = {},
 ): TriggerDeclaration {
-  parseCron(expression);
+  const parsed = parseCron(expression);
+  if (options.timezone !== undefined && !isValidTimeZone(options.timezone)) {
+    throw new CronParseError(parsed.expression, `unknown timezone '${options.timezone}'`);
+  }
   return { id, kind: 'cron', spec: expression, callback, options };
 }
 
@@ -167,7 +191,13 @@ export type SchedulerEvent =
       readonly durationMs: number;
     }
   | { readonly type: 'catchup-applied'; readonly id: string; readonly missed: number }
-  | { readonly type: 'lib-mode-warning'; readonly id: string };
+  | { readonly type: 'lib-mode-warning'; readonly id: string }
+  /**
+   * A persisted trigger row has no re-registered declaration in this
+   * process (W-123). It will never fire; re-register the declaration
+   * or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
+   */
+  | { readonly type: 'orphaned'; readonly id: string };
 
 /**
  * Options for {@link createScheduler}.
@@ -222,6 +252,13 @@ export interface Scheduler {
   events(): AsyncIterable<SchedulerEvent>;
   /** Notify the scheduler that the user / runtime is no longer idle. */
   recordActivity(): void;
+  /**
+   * Persisted trigger rows with no live declaration in this process
+   * (W-123). These never fire: the callback only exists in memory, so
+   * a row survives only as dead weight until the declaration is
+   * re-registered or the row is pruned.
+   */
+  orphans(): Promise<readonly TriggerState[]>;
 }
 
 /** @stable */
@@ -263,6 +300,12 @@ class SchedulerImpl implements Scheduler {
   #handles: Map<string, unknown> = new Map();
   #parsedCron: Map<string, ParsedCron> = new Map();
   #declarations: Map<string, TriggerDeclaration> = new Map();
+  /**
+   * Triggers whose register-time catch-up was deferred because the
+   * scheduler had not started yet (W-123): user callbacks must never
+   * fire before `start()`. Drained by `start()`.
+   */
+  #pendingCatchup: Set<string> = new Set();
   #eventQueue: SchedulerEvent[] = [];
   #eventResolvers: Array<(value: IteratorResult<SchedulerEvent>) => void> = [];
   #closedEvents = false;
@@ -319,7 +362,14 @@ class SchedulerImpl implements Scheduler {
     this.#publish({ type: 'registered', id: declaration.id, kind: declaration.kind });
 
     if (existing !== null && (declaration.kind === 'cron' || declaration.kind === 'interval')) {
-      await this.#applyCatchup(state, existing, now);
+      if (this.#started) {
+        await this.#applyCatchup(state, existing, now);
+      } else {
+        // W-123: register-time catch-up used to fire user callbacks on
+        // a not-started scheduler - a lifecycle violation. Defer the
+        // catch-up to start().
+        this.#pendingCatchup.add(declaration.id);
+      }
     }
 
     if (this.#started) this.#schedule(declaration.id, state);
@@ -330,6 +380,7 @@ class SchedulerImpl implements Scheduler {
     this.#cancelHandle(id);
     this.#declarations.delete(id);
     this.#parsedCron.delete(id);
+    this.#pendingCatchup.delete(id);
     await this.#store.remove(id);
   }
 
@@ -343,9 +394,22 @@ class SchedulerImpl implements Scheduler {
     this.#publish({ type: 'started' });
     const states = await this.#store.list();
     for (const state of states) {
+      if (!this.#declarations.has(state.id)) {
+        // W-123: a persisted row without a re-registered declaration
+        // was skipped silently inside #schedule - it never fires and
+        // nobody learns why. Surface it.
+        console.warn(
+          `[graphorin/triggers] persisted trigger '${state.id}' has no registered declaration ` +
+            `in this process - it will never fire. Re-register the declaration or prune the row ` +
+            `(POST /v1/triggers/prune { "orphaned": true }).`,
+        );
+        this.#publish({ type: 'orphaned', id: state.id });
+        continue;
+      }
       if (state.disabled) continue;
       this.#schedule(state.id, state);
     }
+    await this.#drainPendingCatchup();
   }
 
   async stop(): Promise<void> {
@@ -467,6 +531,11 @@ class SchedulerImpl implements Scheduler {
     return updated;
   }
 
+  async orphans(): Promise<readonly TriggerState[]> {
+    const states = await this.#store.list();
+    return states.filter((state) => !this.#declarations.has(state.id));
+  }
+
   recordActivity(): void {
     this.#lastActivity = this.#now();
     // periphery (P-14): never (re)arm idle timers on a scheduler that
@@ -530,7 +599,7 @@ class SchedulerImpl implements Scheduler {
     switch (decl.kind) {
       case 'cron': {
         const parsed = this.#parsedCron.get(decl.id) ?? parseCron(decl.spec);
-        const next = nextFireAfter(parsed, new Date(now));
+        const next = nextFireAfter(parsed, new Date(now), decl.options.timezone);
         return next === null ? null : next.getTime();
       }
       case 'interval': {
@@ -559,6 +628,25 @@ class SchedulerImpl implements Scheduler {
     }
   }
 
+  /**
+   * Apply the register-time catch-ups that were deferred because the
+   * scheduler had not started yet (W-123). Runs inside `start()`, so
+   * every fire happens on a started scheduler. Uses the FRESH persisted
+   * state on both sides: a manual `fire()` between register and start
+   * already advanced `lastFiredAt`, and double-counting those misses
+   * would re-fire them.
+   */
+  async #drainPendingCatchup(): Promise<void> {
+    const ids = [...this.#pendingCatchup];
+    this.#pendingCatchup.clear();
+    for (const id of ids) {
+      if (!this.#declarations.has(id)) continue;
+      const fresh = await this.#store.get(id);
+      if (fresh === null || fresh.disabled) continue;
+      await this.#applyCatchup(fresh, fresh, this.#now());
+    }
+  }
+
   async #applyCatchup(state: TriggerState, existing: TriggerState, now: number): Promise<void> {
     if (state.catchupPolicy === 'none') return;
     const decl = this.#declarations.get(state.id);
@@ -577,7 +665,7 @@ class SchedulerImpl implements Scheduler {
       const parsed = this.#parsedCron.get(decl.id) ?? parseCron(decl.spec);
       let cursor = lastFired;
       while (missed < SCAN_CAP) {
-        const next = nextFireAfter(parsed, new Date(cursor));
+        const next = nextFireAfter(parsed, new Date(cursor), decl.options.timezone);
         if (next === null || next.getTime() > now) break;
         cursor = next.getTime();
         missed += 1;

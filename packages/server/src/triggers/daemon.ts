@@ -28,6 +28,11 @@ export interface TriggersDaemonStatus {
   readonly active: number;
   readonly disabled: number;
   readonly deferred: number;
+  /**
+   * Persisted rows with no live declaration in this process (W-123) -
+   * they never fire until re-registered or pruned.
+   */
+  readonly orphaned?: number;
   /** Last fire timestamp across the entire pool (ISO-8601). */
   readonly lastFireAt?: string;
 }
@@ -149,6 +154,7 @@ export function createTriggersDaemon(options: CreateTriggersDaemonOptions): Trig
     },
     async status() {
       const all = await options.scheduler.list();
+      const orphaned = (await options.scheduler.orphans()).length;
       let active = 0;
       let disabled = 0;
       let deferred = 0;
@@ -164,6 +170,7 @@ export function createTriggersDaemon(options: CreateTriggersDaemonOptions): Trig
         active,
         disabled,
         deferred,
+        orphaned,
       };
       if (lastFireAtMs !== undefined) {
         out.lastFireAt = new Date(lastFireAtMs).toISOString();
