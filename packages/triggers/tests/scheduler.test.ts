@@ -924,3 +924,229 @@ describe('setDisabled - flag flip, not removal (IP-17)', () => {
     await scheduler.stop();
   });
 });
+
+describe('C4: scheduler harness (floor / jitter / limit / expiry)', () => {
+  let clock: FakeClock;
+
+  beforeEach(() => {
+    _resetLibModeWarningForTesting();
+    clock = new FakeClock();
+  });
+
+  async function makeHarnessScheduler(
+    limits?: import('../src/index.js').SchedulerLimits,
+  ): Promise<Scheduler> {
+    const triggerStore = await makeStore();
+    return createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+      ...(limits !== undefined ? { limits } : {}),
+    });
+  }
+
+  it('declaration factories validate jitterMs / expiresAt eagerly', () => {
+    expect(() => interval('j', 60_000, () => {}, { jitterMs: -1 })).toThrow(/jitterMs/);
+    expect(() => interval('j', 60_000, () => {}, { jitterMs: Number.NaN })).toThrow(/jitterMs/);
+    expect(() => cron('e', '* * * * *', () => {}, { expiresAt: 'not-a-date' })).toThrow(
+      /expiresAt/,
+    );
+    expect(() => idle('e2', 60_000, () => {}, { expiresAt: Number.NaN })).toThrow(/expiresAt/);
+  });
+
+  it('interval floor: register rejects sub-floor interval and idle periods', async () => {
+    const scheduler = await makeHarnessScheduler({});
+    await expect(scheduler.register(interval('fast', 1_000, () => {}))).rejects.toMatchObject({
+      name: 'TriggerLimitError',
+      limit: 'interval-floor',
+      triggerId: 'fast',
+    });
+    await expect(scheduler.register(idle('doze', 5_000, () => {}))).rejects.toMatchObject({
+      name: 'TriggerLimitError',
+      limit: 'interval-floor',
+    });
+    // At the floor is allowed; cron is minute-grained by construction.
+    await scheduler.register(interval('ok', 60_000, () => {}));
+    await scheduler.register(cron('minutely', '* * * * *', () => {}));
+    await scheduler.stop();
+  });
+
+  it('interval floor: intervalFloorMs 0 disables it; no limits = pre-harness behaviour', async () => {
+    const unlimited = await makeHarnessScheduler({ intervalFloorMs: 0 });
+    await unlimited.register(interval('fast', 1_000, () => {}));
+    await unlimited.stop();
+
+    const bare = await makeHarnessScheduler();
+    await bare.register(interval('fast', 1_000, () => {}));
+    await bare.stop();
+  });
+
+  it('maxDeclarations: caps registrations; re-registering an existing id stays allowed', async () => {
+    const scheduler = await makeHarnessScheduler({ intervalFloorMs: 0, maxDeclarations: 2 });
+    await scheduler.register(interval('a', 1_000, () => {}));
+    await scheduler.register(interval('b', 1_000, () => {}));
+    await expect(scheduler.register(interval('c', 1_000, () => {}))).rejects.toMatchObject({
+      name: 'TriggerLimitError',
+      limit: 'max-declarations',
+      triggerId: 'c',
+    });
+    // Update of an existing id does not count against the cap.
+    await scheduler.register(interval('a', 2_000, () => {}));
+    // Unregistering frees a slot.
+    await scheduler.unregister('b');
+    await scheduler.register(interval('c', 1_000, () => {}));
+    await scheduler.stop();
+  });
+
+  it('jitter: deterministic per-id offset shifts the armed delay, constant across fires', async () => {
+    const scheduler = await makeHarnessScheduler();
+    const fires: number[] = [];
+    let bareFiredAt = -1;
+    await scheduler.register(
+      interval(
+        'jittered-task',
+        10_000,
+        () => {
+          fires.push(clock.now());
+        },
+        { jitterMs: 5_000 },
+      ),
+    );
+    await scheduler.register(
+      interval('bare-task', 10_000, () => {
+        bareFiredAt = clock.now();
+      }),
+    );
+    await scheduler.start();
+    await clock.advance(40_000);
+
+    expect(bareFiredAt).toBeGreaterThanOrEqual(10_000);
+    expect(fires.length).toBeGreaterThanOrEqual(2);
+    const first = fires[0] as number;
+    const offset = first - 10_000;
+    expect(offset).toBeGreaterThanOrEqual(0);
+    expect(offset).toBeLessThanOrEqual(5_000);
+    // The offset is constant: every inter-fire gap is interval + offset.
+    const second = fires[1] as number;
+    expect(second - first).toBe(10_000 + offset);
+
+    // Determinism across scheduler instances (restart survivability):
+    // a fresh clock + store + scheduler yields the same first offset.
+    const replayClock = new FakeClock();
+    clock = replayClock;
+    const replay = await makeHarnessScheduler();
+    let replayFirst = -1;
+    await replay.register(
+      interval(
+        'jittered-task',
+        10_000,
+        () => {
+          if (replayFirst === -1) replayFirst = replayClock.now();
+        },
+        { jitterMs: 5_000 },
+      ),
+    );
+    await replay.start();
+    await replayClock.advance(16_000);
+    expect(replayFirst - 10_000).toBe(offset);
+    await replay.stop();
+    await scheduler.stop();
+  });
+
+  it('jitter: idle triggers ignore jitterMs (debounce stays exact)', async () => {
+    const scheduler = await makeHarnessScheduler();
+    let firedAt = -1;
+    await scheduler.register(
+      idle(
+        'quiet',
+        2_000,
+        () => {
+          firedAt = clock.now();
+        },
+        { jitterMs: 5_000 },
+      ),
+    );
+    await scheduler.start();
+    scheduler.recordActivity();
+    await clock.advance(2_000);
+    expect(firedAt).toBe(2_000);
+    await scheduler.stop();
+  });
+
+  it('expiresAt: auto-pauses instead of firing, emits expired, manual fire refuses too', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const scheduler = await makeHarnessScheduler();
+      const events: SchedulerEvent[] = [];
+      void (async () => {
+        for await (const e of scheduler.events()) events.push(e);
+      })();
+      let count = 0;
+      await scheduler.register(
+        interval(
+          'mortal',
+          1_000,
+          () => {
+            count++;
+          },
+          { expiresAt: 2_500 },
+        ),
+      );
+      await scheduler.start();
+      await clock.advance(2_200); // fires at 1000 and 2000, both before expiry
+      expect(count).toBe(2);
+
+      await clock.advance(2_000); // the timer armed for 3000 lands past expiry
+      expect(count).toBe(2); // callback never ran past expiresAt
+      const state = (await scheduler.list()).find((t) => t.id === 'mortal');
+      expect(state?.disabled).toBe(true);
+      expect(events.some((e) => e.type === 'expired' && e.id === 'mortal')).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining("'mortal' passed its expiresAt"),
+      );
+
+      // Manual fire past expiry refuses as well.
+      await scheduler.fire('mortal');
+      expect(count).toBe(2);
+
+      // Re-enabling while still expired re-pauses without firing.
+      await scheduler.setDisabled('mortal', false);
+      await clock.advance(5_000);
+      expect(count).toBe(2);
+      const after = (await scheduler.list()).find((t) => t.id === 'mortal');
+      expect(after?.disabled).toBe(true);
+      await scheduler.stop();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('expiresAt renewal: re-register with a later expiry + re-enable resumes firing', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const scheduler = await makeHarnessScheduler();
+      let count = 0;
+      const cb = (): void => {
+        count++;
+      };
+      await scheduler.register(interval('renewable', 1_000, cb, { expiresAt: 1_500 }));
+      await scheduler.start();
+      await clock.advance(2_500); // fire at 1000; the 2000 arm lands past expiry -> paused
+      expect(count).toBe(1);
+      expect((await scheduler.list()).find((t) => t.id === 'renewable')?.disabled).toBe(true);
+
+      // Renew: later expiresAt + explicit re-enable (registration alone
+      // keeps the persisted disabled flag - documented semantics).
+      await scheduler.register(interval('renewable', 1_000, cb, { expiresAt: 60_000 }));
+      expect((await scheduler.list()).find((t) => t.id === 'renewable')?.disabled).toBe(true);
+      await scheduler.setDisabled('renewable', false);
+      await clock.advance(1_200);
+      expect(count).toBe(2);
+      await scheduler.stop();
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+});

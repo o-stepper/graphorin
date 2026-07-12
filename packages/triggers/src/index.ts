@@ -42,6 +42,25 @@ export type CatchupPolicy = 'none' | 'last' | 'all';
 /** @stable */
 export type TriggerKind = 'cron' | 'interval' | 'idle' | 'event';
 
+/**
+ * Thrown by {@link Scheduler.register} when a declaration violates the
+ * opt-in scheduler harness ({@link SchedulerLimits}): a period below
+ * the interval floor or one declaration too many. Match structurally
+ * by `err.name === 'TriggerLimitError'`.
+ *
+ * @stable
+ */
+export class TriggerLimitError extends Error {
+  override readonly name = 'TriggerLimitError';
+  constructor(
+    public readonly triggerId: string,
+    public readonly limit: 'interval-floor' | 'max-declarations',
+    message: string,
+  ) {
+    super(`[graphorin/triggers] ${message}`);
+  }
+}
+
 /** @stable */
 export interface TriggerOptions {
   readonly catchupPolicy?: CatchupPolicy;
@@ -70,6 +89,28 @@ export interface TriggerOptions {
    * Default: UTC.
    */
   readonly timezone?: string;
+  /**
+   * Maximum deterministic jitter, in milliseconds, added to every
+   * armed delay of a `cron` / `interval` trigger. The actual offset is
+   * derived from a hash of the trigger id - stable across restarts and
+   * processes - so a fleet of tasks sharing one wall-clock boundary
+   * spreads out while each task keeps a fixed cadence. `idle` / `event`
+   * triggers ignore it. The offset shifts only the armed timer, never
+   * the persisted schedule, so catch-up math stays on the unjittered
+   * grid. Default 0 (no jitter).
+   */
+  readonly jitterMs?: number;
+  /**
+   * Instant (ISO-8601 string or epoch ms) after which the trigger
+   * auto-pauses instead of firing: the scheduler flips the persistent
+   * `disabled` flag (exactly like `setDisabled(id, true)`), emits an
+   * `'expired'` event and WARNs once. Non-destructive - the row stays
+   * registered for inspection and `POST /v1/triggers/prune
+   * { "disabled": true }` cleans it up. Renew by re-registering the
+   * declaration with a later `expiresAt` and calling
+   * `setDisabled(id, false)`. Default: never expires.
+   */
+  readonly expiresAt?: string | number;
 }
 
 /**
@@ -96,6 +137,30 @@ export interface TriggerDeclaration {
 }
 
 /**
+ * Eager validation of the harness fields shared by every declaration
+ * factory (C4): a malformed `jitterMs` / `expiresAt` throws at
+ * declaration time, not at first arm.
+ */
+function validateHarnessOptions(kind: TriggerKind, id: string, options: TriggerOptions): void {
+  if (
+    options.jitterMs !== undefined &&
+    (!Number.isFinite(options.jitterMs) || options.jitterMs < 0)
+  ) {
+    throw new Error(`[graphorin/triggers] ${kind}(${id}): jitterMs must be a finite number >= 0`);
+  }
+  if (options.expiresAt !== undefined && parseExpiresAt(options.expiresAt) === null) {
+    throw new Error(
+      `[graphorin/triggers] ${kind}(${id}): expiresAt must be an ISO-8601 string or epoch ms`,
+    );
+  }
+}
+
+function parseExpiresAt(expiresAt: string | number): number | null {
+  const ms = typeof expiresAt === 'number' ? expiresAt : Date.parse(expiresAt);
+  return Number.isFinite(ms) ? ms : null;
+}
+
+/**
  * Build a cron trigger declaration. The expression is validated
  * eagerly - a malformed cron expression throws at registration time,
  * not at first fire.
@@ -112,6 +177,7 @@ export function cron(
   if (options.timezone !== undefined && !isValidTimeZone(options.timezone)) {
     throw new CronParseError(parsed.expression, `unknown timezone '${options.timezone}'`);
   }
+  validateHarnessOptions('cron', id, options);
   return { id, kind: 'cron', spec: expression, callback, options };
 }
 
@@ -125,6 +191,7 @@ export function interval(
   if (!Number.isFinite(intervalMs) || intervalMs <= 0) {
     throw new Error(`[graphorin/triggers] interval(${id}): intervalMs must be > 0`);
   }
+  validateHarnessOptions('interval', id, options);
   return {
     id,
     kind: 'interval',
@@ -144,6 +211,7 @@ export function idle(
   if (!Number.isFinite(idleMs) || idleMs <= 0) {
     throw new Error(`[graphorin/triggers] idle(${id}): idleMs must be > 0`);
   }
+  validateHarnessOptions('idle', id, options);
   return {
     id,
     kind: 'idle',
@@ -163,6 +231,7 @@ export function event(
   if (eventName.length === 0) {
     throw new Error(`[graphorin/triggers] event(${id}): eventName must not be empty`);
   }
+  validateHarnessOptions('event', id, options);
   return {
     id,
     kind: 'event',
@@ -197,7 +266,36 @@ export type SchedulerEvent =
    * process (W-123). It will never fire; re-register the declaration
    * or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
    */
-  | { readonly type: 'orphaned'; readonly id: string };
+  | { readonly type: 'orphaned'; readonly id: string }
+  /**
+   * The trigger's `expiresAt` instant passed, so the scheduler
+   * auto-paused it (C4): the persistent `disabled` flag is set instead
+   * of firing the callback. Renew with a later `expiresAt` +
+   * `setDisabled(id, false)`, or prune it
+   * (`POST /v1/triggers/prune { "disabled": true }`).
+   */
+  | { readonly type: 'expired'; readonly id: string };
+
+/**
+ * Opt-in scheduler harness for proactive task fleets (C4). Values are
+ * bot policy; the defaults are conservative.
+ *
+ * @stable
+ */
+export interface SchedulerLimits {
+  /**
+   * Floor for `interval` / `idle` periods, in milliseconds.
+   * `register(...)` throws {@link TriggerLimitError} for a shorter
+   * period. `cron` triggers are minute-grained by construction and are
+   * not floored. Default 60000 (60s); `0` disables the floor.
+   */
+  readonly intervalFloorMs?: number;
+  /**
+   * Maximum number of registered declarations. Re-registering an
+   * existing id never counts against the cap. Default: unlimited.
+   */
+  readonly maxDeclarations?: number;
+}
 
 /**
  * Options for {@link createScheduler}.
@@ -217,6 +315,12 @@ export interface CreateSchedulerOptions {
    */
   readonly setTimeout?: (cb: () => void, ms: number) => unknown;
   readonly clearTimeout?: (handle: unknown) => void;
+  /**
+   * Opt-in scheduler harness (C4): interval floor + declaration cap
+   * enforced at `register(...)` time. Absent = no constraints (the
+   * pre-harness behaviour). Pass `{}` for the conservative defaults.
+   */
+  readonly limits?: SchedulerLimits;
   /**
    * Resets the per-process WARN-once flag. Used by the test suite to
    * verify the warning fires exactly once per run.
@@ -281,6 +385,22 @@ export function _resetLibModeWarningForTesting(): void {
 
 const DEFAULT_CATCHUP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
+/** Conservative interval/idle floor when the harness is enabled (C4). */
+const DEFAULT_INTERVAL_FLOOR_MS = 60_000;
+
+/**
+ * FNV-1a 32-bit hash - the deterministic jitter seed. Stable across
+ * restarts and processes because it depends only on the trigger id.
+ */
+function fnv1a(input: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    hash ^= input.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
 /**
  * Node clamps `setTimeout` delays beyond `2^31 - 1` ms to 1 ms - a
  * quarterly cron would fire immediately in a hot loop (RP-15). Delays
@@ -294,6 +414,7 @@ class SchedulerImpl implements Scheduler {
   readonly #now: () => number;
   readonly #setTimeout: (cb: () => void, ms: number) => unknown;
   readonly #clearTimeout: (handle: unknown) => void;
+  readonly #limits: SchedulerLimits | undefined;
   #started = false;
   #disposed = false;
   #lastActivity: number;
@@ -317,11 +438,13 @@ class SchedulerImpl implements Scheduler {
     this.#setTimeout = options.setTimeout ?? ((cb, ms) => globalThis.setTimeout(cb, ms));
     this.#clearTimeout =
       options.clearTimeout ?? ((h) => globalThis.clearTimeout(h as ReturnType<typeof setTimeout>));
+    this.#limits = options.limits;
     this.#lastActivity = this.#now();
     if (options._resetLibModeFlag) LIB_MODE_WARNED = false;
   }
 
   async register(declaration: TriggerDeclaration): Promise<TriggerState> {
+    this.#enforceLimits(declaration);
     if (this.#mode === 'lib' && declaration.options.acknowledgeLibMode !== true) {
       if (!LIB_MODE_WARNED) {
         LIB_MODE_WARNED = true;
@@ -437,6 +560,13 @@ class SchedulerImpl implements Scheduler {
     if (decl === undefined) {
       throw new Error(`[graphorin/triggers] no trigger registered with id '${id}'`);
     }
+    if (this.#isExpired(decl)) {
+      // C4: a timer armed before expiry can land after it, and manual
+      // fire() / catch-up must honour expiry too - auto-pause, never
+      // run the callback.
+      await this.#autoPauseExpired(id);
+      return;
+    }
     const firedAt = this.#now();
     this.#publish({ type: 'fire-start', id, firedAt });
     const start = firedAt;
@@ -548,6 +678,12 @@ class SchedulerImpl implements Scheduler {
     for (const decl of this.#declarations.values()) {
       if (decl.kind !== 'idle') continue;
       this.#cancelHandle(decl.id);
+      if (this.#isExpired(decl)) {
+        // C4: this re-arm path bypasses #schedule, so it needs its own
+        // expiry guard.
+        void this.#autoPauseExpired(decl.id);
+        continue;
+      }
       const idleMs = Number.parseInt(decl.spec, 10);
       const handle = this.#setTimeout(() => {
         void this.fire(decl.id);
@@ -580,6 +716,94 @@ class SchedulerImpl implements Scheduler {
   }
 
   // ---------------------------------------------------------------------------
+
+  /**
+   * Opt-in harness enforcement (C4). Deterministic and fail-fast: the
+   * registering caller (often an agent-driven code path) gets the
+   * violation back as a typed error instead of a silently rewritten
+   * schedule.
+   */
+  #enforceLimits(declaration: TriggerDeclaration): void {
+    const limits = this.#limits;
+    if (limits === undefined) return;
+    const floor = limits.intervalFloorMs ?? DEFAULT_INTERVAL_FLOOR_MS;
+    if (floor > 0 && (declaration.kind === 'interval' || declaration.kind === 'idle')) {
+      const periodMs = Number.parseInt(declaration.spec, 10);
+      if (periodMs < floor) {
+        throw new TriggerLimitError(
+          declaration.id,
+          'interval-floor',
+          `${declaration.kind}('${declaration.id}'): period ${periodMs}ms is below the ` +
+            `scheduler floor of ${floor}ms (SchedulerLimits.intervalFloorMs)`,
+        );
+      }
+    }
+    if (
+      limits.maxDeclarations !== undefined &&
+      !this.#declarations.has(declaration.id) &&
+      this.#declarations.size >= limits.maxDeclarations
+    ) {
+      throw new TriggerLimitError(
+        declaration.id,
+        'max-declarations',
+        `register('${declaration.id}'): the scheduler already holds ` +
+          `${this.#declarations.size} declarations (SchedulerLimits.maxDeclarations = ` +
+          `${limits.maxDeclarations})`,
+      );
+    }
+  }
+
+  /** Expiry instant of a declaration, or `null` when it never expires. */
+  #expiresAtMs(decl: TriggerDeclaration): number | null {
+    if (decl.options.expiresAt === undefined) return null;
+    return parseExpiresAt(decl.options.expiresAt);
+  }
+
+  #isExpired(decl: TriggerDeclaration): boolean {
+    const expiresAt = this.#expiresAtMs(decl);
+    return expiresAt !== null && this.#now() >= expiresAt;
+  }
+
+  /**
+   * Auto-pause an expired trigger (C4): flip the persistent `disabled`
+   * flag - exactly what `setDisabled(id, true)` does - WARN once and
+   * publish `'expired'`. Best-effort like the RP-14 re-arm path: a
+   * store failure must not become an unhandled rejection out of a
+   * timer callback.
+   */
+  async #autoPauseExpired(id: string): Promise<void> {
+    this.#cancelHandle(id);
+    try {
+      const state = await this.#store.get(id);
+      if (state === null || state.disabled) return;
+      await this.#store.upsert({
+        ...state,
+        disabled: true,
+        updatedAt: new Date(this.#now()).toISOString(),
+      });
+      console.warn(
+        `[graphorin/triggers] trigger '${id}' passed its expiresAt - auto-paused ` +
+          `(non-destructive). Re-register with a later expiresAt and re-enable, or prune ` +
+          `(POST /v1/triggers/prune { "disabled": true }).`,
+      );
+      this.#publish({ type: 'expired', id });
+    } catch {
+      // Best-effort - see the doc comment above.
+    }
+  }
+
+  /**
+   * Deterministic per-id jitter offset in `[0, jitterMs]` for cron /
+   * interval triggers (C4). Applied to the armed delay only - the
+   * persisted schedule and the catch-up math stay on the unjittered
+   * grid.
+   */
+  #jitterOffset(decl: TriggerDeclaration): number {
+    const jitterMs = decl.options.jitterMs;
+    if (jitterMs === undefined || jitterMs <= 0) return 0;
+    if (decl.kind !== 'cron' && decl.kind !== 'interval') return 0;
+    return fnv1a(decl.id) % (Math.floor(jitterMs) + 1);
+  }
 
   #publish(event: SchedulerEvent): void {
     if (this.#closedEvents) return;
@@ -697,6 +921,11 @@ class SchedulerImpl implements Scheduler {
     const decl = this.#declarations.get(id);
     if (decl === undefined) return;
     if (decl.kind === 'event') return;
+    if (this.#isExpired(decl)) {
+      // C4: never arm past expiry - auto-pause instead.
+      void this.#autoPauseExpired(id);
+      return;
+    }
 
     let delay: number | null = null;
     if (state.nextFireAt !== undefined) {
@@ -707,6 +936,7 @@ class SchedulerImpl implements Scheduler {
     }
     if (delay === null) return;
     if (delay < 0) delay = 0;
+    delay += this.#jitterOffset(decl);
 
     if (delay > MAX_TIMEOUT_MS) {
       // RP-15: chunk the wait - the intermediate wake-up re-reads the

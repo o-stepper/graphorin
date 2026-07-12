@@ -205,6 +205,47 @@ Trigger rows are durable, but callbacks live only in memory: after a restart eve
 
 Register-time catch-up is gated on the scheduler lifecycle: when a trigger with a `catchupPolicy` is registered **before** `start()`, its missed fires are counted and applied during `start()` - user callbacks never run on a not-started scheduler.
 
+### Scheduler harness for proactive fleets
+
+A proactive bot lets an agent-driven code path register its own schedules, which needs guardrails a hand-written deployment does not. The harness is opt-in: pass `limits` to `createScheduler` and declare per-trigger shaping fields. Without `limits` the scheduler behaves exactly as before.
+
+```ts
+import { createScheduler, interval, cron } from '@graphorin/triggers';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+
+const scheduler = createScheduler({
+  store: sqlite.triggers,
+  // Opt-in harness: {} takes the conservative defaults.
+  limits: {
+    intervalFloorMs: 60_000, // default 60s; 0 disables the floor
+    maxDeclarations: 32, // default: unlimited
+  },
+});
+
+// Deterministic jitter: a stable per-id offset in [0, jitterMs] spreads
+// a fleet sharing one wall-clock boundary without drifting any task.
+const digest = cron('daily-digest', '0 8 * * *', async () => {}, {
+  jitterMs: 120_000,
+  // Auto-expiry: past this instant the trigger auto-pauses instead of
+  // firing (non-destructive disabled flag + an 'expired' event).
+  expiresAt: '2027-01-01T00:00:00Z',
+});
+
+await scheduler.register(digest);
+await scheduler.start();
+```
+
+Semantics, in enforcement order:
+
+- **Interval floor** - `register(...)` throws a `TriggerLimitError` (`limit: 'interval-floor'`) for an `interval` / `idle` period below `intervalFloorMs`. Deterministic and fail-fast so an agent-driven registration gets the violation back as feedback instead of a silently rewritten schedule. `cron` is minute-grained by construction and is not floored.
+- **Declaration cap** - `maxDeclarations` bounds the number of registered declarations; re-registering an existing id never counts against the cap. Violation throws `TriggerLimitError` (`limit: 'max-declarations'`).
+- **Deterministic jitter** - `jitterMs` on a `cron` / `interval` declaration shifts every armed delay by `hash(id) % (jitterMs + 1)`. The offset is stable across restarts and processes, applies to the armed timer only (the persisted schedule and catch-up math stay on the unjittered grid), and `idle` / `event` triggers ignore it.
+- **Auto-expiry** - a trigger whose `expiresAt` passed auto-pauses instead of firing: the persistent `disabled` flag flips (exactly like `setDisabled(id, true)`), a WARN is logged and an `'expired'` scheduler event is published. The row stays registered for inspection; `POST /v1/triggers/prune { "disabled": true }` cleans it up. Renew by re-registering the declaration with a later `expiresAt` and calling `setDisabled(id, false)` - registration alone deliberately keeps the persisted disabled flag.
+
+The floor and cap defaults are conservative (60s, unlimited); the actual values are bot policy. The [proactivity guide](/guide/proactivity) shows the harness composed with heartbeat and cron-leg tasks.
+
 ### Background consolidation
 
 When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them during startup (the consolidator daemon starts first and registers its `cron` / `idle` triggers with the scheduler before the scheduler begins firing) so background distillation actually runs - no manual `registerWithScheduler` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. A `buffer:N` trigger (consolidate once the unconsolidated transcript tail reaches N tokens) is evaluated on activity: the server's run tracker calls `scheduler.recordActivity()` on every tracked REST/WS run (making `idle:T` a true debounce) and `consolidator.notifyActivity()` when a run settles - see [Memory system](/guide/memory-system#the-buffer-trigger-and-activity-signals). The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
