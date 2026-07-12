@@ -1,0 +1,160 @@
+[**Graphorin API reference v0.8.0**](../../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [errors](/api/@graphorin/agent/errors/index.md) / AgentBudgetExceededError
+
+# Class: AgentBudgetExceededError
+
+Defined in: [packages/agent/src/errors/index.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L315)
+
+Thrown when a run crosses its `RunBudget` ceiling under
+`onExceed: 'throw'` (C5). The run's promise REJECTS with this error
+after an `agent.error` event; graceful finalization is skipped. The
+default `onExceed: 'stop'` never throws - it resolves the run as
+`status: 'failed'` with `error.code: 'budget-exceeded'` instead.
+
+## Stable
+
+## Extends
+
+- [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md)
+
+## Constructors
+
+### Constructor
+
+```ts
+new AgentBudgetExceededError(args): AgentBudgetExceededError;
+```
+
+Defined in: [packages/agent/src/errors/index.ts:322](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L322)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `limit`: `number`; `observed`: `number`; `resource`: `"cost"` \| `"tokens"`; \} |
+| `args.limit` | `number` |
+| `args.observed` | `number` |
+| `args.resource` | `"cost"` \| `"tokens"` |
+
+#### Returns
+
+`AgentBudgetExceededError`
+
+#### Overrides
+
+[`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`constructor`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#constructor)
+
+## Properties
+
+| Property | Modifier | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`cause`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-cause) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es2022.error.d.ts#L26) |
+| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`code`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-code) | [packages/agent/src/errors/index.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L42) |
+| <a id="property-limit"></a> `limit` | `readonly` | `number` | The configured ceiling. | - | [packages/agent/src/errors/index.ts:321](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L321) |
+| <a id="property-message"></a> `message` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`message`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-message) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
+| <a id="property-name"></a> `name` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`name`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-name) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1076) |
+| <a id="property-observed"></a> `observed` | `readonly` | `number` | Observed cumulative value at the between-step check. | - | [packages/agent/src/errors/index.ts:319](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L319) |
+| <a id="property-resource"></a> `resource` | `readonly` | `"cost"` \| `"tokens"` | Which ceiling tripped. | - | [packages/agent/src/errors/index.ts:317](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L317) |
+| <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`stack`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-stack) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |
+| <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`stackTraceLimit`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-stacktracelimit) | [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L68) |
+
+## Methods
+
+### captureStackTrace()
+
+```ts
+static captureStackTrace(targetObject, constructorOpt?): void;
+```
+
+Defined in: [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:52](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L52)
+
+Creates a `.stack` property on `targetObject`, which when accessed returns
+a string representing the location in the code at which
+`Error.captureStackTrace()` was called.
+
+```js
+const myObject = {};
+Error.captureStackTrace(myObject);
+myObject.stack;  // Similar to `new Error().stack`
+```
+
+The first line of the trace will be prefixed with
+`${myObject.name}: ${myObject.message}`.
+
+The optional `constructorOpt` argument accepts a function. If given, all frames
+above `constructorOpt`, including `constructorOpt`, will be omitted from the
+generated stack trace.
+
+The `constructorOpt` argument is useful for hiding implementation
+details of error generation from the user. For instance:
+
+```js
+function a() {
+  b();
+}
+
+function b() {
+  c();
+}
+
+function c() {
+  // Create an error without stack trace to avoid calculating the stack trace twice.
+  const { stackTraceLimit } = Error;
+  Error.stackTraceLimit = 0;
+  const error = new Error();
+  Error.stackTraceLimit = stackTraceLimit;
+
+  // Capture the stack trace above function b
+  Error.captureStackTrace(error, b); // Neither function c, nor b is included in the stack trace
+  throw error;
+}
+
+a();
+```
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `targetObject` | `object` |
+| `constructorOpt?` | `Function` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`captureStackTrace`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#capturestacktrace)
+
+***
+
+### prepareStackTrace()
+
+```ts
+static prepareStackTrace(err, stackTraces): any;
+```
+
+Defined in: [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:56](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L56)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `err` | `Error` |
+| `stackTraces` | `CallSite`[] |
+
+#### Returns
+
+`any`
+
+#### See
+
+https://v8.dev/docs/stack-trace-api#customizing-stack-traces
+
+#### Inherited from
+
+[`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`prepareStackTrace`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#preparestacktrace)

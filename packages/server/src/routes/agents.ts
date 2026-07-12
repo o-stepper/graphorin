@@ -109,6 +109,13 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
         if (sessionId !== undefined) callOptions.sessionId = sessionId;
         if (userId !== undefined) callOptions.userId = userId;
         const result = await agent.run(parsed.data.input ?? '', callOptions);
+        // C3/W-119: a durable-HITL suspension is not terminal - retain
+        // the resumable RunState so POST /runs/:runId/resume can
+        // re-enter the loop in-process.
+        if (isSuspendedAgentResult(result)) {
+          deps.runs.suspend(runId, result.state);
+          return c.json({ runId, status: 'awaiting_approval', result }, 200);
+        }
         deps.runs.complete(runId, 'completed');
         return c.json({ runId, status: 'completed', result }, 200);
       } catch (err) {
@@ -301,6 +308,13 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     return c.json({ runId, status: 'aborted' });
   });
 
+  // C3/W-119: the formerly-501 endpoint. Resumes an in-process
+  // suspended agent run: the tracker retained the resumable RunState
+  // when the run parked (POST /agents/:id/run suspension branch, or
+  // `runs.registerSuspended(...)` for proactive fires executed outside
+  // the REST surface), and the directive's approval decisions re-enter
+  // the agent loop via `agent.run(state, { directive })`. Cross-process
+  // resume stays library-side over the agent's own CheckpointStore.
   app.post('/:runId/resume', createAuthenticatedMiddleware(), async (c) => {
     const runId = c.req.param('runId');
     const state = deps.runs.snapshot(runId);
@@ -314,26 +328,127 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
         403,
       );
     }
-    // IP-14: a 202 that persists nothing and resumes nothing is a lie
-    // the client SDK was built on. Until the server can rehydrate the
-    // RunState and re-enter the agent loop (the persisted-approvals
-    // work - Wave 3), the honest answer is 501 with the working
-    // library-side path: `agent.run(result.state, { directive })`
-    // executes approved tools for real (AG-1/AG-9).
-    return c.json(
-      {
-        error: 'resume-not-implemented',
-        runId,
-        status: state.status,
-        message:
-          'Server-side HITL resume is not implemented yet. Resume library-side: ' +
-          'agent.run(result.state, { directive }) - the suspended RunState is on the AgentResult.',
-      },
-      501,
-    );
+    if (state.status !== 'awaiting_approval') {
+      return c.json(
+        {
+          error: 'run-not-suspended',
+          runId,
+          status: state.status,
+          message: `Run '${runId}' is '${state.status}', not 'awaiting_approval' - nothing to resume.`,
+        },
+        409,
+      );
+    }
+    const suspended = deps.runs.suspendedStateOf(runId);
+    if (suspended === undefined) {
+      return c.json(
+        {
+          error: 'run-state-unavailable',
+          runId,
+          message:
+            `Run '${runId}' is suspended but its RunState is not retained by this process. ` +
+            'Resume library-side: agent.run(savedState, { directive }).',
+        },
+        409,
+      );
+    }
+    const agentId = state.agentId;
+    const agent = agentId !== undefined ? deps.agents.get(agentId) : undefined;
+    if (agent === undefined) {
+      return c.json(
+        {
+          error: 'agent-not-found',
+          runId,
+          message: `Agent '${agentId ?? '?'}' behind run '${runId}' is not registered.`,
+        },
+        404,
+      );
+    }
+    const parsed = ResumeRunBodySchema.safeParse(await safelyParseJson(c));
+    if (!parsed.success) {
+      return invalidBodyResponse(c, parsed.error);
+    }
+    // exactOptionalPropertyTypes: zod's `.optional()` yields
+    // `string | undefined`; the structural directive wants the field
+    // absent instead.
+    const approvals = parsed.data.approvals.map((a) => ({
+      toolCallId: a.toolCallId,
+      granted: a.granted,
+      ...(a.reason !== undefined ? { reason: a.reason } : {}),
+      ...(a.subRunToolCallId !== undefined ? { subRunToolCallId: a.subRunToolCallId } : {}),
+    }));
+    const tracker = deps.runs.start(runId, {
+      kind: 'agent',
+      agentId: agentId as string,
+      ...(state.sessionId !== undefined ? { sessionId: state.sessionId } : {}),
+      ...(state.userId !== undefined ? { userId: state.userId } : {}),
+    });
+    try {
+      const result = await agent.run(suspended, {
+        signal: tracker.signal,
+        ...(state.sessionId !== undefined ? { sessionId: state.sessionId } : {}),
+        ...(state.userId !== undefined ? { userId: state.userId } : {}),
+        directive: { approvals },
+      });
+      // A partially-resolved directive re-suspends: retain the fresh
+      // state so the next resume call picks up where this one left off.
+      if (isSuspendedAgentResult(result)) {
+        deps.runs.suspend(runId, result.state);
+        return c.json({ runId, status: 'awaiting_approval', result }, 200);
+      }
+      deps.runs.complete(runId, 'completed');
+      return c.json({ runId, status: 'completed', result }, 200);
+    } catch (err) {
+      if (err instanceof Error && err.name === 'ConcurrentRunError') {
+        // The agent instance is busy with another run - the suspension
+        // is untouched; retry later.
+        deps.runs.suspend(runId, suspended);
+        return c.json({ error: 'agent-busy', runId, message: err.message }, 409);
+      }
+      const aborted = tracker.signal.aborted;
+      deps.runs.complete(runId, aborted ? 'aborted' : 'failed', err);
+      return c.json(
+        {
+          runId,
+          status: aborted ? 'aborted' : 'failed',
+          error: aborted ? 'run-aborted' : 'run-failed',
+          message: err instanceof Error ? err.message : String(err),
+        },
+        aborted ? 408 : 500,
+      );
+    }
   });
 
   return app;
+}
+
+const ResumeRunBodySchema = z
+  .object({
+    approvals: z
+      .array(
+        z
+          .object({
+            toolCallId: z.string().min(1),
+            granted: z.boolean(),
+            reason: z.string().optional(),
+            subRunToolCallId: z.string().min(1).optional(),
+          })
+          .strict(),
+      )
+      .min(1),
+  })
+  .strict();
+
+/**
+ * Structural probe for a suspended `AgentResult` (`status:
+ * 'awaiting_approval'` with a resumable `state`). Structural because
+ * registry agents are `ServerAgentLike` - the server never imports the
+ * agent package's types.
+ */
+function isSuspendedAgentResult(value: unknown): value is { readonly state: unknown } {
+  if (typeof value !== 'object' || value === null) return false;
+  const record = value as { readonly status?: unknown; readonly state?: unknown };
+  return record.status === 'awaiting_approval' && typeof record.state === 'object';
 }
 
 /**

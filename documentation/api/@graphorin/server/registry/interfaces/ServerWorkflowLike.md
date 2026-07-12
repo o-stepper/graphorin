@@ -6,7 +6,7 @@
 
 # Interface: ServerWorkflowLike
 
-Defined in: [packages/server/src/registry/index.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L60)
+Defined in: [packages/server/src/registry/index.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L73)
 
 Minimal shape the server needs from a `Workflow`. Mirrors the
 `Workflow` surface from `@graphorin/workflow`.
@@ -17,7 +17,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/server/src/registry/index.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L61) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/server/src/registry/index.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L74) |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 optional deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L93)
+Defined in: [packages/server/src/registry/index.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L106)
 
 W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
@@ -49,7 +49,7 @@ W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 execute(input, options?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L62)
+Defined in: [packages/server/src/registry/index.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L75)
 
 #### Parameters
 
@@ -74,7 +74,7 @@ optional fork(threadId, fromCheckpointId): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L89)
+Defined in: [packages/server/src/registry/index.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L102)
 
 W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
 
@@ -99,7 +99,7 @@ W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
 optional getState(threadId): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L90)
+Defined in: [packages/server/src/registry/index.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L103)
 
 #### Parameters
 
@@ -119,7 +119,7 @@ Defined in: [packages/server/src/registry/index.ts:90](https://github.com/o-step
 optional listCheckpoints(threadId): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L91)
+Defined in: [packages/server/src/registry/index.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L104)
 
 #### Parameters
 
@@ -143,7 +143,7 @@ optional resolveAwakeable(
 opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L82)
+Defined in: [packages/server/src/registry/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L95)
 
 W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
 `name`) - `approve` is the same primitive under the hood.
@@ -173,7 +173,7 @@ optional resume(
 opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L66)
+Defined in: [packages/server/src/registry/index.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L79)
 
 #### Parameters
 
@@ -197,7 +197,7 @@ Defined in: [packages/server/src/registry/index.ts:66](https://github.com/o-step
 optional retry(threadId, opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L72)
+Defined in: [packages/server/src/registry/index.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L85)
 
 W-119: replay a failed/aborted thread (`POST /:id/retry`).
 
@@ -224,7 +224,7 @@ optional tick(threadId, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L74)
+Defined in: [packages/server/src/registry/index.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L87)
 
 W-119: fire a due durable timer (`POST /:id/tick`).
 

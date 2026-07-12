@@ -51,7 +51,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/agents/:id/stream` | **Starts the run** and returns `202` with `runId` + the WS subject (`agent:<id>/runs/<runId>/events`) the events are emitted on (IP-2). Subscribe over WebSocket; workflow runs use `workflow:<id>/runs/<runId>/events`. |
 | `GET` | `/v1/runs/:runId/state` | Read the current `RunState`. |
 | `POST` | `/v1/runs/:runId/abort` | Abort a run. |
-| `POST` | `/v1/runs/:runId/resume` | Answers an honest `501 resume-not-implemented` today (IP-14); resume programmatically via the library `agent.run(state, { directive })`. |
+| `POST` | `/v1/runs/:runId/resume` | Resume an in-process suspended agent run (C3/W-119): body `{ "approvals": [{ "toolCallId", "granted", "reason"?, "subRunToolCallId"? }] }`, scope `agents:invoke:<agentId>`. The tracker retains the resumable `RunState` when a run parks (`POST /agents/:id/run` suspension branch, or `runs.registerSuspended(...)` for proactive fires executed outside REST); a partially-resolved directive re-suspends and retains the fresh state. `409 run-not-suspended` for a run that is not awaiting approval, `409 run-state-unavailable` when this process retains no state (resume those library-side via `agent.run(savedState, { directive })`), `409 agent-busy` when the instance has another run in flight. Suspended records are exempt from retention pruning - settle them via resume or abort. |
 | `POST` | `/v1/runs/:runId/replay` | Replay a recorded run from the audit / cassette artefacts. |
 | `GET` | `/v1/sessions` | List sessions. |
 | `POST` | `/v1/sessions` | Create a session. |
@@ -204,6 +204,47 @@ DST transitions follow Vixie cron semantics:
 Trigger rows are durable, but callbacks live only in memory: after a restart every declaration must be re-registered before `scheduler.start()`. A persisted row whose declaration was **not** re-registered can never fire; `start()` surfaces each such row with a WARN log and an `orphaned` scheduler event instead of skipping it silently, `Scheduler.orphans()` lists them, the daemon reports an `orphaned` count in `/v1/health`, and `POST /v1/triggers/prune { "orphaned": true }` removes them.
 
 Register-time catch-up is gated on the scheduler lifecycle: when a trigger with a `catchupPolicy` is registered **before** `start()`, its missed fires are counted and applied during `start()` - user callbacks never run on a not-started scheduler.
+
+### Scheduler harness for proactive fleets
+
+A proactive bot lets an agent-driven code path register its own schedules, which needs guardrails a hand-written deployment does not. The harness is opt-in: pass `limits` to `createScheduler` and declare per-trigger shaping fields. Without `limits` the scheduler behaves exactly as before.
+
+```ts
+import { createScheduler, interval, cron } from '@graphorin/triggers';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+
+const scheduler = createScheduler({
+  store: sqlite.triggers,
+  // Opt-in harness: {} takes the conservative defaults.
+  limits: {
+    intervalFloorMs: 60_000, // default 60s; 0 disables the floor
+    maxDeclarations: 32, // default: unlimited
+  },
+});
+
+// Deterministic jitter: a stable per-id offset in [0, jitterMs] spreads
+// a fleet sharing one wall-clock boundary without drifting any task.
+const digest = cron('daily-digest', '0 8 * * *', async () => {}, {
+  jitterMs: 120_000,
+  // Auto-expiry: past this instant the trigger auto-pauses instead of
+  // firing (non-destructive disabled flag + an 'expired' event).
+  expiresAt: '2027-01-01T00:00:00Z',
+});
+
+await scheduler.register(digest);
+await scheduler.start();
+```
+
+Semantics, in enforcement order:
+
+- **Interval floor** - `register(...)` throws a `TriggerLimitError` (`limit: 'interval-floor'`) for an `interval` / `idle` period below `intervalFloorMs`. Deterministic and fail-fast so an agent-driven registration gets the violation back as feedback instead of a silently rewritten schedule. `cron` is minute-grained by construction and is not floored.
+- **Declaration cap** - `maxDeclarations` bounds the number of registered declarations; re-registering an existing id never counts against the cap. Violation throws `TriggerLimitError` (`limit: 'max-declarations'`).
+- **Deterministic jitter** - `jitterMs` on a `cron` / `interval` declaration shifts every armed delay by `hash(id) % (jitterMs + 1)`. The offset is stable across restarts and processes, applies to the armed timer only (the persisted schedule and catch-up math stay on the unjittered grid), and `idle` / `event` triggers ignore it.
+- **Auto-expiry** - a trigger whose `expiresAt` passed auto-pauses instead of firing: the persistent `disabled` flag flips (exactly like `setDisabled(id, true)`), a WARN is logged and an `'expired'` scheduler event is published. The row stays registered for inspection; `POST /v1/triggers/prune { "disabled": true }` cleans it up. Renew by re-registering the declaration with a later `expiresAt` and calling `setDisabled(id, false)` - registration alone deliberately keeps the persisted disabled flag.
+
+The floor and cap defaults are conservative (60s, unlimited); the actual values are bot policy. The [proactivity guide](/guide/proactivity) shows the harness composed with heartbeat and cron-leg tasks.
 
 ### Background consolidation
 

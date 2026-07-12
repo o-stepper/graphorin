@@ -115,6 +115,10 @@ export function wireToolExecution<TDeps, TOutput>(
       ? { tools: config.tools as ReadonlyArray<Tool<unknown, unknown, unknown>> }
       : {}),
     ...(config.skills !== undefined ? { skills: config.skills } : {}),
+    // C6: the minimal scaffold defers every tool that does not declare
+    // `defer_loading` itself, so the per-step catalogue starts at
+    // `tool_search` alone and tools surface through promotion.
+    ...(config.scaffold === 'minimal' ? { deferLoadingByDefault: true } : {}),
   }).registry;
 
   // WI-05 (deferred loading + tool_search / P0-3): if any registered

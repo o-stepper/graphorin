@@ -24,7 +24,8 @@ type AgentRuntimeErrorCode =
   | "protocol-injection-rejected"
   | "run-state-version-unsupported"
   | "run-state-malformed"
-  | "concurrent-run";
+  | "concurrent-run"
+  | "budget-exceeded";
 ```
 
 Defined in: [packages/agent/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L16)

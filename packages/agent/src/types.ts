@@ -177,6 +177,28 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * documented explicit pattern). Has no effect without `memory`.
    */
   readonly autoAssembleContext?: boolean;
+  /**
+   * Context-scaffolding preset (C6, decision D-10). `'full'` (default)
+   * is exactly the pre-C6 behaviour. `'minimal'` is the cheap-run
+   * posture for proactive fires and heartbeats:
+   *
+   * - instructions-only system prompt - `autoAssembleContext` must stay
+   *   off (an explicit `autoAssembleContext: true` alongside
+   *   `'minimal'` is a config error, fail-fast);
+   * - deferred tool loading **by default** - every registered tool
+   *   without an explicit `defer_loading` declaration is withheld from
+   *   the per-step catalogue and reachable through `tool_search`
+   *   promotion (an explicit `defer_loading: false` stays eager);
+   * - no plan tool, no attention recitation - `plan: true` alongside
+   *   `'minimal'` is a config error.
+   *
+   * Security layers (permission mode, sandbox, taint, Rule-of-Two) are
+   * deliberately NOT touched by the preset. Known limitation: the
+   * code-mode API projection covers eager tools only, so a
+   * defer-heavy minimal agent projects a near-empty `code_search`
+   * surface (documented in the tools guide).
+   */
+  readonly scaffold?: 'minimal' | 'full';
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
   /**
@@ -482,6 +504,44 @@ export interface InboundTaintSeed {
 }
 
 /**
+ * Run-level budget (C5 / W-084 residual, decision D-8). Enforced as a
+ * between-step precheck against the run's accumulated usage - the step
+ * that crosses a ceiling completes (in-flight overshoot is inherent to
+ * between-step enforcement, exactly like the consolidator's
+ * `BudgetTracker`), and the run stops before the next provider call.
+ * Sub-agent usage is included: handoff / `toTool` children fold their
+ * usage into the parent run's accounting (W-033).
+ *
+ * The cost leg reads `Usage.cost`, which only exists when the provider
+ * chain reports it (wire `withCostTracking` from `@graphorin/provider`
+ * with a `@graphorin/pricing` snapshot). A cost ceiling without USD
+ * cost data is UNENFORCED and WARNs once per run - use `maxTokens` for
+ * a provider-independent ceiling.
+ *
+ * @stable
+ */
+export interface RunBudget {
+  /** Maximum cumulative run cost in USD (sub-agents included). */
+  readonly maxCostUsd?: number;
+  /**
+   * Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents
+   * included). Provider-independent - enforced even without pricing
+   * middleware.
+   */
+  readonly maxTokens?: number;
+  /**
+   * What to do when a ceiling is crossed. `'stop'` (default) ends the
+   * run through the normal terminal path: the result resolves with
+   * `status: 'failed'` and `error.code: 'budget-exceeded'` (the
+   * stop-condition-cut precedent), so the resumable partial state stays
+   * on the result. `'throw'` rejects the run with
+   * {@link AgentBudgetExceededError} after emitting `agent.error` -
+   * graceful finalization (final checkpoint, `agent.end`) is skipped.
+   */
+  readonly onExceed?: 'stop' | 'throw';
+}
+
+/**
  * Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
  *
  * @stable
@@ -491,6 +551,24 @@ export interface AgentCallOptions<TDeps> {
   readonly signal?: AbortSignal;
   readonly sessionId?: string;
   readonly userId?: string;
+  /**
+   * Run-level budget (C5): between-step enforcement against the run's
+   * accumulated usage, sub-agents included. See {@link RunBudget}.
+   * Not persisted in `RunState`: re-supply it when resuming a
+   * suspended run.
+   */
+  readonly budget?: RunBudget;
+  /**
+   * C1/C2: fail-closed per-run model pin. When set, every step of this
+   * run resolves to exactly this provider: it wins over `prepareStep`
+   * provider overrides and the whole preference ladder
+   * (`preferredModel` / tool hints / tier map), and the agent-level
+   * fallback chain is never consulted. Built for proactive fires -
+   * a heartbeat beat or cron fire must not silently escalate to a more
+   * expensive model through fallback. Not persisted in `RunState`:
+   * re-supply it when resuming a suspended run.
+   */
+  readonly pinnedProvider?: Provider;
   /**
    * B1.5: stamp message-borne untrusted input into the run's taint
    * ledger at init (see {@link InboundTaintSeed}). No-op when the
@@ -691,6 +769,13 @@ export interface Agent<TDeps = unknown, TOutput = string> {
   steer(message: AgentInput): void;
   followUp(message: AgentInput): void;
   abort(options?: AbortOptions): void;
+  /**
+   * C1: `true` while this instance has a run in flight (the same
+   * invariant that makes a second `run()` throw `ConcurrentRunError`).
+   * The public busy signal for proactive coordination - a heartbeat
+   * defers its beat instead of colliding with an interactive run.
+   */
+  isBusy(): boolean;
   toTool(options?: AgentToToolOptions): Tool<{ readonly input: string }, TOutput, TDeps>;
   compact(options?: CompactOptions): Promise<CompactionApiResult>;
   /**

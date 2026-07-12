@@ -79,3 +79,20 @@ export async function loadOfflineNotesSkill(): Promise<LoadedOfflineNotesSkill> 
   const stamped = stampSkillTool(noteLookup, skill);
   return { skill, stamped };
 }
+
+/**
+ * C6 skill pattern - "CLI tool with a README on demand": the tool card
+ * stays one line; the full manual rides as a skill RESOURCE and loads
+ * lazily. `skill.resources()` returns accessors without reading any
+ * file bodies; the manual's bytes hit memory only at `readText()`,
+ * which a real agent calls from a tool when the run actually needs the
+ * reference (instead of paying for it in every system prompt).
+ */
+export async function readHarnessManualOnDemand(skill: Skill): Promise<string> {
+  const resources = await skill.resources();
+  const manual = resources.find((r) => r.relativePath.endsWith('MANUAL.md'));
+  if (manual === undefined) {
+    throw new Error('offline-notes skill no longer bundles resources/MANUAL.md.');
+  }
+  return manual.readText();
+}

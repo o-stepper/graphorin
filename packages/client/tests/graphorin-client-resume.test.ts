@@ -28,7 +28,8 @@ describe('GraphorinClient.resume', () => {
       auth: { kind: 'bearer', token: 'abc' },
       fetch: fetchImpl,
     });
-    const result = (await client.resume('run-1', { reason: 'go' })) as {
+    const directive = { approvals: [{ toolCallId: 'tc-1', granted: true }] };
+    const result = (await client.resume('run-1', directive)) as {
       runId?: string;
       status?: string;
     };
@@ -40,7 +41,9 @@ describe('GraphorinClient.resume', () => {
     const headers = call?.init?.headers as Record<string, string>;
     expect(headers.Authorization).toBe('Bearer abc');
     expect(headers['Content-Type']).toBe('application/json');
-    expect(call?.init?.body).toBe(JSON.stringify({ directive: { reason: 'go' } }));
+    // C3/W-119: the directive IS the body (the endpoint's strict
+    // schema), not a `{ directive }` wrapper.
+    expect(call?.init?.body).toBe(JSON.stringify(directive));
   });
 
   it('attaches an Idempotency-Key when provided', async () => {

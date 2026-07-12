@@ -127,6 +127,14 @@ export interface StepCatalogueEnv<TDeps, TOutput> {
   readonly activeRunCapability: 'read-only' | undefined;
   readonly promotedDeferred: Set<string>;
   readonly runStartPromotions: Set<string> | undefined;
+  /**
+   * C1/C2: per-run pinned provider (`AgentCallOptions.pinnedProvider`).
+   * When set, every step resolves to exactly this provider - it wins
+   * over `prepareStep` overrides and the whole preference ladder, and
+   * the fallback chain is never consulted (fail-closed model pinning
+   * for proactive fires).
+   */
+  readonly pinnedProvider?: Provider;
 }
 
 /** What one step's catalogue resolution hands back to the run loop. */
@@ -244,20 +252,33 @@ export function resolveStepToolContext<TDeps, TOutput>(
       >[0]['toolPreferredModels'][number];
     });
 
-  const primary: PreferredModelResolution = resolvePreferredModel({
-    ...(overrides.provider !== undefined ? { prepareStepProvider: overrides.provider } : {}),
-    toolPreferredModels: toolPreferences,
-    ...(config.preferredModel !== undefined ? { agentPreferredModel: config.preferredModel } : {}),
-    agentDefaultProvider: config.provider,
-    ...(config.modelTierMap !== undefined ? { modelTierMap: config.modelTierMap } : {}),
-  });
+  // C1/C2: a per-run pinned provider is invocation-scoped intent - it
+  // wins over `prepareStep` and the whole preference ladder (the fire
+  // must not inherit anyone else's model decisions).
+  const primary: PreferredModelResolution =
+    env.pinnedProvider !== undefined
+      ? {
+          resolvedProvider: env.pinnedProvider,
+          resolvedModelId: env.pinnedProvider.modelId,
+          source: 'pinned',
+        }
+      : resolvePreferredModel({
+          ...(overrides.provider !== undefined ? { prepareStepProvider: overrides.provider } : {}),
+          toolPreferredModels: toolPreferences,
+          ...(config.preferredModel !== undefined
+            ? { agentPreferredModel: config.preferredModel }
+            : {}),
+          agentDefaultProvider: config.provider,
+          ...(config.modelTierMap !== undefined ? { modelTierMap: config.modelTierMap } : {}),
+        });
 
   // RB-48: when `prepareStep` returns an explicit provider
   // override, the fallback chain is NOT consulted for this
   // step (the operator's explicit choice supersedes the
-  // implicit fallback chain).
+  // implicit fallback chain). A pinned provider (C1/C2) suppresses
+  // the chain the same way - fail-closed by construction.
   const fallbackChain: Provider[] =
-    primary.source === 'prepare-step'
+    primary.source === 'pinned' || primary.source === 'prepare-step'
       ? [primary.resolvedProvider]
       : [primary.resolvedProvider, ...(config.fallbackModels ?? []).map(specToProvider)];
 

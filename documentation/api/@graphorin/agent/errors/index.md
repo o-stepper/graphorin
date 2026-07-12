@@ -16,6 +16,7 @@ callers can `switch` on it without parsing messages.
 
 | Class | Description |
 | ------ | ------ |
+| [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) | Thrown when a run crosses its `RunBudget` ceiling under `onExceed: 'throw'` (C5). The run's promise REJECTS with this error after an `agent.error` event; graceful finalization is skipped. The default `onExceed: 'stop'` never throws - it resolves the run as `status: 'failed'` with `error.code: 'budget-exceeded'` instead. |
 | [AgentResolutionError](/api/@graphorin/agent/errors/classes/AgentResolutionError.md) | Thrown by `runStateFromJSON(...)` when the agent name in the serialized state cannot be resolved against the supplied agent graph (renamed agent / removed handoff). |
 | [AgentRuntimeError](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md) | Base class for every error thrown from `@graphorin/agent`. |
 | [ConcurrentRunError](/api/@graphorin/agent/errors/classes/ConcurrentRunError.md) | Thrown when a second `run()` / `stream()` starts while another run is in flight on the same `Agent` instance (AG-11). The public surface (`steer` / `followUp` / `abort` / `compact`) addresses "the run" without a run handle, so overlapping runs would share the abort controller, steer queue, and executor bridge - start the second run on its own `createAgent(...)` instance instead. |

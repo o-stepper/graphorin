@@ -33,6 +33,19 @@ export interface ServerAgentLike {
       readonly signal?: AbortSignal;
       readonly sessionId?: string;
       readonly userId?: string;
+      /**
+       * C3/W-119: HITL resume directive forwarded by
+       * `POST /runs/:runId/resume`. Mirrors the agent package's
+       * `ResumeDirective` structurally.
+       */
+      readonly directive?: {
+        readonly approvals?: ReadonlyArray<{
+          readonly toolCallId: string;
+          readonly granted: boolean;
+          readonly reason?: string;
+          readonly subRunToolCallId?: string;
+        }>;
+      };
     },
   ): Promise<unknown>;
   /**

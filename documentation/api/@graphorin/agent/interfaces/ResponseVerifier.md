@@ -6,7 +6,7 @@
 
 # Interface: ResponseVerifier
 
-Defined in: [packages/agent/src/types.ts:408](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L408)
+Defined in: [packages/agent/src/types.ts:430](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L430)
 
 A deterministic check over the model's terminal response (C3). Runs
 when the loop is about to complete; `ok: false` feeds `feedback` back
@@ -23,7 +23,7 @@ take down a run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/agent/src/types.ts:409](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L409) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/agent/src/types.ts:431](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L431) |
 
 ## Methods
 
@@ -35,7 +35,7 @@ verify(ctx):
 | Promise<VerifierResult>;
 ```
 
-Defined in: [packages/agent/src/types.ts:410](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L410)
+Defined in: [packages/agent/src/types.ts:432](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L432)
 
 #### Parameters
 

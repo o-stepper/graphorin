@@ -63,6 +63,12 @@ export interface ToolRegistryOptions {
   readonly emitAudit?: (event: ToolAuditEvent) => void;
   /** Cosine threshold above which a semantic match counts. Default `0.5`. */
   readonly semanticScoreThreshold?: number;
+  /**
+   * C6: treat tools that do not declare `defer_loading` as deferred
+   * (the minimal-scaffold posture). An explicit `defer_loading: false`
+   * on the tool still wins. Default `false` (per-tool opt-in).
+   */
+  readonly deferLoadingByDefault?: boolean;
 }
 
 /**
@@ -134,12 +140,13 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
   const emit = opts.emitAudit ?? emitToolAudit;
   const emittedWarnings = new Set<string>();
   const embeddingCache = new Map<string, Float32Array>();
+  const deferLoadingByDefault = opts.deferLoadingByDefault === true;
 
   function register<TInput, TOutput, TDeps>(
     tool: Tool<TInput, TOutput, TDeps>,
     source: ToolSource = FIRST_PARTY_SOURCE,
   ): RegistryEntry<TInput, TOutput, TDeps> {
-    const outcome = normaliseTool(tool, source);
+    const outcome = normaliseTool(tool, source, { deferLoadingByDefault });
     const resolved = outcome.resolved;
 
     for (const warning of outcome.warnings) {

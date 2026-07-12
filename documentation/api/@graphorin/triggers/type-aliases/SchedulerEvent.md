@@ -47,10 +47,14 @@ type SchedulerEvent =
   | {
   id: string;
   type: "orphaned";
+}
+  | {
+  id: string;
+  type: "expired";
 };
 ```
 
-Defined in: [packages/triggers/src/index.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L181)
+Defined in: [packages/triggers/src/index.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L250)
 
 Lifecycle event emitted by [Scheduler.events](/api/@graphorin/triggers/interfaces/Scheduler.md#events). Useful for
 tests and for piping into observability without monkey-patching.
@@ -161,5 +165,22 @@ tests and for piping into observability without monkey-patching.
 A persisted trigger row has no re-registered declaration in this
 process (W-123). It will never fire; re-register the declaration
 or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  type: "expired";
+}
+```
+
+The trigger's `expiresAt` instant passed, so the scheduler
+auto-paused it (C4): the persistent `disabled` flag is set instead
+of firing the callback. Renew with a later `expiresAt` +
+`setDisabled(id, false)`, or prune it
+(`POST /v1/triggers/prune { "disabled": true }`).
 
 ## Stable

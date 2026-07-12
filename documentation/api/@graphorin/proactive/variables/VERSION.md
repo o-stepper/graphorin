@@ -1,0 +1,13 @@
+[**Graphorin API reference v0.8.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/proactive](/api/@graphorin/proactive/index.md) / [](/api/@graphorin/proactive/README.md) / VERSION
+
+# Variable: VERSION
+
+```ts
+const VERSION: string = pkg.version;
+```
+
+Defined in: [packages/proactive/src/index.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/index.ts#L17)

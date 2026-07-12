@@ -147,6 +147,8 @@ Independent tool calls in one step run **concurrently**, bounded by `maxParallel
 
 A tool declared `defer_loading: true` is **withheld** from the per-step catalogue to keep large tool sets out of context. When the registry holds at least one deferred tool, the runtime auto-registers the built-in `tool_search` tool. The model calls `tool_search({ query })` to find deferred tools by name / description; matched tools are promoted into the catalogue on the **next** step. Promotions are **append-only** - a newly promoted tool joins the *end* of the catalogue (in promotion order), so the eager prefix and any earlier promotions keep their byte position and the provider's prompt-cache breakpoint survives across steps. A deferred tool's `examples` stay out of context even once it is promoted.
 
+`createAgent({ scaffold: 'minimal' })` flips deferral to the **default**: every tool that does not declare `defer_loading` itself is withheld, the catalogue starts at `tool_search` alone, and the system prompt is the instructions verbatim (`autoAssembleContext: true` / `plan: true` alongside `'minimal'` are config errors). An explicit `defer_loading: false` keeps a tool eager, and runtime built-ins are exempt. Security layers are untouched. See the [Minimal profile](/guide/minimal-profile) guide.
+
 ### Result handles and `read_result`
 
 A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint - so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) - and auto-registers the built-in **`read_result`** tool whenever a registered tool **declares** `truncationStrategy: 'spill-to-file'` (or when `resultReaders` / code-mode are wired) - registration keys on the declared strategy, not on a runtime spill event. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root - never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. Reads also carry the **producer's taint** (TL-6): content read back from a handle whose producing tool was untrusted (MCP / web-search / untrusted skill) is re-sanitized with the producer's policy and recorded in the dataflow ledger under the producer's trust class - `read_result`'s own built-in trust never launders it. See [result handles](/guide/tools#result-handles-and-read-result) in the tools guide.
@@ -313,9 +315,40 @@ When the abort races a suspend, no `awaiting_approval` checkpoint is written fir
 
 The loop consults `stopWhen` (default `isStepCount(50)`) at the top of every step. A run cut by its stop condition mid-task is **not** a clean finish: it ends `status: 'failed'` with `error.code: 'stop-condition'` and the condition's description in the message (plus an `agent.error` event), so a capped run is distinguishable from one that completed naturally. Raise the cap (`stopWhen: isStepCount(n)`) for legitimately long tool loops.
 
+## Run budget
+
+`agent.run(input, { budget })` enforces a per-run spend ceiling as a **between-step precheck** against the run's accumulated usage. Sub-agent usage counts: handoff and `toTool` children fold their tokens and cost into the parent run's accounting before the next check.
+
+```ts no-check
+const result = await agent.run('nightly digest', {
+  budget: {
+    maxCostUsd: 0.25, // needs USD cost data (pricing middleware)
+    maxTokens: 200_000, // provider-independent ceiling
+    onExceed: 'stop', // default; 'throw' rejects instead
+  },
+});
+if (result.status === 'failed' && result.error?.code === 'budget-exceeded') {
+  // partial state is on result.state - resumable like any failed run
+}
+```
+
+Semantics:
+
+- **Between-step enforcement.** The check runs at the top of every step, after the previous step's usage landed. The step that crosses a ceiling therefore completes - in-flight overshoot is inherent to between-step enforcement (the memory consolidator's `BudgetTracker` precheck behaves the same way). The final observed spend is at most one step (plus its sub-agent folds) past the ceiling.
+- **`onExceed: 'stop'`** (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'`, `error.code: 'budget-exceeded'` and an `agent.error` event - the stop-condition-cut precedent, so a budget-cut run is distinguishable and its partial state stays resumable.
+- **`onExceed: 'throw'`** rejects the run with `AgentBudgetExceededError` (`resource`, `observed`, `limit`) after the `agent.error` event; graceful finalization (final checkpoint, `agent.end`) is deliberately skipped.
+- **The cost leg needs priced usage.** `maxCostUsd` compares the accumulated `usage.cost` in USD, which exists only when the provider chain reports cost - wire `withCostTracking` from `@graphorin/provider` with a `@graphorin/pricing` snapshot (see [Pricing](/reference/pricing)). A cost ceiling without USD cost data is UNENFORCED and WARNs once per run; `maxTokens` works with any provider.
+- The budget is a call option, not config: it is **not persisted** in `RunState` - re-supply it when resuming a suspended run.
+
+The proactive primitives compose with this: heartbeat `profile.budgetUsd` and the cron-leg per-fire budget pass through to `RunBudget` (see the [proactivity guide](/guide/proactivity)).
+
 ## One run per instance
 
 An `Agent` instance carries exactly **one in-flight run**: `steer`, `followUp`, `abort`, and `compact` all address "the run" without a run handle, so two overlapping runs on the same instance would share the abort controller, steer queue, and executor bridge. Starting a second `run()` / `stream()` while one is active rejects with `ConcurrentRunError` (`code: 'concurrent-run'`). For parallel work, create separate `createAgent(...)` instances (or use [`agent.fanOut(...)`](#multi-agent)). Run-scoped state is reset at every run boundary - a `steer()` issued after a run has ended belongs to no run and is dropped rather than leaking into the next one.
+
+`agent.isBusy()` is the public read of this invariant: `true` while a run is in flight on the instance. Proactive coordination consumes it - a heartbeat defers its beat instead of colliding with an interactive run (see the [proactivity guide](/guide/proactivity)).
+
+Related per-invocation control: `agent.run(input, { pinnedProvider })` pins **every step** of that run to exactly the supplied provider - it wins over `prepareStep` overrides and the whole preference ladder, and the fallback chain is never consulted. Built for proactive fires, where a beat must not silently escalate to a more expensive model through fallback.
 
 `followUp(message)` is the exception by design: it queues **next-turn metadata**. The queued message does not touch the in-flight run (which still ends with its own terminal status); instead it rides into the next fresh `run()` / `stream()` as a leading user turn, before that call's own input. Resumed runs leave the queue intact.
 

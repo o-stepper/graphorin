@@ -408,10 +408,12 @@ export class GraphorinClient {
    * Resume a paused (HITL) run. The WebSocket protocol intentionally
    * does NOT carry a `resume` control message - resumes are durable
    * + idempotent + body-carrying, which maps onto the REST endpoint
-   * `POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
-   * currently answers **501** - server-side durable resume is not
-   * implemented yet. Library-mode callers resume directly:
-   * `agent.run(result.state, { directive })`.
+   * `POST /v1/runs/:runId/resume`. Since C3/W-119 the server resumes
+   * in-process suspensions for real: pass
+   * `{ approvals: [{ toolCallId, granted }] }` as the directive; a run
+   * whose RunState this server process does not retain answers 409
+   * (`run-state-unavailable`) - resume those library-side via
+   * `agent.run(savedState, { directive })`.
    */
   async resume(
     runId: string,
@@ -440,7 +442,9 @@ export class GraphorinClient {
     const res = await fetchImpl(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(directive === undefined ? {} : { directive }),
+      // C3/W-119: the directive IS the body - the endpoint's strict
+      // schema is `{ approvals: [{ toolCallId, granted, ... }] }`.
+      body: JSON.stringify(directive ?? {}),
     });
     if (!res.ok) {
       throw new TransportFailedError(

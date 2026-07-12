@@ -6,7 +6,7 @@
 
 # Class: AgentRuntimeError
 
-Defined in: [packages/agent/src/errors/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L40)
+Defined in: [packages/agent/src/errors/index.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L41)
 
 Base class for every error thrown from `@graphorin/agent`.
 
@@ -31,6 +31,7 @@ Base class for every error thrown from `@graphorin/agent`.
 - [`MergeBlockedError`](/api/@graphorin/agent/errors/classes/MergeBlockedError.md)
 - [`ProtocolInjectionRejectError`](/api/@graphorin/agent/errors/classes/ProtocolInjectionRejectError.md)
 - [`ProgressWriteError`](/api/@graphorin/agent/errors/classes/ProgressWriteError.md)
+- [`AgentBudgetExceededError`](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md)
 - [`ProviderMiddlewareOrderError`](/api/@graphorin/agent/errors/classes/ProviderMiddlewareOrderError.md)
 
 ## Constructors
@@ -44,7 +45,7 @@ new AgentRuntimeError(
    name?): AgentRuntimeError;
 ```
 
-Defined in: [packages/agent/src/errors/index.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L42)
+Defined in: [packages/agent/src/errors/index.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L43)
 
 #### Parameters
 
@@ -69,7 +70,7 @@ Error.constructor
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | `Error.cause` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es2022.error.d.ts#L26) |
-| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | - | [packages/agent/src/errors/index.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L41) |
+| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | - | [packages/agent/src/errors/index.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L42) |
 | <a id="property-message"></a> `message` | `public` | `string` | - | `Error.message` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
 | <a id="property-name"></a> `name` | `public` | `string` | - | `Error.name` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1076) |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | `Error.stack` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |

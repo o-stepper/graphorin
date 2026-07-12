@@ -18,11 +18,20 @@ import { toWireError } from '../internal/wire-error.js';
 
 /**
  * Stable status discriminator for a run snapshot. Mirrors the values
- * exposed on the public REST surface.
+ * exposed on the public REST surface. `'awaiting_approval'` (C3 /
+ * W-119): the run suspended on durable HITL and its resumable
+ * `RunState` is retained by the tracker until
+ * `POST /runs/:runId/resume` (or an abort) settles it.
  *
  * @stable
  */
-export type RunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'aborted';
+export type RunStatus =
+  | 'pending'
+  | 'running'
+  | 'awaiting_approval'
+  | 'completed'
+  | 'failed'
+  | 'aborted';
 
 /**
  * Identifying tag for the underlying execution kind. Workflows run
@@ -134,6 +143,13 @@ interface RunRecord {
   startedAt?: number;
   completedAt?: number;
   error?: { readonly message: string; readonly code?: string; readonly hint?: string };
+  /**
+   * C3/W-119: the resumable `RunState` of a run suspended on durable
+   * HITL. Opaque to the server (the agent runtime owns its shape).
+   * Retained while `status === 'awaiting_approval'`; cleared on
+   * resume-settle and on abort.
+   */
+  suspendedState?: unknown;
 }
 
 /**
@@ -250,6 +266,8 @@ export class RunStateTracker {
     const wasTerminal = isTerminalStatus(record.status);
     record.status = status;
     record.completedAt = this.#now();
+    // C3: a settled run keeps no suspended state.
+    record.suspendedState = undefined;
     if (err !== undefined) {
       // W-052: keep the machine-readable code next to the message so
       // the GET run-status surface reports it too.
@@ -261,6 +279,47 @@ export class RunStateTracker {
     }
   }
 
+  /**
+   * C3/W-119: park a run whose agent suspended on durable HITL. The
+   * tracker retains the resumable `RunState` (opaque) so the REST
+   * resume endpoint can re-enter the agent loop in-process. Emits the
+   * `run-end` activity (active work stopped) but NOT the terminal
+   * metric - the run is not over.
+   */
+  suspend(runId: string, state: unknown): void {
+    const record = this.#records.get(runId);
+    if (record === undefined) return;
+    record.status = 'awaiting_approval';
+    record.suspendedState = state;
+    this.#emitActivity({ kind: 'run-end', runKind: record.kind });
+  }
+
+  /**
+   * C3: register an EXTERNALLY-suspended run (e.g. a proactive fire
+   * that ran in-process, outside the REST surface) so the messenger's
+   * `POST /runs/:runId/resume` can find and resume it. Declares the
+   * record when unknown; no activity events (the run never "started"
+   * server-side).
+   */
+  registerSuspended(runId: string, descriptor: RunDescriptor, state: unknown): void {
+    const existing = this.#records.get(runId);
+    const record: RunRecord = existing ?? {
+      runId,
+      kind: descriptor.kind,
+      descriptor,
+      status: 'pending',
+      controller: new AbortController(),
+    };
+    record.status = 'awaiting_approval';
+    record.suspendedState = state;
+    this.#records.set(runId, record);
+  }
+
+  /** Peek the retained suspended state (C3). `undefined` when none. */
+  suspendedStateOf(runId: string): unknown {
+    return this.#records.get(runId)?.suspendedState;
+  }
+
   /** Cancel a run via its `AbortController`. */
   abort(runId: string, reason?: unknown): boolean {
     const record = this.#records.get(runId);
@@ -268,9 +327,15 @@ export class RunStateTracker {
     if (!record.controller.signal.aborted) {
       record.controller.abort(reason);
     }
-    if (record.status === 'pending' || record.status === 'running') {
+    if (
+      record.status === 'pending' ||
+      record.status === 'running' ||
+      record.status === 'awaiting_approval'
+    ) {
       record.status = 'aborted';
       record.completedAt = this.#now();
+      // C3: a dropped suspension must not leak its retained state.
+      record.suspendedState = undefined;
       this.#emitTerminal(record);
     }
     return true;
@@ -354,7 +419,11 @@ export class RunStateTracker {
         record.completedAt !== undefined &&
         record.completedAt <= olderThan &&
         record.status !== 'pending' &&
-        record.status !== 'running'
+        record.status !== 'running' &&
+        // C3: a parked approval waits on a HUMAN - retention must not
+        // evict it (a human answer can take hours). Settle it via
+        // resume or abort.
+        record.status !== 'awaiting_approval'
       ) {
         this.#records.delete(runId);
         removed += 1;

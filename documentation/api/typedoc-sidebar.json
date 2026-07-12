@@ -14,6 +14,10 @@
             "collapsed": true,
             "items": [
               {
+                "text": "AgentBudgetExceededError",
+                "link": "/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md"
+              },
+              {
                 "text": "AgentResolutionError",
                 "link": "/api/@graphorin/agent/errors/classes/AgentResolutionError.md"
               },
@@ -1380,6 +1384,17 @@
       {
         "text": "snapshot",
         "link": "/api/@graphorin/pricing/snapshot/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/proactive",
+    "link": "/api/@graphorin/proactive/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "package.json",
+        "link": "/api/@graphorin/proactive/package.json/"
       }
     ]
   },

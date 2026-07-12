@@ -14,7 +14,7 @@ function cron(
    options?): TriggerDeclaration;
 ```
 
-Defined in: [packages/triggers/src/index.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L105)
+Defined in: [packages/triggers/src/index.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L170)
 
 Build a cron trigger declaration. The expression is validated
 eagerly - a malformed cron expression throws at registration time,

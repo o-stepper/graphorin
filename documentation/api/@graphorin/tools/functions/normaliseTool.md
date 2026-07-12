@@ -7,10 +7,13 @@
 # Function: normaliseTool()
 
 ```ts
-function normaliseTool<TInput, TOutput, TDeps>(tool, source): NormaliseOutcome<TInput, TOutput, TDeps>;
+function normaliseTool<TInput, TOutput, TDeps>(
+   tool, 
+   source, 
+opts?): NormaliseOutcome<TInput, TOutput, TDeps>;
 ```
 
-Defined in: [packages/tools/src/registry/normalize.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L104)
+Defined in: [packages/tools/src/registry/normalize.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L123)
 
 Normalise a tool registration. Throws on programming errors
 (invalid examples, invalid `preferredModel`, invalid
@@ -31,6 +34,7 @@ conservative-default branches.
 | ------ | ------ |
 | `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
 | `source` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) |
+| `opts` | [`NormaliseToolOptions`](/api/@graphorin/tools/interfaces/NormaliseToolOptions.md) |
 
 ## Returns
 

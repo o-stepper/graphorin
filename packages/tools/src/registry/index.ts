@@ -10,6 +10,7 @@ export { defineBm25Index, tokenise } from './bm25.js';
 export {
   DEFAULT_MAX_RESULT_TOKENS,
   type NormaliseOutcome,
+  type NormaliseToolOptions,
   type NormaliseWarning,
   normaliseTool,
 } from './normalize.js';
