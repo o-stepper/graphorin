@@ -108,7 +108,7 @@ Pipeline per message: bounded queue (shed on overflow, typed `queue-full` accept
 
 Delivery is fire-and-forget by design: the adapter owns bounded in-call retries and throws the typed `ChannelDeliveryError` (with a `retryable` hint) when they are exhausted. There is no durable outbox in the framework.
 
-The optional `question` field on `DeliveryPayload` is the HITL surface placeholder: `{ prompt, options[], ref }`, where `ref` is an opaque resolve reference - a serialized workflow awakeable address (`serializeAwakeableRef` from `@graphorin/workflow`) or an agent approval id. Rendering (buttons, quick replies, plain text) is the adapter's choice; the full escalation ladder ships with the proactivity wave.
+The optional `question` field on `DeliveryPayload` is the HITL surface placeholder: `{ prompt, options[], ref }`, where `ref` is an opaque resolve reference - a serialized workflow awakeable address (`serializeAwakeableRef` from `@graphorin/workflow`) or an agent approval id. Rendering (buttons, quick replies, plain text) is the adapter's choice; the full escalation ladder is documented in the [proactivity guide](/guide/proactivity).
 
 ## Running under the server
 

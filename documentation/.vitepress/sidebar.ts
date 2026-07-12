@@ -32,6 +32,7 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Agent runtime', link: '/guide/agent-runtime' },
       { text: 'Memory system', link: '/guide/memory-system' },
       { text: 'Workflow engine', link: '/guide/workflow-engine' },
+      { text: 'Proactivity', link: '/guide/proactivity' },
       { text: 'Sessions', link: '/guide/sessions' },
       { text: 'Persistence', link: '/guide/persistence' },
       { text: 'Storage backends', link: '/guide/storage' },

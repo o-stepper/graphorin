@@ -370,7 +370,7 @@ const memory = createMemory({
 });
 ```
 
-The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for the auto-promotion and proactive `act`-grant features of later waves; see the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
+The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for memory auto-promotion (a later wave) and for the proactive [`act` grant](/guide/proactivity#the-act-grant-is-gated-on-the-ingest-gate); see the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
 
 ### Principal / owner dimension
 
