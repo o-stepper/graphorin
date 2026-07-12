@@ -114,7 +114,8 @@ export type ToolTrustClass =
   | 'skill-trusted'
   | 'skill-untrusted'
   | 'mcp-derived'
-  | 'web-search';
+  | 'web-search'
+  | 'channel-inbound';
 
 /**
  * Source descriptor attached to a `Tool` registration. Mirrors the

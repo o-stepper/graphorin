@@ -580,6 +580,9 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../tools
 
   packages/cli:
     dependencies:

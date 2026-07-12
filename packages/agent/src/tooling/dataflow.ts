@@ -29,6 +29,7 @@ import {
   createTaintLedger,
   type DataFlowPolicyConfig,
   deriveTaintLabel,
+  isUntrustedTrustClass,
   type TaintLedger,
   type TaintLedgerSnapshot,
 } from '@graphorin/security/dataflow';
@@ -39,6 +40,7 @@ import type {
   DataFlowRecordInput,
   DataFlowVerdict,
 } from '@graphorin/tools/executor';
+import type { InboundTaintSeed } from '../types.js';
 
 /** Max concurrent run ledgers retained before evicting the oldest. */
 const MAX_TRACKED_RUNS = 128;
@@ -76,6 +78,12 @@ export interface DataFlowGuardWithLedgers extends DataFlowGuard {
    * `derivedTaint: 'strict'` policy leg.
    */
   recordAssistant(runId: string, text: string): void;
+  /**
+   * B1.5: stamp message-borne untrusted input (channel inbound) into a
+   * run's ledger. Called at run init, before the first step, from the
+   * `AgentCallOptions.inboundTaint` seed. Widen-only.
+   */
+  recordInboundMessage(runId: string, seed: InboundTaintSeed): void;
 }
 
 export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardWithLedgers {
@@ -156,6 +164,23 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
     recordAssistant(runId: string, text: string): void {
       if (text.length === 0) return;
       ledgerFor(runId).recordAssistantOutput?.(text);
+    },
+
+    recordInboundMessage(runId: string, seed: InboundTaintSeed): void {
+      // The label mirrors deriveTaintLabel for the 'channel-inbound'
+      // trust class; `untrusted` is sourced from the single shared
+      // predicate so the taint engine and the Rule-of-Two leg can
+      // never disagree about channel input.
+      ledgerFor(runId).recordInboundMessage?.(
+        {
+          trustClass: 'channel-inbound',
+          sourceKind: seed.sourceKind ?? 'channel-inbound',
+          sensitivity: 'unknown',
+          untrusted: isUntrustedTrustClass('channel-inbound'),
+          sensitive: seed.sensitive === true,
+        },
+        seed.text,
+      );
     },
 
     // AG-19: snapshot/rehydrate the run's coarse taint summary across a

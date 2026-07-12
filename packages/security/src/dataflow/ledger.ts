@@ -131,32 +131,44 @@ export function createTaintLedger(opts?: {
   const spans: TrackedSpan[] = [];
   let trackedChars = 0;
 
+  function ingest(label: TaintLabel, outputText: string): void {
+    if (label.sensitive) {
+      sensitiveSeen = true;
+    } else if (!sensitiveSeen && piiSensitivity !== undefined && piiSensitivity(outputText)) {
+      // FIDES-lattice (SDF-8): PII in the output is a sensitive read even
+      // without a 'secret' tag. `sensitiveSeen` latches, so scan only while
+      // it is still false.
+      sensitiveSeen = true;
+    }
+    if (!label.untrusted) return;
+    untrustedSeen = true;
+    untrustedSourceKinds.add(label.sourceKind);
+
+    const normalized = normalize(outputText);
+    if (normalized.length < minSpanLength) return;
+    // Cap a single oversized span to the total budget (store a prefix).
+    const text =
+      normalized.length > maxTrackedChars ? normalized.slice(0, maxTrackedChars) : normalized;
+    spans.push({ text, sourceKind: label.sourceKind });
+    trackedChars += text.length;
+    // FIFO-evict oldest spans until within budget.
+    while (trackedChars > maxTrackedChars && spans.length > 1) {
+      const evicted = spans.shift();
+      if (evicted !== undefined) trackedChars -= evicted.text.length;
+    }
+  }
+
   return {
     recordOutput(label: TaintLabel, outputText: string): void {
-      if (label.sensitive) {
-        sensitiveSeen = true;
-      } else if (!sensitiveSeen && piiSensitivity !== undefined && piiSensitivity(outputText)) {
-        // FIDES-lattice (SDF-8): PII in the output is a sensitive read even
-        // without a 'secret' tag. `sensitiveSeen` latches, so scan only while
-        // it is still false.
-        sensitiveSeen = true;
-      }
-      if (!label.untrusted) return;
-      untrustedSeen = true;
-      untrustedSourceKinds.add(label.sourceKind);
+      ingest(label, outputText);
+    },
 
-      const normalized = normalize(outputText);
-      if (normalized.length < minSpanLength) return;
-      // Cap a single oversized span to the total budget (store a prefix).
-      const text =
-        normalized.length > maxTrackedChars ? normalized.slice(0, maxTrackedChars) : normalized;
-      spans.push({ text, sourceKind: label.sourceKind });
-      trackedChars += text.length;
-      // FIFO-evict oldest spans until within budget.
-      while (trackedChars > maxTrackedChars && spans.length > 1) {
-        const evicted = spans.shift();
-        if (evicted !== undefined) trackedChars -= evicted.text.length;
-      }
+    // B1.5: message-borne untrusted input (channel inbound). Identical
+    // widening + span tracking as recordOutput - the dedicated entry
+    // point exists so message provenance is explicit at call sites and
+    // in third-party ledger implementations.
+    recordInboundMessage(label: TaintLabel, text: string): void {
+      ingest(label, text);
     },
 
     recordAssistantOutput(text: string): void {

@@ -132,6 +132,16 @@ export interface TaintLedger {
    * compiling; the built-in ledger implements it.
    */
   recordAssistantOutput?(text: string): void;
+  /**
+   * B1.5: record message-borne input (channel inbound) with the same
+   * widening semantics as {@link TaintLedger.recordOutput}. A dedicated
+   * entry point because the Rule-of-Two deliberately excludes ordinary
+   * user MESSAGES from the untrusted-input leg - channel messages come
+   * from an authenticated-but-content-untrusted peer and must arm the
+   * gate. Optional so third-party ledgers keep compiling; the built-in
+   * ledger implements it.
+   */
+  recordInboundMessage?(label: TaintLabel, text: string): void;
   /** Probe a sink's serialized arguments for verbatim untrusted carry. */
   inspectArgs(argsText: string): ArgsTaintProbe;
   /** `true` once any untrusted-source output has entered the run. */

@@ -455,6 +455,33 @@ export interface ResumeDirective {
 }
 
 /**
+ * B1.5: message-borne untrusted input entering a run from a channel
+ * gateway. Stamped into the run's taint ledger at init, BEFORE the
+ * first step, so the data-flow policy's untrusted leg is armed even
+ * though the input arrives as a user MESSAGE rather than a tool
+ * output (the Rule-of-Two deliberately excludes ordinary user
+ * messages; channel peers are authenticated but their CONTENT is
+ * attacker-influenceable). Widen-only: it can add taint, never clear
+ * it.
+ *
+ * @stable
+ */
+export interface InboundTaintSeed {
+  /**
+   * The untrusted inbound text. Recorded as verbatim spans so a later
+   * sink call whose args copy the channel text trips the probe.
+   */
+  readonly text: string;
+  /**
+   * Descriptive source kind for audit trails, e.g.
+   * `'channel:telegram'`. Default `'channel-inbound'`.
+   */
+  readonly sourceKind?: string;
+  /** Also arm the sensitive leg (rare; widen-only). */
+  readonly sensitive?: boolean;
+}
+
+/**
  * Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
  *
  * @stable
@@ -464,6 +491,12 @@ export interface AgentCallOptions<TDeps> {
   readonly signal?: AbortSignal;
   readonly sessionId?: string;
   readonly userId?: string;
+  /**
+   * B1.5: stamp message-borne untrusted input into the run's taint
+   * ledger at init (see {@link InboundTaintSeed}). No-op when the
+   * agent has no `dataFlowPolicy` configured.
+   */
+  readonly inboundTaint?: InboundTaintSeed;
   /**
    * HITL resume directive. Supplied alongside a `RunState` to
    * resolve any approvals that were pending when the previous

@@ -319,7 +319,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // Bootstrap the run state, the AG-19 security rehydration and the
     // `tool_search` promotion set (see `runtime/run-init.ts`).
     const { state, promotedDeferred, runStartPromotions } = initializeRunState<TDeps, TOutput>(
-      { config, agentId, sessionId, userId, toolDataFlowGuard },
+      {
+        config,
+        agentId,
+        sessionId,
+        userId,
+        toolDataFlowGuard,
+        ...(options.inboundTaint !== undefined ? { inboundTaint: options.inboundTaint } : {}),
+      },
       resumed,
     );
     activeRunState = state;

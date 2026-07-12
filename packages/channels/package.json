@@ -54,7 +54,8 @@
     "clean": "rimraf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@graphorin/core": "workspace:*"
+    "@graphorin/core": "workspace:*",
+    "@graphorin/tools": "workspace:*"
   },
   "publishConfig": {
     "access": "public",

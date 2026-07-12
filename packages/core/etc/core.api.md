@@ -2711,7 +2711,7 @@ export type ToolSource = {
 };
 
 // @public
-export type ToolTrustClass = 'first-party-built-in' | 'first-party-user-defined' | 'skill-trusted' | 'skill-untrusted' | 'mcp-derived' | 'web-search';
+export type ToolTrustClass = 'first-party-built-in' | 'first-party-user-defined' | 'skill-trusted' | 'skill-untrusted' | 'mcp-derived' | 'web-search' | 'channel-inbound';
 
 // @public
 export function toWireAgentEvent<TOutput = string>(ev: AgentEvent<TOutput> | WireAgentEvent<TOutput>): WireAgentEvent<TOutput>;

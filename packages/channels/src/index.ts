@@ -30,6 +30,11 @@ export {
   type PairingPolicyOptions,
 } from './access.js';
 export {
+  type SanitizationOutcome,
+  type SanitizeChannelInboundOptions,
+  sanitizeChannelInbound,
+} from './inbound.js';
+export {
   type ChannelRoute,
   ChannelRouteConfigError,
   createIdentityRouter,

@@ -57,6 +57,9 @@ export function resolveTrustClass(source: ToolSource): ToolTrustClass {
  * - `'skill-untrusted'`          → `'detect-and-strip-and-wrap'`.
  * - `'mcp-derived'`              → `'detect-and-strip-and-wrap'`.
  * - `'web-search'`               → `'detect-and-strip-and-wrap'`.
+ * - `'channel-inbound'`          → `'detect-and-strip-and-wrap'`
+ *   (message-borne channel text; no tool ever registers with this
+ *   class, but the gateway reuses the same policy table).
  *
  * @stable
  */
@@ -70,6 +73,7 @@ export function defaultInboundSanitization(trustClass: ToolTrustClass): InboundS
     case 'skill-untrusted':
     case 'mcp-derived':
     case 'web-search':
+    case 'channel-inbound':
       return 'detect-and-strip-and-wrap';
   }
 }
