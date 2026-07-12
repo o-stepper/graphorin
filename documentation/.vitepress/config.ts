@@ -78,6 +78,10 @@ const baseConfig = defineConfig({
 
   sitemap: {
     hostname: SITE_URL,
+    // The root page is only a redirect stub (`index.md` + `public/_redirects`
+    // send `/` to `/guide/`); keep it out of the sitemap so crawlers index
+    // the guide directly.
+    transformItems: (items) => items.filter((item) => item.url !== '' && item.url !== '/'),
   },
 
   markdown: {
@@ -91,6 +95,9 @@ const baseConfig = defineConfig({
   themeConfig: {
     siteTitle: 'Graphorin',
     logo: { src: '/logo.svg', alt: 'Graphorin' },
+    // `/` is a redirect stub; send the navbar logo/title straight to the
+    // guide so in-app navigation never bounces through it.
+    logoLink: '/guide/',
 
     nav,
     sidebar,
