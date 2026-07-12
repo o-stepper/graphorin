@@ -6,7 +6,7 @@
 
 # Class: InvalidWorkflowConfigError
 
-Defined in: [packages/workflow/src/errors/index.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L64)
+Defined in: [packages/workflow/src/errors/index.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L65)
 
 Thrown by `createWorkflow` on configuration validation failure.
 
@@ -22,7 +22,7 @@ Thrown by `createWorkflow` on configuration validation failure.
 new InvalidWorkflowConfigError(message, hint?): InvalidWorkflowConfigError;
 ```
 
-Defined in: [packages/workflow/src/errors/index.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L65)
+Defined in: [packages/workflow/src/errors/index.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L66)
 
 #### Parameters
 
@@ -43,9 +43,9 @@ Defined in: [packages/workflow/src/errors/index.ts:65](https://github.com/o-step
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | [packages/workflow/src/errors/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L47) |
-| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | [packages/workflow/src/errors/index.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L46) |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | [packages/workflow/src/errors/index.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L48) |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | [packages/workflow/src/errors/index.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L48) |
+| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | [packages/workflow/src/errors/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L47) |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | [packages/workflow/src/errors/index.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L49) |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`message`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-message) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`name`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-name) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1076) |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`stack`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-stack) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |

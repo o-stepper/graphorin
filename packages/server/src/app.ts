@@ -266,6 +266,20 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
 
   const { triggersDaemon, consolidatorDaemon, workflowTimerDaemon } = buildDaemons(options);
 
+  // A2 (item 7): the run tracker is the single choke point every
+  // REST/WS run passes through - bridge it into the activity seams.
+  // Any tracked run resets the triggers idle window (real debounce for
+  // `idle:T` consolidation); a settled run re-evaluates the
+  // consolidator's `buffer:N` trigger against the unconsolidated tail.
+  if (triggersDaemon !== undefined || consolidatorDaemon !== undefined) {
+    runs.setActivityListener((event) => {
+      triggersDaemon?.scheduler.recordActivity();
+      if (event.kind === 'run-end') {
+        void consolidatorDaemon?.consolidator.notifyActivity?.()?.catch?.(() => {});
+      }
+    });
+  }
+
   const ws = buildWsLayer(app, config, now);
 
   const lifecycle = createLifecycle({

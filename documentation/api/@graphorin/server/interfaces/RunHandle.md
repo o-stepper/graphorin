@@ -6,7 +6,7 @@
 
 # Interface: RunHandle
 
-Defined in: [packages/server/src/runtime/run-state.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L110)
+Defined in: [packages/server/src/runtime/run-state.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L122)
 
 In-flight handle returned by [RunStateTracker.start](/api/@graphorin/server/classes/RunStateTracker.md#start). Handlers
 pass `signal` into the underlying `agent.run / workflow.execute`
@@ -18,8 +18,8 @@ invocation so cancellation propagates instantly.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/server/src/runtime/run-state.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L111) |
-| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | [packages/server/src/runtime/run-state.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L112) |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/server/src/runtime/run-state.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L123) |
+| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | [packages/server/src/runtime/run-state.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L124) |
 
 ## Methods
 
@@ -29,7 +29,7 @@ invocation so cancellation propagates instantly.
 cancel(reason?): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L113)
+Defined in: [packages/server/src/runtime/run-state.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L125)
 
 #### Parameters
 

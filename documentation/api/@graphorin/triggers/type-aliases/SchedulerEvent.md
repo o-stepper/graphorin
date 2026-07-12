@@ -43,12 +43,123 @@ type SchedulerEvent =
   | {
   id: string;
   type: "lib-mode-warning";
+}
+  | {
+  id: string;
+  type: "orphaned";
 };
 ```
 
-Defined in: [packages/triggers/src/index.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L157)
+Defined in: [packages/triggers/src/index.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L181)
 
 Lifecycle event emitted by [Scheduler.events](/api/@graphorin/triggers/interfaces/Scheduler.md#events). Useful for
 tests and for piping into observability without monkey-patching.
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  type: "started";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  type: "stopped";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  kind: TriggerKind;
+  type: "registered";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  firedAt: number;
+  id: string;
+  type: "fire-start";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  durationMs: number;
+  id: string;
+  type: "fire-end";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  durationMs: number;
+  error: unknown;
+  id: string;
+  type: "fire-error";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  missed: number;
+  type: "catchup-applied";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  type: "lib-mode-warning";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  id: string;
+  type: "orphaned";
+}
+```
+
+A persisted trigger row has no re-registered declaration in this
+process (W-123). It will never fire; re-register the declaration
+or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
 
 ## Stable

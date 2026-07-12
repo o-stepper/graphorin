@@ -38,12 +38,13 @@ import { runDeepPhase } from './phases/deep.js';
 import { runLearnedContextPass } from './phases/learned-context.js';
 import { runLightPhase } from './phases/light.js';
 import { runReflectionPass } from './phases/reflect.js';
-import { runStandardPhase } from './phases/standard.js';
+import { renderTranscript, runStandardPhase } from './phases/standard.js';
 import {
   type RegisterTriggersResult,
   registerConsolidatorTriggers,
   type SchedulerLike,
 } from './scheduler.js';
+import { parseTriggerSpec } from './triggers.js';
 import {
   CONSOLIDATOR_TIER_DEFAULTS,
   type ConsolidatorConfig,
@@ -111,6 +112,22 @@ export interface Consolidator {
   isFree(): boolean;
   /** Drain DLQ rows whose `nextRetryAt` <= now. */
   drainDlq(scope: SessionScope): Promise<number>;
+  /**
+   * Activity signal from the embedding runtime (item 7, A2): a turn
+   * finished / the transcript grew. Re-evaluates the `buffer:N`
+   * trigger - when the unconsolidated transcript tail (from the
+   * standard-phase cursor) reaches the configured token threshold
+   * (chars/4 proxy, the same measure as the W-081 transcript budget),
+   * the light+standard chain fires with reason `{ kind: 'buffer' }`.
+   * The documented contract is "buffer:N OR idle:T": whichever comes
+   * first consolidates the settled segment, and the MCON-8 cooldown
+   * still applies so message bursts cannot storm the pipeline. No-op
+   * when no `buffer:N` trigger is configured, when the consolidator
+   * is stopped/paused, or when no scope is resolvable. The server
+   * calls this from its run tracker; library-mode callers invoke it
+   * from their own loop next to `scheduler.recordActivity()`.
+   */
+  notifyActivity(scope?: SessionScope): Promise<PhaseOutcome | null>;
 }
 
 /**
@@ -172,6 +189,12 @@ class ConsolidatorImpl implements Consolidator {
    */
   #deferredRunsAdjustment = 0;
   #emptyExtractions = 0;
+  /**
+   * Smallest configured `buffer:N` threshold (tokens, chars/4 proxy),
+   * parsed once at construction. `null` = no buffer trigger declared,
+   * `notifyActivity(...)` is a no-op (item 7, A2).
+   */
+  readonly #bufferThresholdTokens: number | null;
 
   constructor(opts: CreateConsolidatorOptions) {
     this.#semantic = opts.semantic;
@@ -195,6 +218,7 @@ class ConsolidatorImpl implements Consolidator {
     this.#defaultScope = opts.defaultScope ?? null;
 
     this.#config = resolveConfig(opts);
+    this.#bufferThresholdTokens = minBufferThreshold(this.#config.triggers);
     this.#lockManager = new LockManager({
       store: this.#consolidatorStore,
       waitMs: this.#config.lockWaitMs,
@@ -402,6 +426,31 @@ class ConsolidatorImpl implements Consolidator {
     return last;
   }
 
+  async notifyActivity(scope?: SessionScope): Promise<PhaseOutcome | null> {
+    if (!this.#running || this.#manuallyPaused) return null;
+    const target = scope ?? this.#defaultScope;
+    if (target === null) return null;
+    const threshold = this.#bufferThresholdTokens;
+    if (threshold === null) return null;
+    const session = this.#store.session;
+    if (typeof session.listMessagesSince !== 'function') return null;
+    const state =
+      this.#consolidatorStore !== null ? await this.#consolidatorStore.getState(target) : null;
+    const cursor = state?.lastProcessedMessageId ?? null;
+    // The measured tail is bounded by one standard batch: a tail that
+    // large clears any reasonable threshold anyway, and an undercount
+    // only delays the fire until the `idle:T` leg of the
+    // "buffer:N OR idle:T" contract catches the segment.
+    const tail = await session.listMessagesSince(target, cursor, this.#config.maxStandardBatchSize);
+    if (tail.length === 0) return null;
+    // Same chars/4 token proxy as the W-081 transcript budget, over the
+    // same rendering the standard phase consumes - the threshold and
+    // the budget speak identical units.
+    const tokens = Math.ceil(renderTranscript(tail).length / 4);
+    if (tokens < threshold) return null;
+    return this.trigger({ kind: 'buffer', value: threshold }, target);
+  }
+
   async fireNow(phase: ConsolidatorPhase, scope?: SessionScope): Promise<PhaseOutcome | null> {
     const target = scope ?? this.#defaultScope;
     if (target === null) {
@@ -546,7 +595,12 @@ class ConsolidatorImpl implements Consolidator {
   #planPhases(reason: ConsolidatorTriggerReason): ConsolidatorPhase[] {
     const enabled = new Set(this.#config.phases);
     const planned: ConsolidatorPhase[] = [];
-    if (reason.kind === 'turn' || reason.kind === 'idle' || reason.kind === 'event') {
+    if (
+      reason.kind === 'turn' ||
+      reason.kind === 'idle' ||
+      reason.kind === 'event' ||
+      reason.kind === 'buffer'
+    ) {
       if (enabled.has('light')) planned.push('light');
       if (enabled.has('standard')) planned.push('standard');
     } else if (reason.kind === 'cron' || reason.kind === 'manual' || reason.kind === 'budget') {
@@ -1046,4 +1100,27 @@ function defaultTriggers(): ConsolidatorTriggerSpec[] {
   // scheduler cannot count user turns, so it was inert unless a consumer
   // emitted `trigger({ kind: 'turn' })` itself (MCON-4).
   return ['idle:5m', 'cron:0 4 * * *'];
+}
+
+/**
+ * Smallest `buffer:N` threshold among the configured trigger specs
+ * (item 7, A2). Unparseable specs are skipped here - they already
+ * fail loudly at registration / config-validation time.
+ */
+function minBufferThreshold(specs: ReadonlyArray<ConsolidatorTriggerSpec>): number | null {
+  let min: number | null = null;
+  for (const spec of specs) {
+    let kind: string;
+    let tokens = 0;
+    try {
+      const parsed = parseTriggerSpec(spec);
+      kind = parsed.kind;
+      if (parsed.kind === 'buffer') tokens = parsed.tokens;
+    } catch {
+      continue;
+    }
+    if (kind !== 'buffer') continue;
+    if (min === null || tokens < min) min = tokens;
+  }
+  return min;
 }

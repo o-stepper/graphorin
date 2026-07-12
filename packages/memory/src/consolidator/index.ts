@@ -232,6 +232,10 @@ export function createConsolidatorPlaceholder(
     async trigger() {
       return null;
     },
+    async notifyActivity(): Promise<PhaseOutcome | null> {
+      // Placeholder - no buffer trigger to evaluate.
+      return null;
+    },
     async fireNow(): Promise<PhaseOutcome | null> {
       return null;
     },

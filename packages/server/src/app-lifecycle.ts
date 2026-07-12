@@ -264,6 +264,20 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         // W-032: fire due durable timers from server start onward.
         if (workflowTimerDaemon !== undefined) {
           await workflowTimerDaemon.start();
+        } else if (workflows.size() > 0) {
+          // A3 (item 16 tail): a registered workflow whose thread
+          // suspends on sleepFor/sleepUntil never wakes without a
+          // driver - the quietest deployment gap an always-on
+          // assistant can ship. Domain composition is programmatic by
+          // design (the config file carries no adapters), so surface
+          // the omission loudly instead of sleeping forever.
+          process.stderr.write(
+            `[graphorin/server] ${workflows.size()} workflow(s) are registered but no ` +
+              'durable-timer driver is wired - suspended threads with due timers ' +
+              '(sleepFor/sleepUntil) will never wake on their own. Pass ' +
+              'createServer({ workflowTimers: { driver } }) with createTimerDriver(...) ' +
+              'from @graphorin/workflow.\n',
+          );
         }
 
         // Sample a couple of gauges immediately so the very first

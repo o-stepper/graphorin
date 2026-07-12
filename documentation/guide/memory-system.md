@@ -387,6 +387,12 @@ In library mode the consolidator is **dormant until you start and trigger it** -
 
 Every `trigger(...)` dispatch first replays the triggering scope's ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
 
+#### The buffer trigger and activity signals
+
+`buffer:N` (e.g. `'buffer:1024'`) fires the light+standard chain when the **unconsolidated transcript tail** - everything after the standard-phase cursor - reaches `N` tokens (chars/4 proxy over the exact transcript rendering the extraction consumes, the same measure as the `maxTranscriptChars` budget). The scheduler cannot measure the tail on its own, so the trigger is evaluated on **activity signals**: call `memory.consolidator.notifyActivity(scope?)` whenever a turn finishes or the transcript grows. Together with an idle trigger this gives the documented contract - **the standard phase runs once per settled segment, on `buffer:N` OR `idle:T`, whichever comes first** - and the trigger cooldown (`ceilings.cooldownMs`) keeps message bursts from storming the pipeline.
+
+The standalone server wires the signal automatically: every tracked REST/WS run resets the triggers scheduler's idle window (`scheduler.recordActivity()` - this is what makes `idle:T` a true debounce rather than a fixed interval) and re-evaluates `buffer:N` when the run settles. Library-mode loops call `scheduler.recordActivity()` + `memory.consolidator.notifyActivity()` themselves, next to their existing `trigger({ kind: 'turn' })` emission.
+
 Two safeguards keep a single bad slice from wedging a scope forever:
 
 - **Input transcript budget** (`maxTranscriptChars`, per-tier default 60 000 characters ~ 15k tokens, 120 000 at `full`): `maxStandardBatchSize` bounds only the message *count*, so a batch of long messages could exceed a cheap model's context on every retry. A slice whose rendered transcript exceeds the budget is half-split *before* the provider call (the same convergent recursion that handles `finishReason: 'length'` output truncation); a single message that alone exceeds the budget is tail-truncated, and both events are recorded on the phase span (`consolidator.standard.budget_splits` / `.input_truncations`).
@@ -483,6 +489,14 @@ for await (const progress of migrateEmbedder({
 | `lock-on-first` (default) | Refuses any silent embedder swap with an actionable error pointing at the planned migration. |
 | `multi-active` | Keeps both `vec0` tables alive - reads union, writes go to the active embedder. |
 | `auto-migrate` | Re-embeds existing rows in streamed batches within a single run (cancellable with `AbortSignal`; an aborted migration starts again from the beginning - there is no cross-process checkpoint yet). |
+
+The same version key also records the write-path contextualization mode, so
+switching `contextualRetrieval` (or toggling the consolidator's `llm`
+enrichment) invalidates the index like a model change. If dying on an
+incompatible embedder is worse than degraded recall (an always-on
+assistant), set `createMemory({ onIncompatibleEmbedder: 'fts-only' })` to
+continue keyword-only with a WARN until `graphorin memory migrate` rebuilds
+the index - see [Embedders](/guide/embedders#embedder-identity-migrations).
 
 ## Context assembly (the six layers)
 

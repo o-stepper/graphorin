@@ -31,7 +31,8 @@ export type ConsolidatorTriggerSpec =
   | `idle:${string}`
   | `cron:${string}`
   | `event:${string}`
-  | `budget:${number}`;
+  | `budget:${number}`
+  | `buffer:${number}`;
 
 /**
  * Tier preset that selects a consolidator behaviour bundle. The
@@ -48,7 +49,7 @@ export type ConsolidatorTier = 'free' | 'cheap' | 'standard' | 'full' | 'custom'
  * @stable
  */
 export interface ConsolidatorTriggerReason {
-  readonly kind: 'turn' | 'idle' | 'cron' | 'event' | 'budget' | 'manual';
+  readonly kind: 'turn' | 'idle' | 'cron' | 'event' | 'budget' | 'buffer' | 'manual';
   readonly value?: string | number;
 }
 

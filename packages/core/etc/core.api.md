@@ -381,7 +381,12 @@ export interface AuthTokenStore {
 }
 
 // @public
-export function awaitExternal<TResume = unknown>(name: string): TResume;
+export function awaitExternal<TResume = unknown>(name: string, options?: AwaitExternalOptions<TResume>): TResume;
+
+// @public
+export interface AwaitExternalOptions<TResume> {
+    readonly schema?: PayloadSchemaLike<TResume>;
+}
 
 // @public
 export const AWAKEABLE_PAUSE_KIND: "graphorin.awakeable";
@@ -391,6 +396,17 @@ export interface AwakeablePauseValue {
     // (undocumented)
     readonly kind: typeof AWAKEABLE_PAUSE_KIND;
     readonly name: string;
+}
+
+// @public
+export class AwakeablePayloadError extends TypeError {
+    constructor(awakeableName: string, issues: string);
+    // (undocumented)
+    readonly awakeableName: string;
+    // (undocumented)
+    readonly issues: string;
+    // (undocumented)
+    readonly name = "AwakeablePayloadError";
 }
 
 // @public
@@ -918,6 +934,9 @@ export function isApprovalPauseValue(value: unknown): value is ApprovalPauseValu
 export function isAwakeablePauseValue(value: unknown): value is AwakeablePauseValue;
 
 // @public
+export function isAwakeablePayloadError(err: unknown): err is AwakeablePayloadError;
+
+// @public
 export function isPauseSignal(err: unknown): err is PauseSignal;
 
 // @public
@@ -1265,6 +1284,20 @@ export class PauseSignal<TValue = unknown> extends Error {
     constructor(value: TValue);
     // (undocumented)
     readonly value: TValue;
+}
+
+// @public
+export interface PayloadSchemaLike<T> {
+    // (undocumented)
+    safeParse(value: unknown): {
+        readonly success: true;
+        readonly data: T;
+    } | {
+        readonly success: false;
+        readonly error: {
+            readonly message: string;
+        };
+    };
 }
 
 // @public

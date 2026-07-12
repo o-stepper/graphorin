@@ -44,6 +44,12 @@ Re-exports [awaitExternal](/api/@graphorin/core/functions/awaitExternal.md)
 
 ***
 
+### AwaitExternalOptions
+
+Re-exports [AwaitExternalOptions](/api/@graphorin/core/interfaces/AwaitExternalOptions.md)
+
+***
+
 ### AWAKEABLE\_PAUSE\_KIND
 
 Re-exports [AWAKEABLE_PAUSE_KIND](/api/@graphorin/core/variables/AWAKEABLE_PAUSE_KIND.md)
@@ -53,6 +59,12 @@ Re-exports [AWAKEABLE_PAUSE_KIND](/api/@graphorin/core/variables/AWAKEABLE_PAUSE
 ### AwakeablePauseValue
 
 Re-exports [AwakeablePauseValue](/api/@graphorin/core/interfaces/AwakeablePauseValue.md)
+
+***
+
+### AwakeablePayloadError
+
+Re-exports [AwakeablePayloadError](/api/@graphorin/core/classes/AwakeablePayloadError.md)
 
 ***
 
@@ -128,6 +140,12 @@ Re-exports [isAwakeablePauseValue](/api/@graphorin/core/functions/isAwakeablePau
 
 ***
 
+### isAwakeablePayloadError
+
+Re-exports [isAwakeablePayloadError](/api/@graphorin/core/functions/isAwakeablePayloadError.md)
+
+***
+
 ### isPauseSignal
 
 Re-exports [isPauseSignal](/api/@graphorin/core/functions/isPauseSignal.md)
@@ -197,6 +215,12 @@ Re-exports [PauseResumeScope](/api/@graphorin/core/interfaces/PauseResumeScope.m
 ### PauseSignal
 
 Re-exports [PauseSignal](/api/@graphorin/core/classes/PauseSignal.md)
+
+***
+
+### PayloadSchemaLike
+
+Re-exports [PayloadSchemaLike](/api/@graphorin/core/interfaces/PayloadSchemaLike.md)
 
 ***
 

@@ -718,6 +718,174 @@ describe('scheduler correctness - RP-13/14/15', () => {
   });
 });
 
+describe('W-123: orphan surfacing + catch-up gating', () => {
+  it('start() surfaces persisted rows without a declaration via WARN + orphaned event', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    const store = await makeStore();
+    const s1 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s1.register(interval('ghost', 1_000, () => undefined));
+    await s1.stop();
+
+    // Fresh process over the same store, WITHOUT re-registering 'ghost'.
+    const s2 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    await s2.start();
+    // start() published exactly two events: 'started' then 'orphaned'.
+    const iter = s2.events()[Symbol.asyncIterator]();
+    const first = await iter.next();
+    const second = await iter.next();
+    expect([first.value?.type, second.value?.type]).toEqual(['started', 'orphaned']);
+    expect(second.value?.type === 'orphaned' && second.value.id).toBe('ghost');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0]?.[0]).toContain("'ghost'");
+    expect((await s2.orphans()).map((t) => t.id)).toEqual(['ghost']);
+    warn.mockRestore();
+    await s2.stop();
+  });
+
+  it('orphans() is empty when every persisted row has a declaration', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    const store = await makeStore();
+    const s = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s.register(interval('live', 1_000, () => undefined));
+    expect(await s.orphans()).toEqual([]);
+    await s.stop();
+  });
+
+  it('register-time catch-up never fires callbacks before start()', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    const store = await makeStore();
+    const s1 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s1.register(cron('gated', '0 9 * * *', () => undefined));
+    await s1.start();
+    await s1.fire('gated'); // records lastFiredAt
+    await s1.stop();
+
+    // One 09:00 boundary passes offline.
+    await clock.advance(10 * 60 * 60 * 1000);
+
+    let fires = 0;
+    const s2 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s2.register(
+      cron(
+        'gated',
+        '0 9 * * *',
+        () => {
+          fires++;
+        },
+        { catchupPolicy: 'last' },
+      ),
+    );
+    await clock.advance(0);
+    expect(fires).toBe(0); // the W-123 gate: nothing fires pre-start
+    await s2.start();
+    expect(fires).toBe(1); // the deferred catch-up applied at start()
+    await s2.stop();
+  });
+
+  it('a trigger disabled between register and start applies no deferred catch-up', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    const store = await makeStore();
+    const s1 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s1.register(cron('paused', '0 9 * * *', () => undefined));
+    await s1.start();
+    await s1.fire('paused');
+    await s1.stop();
+
+    await clock.advance(10 * 60 * 60 * 1000);
+
+    let fires = 0;
+    const s2 = createScheduler({
+      store,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s2.register(
+      cron(
+        'paused',
+        '0 9 * * *',
+        () => {
+          fires++;
+        },
+        { catchupPolicy: 'last' },
+      ),
+    );
+    await s2.setDisabled('paused', true);
+    await s2.start();
+    expect(fires).toBe(0);
+    await s2.stop();
+  });
+});
+
+describe('W-124: cron timezone threading', () => {
+  it('cron timezone is honoured when computing nextFireAt', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    // 2026-01-15T00:00:00Z - EST (UTC-5) in effect.
+    await clock.advance(Date.UTC(2026, 0, 15));
+    const scheduler = createScheduler({
+      store: await makeStore(),
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    const state = await scheduler.register(
+      cron('ny-noon', '0 12 * * *', () => undefined, { timezone: 'America/New_York' }),
+    );
+    expect(state.nextFireAt).toBe('2026-01-15T17:00:00.000Z');
+    await scheduler.stop();
+  });
+
+  it('cron() rejects an unknown timezone eagerly', () => {
+    expect(() => cron('bad-tz', '0 9 * * *', () => undefined, { timezone: 'Not/AZone' })).toThrow(
+      /unknown timezone/,
+    );
+  });
+});
+
 describe('setDisabled - flag flip, not removal (IP-17)', () => {
   it('disable stops firing but keeps the trigger; enable re-arms from now', async () => {
     _resetLibModeWarningForTesting();

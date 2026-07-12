@@ -792,7 +792,15 @@ function buildEpisodeRequest(
   };
 }
 
-function renderTranscript(messages: ReadonlyArray<SessionMessageRecord>): string {
+/**
+ * Render a message batch into the exact transcript text the extraction
+ * prompt consumes. Exported for the runtime's `buffer:N` tail
+ * measurement (item 7, A2) so the trigger threshold and the W-081
+ * transcript budget speak identical chars/4 units.
+ *
+ * @internal
+ */
+export function renderTranscript(messages: ReadonlyArray<SessionMessageRecord>): string {
   return messages
     .map((m) => {
       const role = m.message.role;

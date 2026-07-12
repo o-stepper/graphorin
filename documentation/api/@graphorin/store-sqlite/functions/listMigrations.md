@@ -10,7 +10,7 @@
 function listMigrations(): readonly Migration[];
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/registry.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L153)
+Defined in: [packages/store-sqlite/src/migrations/registry.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L154)
 
 Returns the full ordered migration list (built-ins + any registered
 dynamic migrations). Sorted by `version`. Verifies that no two entries

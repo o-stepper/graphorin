@@ -35,7 +35,8 @@ export type WorkflowErrorCode =
   | 'workflow-version-mismatch'
   | 'workflow-divergence'
   | 'pause-not-found'
-  | 'pause-replay-divergence';
+  | 'pause-replay-divergence'
+  | 'awakeable-payload-invalid';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.

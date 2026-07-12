@@ -29,9 +29,20 @@
  * reason about in personal-assistant scenarios; the framework stays
  * consistent with this rule rather than mixing the two conventions.
  *
- * The scheduler treats every trigger as **UTC**. Operators that need
- * a local-time fire encode the offset directly into their cron
- * expression (e.g. `0 14 * * *` for "9am Eastern in winter").
+ * **Timezones (W-124).** By default the scheduler evaluates every
+ * expression in **UTC**. `nextFireAfter(parsed, from, timeZone)`
+ * accepts an optional IANA zone name; the five fields then match the
+ * wall clock of that zone and the returned `Date` is the corresponding
+ * UTC instant. DST transitions follow Vixie cron semantics:
+ *
+ * - **Fixed-time jobs** (neither the minute nor the hour field covers
+ *   its full range): a wall time swallowed by a spring-forward gap
+ *   runs once immediately after the transition; a wall time repeated
+ *   by a fall-back overlap runs only on the first pass.
+ * - **Wildcard jobs** (the minute or the hour field covers its full
+ *   range, e.g. `*` or `0-59`): no compensation - the job simply
+ *   follows the new wall clock, so gap times never run and repeated
+ *   times run on both passes.
  *
  * @packageDocumentation
  */
@@ -166,9 +177,12 @@ function parseNumeric(name: string, raw: string | undefined, expression: string)
 
 /**
  * Compute the next fire time strictly after `from` for the supplied
- * cron schedule. Returns a UTC `Date` (the scheduler treats every
- * trigger as UTC; operators that need local time express that in
- * their cron expression).
+ * cron schedule. Returns a UTC `Date`.
+ *
+ * Without `timeZone` the expression is evaluated in **UTC** (the
+ * historical default). With an IANA `timeZone` the fields match the
+ * wall clock of that zone; DST transitions follow Vixie cron
+ * semantics (see the module doc, W-124).
  *
  * Returns `null` if no fire happens in the next 4 years (defensive -
  * impossible for a well-formed cron expression except a vacuous
@@ -176,7 +190,10 @@ function parseNumeric(name: string, raw: string | undefined, expression: string)
  *
  * @stable
  */
-export function nextFireAfter(parsed: ParsedCron, from: Date): Date | null {
+export function nextFireAfter(parsed: ParsedCron, from: Date, timeZone?: string): Date | null {
+  if (timeZone !== undefined && timeZone !== 'UTC') {
+    return nextFireAfterInZone(parsed, from.getTime(), timeZone);
+  }
   const start = new Date(from.getTime() + 60_000);
   start.setUTCSeconds(0, 0);
   const horizon = new Date(start.getTime() + 4 * 365 * 24 * 60 * 60 * 1000);
@@ -216,6 +233,224 @@ export function nextFireAfter(parsed: ParsedCron, from: Date): Date | null {
       continue;
     }
     return cursor;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Timezone-aware evaluation (W-124)
+// ---------------------------------------------------------------------------
+
+const MINUTE_MS = 60_000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Formatter cache - `Intl.DateTimeFormat` construction is expensive. */
+const ZONE_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+function formatterFor(timeZone: string): Intl.DateTimeFormat {
+  const cached = ZONE_FORMATTERS.get(timeZone);
+  if (cached !== undefined) return cached;
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  });
+  ZONE_FORMATTERS.set(timeZone, formatter);
+  return formatter;
+}
+
+/**
+ * `true` when `timeZone` is an IANA zone name this runtime's Intl data
+ * resolves. The `cron(...)` helper uses it for eager validation so a
+ * typo fails at registration time, never at first fire.
+ *
+ * @stable
+ */
+export function isValidTimeZone(timeZone: string): boolean {
+  try {
+    formatterFor(timeZone);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+interface WallParts {
+  readonly year: number;
+  readonly month: number;
+  readonly day: number;
+  readonly hour: number;
+  readonly minute: number;
+}
+
+function wallPartsAt(utcMs: number, timeZone: string): WallParts {
+  const parts = formatterFor(timeZone).formatToParts(new Date(utcMs));
+  let year = 0;
+  let month = 0;
+  let day = 0;
+  let hour = 0;
+  let minute = 0;
+  for (const part of parts) {
+    switch (part.type) {
+      case 'year':
+        year = Number.parseInt(part.value, 10);
+        break;
+      case 'month':
+        month = Number.parseInt(part.value, 10);
+        break;
+      case 'day':
+        day = Number.parseInt(part.value, 10);
+        break;
+      case 'hour':
+        hour = Number.parseInt(part.value, 10);
+        break;
+      case 'minute':
+        minute = Number.parseInt(part.value, 10);
+        break;
+      default:
+        break;
+    }
+  }
+  return { year, month, day, hour, minute };
+}
+
+/**
+ * Offset (ms) of `timeZone` from UTC at the UTC instant `utcMs`.
+ * Minute-aligned - every real-world offset in the modern IANA era is.
+ */
+function offsetAt(utcMs: number, timeZone: string): number {
+  const w = wallPartsAt(utcMs, timeZone);
+  const wallMs = Date.UTC(w.year, w.month - 1, w.day, w.hour, w.minute);
+  const alignedUtc = Math.floor(utcMs / MINUTE_MS) * MINUTE_MS;
+  return wallMs - alignedUtc;
+}
+
+/**
+ * UTC instants (ascending) whose wall clock in `timeZone` reads exactly
+ * the minute encoded by `wallMs` (wall fields interpreted via
+ * `Date.UTC`). Zero entries: the wall time is skipped by a
+ * spring-forward gap. Two entries: it repeats across a fall-back
+ * overlap.
+ */
+function utcInstantsForWall(wallMs: number, timeZone: string): number[] {
+  const offsets = new Set<number>([
+    offsetAt(wallMs - DAY_MS, timeZone),
+    offsetAt(wallMs, timeZone),
+    offsetAt(wallMs + DAY_MS, timeZone),
+  ]);
+  const out: number[] = [];
+  for (const offset of offsets) {
+    const utc = wallMs - offset;
+    if (offsetAt(utc, timeZone) === offset) out.push(utc);
+  }
+  return out.sort((a, b) => a - b);
+}
+
+/**
+ * First UTC minute AFTER the transition that swallowed the
+ * (nonexistent) wall time `wallMs` - the Vixie "run once immediately
+ * after the change" instant for gap-scheduled fixed-time jobs.
+ */
+function gapTransitionEnd(wallMs: number, timeZone: string): number {
+  let lo = Math.floor((wallMs - DAY_MS) / MINUTE_MS) * MINUTE_MS;
+  let hi = Math.floor((wallMs + DAY_MS) / MINUTE_MS) * MINUTE_MS;
+  const offLo = offsetAt(lo, timeZone);
+  while (hi - lo > MINUTE_MS) {
+    const mid = lo + Math.floor((hi - lo) / (2 * MINUTE_MS)) * MINUTE_MS;
+    if (mid <= lo || mid >= hi) break;
+    if (offsetAt(mid, timeZone) === offLo) lo = mid;
+    else hi = mid;
+  }
+  return hi;
+}
+
+function isFullRange(set: ReadonlySet<number>, range: FieldRange): boolean {
+  for (let v = range.min; v <= range.max; v += 1) {
+    if (!set.has(v)) return false;
+  }
+  return true;
+}
+
+function nextWallDay(
+  year: number,
+  month: number,
+  day: number,
+): { year: number; month: number; day: number } {
+  const d = new Date(Date.UTC(year, month - 1, day) + DAY_MS);
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
+}
+
+function previousWallDay(
+  year: number,
+  month: number,
+  day: number,
+): { year: number; month: number; day: number } {
+  const d = new Date(Date.UTC(year, month - 1, day) - DAY_MS);
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
+}
+
+/** 4 years of wall-calendar days - mirrors the UTC path's horizon. */
+const MAX_DAY_SCAN = 4 * 366;
+
+function nextFireAfterInZone(parsed: ParsedCron, fromMs: number, timeZone: string): Date | null {
+  // Vixie cron's DST compensation applies to "fixed-time" jobs only:
+  // both the minute and the hour field name specific values. Jobs with
+  // a full-range ("wildcard") minute or hour field follow the new wall
+  // clock through a transition instead.
+  const fixedTime =
+    !isFullRange(parsed.minute, RANGES.minute) && !isFullRange(parsed.hour, RANGES.hour);
+  const hours = [...parsed.hour].sort((a, b) => a - b);
+  const minutes = [...parsed.minute].sort((a, b) => a - b);
+
+  // Start one wall day EARLY: a fall-back transition can move the wall
+  // clock backwards across midnight (e.g. America/Santiago ends DST at
+  // 00:00), so instants > fromMs may still live on the previous wall
+  // date. Candidates mapping to utc <= fromMs are filtered below.
+  const startWall = wallPartsAt(fromMs, timeZone);
+  let { year, month, day } = previousWallDay(startWall.year, startWall.month, startWall.day);
+
+  for (let scanned = 0; scanned < MAX_DAY_SCAN; scanned += 1) {
+    if (!parsed.month.has(month)) {
+      // Jump to the 1st of the next wall month (same optimisation as
+      // the UTC path).
+      if (month === 12) {
+        year += 1;
+        month = 1;
+      } else {
+        month += 1;
+      }
+      day = 1;
+      continue;
+    }
+    const dow = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+    if (parsed.day.has(day) && parsed.dayOfWeek.has(dow)) {
+      for (const hour of hours) {
+        for (const minute of minutes) {
+          const wallMs = Date.UTC(year, month - 1, day, hour, minute);
+          const instants = utcInstantsForWall(wallMs, timeZone);
+          let utc: number | null;
+          if (instants.length === 1) {
+            utc = instants[0] ?? null;
+          } else if (instants.length > 1) {
+            // Fall-back overlap: the wall time occurs twice. Fixed-time
+            // jobs run only on the first pass; wildcard jobs on every
+            // pass.
+            utc = fixedTime ? (instants[0] ?? null) : (instants.find((t) => t > fromMs) ?? null);
+          } else {
+            // Spring-forward gap: the wall time never occurs. Fixed-time
+            // jobs run once immediately after the transition; wildcard
+            // jobs get no compensation.
+            utc = fixedTime ? gapTransitionEnd(wallMs, timeZone) : null;
+          }
+          if (utc !== null && utc > fromMs) return new Date(utc);
+        }
+      }
+    }
+    ({ year, month, day } = nextWallDay(year, month, day));
   }
   return null;
 }

@@ -6,7 +6,7 @@
 
 # Interface: TriggerOptions
 
-Defined in: [packages/triggers/src/index.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L34)
+Defined in: [packages/triggers/src/index.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L46)
 
 ## Stable
 
@@ -14,8 +14,9 @@ Defined in: [packages/triggers/src/index.ts:34](https://github.com/o-stepper/gra
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-acknowledgelibmode"></a> `acknowledgeLibMode?` | `readonly` | `boolean` | Suppress the one-time per-process library-mode WARN. Library callers acknowledging that triggers fire only as long as the process lives pass `true` here. | [packages/triggers/src/index.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L51) |
-| <a id="property-catchuppolicy"></a> `catchupPolicy?` | `readonly` | [`CatchupPolicy`](/api/@graphorin/triggers/type-aliases/CatchupPolicy.md) | - | [packages/triggers/src/index.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L35) |
-| <a id="property-catchupwindowms"></a> `catchupWindowMs?` | `readonly` | `number` | How far back (from the last successful fire) misses are honored. Catch-up counts REAL missed fires (RP-12), so the window must exceed the trigger period - a 24h window can never catch up a daily cron whose boundary is itself 24h after the last fire. Default 24h. | [packages/triggers/src/index.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L44) |
-| <a id="property-maxcatchupruns"></a> `maxCatchupRuns?` | `readonly` | `number` | - | [packages/triggers/src/index.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L36) |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | [packages/triggers/src/index.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L45) |
+| <a id="property-acknowledgelibmode"></a> `acknowledgeLibMode?` | `readonly` | `boolean` | Suppress the one-time per-process library-mode WARN. Library callers acknowledging that triggers fire only as long as the process lives pass `true` here. | [packages/triggers/src/index.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L63) |
+| <a id="property-catchuppolicy"></a> `catchupPolicy?` | `readonly` | [`CatchupPolicy`](/api/@graphorin/triggers/type-aliases/CatchupPolicy.md) | - | [packages/triggers/src/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L47) |
+| <a id="property-catchupwindowms"></a> `catchupWindowMs?` | `readonly` | `number` | How far back (from the last successful fire) misses are honored. Catch-up counts REAL missed fires (RP-12), so the window must exceed the trigger period - a 24h window can never catch up a daily cron whose boundary is itself 24h after the last fire. Default 24h. | [packages/triggers/src/index.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L56) |
+| <a id="property-maxcatchupruns"></a> `maxCatchupRuns?` | `readonly` | `number` | - | [packages/triggers/src/index.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L48) |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | [packages/triggers/src/index.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L57) |
+| <a id="property-timezone"></a> `timezone?` | `readonly` | `string` | IANA timezone the cron expression's wall clock is evaluated in (W-124). `cron(...)` validates it eagerly - an unknown zone throws at declaration time. DST transitions follow Vixie semantics (see the cron module doc). Applies to `cron` triggers only; the other kinds ignore it (like the catch-up fields they do not use). Default: UTC. | [packages/triggers/src/index.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L72) |

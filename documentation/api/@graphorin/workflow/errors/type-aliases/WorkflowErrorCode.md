@@ -29,7 +29,8 @@ type WorkflowErrorCode =
   | "workflow-version-mismatch"
   | "workflow-divergence"
   | "pause-not-found"
-  | "pause-replay-divergence";
+  | "pause-replay-divergence"
+  | "awakeable-payload-invalid";
 ```
 
 Defined in: [packages/workflow/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L16)

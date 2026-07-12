@@ -9,6 +9,11 @@
  *   POST   /triggers/:id/enable         (scope `triggers:disable`) - flag flip
  *   DELETE /triggers/:id                (scope `triggers:disable`) - unregister
  *   POST   /triggers/prune              (scope `triggers:disable`)
+ *     body { disabled?: boolean = true, orphaned?: boolean = false } -
+ *     `orphaned: true` additionally removes persisted rows with no
+ *     live declaration in this process (W-123); only the running
+ *     server can tell those apart, which is why the offline CLI prune
+ *     cannot.
  *
  * Response shapes mirror the persisted `TriggerState` rows so CLI +
  * dashboard consumers can render them without re-mapping.
@@ -19,6 +24,7 @@
 import type { TriggerState } from '@graphorin/core/contracts';
 import type { Scheduler } from '@graphorin/triggers';
 import { Hono } from 'hono';
+import { z } from 'zod';
 
 import type { ServerVariables } from '../internal/context.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
@@ -105,19 +111,62 @@ export function createTriggersRoutes(
   });
 
   app.post('/prune', createScopeMiddleware('triggers:disable'), async (c) => {
-    const all = await scheduler.list();
-    const removedIds: string[] = [];
-    for (const trigger of all) {
-      if (trigger.disabled) {
+    let raw: unknown;
+    try {
+      raw = await c.req.json();
+    } catch {
+      raw = {};
+    }
+    const parsed = PruneBodySchema.safeParse(raw ?? {});
+    if (!parsed.success) {
+      return c.json(
+        {
+          error: 'bad-request',
+          message: `Invalid prune body: expected { disabled?: boolean, orphaned?: boolean }.`,
+        },
+        400,
+      );
+    }
+    const pruneDisabled = parsed.data.disabled ?? true;
+    const pruneOrphaned = parsed.data.orphaned ?? false;
+
+    // W-123: orphans first - a disabled orphan belongs to the orphan
+    // bucket, and the second pass never re-sees removed rows.
+    const removedOrphaned: string[] = [];
+    if (pruneOrphaned) {
+      for (const trigger of await scheduler.orphans()) {
         await scheduler.unregister(trigger.id);
-        removedIds.push(trigger.id);
+        removedOrphaned.push(trigger.id);
       }
     }
-    return c.json({ ok: true, removed: removedIds, count: removedIds.length });
+    const removedDisabled: string[] = [];
+    if (pruneDisabled) {
+      for (const trigger of await scheduler.list()) {
+        if (trigger.disabled) {
+          await scheduler.unregister(trigger.id);
+          removedDisabled.push(trigger.id);
+        }
+      }
+    }
+    const removed = [...removedOrphaned, ...removedDisabled];
+    return c.json({
+      ok: true,
+      removed,
+      count: removed.length,
+      disabled: removedDisabled,
+      orphaned: removedOrphaned,
+    });
   });
 
   return app;
 }
+
+const PruneBodySchema = z
+  .object({
+    disabled: z.boolean().optional(),
+    orphaned: z.boolean().optional(),
+  })
+  .strict();
 
 function serializeTrigger(state: TriggerState): Record<string, unknown> {
   return {

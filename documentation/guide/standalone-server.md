@@ -84,7 +84,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/triggers/:id/disable` | **Flag flip** - pause the trigger; it stays registered and persisted. |
 | `POST` | `/v1/triggers/:id/enable` | Re-enable a paused trigger (the next fire is recomputed from now). |
 | `DELETE` | `/v1/triggers/:id` | **Destructive** - unregister and remove the trigger. |
-| `POST` | `/v1/triggers/prune` | **Destructive** - unregister every disabled trigger (no cutoff; the CLI `graphorin triggers prune` adds `--before`). |
+| `POST` | `/v1/triggers/prune` | **Destructive** - body `{ disabled?: boolean = true, orphaned?: boolean = false }`. The default removes every disabled trigger (no cutoff; the CLI `graphorin triggers prune` adds `--before`). `orphaned: true` additionally removes persisted rows with no live declaration in this process - only the running server can tell those apart, the offline CLI cannot. |
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
 | | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
@@ -178,6 +178,7 @@ const morningSummary = cron(
   async () => {
     await agent.run('Send the morning summary.');
   },
+  { timezone: 'Europe/Kyiv' },
 );
 
 const scheduler = createScheduler({ store: sqlite.triggers });
@@ -187,9 +188,26 @@ await scheduler.start();
 
 The triggers daemon (mounted by `@graphorin/server`) owns the schedule, persists the next-firing time across restarts, fires the registered callback, and audits every fire decision.
 
+### Cron timezones and DST
+
+Cron expressions evaluate in **UTC** by default. Pass `timezone` (an IANA zone name) in the declaration options to match the expression against that zone's wall clock instead; `cron(...)` validates the zone eagerly, so a typo throws at declaration time, never at first fire. The `day`/`dayOfWeek` AND-combination rule is unchanged and applies in the zone's calendar.
+
+DST transitions follow Vixie cron semantics:
+
+- **Fixed-time jobs** (neither the minute nor the hour field covers its full range, e.g. `30 2 * * *`): a wall time swallowed by a spring-forward gap runs **once immediately after the transition**; a wall time repeated by a fall-back overlap runs **only on the first pass**.
+- **Wildcard jobs** (the minute or the hour field covers its full range, e.g. `*/30 * * * *`): no compensation - the job follows the new wall clock, so gap times never run and repeated times run on both passes.
+
+`interval` / `idle` / `event` triggers ignore `timezone` (like the catch-up fields they do not use).
+
+### Orphaned triggers and catch-up
+
+Trigger rows are durable, but callbacks live only in memory: after a restart every declaration must be re-registered before `scheduler.start()`. A persisted row whose declaration was **not** re-registered can never fire; `start()` surfaces each such row with a WARN log and an `orphaned` scheduler event instead of skipping it silently, `Scheduler.orphans()` lists them, the daemon reports an `orphaned` count in `/v1/health`, and `POST /v1/triggers/prune { "orphaned": true }` removes them.
+
+Register-time catch-up is gated on the scheduler lifecycle: when a trigger with a `catchupPolicy` is registered **before** `start()`, its missed fires are counted and applied during `start()` - user callbacks never run on a not-started scheduler.
+
 ### Background consolidation
 
-When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them during startup (the consolidator daemon starts first and registers its `cron` / `idle` triggers with the scheduler before the scheduler begins firing) so background distillation actually runs - no manual `registerWithScheduler` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
+When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them during startup (the consolidator daemon starts first and registers its `cron` / `idle` triggers with the scheduler before the scheduler begins firing) so background distillation actually runs - no manual `registerWithScheduler` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. A `buffer:N` trigger (consolidate once the unconsolidated transcript tail reaches N tokens) is evaluated on activity: the server's run tracker calls `scheduler.recordActivity()` on every tracked REST/WS run (making `idle:T` a true debounce) and `consolidator.notifyActivity()` when a run settles - see [Memory system](/guide/memory-system#the-buffer-trigger-and-activity-signals). The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
 
 ## Idempotency
 
