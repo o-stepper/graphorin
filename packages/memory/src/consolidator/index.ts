@@ -60,6 +60,7 @@ export {
 } from './dlq.js';
 export {
   BudgetExceededError,
+  CuratedBlocksMisconfiguredError,
   CustomTierMisconfiguredError,
   ProviderNotConfiguredError,
 } from './errors.js';
@@ -91,6 +92,20 @@ export {
   type WorkflowInductionOptions,
 } from './phases/induce.js';
 export {
+  buildLearnedContextRequest,
+  type CuratedBlockDeps,
+  type CuratedBlockSpec,
+  curatedBlockSystemPrompt,
+  DEFAULT_LEARNED_CONTEXT_MAX_CHARS,
+  LEARNED_CONTEXT_BLOCK_LABEL,
+  type LearnedContextDeps,
+  type LearnedContextOutcome,
+  normalizeLearnedContext,
+  type ResolvedCuratedBlock,
+  runCuratedBlockPass,
+  runLearnedContextPass,
+} from './phases/learned-context.js';
+export {
   type LightPhaseDeps,
   runLightPhase,
 } from './phases/light.js';
@@ -114,6 +129,11 @@ export {
   runStandardPhase,
   type StandardPhaseDeps,
 } from './phases/standard.js';
+export {
+  type ReviserConsolidatorConfig,
+  type ReviserPresetOptions,
+  reviserConsolidatorPreset,
+} from './presets.js';
 export { type Consolidator, createConsolidator } from './runtime.js';
 export {
   type ConsolidatorCatchupPolicy,
@@ -211,6 +231,7 @@ export function createConsolidatorPlaceholder(
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
+    curatedBlocks: [],
     profileProjection: null,
   });
 

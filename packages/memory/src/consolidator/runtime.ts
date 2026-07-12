@@ -30,14 +30,23 @@ import type { WorkingMemory } from '../tiers/working-memory.js';
 import { BudgetTracker } from './budget.js';
 import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
-import { CustomTierMisconfiguredError, ProviderNotConfiguredError } from './errors.js';
+import {
+  CuratedBlocksMisconfiguredError,
+  CustomTierMisconfiguredError,
+  ProviderNotConfiguredError,
+} from './errors.js';
 import { tipMessageId } from './idempotency.js';
 import { LockManager, scopeKey } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
-import { runLearnedContextPass } from './phases/learned-context.js';
+import {
+  LEARNED_CONTEXT_BLOCK_LABEL,
+  type ResolvedCuratedBlock,
+  runCuratedBlockPass,
+} from './phases/learned-context.js';
 import { runLightPhase } from './phases/light.js';
 import {
+  PROFILE_BLOCK_LABEL,
   resolveProfileProjectionConfig,
   runProfileProjectionPass,
 } from './phases/profile-projection.js';
@@ -974,32 +983,42 @@ class ConsolidatorImpl implements Consolidator {
             : (out.llmCostUsd ?? 0) + reflection.costUsd,
       };
     }
-    // Learned-context pass (D3) runs last, folding the run's fresh
-    // synthesis into the standing digest block. Double-gated: enabled by
-    // config and a working-tier handle wired. Rides the deep provider +
-    // budget like reflection.
-    if (this.#config.learnedContext && this.#working !== null) {
-      const learned = await runLearnedContextPass({
-        provider: deepProvider,
-        tracer: this.#tracer,
-        scope,
-        working: this.#working,
-        episodic: this.#episodic,
-        store: this.#store,
-        budget: this.#budget,
-        maxChars: this.#config.learnedContextMaxChars,
-        now: this.#now,
-        ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
-      });
-      out = {
-        ...out,
-        learnedContextUpdated: learned.updated,
-        llmTokensUsed: out.llmTokensUsed + learned.tokens,
-        llmCostUsd:
-          out.llmCostUsd === null && learned.costUsd === 0
-            ? null
-            : (out.llmCostUsd ?? 0) + learned.costUsd,
-      };
+    // Curated-block passes (D3, generalised in wave-D): the registered
+    // list - incl. the learned_context entry contributed by the
+    // `learnedContext: true` sugar - is rewritten block by block.
+    // Double-gated: a non-empty list and a working-tier handle wired.
+    // Rides the deep provider + budget like reflection.
+    if (this.#config.curatedBlocks.length > 0 && this.#working !== null) {
+      let curatedBlocksUpdated = 0;
+      for (const block of this.#config.curatedBlocks) {
+        const rewritten = await runCuratedBlockPass({
+          provider: deepProvider,
+          tracer: this.#tracer,
+          scope,
+          working: this.#working,
+          episodic: this.#episodic,
+          store: this.#store,
+          budget: this.#budget,
+          maxChars: block.maxChars,
+          label: block.label,
+          ...(block.prompt !== null ? { systemPrompt: block.prompt } : {}),
+          now: this.#now,
+          ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
+        });
+        if (rewritten.updated) curatedBlocksUpdated += 1;
+        out = {
+          ...out,
+          ...(block.label === LEARNED_CONTEXT_BLOCK_LABEL
+            ? { learnedContextUpdated: rewritten.updated }
+            : {}),
+          llmTokensUsed: out.llmTokensUsed + rewritten.tokens,
+          llmCostUsd:
+            out.llmCostUsd === null && rewritten.costUsd === 0
+              ? null
+              : (out.llmCostUsd ?? 0) + rewritten.costUsd,
+        };
+      }
+      out = { ...out, curatedBlocksUpdated };
     }
     // Profile-projection pass (wave-D D2) runs last: it reads the facts
     // the drain above may have just settled. Same double-gate + deep
@@ -1120,12 +1139,52 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
     learnedContext: opts.learnedContext ?? preset.learnedContext,
     learnedContextMaxChars: opts.learnedContextMaxChars ?? preset.learnedContextMaxChars,
+    curatedBlocks: resolveCuratedBlocks(opts, preset),
     // Wave-D D2: not per-tier - configured via createMemory({ profile }).
     profileProjection:
       opts.profileProjection === undefined
         ? null
         : resolveProfileProjectionConfig(opts.profileProjection),
   });
+}
+
+/**
+ * Wave-D D3: merge the `learnedContext: true` sugar with the explicit
+ * `curatedBlocks` list into the resolved config, validating labels
+ * (unique, non-empty, never the reserved `profile`).
+ */
+function resolveCuratedBlocks(
+  opts: CreateConsolidatorOptions,
+  preset: { readonly learnedContext: boolean; readonly learnedContextMaxChars: number },
+): ReadonlyArray<ResolvedCuratedBlock> {
+  const learnedContext = opts.learnedContext ?? preset.learnedContext;
+  const learnedContextMaxChars = opts.learnedContextMaxChars ?? preset.learnedContextMaxChars;
+  const out: ResolvedCuratedBlock[] = [];
+  if (learnedContext) {
+    out.push({
+      label: LEARNED_CONTEXT_BLOCK_LABEL,
+      prompt: null,
+      maxChars: learnedContextMaxChars,
+    });
+  }
+  for (const spec of opts.curatedBlocks ?? []) {
+    const label = typeof spec.label === 'string' ? spec.label.trim() : '';
+    if (label.length === 0) {
+      throw new CuratedBlocksMisconfiguredError(String(spec.label), 'empty');
+    }
+    if (label === PROFILE_BLOCK_LABEL) {
+      throw new CuratedBlocksMisconfiguredError(label, 'reserved');
+    }
+    if (out.some((entry) => entry.label === label)) {
+      throw new CuratedBlocksMisconfiguredError(label, 'duplicate');
+    }
+    out.push({
+      label,
+      prompt: spec.prompt ?? null,
+      maxChars: spec.maxChars ?? learnedContextMaxChars,
+    });
+  }
+  return Object.freeze(out);
 }
 
 function defaultTriggers(): ConsolidatorTriggerSpec[] {

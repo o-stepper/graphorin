@@ -64,6 +64,35 @@ export class CustomTierMisconfiguredError extends GraphorinMemoryError {
 }
 
 /**
+ * Raised when the wave-D D3 `curatedBlocks` config is invalid: a
+ * duplicate label (incl. colliding with the `learnedContext: true`
+ * sugar), an empty label, or the reserved `profile` label (the profile
+ * projection owns that block and keeps it read-only - a curated-block
+ * rewrite would fight the projection).
+ *
+ * @stable
+ */
+export class CuratedBlocksMisconfiguredError extends GraphorinMemoryError {
+  override readonly name = 'CuratedBlocksMisconfiguredError';
+  readonly kind = 'curated-blocks-misconfigured' as const;
+  readonly label: string;
+
+  constructor(label: string, problem: 'duplicate' | 'empty' | 'reserved') {
+    super(
+      problem === 'duplicate'
+        ? `[graphorin/memory] curatedBlocks: duplicate label '${label}' (note: learnedContext: true already registers 'learned_context').`
+        : problem === 'empty'
+          ? '[graphorin/memory] curatedBlocks: a block label must be a non-empty string.'
+          : `[graphorin/memory] curatedBlocks: label '${label}' is reserved - the profile projection owns it (read-only).`,
+      {
+        hint: 'Give every curated block a unique, non-reserved label.',
+      },
+    );
+    this.label = label;
+  }
+}
+
+/**
  * Raised when the standard / deep phase attempts an LLM call without
  * a configured provider. Surfaces as a typed failure that the DLQ
  * pipeline can attribute correctly.

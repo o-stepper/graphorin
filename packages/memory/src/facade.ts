@@ -23,6 +23,7 @@ import {
   type ConsolidatorPhase,
   type ConsolidatorTier,
   type ConsolidatorTriggerSpec,
+  type CuratedBlockSpec,
   createConsolidator,
   createConsolidatorPlaceholder,
   createProviderWorkflowInducer,
@@ -61,7 +62,7 @@ import { SemanticMemory, type SemanticSearchDefaults } from './tiers/semantic-me
 import { SessionMemory } from './tiers/session-memory.js';
 import { SharedMemory } from './tiers/shared-memory.js';
 import { type BlockDefinition, WorkingMemory } from './tiers/working-memory.js';
-import { buildMemoryTools, type ScopeResolver } from './tools/index.js';
+import { buildMemoryTools, type MemoryToolProfile, type ScopeResolver } from './tools/index.js';
 
 /**
  * Options accepted by {@link createMemory}.
@@ -245,6 +246,17 @@ export interface CreateMemoryOptions {
    */
   readonly runbookSearch?: boolean;
   /**
+   * Memory tool profile (wave-D D3): which slice of the canonical set
+   * `memory.tools` carries. `'full'` (default) is the stable-order
+   * read+write set; `'interactive'` builds ONLY the read tools - a
+   * front-line agent wired with it cannot write memory by construction
+   * (curation belongs to the reviser); `'reviser'` is the full surface,
+   * semantically reserved for the sleep-time curation agent. The gated
+   * read appendices (`deep_recall`, `runbook_search`) appear in every
+   * profile when enabled.
+   */
+  readonly toolProfile?: MemoryToolProfile;
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws - the
    * agent runtime overrides it in Phase 12.
@@ -342,6 +354,14 @@ export interface CreateMemoryOptions {
     readonly learnedContext?: boolean;
     /** Character bound for the learned-context digest (D3). Default `1200`. */
     readonly learnedContextMaxChars?: number;
+    /**
+     * Curated working blocks the deep phase maintains (wave-D D3) -
+     * the generalisation of the learned-context pass to a registered
+     * list (`learnedContext: true` remains sugar for
+     * `[{ label: 'learned_context' }]` and composes with this).
+     * Labels must be unique and never the reserved `profile`.
+     */
+    readonly curatedBlocks?: ReadonlyArray<CuratedBlockSpec>;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock - used by tests. */
@@ -571,8 +591,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     // P2-4: the gated `deep_recall` tool is registered only when a grader
     // is configured - the offline default stays at exactly eleven tools.
     // D3: `runbook_search` is a second gated appendix, opt-in via
-    // `runbookSearch: true`.
+    // `runbookSearch: true`; `toolProfile` selects the wave-D D3 slice.
     {
+      ...(options.toolProfile !== undefined ? { profile: options.toolProfile } : {}),
       includeDeepRecall: grader !== null,
       includeRunbookSearch: options.runbookSearch === true,
     },
@@ -822,6 +843,7 @@ function buildConsolidator(
     ...(opts.learnedContextMaxChars !== undefined
       ? { learnedContextMaxChars: opts.learnedContextMaxChars }
       : {}),
+    ...(opts.curatedBlocks !== undefined ? { curatedBlocks: opts.curatedBlocks } : {}),
     ...(profile !== undefined ? { profileProjection: profile } : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });

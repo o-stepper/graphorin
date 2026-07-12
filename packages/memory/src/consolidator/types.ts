@@ -18,6 +18,7 @@ import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import type { WorkingMemory } from '../tiers/working-memory.js';
 import type { SalienceWeights } from './decay.js';
+import type { CuratedBlockSpec, ResolvedCuratedBlock } from './phases/learned-context.js';
 import type {
   ProfileProjectionConfig,
   ResolvedProfileProjectionConfig,
@@ -285,8 +286,16 @@ export interface ConsolidatorConfig {
   /** Character bound enforced on the learned-context digest. Default `1200`. */
   readonly learnedContextMaxChars: number;
   /**
+   * Curated working blocks the deep phase maintains (wave-D D3) - the
+   * generalisation of the learned-context pass to a registered list.
+   * Resolved: the `learnedContext: true` sugar contributes a
+   * `learned_context` entry; labels are unique and never `profile`.
+   * Empty ⇒ no curated-block rewrites run.
+   */
+  readonly curatedBlocks: ReadonlyArray<ResolvedCuratedBlock>;
+  /**
    * Profile-projection pass configuration (wave-D D2): after the
-   * learned-context pass, one budgeted LLM call projects ACTIVE facts
+   * curated-block passes, one budgeted LLM call projects ACTIVE facts
    * into the reserved read-only `profile` working block (topic /
    * sub-topic / content slots with fact-id provenance). `null` (the
    * default at every tier) disables the pass. Configured through
@@ -383,6 +392,8 @@ export interface PhaseOutcome {
   readonly insightsCreated: number;
   /** True when the learned-context digest block was rewritten (D3). */
   readonly learnedContextUpdated?: boolean;
+  /** How many curated blocks were rewritten this pass (wave-D D3). */
+  readonly curatedBlocksUpdated?: number;
   /** True when the profile block content changed (wave-D D2). */
   readonly profileProjectionUpdated?: boolean;
   readonly noiseFilteredCount: number;
@@ -521,6 +532,12 @@ export interface CreateConsolidatorOptions {
   readonly learnedContext?: boolean;
   /** Override the {@link ConsolidatorConfig.learnedContextMaxChars} default (D3). */
   readonly learnedContextMaxChars?: number;
+  /**
+   * Curated working blocks the deep phase maintains (wave-D D3).
+   * `learnedContext: true` remains sugar for
+   * `[{ label: 'learned_context' }]` and composes with this list.
+   */
+  readonly curatedBlocks?: ReadonlyArray<CuratedBlockSpec>;
   /** Enable the profile-projection pass (wave-D D2). Default off. */
   readonly profileProjection?: ProfileProjectionConfig;
   /** Default scope used by event triggers + the manual `fireNow` path. */

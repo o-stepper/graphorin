@@ -116,7 +116,17 @@ export const scope: SessionScope = { userId: 'alex' };
 | `recall_episodes` | episodic | Triple-signal episode retrieval. |
 | `conversation_search` | session | FTS5 search over the active session messages. |
 
-These eleven are always registered. A **twelfth**, `deep_recall` (iterative grade-then-reformulate recall), is appended **only when** you configure `iterativeRetrieval` - so the default offline surface stays at exactly eleven and the original tool indices never shift.
+These eleven are always registered on the default profile. A **twelfth**, `deep_recall` (iterative grade-then-reformulate recall), is appended **only when** you configure `iterativeRetrieval`, and a thirteenth, `runbook_search`, with `runbookSearch: true` - so the default offline surface stays at exactly eleven and the original tool indices never shift.
+
+### Tool profiles (wave-D D3)
+
+`createMemory({ toolProfile })` (or `buildMemoryTools(deps, { profile })`) selects which slice of the canonical set `memory.tools` carries:
+
+- `'full'` (default) - the stable-order read+write set above.
+- `'interactive'` - ONLY the read tools (`fact_search`, `recall_episodes`, `conversation_search`, `fact_history`, plus the gated read appendices). The write factories are never constructed, so a front-line conversational agent **cannot write memory by construction** - not by filtering, and with nothing for a prompt injection to reach.
+- `'reviser'` - the full read+write surface, semantically reserved for the sleep-time curation agent.
+
+The intended split is single-writer: interactive agents observe memory, the reviser (and the consolidator pipeline) mutate it. An unknown profile value throws at `createMemory` time.
 
 ## Hybrid search
 
@@ -470,6 +480,12 @@ Use-it-or-lose-it decay (ExpeL) applies to **validated** insights only: each ref
 ### Learned-context digest (opt-in)
 
 `consolidator: { learnedContext: true }` adds a Letta-style sleep-time pass after the deep phase: one budgeted LLM call rewrites the reserved `learned_context` working block from the previous digest + recent episodes + active insights + active procedures. Because it is an ordinary working block, the digest is spliced into layer 3 of the assembled system prompt automatically (inside the stable KV-cache prefix), survives compaction via the persona-block re-anchor pattern (`reanchorPersonaBlock({ blockLabel: 'learned_context' })`), and stays editable by the agent through the `block_*` tools - the pass folds any agent edits into its next rewrite. Size-bounded by `learnedContextMaxChars` (default 1200). Off by default at **every** tier; a silent no-op when the facade has no working tier or the pass finds no evidence (no paid call).
+
+### Curated blocks and the reviser preset (wave-D D3)
+
+The learned-context pass generalises to a **registered list of curated blocks**: `consolidator: { curatedBlocks: [{ label: 'persona' }, { label: 'scratch', prompt: '...', maxChars: 800 }] }` gives each entry its own deep-phase rewrite with the same resilience + budget envelope (`learnedContext: true` remains sugar for a `learned_context` entry and composes with the list). Labels must be unique and never the reserved `profile` (the projection owns that block); violations throw `CuratedBlocksMisconfiguredError` at `createMemory` time. `PhaseOutcome.curatedBlocksUpdated` counts the rewrites per deep pass.
+
+`reviserConsolidatorPreset({ provider, defaultScope, curatedBlocks?, schedule?, onExceed?, ceilings? })` packages the sleep-time reviser: a cheap provider profile routed to every phase, an `idle:15m` + `cron:0 5 * * *` cadence (the cron leg is what reaches the deep phase), and a HARD budget posture - the preset requires `onExceed: 'pause' | 'throw'` and rejects `'log'` (the tier defaults log-and-continue, which is wrong for an unattended reviser). Pass the result directly as `createMemory({ consolidator: reviserConsolidatorPreset({...}) })`. The cheapest reviser available today is still configuration only: `learnedContext: true` on your existing tier.
 
 ### Profile projection (opt-in, wave-D D2)
 
