@@ -8,6 +8,7 @@
 
 export {
   type BaseHealthCheck,
+  type ChannelsCheck,
   type ConsolidatorCheck,
   collectHealth,
   type EmbedderCheck,

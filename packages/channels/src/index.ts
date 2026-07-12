@@ -30,10 +30,28 @@ export {
   type PairingPolicyOptions,
 } from './access.js';
 export {
+  type ChannelGateway,
+  type ChannelGatewayChannelStatus,
+  ChannelGatewayConfigError,
+  type ChannelGatewayOptions,
+  type ChannelGatewayStatus,
+  type ChannelInboundContext,
+  type ChannelInboundHandler,
+  type ChannelReply,
+  type ChannelUnauthorizedHandler,
+  createChannelGateway,
+} from './gateway.js';
+export {
   type SanitizationOutcome,
   type SanitizeChannelInboundOptions,
   sanitizeChannelInbound,
 } from './inbound.js';
+export {
+  type OutboundCommentaryPolicy,
+  type OutboundCommentaryReason,
+  type OutboundSanitizationResult,
+  sanitizeChannelOutbound,
+} from './outbound.js';
 export {
   type ChannelRoute,
   ChannelRouteConfigError,

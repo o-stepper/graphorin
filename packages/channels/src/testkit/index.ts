@@ -6,3 +6,9 @@
  */
 
 export { createInMemoryPairingStore } from './in-memory-pairing-store.js';
+export {
+  createLoopbackAdapter,
+  type LoopbackAdapter,
+  type LoopbackAdapterOptions,
+  type LoopbackInboundInput,
+} from './loopback-adapter.js';

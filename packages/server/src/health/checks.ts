@@ -13,6 +13,7 @@
 
 import type { GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { readWalSize } from '@graphorin/store-sqlite';
+import type { ChannelsDaemon } from '../channels/daemon.js';
 import type { ConsolidatorDaemon } from '../consolidator/daemon.js';
 import type { TriggersDaemon } from '../triggers/daemon.js';
 import type { WorkflowTimerDaemon } from '../workflows/timer-daemon.js';
@@ -96,6 +97,19 @@ export interface ReplayBufferCheck extends BaseHealthCheck {
   readonly subscriptions?: number;
 }
 
+/** B1.6: channel-gateway health. @stable */
+export interface ChannelsCheck extends BaseHealthCheck {
+  readonly running: boolean;
+  /** Number of registered channels (adapters). */
+  readonly channels: number;
+  /** Messages currently queued across all channels. */
+  readonly queued: number;
+  /** Messages shed on queue overflow since start (all channels). */
+  readonly dropped: number;
+  /** Handler/pipeline failures since start (all channels). */
+  readonly failed: number;
+}
+
 /** @stable */
 export type HealthCheck =
   | StorageCheck
@@ -105,6 +119,7 @@ export type HealthCheck =
   | ConsolidatorCheck
   | TriggersCheck
   | WorkflowTimersCheck
+  | ChannelsCheck
   | ReplayBufferCheck;
 
 /** W-032: durable-timer driver health. @stable */
@@ -128,6 +143,7 @@ export interface HealthChecks {
   readonly consolidator?: ConsolidatorCheck;
   readonly triggers?: TriggersCheck;
   readonly workflowTimers?: WorkflowTimersCheck;
+  readonly channels?: ChannelsCheck;
   readonly replayBuffer?: ReplayBufferCheck;
 }
 
@@ -143,6 +159,7 @@ export interface HealthCheckOptions {
   readonly triggers?: TriggersDaemon;
   readonly workflowTimers?: WorkflowTimerDaemon;
   readonly consolidator?: ConsolidatorDaemon;
+  readonly channels?: ChannelsDaemon;
   readonly replayBuffer?: ReplayBufferProbe;
   readonly secretsActive?: string;
   readonly encryptionEnabled?: boolean;
@@ -279,6 +296,36 @@ export async function collectHealth(options: HealthCheckOptions): Promise<Health
         sweeps: 0,
         fired: 0,
         errors: 0,
+        message: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
+
+  if (options.channels !== undefined) {
+    try {
+      const status = await options.channels.status();
+      const queued = status.channels.reduce((acc, c) => acc + c.queued, 0);
+      const dropped = status.channels.reduce((acc, c) => acc + c.dropped, 0);
+      const failed = status.channels.reduce((acc, c) => acc + c.failed, 0);
+      checks.channels = {
+        // A stopped gateway on a server that configured one is a
+        // degraded front door; drops/failures are operator-visible
+        // but do not degrade overall health by themselves.
+        status: status.running ? 'ok' : 'warn',
+        running: status.running,
+        channels: status.channels.length,
+        queued,
+        dropped,
+        failed,
+      };
+    } catch (err) {
+      checks.channels = {
+        status: 'fail',
+        running: false,
+        channels: 0,
+        queued: 0,
+        dropped: 0,
+        failed: 0,
         message: err instanceof Error ? err.message : String(err),
       };
     }

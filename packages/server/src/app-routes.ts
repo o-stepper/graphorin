@@ -18,6 +18,7 @@ import type { createNodeWebSocket } from '@hono/node-ws';
 import type { Hono } from 'hono';
 import { refreshLiveMetrics } from './app-metrics.js';
 import { attachProtectedMiddleware } from './app-middleware.js';
+import type { ChannelsDaemon } from './channels/daemon.js';
 import type { ServerConfigSpec } from './config.js';
 import type { ConsolidatorDaemon } from './consolidator/daemon.js';
 import {
@@ -80,6 +81,7 @@ export interface MountRoutesContext {
   readonly triggersDaemon?: TriggersDaemon;
   readonly consolidatorDaemon?: ConsolidatorDaemon;
   readonly workflowTimerDaemon?: WorkflowTimerDaemon;
+  readonly channelsDaemon?: ChannelsDaemon;
 }
 
 /** IP-23: is `host` a loopback interface (so an open /metrics is not exposed)? */
@@ -104,6 +106,7 @@ export function mountRoutes(
         ctx.wsDispatcher,
         config,
         ctx.workflowTimerDaemon,
+        ctx.channelsDaemon,
       ));
   const health = createExtendedHealthRoutes({
     version: ctx.version,
@@ -281,6 +284,7 @@ function buildDefaultHealthProbes(
   dispatcher: WsDispatcher | undefined,
   config: ServerConfigSpec,
   workflowTimerDaemon?: WorkflowTimerDaemon,
+  channelsDaemon?: ChannelsDaemon,
 ): HealthCheckOptions {
   const out: {
     -readonly [K in keyof HealthCheckOptions]?: HealthCheckOptions[K];
@@ -295,6 +299,7 @@ function buildDefaultHealthProbes(
   if (triggersDaemon !== undefined) out.triggers = triggersDaemon;
   if (consolidatorDaemon !== undefined) out.consolidator = consolidatorDaemon;
   if (workflowTimerDaemon !== undefined) out.workflowTimers = workflowTimerDaemon;
+  if (channelsDaemon !== undefined) out.channels = channelsDaemon;
   if (dispatcher !== undefined) {
     const sizes = dispatcher.size();
     // The dispatcher only exposes (subscribers, subscriptions); the

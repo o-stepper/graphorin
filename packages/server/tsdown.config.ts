@@ -11,6 +11,7 @@ export default defineConfig({
     'src/sse/index.ts',
     'src/commentary/index.ts',
     'src/triggers/index.ts',
+    'src/channels/index.ts',
     'src/consolidator/index.ts',
     'src/health/index.ts',
     'src/metrics/index.ts',

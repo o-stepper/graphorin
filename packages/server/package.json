@@ -77,6 +77,10 @@
       "types": "./dist/triggers/index.d.ts",
       "default": "./dist/triggers/index.js"
     },
+    "./channels": {
+      "types": "./dist/channels/index.d.ts",
+      "default": "./dist/channels/index.js"
+    },
     "./consolidator": {
       "types": "./dist/consolidator/index.d.ts",
       "default": "./dist/consolidator/index.js"
