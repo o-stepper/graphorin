@@ -1,0 +1,27 @@
+[**Graphorin API reference v0.8.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / SttTranscript
+
+# Interface: SttTranscript
+
+Defined in: [packages/core/src/contracts/stt.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L32)
+
+A finished transcription. `trustClass` is pinned to
+`'channel-inbound'` by the type: a transcript of a voice note is
+message-borne channel content and MUST inherit the channel trust
+boundary (sanitization + taint), no matter which engine produced
+it.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-confidence"></a> `confidence?` | `readonly` | `number` | Engine confidence in [0, 1], when reported. | [packages/core/src/contracts/stt.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L37) |
+| <a id="property-durationms"></a> `durationMs?` | `readonly` | `number` | Source audio duration, when known. | [packages/core/src/contracts/stt.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L39) |
+| <a id="property-language"></a> `language?` | `readonly` | `string` | Detected BCP-47 language, when the engine reports one. | [packages/core/src/contracts/stt.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L35) |
+| <a id="property-text"></a> `text` | `readonly` | `string` | - | [packages/core/src/contracts/stt.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L33) |
+| <a id="property-trustclass"></a> `trustClass` | `readonly` | `"channel-inbound"` | Provenance pin - see the interface docs. | [packages/core/src/contracts/stt.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/stt.ts#L41) |

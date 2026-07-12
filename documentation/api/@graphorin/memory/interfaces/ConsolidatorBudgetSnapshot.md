@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorBudgetSnapshot
 
-Defined in: [packages/memory/src/consolidator/types.ts:272](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L272)
+Defined in: [packages/memory/src/consolidator/types.ts:307](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L307)
 
 Budget snapshot block of [ConsolidatorStatus](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md). Surfaces
 both the absolute usage and the remaining envelope so consumers
@@ -19,8 +19,8 @@ without doing the math themselves.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-costremaining"></a> `costRemaining` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L276) |
-| <a id="property-costusedtoday"></a> `costUsedToday` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:274](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L274) |
-| <a id="property-resetat"></a> `resetAt` | `readonly` | `string` | [packages/memory/src/consolidator/types.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L277) |
-| <a id="property-tokensremaining"></a> `tokensRemaining` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L275) |
-| <a id="property-tokensusedtoday"></a> `tokensUsedToday` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:273](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L273) |
+| <a id="property-costremaining"></a> `costRemaining` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:311](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L311) |
+| <a id="property-costusedtoday"></a> `costUsedToday` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:309](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L309) |
+| <a id="property-resetat"></a> `resetAt` | `readonly` | `string` | [packages/memory/src/consolidator/types.ts:312](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L312) |
+| <a id="property-tokensremaining"></a> `tokensRemaining` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:310](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L310) |
+| <a id="property-tokensusedtoday"></a> `tokensUsedToday` | `readonly` | `number` | [packages/memory/src/consolidator/types.ts:308](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L308) |

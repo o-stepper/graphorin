@@ -10,7 +10,7 @@
 type ConflictAuditDecision = "admit" | "dedup" | "supersede" | "pending" | "judge-unparseable";
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:295](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L295)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:303](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L303)
 
 Final pipeline outcome recorded against the candidate fact. Matches
 the storage adapter's `ConflictPipelineDecision` exactly.

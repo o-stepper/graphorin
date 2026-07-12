@@ -274,6 +274,30 @@ Re-exports [OutputSpec](/api/@graphorin/core/interfaces/OutputSpec.md)
 
 ***
 
+### PairedPeerRecord
+
+Re-exports [PairedPeerRecord](/api/@graphorin/core/interfaces/PairedPeerRecord.md)
+
+***
+
+### PairingPeerRef
+
+Re-exports [PairingPeerRef](/api/@graphorin/core/interfaces/PairingPeerRef.md)
+
+***
+
+### PairingRequestRecord
+
+Re-exports [PairingRequestRecord](/api/@graphorin/core/interfaces/PairingRequestRecord.md)
+
+***
+
+### PairingStore
+
+Re-exports [PairingStore](/api/@graphorin/core/interfaces/PairingStore.md)
+
+***
+
 ### PendingWrite
 
 Re-exports [PendingWrite](/api/@graphorin/core/interfaces/PendingWrite.md)
@@ -508,6 +532,12 @@ Re-exports [SessionMemoryStore](/api/@graphorin/core/interfaces/SessionMemorySto
 
 ***
 
+### SessionMessagePushOptions
+
+Re-exports [SessionMessagePushOptions](/api/@graphorin/core/interfaces/SessionMessagePushOptions.md)
+
+***
+
 ### SessionMessageWithMetadata
 
 Re-exports [SessionMessageWithMetadata](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)
@@ -571,6 +601,24 @@ Re-exports [SpanType](/api/@graphorin/core/type-aliases/SpanType.md)
 ### StartSpanOptions
 
 Re-exports [StartSpanOptions](/api/@graphorin/core/interfaces/StartSpanOptions.md)
+
+***
+
+### SttAdapter
+
+Re-exports [SttAdapter](/api/@graphorin/core/interfaces/SttAdapter.md)
+
+***
+
+### SttTranscript
+
+Re-exports [SttTranscript](/api/@graphorin/core/interfaces/SttTranscript.md)
+
+***
+
+### SttTranscriptionRequest
+
+Re-exports [SttTranscriptionRequest](/api/@graphorin/core/interfaces/SttTranscriptionRequest.md)
 
 ***
 

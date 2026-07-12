@@ -338,6 +338,40 @@ When the reconciler routes a candidate as an **update / conflict** of an existin
 
 Quarantine is a **retrieval gate, never a delete** - quarantined rows stay fully auditable. This is the precondition for safely shipping synthesised memory (reflection / reconciliation / induction) against memory-poisoning attacks. See [Security](/guide/security#memory-safety-provenance-quarantine) for the threat model.
 
+The write-time injection gate accepts an optional **pluggable classifier** (B4 / D-12): `createMemory({ injectionClassifier })` consults it AFTER the regex heuristics on every semantic write - a flagged verdict quarantines the write with a `classifier:<id>` marker. Widen-only (a regex hit short-circuits and can never be cleared by the classifier) and resilient (a classifier error degrades to the regex verdict; the write never fails). The framework ships no engine - see the seam contract in [Security](/guide/security#pluggable-injection-classifier-seam).
+
+### The ingest gate: memory writes strictly after guardrails (B3)
+
+Everything above gates what EXTRACTION produces; the ingest gate gates what extraction is allowed to SEE. The agent's run loop stamps a per-turn security verdict (`RunState.verdicts` / `AgentResult.verdicts`: input-guardrail block/rewrite, lateral-leak block, assistant-output dataflow findings), and the composing application persists it next to the message:
+
+```ts no-check
+const result = await agent.run(text, { sessionId });
+// Forward each turn's verdict at the Session.push boundary. For the
+// common single-turn shape the final step's verdict covers the reply:
+await session.push({ role: 'user', content: text });
+await session.push(
+  { role: 'assistant', content: result.output },
+  { verdict: result.verdicts?.[`${result.state.steps.length}:0`] },
+);
+```
+
+`SessionMessageRecord.verdict` (additive to the `@stable` tuple; sqlite column `verdict_json`, migration 035) then feeds the deterministic pre-extraction filter:
+
+```ts no-check
+import { createMemory, verdictIngestGate } from '@graphorin/memory';
+
+const memory = createMemory({
+  store,
+  // Excludes guardrail-BLOCKED and lateral-leak-withheld turns from
+  // the extraction batch; REWRITTEN turns pass (the stored message
+  // already carries the rewritten text). Or supply your own
+  // deterministic (record) => boolean.
+  ingestGate: verdictIngestGate,
+});
+```
+
+The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for the auto-promotion and proactive `act`-grant features of later waves; see the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
+
 ### Principal / owner dimension
 
 Orthogonal to provenance (*where a memory came from*), every fact / episode / rule / insight can carry an `owner` (*who it belongs to*): `'user'` for user-stated content, `'agent'` for the agent's own inferences (the consolidator stamps extraction facts, auto-formed episodes, reflection insights, and induced procedures), `'shared'` for records deliberately published to a multi-agent tier. Default reads apply **no owner filter** - recall is byte-identical - and rows written before the feature count as `'user'`. Opt in at retrieval time: `semantic.search(scope, query, { owner: 'agent' })` (or an array) filters in-store on the FTS + vector legs and record-level on the fused result, separating "the user said X" from "I inferred X".

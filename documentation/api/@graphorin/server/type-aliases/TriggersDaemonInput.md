@@ -16,7 +16,7 @@ type TriggersDaemonInput =
 };
 ```
 
-Defined in: [packages/server/src/app-daemons.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-daemons.ts#L25)
+Defined in: [packages/server/src/app-daemons.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-daemons.ts#L27)
 
 Discriminated union accepted by `CreateServerOptions.triggers`. A
 caller may either supply a fully-built daemon (e.g. constructed

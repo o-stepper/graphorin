@@ -6,7 +6,7 @@
 
 # Interface: SharedMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:183](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L183)
+Defined in: [packages/core/src/contracts/memory-store.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L202)
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:183](https://github.com
 attach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L184)
+Defined in: [packages/core/src/contracts/memory-store.ts:203](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L203)
 
 #### Parameters
 
@@ -39,7 +39,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:184](https://github.com
 detach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:185](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L185)
+Defined in: [packages/core/src/contracts/memory-store.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L204)
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:185](https://github.com
 listFor(agentId): Promise<readonly MemoryRecord[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L186)
+Defined in: [packages/core/src/contracts/memory-store.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L205)
 
 #### Parameters
 

@@ -24,7 +24,7 @@ type ContentChunk =
 };
 ```
 
-Defined in: [packages/core/src/types/tool.ts:145](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L145)
+Defined in: [packages/core/src/types/tool.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L146)
 
 Single chunk of streamed tool content. Streaming-hint tools emit one
 chunk per `ctx.streamContent(...)` call; the executor concatenates

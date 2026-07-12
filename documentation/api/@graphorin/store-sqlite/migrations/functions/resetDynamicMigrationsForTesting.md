@@ -10,7 +10,7 @@
 function _resetDynamicMigrationsForTesting(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/registry.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L202)
+Defined in: [packages/store-sqlite/src/migrations/registry.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L204)
 
 **`Internal`**
 

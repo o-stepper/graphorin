@@ -16,6 +16,6 @@ type WorkflowTimersInput =
 };
 ```
 
-Defined in: [packages/server/src/app-daemons.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-daemons.ts#L30)
+Defined in: [packages/server/src/app-daemons.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-daemons.ts#L32)
 
 W-032: accepted forms for `createServer({ workflowTimers })`.

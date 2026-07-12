@@ -10,7 +10,7 @@
 function defaultTruncationStrategy(trustClass, toolName): TruncationStrategy;
 ```
 
-Defined in: [packages/tools/src/builder/trust-class.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L86)
+Defined in: [packages/tools/src/builder/trust-class.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L90)
 
 Default truncation strategy per trust class + tool name.
 

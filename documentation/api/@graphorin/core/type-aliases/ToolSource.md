@@ -30,7 +30,7 @@ type ToolSource =
 };
 ```
 
-Defined in: [packages/core/src/types/tool.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L126)
+Defined in: [packages/core/src/types/tool.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L127)
 
 Source descriptor attached to a `Tool` registration. Mirrors the
 registration-time provenance the dispatcher uses to derive the

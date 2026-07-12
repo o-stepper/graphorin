@@ -209,6 +209,22 @@ Register-time catch-up is gated on the scheduler lifecycle: when a trigger with 
 
 When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them during startup (the consolidator daemon starts first and registers its `cron` / `idle` triggers with the scheduler before the scheduler begins firing) so background distillation actually runs - no manual `registerWithScheduler` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable - deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. A `buffer:N` trigger (consolidate once the unconsolidated transcript tail reaches N tokens) is evaluated on activity: the server's run tracker calls `scheduler.recordActivity()` on every tracked REST/WS run (making `idle:T` a true debounce) and `consolidator.notifyActivity()` when a run settles - see [Memory system](/guide/memory-system#the-buffer-trigger-and-activity-signals). The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything - see [Memory system](/guide/memory-system#background-consolidator)).
 
+## Channel gateway
+
+The server hosts a channel gateway (the messenger front door from [`@graphorin/channels`](/guide/channels)) as a managed daemon - matched structurally, so the server takes no dependency on the channels package:
+
+```ts no-check
+import { createServer } from '@graphorin/server';
+
+const server = await createServer({
+  store,
+  triggers: { scheduler },
+  channels: { gateway }, // or { daemon: createChannelsDaemon({ gateway }) }
+});
+```
+
+Lifecycle ordering is part of the contract: the gateway starts LAST (inbound traffic only begins once the consolidator, scheduler and durable timers are live) and stops FIRST (the front door closes before shutdown drains in-flight runs). `/v1/health` gains a `channels` check aggregating the per-channel counters (`running`, `channels`, `queued`, `dropped`, `failed`; a stopped gateway reports `warn`, a failing `status()` reports `fail`). When a triggers scheduler is wired alongside, the server registers the gateway's activity listener so every ACCEPTED inbound message calls `scheduler.recordActivity()` - channel traffic debounces `idle:T` triggers exactly like tracked REST/WS runs.
+
 ## Idempotency
 
 Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute. Expired idempotency records (each stores the full response body) are swept from the database automatically by the unified [retention sweep](#retention); the read path already refuses to replay them, so the sweep changes no replay semantics.

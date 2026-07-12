@@ -1,0 +1,21 @@
+[**Graphorin API reference v0.8.0**](../../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/channels](/api/@graphorin/channels/index.md) / [testkit](/api/@graphorin/channels/testkit/index.md) / LoopbackAdapterOptions
+
+# Interface: LoopbackAdapterOptions
+
+Defined in: [packages/channels/src/testkit/loopback-adapter.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L13)
+
+Options for [createLoopbackAdapter](/api/@graphorin/channels/testkit/functions/createLoopbackAdapter.md).
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-accountid"></a> `accountId?` | `readonly` | `string` | Account id stamped on injected messages. Default `'bot'`. | [packages/channels/src/testkit/loopback-adapter.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L18) |
+| <a id="property-capabilities"></a> `capabilities?` | `readonly` | `Partial`\&lt;[`ChannelCapabilities`](/api/@graphorin/channels/interfaces/ChannelCapabilities.md)\&gt; | - | [packages/channels/src/testkit/loopback-adapter.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L16) |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | Channel id. Default `'loopback'`. | [packages/channels/src/testkit/loopback-adapter.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L15) |

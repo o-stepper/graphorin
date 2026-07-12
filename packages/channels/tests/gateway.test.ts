@@ -43,9 +43,11 @@ function buildGateway(overrides?: {
 }
 
 async function settle(): Promise<void> {
-  // Drain loops are promise-chained; two macrotask hops settle them.
-  await new Promise((r) => setTimeout(r, 0));
-  await new Promise((r) => setTimeout(r, 0));
+  // Drain loops are promise-chained; a few macrotask hops settle them
+  // even under a loaded parallel test runner.
+  for (let i = 0; i < 10; i += 1) {
+    await new Promise((r) => setTimeout(r, 0));
+  }
 }
 
 describe('createChannelGateway - construction', () => {

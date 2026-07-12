@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:366](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L366)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:374](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L374)
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:371](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L371)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:379](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L379)
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:371](https://github
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:372](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L372)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:380](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L380)
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:372](https://github
 optional markAttempted(id, attemptedAt?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:380](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L380)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:388](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L388)
 
 Stamp `attemptedAt` on a pending row whose judge call failed
 (MCON-9). The deep phase closes the row as `'judge-unparseable'`
@@ -94,7 +94,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:373](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L373)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:381](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L381)
 
 #### Parameters
 
@@ -118,7 +118,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:367](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L367)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:375](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L375)
 
 #### Parameters
 

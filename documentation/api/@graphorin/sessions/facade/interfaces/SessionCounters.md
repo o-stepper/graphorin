@@ -6,7 +6,7 @@
 
 # Interface: SessionCounters
 
-Defined in: [packages/sessions/src/facade.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L128)
+Defined in: [packages/sessions/src/facade.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L133)
 
 Counter receiver used by the commentary sanitizer + the cassette
 audit emissions. Defaults to a no-op. Hook your `@graphorin/observability`
@@ -25,7 +25,7 @@ inc(
    labels?): void;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L129)
+Defined in: [packages/sessions/src/facade.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L134)
 
 #### Parameters
 

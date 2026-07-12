@@ -10,7 +10,7 @@
 function defaultInboundSanitization(trustClass): InboundSanitizationPolicy;
 ```
 
-Defined in: [packages/tools/src/builder/trust-class.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L63)
+Defined in: [packages/tools/src/builder/trust-class.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L66)
 
 Default inbound-sanitization policy per trust class. Operator
 overrides via `tool({ inboundSanitization: ... })` always win.
@@ -22,6 +22,9 @@ overrides via `tool({ inboundSanitization: ... })` always win.
 - `'skill-untrusted'`          → `'detect-and-strip-and-wrap'`.
 - `'mcp-derived'`              → `'detect-and-strip-and-wrap'`.
 - `'web-search'`               → `'detect-and-strip-and-wrap'`.
+- `'channel-inbound'`          → `'detect-and-strip-and-wrap'`
+  (message-borne channel text; no tool ever registers with this
+  class, but the gateway reuses the same policy table).
 
 ## Parameters
 
