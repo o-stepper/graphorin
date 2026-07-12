@@ -36,6 +36,30 @@ describe('RunStateTracker', () => {
     expect(snap?.agentId).toBe('x');
   });
 
+  it('emits activity events on start and on the first terminal transition only (A2)', () => {
+    const runs = new RunStateTracker();
+    const events: string[] = [];
+    runs.setActivityListener((e) => events.push(`${e.kind}:${e.runKind}`));
+    runs.start('run-a', { kind: 'agent', agentId: 'echo' });
+    expect(events).toEqual(['run-start:agent']);
+    runs.complete('run-a', 'completed');
+    expect(events).toEqual(['run-start:agent', 'run-end:agent']);
+    // A second terminal transition must not re-emit (mirrors IP-15).
+    runs.complete('run-a', 'failed', new Error('late'));
+    expect(events).toEqual(['run-start:agent', 'run-end:agent']);
+  });
+
+  it('a throwing activity listener never breaks run tracking (A2)', () => {
+    const runs = new RunStateTracker();
+    runs.setActivityListener(() => {
+      throw new Error('bridge exploded');
+    });
+    const handle = runs.start('run-b', { kind: 'workflow', workflowId: 'wf' });
+    expect(handle.runId).toBe('run-b');
+    runs.complete('run-b', 'completed');
+    expect(runs.snapshot('run-b')?.status).toBe('completed');
+  });
+
   it('counts in-flight runs correctly', () => {
     const runs = new RunStateTracker();
     runs.start('a', { kind: 'agent', agentId: 'x' });

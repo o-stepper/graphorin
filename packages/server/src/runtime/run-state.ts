@@ -101,6 +101,18 @@ export type RunDescriptor =
     };
 
 /**
+ * Activity event emitted by the tracker's optional listener (A2,
+ * item 7): `run-start` when a run enters `running`, `run-end` on the
+ * first terminal transition.
+ *
+ * @stable
+ */
+export interface RunActivityEvent {
+  readonly kind: 'run-start' | 'run-end';
+  readonly runKind: RunKind;
+}
+
+/**
  * In-flight handle returned by {@link RunStateTracker.start}. Handlers
  * pass `signal` into the underlying `agent.run / workflow.execute`
  * invocation so cancellation propagates instantly.
@@ -135,6 +147,7 @@ export class RunStateTracker {
   readonly #records: Map<string, RunRecord> = new Map();
   readonly #now: () => number;
   readonly #onTerminal: ((info: TerminalRunInfo) => void) | undefined;
+  #onActivity: ((event: RunActivityEvent) => void) | undefined;
 
   constructor(
     options: {
@@ -149,6 +162,27 @@ export class RunStateTracker {
   ) {
     this.#now = options.now ?? Date.now;
     this.#onTerminal = options.onTerminal;
+  }
+
+  /**
+   * A2 (item 7): register the server-side activity listener. The
+   * tracker is the single choke point every REST/WS run passes
+   * through, so this is where the server bridges "a run started /
+   * settled" into `scheduler.recordActivity()` (idle debounce) and
+   * `consolidator.notifyActivity()` (buffer:N evaluation). One
+   * listener slot - `createServer` owns it; exceptions are swallowed
+   * so a bridge failure can never break run tracking.
+   */
+  setActivityListener(listener: ((event: RunActivityEvent) => void) | undefined): void {
+    this.#onActivity = listener;
+  }
+
+  #emitActivity(event: RunActivityEvent): void {
+    try {
+      this.#onActivity?.(event);
+    } catch {
+      // The bridge must never break run tracking.
+    }
   }
 
   #emitTerminal(record: RunRecord): void {
@@ -191,6 +225,7 @@ export class RunStateTracker {
     record.status = 'running';
     record.startedAt = this.#now();
     this.#records.set(runId, record);
+    this.#emitActivity({ kind: 'run-start', runKind: record.kind });
     return Object.freeze({
       runId,
       signal: record.controller.signal,
@@ -220,7 +255,10 @@ export class RunStateTracker {
       // the GET run-status surface reports it too.
       record.error = toWireError(err);
     }
-    if (!wasTerminal) this.#emitTerminal(record);
+    if (!wasTerminal) {
+      this.#emitTerminal(record);
+      this.#emitActivity({ kind: 'run-end', runKind: record.kind });
+    }
   }
 
   /** Cancel a run via its `AbortController`. */

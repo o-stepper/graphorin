@@ -436,7 +436,7 @@ export interface ConsolidatorStatePatch {
 export interface ConsolidatorRunInput {
   readonly id: string;
   readonly scope: SessionScope;
-  readonly triggerKind: 'turn' | 'idle' | 'cron' | 'event' | 'budget' | 'manual';
+  readonly triggerKind: 'turn' | 'idle' | 'cron' | 'event' | 'budget' | 'buffer' | 'manual';
   readonly phase: 'light' | 'standard' | 'deep';
   readonly startedAt: number;
 }

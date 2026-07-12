@@ -153,7 +153,15 @@ export async function registerConsolidatorTriggers(
       continue;
     }
     const parsed = parseTriggerSpec(spec);
-    if (parsed.kind === 'turn' || parsed.kind === 'event' || parsed.kind === 'budget') {
+    if (
+      parsed.kind === 'turn' ||
+      parsed.kind === 'event' ||
+      parsed.kind === 'budget' ||
+      parsed.kind === 'buffer'
+    ) {
+      // The scheduler cannot count turns, receive consumer events, read
+      // the budget, or measure the transcript tail - those fire from
+      // the consumer side (`trigger(...)` / `notifyActivity(...)`).
       skipped.push({ raw: parsed.raw, reason: 'unsupported-by-scheduler' });
       continue;
     }

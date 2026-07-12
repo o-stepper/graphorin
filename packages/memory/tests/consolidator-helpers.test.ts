@@ -361,6 +361,9 @@ describe('consolidator/triggers', () => {
 
     const budget = parseTriggerSpec('budget:0.5');
     expect(budget).toMatchObject<Partial<ParsedTrigger>>({ kind: 'budget', threshold: 0.5 });
+
+    const buffer = parseTriggerSpec('buffer:1024');
+    expect(buffer).toMatchObject<Partial<ParsedTrigger>>({ kind: 'buffer', tokens: 1024 });
   });
 
   it('rejects malformed specs', () => {
@@ -369,6 +372,8 @@ describe('consolidator/triggers', () => {
     expect(() => parseTriggerSpec('cron:')).toThrow(/cron/);
     expect(() => parseTriggerSpec('event:')).toThrow(/empty event/);
     expect(() => parseTriggerSpec('budget:1.5')).toThrow(/fraction between 0 and 1/);
+    expect(() => parseTriggerSpec('buffer:0')).toThrow(/positive integer token threshold/);
+    expect(() => parseTriggerSpec('buffer:12.5')).toThrow(/positive integer token threshold/);
     expect(() => parseTriggerSpec('garbage' as never)).toThrow(/expected 'kind:value'/);
     expect(() => parseTriggerSpec('unknown:x' as never)).toThrow(/unknown consolidator trigger/);
   });

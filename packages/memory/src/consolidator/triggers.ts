@@ -1,8 +1,8 @@
 /**
  * Trigger spec parser. Translates the human-friendly
  * `'turn:N'` / `'idle:Xm'` / `'cron:EXPR'` / `'event:NAME'` /
- * `'budget:N'` declarations into the runtime structure used by the
- * consolidator.
+ * `'budget:N'` / `'buffer:N'` declarations into the runtime structure
+ * used by the consolidator.
  *
  * The parser is exhaustive: every shape recognised here must be
  * matched in {@link parseTriggerSpec}; unrecognised shapes throw a
@@ -27,7 +27,16 @@ export type ParsedTrigger =
   | { readonly kind: 'idle'; readonly idleMs: number; readonly raw: string }
   | { readonly kind: 'cron'; readonly expression: string; readonly raw: string }
   | { readonly kind: 'event'; readonly name: string; readonly raw: string }
-  | { readonly kind: 'budget'; readonly threshold: number; readonly raw: string };
+  | { readonly kind: 'budget'; readonly threshold: number; readonly raw: string }
+  /**
+   * Item 7 (A2): fire when the unconsolidated transcript tail (from
+   * the standard-phase cursor) reaches `tokens` tokens (chars/4 proxy,
+   * same measure as the W-081 transcript budget). Evaluated on
+   * activity signals via `Consolidator.notifyActivity(...)` - the
+   * scheduler cannot measure the tail on its own. Not to be confused
+   * with `budget:F`, which is a spent-budget fraction.
+   */
+  | { readonly kind: 'buffer'; readonly tokens: number; readonly raw: string };
 
 const IDLE_PATTERN = /^(\d+(?:\.\d+)?)(ms|s|m|h)?$/u;
 
@@ -97,6 +106,15 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
       }
       return { kind: 'budget', threshold, raw: spec };
     }
+    case 'buffer': {
+      const tokens = Number.parseInt(value, 10);
+      if (!Number.isFinite(tokens) || tokens <= 0 || String(tokens) !== value.trim()) {
+        throw new TypeError(
+          `[graphorin/memory] invalid buffer trigger '${spec}' - expected positive integer token threshold (e.g. 'buffer:1024')`,
+        );
+      }
+      return { kind: 'buffer', tokens, raw: spec };
+    }
     default:
       throw new TypeError(`[graphorin/memory] unknown consolidator trigger kind '${kind}'`);
   }
@@ -115,6 +133,8 @@ export function reasonFromTrigger(trigger: ParsedTrigger): ConsolidatorTriggerRe
       return { kind: 'event', value: trigger.name };
     case 'budget':
       return { kind: 'budget', value: trigger.threshold };
+    case 'buffer':
+      return { kind: 'buffer', value: trigger.tokens };
   }
 }
 
