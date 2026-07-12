@@ -185,3 +185,33 @@ export async function waitFor(cond: () => boolean, timeoutMs = 5_000): Promise<v
     await new Promise((resolve) => setTimeout(resolve, 5));
   }
 }
+
+/** Single-tool-call script (finish reason 'tool-calls'). */
+export function toolCallScript(args: {
+  readonly toolCallId: string;
+  readonly toolName: string;
+  readonly args: unknown;
+  readonly totalTokens?: number;
+}): MockScript {
+  return {
+    events: [
+      { type: 'stream-start', metadata: { providerName: 'mock', modelId: 'mock' } },
+      { type: 'tool-call-start', toolCallId: args.toolCallId, toolName: args.toolName },
+      {
+        type: 'tool-call-input-delta',
+        toolCallId: args.toolCallId,
+        argsDelta: JSON.stringify(args.args),
+      },
+      { type: 'tool-call-end', toolCallId: args.toolCallId, finalArgs: args.args },
+      {
+        type: 'finish',
+        finishReason: 'tool-calls',
+        usage: {
+          promptTokens: Math.max(1, Math.floor((args.totalTokens ?? 10) / 2)),
+          completionTokens: Math.max(1, Math.floor((args.totalTokens ?? 10) / 2)),
+          totalTokens: args.totalTokens ?? 10,
+        },
+      },
+    ],
+  };
+}

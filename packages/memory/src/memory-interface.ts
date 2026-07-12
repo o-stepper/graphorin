@@ -25,6 +25,7 @@ import type {
 } from '@graphorin/core';
 import type { ConflictPipeline } from './conflict/index.js';
 import type { Consolidator } from './consolidator/runtime.js';
+import type { MemoryIngestGate } from './consolidator/types.js';
 import type {
   CompactionResult,
   CompactionSource,
@@ -144,6 +145,14 @@ export interface Memory {
   readonly contextEngine: ContextEngine;
   /** The active embedder, when configured. `null` otherwise. */
   readonly embedder: EmbedderProvider | null;
+  /**
+   * The configured pre-extraction ingest gate (B3), or `null` when
+   * none is active. Surfaced as EVIDENCE for fail-closed config
+   * checks: enabling a proactive `act` grant or memory auto-promotion
+   * requires an active gate, and a self-asserted boolean would be no
+   * evidence at all.
+   */
+  readonly ingestGate: MemoryIngestGate | null;
   /** The canonical id of the active embedder, when configured. */
   embedderId(): string | null;
   /**

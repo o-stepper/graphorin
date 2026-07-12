@@ -22,6 +22,22 @@ export {
   validateActiveHours,
 } from './active-hours.js';
 export {
+  type AgentApprovalRef,
+  parseApprovalRef,
+  serializeApprovalRef,
+} from './approval-ref.js';
+export {
+  type CreateProactiveCronTaskOptions,
+  createProactiveCronTask,
+  type MemoryIngestGateEvidence,
+  type ProactiveCronSchedule,
+  type ProactiveCronTask,
+  type ProactiveCronTaskStatus,
+  type ProactiveTaskFireResult,
+  type ProactiveTaskSkipReason,
+} from './cron-task.js';
+export { ProactiveConfigError } from './errors.js';
+export {
   type CreateHeartbeatOptions,
   createHeartbeat,
   type Heartbeat,

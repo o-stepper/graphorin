@@ -674,6 +674,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     conflictPipeline,
     contextEngine,
     embedder,
+    // B3/C3: the configured ingest gate surfaced as EVIDENCE for
+    // fail-closed config checks (proactive 'act' grant, auto-promotion).
+    ingestGate: options.ingestGate ?? null,
     embedderId: embedderIdProvider,
     compile,
     metadata,
