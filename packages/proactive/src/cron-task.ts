@@ -162,10 +162,45 @@ export interface CreateProactiveCronTaskOptions<TDeps = unknown> {
   readonly allowRecursiveScheduling?: boolean;
   /** Approve / deny button labels for review-rung outcomes. */
   readonly reviewOptions?: ReadonlyArray<ProactiveOutcomeOption>;
+  /**
+   * C3 messenger bridge: register a parked fire's resumable state with
+   * the server's run tracker so `POST /v1/runs/:runId/resume` can find
+   * it. Structural (`GraphorinServer.runs` satisfies it); pair with
+   * registering the dedicated agent under `registryAgentId` in the
+   * server's agent registry. Absent, question/review outcomes are still
+   * delivered - resolution then happens library-side.
+   */
+  readonly suspendedRuns?: SuspendedRunRegistryLike;
+  /**
+   * Registry id the dedicated agent is registered under for REST
+   * resume (see `suspendedRuns`). Default `proactive-<id>`. Avoid ':'
+   * in the id - it is the scope-segment separator
+   * (`agents:invoke:<id>`).
+   */
+  readonly registryAgentId?: string;
   /** Override the wall clock - used by tests. */
   readonly now?: () => number;
   /** WARN sink. Default `console.warn`. */
   readonly warn?: (message: string) => void;
+}
+
+/**
+ * Structural slice of the server's `RunStateTracker` the C3 bridge
+ * needs - no dependency on `@graphorin/server`.
+ *
+ * @stable
+ */
+export interface SuspendedRunRegistryLike {
+  registerSuspended(
+    runId: string,
+    descriptor: {
+      readonly kind: 'agent';
+      readonly agentId: string;
+      readonly sessionId?: string;
+      readonly userId?: string;
+    },
+    state: unknown,
+  ): void;
 }
 
 /**
@@ -350,6 +385,24 @@ export function createProactiveCronTask<TDeps = unknown>(
             },
           });
           return { escalationBlocked: kind };
+        }
+        // C3 messenger bridge: park the resumable state with the
+        // server tracker so the REST resume route can settle it.
+        try {
+          options.suspendedRuns?.registerSuspended(
+            result.state.id,
+            {
+              kind: 'agent',
+              agentId: options.registryAgentId ?? `proactive-${id}`,
+              sessionId,
+              ...(options.userId !== undefined ? { userId: options.userId } : {}),
+            },
+            result.state,
+          );
+        } catch (err) {
+          warn(
+            `[graphorin/proactive] cron task '${id}' suspendedRuns bridge threw: ${describe(err)}`,
+          );
         }
         const first = pending[0];
         const ref = serializeApprovalRef({

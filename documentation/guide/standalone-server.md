@@ -51,7 +51,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/agents/:id/stream` | **Starts the run** and returns `202` with `runId` + the WS subject (`agent:<id>/runs/<runId>/events`) the events are emitted on (IP-2). Subscribe over WebSocket; workflow runs use `workflow:<id>/runs/<runId>/events`. |
 | `GET` | `/v1/runs/:runId/state` | Read the current `RunState`. |
 | `POST` | `/v1/runs/:runId/abort` | Abort a run. |
-| `POST` | `/v1/runs/:runId/resume` | Answers an honest `501 resume-not-implemented` today (IP-14); resume programmatically via the library `agent.run(state, { directive })`. |
+| `POST` | `/v1/runs/:runId/resume` | Resume an in-process suspended agent run (C3/W-119): body `{ "approvals": [{ "toolCallId", "granted", "reason"?, "subRunToolCallId"? }] }`, scope `agents:invoke:<agentId>`. The tracker retains the resumable `RunState` when a run parks (`POST /agents/:id/run` suspension branch, or `runs.registerSuspended(...)` for proactive fires executed outside REST); a partially-resolved directive re-suspends and retains the fresh state. `409 run-not-suspended` for a run that is not awaiting approval, `409 run-state-unavailable` when this process retains no state (resume those library-side via `agent.run(savedState, { directive })`), `409 agent-busy` when the instance has another run in flight. Suspended records are exempt from retention pruning - settle them via resume or abort. |
 | `POST` | `/v1/runs/:runId/replay` | Replay a recorded run from the audit / cassette artefacts. |
 | `GET` | `/v1/sessions` | List sessions. |
 | `POST` | `/v1/sessions` | Create a session. |

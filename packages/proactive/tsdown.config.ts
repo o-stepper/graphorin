@@ -15,5 +15,11 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   treeshake: true,
-  external: ['@graphorin/core', '@graphorin/agent', '@graphorin/sessions', '@graphorin/triggers'],
+  external: [
+    '@graphorin/core',
+    '@graphorin/agent',
+    '@graphorin/sessions',
+    '@graphorin/triggers',
+    '@graphorin/workflow',
+  ],
 });

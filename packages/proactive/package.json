@@ -57,13 +57,15 @@
     "@graphorin/agent": "workspace:*",
     "@graphorin/core": "workspace:*",
     "@graphorin/sessions": "workspace:*",
-    "@graphorin/triggers": "workspace:*"
+    "@graphorin/triggers": "workspace:*",
+    "@graphorin/workflow": "workspace:*"
   },
   "publishConfig": {
     "access": "public",
     "provenance": true
   },
   "devDependencies": {
+    "@graphorin/channels": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*"
   }
 }

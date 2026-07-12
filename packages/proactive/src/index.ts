@@ -35,6 +35,7 @@ export {
   type ProactiveCronTaskStatus,
   type ProactiveTaskFireResult,
   type ProactiveTaskSkipReason,
+  type SuspendedRunRegistryLike,
 } from './cron-task.js';
 export { ProactiveConfigError } from './errors.js';
 export {
@@ -48,3 +49,9 @@ export {
   type HeartbeatSkipReason,
   type HeartbeatStatus,
 } from './heartbeat.js';
+export {
+  outcomeToDelivery,
+  type ProactiveDeliveryIdentity,
+  type ProactiveDeliveryPayload,
+  workflowAwakeableOutcome,
+} from './ladder.js';

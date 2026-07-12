@@ -380,24 +380,24 @@ describe('REST integration - happy + error paths', () => {
     expect(ok.status).toBe(200);
   });
 
-  it('POST /v1/runs/:runId/resume answers 501 honestly until durable resume lands (IP-14)', async () => {
+  it('POST /v1/runs/:runId/resume answers 409 for a non-suspended run, 404 for unknown (C3/W-119)', async () => {
     if (server === undefined || bearer === undefined) throw new Error('not booted');
+    // C3/W-119: the formerly-501 endpoint now resumes retained
+    // suspensions (see routes-agent-resume.test.ts for the full flow);
+    // a run that is not awaiting approval has nothing to resume.
     server.runs.declare('resume-1', { kind: 'agent', agentId: 'echo' });
     const res = await server.app.request('/v1/runs/resume-1/resume', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ approvals: [{ toolCallId: 'tc-1', granted: true }] }),
     });
-    // IP-14: server-side durable resume is not implemented - the old
-    // 202 persisted nothing while the client SDK documented it as the
-    // durable HITL path. 501 + the library-side pointer is the truth.
-    expect(res.status).toBe(501);
+    expect(res.status).toBe(409);
     const body = (await res.json()) as { error?: string };
-    expect(body.error).toBe('resume-not-implemented');
+    expect(body.error).toBe('run-not-suspended');
     const missing = await server.app.request('/v1/runs/missing/resume', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ approvals: [{ toolCallId: 'tc-1', granted: true }] }),
     });
     expect(missing.status).toBe(404);
   });

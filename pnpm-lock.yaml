@@ -789,7 +789,13 @@ importers:
       '@graphorin/triggers':
         specifier: workspace:*
         version: link:../triggers
+      '@graphorin/workflow':
+        specifier: workspace:*
+        version: link:../workflow
     devDependencies:
+      '@graphorin/channels':
+        specifier: workspace:*
+        version: link:../channels
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
