@@ -5,6 +5,11 @@
  * @packageDocumentation
  */
 
+export {
+  type ConformanceHarness,
+  type ConformanceTestApi,
+  describeChannelAdapterConformance,
+} from './conformance.js';
 export { createInMemoryPairingStore } from './in-memory-pairing-store.js';
 export {
   createLoopbackAdapter,
