@@ -17,10 +17,15 @@ results.
 1. `node scripts/fetch-eval-datasets.mjs --only longmemeval`
 2. Run the ability suites with a REAL provider and a NON-SELF judge,
    at least 3 iterations, e.g.
-   `pnpm --filter @graphorin/benchmark-longmemeval run bench -- --provider <spec> --judge-provider <other-spec> --iterations 3 --report-json <file>`
+   `pnpm --filter @graphorin/benchmark-longmemeval run start -- --provider <spec> --model <id> --judge-provider <other-spec> --judge-model <id> --iterations 3 --json <file>`
+   (add `--max-cost-usd <n>` for a run-level spend ceiling).
 3. Drop the JSON here as `<loader>.<ability|suite>.<config>.json`
    (e.g. `longmemeval.full.default.json`,
-   `longmemeval.full.hyde.json` for the ablation matrix).
+   `longmemeval.full.hyde.json` for the ablation matrix; the D1
+   conflict-pipeline ablation drops as
+   `longmemeval.full.conflict-on.json` from `--conflict-pipeline on`,
+   and the operation-level A/B from `benchmarks/halumem` as
+   `halumem.operations.conflict-<on|off>.json`).
 4. Regenerate the page:
    `node documentation/scripts/build-benchmark-results.mjs --update`
    and commit both the JSON and `documentation/guide/benchmarks.md`.

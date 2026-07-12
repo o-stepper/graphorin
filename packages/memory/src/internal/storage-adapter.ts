@@ -183,6 +183,24 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * `@graphorin/store-sqlite` adapter implements it.
    */
   historyOf?(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>>;
+  /**
+   * Enumerate the recall-eligible facts for the scope (wave-D): live,
+   * non-archived, `status = 'active'`, validity interval containing
+   * now - the same view default recall sees, but as a deterministic
+   * list (`created_at` order) instead of a ranked search. Powers the
+   * profile-projection pass (D2) and the operation-level benchmark
+   * observation (D1). `excludePendingSupersede` additionally drops
+   * facts whose supersede is still pending W-019 validation (a
+   * quarantined successor links to them) - a projection must not
+   * present a value that is already known to be contested.
+   */
+  listActive?(
+    scope: SessionScope,
+    options?: {
+      readonly limit?: number;
+      readonly excludePendingSupersede?: boolean;
+    },
+  ): Promise<ReadonlyArray<Fact>>;
 }
 
 /**

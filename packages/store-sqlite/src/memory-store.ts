@@ -1226,6 +1226,45 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     return rows.map(rowToFact);
   }
 
+  /**
+   * Enumerate the recall-eligible facts for the scope (wave-D): the
+   * same default filters as `count()` / FTS search (live,
+   * non-archived, `status = 'active'`, validity at NOW), returned as a
+   * deterministic `created_at`-ordered list. With
+   * `excludePendingSupersede` facts whose W-019 supersede is still
+   * pending (a live quarantined successor links to them) are dropped
+   * too. Surfaced through `SemanticMemoryStoreExt.listActive`; powers
+   * the D2 profile projection and the operation-level benchmarks.
+   *
+   * @stable
+   */
+  async listActive(
+    scope: SessionScope,
+    options: { readonly limit?: number; readonly excludePendingSupersede?: boolean } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    const limit = options.limit ?? 1000;
+    const now = Date.now();
+    const pendingPredicate =
+      options.excludePendingSupersede === true
+        ? `AND NOT EXISTS (
+             SELECT 1 FROM facts s
+             WHERE s.supersedes = f.id AND s.deleted_at IS NULL AND s.status = 'quarantined'
+           )`
+        : '';
+    const rows = this.#conn.all<FactRow>(
+      `SELECT f.* FROM facts f
+       WHERE f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         AND f.status = 'active'
+         AND (f.valid_from IS NULL OR f.valid_from <= ?)
+         AND (f.valid_to IS NULL OR f.valid_to > ?)
+         ${pendingPredicate}
+       ORDER BY f.created_at ASC, f.id ASC
+       LIMIT ?`,
+      [scope.userId, now, now, limit],
+    );
+    return rows.map(rowToFact);
+  }
+
   async forget(id: string, reason?: string, scope?: SessionScope): Promise<void> {
     // W-154: scoped calls are a deterministic no-op for a foreign id -
     // the ownership check also guards the vec0 deletes below.

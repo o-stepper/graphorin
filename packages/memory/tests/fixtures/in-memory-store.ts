@@ -830,6 +830,34 @@ export function createInMemoryStore(
         out.sort((a, b) => factOrderEpoch(a) - factOrderEpoch(b));
         return out;
       },
+      // Wave-D: recall-eligible enumeration (mirrors store-sqlite's
+      // listActive - live, active, validity at NOW, created order).
+      async listActive(scope, options = {}) {
+        const nowIso = new Date().toISOString();
+        const out: Fact[] = [];
+        for (const fact of facts) {
+          if (fact.userId !== scope.userId) continue;
+          if (fact.deletedAt !== undefined) continue;
+          if (fact.status === 'quarantined') continue;
+          if (!factValidAt(fact, nowIso)) continue;
+          if (
+            options.excludePendingSupersede === true &&
+            facts.some(
+              (s) =>
+                s.supersedes === fact.id && s.deletedAt === undefined && s.status === 'quarantined',
+            )
+          ) {
+            continue;
+          }
+          out.push(fact);
+        }
+        out.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime() ||
+            a.id.localeCompare(b.id),
+        );
+        return out.slice(0, options.limit ?? 1000);
+      },
       async searchVector(
         scope,
         embedding,

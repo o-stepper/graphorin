@@ -1,0 +1,159 @@
+[
+  {
+    "case_id": "relocation",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I live in Berlin and I work as a nurse at the Charite hospital.",
+            "timestamp": "2025-10-01T09:00:00Z"
+          },
+          { "role": "assistant", "content": "Berlin and nursing at Charite, noted." }
+        ]
+      },
+      {
+        "id": "s2",
+        "turns": [
+          {
+            "role": "user",
+            "content": "Update: I moved to Kyiv last month, the Berlin chapter is over.",
+            "timestamp": "2025-12-05T18:00:00Z"
+          }
+        ]
+      }
+    ],
+    "memory_points": [
+      {
+        "kind": "extract",
+        "content": "User works as a nurse at the Charite hospital",
+        "session_id": "s1"
+      },
+      { "kind": "extract", "content": "User lives in Kyiv", "session_id": "s2" },
+      {
+        "kind": "update",
+        "content": "User lives in Kyiv",
+        "previous": "User lives in Berlin",
+        "session_id": "s2"
+      }
+    ],
+    "questions": [
+      {
+        "question": "Where does the user live now?",
+        "answer": "Kyiv",
+        "asked_at": "2026-01-10T10:00:00Z"
+      },
+      { "question": "What is the name of the user's cat?", "unanswerable": true }
+    ]
+  },
+  {
+    "case_id": "diet",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I am vegetarian, please remember that for restaurant suggestions.",
+            "timestamp": "2025-11-11T12:00:00Z"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I started eating fish again, so pescatarian is the right label now.",
+            "timestamp": "2026-01-20T12:00:00Z"
+          }
+        ]
+      }
+    ],
+    "memory_points": [
+      { "kind": "extract", "content": "User is pescatarian", "session_id": "s2" },
+      {
+        "kind": "update",
+        "content": "User is pescatarian",
+        "previous": "User is vegetarian",
+        "session_id": "s2"
+      }
+    ],
+    "questions": [
+      {
+        "question": "What diet does the user follow?",
+        "answer": "Pescatarian (eats fish, no other meat).",
+        "asked_at": "2026-02-01T09:00:00Z"
+      }
+    ]
+  },
+  {
+    "case_id": "subscription",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I subscribed to the MusicApp premium plan yesterday.",
+            "timestamp": "2025-11-20T08:00:00Z"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I cancelled MusicApp completely, drop anything you remember about it.",
+            "timestamp": "2026-01-02T08:00:00Z"
+          }
+        ]
+      }
+    ],
+    "memory_points": [
+      {
+        "kind": "delete",
+        "content": "User has an active MusicApp premium subscription",
+        "session_id": "s2"
+      }
+    ],
+    "questions": []
+  },
+  {
+    "case_id": "family",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          {
+            "role": "user",
+            "content": "My sister Anna is a violinist in the city orchestra.",
+            "timestamp": "2025-12-24T19:00:00Z"
+          },
+          {
+            "role": "user",
+            "content": "My brother Tom teaches physics in Hamburg.",
+            "timestamp": "2025-12-24T19:05:00Z"
+          }
+        ]
+      }
+    ],
+    "memory_points": [
+      { "kind": "extract", "content": "User's sister Anna is a violinist", "session_id": "s1" },
+      {
+        "kind": "extract",
+        "content": "User's brother Tom teaches physics in Hamburg",
+        "session_id": "s1"
+      }
+    ],
+    "questions": [
+      {
+        "question": "What does the user's brother do?",
+        "answer": "He teaches physics in Hamburg.",
+        "asked_at": "2026-01-15T09:00:00Z"
+      }
+    ]
+  }
+]

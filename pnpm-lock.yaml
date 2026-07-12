@@ -101,6 +101,24 @@ importers:
         specifier: workspace:*
         version: link:../../packages/store-sqlite
 
+  benchmarks/halumem:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/evals':
+        specifier: workspace:*
+        version: link:../../packages/evals
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/provider':
+        specifier: workspace:*
+        version: link:../../packages/provider
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+
   benchmarks/latency:
     dependencies:
       '@graphorin/core':
