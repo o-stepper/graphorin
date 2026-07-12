@@ -1356,6 +1356,68 @@ export interface PendingWrite {
     readonly value: unknown;
 }
 
+// @public
+export const PROACTIVE_OUTCOME_LADDER: ReadonlyArray<ProactiveOutcomeKind>;
+
+// @public
+export interface ProactiveActOutcome extends ProactiveOutcomeBase {
+    // (undocumented)
+    readonly kind: 'act';
+}
+
+// @public
+export type ProactiveGrant = ProactiveOutcomeKind;
+
+// @public
+export interface ProactiveNotifyOutcome extends ProactiveOutcomeBase {
+    // (undocumented)
+    readonly kind: 'notify';
+}
+
+// @public
+export type ProactiveOutcome = ProactiveNotifyOutcome | ProactiveQuestionOutcome | ProactiveReviewOutcome | ProactiveActOutcome;
+
+// @public
+export interface ProactiveOutcomeBase {
+    readonly firedAt: string;
+    readonly runId?: string;
+    readonly sessionId?: string;
+    readonly taskId: string;
+    readonly text: string;
+}
+
+// @public
+export type ProactiveOutcomeKind = 'notify' | 'question' | 'review' | 'act';
+
+// @public
+export interface ProactiveOutcomeOption {
+    readonly label: string;
+    readonly value: string;
+}
+
+// @public
+export function proactiveOutcomeWithinGrant(kind: ProactiveOutcomeKind, grant: ProactiveGrant): boolean;
+
+// @public
+export interface ProactiveQuestionOutcome extends ProactiveOutcomeBase {
+    // (undocumented)
+    readonly kind: 'question';
+    // (undocumented)
+    readonly options?: ReadonlyArray<ProactiveOutcomeOption>;
+    // (undocumented)
+    readonly ref: string;
+}
+
+// @public
+export interface ProactiveReviewOutcome extends ProactiveOutcomeBase {
+    // (undocumented)
+    readonly kind: 'review';
+    // (undocumented)
+    readonly options?: ReadonlyArray<ProactiveOutcomeOption>;
+    // (undocumented)
+    readonly ref: string;
+}
+
 // @public (undocumented)
 export interface ProceduralMemoryStore {
     // (undocumented)

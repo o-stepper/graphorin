@@ -93,6 +93,19 @@ export type {
   UserMessage,
 } from './message.js';
 export {
+  PROACTIVE_OUTCOME_LADDER,
+  type ProactiveActOutcome,
+  type ProactiveGrant,
+  type ProactiveNotifyOutcome,
+  type ProactiveOutcome,
+  type ProactiveOutcomeBase,
+  type ProactiveOutcomeKind,
+  type ProactiveOutcomeOption,
+  type ProactiveQuestionOutcome,
+  type ProactiveReviewOutcome,
+  proactiveOutcomeWithinGrant,
+} from './proactive.js';
+export {
   flattenUsageByModel,
   type ReadonlyRunState,
   type RunContext,
