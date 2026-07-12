@@ -69,8 +69,8 @@ describe('B1 acceptance - front door e2e over loopback', () => {
 
     const observed: {
       sanitized?: string;
-      untrustedSeen?: boolean;
-      sourceKinds?: ReadonlyArray<string>;
+      untrustedSeen?: boolean | undefined;
+      sourceKinds?: ReadonlyArray<string> | undefined;
       sessionKey?: string;
     } = {};
 
