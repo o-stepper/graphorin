@@ -69,6 +69,10 @@
       "types": "./dist/inbound/index.d.ts",
       "default": "./dist/inbound/index.js"
     },
+    "./outbound": {
+      "types": "./dist/outbound/index.d.ts",
+      "default": "./dist/outbound/index.js"
+    },
     "./result": {
       "types": "./dist/result/index.d.ts",
       "default": "./dist/result/index.js"

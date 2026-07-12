@@ -18,8 +18,14 @@
  * @packageDocumentation
  */
 
-import { createHash } from 'node:crypto';
 import type { ServerEventFrame } from '@graphorin/protocol';
+import {
+  COMMENTARY_WRAP_CLOSE,
+  COMMENTARY_WRAP_OPEN,
+  freshRegex,
+  sha256Hex,
+  splitByWrapEnvelope,
+} from '@graphorin/tools/outbound';
 
 import {
   DEFAULT_APPLY_TO_EVENTS,
@@ -34,9 +40,6 @@ import type {
   DeliveryCommentarySink,
   DeliveryCommentaryTransport,
 } from './types.js';
-
-const DEFAULT_OPEN = '<<<commentary>>>';
-const DEFAULT_CLOSE = '<<</commentary>>>';
 
 /**
  * Public surface returned by {@link createDeliveryCommentarySanitizer}.
@@ -75,8 +78,8 @@ export function createDeliveryCommentarySanitizer(
   const applyToSet = new Set(applyToEvents);
   const patterns: ReadonlyArray<DeliveryCommentaryPattern> =
     config.patterns ?? DEFAULT_DELIVERY_COMMENTARY_PATTERNS;
-  const open = config.wrapOpen ?? DEFAULT_OPEN;
-  const close = config.wrapClose ?? DEFAULT_CLOSE;
+  const open = config.wrapOpen ?? COMMENTARY_WRAP_OPEN;
+  const close = config.wrapClose ?? COMMENTARY_WRAP_CLOSE;
   const sink: DeliveryCommentarySink | undefined = config.sink;
 
   function sanitize(
@@ -103,8 +106,8 @@ export function createDeliveryCommentarySanitizer(
       applied: true,
       reasons: [...allReasons],
       matchedPattern: [...allReasons][0],
-      sha256OfBefore: sha256(before),
-      sha256OfAfter: sha256(after),
+      sha256OfBefore: sha256Hex(before),
+      sha256OfAfter: sha256Hex(after),
       eventType: frame.type,
     };
     try {
@@ -200,39 +203,4 @@ function applyToText(
     transformed: next.join(''),
     reasons: [...matchedReasons],
   };
-}
-
-function freshRegex(re: RegExp): RegExp {
-  return new RegExp(re.source, re.flags);
-}
-
-function splitByWrapEnvelope(
-  text: string,
-  open: string,
-  close: string,
-): ReadonlyArray<{ readonly kind: 'plain' | 'wrapped'; readonly text: string }> {
-  const out: { kind: 'plain' | 'wrapped'; text: string }[] = [];
-  let cursor = 0;
-  while (cursor < text.length) {
-    const openAt = text.indexOf(open, cursor);
-    if (openAt < 0) {
-      out.push({ kind: 'plain', text: text.slice(cursor) });
-      break;
-    }
-    if (openAt > cursor) {
-      out.push({ kind: 'plain', text: text.slice(cursor, openAt) });
-    }
-    const closeAt = text.indexOf(close, openAt + open.length);
-    if (closeAt < 0) {
-      out.push({ kind: 'plain', text: text.slice(openAt) });
-      break;
-    }
-    out.push({ kind: 'wrapped', text: text.slice(openAt, closeAt + close.length) });
-    cursor = closeAt + close.length;
-  }
-  return out;
-}
-
-function sha256(value: string): string {
-  return createHash('sha256').update(value, 'utf8').digest('hex');
 }

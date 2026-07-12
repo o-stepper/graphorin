@@ -12,7 +12,6 @@
  * @packageDocumentation
  */
 
-import { createHash } from 'node:crypto';
 import type {
   AssistantMessage,
   Message,
@@ -20,6 +19,13 @@ import type {
   ToolMessage,
   UserMessage,
 } from '@graphorin/core';
+import {
+  COMMENTARY_WRAP_CLOSE,
+  COMMENTARY_WRAP_OPEN,
+  freshRegex,
+  sha256Hex,
+  splitByWrapEnvelope,
+} from '@graphorin/tools/outbound';
 import { BUILT_IN_COMMENTARY_PATTERNS } from './built-in-patterns.js';
 import type {
   CommentaryBoundary,
@@ -28,9 +34,6 @@ import type {
   CommentaryReason,
   CommentarySanitizationDecision,
 } from './types.js';
-
-const DEFAULT_OPEN = '<<<commentary>>>';
-const DEFAULT_CLOSE = '<<</commentary>>>';
 
 /**
  * Options accepted by {@link createCommentarySanitizer}.
@@ -103,8 +106,8 @@ export function createCommentarySanitizer(
   const policy: CommentaryPolicy = options.policy ?? 'wrap';
   const patterns: ReadonlyArray<CommentaryPattern> =
     options.patterns ?? BUILT_IN_COMMENTARY_PATTERNS;
-  const open = options.wrapOpen ?? DEFAULT_OPEN;
-  const close = options.wrapClose ?? DEFAULT_CLOSE;
+  const open = options.wrapOpen ?? COMMENTARY_WRAP_OPEN;
+  const close = options.wrapClose ?? COMMENTARY_WRAP_CLOSE;
 
   function applyToText(text: string): {
     readonly transformed: string;
@@ -166,8 +169,8 @@ export function createCommentarySanitizer(
           policy,
           applied: out.applied,
           reasons: out.reasons,
-          sha256OfBefore: sha256(beforeBytes),
-          sha256OfAfter: sha256(afterBytes),
+          sha256OfBefore: sha256Hex(beforeBytes),
+          sha256OfAfter: sha256Hex(afterBytes),
         },
       };
     }
@@ -179,8 +182,8 @@ export function createCommentarySanitizer(
         policy,
         applied: false,
         reasons: [],
-        sha256OfBefore: sha256(beforeBytes),
-        sha256OfAfter: sha256(beforeBytes),
+        sha256OfBefore: sha256Hex(beforeBytes),
+        sha256OfAfter: sha256Hex(beforeBytes),
       },
     };
   }
@@ -240,40 +243,6 @@ function withContent(
   return { ...message, content };
 }
 
-function freshRegex(re: RegExp): RegExp {
-  // RegExp instances with the `g` flag carry mutable lastIndex; clone
-  // every time so the sanitizer stays stateless.
-  return new RegExp(re.source, re.flags);
-}
-
-function splitByWrapEnvelope(
-  text: string,
-  open: string,
-  close: string,
-): ReadonlyArray<{ readonly kind: 'plain' | 'wrapped'; readonly text: string }> {
-  const out: { kind: 'plain' | 'wrapped'; text: string }[] = [];
-  let cursor = 0;
-  while (cursor < text.length) {
-    const openAt = text.indexOf(open, cursor);
-    if (openAt < 0) {
-      out.push({ kind: 'plain', text: text.slice(cursor) });
-      break;
-    }
-    if (openAt > cursor) {
-      out.push({ kind: 'plain', text: text.slice(cursor, openAt) });
-    }
-    const closeAt = text.indexOf(close, openAt + open.length);
-    if (closeAt < 0) {
-      // Malformed wrap; treat the rest as plain so we still process it.
-      out.push({ kind: 'plain', text: text.slice(openAt) });
-      break;
-    }
-    out.push({ kind: 'wrapped', text: text.slice(openAt, closeAt + close.length) });
-    cursor = closeAt + close.length;
-  }
-  return out;
-}
-
 function bytesOf(part: MessageContent): string {
   if (part.type === 'text' || part.type === 'reasoning') return part.text;
   // Hash the type + JSON of the part for non-text inputs so we still
@@ -282,8 +251,4 @@ function bytesOf(part: MessageContent): string {
     type: part.type,
     mimeType: 'mimeType' in part ? part.mimeType : undefined,
   });
-}
-
-function sha256(value: string): string {
-  return createHash('sha256').update(value, 'utf8').digest('hex');
 }

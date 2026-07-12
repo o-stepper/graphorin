@@ -94,7 +94,8 @@
   },
   "dependencies": {
     "@graphorin/core": "workspace:*",
-    "@graphorin/observability": "workspace:*"
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/tools": "workspace:*"
   },
   "publishConfig": {
     "access": "public",
