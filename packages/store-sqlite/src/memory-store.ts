@@ -317,6 +317,23 @@ class WorkingMemoryStoreImpl implements WorkingMemoryStore {
     );
     void reason;
   }
+
+  /**
+   * Hard-delete a block row (wave-D D2, GDPR path). Unlike `delete`
+   * (tombstone), the row is gone - this is the erasure surface for
+   * USER-scoped blocks (e.g. the profile projection), which the
+   * session-delete cascade deliberately never touches
+   * (`scope_session_id IS NULL`). Surfaced through
+   * `WorkingMemoryStoreExt.purge`.
+   *
+   * @stable
+   */
+  async purge(scope: SessionScope, label: string): Promise<void> {
+    this.#conn.run(
+      "DELETE FROM working_blocks WHERE scope_user_id = ? AND COALESCE(scope_session_id, '') = COALESCE(?, '') AND COALESCE(scope_agent_id, '') = COALESCE(?, '') AND label = ?",
+      [scope.userId, scope.sessionId ?? null, scope.agentId ?? null, label],
+    );
+  }
 }
 
 class SessionMemoryStoreImpl implements SessionMemoryStore {

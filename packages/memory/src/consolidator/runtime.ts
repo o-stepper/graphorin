@@ -37,6 +37,10 @@ import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
 import { runLearnedContextPass } from './phases/learned-context.js';
 import { runLightPhase } from './phases/light.js';
+import {
+  resolveProfileProjectionConfig,
+  runProfileProjectionPass,
+} from './phases/profile-projection.js';
 import { runReflectionPass } from './phases/reflect.js';
 import { renderTranscript, runStandardPhase } from './phases/standard.js';
 import {
@@ -997,6 +1001,31 @@ class ConsolidatorImpl implements Consolidator {
             : (out.llmCostUsd ?? 0) + learned.costUsd,
       };
     }
+    // Profile-projection pass (wave-D D2) runs last: it reads the facts
+    // the drain above may have just settled. Same double-gate + deep
+    // provider + budget envelope as the learned-context pass.
+    if (this.#config.profileProjection !== null && this.#working !== null) {
+      const projected = await runProfileProjectionPass({
+        provider: deepProvider,
+        tracer: this.#tracer,
+        scope,
+        working: this.#working,
+        store: this.#store,
+        budget: this.#budget,
+        config: this.#config.profileProjection,
+        now: this.#now,
+        ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
+      });
+      out = {
+        ...out,
+        profileProjectionUpdated: projected.updated,
+        llmTokensUsed: out.llmTokensUsed + projected.tokens,
+        llmCostUsd:
+          out.llmCostUsd === null && projected.costUsd === 0
+            ? null
+            : (out.llmCostUsd ?? 0) + projected.costUsd,
+      };
+    }
     return out;
   }
 
@@ -1091,6 +1120,11 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
     learnedContext: opts.learnedContext ?? preset.learnedContext,
     learnedContextMaxChars: opts.learnedContextMaxChars ?? preset.learnedContextMaxChars,
+    // Wave-D D2: not per-tier - configured via createMemory({ profile }).
+    profileProjection:
+      opts.profileProjection === undefined
+        ? null
+        : resolveProfileProjectionConfig(opts.profileProjection),
   });
 }
 

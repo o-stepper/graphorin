@@ -591,6 +591,10 @@ export function createInMemoryStore(
           blocks.set(blockKey(scope, label), updated);
         }
       },
+      // Wave-D D2: hard erasure (no tombstone) - mirrors store-sqlite.
+      async purge(scope, label) {
+        blocks.delete(blockKey(scope, label));
+      },
     },
     session: {
       async push(_scope, message, options) {

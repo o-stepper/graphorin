@@ -95,6 +95,21 @@ export {
   runLightPhase,
 } from './phases/light.js';
 export {
+  buildProfileProjectionRequest,
+  DEFAULT_PROFILE_MAX_CHARS,
+  DEFAULT_PROFILE_MAX_SLOTS,
+  PROFILE_BLOCK_LABEL,
+  type ProfileProjectionConfig,
+  type ProfileProjectionDeps,
+  type ProfileProjectionOutcome,
+  type ProfileSlot,
+  parseProfileSlots,
+  type ResolvedProfileProjectionConfig,
+  renderProfileBlock,
+  resolveProfileProjectionConfig,
+  runProfileProjectionPass,
+} from './phases/profile-projection.js';
+export {
   parseExtraction,
   runStandardPhase,
   type StandardPhaseDeps,
@@ -196,6 +211,7 @@ export function createConsolidatorPlaceholder(
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
+    profileProjection: null,
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

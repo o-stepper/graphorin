@@ -41,6 +41,7 @@ export type KnownSpanType =
   | 'memory.consolidate.deep'
   | 'memory.consolidate.reflect'
   | 'memory.consolidate.learned-context'
+  | 'memory.consolidate.profile-projection'
   | 'memory.search.insight'
   | 'memory.read.insight'
   | 'memory.write.insight'

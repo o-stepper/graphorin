@@ -18,6 +18,10 @@ import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import type { WorkingMemory } from '../tiers/working-memory.js';
 import type { SalienceWeights } from './decay.js';
+import type {
+  ProfileProjectionConfig,
+  ResolvedProfileProjectionConfig,
+} from './phases/profile-projection.js';
 
 /**
  * B3 (item 15): deterministic pre-extraction admission gate. Runs on
@@ -280,6 +284,15 @@ export interface ConsolidatorConfig {
   readonly learnedContext: boolean;
   /** Character bound enforced on the learned-context digest. Default `1200`. */
   readonly learnedContextMaxChars: number;
+  /**
+   * Profile-projection pass configuration (wave-D D2): after the
+   * learned-context pass, one budgeted LLM call projects ACTIVE facts
+   * into the reserved read-only `profile` working block (topic /
+   * sub-topic / content slots with fact-id provenance). `null` (the
+   * default at every tier) disables the pass. Configured through
+   * `createMemory({ profile })`, not per-tier.
+   */
+  readonly profileProjection: ResolvedProfileProjectionConfig | null;
 }
 
 /**
@@ -370,6 +383,8 @@ export interface PhaseOutcome {
   readonly insightsCreated: number;
   /** True when the learned-context digest block was rewritten (D3). */
   readonly learnedContextUpdated?: boolean;
+  /** True when the profile block content changed (wave-D D2). */
+  readonly profileProjectionUpdated?: boolean;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -506,6 +521,8 @@ export interface CreateConsolidatorOptions {
   readonly learnedContext?: boolean;
   /** Override the {@link ConsolidatorConfig.learnedContextMaxChars} default (D3). */
   readonly learnedContextMaxChars?: number;
+  /** Enable the profile-projection pass (wave-D D2). Default off. */
+  readonly profileProjection?: ProfileProjectionConfig;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }

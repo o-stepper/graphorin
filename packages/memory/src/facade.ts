@@ -29,6 +29,7 @@ import {
   type MemoryIngestGate,
   type OnBudgetExceed,
   type PhaseListener,
+  type ProfileProjectionConfig,
   type SalienceWeights,
 } from './consolidator/index.js';
 import { createContextEngine } from './context-engine/engine.js';
@@ -249,6 +250,19 @@ export interface CreateMemoryOptions {
    * agent runtime overrides it in Phase 12.
    */
   readonly resolveScope?: ScopeResolver;
+  /**
+   * Profile projection (wave-D D2, plan item 6): after each deep
+   * consolidation phase, one budgeted LLM call projects ACTIVE facts
+   * (never quarantined, never pending-supersede) into the reserved
+   * read-only `profile` working block as topic / sub-topic / content
+   * slots with fact-id provenance. The block is written USER-scoped by
+   * default - session deletion deliberately does not erase it; the
+   * erasure path is `memory.working.purge(userScope, 'profile')`.
+   * Requires an enabled consolidator (the pass rides the deep phase);
+   * configured here without one, a one-time WARN is written and the
+   * projection never runs.
+   */
+  readonly profile?: ProfileProjectionConfig;
   /**
    * Consolidator configuration. When omitted, empty, or
    * `enabled: false`, the facade installs the Phase 10a no-op
@@ -565,14 +579,29 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   );
 
   const consolidatorOpts = options.consolidator;
+  // Wave-D D2: the profile projection rides the deep phase - without an
+  // enabled consolidator it can never run. Warn once instead of
+  // silently accepting dead config.
+  const consolidatorEnabled =
+    consolidatorOpts !== undefined && shouldEnableConsolidator(consolidatorOpts);
+  if (options.profile !== undefined && !consolidatorEnabled && !profileConfigIgnoredWarned) {
+    profileConfigIgnoredWarned = true;
+    process.stderr.write(
+      '[graphorin/memory] `profile` (profile projection) was configured without an enabled ' +
+        'consolidator - the projection rides the deep consolidation phase and will never run. ' +
+        'Enable `consolidator` (with a provider) to activate it.\n',
+    );
+  }
   const consolidator: Consolidator = buildConsolidator(
     consolidatorOpts,
+    consolidatorEnabled,
     options.store,
     semantic,
     episodic,
     working,
     tracer,
     options.ingestGate,
+    options.profile,
   );
   consolidatorForSpend = consolidator;
   const contextEngineConfig = options.contextEngine ?? {};
@@ -713,17 +742,18 @@ function escapeXml(value: string): string {
 
 function buildConsolidator(
   opts: CreateMemoryOptions['consolidator'],
+  enabled: boolean,
   store: CreateMemoryOptions['store'],
   semantic: SemanticMemory,
   episodic: EpisodicMemory,
   working: WorkingMemory,
   tracer: Tracer,
   ingestGate?: MemoryIngestGate,
+  profile?: ProfileProjectionConfig,
 ): Consolidator {
   if (opts === undefined) {
     return createConsolidatorPlaceholder();
   }
-  const enabled = shouldEnableConsolidator(opts);
   if (!enabled) {
     return createConsolidatorPlaceholder({
       ...(opts.triggers !== undefined ? { triggers: opts.triggers } : {}),
@@ -792,6 +822,7 @@ function buildConsolidator(
     ...(opts.learnedContextMaxChars !== undefined
       ? { learnedContextMaxChars: opts.learnedContextMaxChars }
       : {}),
+    ...(profile !== undefined ? { profileProjection: profile } : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });
   if (opts.onPhaseFinished !== undefined) {
@@ -801,10 +832,12 @@ function buildConsolidator(
 }
 
 let consolidatorConfigIgnoredWarned = false;
+let profileConfigIgnoredWarned = false;
 
 /** @internal - test seam for the one-time disabled-config warning. */
 export function _resetConsolidatorConfigWarningForTesting(): void {
   consolidatorConfigIgnoredWarned = false;
+  profileConfigIgnoredWarned = false;
 }
 
 function shouldEnableConsolidator(opts: NonNullable<CreateMemoryOptions['consolidator']>): boolean {

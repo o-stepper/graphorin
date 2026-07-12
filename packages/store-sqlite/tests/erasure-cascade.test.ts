@@ -285,6 +285,50 @@ describe('W-005 - checkpoint session linkage + delete cascade', () => {
     expect(hits.length).toBe(1);
   });
 
+  it('wave-D D2: a user-scoped block survives session deletion; working.purge hard-deletes it', async () => {
+    const store = await makeStore();
+    const now = new Date().toISOString();
+    const userScope = { userId: 'alex' };
+    await store.memory.working.upsert(userScope, {
+      id: 'b-profile',
+      kind: 'working',
+      userId: 'alex',
+      sensitivity: 'internal',
+      label: 'profile',
+      value: 'identity:\n- name: Alex [f1]',
+      charLimit: 400,
+      readOnly: true,
+      createdAt: now,
+    });
+    await store.memory.working.upsert(
+      { userId: 'alex', sessionId: 's-peer' },
+      {
+        id: 'b-peer-profile',
+        kind: 'working',
+        userId: 'alex',
+        sessionId: 's-peer',
+        sensitivity: 'internal',
+        label: 'profile',
+        value: 'per-peer profile',
+        charLimit: 400,
+        createdAt: now,
+      },
+    );
+
+    // The session cascade removes ONLY the session-scoped variant.
+    await store.sessions.deleteSession('s-peer');
+    const count = (sql: string) => store.connection.get<{ n: number }>(sql)?.n ?? -1;
+    expect(count("SELECT COUNT(*) AS n FROM working_blocks WHERE id = 'b-peer-profile'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM working_blocks WHERE id = 'b-profile'")).toBe(1);
+
+    // delete() is a tombstone (row survives); purge() is the erasure path.
+    await store.memory.working.delete(userScope, 'profile');
+    expect(count("SELECT COUNT(*) AS n FROM working_blocks WHERE id = 'b-profile'")).toBe(1);
+    expect(typeof store.memory.working.purge).toBe('function');
+    await store.memory.working.purge?.(userScope, 'profile');
+    expect(count("SELECT COUNT(*) AS n FROM working_blocks WHERE id = 'b-profile'")).toBe(0);
+  });
+
   it("migration 029's backfill recovers session_id from legacy agent state blobs", async () => {
     const store = await makeStore();
     // A legacy-format row: written before the column was stamped.
