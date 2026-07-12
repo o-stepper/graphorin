@@ -313,6 +313,33 @@ When the abort races a suspend, no `awaiting_approval` checkpoint is written fir
 
 The loop consults `stopWhen` (default `isStepCount(50)`) at the top of every step. A run cut by its stop condition mid-task is **not** a clean finish: it ends `status: 'failed'` with `error.code: 'stop-condition'` and the condition's description in the message (plus an `agent.error` event), so a capped run is distinguishable from one that completed naturally. Raise the cap (`stopWhen: isStepCount(n)`) for legitimately long tool loops.
 
+## Run budget
+
+`agent.run(input, { budget })` enforces a per-run spend ceiling as a **between-step precheck** against the run's accumulated usage. Sub-agent usage counts: handoff and `toTool` children fold their tokens and cost into the parent run's accounting before the next check.
+
+```ts no-check
+const result = await agent.run('nightly digest', {
+  budget: {
+    maxCostUsd: 0.25, // needs USD cost data (pricing middleware)
+    maxTokens: 200_000, // provider-independent ceiling
+    onExceed: 'stop', // default; 'throw' rejects instead
+  },
+});
+if (result.status === 'failed' && result.error?.code === 'budget-exceeded') {
+  // partial state is on result.state - resumable like any failed run
+}
+```
+
+Semantics:
+
+- **Between-step enforcement.** The check runs at the top of every step, after the previous step's usage landed. The step that crosses a ceiling therefore completes - in-flight overshoot is inherent to between-step enforcement (the memory consolidator's `BudgetTracker` precheck behaves the same way). The final observed spend is at most one step (plus its sub-agent folds) past the ceiling.
+- **`onExceed: 'stop'`** (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'`, `error.code: 'budget-exceeded'` and an `agent.error` event - the stop-condition-cut precedent, so a budget-cut run is distinguishable and its partial state stays resumable.
+- **`onExceed: 'throw'`** rejects the run with `AgentBudgetExceededError` (`resource`, `observed`, `limit`) after the `agent.error` event; graceful finalization (final checkpoint, `agent.end`) is deliberately skipped.
+- **The cost leg needs priced usage.** `maxCostUsd` compares the accumulated `usage.cost` in USD, which exists only when the provider chain reports cost - wire `withCostTracking` from `@graphorin/provider` with a `@graphorin/pricing` snapshot (see [Pricing](/reference/pricing)). A cost ceiling without USD cost data is UNENFORCED and WARNs once per run; `maxTokens` works with any provider.
+- The budget is a call option, not config: it is **not persisted** in `RunState` - re-supply it when resuming a suspended run.
+
+The proactive primitives compose with this: heartbeat `profile.budgetUsd` and the cron-leg per-fire budget pass through to `RunBudget` (see the [proactivity guide](/guide/proactivity)).
+
 ## One run per instance
 
 An `Agent` instance carries exactly **one in-flight run**: `steer`, `followUp`, `abort`, and `compact` all address "the run" without a run handle, so two overlapping runs on the same instance would share the abort controller, steer queue, and executor bridge. Starting a second `run()` / `stream()` while one is active rejects with `ConcurrentRunError` (`code: 'concurrent-run'`). For parallel work, create separate `createAgent(...)` instances (or use [`agent.fanOut(...)`](#multi-agent)). Run-scoped state is reset at every run boundary - a `steer()` issued after a run has ended belongs to no run and is dropped rather than leaking into the next one.

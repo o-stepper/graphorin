@@ -32,6 +32,7 @@ import { isStepCount, NOOP_TRACER } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
 
 import {
+  AgentBudgetExceededError,
   AgentRuntimeError,
   ConcurrentRunError,
   InvalidAgentConfigError,
@@ -70,6 +71,7 @@ import {
   applyReasoningRetention,
   countLeadingSystemMessages,
 } from './runtime/messages.js';
+import { checkRunBudget, isCostCeilingUnpriced, validateRunBudget } from './runtime/run-budget.js';
 import {
   type CompactionRunEnv,
   maybeAutoCompact,
@@ -299,6 +301,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         : rawSeed;
     const sessionId = options.sessionId ?? config.sessionId ?? `session_${newId()}`;
     const userId = options.userId ?? config.userId;
+    // C5: eager validation - a malformed budget rejects synchronously
+    // (the ConcurrentRunError precedent), never produces a half-run.
+    const runBudget = validateRunBudget(options.budget);
+    let budgetUnpricedWarned = false;
     const localCtl = new AbortController();
     abortController = localCtl;
     // AG-5: the loop + every provider request must observe the LOCAL
@@ -604,6 +610,35 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           }
           break;
         }
+        // C5: run-level budget - a between-step precheck against the
+        // accumulated usage (sub-agent folds included, W-033). The step
+        // that crossed the ceiling has already completed; the run stops
+        // before the next provider call (in-flight overshoot is
+        // documented on RunBudget).
+        if (runBudget !== undefined) {
+          if (!budgetUnpricedWarned && isCostCeilingUnpriced(runBudget, state.usage)) {
+            budgetUnpricedWarned = true;
+            console.warn(
+              '[graphorin/agent] RunBudget.maxCostUsd is set but the accumulated usage ' +
+                'carries no USD cost data, so the cost ceiling is UNENFORCED. Wire ' +
+                'withCostTracking (@graphorin/provider) with a @graphorin/pricing snapshot, ' +
+                'or use RunBudget.maxTokens.',
+            );
+          }
+          const breach = checkRunBudget(runBudget, state.usage);
+          if (breach !== null) {
+            if (runBudget.onExceed === 'throw') {
+              throw new AgentBudgetExceededError(breach);
+            }
+            yield {
+              type: 'agent.error',
+              error: { message: breach.message, code: 'budget-exceeded' },
+            };
+            state.status = 'failed';
+            state.error = { message: breach.message, code: 'budget-exceeded' };
+            return yield* finishRun(state, finalSnapshot);
+          }
+        }
         stepNumber += 1;
         const stepStart = new Date().toISOString();
 
@@ -855,6 +890,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       yield { type: 'agent.error', error: { message, code } };
       state.status = 'failed';
       state.error = { message, code };
+      if (cause instanceof AgentBudgetExceededError) {
+        // C5: `onExceed: 'throw'` REJECTS the run - the caller opted
+        // out of graceful finalization (no final checkpoint, no
+        // `agent.end`). The `finally` below still closes the trace.
+        throw cause;
+      }
       return yield* finishRun(state, finalSnapshot);
     } finally {
       // C7: close the trace tree on every exit path.

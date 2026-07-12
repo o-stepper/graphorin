@@ -42,6 +42,7 @@ export type {
   OutputGuardrail,
 } from '@graphorin/security/guardrails';
 export {
+  AgentBudgetExceededError,
   AgentResolutionError,
   AgentRuntimeError,
   type AgentRuntimeErrorCode,
@@ -176,6 +177,7 @@ export type {
   PrepareStepOverrides,
   ResponseVerifier,
   ResumeDirective,
+  RunBudget,
   SkillsRegistryLike,
   VerifierResult,
 } from './types.js';

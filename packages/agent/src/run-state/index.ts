@@ -563,7 +563,18 @@ export function addModelUsage(state: RunState, modelId: string, delta: Usage): v
             }
           : {}),
         attemptCount: prev.attemptCount + 1,
-        ...(prev.cost !== undefined ? { cost: prev.cost } : {}),
+        // C5: merge reported cost instead of dropping the delta's
+        // (same-currency amounts add; cross-currency keeps prev).
+        ...(prev.cost !== undefined || delta.cost !== undefined
+          ? {
+              cost:
+                prev.cost === undefined
+                  ? { ...(delta.cost as NonNullable<Usage['cost']>) }
+                  : delta.cost !== undefined && delta.cost.currency === prev.cost.currency
+                    ? { amount: prev.cost.amount + delta.cost.amount, currency: prev.cost.currency }
+                    : { ...prev.cost },
+            }
+          : {}),
       }
     : { ...delta, attemptCount: 1 };
   current[modelId] = merged;

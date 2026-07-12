@@ -156,6 +156,8 @@ const cost = calculateCost(
 
 Cost figures ride the provider middleware, not a span attribute: `withCostTracking`'s `priceLookup` bills each call against the active snapshot and surfaces `costUsd` on its `onUsage` hook, and `@graphorin/observability`'s `costTrackerUsageDelegate(...)` routes those figures into a `CostTracker` for per-run / per-session rollups. A model missing from the snapshot never gets an invented number - `lookupPrice` returns `null` and warns once per process per (provider, model) pair.
 
+The agent's run-level budget consumes the same figures: when the provider chain fills `Usage.cost`, the run loop accumulates it onto `state.usage.cost` (sub-agent folds included) and `agent.run(input, { budget: { maxCostUsd } })` enforces the ceiling between steps - see [Run budget](/guide/agent-runtime#run-budget). Without priced usage the cost leg is unenforced (it WARNs once per run); `budget.maxTokens` needs no pricing at all.
+
 ## Privacy
 
 - Bundled snapshot ships **inside** the npm tarball - no first-run download.

@@ -198,6 +198,17 @@ export function addUsage(a: Usage, b: Usage): Usage {
   const reasoningTokens = optional(a.reasoningTokens, b.reasoningTokens);
   const cachedReadTokens = optional(a.cachedReadTokens, b.cachedReadTokens);
   const cacheWriteTokens = optional(a.cacheWriteTokens, b.cacheWriteTokens);
+  // C5: preserve reported cost (same-currency amounts add; a
+  // cross-currency pair keeps the first-seen currency - conversion is
+  // not this function's business).
+  const cost =
+    a.cost === undefined
+      ? b.cost !== undefined
+        ? { ...b.cost }
+        : undefined
+      : b.cost !== undefined && b.cost.currency === a.cost.currency
+        ? { amount: a.cost.amount + b.cost.amount, currency: a.cost.currency }
+        : { ...a.cost };
   return {
     promptTokens: a.promptTokens + b.promptTokens,
     completionTokens: a.completionTokens + b.completionTokens,
@@ -205,6 +216,7 @@ export function addUsage(a: Usage, b: Usage): Usage {
     ...(reasoningTokens !== undefined ? { reasoningTokens } : {}),
     ...(cachedReadTokens !== undefined ? { cachedReadTokens } : {}),
     ...(cacheWriteTokens !== undefined ? { cacheWriteTokens } : {}),
+    ...(cost !== undefined ? { cost } : {}),
   };
 }
 
@@ -237,6 +249,19 @@ export function accumulateUsage(target: Usage, delta: Usage): void {
   }
   if (delta.cacheWriteTokens !== undefined) {
     target.cacheWriteTokens = (target.cacheWriteTokens ?? 0) + delta.cacheWriteTokens;
+  }
+  // C5: fold reported cost so `state.usage.cost` reflects the whole run
+  // (pricing middleware fills per-call cost; before this the run-level
+  // aggregate silently dropped it). Same-currency amounts add; a
+  // cross-currency delta keeps the first-seen currency untouched -
+  // currency conversion is not this function's business. The run-level
+  // budget reads the USD aggregate (see runtime/run-budget.ts).
+  if (delta.cost !== undefined) {
+    if (target.cost === undefined) {
+      target.cost = { ...delta.cost };
+    } else if (target.cost.currency === delta.cost.currency) {
+      target.cost = { ...target.cost, amount: target.cost.amount + delta.cost.amount };
+    }
   }
 }
 
