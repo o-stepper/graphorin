@@ -38,6 +38,12 @@ export type {
   WorkingMemoryStore,
 } from './memory-store.js';
 export type { OAuthServerRecord, OAuthServerStore } from './oauth-server-store.js';
+export type {
+  PairedPeerRecord,
+  PairingPeerRef,
+  PairingRequestRecord,
+  PairingStore,
+} from './pairing-store.js';
 export type { ModelHint, ModelSpec, ProviderLike } from './preferred-model.js';
 export { MODEL_HINTS } from './preferred-model.js';
 export type {

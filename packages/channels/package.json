@@ -53,6 +53,9 @@
     "lint": "biome check .",
     "clean": "rimraf dist .turbo *.tsbuildinfo"
   },
+  "dependencies": {
+    "@graphorin/core": "workspace:*"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true

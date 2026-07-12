@@ -1254,6 +1254,50 @@ export interface OutputSpec {
 }
 
 // @public
+export interface PairedPeerRecord extends PairingPeerRef {
+    readonly pairedAt: string;
+}
+
+// @public
+export interface PairingPeerRef {
+    // (undocumented)
+    readonly accountId: string;
+    // (undocumented)
+    readonly channelId: string;
+    // (undocumented)
+    readonly peerId: string;
+}
+
+// @public
+export interface PairingRequestRecord extends PairingPeerRef {
+    // (undocumented)
+    readonly code: string;
+    readonly createdAt: string;
+    readonly expiresAt: string;
+}
+
+// @public
+export interface PairingStore {
+    // (undocumented)
+    addPairedPeer(peer: PairedPeerRecord): Promise<void>;
+    countPendingRequests(channelId: string, nowIso: string): Promise<number>;
+    // (undocumented)
+    deleteRequest(channelId: string, code: string): Promise<void>;
+    // (undocumented)
+    findRequestByCode(channelId: string, code: string): Promise<PairingRequestRecord | null>;
+    // (undocumented)
+    findRequestByPeer(peer: PairingPeerRef): Promise<PairingRequestRecord | null>;
+    // (undocumented)
+    isPaired(peer: PairingPeerRef): Promise<boolean>;
+    // (undocumented)
+    listPairedPeers(channelId?: string): Promise<ReadonlyArray<PairedPeerRecord>>;
+    pruneExpiredRequests(nowIso: string): Promise<number>;
+    // (undocumented)
+    removePairedPeer(peer: PairingPeerRef): Promise<void>;
+    upsertRequest(request: PairingRequestRecord): Promise<void>;
+}
+
+// @public
 export function pause<TValue, TResume = unknown>(value: TValue): TResume;
 
 // @public

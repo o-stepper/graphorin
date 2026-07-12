@@ -19,6 +19,17 @@ import pkg from '../package.json' with { type: 'json' };
 export const VERSION: string = pkg.version;
 
 export {
+  ChannelAccessConfigError,
+  type ChannelAccessController,
+  type ChannelAccessDecision,
+  type ChannelAccessPolicyConfig,
+  type ChannelAccessPolicyKind,
+  type ChannelAllowlistEntry,
+  type CreateAccessControllerOptions,
+  createAccessController,
+  type PairingPolicyOptions,
+} from './access.js';
+export {
   type ChannelRoute,
   ChannelRouteConfigError,
   createIdentityRouter,
