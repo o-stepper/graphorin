@@ -2297,6 +2297,32 @@ export function stream<T>(opts?: {
     readonly default?: ReadonlyArray<T>;
 }): Stream<T>;
 
+// @public
+export interface SttAdapter {
+    readonly id: string;
+    // (undocumented)
+    transcribe(request: SttTranscriptionRequest): Promise<SttTranscript>;
+}
+
+// @public
+export interface SttTranscript {
+    readonly confidence?: number;
+    readonly durationMs?: number;
+    readonly language?: string;
+    // (undocumented)
+    readonly text: string;
+    readonly trustClass: 'channel-inbound';
+}
+
+// @public
+export interface SttTranscriptionRequest {
+    readonly audio: Uint8Array;
+    readonly languageHint?: string;
+    readonly mimeType: string;
+    // (undocumented)
+    readonly signal?: AbortSignal;
+}
+
 // @public (undocumented)
 export interface SystemMessage {
     // (undocumented)

@@ -86,6 +86,7 @@ export type {
   SessionStoreExt,
   SessionWorkflowRun,
 } from './session-store.js';
+export type { SttAdapter, SttTranscript, SttTranscriptionRequest } from './stt.js';
 export type { TokenCounter } from './token-counter.js';
 export type {
   AnyTool,
