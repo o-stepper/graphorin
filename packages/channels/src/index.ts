@@ -17,3 +17,27 @@
 import pkg from '../package.json' with { type: 'json' };
 
 export const VERSION: string = pkg.version;
+
+export {
+  type ChannelRoute,
+  ChannelRouteConfigError,
+  createIdentityRouter,
+  defaultSessionKey,
+  type IdentityRouter,
+  type IdentityRouterOptions,
+  type ResolvedChannelRoute,
+} from './router.js';
+export {
+  type ChannelAdapter,
+  type ChannelAttachment,
+  type ChannelCapabilities,
+  ChannelDeliveryError,
+  type ChannelIdentity,
+  type ChannelRuntimeContext,
+  type DeliveryPayload,
+  type DeliveryQuestion,
+  type DeliveryReceipt,
+  type InboundAcceptance,
+  type InboundChannelMessage,
+  isChannelDeliveryError,
+} from './spi.js';
