@@ -456,7 +456,11 @@ export const SESSION_SCOPED_PURGES: ReadonlyArray<SessionScopedPurge> = Object.f
         sessionColumn: 'scope_session_id',
         fts: 'facts_fts',
         vec: { prefix: 'facts_vec_', idColumn: 'fact_id' },
-        refs: [{ table: 'fact_entities', column: 'fact_id' }],
+        refs: [
+          { table: 'fact_entities', column: 'fact_id' },
+          // Wave-D D4: the recall ledger rides its fact.
+          { table: 'fact_recall_queries', column: 'fact_id' },
+        ],
         history: { kind: 'fact', textColumn: 'text', valueMatch: true },
       },
       {

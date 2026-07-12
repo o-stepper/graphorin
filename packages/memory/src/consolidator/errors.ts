@@ -93,6 +93,33 @@ export class CuratedBlocksMisconfiguredError extends GraphorinMemoryError {
 }
 
 /**
+ * Raised at `createMemory` time when an auto-promotion feature is
+ * enabled without the B3 ingest gate (wave-D D4, fail-closed): both
+ * the deterministic promotion step and the write-time
+ * `autoPromoteExtraction` hatch move synthesized content into default
+ * recall, so they REQUIRE the admission gate as configured evidence -
+ * the same posture as the proactive `act` grant.
+ *
+ * @stable
+ */
+export class IngestGateRequiredError extends GraphorinMemoryError {
+  override readonly name = 'IngestGateRequiredError';
+  readonly kind = 'ingest-gate-required' as const;
+  readonly feature: 'promotion' | 'autoPromoteExtraction';
+
+  constructor(feature: 'promotion' | 'autoPromoteExtraction') {
+    super(
+      `[graphorin/memory] '${feature}' requires an ingest gate - auto-promotion without the B3 ` +
+        'admission gate would move unvetted content into default recall (fail-closed).',
+      {
+        hint: 'Pass createMemory({ ingestGate: verdictIngestGate }) (or your own gate) alongside the promotion feature.',
+      },
+    );
+    this.feature = feature;
+  }
+}
+
+/**
  * Raised when the standard / deep phase attempts an LLM call without
  * a configured provider. Surfaces as a typed failure that the DLQ
  * pipeline can attribute correctly.

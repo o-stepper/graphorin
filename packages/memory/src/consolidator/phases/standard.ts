@@ -151,6 +151,32 @@ const EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT = [
 ].join(' ');
 
 /**
+ * W-083 guard (wave-D D4, optional leg): with `autoPromoteExtraction`
+ * enabled, an update/conflict decision against a QUARANTINED or
+ * USER-provenance target must NOT close the old interval immediately -
+ * the pending-supersede path is forced instead, so a MINJA-style
+ * extraction cannot instantly retire content a human wrote or content
+ * that is itself still unvetted. Fail-closed: an unreadable target
+ * suppresses the escape hatch too. A no-op when the hatch is off
+ * (deferred supersede already covers the risk).
+ */
+async function allowImmediateSupersede(
+  deps: StandardPhaseDeps,
+  targetId: string,
+): Promise<boolean> {
+  if (!deps.autoPromoteExtraction) return false;
+  try {
+    const target = await deps.semantic.get(deps.scope, targetId);
+    if (target === null) return false;
+    if (target.status === 'quarantined') return false;
+    if (target.provenance === 'user') return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Run the standard phase. Returns a {@link PhaseOutcome}; errors are
  * surfaced via `status: 'failed'` + `errorMessage` so the caller can
  * land the batch in the DLQ.
@@ -392,7 +418,9 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
               decision.targetId,
               input,
               decision.reason,
-              { autoPromoteSynthesized: deps.autoPromoteExtraction },
+              {
+                autoPromoteSynthesized: await allowImmediateSupersede(deps, decision.targetId),
+              },
             );
             candidateId = stored.id;
             factsUpdated += 1;
@@ -404,7 +432,9 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
               decision.targetId,
               input,
               decision.reason,
-              { autoPromoteSynthesized: deps.autoPromoteExtraction },
+              {
+                autoPromoteSynthesized: await allowImmediateSupersede(deps, decision.targetId),
+              },
             );
             candidateId = stored.id;
             factsUpdated += 1;

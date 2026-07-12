@@ -218,6 +218,59 @@ export type PostCompactionHook = (
 ) => Promise<ReadonlyArray<import('@graphorin/core').MessageContent>>;
 
 /**
+ * Per-call context handed to a PRE-compaction hook (wave-D D4) -
+ * fired BEFORE the summarizer runs, while the full buffer is still
+ * available. This is the seam the built-in `memoryFlushHook` uses to
+ * salvage durable facts from content that is about to be summarized
+ * away.
+ *
+ * @stable
+ */
+export interface PreCompactionHookContext {
+  readonly scope: SessionScope;
+  readonly runId: string;
+  readonly sessionId: string;
+  readonly agentId: string;
+  readonly source: CompactionSource;
+  /**
+   * The full pre-compaction buffer (what the summarizer is about to
+   * operate on) - the model-visible messages, i.e. post-guardrail
+   * content, never the raw blocked turns.
+   */
+  readonly messages: ReadonlyArray<Message>;
+}
+
+/**
+ * Pre-compaction hook signature (wave-D D4). Side-effect only - a
+ * pre-hook cannot alter what gets compacted; a throwing hook is
+ * recorded in `hookFailures` and never blocks the compaction.
+ *
+ * @stable
+ */
+export type PreCompactionHook = (ctx: PreCompactionHookContext) => Promise<void>;
+
+/**
+ * Named pre-compaction hook (built-in form): receives the shared hook
+ * deps (memory handle, scope, privacy filter) plus the pre-compaction
+ * context. Mirrors `NamedPostCompactionHook`.
+ *
+ * @stable
+ */
+export interface NamedPreCompactionHook {
+  readonly id: string;
+  run(
+    deps: {
+      readonly memory: import('../../memory-interface.js').Memory;
+      readonly scope: SessionScope;
+      readonly allowSensitivity?: (
+        sensitivity: import('@graphorin/core').Sensitivity | undefined,
+      ) => boolean;
+    },
+    ctx: PreCompactionHookContext,
+  ): Promise<void>;
+}
+
+/**
  * Full compaction config. Either `false` (explicitly disabled),
  * `'auto'` (resolved per-provider at warm-up) or a fully-specified
  * record.
@@ -228,6 +281,13 @@ export interface CompactionConfig {
   readonly trigger?: 'never' | CompactionTriggerConfig;
   readonly strategy?: CompactionStrategy;
   readonly postCompactionHooks?: ReadonlyArray<PostCompactionHook>;
+  /**
+   * Pre-compaction hooks (wave-D D4): fired before the summarizer,
+   * with the full buffer in context. Default: none - the built-in
+   * `memoryFlushHook` is opt-in. Accepts plain functions or named
+   * hooks.
+   */
+  readonly preCompactionHooks?: ReadonlyArray<PreCompactionHook | NamedPreCompactionHook>;
 }
 
 /**

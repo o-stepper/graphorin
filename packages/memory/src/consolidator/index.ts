@@ -62,6 +62,7 @@ export {
   BudgetExceededError,
   CuratedBlocksMisconfiguredError,
   CustomTierMisconfiguredError,
+  IngestGateRequiredError,
   ProviderNotConfiguredError,
 } from './errors.js';
 export { tipMessageId } from './idempotency.js';
@@ -134,6 +135,13 @@ export {
   type ReviserPresetOptions,
   reviserConsolidatorPreset,
 } from './presets.js';
+export {
+  type PromotionCandidate,
+  type PromotionPolicyConfig,
+  type ResolvedPromotionPolicy,
+  resolvePromotionPolicy,
+  shouldPromote,
+} from './promotion.js';
 export { type Consolidator, createConsolidator } from './runtime.js';
 export {
   type ConsolidatorCatchupPolicy,
@@ -233,6 +241,7 @@ export function createConsolidatorPlaceholder(
     learnedContextMaxChars: 1200,
     curatedBlocks: [],
     profileProjection: null,
+    promotion: null,
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

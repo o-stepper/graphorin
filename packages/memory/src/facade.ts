@@ -27,10 +27,12 @@ import {
   createConsolidator,
   createConsolidatorPlaceholder,
   createProviderWorkflowInducer,
+  IngestGateRequiredError,
   type MemoryIngestGate,
   type OnBudgetExceed,
   type PhaseListener,
   type ProfileProjectionConfig,
+  type PromotionPolicyConfig,
   type SalienceWeights,
 } from './consolidator/index.js';
 import { createContextEngine } from './context-engine/engine.js';
@@ -326,8 +328,22 @@ export interface CreateMemoryOptions {
     readonly formEpisodes?: boolean;
     /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
     readonly importanceScoring?: boolean;
-    /** Opt in to auto-promotion of injection-clean extraction facts (MCON-2). Default off. */
+    /**
+     * Opt in to auto-promotion of injection-clean extraction facts
+     * (MCON-2). Default off. Wave-D D4: REQUIRES `ingestGate` - the
+     * documented precondition is now enforced fail-closed at
+     * `createMemory` time ({@link IngestGateRequiredError}).
+     */
     readonly autoPromoteExtraction?: boolean;
+    /**
+     * Deterministic quarantine-exit policy (wave-D D4, D-7): the deep
+     * phase promotes quarantined facts whose recall evidence clears
+     * every threshold through the audited validate path. Default off.
+     * REQUIRES `ingestGate` (fail-closed) - promotion without the B3
+     * admission gate would move unvetted content into default recall.
+     * Distinct from `autoPromoteExtraction` (write-time hatch).
+     */
+    readonly promotion?: PromotionPolicyConfig;
     /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
     readonly reflection?: boolean;
     /** Accumulated-importance threshold at which reflection fires (P1-1). */
@@ -600,6 +616,17 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   );
 
   const consolidatorOpts = options.consolidator;
+  // Wave-D D4 (fail-closed): every auto-promotion surface requires the
+  // B3 ingest gate as configured evidence - same posture as the
+  // proactive 'act' grant. Checked before anything is constructed.
+  if (options.ingestGate === undefined) {
+    if (consolidatorOpts?.promotion !== undefined) {
+      throw new IngestGateRequiredError('promotion');
+    }
+    if (consolidatorOpts?.autoPromoteExtraction === true) {
+      throw new IngestGateRequiredError('autoPromoteExtraction');
+    }
+  }
   // Wave-D D2: the profile projection rides the deep phase - without an
   // enabled consolidator it can never run. Warn once instead of
   // silently accepting dead config.
@@ -844,6 +871,7 @@ function buildConsolidator(
       ? { learnedContextMaxChars: opts.learnedContextMaxChars }
       : {}),
     ...(opts.curatedBlocks !== undefined ? { curatedBlocks: opts.curatedBlocks } : {}),
+    ...(opts.promotion !== undefined ? { promotion: opts.promotion } : {}),
     ...(profile !== undefined ? { profileProjection: profile } : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });

@@ -43,6 +43,7 @@ export type KnownSpanType =
   | 'memory.consolidate.learned-context'
   | 'memory.consolidate.curated-block'
   | 'memory.consolidate.profile-projection'
+  | 'memory.consolidate.promotion'
   | 'memory.search.insight'
   | 'memory.read.insight'
   | 'memory.write.insight'

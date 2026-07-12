@@ -413,6 +413,8 @@ The `context.compacted` event carries `beforeTokens`, `afterTokens`, `summaryTok
 
 When `@graphorin/memory.contextEngine` auto-compacts the buffer, the runtime fires every registered `postCompactionHooks[i]` between the trim and the next `provider.stream(...)` call, then re-injects each hook's returned Context Essentials into the trimmed buffer as a trailing `system` message. Failed hooks are isolated; the harness continues with the survivors.
 
+Since wave-D D4 there is a mirror seam on the OTHER side of the summarizer: `preCompactionHooks` fire before the pass, with the full pre-compaction buffer in context (side-effect only - they cannot alter what gets compacted, and a throwing hook lands in `hookFailures` without blocking the pass). The built-in `memoryFlushHook` uses it to salvage durable facts into quarantined memory before they are summarized away - see [Memory § Pre-compaction memory flush](/guide/memory-system#pre-compaction-memory-flush-opt-in-wave-d-d4). Both hook arrays fire on auto, manual and emergency passes alike.
+
 ## Agent-step-level fan-out
 
 ```ts no-check

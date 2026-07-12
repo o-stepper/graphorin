@@ -201,6 +201,23 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
       readonly excludePendingSupersede?: boolean;
     },
   ): Promise<ReadonlyArray<Fact>>;
+  /**
+   * Enumerate quarantined, live, non-archived facts together with
+   * their recall statistics (wave-D D4) - the candidate feed for the
+   * deterministic PromotionPolicy: `accessCount` is the monotonic
+   * migration-027 counter, `uniqueQueryCount` the migration-036
+   * distinct-query ledger count. Deterministic `created_at` order.
+   */
+  listPromotionCandidates?(
+    scope: SessionScope,
+    options?: { readonly limit?: number },
+  ): Promise<
+    ReadonlyArray<{
+      readonly fact: Fact;
+      readonly accessCount: number;
+      readonly uniqueQueryCount: number;
+    }>
+  >;
 }
 
 /**
@@ -657,12 +674,15 @@ export interface DecayMemoryStoreExt {
    * `lastAccessedAt` and reinforce `strength` (implementation-capped).
    * Optional - adapters without decay columns may omit it; callers
    * MUST treat failures as non-fatal (the read path never breaks on a
-   * bookkeeping write).
+   * bookkeeping write). With `queryHash` (wave-D D4) the adapter also
+   * feeds the persistent recall ledger - the DISTINCT-query counter
+   * behind the PromotionPolicy `minUniqueQueries` threshold.
    */
   markAccessed?(
     ids: ReadonlyArray<string>,
     accessedAt?: number,
     scope?: SessionScope,
+    queryHash?: string,
   ): Promise<void>;
   /**
    * Narrow decay-column read for exactly the given fact ids (MRET-8) -

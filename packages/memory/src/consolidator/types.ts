@@ -23,6 +23,7 @@ import type {
   ProfileProjectionConfig,
   ResolvedProfileProjectionConfig,
 } from './phases/profile-projection.js';
+import type { PromotionPolicyConfig, ResolvedPromotionPolicy } from './promotion.js';
 
 /**
  * B3 (item 15): deterministic pre-extraction admission gate. Runs on
@@ -302,6 +303,15 @@ export interface ConsolidatorConfig {
    * `createMemory({ profile })`, not per-tier.
    */
   readonly profileProjection: ResolvedProfileProjectionConfig | null;
+  /**
+   * Deterministic quarantine-exit policy (wave-D D4, D-7): the deep
+   * phase promotes quarantined facts whose recall evidence clears
+   * every threshold, through the audited `SemanticMemory.validate`
+   * path. `null` (default at every tier) disables the step. Enabling
+   * it REQUIRES the B3 ingest gate (fail-closed config check in
+   * `createMemory`).
+   */
+  readonly promotion: ResolvedPromotionPolicy | null;
 }
 
 /**
@@ -396,6 +406,8 @@ export interface PhaseOutcome {
   readonly curatedBlocksUpdated?: number;
   /** True when the profile block content changed (wave-D D2). */
   readonly profileProjectionUpdated?: boolean;
+  /** Facts promoted out of quarantine by the promotion step (wave-D D4). */
+  readonly factsPromoted?: number;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -540,6 +552,8 @@ export interface CreateConsolidatorOptions {
   readonly curatedBlocks?: ReadonlyArray<CuratedBlockSpec>;
   /** Enable the profile-projection pass (wave-D D2). Default off. */
   readonly profileProjection?: ProfileProjectionConfig;
+  /** Enable the deterministic promotion step (wave-D D4). Default off. */
+  readonly promotion?: PromotionPolicyConfig;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }

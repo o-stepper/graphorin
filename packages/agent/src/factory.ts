@@ -174,6 +174,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   const agentId = newId('agent');
   const tracer = config.tracer ?? NOOP_TRACER;
   const stopWhen = config.stopWhen ?? isStepCount(50);
+  // Wave-D D4: auto-induction failures WARN once per agent, never fail
+  // the run (the induced procedure is a bonus, not a contract).
+  let autoInductionWarned = false;
+  const warnAutoInductionFailedOnce = (error: unknown): void => {
+    if (autoInductionWarned) return;
+    autoInductionWarned = true;
+    process.stderr.write(
+      `[graphorin/agent] procedureInduction.auto: induction failed and will keep being skipped silently this process (${
+        error instanceof Error ? error.message : String(error)
+      }).\n`,
+    );
+  };
   const fallbackPolicy: AgentFallbackPolicy = config.fallbackPolicy ?? {};
   const handoffMap = new Map<
     string,
@@ -368,6 +380,39 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       }
       if (promotedDeferred.size > 0) {
         (s as { promotedTools?: readonly string[] }).promotedTools = [...promotedDeferred];
+      }
+      // Wave-D D4: opt-in auto-induction - a SUCCEEDED run above the
+      // complexity thresholds is distilled into a procedure candidate.
+      // The induced rule lands QUARANTINED (the induce path enforces
+      // that); failed / aborted / suspended runs never induce. Awaited
+      // (deterministic; pick a cheap inducer) but never fatal.
+      if (
+        s.status === 'completed' &&
+        config.procedureInduction?.auto === true &&
+        memory !== undefined
+      ) {
+        const thresholds = config.procedureInduction;
+        const stepCount = s.steps.length;
+        const toolCallCount = s.steps.reduce((n, step) => n + step.toolCalls.length, 0);
+        const costUsd = s.usage.cost?.currency === 'USD' ? s.usage.cost.amount : 0;
+        if (
+          stepCount >= (thresholds.minSteps ?? 3) &&
+          toolCallCount >= (thresholds.minToolCalls ?? 3) &&
+          costUsd >= (thresholds.minCostUsd ?? 0)
+        ) {
+          try {
+            await memory.procedural.induceFromRun(
+              {
+                userId: userId ?? 'anonymous',
+                sessionId,
+                agentId,
+              },
+              s,
+            );
+          } catch (error) {
+            warnAutoInductionFailedOnce(error);
+          }
+        }
       }
       return yield* finishRunBase(s, snapshot);
     }

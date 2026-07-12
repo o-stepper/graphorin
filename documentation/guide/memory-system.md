@@ -29,7 +29,7 @@ flowchart LR
 | Tier | What it stores | Read surface | Write surface |
 |---|---|---|---|
 | **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `append`, `replace`, `rethink`, `attach`, `detach`, `forget` |
-| **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant`, `compact` |
+| **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant` (deprecated - see the pre-compaction flush), `compact` |
 | **episodic** | Things that happened - decisions, events, milestones - captured with proper bi-temporal validity. | `recent`, `search` | `record` |
 | **semantic** | Facts about you, the world, the task. Conflicts resolved through a multi-stage pipeline. | `search`, `searchIterative`, `history` | `remember`, `supersede`, `forget`, `validate` |
 | **procedural** | How to do things - workflows, recipes, learned patterns. | `list`, `activate` | `define`, `remove`, `induce` |
@@ -380,7 +380,7 @@ const memory = createMemory({
 });
 ```
 
-The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for memory auto-promotion (a later wave) and for the proactive [`act` grant](/guide/proactivity#the-act-grant-is-gated-on-the-ingest-gate); see the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
+The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for memory auto-promotion and for the proactive [`act` grant](/guide/proactivity#the-act-grant-is-gated-on-the-ingest-gate) - since wave-D D4 this is ENFORCED at `createMemory` time: `consolidator.promotion` or `autoPromoteExtraction: true` without an `ingestGate` throws `IngestGateRequiredError`. See the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
 
 ### Principal / owner dimension
 
@@ -420,7 +420,7 @@ A background pipeline (`Consolidator`) distils long conversations into long-term
 | **Standard** | One LLM extraction pass over new session slices (**temporally anchored** - per-message timestamps + "today is" so relative dates resolve), **neighbour-aware** reconciliation (add / update / noop / conflict), an embedder-independent exact-duplicate guard, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. Extracted facts land **quarantined** until validated. |
 | **Deep** | An LLM judge drains the pending CONFLICT-CHECK queue (supersede / soft dedup / admit) and, at the `full` tier, runs **reflection / insight synthesis**. |
 
-Procedural induction is **not** phase-scheduled - call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself; there is no cross-agent shared-tier promotion.
+Procedural induction is **not** phase-scheduled. You can call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself, or - wave-D D4, opt-in - let the AGENT do it: `createAgent({ procedureInduction: { auto: true, minSteps?, minToolCalls?, minCostUsd? } })` calls `induceFromRun` after every run that COMPLETES at or above the thresholds (defaults: 3 steps, 3 tool calls, cost ignored). Failed / aborted / suspended runs never induce, the induced rule still lands quarantined, an inducer failure WARNs once and never fails the run, and the call is awaited before `agent.end` - wire a cheap inducer model on `createMemory({ procedureInduction })`. There is no cross-agent shared-tier promotion.
 
 ### Making it run
 
@@ -480,6 +480,16 @@ Use-it-or-lose-it decay (ExpeL) applies to **validated** insights only: each ref
 ### Learned-context digest (opt-in)
 
 `consolidator: { learnedContext: true }` adds a Letta-style sleep-time pass after the deep phase: one budgeted LLM call rewrites the reserved `learned_context` working block from the previous digest + recent episodes + active insights + active procedures. Because it is an ordinary working block, the digest is spliced into layer 3 of the assembled system prompt automatically (inside the stable KV-cache prefix), survives compaction via the persona-block re-anchor pattern (`reanchorPersonaBlock({ blockLabel: 'learned_context' })`), and stays editable by the agent through the `block_*` tools - the pass folds any agent edits into its next rewrite. Size-bounded by `learnedContextMaxChars` (default 1200). Off by default at **every** tier; a silent no-op when the facade has no working tier or the pass finds no evidence (no paid call).
+
+### Promotion policy (opt-in, wave-D D4)
+
+Quarantine needs an exit that is neither manual-only (`fact_validate`) nor write-time (`autoPromoteExtraction`). `consolidator: { promotion: { minSalience?, minRecalls?, minUniqueQueries?, minAgeMs?, allowedProvenance?, maxPerRun? } }` adds a **deterministic** step to the deep phase: quarantined facts whose recall evidence clears EVERY threshold are promoted through the audited `SemanticMemory.validate` path (which refuses injection-flagged facts - never forced - and completes any pending W-019 supersede). No LLM call. The evidence comes from two persistent counters: `access_count` (every recall, migration 027) and the **recall ledger** (DISTINCT queries by hash, migration 036) - a fact recalled 50 times by one repeated query is weaker evidence than one recalled by 5 different questions. Defaults: 3 recalls, 2 distinct queries, 24h age, synthesized provenance only (`extraction`/`reflection`/`induction`), 10 promotions per pass.
+
+Note default recall EXCLUDES quarantined facts, so with the default thresholds promotion follows demonstrated usage through quarantine-inclusive surfaces (review / inspector reads, `deep_recall`); a bot that wants age + salience-only promotion sets `minRecalls: 0, minUniqueQueries: 0` explicitly. Enabling `promotion` REQUIRES the [ingest gate](#the-ingest-gate-b3) - fail-closed at `createMemory` time - and is deliberately separate from `autoPromoteExtraction` (which also now requires the gate, plus a W-083 guard: with the hatch on, an update/conflict decision against a quarantined or user-written target is forced onto the pending-supersede path instead of closing it immediately).
+
+### Pre-compaction memory flush (opt-in, wave-D D4)
+
+Compaction summarizes content away; the flush salvages the durable part first. `contextEngine: { compaction: { preCompactionHooks: [memoryFlushHook({ provider, maxFacts?, maxInputChars?, maxOutputTokens? })] } }` fires ONE budgeted LLM call before the summarizer (auto, manual and emergency passes alike), extracts self-contained facts from the model-visible buffer, and writes them with `provenance: 'extraction'` - so every flushed fact lands **quarantined** and exits only via validation or the promotion policy. When the facade carries an `ingestGate`, the hook applies it to every candidate message (fail-closed). A provider failure WARNs and flushes nothing - compaction is never blocked. The flush call happens outside the agent loop, so agent run budgets do not observe it: bound it here and pick a cheap model. `preCompactionHooks` is a general seam (side-effect only, failures land in `hookFailures`); the old `SessionMemory.flushImportant` stub is deprecated in favour of this hook.
 
 ### Curated blocks and the reviser preset (wave-D D3)
 

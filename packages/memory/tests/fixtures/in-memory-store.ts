@@ -546,6 +546,9 @@ export function createInMemoryStore(
   // P1-3: contextual index text per fact (mirrors store-sqlite's facts_fts).
   const factIndexText = new Map<string, string>();
   const episodeVectors = new Map<string, Float32Array>();
+  // Wave-D D4: recall-ledger mirrors (access counter + distinct-query hashes).
+  const accessCounts = new Map<string, number>();
+  const recallLedger = new Map<string, Set<string>>();
   const decaySignals = new Map<
     string,
     { strength: number; lastAccessedAt: number | null; createdAt: number; archived: boolean }
@@ -970,7 +973,12 @@ export function createInMemoryStore(
         }
         return out;
       },
-      async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number) {
+      async markAccessed(
+        ids: ReadonlyArray<string>,
+        accessedAt?: number,
+        _scope?: unknown,
+        queryHash?: string,
+      ) {
         const at = accessedAt ?? Date.now();
         for (const id of ids) {
           const sig = decaySignals.get(id) ?? {
@@ -984,7 +992,32 @@ export function createInMemoryStore(
             lastAccessedAt: at,
             strength: Math.min(2, sig.strength + 0.1),
           });
+          // Wave-D D4: mirror store-sqlite's recall ledger.
+          accessCounts.set(id, (accessCounts.get(id) ?? 0) + 1);
+          if (queryHash !== undefined && queryHash.length > 0) {
+            const hashes = recallLedger.get(id) ?? new Set<string>();
+            hashes.add(queryHash);
+            recallLedger.set(id, hashes);
+          }
         }
+      },
+      // Wave-D D4: quarantined candidates + recall stats (mirrors
+      // store-sqlite's listPromotionCandidates).
+      async listPromotionCandidates(scope, options = {}) {
+        const limit = options.limit ?? 200;
+        const out: Array<{ fact: Fact; accessCount: number; uniqueQueryCount: number }> = [];
+        for (const fact of facts) {
+          if (fact.userId !== scope.userId) continue;
+          if (fact.deletedAt !== undefined) continue;
+          if (fact.status !== 'quarantined') continue;
+          out.push({
+            fact,
+            accessCount: accessCounts.get(fact.id) ?? 0,
+            uniqueQueryCount: recallLedger.get(fact.id)?.size ?? 0,
+          });
+          if (out.length >= limit) break;
+        }
+        return out;
       },
       async listDecaySignals(ids: ReadonlyArray<string>) {
         const out: Array<{

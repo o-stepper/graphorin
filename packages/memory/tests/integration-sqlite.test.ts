@@ -347,6 +347,8 @@ describe('@graphorin/memory <> @graphorin/store-sqlite - integration', () => {
       const on = createMemory({
         store: sqlite.memory,
         embeddings: sqlite.embeddings,
+        // Wave-D D4: the hatch requires the ingest gate (fail-closed).
+        ingestGate: () => true,
         consolidator: { tier: 'standard', defaultScope: SCOPE, autoPromoteExtraction: true },
       });
       expect(on.consolidator.config().autoPromoteExtraction).toBe(true);

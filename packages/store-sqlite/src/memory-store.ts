@@ -1282,6 +1282,42 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     return rows.map(rowToFact);
   }
 
+  /**
+   * Quarantined, live, non-archived facts + their recall statistics
+   * (wave-D D4) - the deterministic candidate feed for the
+   * PromotionPolicy. Surfaced through
+   * `SemanticMemoryStoreExt.listPromotionCandidates`.
+   *
+   * @stable
+   */
+  async listPromotionCandidates(
+    scope: SessionScope,
+    options: { readonly limit?: number } = {},
+  ): Promise<
+    ReadonlyArray<{
+      readonly fact: Fact;
+      readonly accessCount: number;
+      readonly uniqueQueryCount: number;
+    }>
+  > {
+    const limit = options.limit ?? 200;
+    const rows = this.#conn.all<FactRow & { unique_queries: number }>(
+      `SELECT f.*,
+              (SELECT COUNT(*) FROM fact_recall_queries q WHERE q.fact_id = f.id) AS unique_queries
+       FROM facts f
+       WHERE f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         AND f.status = 'quarantined'
+       ORDER BY f.created_at ASC, f.id ASC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map((row) => ({
+      fact: rowToFact(row),
+      accessCount: (row as { access_count?: number }).access_count ?? 0,
+      uniqueQueryCount: row.unique_queries,
+    }));
+  }
+
   async forget(id: string, reason?: string, scope?: SessionScope): Promise<void> {
     // W-154: scoped calls are a deterministic no-op for a foreign id -
     // the ownership check also guards the vec0 deletes below.
@@ -1445,6 +1481,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     ids: ReadonlyArray<string>,
     accessedAt?: number,
     scope?: SessionScope,
+    queryHash?: string,
   ): Promise<void> {
     if (ids.length === 0) return;
     const at = accessedAt ?? Date.now();
@@ -1460,6 +1497,24 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
        WHERE id IN (${placeholders})${scope !== undefined ? ' AND scope_user_id = ?' : ''}`,
       scope !== undefined ? [at, ...ids, scope.userId] : [at, ...ids],
     );
+    // Wave-D D4 (migration 036): the recall ledger counts DISTINCT
+    // queries per fact - INSERT OR IGNORE makes replays of the same
+    // query a no-op. Scope-guarded like the UPDATE above.
+    if (queryHash !== undefined && queryHash.length > 0) {
+      for (const id of ids) {
+        if (scope !== undefined) {
+          const owned = this.#conn.get<{ one: number }>(
+            'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+            [id, scope.userId],
+          );
+          if (owned === undefined) continue;
+        }
+        this.#conn.run(
+          'INSERT OR IGNORE INTO fact_recall_queries (fact_id, query_hash, first_seen) VALUES (?, ?, ?)',
+          [id, queryHash, at],
+        );
+      }
+    }
   }
 
   /**
@@ -1605,6 +1660,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       // the PURGE audit row). The canonical `entities` are shared data and are
       // intentionally left intact - only this fact's links are removed.
       this.#conn.run('DELETE FROM fact_entities WHERE fact_id = ?', [id]);
+      // Wave-D D4: the recall ledger rides its fact (query hashes are
+      // usage metadata - they must not survive a GDPR purge).
+      this.#conn.run('DELETE FROM fact_recall_queries WHERE fact_id = ?', [id]);
       this.#conn.run('DELETE FROM facts WHERE id = ?', [id]);
     });
   }

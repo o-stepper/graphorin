@@ -55,7 +55,9 @@ import type {
   CompactionSource,
   CompactionStrategy,
   CompactionSummarizer,
+  NamedPreCompactionHook,
   PostCompactionHook,
+  PreCompactionHook,
 } from './compaction/types.js';
 import type {
   AnnotatedPart,
@@ -380,6 +382,13 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ? undefined
       : compactionInput.postCompactionHooks,
   );
+  // Wave-D D4: pre-compaction hooks. No defaults - the built-in
+  // memoryFlushHook is opt-in (it makes a provider call per compaction).
+  const preCompactionHooks: ReadonlyArray<NamedPreCompactionHook> = resolvePreHooks(
+    compactionInput === false || compactionInput === undefined
+      ? undefined
+      : compactionInput.preCompactionHooks,
+  );
   const summarizer = config.summarizer;
   const now = config.now ?? Date.now;
 
@@ -669,6 +678,46 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       now,
       ...(callInput.signal !== undefined ? { signal: callInput.signal } : {}),
     };
+    const hookFailures: Array<{ readonly hookName: string; readonly reason: string }> = [];
+    // context-engine-02: the same D2 privacy decision `assemble()` applies
+    // to blocks / rules / facts, handed to the hooks - their output is
+    // spliced into the buffer and shipped to the provider, so it must obey
+    // the same filter or secret-tier content leaks on the first compaction.
+    const allowSensitivity = (sensitivity: Sensitivity | undefined): boolean =>
+      privacyDecide(sensitivity, {
+        ...(privacy.providerAcceptsSensitivity !== undefined
+          ? { providerAcceptsSensitivity: privacy.providerAcceptsSensitivity }
+          : {}),
+        providerTrust,
+        cloudUploadConsent,
+        defaultSensitivity,
+      }).decision === 'pass';
+    // Wave-D D4: pre-compaction hooks fire BEFORE the summarizer, while
+    // the full buffer is still available (the memory-flush seam). A
+    // throwing hook lands in hookFailures and never blocks compaction.
+    if (preCompactionHooks.length > 0) {
+      const preCtx = {
+        scope: callInput.scope,
+        runId: callInput.runId,
+        sessionId: callInput.sessionId,
+        agentId: callInput.agentId,
+        source: callInput.source,
+        messages: callInput.messages,
+      };
+      for (const hook of preCompactionHooks) {
+        try {
+          await hook.run(
+            { memory: callInput.memory, scope: callInput.scope, allowSensitivity },
+            preCtx,
+          );
+        } catch (err) {
+          hookFailures.push({
+            hookName: hook.id,
+            reason: err instanceof Error ? err.name : 'UnknownError',
+          });
+        }
+      }
+    }
     // C4: one retry with a short backoff on summarizer failure, then a
     // strictly-smaller-than-input assert - a pass that dropped messages
     // yet did not shrink the buffer is a failure (a looping/echoing
@@ -727,22 +776,8 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       source: callInput.source,
       droppedMessages,
     };
-    const hookFailures: Array<{ readonly hookName: string; readonly reason: string }> = [];
     const extraContent: MessageContent[] = [];
     let hooksFired = 0;
-    // context-engine-02: the same D2 privacy decision `assemble()` applies
-    // to blocks / rules / facts, handed to the hooks - their output is
-    // spliced into the buffer and shipped to the provider, so it must obey
-    // the same filter or secret-tier content leaks on the first compaction.
-    const allowSensitivity = (sensitivity: Sensitivity | undefined): boolean =>
-      privacyDecide(sensitivity, {
-        ...(privacy.providerAcceptsSensitivity !== undefined
-          ? { providerAcceptsSensitivity: privacy.providerAcceptsSensitivity }
-          : {}),
-        providerTrust,
-        cloudUploadConsent,
-        defaultSensitivity,
-      }).decision === 'pass';
     for (const hook of compactionHooks) {
       try {
         // CE-6: hooks receive the REAL compaction context - the old code
@@ -910,6 +945,29 @@ function resolvePackInput(input: ContextEngineConfig['locale']): ContextLocalePa
     return resolveLocalePack({ id: input });
   }
   return resolveLocalePack(input);
+}
+
+/**
+ * Wave-D D4: normalise the configured pre-compaction hooks. No
+ * defaults - an absent config means no pre-hooks run.
+ */
+function resolvePreHooks(
+  input: ReadonlyArray<PreCompactionHook | NamedPreCompactionHook> | undefined,
+): ReadonlyArray<NamedPreCompactionHook> {
+  if (input === undefined) return Object.freeze([]);
+  return Object.freeze(
+    input.map((hook, idx): NamedPreCompactionHook => {
+      if (typeof hook === 'function') {
+        return {
+          id: `customPreHook_${idx}`,
+          async run(_deps, ctx) {
+            await hook(ctx);
+          },
+        };
+      }
+      return hook;
+    }),
+  );
 }
 
 function resolveDefaultHooks(

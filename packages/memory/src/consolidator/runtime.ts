@@ -19,6 +19,7 @@
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
+import { withMemorySpan } from '../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   DlqBatchRow,
@@ -52,6 +53,11 @@ import {
 } from './phases/profile-projection.js';
 import { runReflectionPass } from './phases/reflect.js';
 import { renderTranscript, runStandardPhase } from './phases/standard.js';
+import {
+  type ResolvedPromotionPolicy,
+  resolvePromotionPolicy,
+  shouldPromote,
+} from './promotion.js';
 import {
   type RegisterTriggersResult,
   registerConsolidatorTriggers,
@@ -937,12 +943,21 @@ class ConsolidatorImpl implements Consolidator {
       now: this.#now,
       ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
     });
+    let out: PhaseOutcome = deepOut;
+    // Wave-D D4: the deterministic promotion step runs right after the
+    // conflict drain, so freshly-settled facts are candidates and every
+    // later pass (reflection, curated blocks, profile projection) sees
+    // the promoted state. No LLM call - pure policy over recall
+    // evidence, executed through the audited validate path.
+    if (this.#config.promotion !== null) {
+      const factsPromoted = await this.#runPromotionStep(scope, this.#config.promotion);
+      out = { ...out, factsPromoted };
+    }
     // Reflection pass (P1-1) runs after the conflict drain, reusing the
     // deep run's lock + budget + audit window. Triple-gated: enabled by
     // config, an episodic tier present (importance source), and an
     // insight-capable storage adapter. The accumulated-importance
     // threshold is enforced inside the pass.
-    let out: PhaseOutcome = deepOut;
     const insightStore = this.#store.insights;
     if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
       // MCON-13: read the persisted reflection watermark so the gate only
@@ -1048,6 +1063,52 @@ class ConsolidatorImpl implements Consolidator {
     return out;
   }
 
+  /**
+   * Wave-D D4: execute the deterministic promotion policy - list the
+   * quarantined candidates with their recall stats, apply the pure
+   * `shouldPromote` verdict, and promote each winner through the
+   * audited `SemanticMemory.validate` path (which refuses
+   * injection-flagged facts - those are counted and skipped, never
+   * forced). Returns the number of facts promoted.
+   */
+  async #runPromotionStep(scope: SessionScope, policy: ResolvedPromotionPolicy): Promise<number> {
+    return withMemorySpan(
+      this.#tracer,
+      'memory.consolidate.promotion',
+      scope,
+      { 'consolidator.phase': 'promotion' },
+      async (span) => {
+        const listCandidates = this.#store.semantic.listPromotionCandidates;
+        if (typeof listCandidates !== 'function') {
+          span.setAttributes({ 'consolidator.promotion.skipped': 'no-candidate-surface' });
+          return 0;
+        }
+        const candidates = await listCandidates.call(this.#store.semantic, scope, {});
+        const nowMs = this.#now();
+        let promoted = 0;
+        let refused = 0;
+        for (const candidate of candidates) {
+          if (promoted >= policy.maxPerRun) break;
+          if (!shouldPromote(candidate, policy, nowMs)) continue;
+          try {
+            await this.#semantic.validate(scope, candidate.fact.id, 'promotion-policy');
+            promoted += 1;
+          } catch {
+            // QuarantinePromotionRefusedError (injection-flagged) or a
+            // storage hiccup - never force, never fail the deep phase.
+            refused += 1;
+          }
+        }
+        span.setAttributes({
+          'consolidator.promotion.candidates': candidates.length,
+          'consolidator.promotion.promoted': promoted,
+          'consolidator.promotion.refused': refused,
+        });
+        return promoted;
+      },
+    );
+  }
+
   #emit(
     outcome: PhaseOutcome,
     scope: SessionScope,
@@ -1145,6 +1206,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
       opts.profileProjection === undefined
         ? null
         : resolveProfileProjectionConfig(opts.profileProjection),
+    // Wave-D D4: not per-tier - opt-in, ingest-gate-gated at the facade.
+    promotion: opts.promotion === undefined ? null : resolvePromotionPolicy(opts.promotion),
   });
 }
 
