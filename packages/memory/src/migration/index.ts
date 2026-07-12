@@ -9,5 +9,8 @@ export type {
   EmbedderMigrationStrategy,
   MigrateEmbedderOptions,
   MigrationProgress,
+  MigrationRow,
+  MigrationStateStoreLike,
+  NextBatchHook,
 } from './embedder-migration.js';
 export { migrateEmbedder } from './embedder-migration.js';

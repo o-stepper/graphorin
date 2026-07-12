@@ -27,9 +27,7 @@ function semanticExt(store: GraphorinSqliteStore): {
   listPromotionCandidates(
     scope: SessionScope,
     options?: { readonly limit?: number },
-  ): Promise<
-    ReadonlyArray<{ fact: Fact; accessCount: number; uniqueQueryCount: number }>
-  >;
+  ): Promise<ReadonlyArray<{ fact: Fact; accessCount: number; uniqueQueryCount: number }>>;
   purge(id: string, reason?: string, scope?: SessionScope): Promise<void>;
 } {
   return store.memory.semantic as unknown as ReturnType<typeof semanticExt>;

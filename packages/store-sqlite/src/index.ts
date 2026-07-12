@@ -65,6 +65,12 @@ import {
   SqliteConsolidatorStateStore,
 } from './consolidator-store.js';
 import {
+  createMigrationBatcher,
+  dropRetiredVectorTables,
+  EmbedderMigrationStateRepository,
+  type EmbedderMigrationStateRow,
+} from './embedder-migration-support.js';
+import {
   EmbedderLockOnFirstError,
   type EmbedderPolicy,
   EmbeddingMetaRepository,
@@ -155,6 +161,14 @@ export interface CreateSqliteStoreOptions {
    * for tests that exercise migrations without the native build.
    */
   readonly skipSqliteVec?: boolean;
+  /**
+   * Wave-D D5: policy when the `sqlite-vec` peer is missing/broken.
+   * `'fail'` (default) throws {@link SqliteVecMissingError};
+   * `'linear-fallback'` serves vectors from plain sidecar tables with
+   * an in-process batched cosine scan. See
+   * `OpenConnectionOptions.onMissingSqliteVec`.
+   */
+  readonly onMissingSqliteVec?: 'fail' | 'linear-fallback';
   /** Override constructor - test-only escape hatch. */
   readonly driver?: BetterSqlite3Constructor;
   /** Override the `sqlite-vec` loader - test-only escape hatch. */
@@ -203,6 +217,17 @@ export interface GraphorinSqliteStore {
   readonly embeddings: EmbeddingMetaRepository;
   readonly connection: SqliteConnection;
   readonly appliedMigrations: readonly AppliedMigration[];
+  /**
+   * Wave-D D5 (MST-12): store-side embedder-migration support - the
+   * persisted resumable cursor over `migration_state`, the `nextBatch`
+   * pager the `@graphorin/memory` runner consumes (structural match),
+   * and the retired-vec-table space reclaim.
+   */
+  readonly embedderMigration: {
+    readonly state: EmbedderMigrationStateRepository;
+    readonly nextBatch: ReturnType<typeof createMigrationBatcher>;
+    dropRetiredVectorTables(): { readonly dropped: ReadonlyArray<string> };
+  };
   /** Initialize the store: run migrations + start checkpoint manager. */
   init(): Promise<void>;
   /** Close the connection + stop the checkpoint manager. Idempotent. */
@@ -222,6 +247,9 @@ export async function createSqliteStore(
     path: options.path,
     ...(options.encryption !== undefined ? { encryption: options.encryption } : {}),
     ...(options.skipSqliteVec !== undefined ? { skipSqliteVec: options.skipSqliteVec } : {}),
+    ...(options.onMissingSqliteVec !== undefined
+      ? { onMissingSqliteVec: options.onMissingSqliteVec }
+      : {}),
     ...(options.driver !== undefined ? { driver: options.driver } : {}),
     ...(options.loadVecExtension !== undefined
       ? {
@@ -267,6 +295,14 @@ export async function createSqliteStore(
 
   const embeddings = new EmbeddingMetaRepository(conn, policy);
   const memoryStore = new SqliteMemoryStore(conn, embeddings);
+  // Wave-D D5: the migration surface reuses the memory store's table
+  // manager so drops stay visible to its purge paths.
+  const embedderMigration = {
+    state: new EmbedderMigrationStateRepository(conn),
+    nextBatch: createMigrationBatcher(conn, embeddings, memoryStore.vectorTableManager()),
+    dropRetiredVectorTables: () =>
+      dropRetiredVectorTables(conn, embeddings, memoryStore.vectorTableManager()),
+  };
   const checkpointStore = new SqliteCheckpointStore(conn);
   const sessionStore = new SqliteSessionStore(conn);
   const triggerStore = new SqliteTriggerStore(conn);
@@ -302,6 +338,9 @@ export async function createSqliteStore(
     },
     get embeddings() {
       return embeddings;
+    },
+    get embedderMigration() {
+      return embedderMigration;
     },
     get connection() {
       return conn;
@@ -345,6 +384,9 @@ export {
   type DlqBatchRow,
   deleteSpansForSession,
   EmbedderLockOnFirstError,
+  // wave-D D5: embedder-migration support
+  EmbedderMigrationStateRepository,
+  type EmbedderMigrationStateRow,
   // embedder registry
   type EmbedderPolicy,
   EmbeddingMetaRepository,

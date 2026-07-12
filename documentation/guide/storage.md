@@ -56,7 +56,7 @@ a live server.
 | While the server is live | Commands |
 |---|---|
 | Safe (read-only) | `memory status/inspect/activity/why/review` (listing), `traces status`, `triggers list/status`, `audit verify/export`, `storage status`, `storage backup` (online page-level copy, safe under a live writer; the copy inherits the source file's mode) |
-| Works, but contends for the write lock | `memory review --promote`, `memory prune-history`, `traces prune`, `triggers disable/prune`, `consolidator dlq-clear`, `token create/revoke/rotate/rekey`, `secrets set/rotate/delete`, `audit prune`, `storage compact` |
+| Works, but contends for the write lock | `memory review --promote`, `memory prune-history`, `memory migrate` (long-running: one write transaction per re-embed batch - keep batches small, prefer quiet hours), `traces prune`, `triggers disable/prune`, `consolidator dlq-clear`, `token create/revoke/rotate/rekey`, `secrets set/rotate/delete`, `audit prune`, `storage compact` |
 | Requires a stopped server | `storage rekey` (fails fast with `database is locked`), `storage encrypt --swap` (refuses while another process holds the file), `graphorin migrate` when the CLI and server versions disagree |
 
 ::: warning Contended writes stall the server's event loop
@@ -95,6 +95,18 @@ the `VACUUM` that is forbidden. `graphorin storage compact` detects this and
 reports the limitation instead of touching the file; to actually reclaim disk,
 initialise a fresh store (it gets `auto_vacuum=2`) and move the data across.
 :::
+
+### Embedder migration and space reclaim runbook
+
+Switching embedding models re-embeds every stored vector (wave-D D5 - MST-12 closed):
+
+1. **Author the factory module** (the CLI never downloads models implicitly - DEC-154): a local JS file exporting `{ embedders: { '<canonical-id>': () => EmbedderProvider } }` keyed by the ids `graphorin memory status` reports.
+2. **Run the migration**: `graphorin memory migrate --from <old-id> --to <new-id> --strategy auto-migrate --embedders ./embedders.mjs`. Progress persists into `migration_state` after every batch; the runner walks facts, then episodes (session messages carry no vector reads today). Each batch is one write transaction - it *contends* for the write lock (see the matrix above): keep `--batch-size` modest (default 512; smaller on busy deployments - the W-070 event-loop caveat applies), or stop the server for very large stores.
+3. **Kill / crash / abort are fine**: re-running the SAME invocation resumes from the persisted cursor - across process restarts. A committed migration retires the source embedder.
+4. **Reclaim the space**: retirement alone keeps the old vector tables at full size. `--reclaim` (or a later `graphorin memory migrate ... --reclaim` re-run after manual retirement) drops the retired embedder's `*_vec_*` sidecar tables and runs `PRAGMA incremental_vacuum`. Freed pages return to the OS only on `auto_vacuum=INCREMENTAL` databases (everything Graphorin created recently); older files keep their high-water size - `graphorin storage compact` explains the options.
+5. **Contention symptoms**: a busy server surfaces as `SqliteBusyError` after `busy_timeout` (default 5 s; raise via `busyTimeoutMs` for maintenance windows). The migration is safe to interrupt at any point - resume covers it.
+
+When the `sqlite-vec` native peer is unavailable entirely, `createSqliteStore({ onMissingSqliteVec: 'linear-fallback' })` keeps vector search alive: sidecars become plain tables and KNN runs as an in-process batched cosine scan (yielding to the event loop between batches). A database must stay in ONE mode - the store refuses to open vec0 tables in fallback mode (and vice versa) with an actionable error; migrate between modes with `graphorin memory migrate`. The fallback trades throughput for portability: fine for small personal stores, not for large multi-user ones.
 
 ## `@graphorin/store-sqlite-encrypted` (encryption-at-rest)
 

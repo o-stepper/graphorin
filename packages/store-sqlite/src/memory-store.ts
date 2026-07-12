@@ -800,6 +800,41 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     }
     const tableName = this.#vectorMgr.ensureTable('episodes', meta);
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    // Wave-D D5: linear-fallback (see the facts twin above).
+    if (this.#vectorMgr.mode === 'linear-fallback') {
+      const candidates = await this.#vectorMgr.linearKnn(
+        tableName,
+        'episode_id',
+        embedding,
+        Math.max(topK * 4, 64),
+      );
+      if (candidates.length === 0) return [];
+      const distanceById = new Map(candidates.map((c) => [c.id, c.distance]));
+      const ids = candidates.map((c) => c.id);
+      const binds: Array<string | number> = [scope.userId, embedderId];
+      if (asOfEpoch !== null) binds.push(asOfEpoch);
+      binds.push(...ids);
+      const rows = this.#conn.all<EpisodeRow>(
+        `SELECT e.* FROM episodes e
+         WHERE e.scope_user_id = ?
+           AND e.embedder_id = ?
+           AND e.deleted_at IS NULL
+           AND e.archived = 0
+           ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
+           AND e.id IN (${ids.map(() => '?').join(', ')})`,
+        binds,
+      );
+      return rows
+        .map((row) => ({ row, distance: distanceById.get(row.id) ?? 2 }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, topK)
+        .map(({ row, distance }) => ({
+          record: rowToEpisode(row),
+          score: scoreFromDistance(meta.distanceMetric, distance),
+          signals: { vector: scoreFromDistance(meta.distanceMetric, distance) },
+        }));
+    }
     const runKnn = (k: number): ReadonlyArray<EpisodeRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         f32ToBlob(embedding),
@@ -1118,6 +1153,45 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const asOfEpoch = resolveFactValidityEpoch(asOf, includeSuperseded);
     // D3: retrieval-time principal filter - absent ⇒ no predicate.
     const owners = normalizeOwnerFilter(owner);
+    // Wave-D D5: linear-fallback mode - in-process cosine KNN over the
+    // plain sidecar, then the SAME base-table filters over the candidate
+    // ids (over-fetched so post-filters cannot starve the caller).
+    if (this.#vectorMgr.mode === 'linear-fallback') {
+      const candidates = await this.#vectorMgr.linearKnn(
+        tableName,
+        'fact_id',
+        embedding,
+        Math.max(topK * 4, 64),
+      );
+      if (candidates.length === 0) return [];
+      const distanceById = new Map(candidates.map((c) => [c.id, c.distance]));
+      const ids = candidates.map((c) => c.id);
+      const binds: Array<string | number> = [scope.userId, embedderId];
+      if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
+      if (owners !== null) binds.push(...owners);
+      binds.push(...ids);
+      const rows = this.#conn.all<FactRow>(
+        `SELECT f.* FROM facts f
+         WHERE f.scope_user_id = ?
+           AND f.embedder_id = ?
+           AND f.deleted_at IS NULL
+           AND f.archived = 0
+           ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
+           ${owners !== null ? ownerPredicate('f', owners.length) : ''}
+           AND f.id IN (${ids.map(() => '?').join(', ')})`,
+        binds,
+      );
+      return rows
+        .map((row) => ({ row, distance: distanceById.get(row.id) ?? 2 }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, topK)
+        .map(({ row, distance }) => ({
+          record: rowToFact(row),
+          score: scoreFromDistance(meta.distanceMetric, distance),
+          signals: { vector: scoreFromDistance(meta.distanceMetric, distance) },
+        }));
+    }
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         f32ToBlob(embedding),
