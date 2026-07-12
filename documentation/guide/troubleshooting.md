@@ -47,10 +47,14 @@ native counter (e.g. an API key for Anthropic) for exact accounting.
 No embedder is configured. Add one (see [Embedders](/guide/embedders)); without
 it, memory uses keyword (FTS5) search only.
 
-**"embedder id mismatch" on startup.**
-You changed the embedder model/config under a `lock-on-first` policy. Either
-restore the original embedder, switch to `multi-active` / `auto-migrate`, or
-re-embed. See [Embedders](/guide/embedders#embedder-identity-migrations).
+**"embedder id mismatch" / "contextualization mode" error on startup.**
+You changed the embedder model/config - or the `contextualRetrieval` mode,
+which is part of the same index version key - under a `lock-on-first` policy.
+Either restore the original configuration, switch to `multi-active` /
+`auto-migrate`, or re-embed. To keep an always-on assistant serving instead
+of crash-looping, `createMemory({ onIncompatibleEmbedder: 'fts-only' })`
+degrades to keyword-only search until you migrate.
+See [Embedders](/guide/embedders#embedder-identity-migrations).
 
 ## Storage
 

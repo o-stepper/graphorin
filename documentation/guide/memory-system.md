@@ -484,6 +484,14 @@ for await (const progress of migrateEmbedder({
 | `multi-active` | Keeps both `vec0` tables alive - reads union, writes go to the active embedder. |
 | `auto-migrate` | Re-embeds existing rows in streamed batches within a single run (cancellable with `AbortSignal`; an aborted migration starts again from the beginning - there is no cross-process checkpoint yet). |
 
+The same version key also records the write-path contextualization mode, so
+switching `contextualRetrieval` (or toggling the consolidator's `llm`
+enrichment) invalidates the index like a model change. If dying on an
+incompatible embedder is worse than degraded recall (an always-on
+assistant), set `createMemory({ onIncompatibleEmbedder: 'fts-only' })` to
+continue keyword-only with a WARN until `graphorin memory migrate` rebuilds
+the index - see [Embedders](/guide/embedders#embedder-identity-migrations).
+
 ## Context assembly (the six layers)
 
 The facade's **context engine** (`memory.contextEngine`) compiles memory into the agent's per-run system prompt. The agent runtime calls `memory.contextEngine.assemble(...)` once at run start when you opt in with `createAgent({ memory, autoAssembleContext: true })` (see [memory-aware system prompt](/guide/agent-runtime#memory-aware-system-prompt-opt-in)); the assembled prompt stacks six layers:

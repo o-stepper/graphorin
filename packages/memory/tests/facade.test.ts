@@ -52,6 +52,70 @@ describe('@graphorin/memory - createMemory facade', () => {
     expect(known[0]?.id).toBe('stub:hash@8');
   });
 
+  it("onIncompatibleEmbedder 'fts-only' degrades instead of throwing (item 10 step 2)", async () => {
+    const registry = new InMemoryEmbeddingRegistry();
+    const incompatible = Object.assign(new Error('registered with a different configHash'), {
+      name: 'EmbedderLockOnFirstError',
+    });
+    const throwingRegistry = new Proxy(registry, {
+      get(target, prop, receiver) {
+        if (prop === 'registerOrReturn') {
+          return () => {
+            throw incompatible;
+          };
+        }
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+    const stderr: string[] = [];
+    const original = process.stderr.write.bind(process.stderr);
+    process.stderr.write = ((chunk: string | Uint8Array) => {
+      stderr.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write;
+    try {
+      const memory = createMemory({
+        store: createInMemoryStore(),
+        embeddings: throwingRegistry,
+        embedder: createStubEmbedder({ id: 'stub:hash@8' }),
+        onIncompatibleEmbedder: 'fts-only',
+      });
+      // Degraded: no bound embedder id, but the facade is alive and
+      // writes/reads work without vectors.
+      expect(memory.embedderId()).toBeNull();
+      const scope = { userId: 'u1' } as const;
+      await memory.semantic.remember(scope, { text: 'fts still works' });
+      const hits = await memory.semantic.search(scope, 'fts');
+      expect(hits.length).toBeGreaterThan(0);
+    } finally {
+      process.stderr.write = original;
+    }
+    expect(stderr.join('')).toContain('continuing FTS-only');
+  });
+
+  it("onIncompatibleEmbedder default 'fail' rethrows the registry error", () => {
+    const registry = new InMemoryEmbeddingRegistry();
+    const throwingRegistry = new Proxy(registry, {
+      get(target, prop, receiver) {
+        if (prop === 'registerOrReturn') {
+          return () => {
+            throw Object.assign(new Error('incompatible'), {
+              name: 'EmbedderLockOnFirstError',
+            });
+          };
+        }
+        return Reflect.get(target, prop, receiver);
+      },
+    });
+    expect(() =>
+      createMemory({
+        store: createInMemoryStore(),
+        embeddings: throwingRegistry,
+        embedder: createStubEmbedder({ id: 'stub:hash@8' }),
+      }),
+    ).toThrow('incompatible');
+  });
+
   it('exposes a working consolidator placeholder by default', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

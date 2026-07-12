@@ -254,6 +254,13 @@ export interface EmbeddingMetaRegistryLike {
     readonly dim: number;
     readonly distanceMetric?: 'cosine' | 'dot' | 'euclidean';
     readonly configHash: string;
+    /**
+     * Write-path contextualization recipe (item 10 step 1) - joins the
+     * index version key so a `contextualRetrieval` switch invalidates
+     * the index like a model change. Optional-additive: registries
+     * predating the field ignore it.
+     */
+    readonly indexMode?: string | null;
     readonly notes?: string | null;
   }): { readonly id: string };
   get(id: string): unknown | null;

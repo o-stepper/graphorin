@@ -32,13 +32,15 @@ export function inferModelName(id: string): string {
  * Register the supplied embedder with the storage layer's
  * `embedding_meta` registry. Returns the canonical id surfaced to the
  * memory writers. Idempotent - a registry that already knows the id
- * with a matching `configHash` returns the existing row.
+ * with a matching `configHash` (and, when supplied, `indexMode`)
+ * returns the existing row.
  *
  * @internal
  */
 export function bindEmbedder(
   embedder: EmbedderProvider,
   registry: EmbeddingMetaRegistryLike,
+  indexMode?: string,
 ): string {
   const id = embedder.id();
   registry.registerOrReturn({
@@ -48,6 +50,7 @@ export function bindEmbedder(
     dim: embedder.dim(),
     configHash: embedder.configHash(),
     distanceMetric: 'cosine',
+    ...(indexMode !== undefined ? { indexMode } : {}),
   });
   return id;
 }

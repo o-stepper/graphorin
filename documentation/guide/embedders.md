@@ -89,5 +89,24 @@ incompatible vectors:
   the `graphorin memory migrate` CLI form is not yet supported and exits with
   code `2`), then retire the old id.
 
+The index version key covers more than the model: the registry records the
+**write-path contextualization mode** (`contextualRetrieval`, plus the
+consolidator's opt-in `llm` enrichment) alongside the embedder's `configHash`.
+Switching the mode changes the text that gets embedded, so it invalidates the
+index exactly like a model change and trips the same policy. Databases created
+before the mode was recorded adopt the current mode on their next start
+instead of failing retroactively.
+
+When the configured embedder is incompatible with the existing index
+(different `configHash`, a `lock-on-first` conflict, or a contextualization
+mode switch), `createMemory({ onIncompatibleEmbedder })` picks the failure
+mode: `'fail'` (default) refuses to start with the actionable error, while
+`'fts-only'` degrades - the embedder is dropped for the process, semantic
+search serves keyword (FTS5) results only, writes store no vectors, and a
+WARN plus an `x.memory.embedder-incompatible` span point at
+`graphorin memory migrate`. The stored vectors stay untouched (stale) until
+an explicit migration. For an always-on assistant the degraded mode keeps
+memory serving instead of crash-looping on startup.
+
 See the [Memory system](/guide/memory-system) guide for how vector search,
 the RRF fusion step, and [rerankers](/guide/rerankers) fit together.

@@ -17,6 +17,16 @@ export interface EmbeddingMetaRow {
   readonly dim: number;
   readonly distanceMetric: 'cosine' | 'dot' | 'euclidean';
   readonly configHash: string;
+  /**
+   * Write-path contextualization recipe the index was built with
+   * (item 10 step 1) - e.g. `'late-chunk'`, `'off'`, `'late-chunk+llm'`.
+   * Part of the index version key: a different mode means the stored
+   * vectors were computed from differently contextualized text, which
+   * is as incompatible as a different model. `null` marks a legacy row
+   * registered before the column existed; it adopts the caller's mode
+   * on the next `registerOrReturn`.
+   */
+  readonly indexMode: string | null;
   /** Lazy-created vec0 table for facts. */
   readonly vecTableFacts: string;
   /** Lazy-created vec0 table for episodes. */
@@ -86,7 +96,7 @@ export class EmbeddingMetaRepository {
     const cached = this.#cache.get(id);
     if (cached !== undefined) return cached;
     const row = this.#conn.get<EmbeddingMetaRowRaw>(
-      'SELECT id, embedder_kind, model, dim, distance_metric, config_hash, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes FROM embedding_meta WHERE id = ?',
+      'SELECT id, embedder_kind, model, dim, distance_metric, config_hash, index_mode, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes FROM embedding_meta WHERE id = ?',
       [id],
     );
     if (row === undefined) return null;
@@ -98,7 +108,7 @@ export class EmbeddingMetaRepository {
   /** Snapshot of every registered embedder. */
   listAll(): readonly EmbeddingMetaRow[] {
     const rows = this.#conn.all<EmbeddingMetaRowRaw>(
-      'SELECT id, embedder_kind, model, dim, distance_metric, config_hash, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes FROM embedding_meta ORDER BY created_at',
+      'SELECT id, embedder_kind, model, dim, distance_metric, config_hash, index_mode, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes FROM embedding_meta ORDER BY created_at',
     );
     return rows.map(decodeRow);
   }
@@ -131,6 +141,30 @@ export class EmbeddingMetaRepository {
           `[graphorin/store-sqlite] embedder '${input.id}' is registered with a different configHash. ` +
             'Run `graphorin memory migrate` to swap embedder, or pass a stable configHash from your embedder.',
         );
+      }
+      if (input.indexMode !== undefined && input.indexMode !== null) {
+        if (existing.indexMode === null) {
+          // Legacy row (pre-033): adopt the caller's write-path mode
+          // once instead of failing every existing database
+          // retroactively. From here on, a mode switch is an
+          // incompatibility.
+          const adopted: EmbeddingMetaRow = { ...existing, indexMode: input.indexMode };
+          this.#conn.run('UPDATE embedding_meta SET index_mode = ? WHERE id = ?', [
+            input.indexMode,
+            existing.id,
+          ]);
+          this.#cache.set(existing.id, adopted);
+          return adopted;
+        }
+        if (existing.indexMode !== input.indexMode) {
+          throw new EmbedderLockOnFirstError(
+            `[graphorin/store-sqlite] embedder '${input.id}' indexed this database with ` +
+              `contextualization mode '${existing.indexMode}', but the current configuration ` +
+              `uses '${input.indexMode}'. The stored vectors were computed from differently ` +
+              'contextualized text - run `graphorin memory migrate` to rebuild the index, or ' +
+              'restore the previous contextualRetrieval mode.',
+          );
+        }
       }
       return existing;
     }
@@ -166,6 +200,7 @@ export class EmbeddingMetaRepository {
       distanceMetric:
         input.distanceMetric === 'dot' ? 'cosine' : (input.distanceMetric ?? 'cosine'),
       configHash: input.configHash,
+      indexMode: input.indexMode ?? null,
       vecTableFacts: `facts_vec_${slug}`,
       vecTableEpisodes: `episodes_vec_${slug}`,
       vecTableMessages: `session_messages_vec_${slug}`,
@@ -174,7 +209,7 @@ export class EmbeddingMetaRepository {
       notes: input.notes ?? null,
     };
     this.#conn.run(
-      'INSERT INTO embedding_meta (id, embedder_kind, model, dim, distance_metric, config_hash, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)',
+      'INSERT INTO embedding_meta (id, embedder_kind, model, dim, distance_metric, config_hash, index_mode, vec_table_facts, vec_table_episodes, vec_table_messages, created_at, retired_at, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)',
       [
         row.id,
         row.embedderKind,
@@ -182,6 +217,7 @@ export class EmbeddingMetaRepository {
         row.dim,
         row.distanceMetric,
         row.configHash,
+        row.indexMode,
         row.vecTableFacts,
         row.vecTableEpisodes,
         row.vecTableMessages,
@@ -217,6 +253,7 @@ interface EmbeddingMetaRowRaw {
   dim: number;
   distance_metric: 'cosine' | 'dot' | 'euclidean';
   config_hash: string;
+  index_mode: string | null;
   vec_table_facts: string;
   vec_table_episodes: string;
   vec_table_messages: string;
@@ -233,6 +270,7 @@ function decodeRow(row: EmbeddingMetaRowRaw): EmbeddingMetaRow {
     dim: row.dim,
     distanceMetric: row.distance_metric,
     configHash: row.config_hash,
+    indexMode: row.index_mode,
     vecTableFacts: row.vec_table_facts,
     vecTableEpisodes: row.vec_table_episodes,
     vecTableMessages: row.vec_table_messages,
@@ -256,6 +294,14 @@ export interface RegisterEmbedderInput {
   readonly dim: number;
   readonly distanceMetric?: 'cosine' | 'dot' | 'euclidean';
   readonly configHash: string;
+  /**
+   * Write-path contextualization recipe (item 10 step 1). When
+   * supplied, it joins the index version key: a legacy `null` row
+   * adopts it once, after which a different mode fails registration
+   * exactly like a configHash change. Omitted = legacy caller, no
+   * mode check.
+   */
+  readonly indexMode?: string | null;
   readonly notes?: string | null;
 }
 

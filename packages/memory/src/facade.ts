@@ -111,6 +111,19 @@ export interface CreateMemoryOptions {
    */
   readonly contextualRetrieval?: 'off' | 'late-chunk';
   /**
+   * Behavior when the configured embedder is incompatible with the
+   * index this database was built with (different configHash, a
+   * lock-on-first conflict, or a contextualization-mode switch - item
+   * 10 step 2). `'fail'` (default) rethrows the registry error.
+   * `'fts-only'` degrades instead of dying: the embedder is dropped
+   * for this process, semantic search serves FTS-only results, writes
+   * store no vectors, and a WARN plus an `x.memory.embedder-incompatible`
+   * span name the fix (`graphorin memory migrate`). The stored vectors
+   * stay untouched (stale) until an explicit migrate. Suits always-on
+   * assistants where degraded recall beats a crash loop.
+   */
+  readonly onIncompatibleEmbedder?: 'fail' | 'fts-only';
+  /**
    * Query transformation for retrieval (P2-3, opt-in). When supplied,
    * `SemanticMemory.search(..., { multiQuery })` fans the query into
    * reworded variants (multi-query / RAG-Fusion) and `{ hyde }` adds a
@@ -349,11 +362,50 @@ export function createMemory(options: CreateMemoryOptions): Memory {
       );
     });
 
+  // Item 10 step 1: the write-path contextualization recipe joins the
+  // index version key. The semantic tier's mode defaults to
+  // 'late-chunk'; the consolidator's opt-in 'llm' enrichment changes
+  // what standard-phase writes index, so it marks the recipe too.
+  const writePathMode = options.contextualRetrieval ?? 'late-chunk';
+  const indexMode =
+    options.consolidator?.contextualRetrieval === 'llm' ? `${writePathMode}+llm` : writePathMode;
+
   let activeEmbedderId: string | null = null;
+  let boundEmbedder = options.embedder ?? null;
   if (options.embedder !== undefined) {
-    activeEmbedderId = bindEmbedder(options.embedder, options.embeddings);
+    try {
+      activeEmbedderId = bindEmbedder(options.embedder, options.embeddings, indexMode);
+    } catch (err) {
+      const degrade =
+        (options.onIncompatibleEmbedder ?? 'fail') === 'fts-only' &&
+        err instanceof Error &&
+        err.name === 'EmbedderLockOnFirstError';
+      if (!degrade) throw err;
+      // Item 10 step 2: managed degradation instead of a crash loop.
+      // The embedder is dropped for this process - the vector leg is
+      // off (search falls back to FTS, writes store no vectors) and
+      // the existing vectors stay stale until `graphorin memory
+      // migrate` rebuilds the index.
+      boundEmbedder = null;
+      const cause = err.message;
+      process.stderr.write(
+        `[graphorin/memory] embedder '${options.embedder.id()}' is incompatible with the ` +
+          `existing index - continuing FTS-only (onIncompatibleEmbedder: 'fts-only'). Vector ` +
+          `search is DISABLED until 'graphorin memory migrate' rebuilds the index. Cause: ${cause}\n`,
+      );
+      tracer
+        .startSpan({
+          type: 'x.memory.embedder-incompatible',
+          attrs: {
+            'memory.embedder.id': options.embedder.id(),
+            'memory.embedder.degraded_to': 'fts-only',
+            'memory.embedder.cause': cause,
+          },
+        })
+        .end();
+    }
   }
-  const embedder = options.embedder ?? null;
+  const embedder = boundEmbedder;
   const embedderIdProvider = (): string | null => activeEmbedderId;
 
   const working = new WorkingMemory({ store: options.store, tracer });
