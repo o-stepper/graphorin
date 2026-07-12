@@ -123,6 +123,17 @@ export interface RunState {
    */
   promotedTools?: ReadonlyArray<string>;
   /**
+   * B3 (item 15): per-turn security verdicts, keyed by turn position
+   * `'<stepNumber>:<offsetInStep>'` (the step's assistant turn is
+   * offset 0; step 0 is the pre-step input stage). Stamped by the run
+   * loop's commit gates so downstream consumers - the `Session.push`
+   * boundary and the memory ingest gate - can exclude
+   * guardrail-blocked turns from long-term memory. Widen-only: gates
+   * only ever ADD entries. Compaction wipes entries for the turns it
+   * summarized away. Absent until a gate fires.
+   */
+  verdicts?: RunVerdicts;
+  /**
    * D6 structured plan/todo list - the agent's own working plan,
    * journaled so it survives suspend/resume (a TodoWrite-style tool
    * mutates it, and attention-recitation renders it back into the
@@ -193,6 +204,8 @@ export interface ReadonlyRunState {
   readonly taintSummary?: RunTaintSummary;
   /** See {@link RunState.promotedTools}. */
   readonly promotedTools?: ReadonlyArray<string>;
+  /** See {@link RunState.verdicts}. */
+  readonly verdicts?: RunVerdicts;
   /** See {@link RunState.todos}. */
   readonly todos?: ReadonlyArray<TodoItem>;
   /** See {@link RunState.pendingSubRuns}. */
@@ -221,6 +234,35 @@ export interface RunTaintSummary {
    */
   readonly spanTileHashes?: ReadonlyArray<string>;
 }
+
+/**
+ * B3 (item 15): one turn's security verdict. All fields are optional
+ * and additive; the ABSENCE of a verdict entry means the turn passed
+ * every gate untouched.
+ *
+ * @stable
+ */
+export interface RunTurnVerdict {
+  /** An input/output guardrail blocked or rewrote this turn. */
+  readonly guardrail?: 'block' | 'rewrite';
+  /** The lateral-leak defense withheld this assistant turn. */
+  readonly lateralLeak?: boolean;
+  /**
+   * Data-flow policy findings attached to this turn (e.g. flagged
+   * sink flows). Bounded descriptive labels, never content.
+   */
+  readonly dataflowFlags?: ReadonlyArray<string>;
+}
+
+/**
+ * B3: the plain-object verdict sidecar on {@link RunState.verdicts}.
+ * Keys are turn positions `'<stepNumber>:<offsetInStep>'`. A plain
+ * JSON-safe object on purpose (core `Message` has no id and `Map` is
+ * not JSON-serializable).
+ *
+ * @stable
+ */
+export type RunVerdicts = Record<string, RunTurnVerdict>;
 
 /**
  * One item in the agent's structured plan (D6). `status` drives both

@@ -216,6 +216,12 @@ function spliceCompacted(env: CompactionRunEnv, envelope: CompactionEnvelope): v
   }
   messages.splice(0, messages.length, ...rebuilt);
   state.messages.splice(0, state.messages.length, ...rebuilt);
+  // B3: every existing verdict entry describes a turn this splice just
+  // summarized away - the sidecar must not outlive the messages it
+  // annotates. Later turns re-accumulate from a clean slate.
+  if (state.verdicts !== undefined) {
+    state.verdicts = {};
+  }
 }
 
 /**

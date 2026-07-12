@@ -33,6 +33,7 @@ export type {
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
+  SessionMessagePushOptions,
   SessionMessageWithMetadata,
   SharedMemoryStore,
   WorkingMemoryStore,

@@ -731,6 +731,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           stepReasoningParts,
           finalCalls,
           reasoningPolicy,
+          stepNumber,
         );
 
         const handoffCalls = finalCalls.filter((c) => handoffMap.has(c.toolName));

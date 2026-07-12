@@ -18,6 +18,7 @@ import type {
   ReasoningContent,
   ReasoningRetention,
   RunState,
+  RunTurnVerdict,
   ToolCall,
 } from '@graphorin/core';
 import { composeGuardrails, type InputGuardrail } from '@graphorin/security/guardrails';
@@ -26,6 +27,38 @@ import type { buildDataFlowGuard } from '../tooling/dataflow.js';
 import type { AbortOptions, AgentConfig, VerifierResult } from '../types.js';
 import { buildAssistantMessage } from './messages.js';
 import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
+
+/**
+ * B3 (item 15): merge one turn's verdict into the run's plain-object
+ * sidecar. Widen-only: 'block' beats 'rewrite', flags accumulate,
+ * nothing is ever cleared here (compaction owns removal). Keys are
+ * `'<stepNumber>:<offsetInStep>'`; step 0 is the pre-step input
+ * stage.
+ */
+export function stampTurnVerdict(
+  state: MutableRunState & RunState,
+  stepNumber: number,
+  offset: number,
+  verdict: RunTurnVerdict,
+): void {
+  const key = `${stepNumber}:${offset}`;
+  const existing = state.verdicts?.[key];
+  const guardrail =
+    existing?.guardrail === 'block' || verdict.guardrail === 'block'
+      ? ('block' as const)
+      : (verdict.guardrail ?? existing?.guardrail);
+  const flags = [
+    ...new Set([...(existing?.dataflowFlags ?? []), ...(verdict.dataflowFlags ?? [])]),
+  ];
+  const merged: RunTurnVerdict = {
+    ...(guardrail !== undefined ? { guardrail } : {}),
+    ...(existing?.lateralLeak === true || verdict.lateralLeak === true
+      ? { lateralLeak: true }
+      : {}),
+    ...(flags.length > 0 ? { dataflowFlags: flags } : {}),
+  };
+  state.verdicts = { ...(state.verdicts ?? {}), [key]: merged };
+}
 
 const sha256Hex = (input: string): string =>
   createHash('sha256').update(input, 'utf8').digest('hex');
@@ -179,6 +212,8 @@ export async function* screenInputGuardrails<TOutput>(
       yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
       state.status = 'failed';
       state.error = { message, code: 'guardrail-blocked' };
+      // B3: pre-step input stage = step 0; offset = buffer index.
+      stampTurnVerdict(state, 0, i, { guardrail: 'block' });
       return true;
     }
     if (composed.value !== msg.content) {
@@ -186,6 +221,7 @@ export async function* screenInputGuardrails<TOutput>(
       const stateIdx = state.messages.indexOf(msg);
       messages[i] = rewritten;
       if (stateIdx !== -1) state.messages[stateIdx] = rewritten;
+      stampTurnVerdict(state, 0, i, { guardrail: 'rewrite' });
     }
   }
   return false;
@@ -219,6 +255,7 @@ export async function* commitAssistantMessage<TOutput>(
   stepReasoningParts: ReadonlyArray<ReasoningContent>,
   finalCalls: ReadonlyArray<ToolCall>,
   reasoningPolicy: ReasoningRetention,
+  stepNumber = 0,
 ): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
   const { state, messages, sessionId, agentId, causalityMonitor, toolDataFlowGuard } = env;
   const leakCheck =
@@ -236,6 +273,13 @@ export async function* commitAssistantMessage<TOutput>(
   );
   messages.push(assistant);
   state.messages.push(assistant);
+
+  // B3: a withheld assistant turn carries a durable verdict so the
+  // Session.push boundary + memory ingest gate can keep the (blocked)
+  // turn out of long-term memory.
+  if (leakBlocked) {
+    stampTurnVerdict(state, stepNumber, 0, { lateralLeak: true });
+  }
 
   // C6: once the run is tainted, the model's own TEXT output is
   // derived from untrusted context - record it so a later sink call
@@ -412,8 +456,20 @@ export async function* finalizeRunOutput<TDeps, TOutput>(
       yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
       state.status = 'failed';
       state.error = { message, code: 'guardrail-blocked' };
+      // B3: the final output belongs to the last step's assistant turn.
+      stampTurnVerdict(state, lastStepNumber(state), 0, { guardrail: 'block' });
     } else if (composed.value !== finalSnapshot.output) {
       finalSnapshot.output = composed.value;
+      stampTurnVerdict(state, lastStepNumber(state), 0, { guardrail: 'rewrite' });
     }
   }
+}
+
+/** Highest step number recorded on the run (0 before the first step). */
+function lastStepNumber(state: RunState): number {
+  let max = 0;
+  for (const step of state.steps) {
+    if (step.stepNumber > max) max = step.stepNumber;
+  }
+  return max;
 }

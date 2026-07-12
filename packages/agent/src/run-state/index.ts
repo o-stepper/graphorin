@@ -17,6 +17,8 @@ import type {
   RunStateUsageByModel,
   RunStatus,
   RunTaintSummary,
+  RunTurnVerdict,
+  RunVerdicts,
   TodoItem,
   ToolApproval,
   Usage,
@@ -73,6 +75,8 @@ export interface SerializedRunState {
   readonly taintSummary?: RunTaintSummary;
   /** AG-19: deferred tools promoted by `tool_search` this run. */
   readonly promotedTools?: ReadonlyArray<string>;
+  /** B3: per-turn security verdicts keyed by `'<step>:<offset>'`. */
+  readonly verdicts?: RunVerdicts;
   /** D6: journaled structured plan/todo list. */
   readonly todos?: ReadonlyArray<TodoItem>;
   /**
@@ -164,6 +168,7 @@ export function serializeRunState(
     ...(wire.usageByModel !== undefined ? { usageByModel: wire.usageByModel } : {}),
     ...(wire.taintSummary !== undefined ? { taintSummary: wire.taintSummary } : {}),
     ...(wire.promotedTools !== undefined ? { promotedTools: wire.promotedTools } : {}),
+    ...(wire.verdicts !== undefined ? { verdicts: wire.verdicts } : {}),
     ...(wire.todos !== undefined ? { todos: wire.todos } : {}),
     ...(pendingSubRuns !== undefined ? { pendingSubRuns } : {}),
     startedAt: wire.startedAt,
@@ -401,6 +406,26 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
       ...(tileHashes !== undefined && tileHashes.length > 0 ? { spanTileHashes: tileHashes } : {}),
     };
   }
+  // B3: rehydrate the per-turn verdict sidecar (additive; absent pre-B3).
+  let verdicts: RunVerdicts | undefined;
+  if (isRecord(payload.verdicts)) {
+    const rebuilt: Record<string, RunTurnVerdict> = {};
+    for (const [key, value] of Object.entries(payload.verdicts)) {
+      if (!isRecord(value)) continue;
+      const flags = Array.isArray(value.dataflowFlags)
+        ? value.dataflowFlags.filter((f): f is string => typeof f === 'string')
+        : undefined;
+      const entry: RunTurnVerdict = {
+        ...(value.guardrail === 'block' || value.guardrail === 'rewrite'
+          ? { guardrail: value.guardrail }
+          : {}),
+        ...(value.lateralLeak === true ? { lateralLeak: true } : {}),
+        ...(flags !== undefined && flags.length > 0 ? { dataflowFlags: flags } : {}),
+      };
+      if (Object.keys(entry).length > 0) rebuilt[key] = entry;
+    }
+    if (Object.keys(rebuilt).length > 0) verdicts = rebuilt;
+  }
   const promotedTools = Array.isArray(payload.promotedTools)
     ? payload.promotedTools.filter((t): t is string => typeof t === 'string')
     : undefined;
@@ -431,6 +456,7 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     ...(usageByModel !== undefined ? { usageByModel } : {}),
     ...(taintSummary !== undefined ? { taintSummary } : {}),
     ...(promotedTools !== undefined ? { promotedTools } : {}),
+    ...(verdicts !== undefined ? { verdicts } : {}),
     ...(todos !== undefined ? { todos } : {}),
     startedAt,
     ...(typeof finishedAtRaw === 'string' ? { finishedAt: finishedAtRaw } : {}),

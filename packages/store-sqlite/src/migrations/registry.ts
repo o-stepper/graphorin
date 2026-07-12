@@ -79,6 +79,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '032': '@graphorin/store-sqlite (workflow durable-timer wake_at enumeration)',
   '033': '@graphorin/store-sqlite (embedding index-mode column)',
   '034': '@graphorin/channels (pairing requests + paired peers)',
+  '035': '@graphorin/memory (session-message security verdict)',
 };
 
 /**

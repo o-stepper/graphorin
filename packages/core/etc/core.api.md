@@ -248,6 +248,7 @@ export interface AgentResult<TOutput = string> {
     readonly status: RunStatus;
     // (undocumented)
     readonly usage: Usage;
+    readonly verdicts?: RunVerdicts;
 }
 
 // @public (undocumented)
@@ -1600,6 +1601,7 @@ export interface ReadonlyRunState {
     readonly usageByModel?: RunStateUsageByModel;
     // (undocumented)
     readonly userId?: string;
+    readonly verdicts?: RunVerdicts;
 }
 
 // @public
@@ -1851,6 +1853,7 @@ export interface RunState {
     usageByModel?: RunStateUsageByModel;
     // (undocumented)
     readonly userId?: string;
+    verdicts?: RunVerdicts;
 }
 
 // @public
@@ -1900,6 +1903,16 @@ export interface RunTaintSummary {
     // (undocumented)
     readonly untrustedSourceKinds: ReadonlyArray<string>;
 }
+
+// @public
+export interface RunTurnVerdict {
+    readonly dataflowFlags?: ReadonlyArray<string>;
+    readonly guardrail?: 'block' | 'rewrite';
+    readonly lateralLeak?: boolean;
+}
+
+// @public
+export type RunVerdicts = Record<string, RunTurnVerdict>;
 
 // Warning: (ae-internal-missing-underscore) The name "runWithPauseResume" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -2114,8 +2127,14 @@ export interface SessionMemoryStore {
     list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
     listWithMetadata?(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
     // (undocumented)
-    push(scope: SessionScope, message: Message): Promise<MessageRef>;
+    push(scope: SessionScope, message: Message, options?: SessionMessagePushOptions): Promise<MessageRef>;
     search(scope: SessionScope, query: string, opts?: MemorySearchOptions): Promise<ReadonlyArray<MemoryHit>>;
+}
+
+// @public
+export interface SessionMessagePushOptions {
+    // (undocumented)
+    readonly verdict?: RunTurnVerdict;
 }
 
 // @public
