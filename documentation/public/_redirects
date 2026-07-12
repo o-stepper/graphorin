@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects (evaluated before static assets).
+# The docs site has no landing page: the root goes straight to the
+# guide. Keep in sync with the meta-refresh stub in `documentation/index.md`,
+# which covers dev/preview servers that ignore this file.
+/ /guide/ 301
