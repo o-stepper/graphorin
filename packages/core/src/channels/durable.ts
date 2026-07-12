@@ -117,18 +117,100 @@ export function sleepFor(ms: number): void {
 }
 
 /**
- * Suspend on a named durable promise. The thread stays suspended (and
- * survives restarts) until an external caller resolves it via
- * `workflow.resolveAwakeable(threadId, name, value)`; that `value` is
- * returned here.
+ * Structural schema slice `awaitExternal({ schema })` validates the
+ * resolved payload against. Matches zod v3 and v4 (and anything else
+ * exposing the same `safeParse`) without a zod dependency in core -
+ * the same structural stance as the tools-layer schema seam.
  *
  * @stable
  */
-export function awaitExternal<TResume = unknown>(name: string): TResume {
+export interface PayloadSchemaLike<T> {
+  safeParse(
+    value: unknown,
+  ):
+    | { readonly success: true; readonly data: T }
+    | { readonly success: false; readonly error: { readonly message: string } };
+}
+
+/**
+ * Thrown by {@link awaitExternal} when the resolved payload fails the
+ * declared `schema`. The workflow engine recognises it by `name` and
+ * RESTORES the suspension instead of failing the thread: the invalid
+ * value is discarded, the pending pause survives, and the resolver
+ * receives a typed `awakeable-payload-invalid` error. Validation runs
+ * at the replay delivery point (the node re-executing with the
+ * resumed value) because that is the only place the schema object
+ * exists - `PendingPauseRecord` persists `name`/`wakeAt` only and a
+ * schema is not serializable across processes.
+ *
+ * @stable
+ */
+export class AwakeablePayloadError extends TypeError {
+  override readonly name = 'AwakeablePayloadError';
+  constructor(
+    public readonly awakeableName: string,
+    public readonly issues: string,
+  ) {
+    super(
+      `[graphorin/core] awakeable '${awakeableName}' was resolved with a payload that fails ` +
+        `its schema: ${issues}`,
+    );
+  }
+}
+
+/**
+ * Structural guard for {@link AwakeablePayloadError} - matches by
+ * `name` so the check survives duplicated module instances.
+ *
+ * @stable
+ */
+export function isAwakeablePayloadError(err: unknown): err is AwakeablePayloadError {
+  return (
+    err instanceof Error &&
+    err.name === 'AwakeablePayloadError' &&
+    typeof (err as { awakeableName?: unknown }).awakeableName === 'string'
+  );
+}
+
+/** Options for {@link awaitExternal}. @stable */
+export interface AwaitExternalOptions<TResume> {
+  /**
+   * Validates the resolved payload at the replay delivery point. On
+   * failure the engine restores the suspension (the thread stays
+   * suspended, the invalid value is discarded) and the resolver gets
+   * a typed `awakeable-payload-invalid` error. The parsed (possibly
+   * transformed) value is what the node receives.
+   */
+  readonly schema?: PayloadSchemaLike<TResume>;
+}
+
+/**
+ * Suspend on a named durable promise. The thread stays suspended (and
+ * survives restarts) until an external caller resolves it via
+ * `workflow.resolveAwakeable(threadId, name, value)`; that `value` is
+ * returned here. With `options.schema` the value is validated on
+ * delivery - see {@link AwakeablePayloadError} for the rejection
+ * semantics.
+ *
+ * @stable
+ */
+export function awaitExternal<TResume = unknown>(
+  name: string,
+  options?: AwaitExternalOptions<TResume>,
+): TResume {
   if (typeof name !== 'string' || name.length === 0) {
     throw new TypeError('[graphorin/core] awaitExternal(name) needs a non-empty name');
   }
-  return pause<AwakeablePauseValue, TResume>({ kind: AWAKEABLE_PAUSE_KIND, name });
+  const value = pause<AwakeablePauseValue, TResume>({ kind: AWAKEABLE_PAUSE_KIND, name });
+  const schema = options?.schema;
+  if (schema !== undefined) {
+    const parsed = schema.safeParse(value);
+    if (!parsed.success) {
+      throw new AwakeablePayloadError(name, parsed.error.message);
+    }
+    return parsed.data;
+  }
+  return value;
 }
 
 /**

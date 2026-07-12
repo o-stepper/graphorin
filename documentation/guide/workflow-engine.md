@@ -199,6 +199,23 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 
 `getState(threadId).pendingPauses` surfaces the full pending set - timers carry `wakeAt`, awakeables/approvals carry `name` - so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
 
+#### Validating resolved payloads
+
+`awaitExternal(name, { schema })` validates the resolved payload on delivery. The schema is structural (`PayloadSchemaLike`: anything with zod's `safeParse` shape, v3 or v4) and runs at the **replay delivery point** - the node re-executing with the resumed value - because that is the only place the schema object exists: pause records persist `name`/`wakeAt` only, and a schema is not serializable across processes. On failure the engine **restores the suspension** instead of failing the thread: the invalid value is discarded (it never persists as a satisfied answer), the thread stays suspended on the same awakeable, and the resolver receives a typed `awakeable-payload-invalid` error - resolve again with a conforming payload. Keep schemas stable across deploys: a previously accepted value is re-validated on every later replay.
+
+```ts
+import { awaitExternal } from '@graphorin/workflow';
+import { z } from 'zod';
+
+const amount = awaitExternal<number>('payment-confirmed', {
+  schema: z.number().positive(),
+});
+```
+
+#### Addressing an awakeable from outside
+
+The canonical address of a pending awakeable/approval is the triple `(workflowId, threadId, name)` - exactly what the REST surface consumes (`POST /v1/workflows/:workflowId/resume` with `{ threadId, name }`). For channel surfaces with a single opaque payload slot (a messenger button's callback data, an email link), `serializeAwakeableRef` / `parseAwakeableRef` round-trip the triple through one compact string (`wf:<workflowId>:<threadId>:<name>`, segments URI-encoded); `parseAwakeableRef` returns `null` on malformed input instead of throwing, since callback data is untrusted.
+
 ### Firing durable timers
 
 Nothing needs to poll by hand: `createTimerDriver` ships with the package. The engine stamps the earliest due timer on every suspended checkpoint (`CheckpointMetadata.wakeAt`), the store enumerates due threads (`CheckpointStore.listSuspended` - implemented by the SQLite adapter and `InMemoryCheckpointStore`), and the driver ticks them on a poll loop that re-arms at `min(pollIntervalMs, earliest nextWakeAt)`:
@@ -219,6 +236,8 @@ driver.start(); // library mode; driver.stop() on shutdown
 ```
 
 On the server, wire the same driver through the lifecycle daemon instead: `createServer({ workflowTimers: { driver } })` starts and stops it with the process and reports `sweeps/fired/errors/nextWakeAt` under `checks.workflowTimers` on `/v1/health`. Per-thread tick failures are isolated (`onError`), and a `checkpoint-version-conflict` from two drivers racing the same thread is treated as benign - the store CAS already picked a winner. A custom `CheckpointStore` without `listSuspended` fails fast at `createTimerDriver` with a typed error rather than silently never firing. Threads suspended by versions before the `wake_at` column existed are invisible to the driver until one manual `tick` (or any resume) re-persists them.
+
+The wiring is **programmatic by design** - the config file carries no domain adapters, so there is no `workflowTimers` config key. Forgetting the driver used to be the quietest deployment gap an always-on assistant could ship (a `sleepFor` thread just never wakes); the server now warns loudly at `start()` when workflows are registered without a timer driver.
 
 ### Per-node timeout and retry
 
@@ -318,7 +337,7 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired - counted PER INVOCATION of execute/resume/retry/tick since W-122, so long-lived timer/approval threads never trip it and a capped invocation is retryable; the opt-in `maxTotalSteps` adds a lifetime quota under the same code), `pause-replay-divergence` (W-120: the body's pause order diverged from the journal), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired - counted PER INVOCATION of execute/resume/retry/tick since W-122, so long-lived timer/approval threads never trip it and a capped invocation is retryable; the opt-in `maxTotalSteps` adds a lifetime quota under the same code), `pause-replay-divergence` (W-120: the body's pause order diverged from the journal), `awakeable-payload-invalid` (a resolved payload failed the `awaitExternal` schema - the thread stays suspended on the same awakeable), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
 
 Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 

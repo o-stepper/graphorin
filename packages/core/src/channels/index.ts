@@ -34,15 +34,19 @@ export { Directive } from './directive.js';
 export { Dispatch, dispatch } from './dispatch.js';
 export type {
   ApprovalPauseValue,
+  AwaitExternalOptions,
   AwakeablePauseValue,
+  PayloadSchemaLike,
   TimerPauseValue,
 } from './durable.js';
 export {
   APPROVAL_PAUSE_KIND,
   AWAKEABLE_PAUSE_KIND,
+  AwakeablePayloadError,
   awaitExternal,
   isApprovalPauseValue,
   isAwakeablePauseValue,
+  isAwakeablePayloadError,
   isTimerPauseValue,
   requestApproval,
   sleepFor,

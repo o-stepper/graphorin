@@ -90,6 +90,8 @@ export {
   sleepUntil,
   stream,
 } from '@graphorin/core';
+export type { AwakeableRef } from './awakeable-ref.js';
+export { parseAwakeableRef, serializeAwakeableRef } from './awakeable-ref.js';
 export { InMemoryCheckpointStore } from './checkpoint-store-memory.js';
 export {
   CheckpointNotFoundError,

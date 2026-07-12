@@ -32,10 +32,12 @@ import type {
   WorkflowEvent,
 } from '@graphorin/core';
 import {
+  AWAKEABLE_PAUSE_KIND,
   CheckpointConflictError,
   Dispatch,
   isApprovalPauseValue,
   isAwakeablePauseValue,
+  isAwakeablePayloadError,
   isPauseSignal,
   isReplayDivergenceSignal,
   isTimerPauseValue,
@@ -201,6 +203,14 @@ interface PlannedTask {
   readonly resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
   readonly staticBefore?: boolean;
   readonly staticAfter?: boolean;
+  /**
+   * Marks the resume task that carries the FRESH directive value as
+   * its last `resumeValues` entry (vs replay-only siblings). The
+   * awakeable payload-validation branch trims exactly that value when
+   * restoring the suspension, so a rejected payload is discarded
+   * instead of replaying forever.
+   */
+  readonly freshResume?: boolean;
 }
 
 interface RunInternalState<TState extends object> {
@@ -564,7 +574,7 @@ export async function* resumeEngine<TState extends object>(
               resumeMeta: primary.staticBefore
                 ? []
                 : [...priorMetaOf(primary), pauseMetaOf(primary)],
-              ...(primary.staticBefore ? { staticBefore: true } : {}),
+              ...(primary.staticBefore ? { staticBefore: true } : { freshResume: true }),
             });
           }
         }
@@ -865,6 +875,12 @@ async function* driveRun<TState extends object>(
       durationMs: number;
       status: 'completed' | 'paused' | 'failed';
       pendingDispatches: PlannedTask[];
+      /**
+       * Awakeable schema validation rejected the freshly delivered
+       * payload: the restored pause record must NOT persist that value
+       * as satisfied (it would replay - and fail - forever).
+       */
+      rejectedResume?: boolean;
     }> = [];
 
     // WF-9: every task observes the same frozen checkpoint-equivalent
@@ -975,6 +991,7 @@ async function* driveRun<TState extends object>(
       let writes: ChannelWrite[] = [];
       const dispatches: PlannedTask[] = [];
       let paused: { value: unknown } | undefined;
+      let rejectedResume = false;
       let status: 'completed' | 'paused' | 'failed' = 'completed';
       try {
         const node = config.nodes[task.nodeName];
@@ -1011,6 +1028,28 @@ async function* driveRun<TState extends object>(
         if (isPauseSignal(err)) {
           paused = { value: err.value };
           status = 'paused';
+        } else if (isAwakeablePayloadError(err)) {
+          // A3 (item 16 tail): schema validation at the replay delivery
+          // point rejected the resolved payload. Restore the suspension
+          // instead of failing the thread - the node re-suspends under
+          // the same awakeable name, the invalid value is discarded
+          // (see `rejectedResume` in the pause-record builder), and the
+          // resolver receives a typed `awakeable-payload-invalid` error
+          // event while the thread stays suspended.
+          paused = { value: { kind: AWAKEABLE_PAUSE_KIND, name: err.awakeableName } };
+          status = 'paused';
+          rejectedResume = task.freshResume === true;
+          stepEvents.push(
+            emitError<TState>(
+              threadId,
+              new WorkflowError('awakeable-payload-invalid', err.message, {
+                hint:
+                  'the thread is still suspended on the same awakeable - resolve it again ' +
+                  'with a payload matching the declared schema',
+              }),
+            ),
+          );
+          wakeEventPump();
         } else if (isReplayDivergenceSignal(err)) {
           // W-120: nondeterministic pause order - fail LOUDLY with the
           // typed code instead of delivering a value to the wrong pause.
@@ -1047,6 +1086,7 @@ async function* driveRun<TState extends object>(
         durationMs,
         status,
         pendingDispatches: dispatches,
+        ...(rejectedResume ? { rejectedResume: true } : {}),
       });
 
       if (includeTaskEvents) {
@@ -1175,18 +1215,25 @@ async function* driveRun<TState extends object>(
     for (const outcome of orderedOutcomes) {
       if (outcome.paused === undefined) continue;
       const pauseValue = outcome.paused.value;
+      // A3: a schema-rejected fresh payload must not persist as a
+      // satisfied value - it would replay (and fail) on every future
+      // resume. Trim exactly the freshly delivered last entry.
+      const satisfiedValues =
+        outcome.rejectedResume === true
+          ? (outcome.task.resumeValues ?? []).slice(0, -1)
+          : (outcome.task.resumeValues ?? []);
+      const satisfiedMeta =
+        outcome.rejectedResume === true
+          ? (outcome.task.resumeMeta ?? []).slice(0, -1)
+          : (outcome.task.resumeMeta ?? []);
       pauseRecords.push({
         nodeName: outcome.task.nodeName,
         value: pauseValue,
         ...(outcome.task.dispatchArgs !== undefined
           ? { dispatchArgs: outcome.task.dispatchArgs }
           : {}),
-        ...(outcome.task.resumeValues !== undefined && outcome.task.resumeValues.length > 0
-          ? { satisfied: outcome.task.resumeValues }
-          : {}),
-        ...(outcome.task.resumeMeta !== undefined && outcome.task.resumeMeta.length > 0
-          ? { satisfiedMeta: outcome.task.resumeMeta }
-          : {}),
+        ...(satisfiedValues.length > 0 ? { satisfied: satisfiedValues } : {}),
+        ...(satisfiedMeta.length > 0 ? { satisfiedMeta } : {}),
         ...(isTimerPauseValue(pauseValue) ? { wakeAt: pauseValue.wakeAt } : {}),
         ...(isAwakeablePauseValue(pauseValue) || isApprovalPauseValue(pauseValue)
           ? { name: pauseValue.name }
