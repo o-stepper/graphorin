@@ -5,6 +5,7 @@ import { transformerTwoslash } from '@shikijs/vitepress-twoslash';
 import { defineConfig } from 'vitepress';
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import { nav } from './nav.js';
+import { graphorinDark, graphorinLight } from './shiki-themes.js';
 import { sidebar } from './sidebar.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -85,7 +86,9 @@ const baseConfig = defineConfig({
   },
 
   markdown: {
-    theme: { light: 'github-light', dark: 'github-dark-dimmed' },
+    // Custom themes keyed to the graphite/terracotta site palette; the
+    // stock github pair is blue-dominant and reads off-brand next to it.
+    theme: { light: graphorinLight, dark: graphorinDark },
     lineNumbers: false,
     codeTransformers: [transformerTwoslash()],
     languages: ['ts', 'tsx', 'js', 'jsx', 'bash', 'json', 'yaml', 'md', 'mermaid'],
