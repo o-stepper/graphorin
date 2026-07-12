@@ -11,6 +11,7 @@ export default defineConfig({
     'src/guard/index.ts',
     'src/guardrails/index.ts',
     'src/hardening/index.ts',
+    'src/inspect/index.ts',
     'src/oauth/index.ts',
     'src/policy/index.ts',
     'src/supply-chain/index.ts',

@@ -84,6 +84,13 @@ export interface DataFlowGuardWithLedgers extends DataFlowGuard {
    * `AgentCallOptions.inboundTaint` seed. Widen-only.
    */
   recordInboundMessage(runId: string, seed: InboundTaintSeed): void;
+  /**
+   * B4 (item 14): evaluate the run's OUTGOING assistant text as a
+   * sink (stable sink id `'assistant-output'`, declassifiable via
+   * `declassifySinks`). Called by the commit gate BEFORE the message
+   * is appended; `'block'` replaces the outgoing text with a notice.
+   */
+  inspectAssistantOutput(runId: string, text: string): DataFlowVerdict;
 }
 
 export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardWithLedgers {
@@ -164,6 +171,33 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
     recordAssistant(runId: string, text: string): void {
       if (text.length === 0) return;
       ledgerFor(runId).recordAssistantOutput?.(text);
+    },
+
+    inspectAssistantOutput(runId: string, text: string): DataFlowVerdict {
+      const ledger = ledgerFor(runId);
+      const probe = ledger.inspectArgs(text);
+      const decision = policy.evaluate({
+        toolName: 'assistant-output',
+        sinkKind: 'assistant-output',
+        // The reply surface has no side-effect class of its own; the
+        // sinkKind makes it a sink regardless, and 'read-only' keeps
+        // the field honest (nothing mutates).
+        sideEffectClass: 'read-only',
+        carriesUntrustedVerbatim: probe.carriesUntrustedVerbatim,
+        untrustedSeen: ledger.untrustedSeen,
+        sensitiveSeen: ledger.sensitiveSeen,
+        sourceKinds:
+          probe.matchedSourceKinds.length > 0
+            ? probe.matchedSourceKinds
+            : ledger.untrustedSourceKinds,
+      });
+      if (decision.action === 'allow') return { action: 'allow' };
+      return {
+        action: decision.action,
+        flow: decision.flow,
+        reason: decision.reason,
+        sourceKinds: decision.sourceKinds,
+      };
     },
 
     recordInboundMessage(runId: string, seed: InboundTaintSeed): void {

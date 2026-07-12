@@ -15,6 +15,7 @@ import type {
   Tracer,
 } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
+import type { InjectionClassifier } from '@graphorin/security/inspect';
 import { type ConflictPipelineOptions, createConflictPipeline } from './conflict/index.js';
 import {
   type Consolidator,
@@ -134,6 +135,12 @@ export interface CreateMemoryOptions {
    * auto-promotion and act-grant features of later waves REQUIRE).
    */
   readonly ingestGate?: MemoryIngestGate;
+  /**
+   * B4 (D-12): optional pluggable injection classifier consulted at
+   * the semantic write-time quarantine gate after the offline regex
+   * heuristics. Default off; classifier errors never fail a write.
+   */
+  readonly injectionClassifier?: InjectionClassifier;
   /**
    * Query transformation for retrieval (P2-3, opt-in). When supplied,
    * `SemanticMemory.search(..., { multiQuery })` fans the query into
@@ -486,6 +493,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
     reranker,
     conflictPipeline,
+    ...(options.injectionClassifier !== undefined
+      ? { injectionClassifier: options.injectionClassifier }
+      : {}),
     ...(options.contextualRetrieval !== undefined
       ? { contextualRetrieval: options.contextualRetrieval }
       : {}),

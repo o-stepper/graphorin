@@ -16,7 +16,12 @@
  */
 
 import type { ChannelAccessController, ChannelAccessDecision } from './access.js';
-import { type SanitizationOutcome, sanitizeChannelInbound } from './inbound.js';
+import {
+  type InjectionClassifier,
+  type SanitizationOutcome,
+  sanitizeChannelInbound,
+  sanitizeChannelInboundWithClassifier,
+} from './inbound.js';
 import { type OutboundCommentaryPolicy, sanitizeChannelOutbound } from './outbound.js';
 import type { IdentityRouter, ResolvedChannelRoute } from './router.js';
 import type {
@@ -110,6 +115,12 @@ export interface ChannelGatewayOptions {
    * `'strip'` (messenger peers have no envelope-collapsing UI).
    */
   readonly outboundPolicy?: OutboundCommentaryPolicy;
+  /**
+   * B4 (D-12): optional pluggable injection classifier consulted on
+   * every inbound body after the regex pass. Default off; classifier
+   * errors never fail the pipeline (resilience contract).
+   */
+  readonly injectionClassifier?: InjectionClassifier;
   /** WARN sink. Default `process.stderr`. */
   readonly warn?: (line: string) => void;
 }
@@ -246,9 +257,15 @@ export function createChannelGateway(options: ChannelGatewayOptions): ChannelGat
       }
       return;
     }
-    const sanitization = sanitizeChannelInbound(message.text, {
-      channelId: message.identity.channelId,
-    });
+    const sanitization =
+      options.injectionClassifier !== undefined
+        ? await sanitizeChannelInboundWithClassifier(message.text, {
+            channelId: message.identity.channelId,
+            classifier: options.injectionClassifier,
+          })
+        : sanitizeChannelInbound(message.text, {
+            channelId: message.identity.channelId,
+          });
     if (sanitization.blocked) {
       runtime.failed += 1;
       warn(

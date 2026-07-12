@@ -247,8 +247,20 @@ export interface AssistantCommitEnv {
  *
  * Commits the (possibly replaced) assistant message to both buffers,
  * records the C6 taint span, and emits `agent.lateral-leak.detected`
- * when the monitor tripped. Returns `leakBlocked`.
+ * when the monitor tripped. Returns `true` when the durable text was
+ * withheld - by the lateral-leak defense or by the B4
+ * assistant-output data-flow sink - so the loop also withholds the
+ * run's final output.
  */
+/**
+ * B4 (item 14): the outgoing-text replacement when the data-flow
+ * policy BLOCKS the assistant-output sink in enforce mode (lethal
+ * trifecta / verbatim untrusted carry without a declassify). Mirrors
+ * {@link LATERAL_LEAK_BLOCKED_NOTICE}.
+ */
+export const ASSISTANT_OUTPUT_BLOCKED_NOTICE =
+  '[graphorin] assistant reply withheld by the data-flow policy (assistant-output sink).';
+
 export async function* commitAssistantMessage<TOutput>(
   env: AssistantCommitEnv,
   textBuffer: string,
@@ -264,8 +276,25 @@ export async function* commitAssistantMessage<TOutput>(
       : undefined;
   const leakBlocked = leakCheck?.leakDetected === true && leakCheck.decision === 'block';
 
+  // B4 (item 14): the outgoing text is a data-flow SINK (stable id
+  // 'assistant-output'). Evaluated before the commit, unified with the
+  // lateral-leak block path: enforce-mode 'block' replaces the durable
+  // message with a notice (deltas already streamed - what the gate
+  // protects is the persistent buffer, the run's final output and any
+  // downstream delivery); 'flag'/'declassify' only stamp the verdict
+  // sidecar. Declassify via `declassifySinks: ['assistant-output']`.
+  const outputVerdict =
+    !leakBlocked && toolDataFlowGuard !== undefined && textBuffer.length > 0
+      ? toolDataFlowGuard.inspectAssistantOutput(state.id, textBuffer)
+      : undefined;
+  const outputBlocked = outputVerdict !== undefined && outputVerdict.action === 'block';
+
   const assistant: AssistantMessage = buildAssistantMessage(
-    leakBlocked ? LATERAL_LEAK_BLOCKED_NOTICE : textBuffer,
+    leakBlocked
+      ? LATERAL_LEAK_BLOCKED_NOTICE
+      : outputBlocked
+        ? ASSISTANT_OUTPUT_BLOCKED_NOTICE
+        : textBuffer,
     stepReasoningParts,
     finalCalls,
     agentId,
@@ -280,6 +309,15 @@ export async function* commitAssistantMessage<TOutput>(
   if (leakBlocked) {
     stampTurnVerdict(state, stepNumber, 0, { lateralLeak: true });
   }
+  if (outputVerdict !== undefined && outputVerdict.action !== 'allow') {
+    stampTurnVerdict(state, stepNumber, 0, {
+      ...(outputBlocked ? { guardrail: 'block' as const } : {}),
+      dataflowFlags: [
+        `assistant-output:${outputVerdict.action}`,
+        ...(outputVerdict.flow !== undefined ? [`assistant-output:${outputVerdict.flow}`] : []),
+      ],
+    });
+  }
 
   // C6: once the run is tainted, the model's own TEXT output is
   // derived from untrusted context - record it so a later sink call
@@ -288,7 +326,7 @@ export async function* commitAssistantMessage<TOutput>(
   // recorded: the sink gate inspects those same args next, and
   // recording them first would self-match every post-taint call,
   // collapsing the precise verbatim signal into the coarse one.
-  if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked) {
+  if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked && !outputBlocked) {
     toolDataFlowGuard.recordAssistant(state.id, textBuffer);
   }
 
@@ -310,7 +348,7 @@ export async function* commitAssistantMessage<TOutput>(
       detectedAtIso: new Date().toISOString(),
     };
   }
-  return leakBlocked;
+  return leakBlocked || outputBlocked;
 }
 
 /** The run-scoped context the verifier gate operates on. */
