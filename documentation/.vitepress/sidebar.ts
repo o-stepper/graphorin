@@ -20,6 +20,7 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'What is Graphorin?', link: '/guide/' },
       { text: 'Installation', link: '/guide/installation' },
       { text: 'Quickstart', link: '/guide/quickstart' },
+      { text: 'Minimal profile', link: '/guide/minimal-profile' },
       { text: 'Architecture', link: '/guide/architecture' },
       { text: 'Privacy & no-phone-home', link: '/guide/privacy' },
     ],

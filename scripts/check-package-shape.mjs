@@ -32,10 +32,10 @@
  * (add `--skip-build` after a fresh `pnpm build`).
  *
  * Known-failure legs: `--allow-fail <leg>` (repeatable) downgrades a
- * named leg's failure to a warning. CI passes `--allow-fail zod4`
- * until the zod-4 type break (W-013) is fixed — the leg still RUNS and
- * its output is visible, so the sensitivity of the gate is proven
- * rather than assumed. Remove the flag once W-013 lands (wave 2).
+ * named leg's failure to a warning. CI passes no `--allow-fail` today
+ * (the historical `--allow-fail zod4` was removed once the W-013 zod-4
+ * type break landed); the flag stays available for the next
+ * known-failure window.
  *
  * Exit codes: 0 ok · 1 defect · 2 invocation error.
  */

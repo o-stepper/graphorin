@@ -62,7 +62,7 @@ import pkg from '../package.json' with { type: 'json' };
 import { connectTourMcpClient } from './mcp-client.js';
 import { LARGE_PAYLOAD_MIN_BYTES, startTourMcpServer } from './mcp-server.js';
 import { makeTourRunContext } from './run-context.js';
-import { loadOfflineNotesSkill } from './skill.js';
+import { loadOfflineNotesSkill, readHarnessManualOnDemand } from './skill.js';
 
 export const VERSION: string = pkg.version;
 
@@ -200,9 +200,9 @@ function buildFirstPartyTools() {
  */
 function registerCodeModeTools(registry: ToolRegistry, executor: ToolExecutor): void {
   const codeTools = registry.list().filter((entry) => !RESERVED_TOOL_NAMES.has(entry.name));
-  const eagerProjectable = codeTools.filter(
+  const eagerProjectable: ReadonlyArray<ProjectableTool> = codeTools.filter(
     (entry) => entry.__effectiveDeferLoading !== true,
-  ) as unknown as ReadonlyArray<ProjectableTool>;
+  );
   const projection = projectToolApi(eagerProjectable);
   const allowedTools = codeTools.map((entry) => entry.name);
 
@@ -334,8 +334,14 @@ export async function runTour(options: TourOptions = {}): Promise<TourReport> {
     if (!noteOutput.includes('run-scoped')) {
       throw new Error('note_lookup did not return the bundled spill note.');
     }
+    // C6 skill pattern - README on demand: the listing is lazy (zero
+    // bytes read); the manual body loads only at readText().
+    const manual = await readHarnessManualOnDemand(skill);
+    if (!manual.includes('loaded on demand')) {
+      throw new Error('resources/MANUAL.md did not load through the lazy resource accessor.');
+    }
     log(
-      `[3/6] skill: '${skill.metadata.name}' (trust=${skill.metadata.graphorinTrustLevel}, declared tools=${skill.toolDeclarations().length}, description=${JSON.stringify(firstLine(skill.metadata.description))}); registered '${stamped.tool.name}'`,
+      `[3/6] skill: '${skill.metadata.name}' (trust=${skill.metadata.graphorinTrustLevel}, declared tools=${skill.toolDeclarations().length}, description=${JSON.stringify(firstLine(skill.metadata.description))}); registered '${stamped.tool.name}'; manual read on demand (${manual.length} chars via Skill.resources)`,
     );
 
     // Stage 4 - discover the deferred tool through the executor.

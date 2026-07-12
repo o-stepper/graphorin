@@ -142,6 +142,21 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       "outputType.kind 'text' with a schema - did you mean kind: 'structured'?",
     );
   }
+  // C6: the minimal scaffold is instructions-only + no plan tool by
+  // definition - a contradictory explicit flag is a config error, not a
+  // silent override (deterministic, fail-fast).
+  if (config.scaffold === 'minimal') {
+    if (config.autoAssembleContext === true) {
+      throw new InvalidAgentConfigError(
+        "scaffold 'minimal' with autoAssembleContext: true - the minimal scaffold is instructions-only; drop one of the two",
+      );
+    }
+    if (config.plan === true) {
+      throw new InvalidAgentConfigError(
+        "scaffold 'minimal' with plan: true - the minimal scaffold disables the plan tool and recitation; drop one of the two",
+      );
+    }
+  }
   validatePreferredModel(config.preferredModel);
   if (config.modelTierMap !== undefined) {
     for (const [tier, spec] of Object.entries(config.modelTierMap)) {

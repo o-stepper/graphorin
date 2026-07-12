@@ -94,6 +94,25 @@ export type NormaliseWarning =
 export const DEFAULT_MAX_RESULT_TOKENS = 16384;
 
 /**
+ * Registry-level normalisation knobs threaded from
+ * `createToolRegistry(...)` (C6).
+ *
+ * @stable
+ */
+export interface NormaliseToolOptions {
+  /**
+   * Treat tools that do not declare `defer_loading` as deferred (the
+   * minimal-scaffold posture). An explicit `defer_loading: false` on
+   * the tool still wins - the per-tool declaration is the stronger
+   * signal. `built-in` source registrations are exempt: the runtime
+   * registers those deliberately (`tool_search`, `read_result`, ...)
+   * and deferring the discovery surface itself would be self-defeating.
+   * Default `false` (per-tool opt-in, the pre-C6 behaviour).
+   */
+  readonly deferLoadingByDefault?: boolean;
+}
+
+/**
  * Normalise a tool registration. Throws on programming errors
  * (invalid examples, invalid `preferredModel`, invalid
  * `sideEffectClass`); collects WARN markers for the
@@ -104,6 +123,7 @@ export const DEFAULT_MAX_RESULT_TOKENS = 16384;
 export function normaliseTool<TInput, TOutput, TDeps>(
   tool: Tool<TInput, TOutput, TDeps>,
   source: ToolSource,
+  opts: NormaliseToolOptions = {},
 ): NormaliseOutcome<TInput, TOutput, TDeps> {
   const warnings: NormaliseWarning[] = [];
   const trustClass = resolveTrustClass(source);
@@ -116,8 +136,13 @@ export function normaliseTool<TInput, TOutput, TDeps>(
   const truncationStrategy: TruncationStrategy =
     tool.truncationStrategy ?? defaultTruncationStrategy(trustClass, tool.name);
 
-  // Resolve effective defer_loading.
-  const effectiveDeferLoading = tool.defer_loading === true;
+  // Resolve effective defer_loading: the per-tool declaration wins;
+  // otherwise the registry-level default (C6 minimal-scaffold posture)
+  // decides. An explicit `defer_loading: false` stays eager even under
+  // `deferLoadingByDefault: true`, and `built-in` registrations are
+  // exempt from the default (see NormaliseToolOptions).
+  const defaultDefer = opts.deferLoadingByDefault === true && source.kind !== 'built-in';
+  const effectiveDeferLoading = tool.defer_loading ?? defaultDefer;
 
   // Validate `preferredModel` shape.
   if (tool.preferredModel !== undefined) {
@@ -199,6 +224,10 @@ export function normaliseTool<TInput, TOutput, TDeps>(
     examplesEagerlyRendered = false;
   } else if (tool.defer_loading === false) {
     examplesEagerlyRendered = true;
+  } else if (defaultDefer) {
+    // C6: a default-deferred tool renders its examples lazily too -
+    // same behaviour as an explicit `defer_loading: true`.
+    examplesEagerlyRendered = false;
   }
   // else: leave undefined; agent runtime decides at assembly time.
 

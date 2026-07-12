@@ -233,3 +233,68 @@ describe('normaliseTool', () => {
     expect(resolved.__preferredModel).toBe('fast');
   });
 });
+
+describe('normaliseTool - deferLoadingByDefault (C6)', () => {
+  const base = () =>
+    tool({
+      name: 'lazy_candidate',
+      description: 'a',
+      inputSchema: z.object({}),
+      sideEffectClass: 'pure',
+      async execute() {
+        return null;
+      },
+    });
+
+  it('defaults undeclared tools to deferred when the registry opts in', () => {
+    const { resolved } = normaliseTool(
+      base(),
+      { kind: 'first-party' },
+      {
+        deferLoadingByDefault: true,
+      },
+    );
+    expect(resolved.__effectiveDeferLoading).toBe(true);
+    // Default-deferred tools render examples lazily, like explicit defer.
+    expect(resolved.examplesEagerlyRendered).toBe(false);
+  });
+
+  it('an explicit defer_loading: false wins over the registry default', () => {
+    const t = { ...base(), defer_loading: false } as ReturnType<typeof base>;
+    const { resolved } = normaliseTool(
+      t,
+      { kind: 'first-party' },
+      {
+        deferLoadingByDefault: true,
+      },
+    );
+    expect(resolved.__effectiveDeferLoading).toBe(false);
+    expect(resolved.examplesEagerlyRendered).toBe(true);
+  });
+
+  it('without the option the pre-C6 behaviour holds (per-tool opt-in only)', () => {
+    const { resolved } = normaliseTool(base(), { kind: 'first-party' });
+    expect(resolved.__effectiveDeferLoading).toBe(false);
+    expect(resolved.examplesEagerlyRendered).toBeUndefined();
+  });
+});
+
+describe('normaliseTool - built-in exemption from deferLoadingByDefault (C6)', () => {
+  it('built-in registrations stay eager under the registry default', () => {
+    const t = tool({
+      name: 'tool_search',
+      description: 'discovery',
+      inputSchema: z.object({}),
+      sideEffectClass: 'pure',
+      async execute() {
+        return null;
+      },
+    });
+    const { resolved } = normaliseTool(
+      t,
+      { kind: 'built-in', subsystem: 'tool-discovery' },
+      { deferLoadingByDefault: true },
+    );
+    expect(resolved.__effectiveDeferLoading).toBe(false);
+  });
+});

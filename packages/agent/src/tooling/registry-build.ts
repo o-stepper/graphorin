@@ -77,6 +77,12 @@ export interface BuildToolRegistryOptions {
   readonly embedder?: ToolSearchEmbedder;
   /** Cosine threshold for the semantic search stage (WI-05). */
   readonly semanticScoreThreshold?: number;
+  /**
+   * C6: defer-load every tool that does not declare `defer_loading`
+   * itself (the minimal-scaffold posture). Passed through to
+   * `createToolRegistry(...)`. Default `false`.
+   */
+  readonly deferLoadingByDefault?: boolean;
 }
 
 /** Outcome of {@link buildToolRegistry}. */
@@ -111,6 +117,7 @@ export function buildToolRegistry(options: BuildToolRegistryOptions = {}): Build
     ...(options.semanticScoreThreshold !== undefined
       ? { semanticScoreThreshold: options.semanticScoreThreshold }
       : {}),
+    ...(options.deferLoadingByDefault === true ? { deferLoadingByDefault: true } : {}),
   });
 
   let registered = 0;

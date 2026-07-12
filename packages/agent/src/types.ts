@@ -177,6 +177,28 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * documented explicit pattern). Has no effect without `memory`.
    */
   readonly autoAssembleContext?: boolean;
+  /**
+   * Context-scaffolding preset (C6, decision D-10). `'full'` (default)
+   * is exactly the pre-C6 behaviour. `'minimal'` is the cheap-run
+   * posture for proactive fires and heartbeats:
+   *
+   * - instructions-only system prompt - `autoAssembleContext` must stay
+   *   off (an explicit `autoAssembleContext: true` alongside
+   *   `'minimal'` is a config error, fail-fast);
+   * - deferred tool loading **by default** - every registered tool
+   *   without an explicit `defer_loading` declaration is withheld from
+   *   the per-step catalogue and reachable through `tool_search`
+   *   promotion (an explicit `defer_loading: false` stays eager);
+   * - no plan tool, no attention recitation - `plan: true` alongside
+   *   `'minimal'` is a config error.
+   *
+   * Security layers (permission mode, sandbox, taint, Rule-of-Two) are
+   * deliberately NOT touched by the preset. Known limitation: the
+   * code-mode API projection covers eager tools only, so a
+   * defer-heavy minimal agent projects a near-empty `code_search`
+   * surface (documented in the tools guide).
+   */
+  readonly scaffold?: 'minimal' | 'full';
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
   /**
