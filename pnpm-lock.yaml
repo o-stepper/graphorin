@@ -775,6 +775,25 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/proactive:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../agent
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../core
+      '@graphorin/sessions':
+        specifier: workspace:*
+        version: link:../sessions
+      '@graphorin/triggers':
+        specifier: workspace:*
+        version: link:../triggers
+    devDependencies:
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../store-sqlite
+
   packages/protocol:
     dependencies:
       zod:

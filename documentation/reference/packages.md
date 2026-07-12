@@ -60,6 +60,7 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 |---|---|---|
 | `@graphorin/agent` | stable | Agent runtime - typed `model -> tool calls -> model` loop, streaming events, durable HITL, multi-agent handoffs, fan-out, evaluator-optimizer. |
 | `@graphorin/workflow` | stable | Durable step-graph runtime with checkpoints, `pause` / `resume`, `Dispatch`, channel kinds. |
+| `@graphorin/proactive` | stable | Proactivity layer - checklist-driven heartbeat runner and cron-leg tasks (fresh session per fire, fail-closed model pinning) emitting the typed notify / question / review / act escalation ladder. |
 
 ## Tier 6 - Standalone server + DX
 

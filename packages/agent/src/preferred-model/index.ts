@@ -35,7 +35,19 @@ const TIER_ORDER: Record<ModelHint, number> = { fast: 0, balanced: 1, smart: 2 }
 export interface PreferredModelResolution {
   readonly resolvedProvider: Provider;
   readonly resolvedModelId: string;
-  readonly source: 'prepare-step' | 'tier-map' | 'spec' | 'agent-preferred' | 'fallthrough-default';
+  readonly source:
+    | 'prepare-step'
+    | 'tier-map'
+    | 'spec'
+    | 'agent-preferred'
+    | 'fallthrough-default'
+    /**
+     * C1/C2: the run was invoked with `AgentCallOptions.pinnedProvider` -
+     * invocation-scoped intent that wins over every preference ladder
+     * and suppresses the fallback chain (fail-closed pinning for
+     * proactive fires).
+     */
+    | 'pinned';
   readonly hintApplied?: ModelHint;
   readonly fallthroughReason?:
     | 'tier-not-mapped'

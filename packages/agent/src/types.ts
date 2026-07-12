@@ -559,6 +559,17 @@ export interface AgentCallOptions<TDeps> {
    */
   readonly budget?: RunBudget;
   /**
+   * C1/C2: fail-closed per-run model pin. When set, every step of this
+   * run resolves to exactly this provider: it wins over `prepareStep`
+   * provider overrides and the whole preference ladder
+   * (`preferredModel` / tool hints / tier map), and the agent-level
+   * fallback chain is never consulted. Built for proactive fires -
+   * a heartbeat beat or cron fire must not silently escalate to a more
+   * expensive model through fallback. Not persisted in `RunState`:
+   * re-supply it when resuming a suspended run.
+   */
+  readonly pinnedProvider?: Provider;
+  /**
    * B1.5: stamp message-borne untrusted input into the run's taint
    * ledger at init (see {@link InboundTaintSeed}). No-op when the
    * agent has no `dataFlowPolicy` configured.
@@ -758,6 +769,13 @@ export interface Agent<TDeps = unknown, TOutput = string> {
   steer(message: AgentInput): void;
   followUp(message: AgentInput): void;
   abort(options?: AbortOptions): void;
+  /**
+   * C1: `true` while this instance has a run in flight (the same
+   * invariant that makes a second `run()` throw `ConcurrentRunError`).
+   * The public busy signal for proactive coordination - a heartbeat
+   * defers its beat instead of colliding with an interactive run.
+   */
+  isBusy(): boolean;
   toTool(options?: AgentToToolOptions): Tool<{ readonly input: string }, TOutput, TDeps>;
   compact(options?: CompactOptions): Promise<CompactionApiResult>;
   /**

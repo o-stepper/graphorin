@@ -1,0 +1,69 @@
+{
+  "name": "@graphorin/proactive",
+  "version": "0.8.0",
+  "description": "Proactivity layer for the Graphorin framework: heartbeat runner (checklist-driven periodic agent beats with sentinel suppression, busy-deferral via Agent.isBusy(), active-hours windows and per-beat budget/model pinning) and a cron-leg task runner (fresh session per fire over durable triggers, fail-closed model pinning, deterministic no-recursive-scheduling guard) emitting the typed notify/question/review/act escalation ladder.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/proactive",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/proactive"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "proactive",
+    "heartbeat",
+    "cron",
+    "escalation",
+    "background-tasks"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/core": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/triggers": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite": "workspace:*"
+  }
+}

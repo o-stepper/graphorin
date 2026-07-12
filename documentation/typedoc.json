@@ -18,6 +18,7 @@
     "../packages/embedder-ollama",
     "../packages/store-sqlite",
     "../packages/triggers",
+    "../packages/proactive",
     "../packages/security",
     "../packages/observability",
     "../packages/pricing",

@@ -539,6 +539,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       promotedDeferred,
       runStartPromotions,
       activeRunCapability,
+      ...(options.pinnedProvider !== undefined ? { pinnedProvider: options.pinnedProvider } : {}),
       executorBridgeSlot,
       pendingManualCompacts,
       getPendingAbort: () => pendingAbort,
@@ -1010,6 +1011,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     steer,
     followUp,
     abort,
+    // C1: the public busy signal - same invariant that makes a second
+    // run() throw ConcurrentRunError. Proactive coordination reads it
+    // to defer a beat instead of colliding with an interactive run.
+    isBusy: () => runInFlight,
     toTool,
     compact,
     fanOut,

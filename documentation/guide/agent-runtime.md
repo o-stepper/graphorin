@@ -346,6 +346,10 @@ The proactive primitives compose with this: heartbeat `profile.budgetUsd` and th
 
 An `Agent` instance carries exactly **one in-flight run**: `steer`, `followUp`, `abort`, and `compact` all address "the run" without a run handle, so two overlapping runs on the same instance would share the abort controller, steer queue, and executor bridge. Starting a second `run()` / `stream()` while one is active rejects with `ConcurrentRunError` (`code: 'concurrent-run'`). For parallel work, create separate `createAgent(...)` instances (or use [`agent.fanOut(...)`](#multi-agent)). Run-scoped state is reset at every run boundary - a `steer()` issued after a run has ended belongs to no run and is dropped rather than leaking into the next one.
 
+`agent.isBusy()` is the public read of this invariant: `true` while a run is in flight on the instance. Proactive coordination consumes it - a heartbeat defers its beat instead of colliding with an interactive run (see the [proactivity guide](/guide/proactivity)).
+
+Related per-invocation control: `agent.run(input, { pinnedProvider })` pins **every step** of that run to exactly the supplied provider - it wins over `prepareStep` overrides and the whole preference ladder, and the fallback chain is never consulted. Built for proactive fires, where a beat must not silently escalate to a more expensive model through fallback.
+
 `followUp(message)` is the exception by design: it queues **next-turn metadata**. The queued message does not touch the in-flight run (which still ends with its own terminal status); instead it rides into the next fresh `run()` / `stream()` as a leading user turn, before that call's own input. Resumed runs leave the queue intact.
 
 ## Reasoning preservation
