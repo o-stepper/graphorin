@@ -10,7 +10,7 @@
 function _resetLibModeWarningForTesting(): void;
 ```
 
-Defined in: [packages/triggers/src/index.ts:241](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L241)
+Defined in: [packages/triggers/src/index.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L278)
 
 **`Internal`**
 

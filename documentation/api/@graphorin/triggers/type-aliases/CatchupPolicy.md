@@ -10,7 +10,7 @@
 type CatchupPolicy = "none" | "last" | "all";
 ```
 
-Defined in: [packages/triggers/src/index.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L28)
+Defined in: [packages/triggers/src/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L40)
 
 Catch-up policy applied when a trigger missed one or more fires
 while the scheduler was offline.

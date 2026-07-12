@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:502](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L502)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:509](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L509)
 
 Optional consolidator-state surface every storage adapter exposes
 for Phase 10c. Mirrors the `consolidator_state`,
@@ -30,7 +30,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:512](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L512)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:519](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L519)
 
 Atomically claim the per-scope lock. Returns `true` when the
 row was either unlocked, owned by `runId`, or stale (the held
@@ -62,7 +62,7 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:540](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L540)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:547](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L547)
 
 Claim every DLQ row whose `nextRetryAt` is at or before `now`,
 up to `limit`. Returns the rows in failed-at order so the
@@ -88,7 +88,7 @@ oldest backlog drains first.
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:534](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L534)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:541](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L541)
 
 #### Parameters
 
@@ -110,7 +110,7 @@ getState(scope): Promise<
 | null>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:503](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L503)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:510](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L510)
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:503](https://github
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:563](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L563)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:570](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L570)
 
 #### Parameters
 
@@ -163,7 +163,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:517](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L517)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:524](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L524)
 
 #### Parameters
 
@@ -197,7 +197,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:562](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L562)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:569](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L569)
 
 Mark the row exhausted (`retryCount` exceeded the configured
 cap). The row stays in the DLQ for operator inspection.
@@ -227,7 +227,7 @@ exhaustion.
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:546](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L546)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:553](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L553)
 
 Mark the row succeeded - removes it from the DLQ.
 
@@ -249,7 +249,7 @@ Mark the row succeeded - removes it from the DLQ.
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:516](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L516)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:523](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L523)
 
 #### Parameters
 
@@ -269,7 +269,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:516](https://github
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:515](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L515)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:522](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L522)
 
 #### Parameters
 
@@ -289,7 +289,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:515](https://github
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:513](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L513)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:520](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L520)
 
 #### Parameters
 
@@ -313,7 +313,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:552](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L552)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:559](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L559)
 
 Schedule the next retry attempt. The caller computes
 `nextRetryAt` so the backoff schedule is centralized in the
@@ -339,7 +339,7 @@ consolidator.
 upsertState(scope, patch): Promise<ConsolidatorStateRow>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:504](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L504)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:511](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L511)
 
 #### Parameters
 

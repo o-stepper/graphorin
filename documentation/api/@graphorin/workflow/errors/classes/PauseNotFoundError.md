@@ -6,7 +6,7 @@
 
 # Class: PauseNotFoundError
 
-Defined in: [packages/workflow/src/errors/index.ts:273](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L273)
+Defined in: [packages/workflow/src/errors/index.ts:274](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L274)
 
 Thrown by `resolveAwakeable` / `approve` (D1) when no pending pause
 carries the requested name.
@@ -23,7 +23,7 @@ carries the requested name.
 new PauseNotFoundError(threadId, pauseName): PauseNotFoundError;
 ```
 
-Defined in: [packages/workflow/src/errors/index.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L277)
+Defined in: [packages/workflow/src/errors/index.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L278)
 
 #### Parameters
 
@@ -44,14 +44,14 @@ Defined in: [packages/workflow/src/errors/index.ts:277](https://github.com/o-ste
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | [packages/workflow/src/errors/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L47) |
-| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | [packages/workflow/src/errors/index.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L46) |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | [packages/workflow/src/errors/index.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L48) |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | [packages/workflow/src/errors/index.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L48) |
+| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | [packages/workflow/src/errors/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L47) |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | [packages/workflow/src/errors/index.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L49) |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`message`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-message) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`name`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-name) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1076) |
-| <a id="property-pausename"></a> `pauseName` | `readonly` | `string` | - | - | [packages/workflow/src/errors/index.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L275) |
+| <a id="property-pausename"></a> `pauseName` | `readonly` | `string` | - | - | [packages/workflow/src/errors/index.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L276) |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`stack`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-stack) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | - | - | [packages/workflow/src/errors/index.ts:274](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L274) |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | - | - | [packages/workflow/src/errors/index.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L275) |
 | <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`stackTraceLimit`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-stacktracelimit) | [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L68) |
 
 ## Methods

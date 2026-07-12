@@ -31,6 +31,26 @@ Defined in: [packages/server/src/consolidator/daemon.ts:28](https://github.com/o
 
 ***
 
+### notifyActivity()?
+
+```ts
+optional notifyActivity(): Promise<unknown>;
+```
+
+Defined in: [packages/server/src/consolidator/daemon.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L44)
+
+A2 (item 7): activity signal - a tracked run settled, the
+transcript may have grown. The server's run tracker calls this so
+a configured `buffer:N` trigger is re-evaluated against the
+unconsolidated tail. Optional: older consolidator surfaces simply
+opt out.
+
+#### Returns
+
+`Promise`\&lt;`unknown`\&gt;
+
+***
+
 ### pause()?
 
 ```ts

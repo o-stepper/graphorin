@@ -10,7 +10,7 @@
 type ConsolidatorTier = "free" | "cheap" | "standard" | "full" | "custom";
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L43)
+Defined in: [packages/memory/src/consolidator/types.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L44)
 
 Tier preset that selects a consolidator behaviour bundle. The
 `'free'` preset is the default per DEC-144 / ADR-038 - no LLM call

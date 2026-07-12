@@ -6,7 +6,7 @@
 
 # Interface: TriggersDaemon
 
-Defined in: [packages/server/src/triggers/daemon.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L67)
+Defined in: [packages/server/src/triggers/daemon.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L72)
 
 Stateful handle returned by [createTriggersDaemon](/api/@graphorin/server/functions/createTriggersDaemon.md). The
 `start()` / `stop()` methods are wired into
@@ -18,7 +18,7 @@ Stateful handle returned by [createTriggersDaemon](/api/@graphorin/server/functi
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-scheduler"></a> `scheduler` | `readonly` | [`Scheduler`](/api/@graphorin/triggers/interfaces/Scheduler.md) | [packages/server/src/triggers/daemon.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L72) |
+| <a id="property-scheduler"></a> `scheduler` | `readonly` | [`Scheduler`](/api/@graphorin/triggers/interfaces/Scheduler.md) | [packages/server/src/triggers/daemon.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L77) |
 
 ## Methods
 
@@ -28,7 +28,7 @@ Stateful handle returned by [createTriggersDaemon](/api/@graphorin/server/functi
 metrics(): TriggersDaemonMetrics;
 ```
 
-Defined in: [packages/server/src/triggers/daemon.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L71)
+Defined in: [packages/server/src/triggers/daemon.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L76)
 
 #### Returns
 
@@ -42,7 +42,7 @@ Defined in: [packages/server/src/triggers/daemon.ts:71](https://github.com/o-ste
 start(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/triggers/daemon.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L68)
+Defined in: [packages/server/src/triggers/daemon.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L73)
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: [packages/server/src/triggers/daemon.ts:68](https://github.com/o-ste
 status(): Promise<TriggersDaemonStatus>;
 ```
 
-Defined in: [packages/server/src/triggers/daemon.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L70)
+Defined in: [packages/server/src/triggers/daemon.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L75)
 
 #### Returns
 
@@ -70,7 +70,7 @@ Defined in: [packages/server/src/triggers/daemon.ts:70](https://github.com/o-ste
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/triggers/daemon.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L69)
+Defined in: [packages/server/src/triggers/daemon.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L74)
 
 #### Returns
 

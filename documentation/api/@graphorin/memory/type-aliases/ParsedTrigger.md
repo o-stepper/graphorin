@@ -32,6 +32,11 @@ type ParsedTrigger =
   kind: "budget";
   raw: string;
   threshold: number;
+}
+  | {
+  kind: "buffer";
+  raw: string;
+  tokens: number;
 };
 ```
 
@@ -41,5 +46,84 @@ Parsed trigger declaration. The `kind` discriminator drives the
 runtime dispatch; the `value` carries the spec-specific argument
 already converted to a `number` (turns / millis / threshold) or a
 string (cron expr / event name).
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  count: number;
+  kind: "turn";
+  raw: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  idleMs: number;
+  kind: "idle";
+  raw: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  expression: string;
+  kind: "cron";
+  raw: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "event";
+  name: string;
+  raw: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "budget";
+  raw: string;
+  threshold: number;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "buffer";
+  raw: string;
+  tokens: number;
+}
+```
+
+Item 7 (A2): fire when the unconsolidated transcript tail (from
+the standard-phase cursor) reaches `tokens` tokens (chars/4 proxy,
+same measure as the W-081 transcript budget). Evaluated on
+activity signals via `Consolidator.notifyActivity(...)` - the
+scheduler cannot measure the tail on its own. Not to be confused
+with `budget:F`, which is a spent-budget fraction.
 
 ## Stable

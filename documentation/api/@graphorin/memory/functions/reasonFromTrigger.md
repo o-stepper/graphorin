@@ -10,7 +10,7 @@
 function reasonFromTrigger(trigger): ConsolidatorTriggerReason;
 ```
 
-Defined in: [packages/memory/src/consolidator/triggers.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/triggers.ts#L106)
+Defined in: [packages/memory/src/consolidator/triggers.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/triggers.ts#L124)
 
 Build a [ConsolidatorTriggerReason](/api/@graphorin/memory/interfaces/ConsolidatorTriggerReason.md) from a parsed trigger.
 

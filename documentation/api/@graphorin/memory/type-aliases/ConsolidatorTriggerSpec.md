@@ -12,7 +12,8 @@ type ConsolidatorTriggerSpec =
   | `idle:${string}`
   | `cron:${string}`
   | `event:${string}`
-  | `budget:${number}`;
+  | `budget:${number}`
+  | `buffer:${number}`;
 ```
 
 Defined in: [packages/memory/src/consolidator/types.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L29)

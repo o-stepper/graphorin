@@ -34,7 +34,12 @@ function captureStderr(): { readonly lines: string[]; restore: () => void } {
     lines.push(String(chunk));
     return true;
   }) as typeof process.stderr.write;
-  return { lines, restore: () => void (process.stderr.write = original) };
+  return {
+    lines,
+    restore: () => {
+      process.stderr.write = original;
+    },
+  };
 }
 
 let active: GraphorinServer | undefined;

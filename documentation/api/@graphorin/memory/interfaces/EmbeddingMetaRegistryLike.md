@@ -22,7 +22,7 @@ works.
 assertKnown(id): void;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:260](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L260)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:267](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L267)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:260](https://github
 get(id): unknown;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:259](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L259)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:266](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L266)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ listActive(): readonly {
 }[];
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:263](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L263)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:270](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L270)
 
 #### Returns
 
@@ -85,7 +85,7 @@ listAll(): readonly {
 }[];
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:262](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L262)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:269](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L269)
 
 #### Returns
 
@@ -108,16 +108,17 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:250](https://github
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | \{ `configHash`: `string`; `dim`: `number`; `distanceMetric?`: `"cosine"` \| `"dot"` \| `"euclidean"`; `embedderKind`: `string`; `id`: `string`; `model`: `string`; `notes?`: `string` \| `null`; \} |
-| `input.configHash` | `string` |
-| `input.dim` | `number` |
-| `input.distanceMetric?` | `"cosine"` \| `"dot"` \| `"euclidean"` |
-| `input.embedderKind` | `string` |
-| `input.id` | `string` |
-| `input.model` | `string` |
-| `input.notes?` | `string` \| `null` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | \{ `configHash`: `string`; `dim`: `number`; `distanceMetric?`: `"cosine"` \| `"dot"` \| `"euclidean"`; `embedderKind`: `string`; `id`: `string`; `indexMode?`: `string` \| `null`; `model`: `string`; `notes?`: `string` \| `null`; \} | - |
+| `input.configHash` | `string` | - |
+| `input.dim` | `number` | - |
+| `input.distanceMetric?` | `"cosine"` \| `"dot"` \| `"euclidean"` | - |
+| `input.embedderKind` | `string` | - |
+| `input.id` | `string` | - |
+| `input.indexMode?` | `string` \| `null` | Write-path contextualization recipe (item 10 step 1) - joins the index version key so a `contextualRetrieval` switch invalidates the index like a model change. Optional-additive: registries predating the field ignore it. |
+| `input.model` | `string` | - |
+| `input.notes?` | `string` \| `null` | - |
 
 #### Returns
 
@@ -129,7 +130,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:250](https://github
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `id` | `string` | [packages/memory/src/internal/storage-adapter.ts:258](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L258) |
+| `id` | `string` | [packages/memory/src/internal/storage-adapter.ts:265](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L265) |
 
 ***
 
@@ -139,7 +140,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:250](https://github
 retire(id, retiredAt?): void;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:261](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L261)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L268)
 
 #### Parameters
 

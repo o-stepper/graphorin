@@ -3309,6 +3309,10 @@
             "collapsed": true,
             "items": [
               {
+                "text": "isValidTimeZone",
+                "link": "/api/@graphorin/triggers/cron/functions/isValidTimeZone.md"
+              },
+              {
                 "text": "nextFireAfter",
                 "link": "/api/@graphorin/triggers/cron/functions/nextFireAfter.md"
               },

@@ -6,7 +6,7 @@
 
 # Interface: Scheduler
 
-Defined in: [packages/triggers/src/index.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L204)
+Defined in: [packages/triggers/src/index.ts:234](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L234)
 
 Public Scheduler surface.
 
@@ -20,7 +20,7 @@ Public Scheduler surface.
 emit(eventName, payload?): Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L211)
+Defined in: [packages/triggers/src/index.ts:241](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L241)
 
 Emit `eventName` to every registered `event` trigger.
 
@@ -43,7 +43,7 @@ Emit `eventName` to every registered `event` trigger.
 events(): AsyncIterable<SchedulerEvent>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L222)
+Defined in: [packages/triggers/src/index.ts:252](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L252)
 
 AsyncIterable lifecycle event stream.
 
@@ -59,7 +59,7 @@ AsyncIterable lifecycle event stream.
 fire(id, payload?): Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L213)
+Defined in: [packages/triggers/src/index.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L243)
 
 Manually fire `id` (used by `graphorin triggers fire`, Phase 15).
 
@@ -82,7 +82,26 @@ Manually fire `id` (used by `graphorin triggers fire`, Phase 15).
 list(): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:207](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L207)
+Defined in: [packages/triggers/src/index.ts:237](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L237)
+
+#### Returns
+
+`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
+
+***
+
+### orphans()
+
+```ts
+orphans(): Promise<readonly TriggerState[]>;
+```
+
+Defined in: [packages/triggers/src/index.ts:261](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L261)
+
+Persisted trigger rows with no live declaration in this process
+(W-123). These never fire: the callback only exists in memory, so
+a row survives only as dead weight until the declaration is
+re-registered or the row is pruned.
 
 #### Returns
 
@@ -96,7 +115,7 @@ Defined in: [packages/triggers/src/index.ts:207](https://github.com/o-stepper/gr
 recordActivity(): void;
 ```
 
-Defined in: [packages/triggers/src/index.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L224)
+Defined in: [packages/triggers/src/index.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L254)
 
 Notify the scheduler that the user / runtime is no longer idle.
 
@@ -112,7 +131,7 @@ Notify the scheduler that the user / runtime is no longer idle.
 register(declaration): Promise<TriggerState>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L205)
+Defined in: [packages/triggers/src/index.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L235)
 
 #### Parameters
 
@@ -132,7 +151,7 @@ Defined in: [packages/triggers/src/index.ts:205](https://github.com/o-stepper/gr
 setDisabled(id, disabled): Promise<TriggerState>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L220)
+Defined in: [packages/triggers/src/index.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L250)
 
 Flip the persistent `disabled` flag (IP-17). Disabling cancels the
 armed timer but keeps the trigger registered + persisted; enabling
@@ -158,7 +177,7 @@ removal is `unregister(...)`.
 start(): Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L208)
+Defined in: [packages/triggers/src/index.ts:238](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L238)
 
 #### Returns
 
@@ -172,7 +191,7 @@ Defined in: [packages/triggers/src/index.ts:208](https://github.com/o-stepper/gr
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:209](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L209)
+Defined in: [packages/triggers/src/index.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L239)
 
 #### Returns
 
@@ -186,7 +205,7 @@ Defined in: [packages/triggers/src/index.ts:209](https://github.com/o-stepper/gr
 unregister(id): Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L206)
+Defined in: [packages/triggers/src/index.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L236)
 
 #### Parameters
 

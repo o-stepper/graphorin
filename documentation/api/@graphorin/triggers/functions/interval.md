@@ -14,7 +14,7 @@ function interval(
    options?): TriggerDeclaration;
 ```
 
-Defined in: [packages/triggers/src/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L95)
+Defined in: [packages/triggers/src/index.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L119)
 
 ## Parameters
 

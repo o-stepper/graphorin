@@ -10,7 +10,7 @@
 const CHECKPOINT_SCHEMA_VERSION: "graphorin-workflow-checkpoint/1.0";
 ```
 
-Defined in: [packages/workflow/src/internal/engine.ts:2302](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/internal/engine.ts#L2302)
+Defined in: [packages/workflow/src/internal/engine.ts:2349](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/internal/engine.ts#L2349)
 
 Schema version embedded in every persisted checkpoint envelope.
 Bumping the major part requires a documented migration path; the
