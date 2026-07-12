@@ -118,12 +118,13 @@ export interface MemoryMigrateOptions extends MemoryCommonOptions {
   readonly to: string;
   readonly strategy: 'lock-on-first' | 'auto-migrate' | 'multi-active';
   /**
-   * Path to a JS module exporting an `embedders` object:
-   * `{ <id>: () => EmbedderProvider | Promise<EmbedderProvider> }`,
-   * keyed by canonical embedder id. The CLI imports this module so it
-   * can construct the source / target embedder instances the runner
-   * needs (DEC-154: the framework never downloads models implicitly).
-   * Without the module the command exits `2` with a pointer.
+   * Path to a JS module exporting an `embedders` object keyed by
+   * canonical embedder id, each value a zero-arg factory returning an
+   * `EmbedderProvider` (sync or promise). The CLI imports this module
+   * so it can construct the source / target embedder instances the
+   * runner needs (DEC-154: the framework never downloads models
+   * implicitly). Without the module the command exits `2` with a
+   * pointer.
    */
   readonly embeddersModule?: string;
   /** Rows per re-embed batch (wave-D D5). Default `512`. */

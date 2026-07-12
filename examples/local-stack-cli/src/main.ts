@@ -35,6 +35,7 @@ import {
   defineAutoRecallStrategy,
   defineBlock,
   type Memory,
+  verdictIngestGate,
 } from '@graphorin/memory';
 import { createProvider, ollamaAdapter } from '@graphorin/provider';
 import { JsTiktokenCounter } from '@graphorin/provider/counters';
@@ -313,6 +314,10 @@ export async function createAssistant(options: AssistantOptions = {}): Promise<A
     store: store.memory,
     embeddings: store.embeddings,
     ...(embedder !== null ? { embedder } : {}),
+    // Wave-D D4: auto-promotion is fail-closed on the B3 admission gate -
+    // the canonical verdict gate keeps guardrail-blocked turns out of
+    // extraction, which is what makes `autoPromoteExtraction` acceptable.
+    ingestGate: verdictIngestGate,
     workingBlocks: [
       defineBlock({
         label: 'persona',

@@ -13,17 +13,37 @@ takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) bu
 surface (per-tier ACL, scope resolver, etc.) without rebuilding the
 underlying memory facade.
 
+Wave-D D3 adds tool PROFILES: `'full'` (the canonical stable-order
+set), `'interactive'` (read-only - the front-line conversational
+agent cannot write memory by construction; curation belongs to the
+reviser), and `'reviser'` (the full read+write surface, semantically
+reserved for the sleep-time curation agent). The single-writer split
+mirrors the channels-wave discipline: interactive agents observe,
+the reviser mutates.
+
 ## Interfaces
 
 | Interface | Description |
 | ------ | ------ |
 | [BuildMemoryToolsOptions](/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md) | Options for [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md). |
 
+## Type Aliases
+
+| Type Alias | Description |
+| ------ | ------ |
+| [MemoryToolProfile](/api/@graphorin/memory/tools/type-aliases/MemoryToolProfile.md) | Memory tool profile (wave-D D3): which slice of the canonical set an agent receives. `'interactive'` is read-only by construction. |
+
+## Variables
+
+| Variable | Description |
+| ------ | ------ |
+| [MEMORY\_TOOL\_PROFILES](/api/@graphorin/memory/tools/variables/MEMORY_TOOL_PROFILES.md) | The valid profile values (runtime validation source). |
+
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
-| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical eleven-memory-tool array. Order is stable - consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended as a twelfth, after the stable eleven. |
+| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical memory-tool array for a profile. Order is stable for `'full'` / `'reviser'` - consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended after the stable eleven; `runbook_search` after it. Both gated appendices are reads, so they appear in every profile. |
 | [createRunbookSearchTool](/api/@graphorin/memory/tools/functions/createRunbookSearchTool.md) | `runbook_search` - find validated procedures matching a task description. Quarantined (unvalidated induced) procedures never surface here: they must not drive actions until validated. |
 
 ## References

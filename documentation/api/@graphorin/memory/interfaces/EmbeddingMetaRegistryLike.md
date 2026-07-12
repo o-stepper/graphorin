@@ -6,7 +6,7 @@
 
 # Interface: EmbeddingMetaRegistryLike
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:257](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L257)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:292](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L292)
 
 Optional extension surface for storage adapters' embedder registry.
 The interface is structural so any adapter that matches the shape
@@ -22,7 +22,7 @@ works.
 assertKnown(id): void;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L275)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:310](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L310)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:275](https://github
 get(id): unknown;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:274](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L274)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:309](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L309)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ listActive(): readonly {
 }[];
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L278)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:313](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L313)
 
 #### Returns
 
@@ -85,7 +85,7 @@ listAll(): readonly {
 }[];
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L277)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:312](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L312)
 
 #### Returns
 
@@ -104,7 +104,7 @@ registerOrReturn(input): {
 };
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:258](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L258)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:293](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L293)
 
 #### Parameters
 
@@ -130,7 +130,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:258](https://github
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `id` | `string` | [packages/memory/src/internal/storage-adapter.ts:273](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L273) |
+| `id` | `string` | [packages/memory/src/internal/storage-adapter.ts:308](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L308) |
 
 ***
 
@@ -140,7 +140,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:258](https://github
 retire(id, retiredAt?): void;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L276)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:311](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L311)
 
 #### Parameters
 

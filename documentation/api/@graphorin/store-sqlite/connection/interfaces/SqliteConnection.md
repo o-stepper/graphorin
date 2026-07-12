@@ -22,6 +22,7 @@ concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/conne
 | <a id="property-encrypted"></a> `encrypted` | `readonly` | `boolean` | Whether the connection is encryption-enabled. | [packages/store-sqlite/src/connection.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L33) |
 | <a id="property-inmemory"></a> `inMemory` | `readonly` | `boolean` | Whether the connection wraps a `:memory:` database. | [packages/store-sqlite/src/connection.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L35) |
 | <a id="property-path"></a> `path` | `readonly` | `string` | Path to the underlying database file (`':memory:'` for in-memory). | [packages/store-sqlite/src/connection.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L31) |
+| <a id="property-vectorsearchmode"></a> `vectorSearchMode?` | `readonly` | `"vec0"` \| `"linear-fallback"` \| `"disabled"` | How vector sidecars are served (wave-D D5): `'vec0'` (sqlite-vec loaded), `'linear-fallback'` (plain tables + in-process cosine scan), or `'disabled'` (`skipSqliteVec`). Optional so existing structural stubs keep compiling; absent reads as `'vec0'`. | [packages/store-sqlite/src/connection.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L42) |
 
 ## Methods
 
@@ -31,7 +32,7 @@ concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/conne
 all<T>(query, params?): T[];
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L41)
+Defined in: [packages/store-sqlite/src/connection.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L48)
 
 #### Type Parameters
 
@@ -58,7 +59,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:41](https://github.com/o-st
 close(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L44)
+Defined in: [packages/store-sqlite/src/connection.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L51)
 
 #### Returns
 
@@ -72,7 +73,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:44](https://github.com/o-st
 exec(query): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L37)
+Defined in: [packages/store-sqlite/src/connection.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L44)
 
 #### Parameters
 
@@ -92,7 +93,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:37](https://github.com/o-st
 execMany(sql): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L38)
+Defined in: [packages/store-sqlite/src/connection.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L45)
 
 #### Parameters
 
@@ -112,7 +113,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:38](https://github.com/o-st
 get<T>(query, params?): T | undefined;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L40)
+Defined in: [packages/store-sqlite/src/connection.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L47)
 
 #### Type Parameters
 
@@ -139,7 +140,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:40](https://github.com/o-st
 pragma(query, options?): unknown;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L36)
+Defined in: [packages/store-sqlite/src/connection.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L43)
 
 #### Parameters
 
@@ -161,7 +162,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:36](https://github.com/o-st
 prepare(query): BetterSqlite3Statement;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L42)
+Defined in: [packages/store-sqlite/src/connection.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L49)
 
 #### Parameters
 
@@ -181,7 +182,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:42](https://github.com/o-st
 raw(): BetterSqlite3Database;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L46)
+Defined in: [packages/store-sqlite/src/connection.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L53)
 
 Returns the underlying `better-sqlite3` handle. Escape hatch only.
 
@@ -199,7 +200,7 @@ run(query, params?): {
 };
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L39)
+Defined in: [packages/store-sqlite/src/connection.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L46)
 
 #### Parameters
 
@@ -218,7 +219,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:39](https://github.com/o-st
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `changes` | `number` | [packages/store-sqlite/src/connection.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L39) |
+| `changes` | `number` | [packages/store-sqlite/src/connection.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L46) |
 
 ***
 
@@ -228,7 +229,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:39](https://github.com/o-st
 transaction<T>(fn): T;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L43)
+Defined in: [packages/store-sqlite/src/connection.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L50)
 
 #### Type Parameters
 

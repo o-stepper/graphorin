@@ -10,7 +10,7 @@
 function verdictIngestGate(record): boolean;
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L44)
+Defined in: [packages/memory/src/consolidator/types.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L50)
 
 The canonical verdict-driven ingest gate: excludes turns whose
 persisted [SessionMessageRecord.verdict](/api/@graphorin/memory/interfaces/SessionMessageRecord.md#property-verdict) says an input/output

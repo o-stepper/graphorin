@@ -17,7 +17,7 @@ type VerifierResult =
 };
 ```
 
-Defined in: [packages/agent/src/types.ts:414](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L414)
+Defined in: [packages/agent/src/types.ts:436](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L436)
 
 Outcome of one [ResponseVerifier](/api/@graphorin/agent/interfaces/ResponseVerifier.md) check (C3).
 

@@ -6,7 +6,7 @@
 
 # Interface: SessionMessagePushOptions
 
-Defined in: [packages/core/src/contracts/memory-store.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L119)
+Defined in: [packages/core/src/contracts/memory-store.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L128)
 
 B3 (item 15): optional per-message write metadata. `verdict` is the
 turn's security verdict from the run loop's commit gates
@@ -21,4 +21,4 @@ scope?)`); widen-only semantics like `ToolReturn.taint`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-verdict"></a> `verdict?` | `readonly` | [`RunTurnVerdict`](/api/@graphorin/core/interfaces/RunTurnVerdict.md) | [packages/core/src/contracts/memory-store.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L120) |
+| <a id="property-verdict"></a> `verdict?` | `readonly` | [`RunTurnVerdict`](/api/@graphorin/core/interfaces/RunTurnVerdict.md) | [packages/core/src/contracts/memory-store.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L129) |

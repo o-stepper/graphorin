@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorTriggerReason
 
-Defined in: [packages/memory/src/consolidator/types.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L81)
+Defined in: [packages/memory/src/consolidator/types.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L87)
 
 Triggering reason surfaced through `Consolidator.trigger(...)`.
 
@@ -16,5 +16,5 @@ Triggering reason surfaced through `Consolidator.trigger(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"buffer"` \| `"manual"` | [packages/memory/src/consolidator/types.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L82) |
-| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | [packages/memory/src/consolidator/types.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L83) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"buffer"` \| `"manual"` | [packages/memory/src/consolidator/types.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L88) |
+| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | [packages/memory/src/consolidator/types.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L89) |

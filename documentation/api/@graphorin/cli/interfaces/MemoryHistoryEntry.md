@@ -6,7 +6,7 @@
 
 # Interface: MemoryHistoryEntry
 
-Defined in: [packages/cli/src/commands/memory.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L222)
+Defined in: [packages/cli/src/commands/memory.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L340)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: [packages/cli/src/commands/memory.ts:222](https://github.com/o-stepp
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L225) |
-| <a id="property-event"></a> `event` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:223](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L223) |
-| <a id="property-source"></a> `source` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L224) |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:343](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L343) |
+| <a id="property-event"></a> `event` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:341](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L341) |
+| <a id="property-source"></a> `source` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:342](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L342) |

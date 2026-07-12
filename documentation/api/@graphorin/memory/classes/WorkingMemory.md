@@ -86,7 +86,7 @@ attach(
 agentId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L222)
+Defined in: [packages/memory/src/tiers/working-memory.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L251)
 
 Attach a working block to an additional agent. Backed by the
 adapter's `shared.attach(...)` join table so multi-agent crews
@@ -112,7 +112,7 @@ can share the same block without duplicating storage.
 compile(scope, agentId?): Promise<string>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:265](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L265)
+Defined in: [packages/memory/src/tiers/working-memory.ts:294](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L294)
 
 Render a deterministic `<memory_blocks>` XML fragment for the
 supplied scope. The full layered system prompt (six layers) is
@@ -208,7 +208,7 @@ detach(
 agentId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L239)
+Defined in: [packages/memory/src/tiers/working-memory.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L268)
 
 Detach a working block from an agent.
 
@@ -272,6 +272,36 @@ List active (non-deleted) blocks for the supplied scope.
 #### Returns
 
 `Promise`\&lt;readonly [`Block`](/api/@graphorin/core/interfaces/Block.md)[]\&gt;
+
+***
+
+### purge()
+
+```ts
+purge(scope, label): Promise<void>;
+```
+
+Defined in: [packages/memory/src/tiers/working-memory.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L227)
+
+Hard-delete a block (wave-D D2, GDPR path). Unlike [forget](/api/@graphorin/memory/classes/WorkingMemory.md#forget)
+(soft tombstone), the stored value is gone. This is the erasure
+surface for USER-scoped blocks (e.g. the `profile` projection): the
+session-delete cascade never reaches rows without a session id, so
+user-level erasure must call this explicitly. Throws when the
+storage adapter does not implement the optional
+`WorkingMemoryStoreExt.purge` - a silent soft-delete fallback would
+misreport erasure.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `label` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
 
 ***
 

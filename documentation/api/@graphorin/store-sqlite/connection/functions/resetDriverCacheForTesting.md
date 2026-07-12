@@ -10,7 +10,7 @@
 function _resetDriverCacheForTesting(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L165)
+Defined in: [packages/store-sqlite/src/connection.ts:185](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L185)
 
 **`Internal`**
 

@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L124)
+Defined in: [packages/core/src/contracts/memory-store.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L133)
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:124](https://github.com
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L130)
+Defined in: [packages/core/src/contracts/memory-store.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L139)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:130](https://github.com
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L135)
+Defined in: [packages/core/src/contracts/memory-store.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L144)
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -70,7 +70,7 @@ push(
 options?): Promise<MessageRef>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L125)
+Defined in: [packages/core/src/contracts/memory-store.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L134)
 
 #### Parameters
 
@@ -95,7 +95,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L150)
+Defined in: [packages/core/src/contracts/memory-store.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L159)
 
 Full-text search over the scoped session messages.
 

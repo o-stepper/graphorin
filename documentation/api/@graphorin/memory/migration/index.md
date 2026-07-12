@@ -32,3 +32,21 @@ Re-exports [MigrateEmbedderOptions](/api/@graphorin/memory/interfaces/MigrateEmb
 ### MigrationProgress
 
 Re-exports [MigrationProgress](/api/@graphorin/memory/interfaces/MigrationProgress.md)
+
+***
+
+### MigrationRow
+
+Re-exports [MigrationRow](/api/@graphorin/memory/interfaces/MigrationRow.md)
+
+***
+
+### MigrationStateStoreLike
+
+Re-exports [MigrationStateStoreLike](/api/@graphorin/memory/interfaces/MigrationStateStoreLike.md)
+
+***
+
+### NextBatchHook
+
+Re-exports [NextBatchHook](/api/@graphorin/memory/type-aliases/NextBatchHook.md)

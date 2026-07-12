@@ -10,6 +10,12 @@ Barrel export for every shipped scorer family.
 
 ## References
 
+### anyMatch
+
+Re-exports [anyMatch](/api/@graphorin/evals/functions/anyMatch.md)
+
+***
+
 ### argumentValidity
 
 Re-exports [argumentValidity](/api/@graphorin/evals/functions/argumentValidity.md)
@@ -100,6 +106,60 @@ Re-exports [LlmJudgeOptions](/api/@graphorin/evals/interfaces/LlmJudgeOptions.md
 
 ***
 
+### memoryExtractionPrecision
+
+Re-exports [memoryExtractionPrecision](/api/@graphorin/evals/functions/memoryExtractionPrecision.md)
+
+***
+
+### memoryExtractionRecall
+
+Re-exports [memoryExtractionRecall](/api/@graphorin/evals/functions/memoryExtractionRecall.md)
+
+***
+
+### MemoryPointMatcher
+
+Re-exports [MemoryPointMatcher](/api/@graphorin/evals/type-aliases/MemoryPointMatcher.md)
+
+***
+
+### MemoryPointScorerOptions
+
+Re-exports [MemoryPointScorerOptions](/api/@graphorin/evals/interfaces/MemoryPointScorerOptions.md)
+
+***
+
+### memoryPointTokens
+
+Re-exports [memoryPointTokens](/api/@graphorin/evals/functions/memoryPointTokens.md)
+
+***
+
+### memoryQaHallucination
+
+Re-exports [memoryQaHallucination](/api/@graphorin/evals/functions/memoryQaHallucination.md)
+
+***
+
+### MemoryQaHallucinationOptions
+
+Re-exports [MemoryQaHallucinationOptions](/api/@graphorin/evals/interfaces/MemoryQaHallucinationOptions.md)
+
+***
+
+### memoryUpdateOmission
+
+Re-exports [memoryUpdateOmission](/api/@graphorin/evals/functions/memoryUpdateOmission.md)
+
+***
+
+### MemoryUpdateOmissionOptions
+
+Re-exports [MemoryUpdateOmissionOptions](/api/@graphorin/evals/interfaces/MemoryUpdateOmissionOptions.md)
+
+***
+
 ### parseScore
 
 Re-exports [parseScore](/api/@graphorin/evals/functions/parseScore.md)
@@ -163,6 +223,18 @@ Re-exports [RegexMatchOptions](/api/@graphorin/evals/interfaces/RegexMatchOption
 ### scoreContract
 
 Re-exports [scoreContract](/api/@graphorin/evals/functions/scoreContract.md)
+
+***
+
+### tokenF1
+
+Re-exports [tokenF1](/api/@graphorin/evals/functions/tokenF1.md)
+
+***
+
+### tokenF1Matcher
+
+Re-exports [tokenF1Matcher](/api/@graphorin/evals/functions/tokenF1Matcher.md)
 
 ***
 

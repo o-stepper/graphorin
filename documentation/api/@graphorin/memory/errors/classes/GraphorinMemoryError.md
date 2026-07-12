@@ -31,7 +31,9 @@ surfaced to operators (CLI command / docs link to fix the issue).
 - [`QuarantinePromotionRefusedError`](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md)
 - [`ProcedureInductionNotConfiguredError`](/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md)
 - [`BudgetExceededError`](/api/@graphorin/memory/classes/BudgetExceededError.md)
+- [`CuratedBlocksMisconfiguredError`](/api/@graphorin/memory/classes/CuratedBlocksMisconfiguredError.md)
 - [`CustomTierMisconfiguredError`](/api/@graphorin/memory/classes/CustomTierMisconfiguredError.md)
+- [`IngestGateRequiredError`](/api/@graphorin/memory/classes/IngestGateRequiredError.md)
 - [`ProviderNotConfiguredError`](/api/@graphorin/memory/classes/ProviderNotConfiguredError.md)
 
 ## Constructors

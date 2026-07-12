@@ -6,7 +6,7 @@
 
 # Interface: SessionListOptions
 
-Defined in: [packages/core/src/contracts/memory-store.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L158)
+Defined in: [packages/core/src/contracts/memory-store.ts:167](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L167)
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:158](https://github.com
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L161) |
-| <a id="property-lastn"></a> `lastN?` | `readonly` | `number` | [packages/core/src/contracts/memory-store.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L159) |
-| <a id="property-role"></a> `role?` | `readonly` | `"user"` \| `"tool"` \| `"system"` \| `"assistant"` | [packages/core/src/contracts/memory-store.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L162) |
-| <a id="property-sincemessageid"></a> `sinceMessageId?` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L160) |
+| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L170) |
+| <a id="property-lastn"></a> `lastN?` | `readonly` | `number` | [packages/core/src/contracts/memory-store.ts:168](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L168) |
+| <a id="property-role"></a> `role?` | `readonly` | `"user"` \| `"tool"` \| `"system"` \| `"assistant"` | [packages/core/src/contracts/memory-store.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L171) |
+| <a id="property-sincemessageid"></a> `sinceMessageId?` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:169](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L169) |

@@ -163,6 +163,75 @@ in default recall until the successor is validated, at which point
 
 ***
 
+### listActive()?
+
+```ts
+optional listActive(scope, options?): Promise<readonly Fact[]>;
+```
+
+Defined in: [packages/memory/src/internal/storage-adapter.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L197)
+
+Enumerate the recall-eligible facts for the scope (wave-D): live,
+non-archived, `status = 'active'`, validity interval containing
+now - the same view default recall sees, but as a deterministic
+list (`created_at` order) instead of a ranked search. Powers the
+profile-projection pass (D2) and the operation-level benchmark
+observation (D1). `excludePendingSupersede` additionally drops
+facts whose supersede is still pending W-019 validation (a
+quarantined successor links to them) - a projection must not
+present a value that is already known to be contested.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `options?` | \{ `excludePendingSupersede?`: `boolean`; `limit?`: `number`; \} |
+| `options.excludePendingSupersede?` | `boolean` |
+| `options.limit?` | `number` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+
+***
+
+### listPromotionCandidates()?
+
+```ts
+optional listPromotionCandidates(scope, options?): Promise<readonly {
+  accessCount: number;
+  fact: Fact;
+  uniqueQueryCount: number;
+}[]>;
+```
+
+Defined in: [packages/memory/src/internal/storage-adapter.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L211)
+
+Enumerate quarantined, live, non-archived facts together with
+their recall statistics (wave-D D4) - the candidate feed for the
+deterministic PromotionPolicy: `accessCount` is the monotonic
+migration-027 counter, `uniqueQueryCount` the migration-036
+distinct-query ledger count. Deterministic `created_at` order.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `options?` | \{ `limit?`: `number`; \} |
+| `options.limit?` | `number` |
+
+#### Returns
+
+`Promise`\<readonly \{
+  `accessCount`: `number`;
+  `fact`: [`Fact`](/api/@graphorin/core/interfaces/Fact.md);
+  `uniqueQueryCount`: `number`;
+\}[]\>
+
+***
+
 ### purge()?
 
 ```ts

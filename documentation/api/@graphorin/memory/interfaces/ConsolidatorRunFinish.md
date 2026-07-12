@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorRunFinish
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:453](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L453)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:488](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L488)
 
 ## Stable
 
@@ -14,17 +14,17 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:453](https://github
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-conflictsresolved"></a> `conflictsResolved?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:461](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L461) |
-| <a id="property-emptyextractions"></a> `emptyExtractions?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:463](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L463) |
-| <a id="property-episodesformed"></a> `episodesFormed?` | `readonly` | `number` | Episodes auto-formed by the run (P1-2 / MCON-17). | [packages/memory/src/internal/storage-adapter.ts:465](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L465) |
-| <a id="property-errormessage"></a> `errorMessage?` | `readonly` | `string` \| `null` | - | [packages/memory/src/internal/storage-adapter.ts:468](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L468) |
-| <a id="property-factscreated"></a> `factsCreated?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:459](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L459) |
-| <a id="property-factsupdated"></a> `factsUpdated?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:460](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L460) |
-| <a id="property-finishedat"></a> `finishedAt` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:455](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L455) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | [packages/memory/src/internal/storage-adapter.ts:454](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L454) |
-| <a id="property-insightscreated"></a> `insightsCreated?` | `readonly` | `number` | Insights synthesized by the run's reflection pass (P1-1 / MCON-17). | [packages/memory/src/internal/storage-adapter.ts:467](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L467) |
-| <a id="property-llmcostusd"></a> `llmCostUsd?` | `readonly` | `number` \| `null` | - | [packages/memory/src/internal/storage-adapter.ts:458](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L458) |
-| <a id="property-llmtokensused"></a> `llmTokensUsed?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:457](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L457) |
-| <a id="property-noisefilteredcount"></a> `noiseFilteredCount?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:462](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L462) |
-| <a id="property-retrycount"></a> `retryCount?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:469](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L469) |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | - | [packages/memory/src/internal/storage-adapter.ts:456](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L456) |
+| <a id="property-conflictsresolved"></a> `conflictsResolved?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:496](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L496) |
+| <a id="property-emptyextractions"></a> `emptyExtractions?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:498](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L498) |
+| <a id="property-episodesformed"></a> `episodesFormed?` | `readonly` | `number` | Episodes auto-formed by the run (P1-2 / MCON-17). | [packages/memory/src/internal/storage-adapter.ts:500](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L500) |
+| <a id="property-errormessage"></a> `errorMessage?` | `readonly` | `string` \| `null` | - | [packages/memory/src/internal/storage-adapter.ts:503](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L503) |
+| <a id="property-factscreated"></a> `factsCreated?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:494](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L494) |
+| <a id="property-factsupdated"></a> `factsUpdated?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:495](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L495) |
+| <a id="property-finishedat"></a> `finishedAt` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:490](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L490) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | [packages/memory/src/internal/storage-adapter.ts:489](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L489) |
+| <a id="property-insightscreated"></a> `insightsCreated?` | `readonly` | `number` | Insights synthesized by the run's reflection pass (P1-1 / MCON-17). | [packages/memory/src/internal/storage-adapter.ts:502](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L502) |
+| <a id="property-llmcostusd"></a> `llmCostUsd?` | `readonly` | `number` \| `null` | - | [packages/memory/src/internal/storage-adapter.ts:493](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L493) |
+| <a id="property-llmtokensused"></a> `llmTokensUsed?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:492](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L492) |
+| <a id="property-noisefilteredcount"></a> `noiseFilteredCount?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:497](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L497) |
+| <a id="property-retrycount"></a> `retryCount?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:504](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L504) |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | - | [packages/memory/src/internal/storage-adapter.ts:491](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L491) |

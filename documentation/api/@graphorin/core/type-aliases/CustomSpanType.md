@@ -10,7 +10,7 @@
 type CustomSpanType = `x.${string}`;
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L73)
+Defined in: [packages/core/src/contracts/tracer.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L76)
 
 Namespaced escape hatch for user-defined span kinds (W-126): any
 string under the `x.` prefix, e.g. `'x.acme.rerank'`. The prefix
