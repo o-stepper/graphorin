@@ -23,6 +23,7 @@ import type { Hono } from 'hono';
 import { ensureStoreAuditBinding } from './app-audit-binding.js';
 import { mountRoutes } from './app-routes.js';
 import type { WsLayer } from './app-ws.js';
+import type { ChannelsDaemon } from './channels/daemon.js';
 import { bridgeCommentaryToAudit } from './commentary/index.js';
 import type { ServerConfigSpec } from './config.js';
 import type { ConsolidatorDaemon } from './consolidator/daemon.js';
@@ -89,6 +90,7 @@ export interface ServerLifecycleDeps {
   readonly triggersDaemon: TriggersDaemon | undefined;
   readonly consolidatorDaemon: ConsolidatorDaemon | undefined;
   readonly workflowTimerDaemon: WorkflowTimerDaemon | undefined;
+  readonly channelsDaemon: ChannelsDaemon | undefined;
 }
 
 /**
@@ -121,6 +123,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
     triggersDaemon,
     consolidatorDaemon,
     workflowTimerDaemon,
+    channelsDaemon,
   } = deps;
   const commentaryAuditSink = deps.ws.commentaryAuditSink;
 
@@ -242,6 +245,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           ...(triggersDaemon !== undefined ? { triggersDaemon } : {}),
           ...(consolidatorDaemon !== undefined ? { consolidatorDaemon } : {}),
           ...(workflowTimerDaemon !== undefined ? { workflowTimerDaemon } : {}),
+          ...(channelsDaemon !== undefined ? { channelsDaemon } : {}),
         });
 
         // Start the consolidator first so it is ready to handle fired
@@ -278,6 +282,14 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
               'createServer({ workflowTimers: { driver } }) with createTimerDriver(...) ' +
               'from @graphorin/workflow.\n',
           );
+        }
+
+        // B1.6: the gateway starts LAST - inbound traffic only begins
+        // once every downstream daemon (consolidator, scheduler,
+        // timers) is live, so the first channel message never races
+        // half-wired composition.
+        if (channelsDaemon !== undefined) {
+          await channelsDaemon.start();
         }
 
         // Sample a couple of gauges immediately so the very first
@@ -402,6 +414,16 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
       }
 
+      // B1.6: the gateway stops FIRST - the front door closes before
+      // the daemons behind it, so shutdown drains only work that is
+      // already in flight.
+      if (channelsDaemon !== undefined) {
+        try {
+          await channelsDaemon.stop();
+        } catch (err) {
+          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+        }
+      }
       if (workflowTimerDaemon !== undefined) {
         try {
           await workflowTimerDaemon.stop();

@@ -22,6 +22,7 @@ import type {
   CheckpointStoreExt,
   MemoryStoreExt,
   OAuthServerStore,
+  PairingStore,
   SessionStoreExt,
   TriggerStore,
 } from '@graphorin/core/contracts';
@@ -100,6 +101,7 @@ import {
 import { listMigrations, type Migration, registerMigration } from './migrations/registry.js';
 import { type AppliedMigration, pendingMigrations, runMigrations } from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
+import { SqlitePairingStore } from './pairing-store.js';
 import {
   SESSION_SCOPED_PURGES,
   SESSION_TABLE_EXEMPTIONS,
@@ -194,6 +196,7 @@ export interface GraphorinSqliteStore {
   readonly checkpoints: CheckpointStoreExt;
   readonly sessions: SessionStoreExt;
   readonly triggers: TriggerStore;
+  readonly pairing: PairingStore;
   readonly authTokens: AuthTokenStore;
   readonly oauthServers: OAuthServerStore;
   readonly idempotency: IdempotencyStore;
@@ -267,6 +270,7 @@ export async function createSqliteStore(
   const checkpointStore = new SqliteCheckpointStore(conn);
   const sessionStore = new SqliteSessionStore(conn);
   const triggerStore = new SqliteTriggerStore(conn);
+  const pairingStore = new SqlitePairingStore(conn);
   const authTokenStore = new SqliteAuthTokenStore(conn);
   const oauthServerStore = new SqliteOAuthServerStore(conn);
   const idempotencyStore = new SqliteIdempotencyStore(conn);
@@ -283,6 +287,9 @@ export async function createSqliteStore(
     },
     get triggers() {
       return triggerStore;
+    },
+    get pairing() {
+      return pairingStore;
     },
     get authTokens() {
       return authTokenStore;
@@ -383,6 +390,7 @@ export {
   SqliteMemoryStore,
   type SqliteMemoryWriteOptions,
   SqliteOAuthServerStore,
+  SqlitePairingStore,
   SqliteSessionStore,
   SqliteTriggerStore,
   slugifyEmbedderId,

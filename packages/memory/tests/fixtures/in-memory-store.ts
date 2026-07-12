@@ -10,6 +10,7 @@ import type {
   Message,
   MessageRef,
   Rule,
+  RunTurnVerdict,
   SessionScope,
 } from '@graphorin/core';
 import type {
@@ -534,6 +535,7 @@ export function createInMemoryStore(
     sequence: number;
     createdAt: string;
     tokenCount: number | null;
+    verdict?: RunTurnVerdict;
   }> = [];
   const episodes: Episode[] = [];
   const facts: Fact[] = [];
@@ -591,7 +593,7 @@ export function createInMemoryStore(
       },
     },
     session: {
-      async push(_scope, message) {
+      async push(_scope, message, options) {
         messageSeq += 1;
         const id = `msg_${messageSeq}`;
         messages.push(message);
@@ -600,6 +602,7 @@ export function createInMemoryStore(
           sequence: messageSeq,
           createdAt: new Date().toISOString(),
           tokenCount: null,
+          ...(options?.verdict !== undefined ? { verdict: options.verdict } : {}),
         });
         return { messageId: id, sequence: messageSeq, persistedAt: new Date().toISOString() };
       },
@@ -625,6 +628,7 @@ export function createInMemoryStore(
             createdAt: meta.createdAt,
             tokenCount: meta.tokenCount,
             message,
+            ...(meta.verdict !== undefined ? { verdict: meta.verdict } : {}),
           });
         }
         return out;

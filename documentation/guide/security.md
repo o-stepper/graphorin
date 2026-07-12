@@ -203,7 +203,7 @@ The agent runtime's defense layer composes orthogonally with the security primit
 | `causalityMonitor` (`createAgent({ causalityMonitor })`) | Implements an Agentic Reference Monitor pattern. Every cross-agent flow is checked against the stated capability. |
 | `mergeGuard` (`createAgent({ mergeGuard })`) | Per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy; `detect-and-block` refuses the merge (`MergeBlockedError`). |
 | Protocol-injection guard (`guardOutboundContent` helper) | Control-character escape catalogue for server-boundary wiring (SSE / session export) - not an `AgentConfig` knob. |
-| Commentary-phase trace sanitisation | At the session-output boundary, before any export. |
+| Commentary-phase trace sanitisation | At the session-output boundary, before any export. The 7-pattern catalogue is single-sourced from `@graphorin/tools/outbound` and shared with the server delivery layer (WS / SSE frames) and the channel gateway, so tool-call scaffolding (`tool.call.*` payloads, fan-out and compaction events) is scrubbed on every outbound surface; the sanitizers themselves stay boundary-specific. |
 | Inbound sanitisation preamble | When non-trusted content is in the message list, a locale-resolved preamble is appended **after** the cache breakpoint. |
 
 ## Provenance / data-flow policy
@@ -243,11 +243,32 @@ Three modes (`DataFlowMode`):
 
 Findings are **metadata-only** - they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding; paraphrase is what `derivedTaint: 'strict'` and the trifecta signal cover). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either. The sink gate probes the **post-repair** arguments - the same payload the approval gate saw and the payload the executed input is derived from - so spans introduced by the arg-repair hook are visible to the verbatim probe; the residual limitation is that probing happens before schema coercion, so text introduced purely by a Zod `transform`/`default` is not probed.
 
-Three additional propagation legs close gaps the run-local shingle probe cannot see:
+Four additional propagation legs close gaps the run-local shingle probe cannot see:
 
 - **Model output** - once a run is tainted, the agent records each step's assistant text as derived-untrusted (`llm-derived`), so a later sink call copying the model's own phrasing still trips the verbatim probe.
+- **Channel inbound** (B1.5) - message-borne text from a messenger gateway arms the ledger through the dedicated `'channel-inbound'` trust class and the `AgentCallOptions.inboundTaint` seed, stamped at run init BEFORE the first step. The Rule-of-Two deliberately excludes ordinary user messages from its untrusted-input leg; channel peers are authenticated but their CONTENT is attacker-influenceable, so `'channel-inbound'` is registered in the same single `isUntrustedTrustClass` source both layers consume. Widen-only: the seed can add taint, never clear it.
 - **Memory recall** - the recall tools (`fact_search`, `deep_recall`, `recall_episodes`) attach a taint override when any returned item is quarantined or foreign-provenance, so poisoned memory written in an earlier session re-arms the ledger at recall (the cross-session MINJA leg). Overrides only ever WIDEN a label; nothing can launder an untrusted tool's output.
 - **Suspend/resume** - the persisted `RunState.taintSummary` now carries one-way FNV-1a hashes of the tracked spans' tiles alongside the coarse flags, so a resumed run re-detects verbatim copies of pre-suspend untrusted content (at tile granularity) without any untrusted text ever being persisted.
+
+### The assistant reply as a sink
+
+Tools are not the only exfiltration surface - the reply itself reaches whoever is on the other end of the conversation (a messenger peer, an exported transcript). Since B4 the run's outgoing assistant text is evaluated as a sink with the stable id `'assistant-output'` (`DataFlowEvaluation.sinkKind: 'assistant-output'`), gated in the commit path BEFORE the message enters the durable history:
+
+- **enforce** - a tripped flow withholds the reply: the durable message and the run's final output are replaced by a fixed notice (the streamed deltas already left, exactly like the lateral-leak block; what the gate protects is the persistent buffer and anything delivered downstream). The turn's verdict records `guardrail: 'block'` plus the flow in `dataflowFlags`, so the memory ingest gate also keeps it out of long-term memory.
+- **shadow** - the reply passes; the verdict sidecar records `assistant-output:flag`.
+- **declassify** - add `'assistant-output'` to `declassifySinks` to re-open the reply surface deliberately (audited like any other declassification). Do this only after reviewing enforce-mode blocks: on a lethal-trifecta run the blocked reply is the policy working.
+
+### Pluggable injection classifier (seam)
+
+The regex catalogues catch KNOWN imperative patterns; a classifier catches paraphrases. `@graphorin/security/inspect` defines the `InjectionClassifier` contract plus the resilient `runInjectionClassifier` helper (an engine error always degrades to the regex verdict alone - a classifier can never fail a run). The framework ships NO engine (offline default off); three surfaces consult one when configured:
+
+| Surface | Wiring |
+|---|---|
+| Inbound sanitisation | `applyInboundSanitizationWithClassifier` (`@graphorin/tools/inbound`); the channel gateway exposes it as `createChannelGateway({ injectionClassifier })`. A flagged verdict appends `classifier:<id>` to `patternsHit`. |
+| Final output (SDF-4) | `injectionClassifierOutputGuardrail(classifier)` - add to `createAgent({ guardrails: { output: [...] } })`; `action: 'warn'` (default) or `'block'`. |
+| Memory write gate | `createMemory({ injectionClassifier })` - consulted at the write-time quarantine gate after the regex heuristics; a flagged verdict quarantines the write. Widen-only: a regex hit short-circuits and can never be cleared by the classifier. |
+
+W-103 stays as shipped (D-13): `treatPiiAsSensitive` remains opt-in warn-first framework-wide; the recommended `treatPiiAsSensitive: true` lives in the [channel gateway security preset](/guide/channels#recommended-gateway-security-preset), and the default is revisited on injection-gate eval evidence.
 
 **Pattern catalogues are signal, not gates.** The injection regex catalogues (the guardrails heuristics and the memory quarantine heuristics) share a Unicode pre-pass - `normalizeForMatching`: NFKC + zero-width strip + lowercase - and the PII catalogue's boolean detector (`containsPii`) applies the case-preserving variant `normalizeForPiiMatching` (W-150; IBAN-style patterns are case-sensitive by design), so cheap character-injection - zero-width splits, fullwidth homoglyphs - no longer slips past either family. Spilled oversized tool results are additionally scanned **whole** at spill time; when that artifact-level scan flagged a pattern, every later page read surfaces the fact via the `tool.inbound.sanitization.cross-page-flag.total` counter, even when the pattern straddles a page boundary that hides it from the per-page scan (W-156). They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate - memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
 
@@ -331,6 +352,16 @@ This is the precondition for shipping **synthesised** memory safely. Three deriv
 - **Workflow induction** (procedural tier) - the highest-risk write, since procedures drive *actions*; induced procedures land `induction` + quarantined and are excluded from `activate()` until a human validates them.
 
 See [Memory system § Memory safety](/guide/memory-system#memory-safety-provenance-quarantine) for the API surface.
+
+### Memory writes strictly after guardrails (B3)
+
+Long-term memory is written strictly AFTER the run loop's security gates, and the ordering is enforced by construction rather than by convention:
+
+1. **Tool writes** are side-effecting sinks - the executor's gates (approval, argument policy, dataflow) run before any memory write-tool executes (this has been true since the write-tools shipped).
+2. **Per-turn verdicts** - the commit gates stamp `RunState.verdicts` (input guardrail block/rewrite, lateral-leak block, assistant-output dataflow findings). `AgentResult.verdicts` surfaces them so the composing application forwards each turn's verdict into `session.push(message, { verdict })`, where it is persisted next to the message (additive `@stable` field, widen-only semantics).
+3. **Consolidation reads only persisted verdicts** - `createMemory({ ingestGate: verdictIngestGate })` excludes guardrail-blocked and lateral-leak-withheld turns from the extraction batch on BOTH consolidator paths, before noise filtering. Rewritten turns pass (the stored message already carries the rewritten text). The idempotency cursor still advances through excluded messages, so a blocked turn can never wedge consolidation; a throwing gate excludes the record (fail-closed).
+
+The ingest gate is REQUIRED before enabling memory auto-promotion or granting a proactive task the `act` outcome (both ship in later waves and enforce this precondition in config). Channels were never blocked on this item - write-time quarantine, injection detection and recall re-arm act as the interim defense - but a gateway should enable the gate from day one (see the [channel gateway preset](/guide/channels#recommended-gateway-security-preset)). `Session.push` and the consolidator's internal writes are not tool calls; they are covered by the verdict persistence + ingest gate legs above, not by the executor's sink gates.
 
 ## Compaction summary trust
 

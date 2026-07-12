@@ -4,6 +4,7 @@ import type {
   Message,
   MessageRef,
   SessionListOptions,
+  SessionMessagePushOptions,
   SessionMessageWithMetadata,
   SessionScope,
   Tracer,
@@ -62,8 +63,16 @@ export class SessionMemory {
     this.#compactionPolicy = args.compactionPolicy ?? {};
   }
 
-  /** Persist a message. Returns the storage reference. */
-  async push(scope: SessionScope, message: Message): Promise<MessageRef> {
+  /**
+   * Persist a message. Returns the storage reference. B3:
+   * `options.verdict` threads the run loop's per-turn security
+   * verdict onto the stored row for the memory ingest gate.
+   */
+  async push(
+    scope: SessionScope,
+    message: Message,
+    options?: SessionMessagePushOptions,
+  ): Promise<MessageRef> {
     return withMemorySpan(
       this.#tracer,
       'memory.write.session',
@@ -75,7 +84,7 @@ export class SessionMemory {
           : {}),
       },
       async (span) => {
-        const ref = await this.#store.session.push(scope, message);
+        const ref = await this.#store.session.push(scope, message, options);
         span.setAttributes({
           'memory.session.sequence': ref.sequence,
           'memory.session.message_id': ref.messageId,

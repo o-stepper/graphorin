@@ -103,6 +103,8 @@ export {
   type RunStep,
   type RunStepProviderResponse,
   type RunTaintSummary,
+  type RunTurnVerdict,
+  type RunVerdicts,
   type TodoItem,
 } from './run.js';
 export type { Sensitivity } from './sensitivity.js';

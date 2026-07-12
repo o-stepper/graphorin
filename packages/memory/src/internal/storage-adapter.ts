@@ -14,6 +14,7 @@ import type {
   MessageRef,
   ProceduralMemoryStore,
   Rule,
+  RunTurnVerdict,
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
@@ -198,6 +199,13 @@ export interface SessionMessageRecord {
   readonly createdAt: string;
   readonly tokenCount: number | null;
   readonly message: Message;
+  /**
+   * B3 (item 15): the turn's persisted security verdict, when the run
+   * loop stamped one (`SessionMessagePushOptions.verdict`). Read by
+   * the memory ingest gate to exclude guardrail-blocked turns from
+   * extraction. Additive to the @stable tuple.
+   */
+  readonly verdict?: RunTurnVerdict;
 }
 
 /**

@@ -13,6 +13,7 @@ import type {
   MemoryStatus,
   Message,
   Rule,
+  RunTurnVerdict,
   SessionScope,
 } from '@graphorin/core';
 import type {
@@ -23,6 +24,7 @@ import type {
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
+  SessionMessagePushOptions,
   SessionMessageWithMetadata,
   SharedMemoryStore,
   WorkingMemoryStore,
@@ -331,7 +333,11 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     this.#vectorMgr = vectorMgr;
   }
 
-  async push(scope: SessionScope, message: Message): Promise<MessageRef> {
+  async push(
+    scope: SessionScope,
+    message: Message,
+    options?: SessionMessagePushOptions,
+  ): Promise<MessageRef> {
     if (scope.sessionId === undefined) {
       throw new Error('[graphorin/store-sqlite] SessionMemoryStore.push requires scope.sessionId');
     }
@@ -353,8 +359,9 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
       this.#conn.run(
         `INSERT INTO session_messages (
            id, scope_user_id, scope_session_id, scope_agent_id, agent_id, role,
-           content_json, tool_calls_json, tool_call_id, sequence, created_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           content_json, tool_calls_json, tool_call_id, sequence, created_at,
+           verdict_json
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
           scope.userId,
@@ -367,6 +374,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
           readToolCallId(message),
           sequence,
           createdAt,
+          options?.verdict !== undefined ? JSON.stringify(options.verdict) : null,
         ],
       );
       const text = renderMessageForFts(message);
@@ -532,6 +540,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
       readonly createdAt: string;
       readonly tokenCount: number | null;
       readonly message: Message;
+      readonly verdict?: RunTurnVerdict;
     }>
   > {
     if (scope.sessionId === undefined) {
@@ -552,13 +561,17 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
        LIMIT ?`,
       [...params, limit],
     );
-    return rows.map((row) => ({
-      id: row.id,
-      sequence: row.sequence,
-      createdAt: new Date(row.created_at).toISOString(),
-      tokenCount: row.token_count,
-      message: rowToMessage(row),
-    }));
+    return rows.map((row) => {
+      const verdict = row.verdict_json != null ? parseVerdictJson(row.verdict_json) : undefined;
+      return {
+        id: row.id,
+        sequence: row.sequence,
+        createdAt: new Date(row.created_at).toISOString(),
+        tokenCount: row.token_count,
+        message: rowToMessage(row),
+        ...(verdict !== undefined ? { verdict } : {}),
+      };
+    });
   }
 
   /**
@@ -2438,6 +2451,7 @@ interface SessionMessageRow {
   sequence: number;
   created_at: number;
   deleted_at: number | null;
+  verdict_json: string | null;
 }
 
 interface SessionMessageFtsRow {
@@ -2566,6 +2580,35 @@ function rowToBlock(row: WorkingBlockRow): Block {
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
   } as Block;
+}
+
+/**
+ * B3: parse a persisted verdict column defensively - a malformed row
+ * degrades to 'no verdict' instead of failing the read path.
+ */
+function parseVerdictJson(raw: string): RunTurnVerdict | undefined {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return undefined;
+    const value = parsed as {
+      guardrail?: unknown;
+      lateralLeak?: unknown;
+      dataflowFlags?: unknown;
+    };
+    const flags = Array.isArray(value.dataflowFlags)
+      ? value.dataflowFlags.filter((f): f is string => typeof f === 'string')
+      : undefined;
+    const out: RunTurnVerdict = {
+      ...(value.guardrail === 'block' || value.guardrail === 'rewrite'
+        ? { guardrail: value.guardrail }
+        : {}),
+      ...(value.lateralLeak === true ? { lateralLeak: true } : {}),
+      ...(flags !== undefined && flags.length > 0 ? { dataflowFlags: flags } : {}),
+    };
+    return Object.keys(out).length > 0 ? out : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 function rowToMessage(row: SessionMessageRow): Message {

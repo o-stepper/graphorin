@@ -10,7 +10,7 @@
 function createSessionManager(opts): SessionManager;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:357](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L357)
+Defined in: [packages/sessions/src/facade.ts:367](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L367)
 
 Build a session manager. The manager is the public entry point;
 sessions are obtained via `manager.create(...)` / `manager.get(...)`.

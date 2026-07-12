@@ -169,6 +169,7 @@ export type {
   CompactionApiResult,
   CompactOptions,
   HandoffEntry,
+  InboundTaintSeed,
   OutputSpec,
   PostCompactionHook,
   PrepareStepHook,

@@ -10,7 +10,7 @@
 function applyInboundSanitization(opts): SanitizationOutcome;
 ```
 
-Defined in: [packages/tools/src/inbound/sanitize.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/inbound/sanitize.ts#L93)
+Defined in: [packages/tools/src/inbound/sanitize.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/inbound/sanitize.ts#L94)
 
 Apply the per-policy inbound sanitization.
 

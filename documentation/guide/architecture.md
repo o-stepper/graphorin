@@ -14,7 +14,7 @@ flowchart TB
     consumer["Consumer apps (NOT Graphorin)\npersonal-assistant CLI · Slack/Telegram bots · custom UIs"]
     runtime["Tier 5/6 - Runtime + Server\n@graphorin/agent · @graphorin/workflow · @graphorin/server"]
     memory["Tier 4 - Memory & Sessions\n@graphorin/memory · @graphorin/sessions"]
-    surface["Tier 3 - External surface\n@graphorin/tools · @graphorin/skills · @graphorin/mcp"]
+    surface["Tier 3 - External surface\n@graphorin/tools · @graphorin/skills · @graphorin/mcp · @graphorin/channels"]
     persistProv["Tier 2 - Persistence + Provider\n@graphorin/store-sqlite · @graphorin/embedder-transformersjs\n@graphorin/triggers · @graphorin/provider"]
     crosscut["Tier 1 - Cross-cutting infrastructure\n@graphorin/security · @graphorin/observability · @graphorin/pricing"]
     foundation["Tier 0 - Foundation\n@graphorin/core (types · contracts · utilities · ESM-only)"]
@@ -62,6 +62,7 @@ Sub-paths:
 - **`@graphorin/tools`** - typed `tool({ ... })` builder, `ToolRegistry`, `ToolExecutor` (parallel / sequential dispatch, approvals, sandbox enforcement, inbound sanitisation).
 - **`@graphorin/skills`** - loader for the public `SKILL.md` packaging format with three-tier progressive disclosure, plus Graphorin extensions namespaced under `graphorin-*` and `metadata.graphorin.*`.
 - **`@graphorin/mcp`** - Model Context Protocol client over stdio and Streamable HTTP, wrapping `@modelcontextprotocol/sdk`.
+- **`@graphorin/channels`** - messenger front door: the vendor-neutral `ChannelAdapter` SPI, identity routing, pairing access policy, the gateway runtime with the inbound trust boundary + outbound scaffolding sanitisation, and the adapter testkit. Ships no vendor adapters.
 
 ### Tier 4 - Memory & Sessions
 

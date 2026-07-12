@@ -33,11 +33,18 @@ export type {
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
+  SessionMessagePushOptions,
   SessionMessageWithMetadata,
   SharedMemoryStore,
   WorkingMemoryStore,
 } from './memory-store.js';
 export type { OAuthServerRecord, OAuthServerStore } from './oauth-server-store.js';
+export type {
+  PairedPeerRecord,
+  PairingPeerRef,
+  PairingRequestRecord,
+  PairingStore,
+} from './pairing-store.js';
 export type { ModelHint, ModelSpec, ProviderLike } from './preferred-model.js';
 export { MODEL_HINTS } from './preferred-model.js';
 export type {
@@ -80,6 +87,7 @@ export type {
   SessionStoreExt,
   SessionWorkflowRun,
 } from './session-store.js';
+export type { SttAdapter, SttTranscript, SttTranscriptionRequest } from './stt.js';
 export type { TokenCounter } from './token-counter.js';
 export type {
   AnyTool,

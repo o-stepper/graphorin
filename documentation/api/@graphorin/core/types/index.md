@@ -478,6 +478,18 @@ Re-exports [RunTaintSummary](/api/@graphorin/core/interfaces/RunTaintSummary.md)
 
 ***
 
+### RunTurnVerdict
+
+Re-exports [RunTurnVerdict](/api/@graphorin/core/interfaces/RunTurnVerdict.md)
+
+***
+
+### RunVerdicts
+
+Re-exports [RunVerdicts](/api/@graphorin/core/type-aliases/RunVerdicts.md)
+
+***
+
 ### SandboxPolicy
 
 Re-exports [SandboxPolicy](/api/@graphorin/core/type-aliases/SandboxPolicy.md)

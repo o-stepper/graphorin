@@ -18,6 +18,7 @@ import type {
   ReasoningContent,
   ReasoningRetention,
   RunState,
+  RunTurnVerdict,
   ToolCall,
 } from '@graphorin/core';
 import { composeGuardrails, type InputGuardrail } from '@graphorin/security/guardrails';
@@ -26,6 +27,38 @@ import type { buildDataFlowGuard } from '../tooling/dataflow.js';
 import type { AbortOptions, AgentConfig, VerifierResult } from '../types.js';
 import { buildAssistantMessage } from './messages.js';
 import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
+
+/**
+ * B3 (item 15): merge one turn's verdict into the run's plain-object
+ * sidecar. Widen-only: 'block' beats 'rewrite', flags accumulate,
+ * nothing is ever cleared here (compaction owns removal). Keys are
+ * `'<stepNumber>:<offsetInStep>'`; step 0 is the pre-step input
+ * stage.
+ */
+export function stampTurnVerdict(
+  state: MutableRunState & RunState,
+  stepNumber: number,
+  offset: number,
+  verdict: RunTurnVerdict,
+): void {
+  const key = `${stepNumber}:${offset}`;
+  const existing = state.verdicts?.[key];
+  const guardrail =
+    existing?.guardrail === 'block' || verdict.guardrail === 'block'
+      ? ('block' as const)
+      : (verdict.guardrail ?? existing?.guardrail);
+  const flags = [
+    ...new Set([...(existing?.dataflowFlags ?? []), ...(verdict.dataflowFlags ?? [])]),
+  ];
+  const merged: RunTurnVerdict = {
+    ...(guardrail !== undefined ? { guardrail } : {}),
+    ...(existing?.lateralLeak === true || verdict.lateralLeak === true
+      ? { lateralLeak: true }
+      : {}),
+    ...(flags.length > 0 ? { dataflowFlags: flags } : {}),
+  };
+  state.verdicts = { ...(state.verdicts ?? {}), [key]: merged };
+}
 
 const sha256Hex = (input: string): string =>
   createHash('sha256').update(input, 'utf8').digest('hex');
@@ -179,6 +212,8 @@ export async function* screenInputGuardrails<TOutput>(
       yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
       state.status = 'failed';
       state.error = { message, code: 'guardrail-blocked' };
+      // B3: pre-step input stage = step 0; offset = buffer index.
+      stampTurnVerdict(state, 0, i, { guardrail: 'block' });
       return true;
     }
     if (composed.value !== msg.content) {
@@ -186,6 +221,7 @@ export async function* screenInputGuardrails<TOutput>(
       const stateIdx = state.messages.indexOf(msg);
       messages[i] = rewritten;
       if (stateIdx !== -1) state.messages[stateIdx] = rewritten;
+      stampTurnVerdict(state, 0, i, { guardrail: 'rewrite' });
     }
   }
   return false;
@@ -211,14 +247,27 @@ export interface AssistantCommitEnv {
  *
  * Commits the (possibly replaced) assistant message to both buffers,
  * records the C6 taint span, and emits `agent.lateral-leak.detected`
- * when the monitor tripped. Returns `leakBlocked`.
+ * when the monitor tripped. Returns `true` when the durable text was
+ * withheld - by the lateral-leak defense or by the B4
+ * assistant-output data-flow sink - so the loop also withholds the
+ * run's final output.
  */
+/**
+ * B4 (item 14): the outgoing-text replacement when the data-flow
+ * policy BLOCKS the assistant-output sink in enforce mode (lethal
+ * trifecta / verbatim untrusted carry without a declassify). Mirrors
+ * {@link LATERAL_LEAK_BLOCKED_NOTICE}.
+ */
+export const ASSISTANT_OUTPUT_BLOCKED_NOTICE =
+  '[graphorin] assistant reply withheld by the data-flow policy (assistant-output sink).';
+
 export async function* commitAssistantMessage<TOutput>(
   env: AssistantCommitEnv,
   textBuffer: string,
   stepReasoningParts: ReadonlyArray<ReasoningContent>,
   finalCalls: ReadonlyArray<ToolCall>,
   reasoningPolicy: ReasoningRetention,
+  stepNumber = 0,
 ): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
   const { state, messages, sessionId, agentId, causalityMonitor, toolDataFlowGuard } = env;
   const leakCheck =
@@ -227,8 +276,25 @@ export async function* commitAssistantMessage<TOutput>(
       : undefined;
   const leakBlocked = leakCheck?.leakDetected === true && leakCheck.decision === 'block';
 
+  // B4 (item 14): the outgoing text is a data-flow SINK (stable id
+  // 'assistant-output'). Evaluated before the commit, unified with the
+  // lateral-leak block path: enforce-mode 'block' replaces the durable
+  // message with a notice (deltas already streamed - what the gate
+  // protects is the persistent buffer, the run's final output and any
+  // downstream delivery); 'flag'/'declassify' only stamp the verdict
+  // sidecar. Declassify via `declassifySinks: ['assistant-output']`.
+  const outputVerdict =
+    !leakBlocked && toolDataFlowGuard !== undefined && textBuffer.length > 0
+      ? toolDataFlowGuard.inspectAssistantOutput(state.id, textBuffer)
+      : undefined;
+  const outputBlocked = outputVerdict !== undefined && outputVerdict.action === 'block';
+
   const assistant: AssistantMessage = buildAssistantMessage(
-    leakBlocked ? LATERAL_LEAK_BLOCKED_NOTICE : textBuffer,
+    leakBlocked
+      ? LATERAL_LEAK_BLOCKED_NOTICE
+      : outputBlocked
+        ? ASSISTANT_OUTPUT_BLOCKED_NOTICE
+        : textBuffer,
     stepReasoningParts,
     finalCalls,
     agentId,
@@ -237,6 +303,22 @@ export async function* commitAssistantMessage<TOutput>(
   messages.push(assistant);
   state.messages.push(assistant);
 
+  // B3: a withheld assistant turn carries a durable verdict so the
+  // Session.push boundary + memory ingest gate can keep the (blocked)
+  // turn out of long-term memory.
+  if (leakBlocked) {
+    stampTurnVerdict(state, stepNumber, 0, { lateralLeak: true });
+  }
+  if (outputVerdict !== undefined && outputVerdict.action !== 'allow') {
+    stampTurnVerdict(state, stepNumber, 0, {
+      ...(outputBlocked ? { guardrail: 'block' as const } : {}),
+      dataflowFlags: [
+        `assistant-output:${outputVerdict.action}`,
+        ...(outputVerdict.flow !== undefined ? [`assistant-output:${outputVerdict.flow}`] : []),
+      ],
+    });
+  }
+
   // C6: once the run is tainted, the model's own TEXT output is
   // derived from untrusted context - record it so a later sink call
   // copying the model's phrasing still trips the verbatim probe
@@ -244,7 +326,7 @@ export async function* commitAssistantMessage<TOutput>(
   // recorded: the sink gate inspects those same args next, and
   // recording them first would self-match every post-taint call,
   // collapsing the precise verbatim signal into the coarse one.
-  if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked) {
+  if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked && !outputBlocked) {
     toolDataFlowGuard.recordAssistant(state.id, textBuffer);
   }
 
@@ -266,7 +348,7 @@ export async function* commitAssistantMessage<TOutput>(
       detectedAtIso: new Date().toISOString(),
     };
   }
-  return leakBlocked;
+  return leakBlocked || outputBlocked;
 }
 
 /** The run-scoped context the verifier gate operates on. */
@@ -412,8 +494,20 @@ export async function* finalizeRunOutput<TDeps, TOutput>(
       yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
       state.status = 'failed';
       state.error = { message, code: 'guardrail-blocked' };
+      // B3: the final output belongs to the last step's assistant turn.
+      stampTurnVerdict(state, lastStepNumber(state), 0, { guardrail: 'block' });
     } else if (composed.value !== finalSnapshot.output) {
       finalSnapshot.output = composed.value;
+      stampTurnVerdict(state, lastStepNumber(state), 0, { guardrail: 'rewrite' });
     }
   }
+}
+
+/** Highest step number recorded on the run (0 before the first step). */
+function lastStepNumber(state: RunState): number {
+  let max = 0;
+  for (const step of state.steps) {
+    if (step.stepNumber > max) max = step.stepNumber;
+  }
+  return max;
 }

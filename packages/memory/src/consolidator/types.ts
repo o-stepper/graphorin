@@ -13,11 +13,41 @@
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
 import type { ContextualRetrievalMode } from '../internal/contextualize.js';
-import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
+import type { MemoryStoreAdapter, SessionMessageRecord } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import type { WorkingMemory } from '../tiers/working-memory.js';
 import type { SalienceWeights } from './decay.js';
+
+/**
+ * B3 (item 15): deterministic pre-extraction admission gate. Runs on
+ * every fetched {@link SessionMessageRecord} BEFORE noise filtering on
+ * both consolidator batch paths (runtime dispatch pre-fetch and the
+ * standard phase's self-fetch). Return `true` to admit the record
+ * into extraction. Excluded records still advance the idempotency
+ * cursor - a blocked turn can never wedge consolidation. A throwing
+ * gate excludes the record (fail-closed).
+ *
+ * @stable
+ */
+export type MemoryIngestGate = (record: SessionMessageRecord) => boolean;
+
+/**
+ * The canonical verdict-driven ingest gate: excludes turns whose
+ * persisted {@link SessionMessageRecord.verdict} says an input/output
+ * guardrail BLOCKED the turn or the lateral-leak defense withheld it.
+ * Rewritten turns pass - the stored message already carries the
+ * rewritten text. Records without a verdict pass untouched.
+ *
+ * @stable
+ */
+export function verdictIngestGate(record: SessionMessageRecord): boolean {
+  const verdict = record.verdict;
+  if (verdict === undefined) return true;
+  if (verdict.guardrail === 'block') return false;
+  if (verdict.lateralLeak === true) return false;
+  return true;
+}
 
 /**
  * Trigger discriminator. The `'turn:N'` and `'idle:Xm'` variants are
@@ -130,6 +160,11 @@ export interface ConsolidatorConfig {
   readonly deepModel: string | null;
   readonly budgetResetSemantics: 'utc' | 'local' | 'sliding-24h';
   readonly noiseFilters: ReadonlyArray<'default' | 'minimal' | 'none'>;
+  /**
+   * B3 (item 15): deterministic pre-extraction admission gate. `null`
+   * (default) admits everything. See {@link MemoryIngestGate}.
+   */
+  readonly ingestGate: MemoryIngestGate | null;
   readonly lockWaitMs: number;
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
@@ -432,6 +467,8 @@ export interface CreateConsolidatorOptions {
   readonly deepModel?: string | null;
   readonly budgetResetSemantics?: 'utc' | 'local' | 'sliding-24h';
   readonly noiseFilters?: ReadonlyArray<'default' | 'minimal' | 'none'>;
+  /** B3: override {@link ConsolidatorConfig.ingestGate}. */
+  readonly ingestGate?: MemoryIngestGate;
   readonly lockWaitMs?: number;
   readonly decayTauDays?: number;
   readonly decayArchiveThreshold?: number;

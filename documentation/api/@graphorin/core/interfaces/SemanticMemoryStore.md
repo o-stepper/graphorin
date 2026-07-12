@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L157)
+Defined in: [packages/core/src/contracts/memory-store.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L176)
 
 ## Stable
 
@@ -25,7 +25,7 @@ forget(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:172](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L172)
+Defined in: [packages/core/src/contracts/memory-store.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L191)
 
 Soft-delete a fact. W-154: when `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
@@ -57,7 +57,7 @@ compatible.
 remember(fact): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L158)
+Defined in: [packages/core/src/contracts/memory-store.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L177)
 
 #### Parameters
 
@@ -77,7 +77,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:158](https://github.com
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L159)
+Defined in: [packages/core/src/contracts/memory-store.ts:178](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L178)
 
 #### Parameters
 
@@ -101,7 +101,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L160)
+Defined in: [packages/core/src/contracts/memory-store.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L179)
 
 #### Parameters
 

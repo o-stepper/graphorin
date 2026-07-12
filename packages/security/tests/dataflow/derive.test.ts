@@ -11,6 +11,7 @@ describe('W-101 - isUntrustedTrustClass agrees with deriveTaintLabel', () => {
     'skill-untrusted',
     'mcp-derived',
     'web-search',
+    'channel-inbound',
   ];
   it('the two layers share one definition of "untrusted source"', () => {
     for (const trustClass of ALL) {
@@ -22,6 +23,7 @@ describe('W-101 - isUntrustedTrustClass agrees with deriveTaintLabel', () => {
       'skill-untrusted',
       'mcp-derived',
       'web-search',
+      'channel-inbound',
     ]);
   });
 });

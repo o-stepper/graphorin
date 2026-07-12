@@ -16,6 +16,24 @@ Re-exports [applyInboundSanitization](/api/@graphorin/tools/functions/applyInbou
 
 ***
 
+### applyInboundSanitizationWithClassifier
+
+Re-exports [applyInboundSanitizationWithClassifier](/api/@graphorin/tools/functions/applyInboundSanitizationWithClassifier.md)
+
+***
+
+### InboundSanitizationWithClassifierOptions
+
+Re-exports [InboundSanitizationWithClassifierOptions](/api/@graphorin/tools/interfaces/InboundSanitizationWithClassifierOptions.md)
+
+***
+
+### InjectionClassifier
+
+Re-exports [InjectionClassifier](/api/@graphorin/tools/interfaces/InjectionClassifier.md)
+
+***
+
 ### neutralizeEnvelopeDelimiters
 
 Re-exports [neutralizeEnvelopeDelimiters](/api/@graphorin/tools/functions/neutralizeEnvelopeDelimiters.md)

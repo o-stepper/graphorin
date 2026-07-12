@@ -13,7 +13,8 @@ type ToolTrustClass =
   | "skill-trusted"
   | "skill-untrusted"
   | "mcp-derived"
-  | "web-search";
+  | "web-search"
+  | "channel-inbound";
 ```
 
 Defined in: [packages/core/src/types/tool.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L111)

@@ -246,6 +246,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [errors](/api/@graphorin/tools/errors/index.md) | Typed error classes for `@graphorin/tools`. |
 | [executor](/api/@graphorin/tools/executor/index.md) | Tool executor surface for `@graphorin/tools`. |
 | [inbound](/api/@graphorin/tools/inbound/index.md) | Inbound prompt-injection sanitization surface for `@graphorin/tools`. |
+| [outbound](/api/@graphorin/tools/outbound/index.md) | `@graphorin/tools/outbound` - single-source outbound commentary pattern catalogue + envelope helpers shared by the server delivery layer, the session-output boundary and the channel gateway. |
 | [package.json](/api/@graphorin/tools/package.json/index.md) | - |
 | [registry](/api/@graphorin/tools/registry/index.md) | Strategy-aware tool registry surface for `@graphorin/tools`. |
 | [result](/api/@graphorin/tools/result/index.md) | Tool result envelope helpers for `@graphorin/tools` - token counting, truncation pipeline (`'middle' | 'tail' | 'spill-to-file' | 'summarize'`), and the `ToolReturn` content-parts pass-through convention. |

@@ -13,7 +13,7 @@ import type { Memory } from '@graphorin/memory';
 import { newId } from '../internal/ids.js';
 import { createInitialRunState } from '../run-state/index.js';
 import type { buildDataFlowGuard } from '../tooling/dataflow.js';
-import type { AgentCallOptions, AgentConfig } from '../types.js';
+import type { AgentCallOptions, AgentConfig, InboundTaintSeed } from '../types.js';
 import { lastUserText } from './messages.js';
 import type { MutableRunState } from './run-input.js';
 
@@ -105,6 +105,8 @@ export interface RunStateInitEnv<TDeps, TOutput> {
   readonly sessionId: string;
   readonly userId: string | undefined;
   readonly toolDataFlowGuard: ReturnType<typeof buildDataFlowGuard> | undefined;
+  /** B1.5: message-borne taint seed from `AgentCallOptions.inboundTaint`. */
+  readonly inboundTaint?: InboundTaintSeed;
 }
 
 /** The run-scoped state the bootstrap hands back to the run loop. */
@@ -144,6 +146,13 @@ export function initializeRunState<TDeps, TOutput>(
   // boundary (the promoted-tool set is restored below, once it exists).
   if (resumed && state.taintSummary !== undefined) {
     toolDataFlowGuard?.seedLedger(state.id, state.taintSummary);
+  }
+
+  // B1.5: stamp message-borne channel input into the ledger BEFORE the
+  // first step. Runs after the resume seed on purpose - widen-only, so
+  // a resumed run keeps its persisted taint AND gains the new message's.
+  if (env.inboundTaint !== undefined) {
+    toolDataFlowGuard?.recordInboundMessage(state.id, env.inboundTaint);
   }
 
   // WI-05: deferred tools promoted by a `tool_search` call this run.

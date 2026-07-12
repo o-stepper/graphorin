@@ -15,6 +15,7 @@ import type {
   Tracer,
 } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
+import type { InjectionClassifier } from '@graphorin/security/inspect';
 import { type ConflictPipelineOptions, createConflictPipeline } from './conflict/index.js';
 import {
   type Consolidator,
@@ -25,6 +26,7 @@ import {
   createConsolidator,
   createConsolidatorPlaceholder,
   createProviderWorkflowInducer,
+  type MemoryIngestGate,
   type OnBudgetExceed,
   type PhaseListener,
   type SalienceWeights,
@@ -123,6 +125,22 @@ export interface CreateMemoryOptions {
    * assistants where degraded recall beats a crash loop.
    */
   readonly onIncompatibleEmbedder?: 'fail' | 'fts-only';
+  /**
+   * B3 (item 15): deterministic pre-extraction admission gate over
+   * persisted session messages, applied on BOTH consolidator batch
+   * paths before noise filtering; excluded messages still advance the
+   * idempotency cursor. Pass the canonical `verdictIngestGate` to
+   * exclude guardrail-blocked / lateral-leak-withheld turns from
+   * long-term memory (the safe-by-construction write gate the
+   * auto-promotion and act-grant features of later waves REQUIRE).
+   */
+  readonly ingestGate?: MemoryIngestGate;
+  /**
+   * B4 (D-12): optional pluggable injection classifier consulted at
+   * the semantic write-time quarantine gate after the offline regex
+   * heuristics. Default off; classifier errors never fail a write.
+   */
+  readonly injectionClassifier?: InjectionClassifier;
   /**
    * Query transformation for retrieval (P2-3, opt-in). When supplied,
    * `SemanticMemory.search(..., { multiQuery })` fans the query into
@@ -475,6 +493,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
     reranker,
     conflictPipeline,
+    ...(options.injectionClassifier !== undefined
+      ? { injectionClassifier: options.injectionClassifier }
+      : {}),
     ...(options.contextualRetrieval !== undefined
       ? { contextualRetrieval: options.contextualRetrieval }
       : {}),
@@ -551,6 +572,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     episodic,
     working,
     tracer,
+    options.ingestGate,
   );
   consolidatorForSpend = consolidator;
   const contextEngineConfig = options.contextEngine ?? {};
@@ -693,6 +715,7 @@ function buildConsolidator(
   episodic: EpisodicMemory,
   working: WorkingMemory,
   tracer: Tracer,
+  ingestGate?: MemoryIngestGate,
 ): Consolidator {
   if (opts === undefined) {
     return createConsolidatorPlaceholder();
@@ -724,6 +747,7 @@ function buildConsolidator(
     ...(opts.cheapModel !== undefined ? { cheapModel: opts.cheapModel } : {}),
     ...(opts.deepModel !== undefined ? { deepModel: opts.deepModel } : {}),
     ...(opts.noiseFilters !== undefined ? { noiseFilters: opts.noiseFilters } : {}),
+    ...(ingestGate !== undefined ? { ingestGate } : {}),
     ...(opts.lockWaitMs !== undefined ? { lockWaitMs: opts.lockWaitMs } : {}),
     ...(opts.decayTauDays !== undefined ? { decayTauDays: opts.decayTauDays } : {}),
     ...(opts.decayArchiveThreshold !== undefined

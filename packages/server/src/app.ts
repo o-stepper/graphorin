@@ -24,10 +24,16 @@
 import process from 'node:process';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { Hono } from 'hono';
-import { buildDaemons, type TriggersDaemonInput, type WorkflowTimersInput } from './app-daemons.js';
+import {
+  buildDaemons,
+  type ChannelsInput,
+  type TriggersDaemonInput,
+  type WorkflowTimersInput,
+} from './app-daemons.js';
 import { createLifecycle } from './app-lifecycle.js';
 import { attachGlobalMiddleware } from './app-middleware.js';
 import { buildWsLayer } from './app-ws.js';
+import type { ChannelsDaemon } from './channels/daemon.js';
 import { parseServerConfig, type ServerConfigInput, type ServerConfigSpec } from './config.js';
 import type { ConsolidatorDaemon, ConsolidatorLike } from './consolidator/daemon.js';
 import { ConfigInvalidError } from './errors/index.js';
@@ -47,7 +53,7 @@ import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 // Stable re-exports - both were born in this module and stay
 // importable from `./app.js` (and the package barrel) unchanged.
 export { ensureStoreAuditBinding } from './app-audit-binding.js';
-export type { TriggersDaemonInput, WorkflowTimersInput } from './app-daemons.js';
+export type { ChannelsInput, TriggersDaemonInput, WorkflowTimersInput } from './app-daemons.js';
 
 /**
  * Public surface returned by {@link createServer}.
@@ -92,6 +98,11 @@ export interface GraphorinServer {
    * operator wired a `createTimerDriver(...)` at construction time.
    */
   readonly workflowTimers: WorkflowTimerDaemon | undefined;
+  /**
+   * B1.6: optional channels daemon - populated when the operator
+   * wired a channel gateway via `createServer({ channels })`.
+   */
+  readonly channels: ChannelsDaemon | undefined;
   /**
    * Phase 14c Prometheus registry. Always present; sample updates
    * are observable via `metrics.snapshot()`.
@@ -150,6 +161,14 @@ export interface CreateServerOptions {
    * and stops it with the lifecycle and reports it on `/v1/health`.
    */
   readonly workflowTimers?: WorkflowTimersInput;
+  /**
+   * B1.6: optional channel-gateway surface (`@graphorin/channels`,
+   * matched structurally - no package dependency). Pass the gateway
+   * (`{ gateway }`) or a pre-built daemon; the server starts/stops it
+   * with the lifecycle, reports it on `/v1/health`, and bridges
+   * accepted inbound messages into `scheduler.recordActivity()`.
+   */
+  readonly channels?: ChannelsInput;
   /**
    * Optional replay API consumed by the scope-enforced replay
    * endpoints. Phase 14c.
@@ -264,7 +283,8 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   // Request-state / CORS / CSRF / rate-limit - see `app-middleware.ts`.
   attachGlobalMiddleware(app, config, now);
 
-  const { triggersDaemon, consolidatorDaemon, workflowTimerDaemon } = buildDaemons(options);
+  const { triggersDaemon, consolidatorDaemon, workflowTimerDaemon, channelsDaemon } =
+    buildDaemons(options);
 
   // A2 (item 7): the run tracker is the single choke point every
   // REST/WS run passes through - bridge it into the activity seams.
@@ -277,6 +297,15 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
       if (event.kind === 'run-end') {
         void consolidatorDaemon?.consolidator.notifyActivity?.()?.catch?.(() => {});
       }
+    });
+  }
+
+  // B1.6 + A2: channel inbound is user activity too - every ACCEPTED
+  // inbound message resets the idle window, exactly like a tracked
+  // run. Wired via the gateway's single listener slot.
+  if (channelsDaemon !== undefined && triggersDaemon !== undefined) {
+    channelsDaemon.gateway.setActivityListener?.(() => {
+      triggersDaemon.scheduler.recordActivity();
     });
   }
 
@@ -300,6 +329,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     triggersDaemon,
     consolidatorDaemon,
     workflowTimerDaemon,
+    channelsDaemon,
   });
 
   const handle: GraphorinServer = {
@@ -324,6 +354,9 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     },
     get workflowTimers() {
       return workflowTimerDaemon;
+    },
+    get channels() {
+      return channelsDaemon;
     },
     get listeningOn() {
       return lifecycle.listeningOn;

@@ -15,6 +15,12 @@ const UNTRUSTED_TRUST_CLASSES: ReadonlySet<ToolTrustClass> = new Set<ToolTrustCl
   'mcp-derived',
   'web-search',
   'skill-untrusted',
+  // Message-borne input from a messenger channel (B1.5). Channel peers
+  // are authenticated by the pairing policy but their CONTENT is still
+  // attacker-influenceable (forwarded text, quoted articles), so both
+  // the taint engine and the Rule-of-Two untrustedInput leg treat it
+  // as untrusted.
+  'channel-inbound',
 ]);
 
 /**

@@ -490,6 +490,68 @@
     ]
   },
   {
+    "text": "@graphorin/channels",
+    "link": "/api/@graphorin/channels/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "package.json",
+        "link": "/api/@graphorin/channels/package.json/"
+      },
+      {
+        "text": "testkit",
+        "link": "/api/@graphorin/channels/testkit/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ConformanceHarness",
+                "link": "/api/@graphorin/channels/testkit/interfaces/ConformanceHarness.md"
+              },
+              {
+                "text": "ConformanceTestApi",
+                "link": "/api/@graphorin/channels/testkit/interfaces/ConformanceTestApi.md"
+              },
+              {
+                "text": "LoopbackAdapter",
+                "link": "/api/@graphorin/channels/testkit/interfaces/LoopbackAdapter.md"
+              },
+              {
+                "text": "LoopbackAdapterOptions",
+                "link": "/api/@graphorin/channels/testkit/interfaces/LoopbackAdapterOptions.md"
+              },
+              {
+                "text": "LoopbackInboundInput",
+                "link": "/api/@graphorin/channels/testkit/interfaces/LoopbackInboundInput.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createInMemoryPairingStore",
+                "link": "/api/@graphorin/channels/testkit/functions/createInMemoryPairingStore.md"
+              },
+              {
+                "text": "createLoopbackAdapter",
+                "link": "/api/@graphorin/channels/testkit/functions/createLoopbackAdapter.md"
+              },
+              {
+                "text": "describeChannelAdapterConformance",
+                "link": "/api/@graphorin/channels/testkit/functions/describeChannelAdapterConformance.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "text": "@graphorin/cli",
     "link": "/api/@graphorin/cli/",
     "collapsed": true,
@@ -1892,6 +1954,10 @@
         "link": "/api/@graphorin/security/hardening/"
       },
       {
+        "text": "inspect",
+        "link": "/api/@graphorin/security/inspect/"
+      },
+      {
         "text": "oauth",
         "link": "/api/@graphorin/security/oauth/"
       },
@@ -1922,6 +1988,10 @@
     "link": "/api/@graphorin/server/",
     "collapsed": true,
     "items": [
+      {
+        "text": "channels",
+        "link": "/api/@graphorin/server/channels/"
+      },
       {
         "text": "commentary",
         "link": "/api/@graphorin/server/commentary/",
@@ -3251,6 +3321,73 @@
       {
         "text": "inbound",
         "link": "/api/@graphorin/tools/inbound/"
+      },
+      {
+        "text": "outbound",
+        "link": "/api/@graphorin/tools/outbound/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "OutboundCommentaryPattern",
+                "link": "/api/@graphorin/tools/outbound/interfaces/OutboundCommentaryPattern.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "OutboundCommentaryPolicy",
+                "link": "/api/@graphorin/tools/outbound/type-aliases/OutboundCommentaryPolicy.md"
+              },
+              {
+                "text": "OutboundCommentaryReason",
+                "link": "/api/@graphorin/tools/outbound/type-aliases/OutboundCommentaryReason.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "COMMENTARY_WRAP_CLOSE",
+                "link": "/api/@graphorin/tools/outbound/variables/COMMENTARY_WRAP_CLOSE.md"
+              },
+              {
+                "text": "COMMENTARY_WRAP_OPEN",
+                "link": "/api/@graphorin/tools/outbound/variables/COMMENTARY_WRAP_OPEN.md"
+              },
+              {
+                "text": "OUTBOUND_COMMENTARY_PATTERNS",
+                "link": "/api/@graphorin/tools/outbound/variables/OUTBOUND_COMMENTARY_PATTERNS.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "freshRegex",
+                "link": "/api/@graphorin/tools/outbound/functions/freshRegex.md"
+              },
+              {
+                "text": "sha256Hex",
+                "link": "/api/@graphorin/tools/outbound/functions/sha256Hex.md"
+              },
+              {
+                "text": "splitByWrapEnvelope",
+                "link": "/api/@graphorin/tools/outbound/functions/splitByWrapEnvelope.md"
+              }
+            ]
+          }
+        ]
       },
       {
         "text": "package.json",

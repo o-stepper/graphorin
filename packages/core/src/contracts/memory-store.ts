@@ -8,6 +8,7 @@ import type {
   Rule,
 } from '../types/memory.js';
 import type { Message } from '../types/message.js';
+import type { RunTurnVerdict } from '../types/run.js';
 import type { SessionScope } from '../types/session-scope.js';
 
 /**
@@ -105,9 +106,27 @@ export interface SessionMessageWithMetadata {
   readonly createdAt: string;
 }
 
+/**
+ * B3 (item 15): optional per-message write metadata. `verdict` is the
+ * turn's security verdict from the run loop's commit gates
+ * (`RunState.verdicts`); persisted so the memory ingest gate can
+ * exclude guardrail-blocked turns from extraction deterministically.
+ * Additive third argument (arity precedent: `forget(id, reason?,
+ * scope?)`); widen-only semantics like `ToolReturn.taint`.
+ *
+ * @stable
+ */
+export interface SessionMessagePushOptions {
+  readonly verdict?: RunTurnVerdict;
+}
+
 /** @stable */
 export interface SessionMemoryStore {
-  push(scope: SessionScope, message: Message): Promise<MessageRef>;
+  push(
+    scope: SessionScope,
+    message: Message,
+    options?: SessionMessagePushOptions,
+  ): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
   /**
    * List messages with their persisted identity (RP-5). Optional: stores that

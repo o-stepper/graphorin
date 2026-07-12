@@ -1,4 +1,4 @@
-import type { RunError, RunState, RunStatus } from './run.js';
+import type { RunError, RunState, RunStatus, RunVerdicts } from './run.js';
 import type { ContentChunk, ToolError } from './tool.js';
 import type { Usage } from './usage.js';
 
@@ -569,6 +569,12 @@ export interface AgentResult<TOutput = string> {
   readonly status: RunStatus;
   /** Populated when the run failed; mirrors `RunState.error`. */
   readonly error?: RunError;
+  /**
+   * B3 (item 15): the run's per-turn security verdicts (mirrors
+   * `state.verdicts`). Surfaced directly so callers can apply them at
+   * the `Session.push` boundary without digging into the state.
+   */
+  readonly verdicts?: RunVerdicts;
   /**
    * The run's final state. Resumable when `status === 'awaiting_approval'`
    * - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally

@@ -10,13 +10,14 @@ import type {
   Tracer,
 } from '@graphorin/core';
 import { md5 } from '@graphorin/core';
+import { type InjectionClassifier, runInjectionClassifier } from '@graphorin/security/inspect';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
 import { DEFAULT_SALIENCE_WEIGHTS, type SalienceWeights } from '../consolidator/decay.js';
 import { QuarantinePromotionRefusedError } from '../errors/index.js';
 import { type EntityResolver, normalizeEntityName } from '../graph/entity-resolver.js';
 import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
-import { detectMemoryInjection } from '../internal/injection-heuristics.js';
+import { detectMemoryInjection, type InjectionScan } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
@@ -438,6 +439,7 @@ export class SemanticMemory {
   readonly #grader: RetrievalGrader | null;
   readonly #iterativeMaxIterations: number;
   readonly #iterativeDifficultyThreshold: number | undefined;
+  readonly #injectionClassifier: InjectionClassifier | null;
   #reranker: ReRanker;
   readonly #trustWeights: SalienceWeights;
   readonly #searchDefaults: SemanticSearchDefaults;
@@ -449,6 +451,13 @@ export class SemanticMemory {
     embedderIdProvider: () => string | null;
     reranker: ReRanker;
     conflictPipeline?: ConflictPipeline;
+    /**
+     * B4 (D-12): optional pluggable injection classifier consulted at
+     * the write-time quarantine gate AFTER the regex heuristics. A
+     * flagged verdict quarantines the write exactly like a regex hit;
+     * classifier errors never fail the write (resilience contract).
+     */
+    injectionClassifier?: InjectionClassifier | null;
     /**
      * Query transformer for multi-query / HyDE retrieval (P2-3). When
      * supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one
@@ -511,6 +520,7 @@ export class SemanticMemory {
     this.#embedder = args.embedder;
     this.#embedderIdProvider = args.embedderIdProvider;
     this.#reranker = args.reranker;
+    this.#injectionClassifier = args.injectionClassifier ?? null;
     this.#pipeline = args.conflictPipeline ?? null;
     this.#contextualMode = args.contextualRetrieval ?? 'late-chunk';
     this.#queryTransformer = args.queryTransformer ?? null;
@@ -574,7 +584,25 @@ export class SemanticMemory {
       const provenance = input.provenance;
       const synthesized =
         provenance === 'extraction' || provenance === 'reflection' || provenance === 'induction';
-      const injection = detectMemoryInjection(text);
+      const heuristics = detectMemoryInjection(text);
+      // B4 (D-12): the pluggable classifier widens the regex verdict -
+      // consulted only when the regex pass is clean (a hit already
+      // quarantines) and never able to CLEAR a hit. Errors degrade to
+      // the regex verdict alone (runInjectionClassifier is resilient).
+      let classifierFlagged = false;
+      if (!heuristics.flagged && this.#injectionClassifier !== null) {
+        const verdict = await runInjectionClassifier(this.#injectionClassifier, {
+          text,
+          surface: 'memory-write',
+        });
+        classifierFlagged = verdict?.flagged === true;
+      }
+      const injection: InjectionScan = classifierFlagged
+        ? {
+            flagged: true,
+            markers: [...heuristics.markers, `classifier:${this.#injectionClassifier?.id}`],
+          }
+        : heuristics;
       // MCON-2 auto-promotion: an opted-in, injection-clean synthesized write is
       // admitted `active`. Injection-flagged writes always stay quarantined.
       const autoPromote = options.autoPromoteSynthesized === true;

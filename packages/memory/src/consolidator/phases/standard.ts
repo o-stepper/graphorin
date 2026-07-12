@@ -35,7 +35,7 @@ import type { FactInput, SemanticMemory } from '../../tiers/semantic-memory.js';
 import type { BudgetTracker } from '../budget.js';
 import { applyNoiseFilters, type NoiseFilterPreset, renderText } from '../noise-filter.js';
 import { preFilterCandidate, reconcileCandidate } from '../reconcile.js';
-import type { PhaseOutcome } from '../types.js';
+import type { MemoryIngestGate, PhaseOutcome } from '../types.js';
 
 /** Top-s nearest neighbours surfaced to the reconcile pre-filter + LLM. */
 const RECONCILE_TOP_K = 10;
@@ -72,6 +72,8 @@ export interface StandardPhaseDeps {
   readonly scope: SessionScope;
   readonly cheapModel: string | null;
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
+  /** B3: deterministic pre-extraction admission gate (see MemoryIngestGate). */
+  readonly ingestGate?: MemoryIngestGate | null;
   readonly maxBatchSize: number;
   /**
    * W-081: input transcript budget in characters (chars/4 token proxy).
@@ -187,14 +189,30 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
           deps.maxBatchSize,
         );
       }
-      const filtered = applyNoiseFilters(
-        rawBatch as ReadonlyArray<SessionMessageRecord>,
-        deps.noiseFilters,
-      );
+      // B3 (item 15): the ingest gate runs BEFORE noise filtering on
+      // both batch paths (the runtime pre-fetch hands `deps.batch`; the
+      // self-fetch above covers direct invocations). Excluded records
+      // still advance the cursor - the runtime computes it from the
+      // RAW batch - so a blocked turn can never wedge consolidation. A
+      // throwing gate excludes the record (fail-closed).
+      const gate = deps.ingestGate ?? null;
+      const admitted =
+        gate === null
+          ? (rawBatch as ReadonlyArray<SessionMessageRecord>)
+          : (rawBatch as ReadonlyArray<SessionMessageRecord>).filter((record) => {
+              try {
+                return gate(record);
+              } catch {
+                return false;
+              }
+            });
+      const gatedOut = rawBatch.length - admitted.length;
+      const filtered = applyNoiseFilters(admitted, deps.noiseFilters);
       span.setAttributes({
         'consolidator.standard.batch_size': rawBatch.length,
         'consolidator.standard.kept_count': filtered.kept.length,
         'consolidator.standard.noise_filtered': filtered.droppedCount,
+        'consolidator.standard.ingest_gated': gatedOut,
       });
       if (filtered.kept.length === 0) {
         span.setAttributes({

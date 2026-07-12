@@ -6,7 +6,7 @@
 
 # Interface: ProceduralMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:729](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L729)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:737](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L737)
 
 Extension of the typed `ProceduralMemoryStore` with the optional
 promotion helper that storage adapters may expose (MCON-2).
@@ -73,7 +73,7 @@ Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/
 optional recordSuccess(id): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:761](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L761)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:769](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L769)
 
 Record one demonstrated successful reuse of a rule and return the
 new counter value (MCON-2 part 4). Powers
@@ -127,7 +127,7 @@ optional search(
 opts?): Promise<readonly MemoryHit<Rule>[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:749](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L749)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:757](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L757)
 
 Lexical runbook search over rule text (D3, migration 028) - content
 recall for "find the procedure for this task", as opposed to
@@ -162,7 +162,7 @@ optional setStatus(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:735](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L735)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:743](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L743)
 
 Set a rule's retrieval-trust `status` - promote a quarantined (induced)
 procedure into `activate()` or re-quarantine an active one, with a

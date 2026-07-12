@@ -66,6 +66,7 @@ export {
   type InducedProcedure,
   MAX_PROCEDURE_STEPS,
   MAX_TRAJECTORY_STEPS_SHOWN,
+  type MemoryIngestGate,
   normalizeInducedProcedure,
   type OnBudgetExceed,
   type ParsedTrigger,
@@ -85,6 +86,7 @@ export {
   type TriggerDeclarationLike,
   trajectoryFromRunState,
   type VerificationResult,
+  verdictIngestGate,
   type WorkflowInducer,
   type WorkflowInductionOptions,
 } from './consolidator/index.js';

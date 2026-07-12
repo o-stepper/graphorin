@@ -6,7 +6,7 @@
 
 # Class: SqliteMemoryStore
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L189)
+Defined in: [packages/store-sqlite/src/memory-store.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L191)
 
 Default `MemoryStore` implementation backed by SQLite + sqlite-vec.
 
@@ -24,7 +24,7 @@ Default `MemoryStore` implementation backed by SQLite + sqlite-vec.
 new SqliteMemoryStore(conn, embeddings): SqliteMemoryStore;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L208)
+Defined in: [packages/store-sqlite/src/memory-store.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L210)
 
 #### Parameters
 
@@ -41,16 +41,16 @@ Defined in: [packages/store-sqlite/src/memory-store.ts:208](https://github.com/o
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-conflicts"></a> `conflicts` | `readonly` | [`SqliteConflictStore`](/api/@graphorin/store-sqlite/classes/SqliteConflictStore.md) | - | [packages/store-sqlite/src/memory-store.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L201) |
-| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`SqliteConsolidatorStateStore`](/api/@graphorin/store-sqlite/classes/SqliteConsolidatorStateStore.md) | - | [packages/store-sqlite/src/memory-store.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L202) |
-| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L197) |
-| <a id="property-graph"></a> `graph` | `readonly` | `SqliteGraphStore` | Lightweight relation-graph surface (P2-1): entities + one-hop CTE. | [packages/store-sqlite/src/memory-store.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L206) |
-| <a id="property-insights"></a> `insights` | `readonly` | `SqliteInsightStore` | Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. | [packages/store-sqlite/src/memory-store.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L204) |
-| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L199) |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L198) |
-| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L196) |
-| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L200) |
-| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L195) |
+| <a id="property-conflicts"></a> `conflicts` | `readonly` | [`SqliteConflictStore`](/api/@graphorin/store-sqlite/classes/SqliteConflictStore.md) | - | [packages/store-sqlite/src/memory-store.ts:203](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L203) |
+| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`SqliteConsolidatorStateStore`](/api/@graphorin/store-sqlite/classes/SqliteConsolidatorStateStore.md) | - | [packages/store-sqlite/src/memory-store.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L204) |
+| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L199) |
+| <a id="property-graph"></a> `graph` | `readonly` | `SqliteGraphStore` | Lightweight relation-graph surface (P2-1): entities + one-hop CTE. | [packages/store-sqlite/src/memory-store.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L208) |
+| <a id="property-insights"></a> `insights` | `readonly` | `SqliteInsightStore` | Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. | [packages/store-sqlite/src/memory-store.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L206) |
+| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L201) |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L200) |
+| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L198) |
+| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L202) |
+| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | - | [packages/store-sqlite/src/memory-store.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L197) |
 
 ## Methods
 
@@ -60,7 +60,7 @@ Defined in: [packages/store-sqlite/src/memory-store.ts:208](https://github.com/o
 close(): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L229)
+Defined in: [packages/store-sqlite/src/memory-store.ts:231](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L231)
 
 Cleanly close any underlying handles. Idempotent.
 
@@ -80,7 +80,7 @@ Cleanly close any underlying handles. Idempotent.
 embeddingMetaRepository(): EmbeddingMetaRepository;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L239)
+Defined in: [packages/store-sqlite/src/memory-store.ts:241](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L241)
 
 Surfaced for tests and the consolidator.
 
@@ -96,7 +96,7 @@ Surfaced for tests and the consolidator.
 init(): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L224)
+Defined in: [packages/store-sqlite/src/memory-store.ts:226](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L226)
 
 Initialize / migrate the underlying storage. Idempotent.
 
@@ -116,7 +116,7 @@ Initialize / migrate the underlying storage. Idempotent.
 pruneHistory(olderThanMs): Promise<number>;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:252](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L252)
+Defined in: [packages/store-sqlite/src/memory-store.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L254)
 
 store-04: retention prune for the `memory_history` audit trail -
 without one the table grows unboundedly (every supersede /
@@ -148,7 +148,7 @@ their own maintenance schedule; nothing prunes automatically.
 vectorTableManager(): VectorTableManager;
 ```
 
-Defined in: [packages/store-sqlite/src/memory-store.ts:234](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L234)
+Defined in: [packages/store-sqlite/src/memory-store.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/memory-store.ts#L236)
 
 Surfaced for tests and the consolidator.
 

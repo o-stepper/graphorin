@@ -33,6 +33,7 @@ import pkg from '../package.json' with { type: 'json' };
 export const VERSION: string = pkg.version;
 
 export {
+  type ChannelsInput,
   type CreateServerOptions,
   createServer,
   ensureStoreAuditBinding,
@@ -40,6 +41,14 @@ export {
   type TriggersDaemonInput,
   type WorkflowTimersInput,
 } from './app.js';
+export {
+  type ChannelGatewayLike,
+  type ChannelGatewayStatusLike,
+  type ChannelStatusLike,
+  type ChannelsDaemon,
+  type CreateChannelsDaemonOptions,
+  createChannelsDaemon,
+} from './channels/index.js';
 export {
   createDeliveryCommentarySanitizer,
   DEFAULT_APPLY_TO_EVENTS,
@@ -74,6 +83,7 @@ export {
 export * from './errors/index.js';
 export {
   type BaseHealthCheck,
+  type ChannelsCheck,
   type ConsolidatorCheck,
   collectHealth,
   createExtendedHealthRoutes,

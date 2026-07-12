@@ -124,11 +124,12 @@ export type {
   ConsolidatorTriggerReason,
   ConsolidatorTriggerSpec,
   CreateConsolidatorOptions,
+  MemoryIngestGate,
   OnBudgetExceed,
   PhaseListener,
   PhaseOutcome,
 } from './types.js';
-export { CONSOLIDATOR_TIER_DEFAULTS } from './types.js';
+export { CONSOLIDATOR_TIER_DEFAULTS, verdictIngestGate } from './types.js';
 
 /**
  * Build a no-op consolidator that honours the full {@link Consolidator}
@@ -171,6 +172,7 @@ export function createConsolidatorPlaceholder(
     onExceed: 'pause',
     cheapModel: null,
     deepModel: null,
+    ingestGate: null,
     budgetResetSemantics: 'utc',
     noiseFilters: Object.freeze(['default' as const]),
     lockWaitMs: 30_000,

@@ -19,7 +19,7 @@ suspected leak.
 | ------ | ------ | ------ | ------ |
 | <a id="property-agentid"></a> `agentId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:543](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L543) |
 | <a id="property-causalitychain"></a> `causalityChain` | `readonly` | readonly `string`[] | [packages/core/src/types/agent-event.ts:546](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L546) |
-| <a id="property-decision"></a> `decision` | `readonly` | `"strip"` \| `"block"` \| `"detect"` \| `"flag"` | [packages/core/src/types/agent-event.ts:549](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L549) |
+| <a id="property-decision"></a> `decision` | `readonly` | `"block"` \| `"strip"` \| `"detect"` \| `"flag"` | [packages/core/src/types/agent-event.ts:549](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L549) |
 | <a id="property-detectedatiso"></a> `detectedAtIso` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:550](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L550) |
 | <a id="property-matchedpattern"></a> `matchedPattern?` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:548](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L548) |
 | <a id="property-messagecontentsha256"></a> `messageContentSha256` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:547](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L547) |

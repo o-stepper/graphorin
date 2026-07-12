@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L210)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L218)
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L239)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:247](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L247)
 
 Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L229)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:237](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L237)
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -130,7 +130,10 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 ### push()
 
 ```ts
-push(scope, message): Promise<MessageRef>;
+push(
+   scope, 
+   message, 
+options?): Promise<MessageRef>;
 ```
 
 Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
@@ -141,6 +144,7 @@ Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `message` | [`Message`](/api/@graphorin/core/type-aliases/Message.md) |
+| `options?` | [`SessionMessagePushOptions`](/api/@graphorin/core/interfaces/SessionMessagePushOptions.md) |
 
 #### Returns
 
@@ -201,7 +205,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L211)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L219)
 
 #### Parameters
 
@@ -224,7 +228,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:211](https://github
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L222)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L230)
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

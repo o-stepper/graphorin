@@ -248,6 +248,7 @@ export interface AgentResult<TOutput = string> {
     readonly status: RunStatus;
     // (undocumented)
     readonly usage: Usage;
+    readonly verdicts?: RunVerdicts;
 }
 
 // @public (undocumented)
@@ -1254,6 +1255,50 @@ export interface OutputSpec {
 }
 
 // @public
+export interface PairedPeerRecord extends PairingPeerRef {
+    readonly pairedAt: string;
+}
+
+// @public
+export interface PairingPeerRef {
+    // (undocumented)
+    readonly accountId: string;
+    // (undocumented)
+    readonly channelId: string;
+    // (undocumented)
+    readonly peerId: string;
+}
+
+// @public
+export interface PairingRequestRecord extends PairingPeerRef {
+    // (undocumented)
+    readonly code: string;
+    readonly createdAt: string;
+    readonly expiresAt: string;
+}
+
+// @public
+export interface PairingStore {
+    // (undocumented)
+    addPairedPeer(peer: PairedPeerRecord): Promise<void>;
+    countPendingRequests(channelId: string, nowIso: string): Promise<number>;
+    // (undocumented)
+    deleteRequest(channelId: string, code: string): Promise<void>;
+    // (undocumented)
+    findRequestByCode(channelId: string, code: string): Promise<PairingRequestRecord | null>;
+    // (undocumented)
+    findRequestByPeer(peer: PairingPeerRef): Promise<PairingRequestRecord | null>;
+    // (undocumented)
+    isPaired(peer: PairingPeerRef): Promise<boolean>;
+    // (undocumented)
+    listPairedPeers(channelId?: string): Promise<ReadonlyArray<PairedPeerRecord>>;
+    pruneExpiredRequests(nowIso: string): Promise<number>;
+    // (undocumented)
+    removePairedPeer(peer: PairingPeerRef): Promise<void>;
+    upsertRequest(request: PairingRequestRecord): Promise<void>;
+}
+
+// @public
 export function pause<TValue, TResume = unknown>(value: TValue): TResume;
 
 // @public
@@ -1556,6 +1601,7 @@ export interface ReadonlyRunState {
     readonly usageByModel?: RunStateUsageByModel;
     // (undocumented)
     readonly userId?: string;
+    readonly verdicts?: RunVerdicts;
 }
 
 // @public
@@ -1807,6 +1853,7 @@ export interface RunState {
     usageByModel?: RunStateUsageByModel;
     // (undocumented)
     readonly userId?: string;
+    verdicts?: RunVerdicts;
 }
 
 // @public
@@ -1856,6 +1903,16 @@ export interface RunTaintSummary {
     // (undocumented)
     readonly untrustedSourceKinds: ReadonlyArray<string>;
 }
+
+// @public
+export interface RunTurnVerdict {
+    readonly dataflowFlags?: ReadonlyArray<string>;
+    readonly guardrail?: 'block' | 'rewrite';
+    readonly lateralLeak?: boolean;
+}
+
+// @public
+export type RunVerdicts = Record<string, RunTurnVerdict>;
 
 // Warning: (ae-internal-missing-underscore) The name "runWithPauseResume" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -2070,8 +2127,14 @@ export interface SessionMemoryStore {
     list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
     listWithMetadata?(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
     // (undocumented)
-    push(scope: SessionScope, message: Message): Promise<MessageRef>;
+    push(scope: SessionScope, message: Message, options?: SessionMessagePushOptions): Promise<MessageRef>;
     search(scope: SessionScope, query: string, opts?: MemorySearchOptions): Promise<ReadonlyArray<MemoryHit>>;
+}
+
+// @public
+export interface SessionMessagePushOptions {
+    // (undocumented)
+    readonly verdict?: RunTurnVerdict;
 }
 
 // @public
@@ -2252,6 +2315,32 @@ export function stream<T>(opts?: {
     readonly unique?: boolean;
     readonly default?: ReadonlyArray<T>;
 }): Stream<T>;
+
+// @public
+export interface SttAdapter {
+    readonly id: string;
+    // (undocumented)
+    transcribe(request: SttTranscriptionRequest): Promise<SttTranscript>;
+}
+
+// @public
+export interface SttTranscript {
+    readonly confidence?: number;
+    readonly durationMs?: number;
+    readonly language?: string;
+    // (undocumented)
+    readonly text: string;
+    readonly trustClass: 'channel-inbound';
+}
+
+// @public
+export interface SttTranscriptionRequest {
+    readonly audio: Uint8Array;
+    readonly languageHint?: string;
+    readonly mimeType: string;
+    // (undocumented)
+    readonly signal?: AbortSignal;
+}
 
 // @public (undocumented)
 export interface SystemMessage {
@@ -2667,7 +2756,7 @@ export type ToolSource = {
 };
 
 // @public
-export type ToolTrustClass = 'first-party-built-in' | 'first-party-user-defined' | 'skill-trusted' | 'skill-untrusted' | 'mcp-derived' | 'web-search';
+export type ToolTrustClass = 'first-party-built-in' | 'first-party-user-defined' | 'skill-trusted' | 'skill-untrusted' | 'mcp-derived' | 'web-search' | 'channel-inbound';
 
 // @public
 export function toWireAgentEvent<TOutput = string>(ev: AgentEvent<TOutput> | WireAgentEvent<TOutput>): WireAgentEvent<TOutput>;

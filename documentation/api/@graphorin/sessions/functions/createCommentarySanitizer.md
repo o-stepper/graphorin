@@ -10,7 +10,7 @@
 function createCommentarySanitizer(options?): CommentarySanitizer;
 ```
 
-Defined in: [packages/sessions/src/commentary/sanitizer.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L100)
+Defined in: [packages/sessions/src/commentary/sanitizer.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L103)
 
 Build a stateless commentary-phase sanitizer.
 

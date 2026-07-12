@@ -10,7 +10,7 @@
 function createServer(options?): Promise<GraphorinServer>;
 ```
 
-Defined in: [packages/server/src/app.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app.ts#L196)
+Defined in: [packages/server/src/app.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app.ts#L215)
 
 Build a fully-wired Graphorin server. The returned handle is
 inert until `start()` is awaited.

@@ -88,6 +88,10 @@
       "types": "./dist/hardening/index.d.ts",
       "default": "./dist/hardening/index.js"
     },
+    "./inspect": {
+      "types": "./dist/inspect/index.d.ts",
+      "default": "./dist/inspect/index.js"
+    },
     "./oauth": {
       "types": "./dist/oauth/index.d.ts",
       "default": "./dist/oauth/index.js"

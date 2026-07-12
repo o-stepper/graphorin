@@ -575,6 +575,19 @@ importers:
         specifier: ^3.25.0
         version: 3.25.76
 
+  packages/channels:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../core
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../tools
+    devDependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../agent
+
   packages/cli:
     dependencies:
       '@graphorin/core':
@@ -929,6 +942,9 @@ importers:
       '@graphorin/observability':
         specifier: workspace:*
         version: link:../observability
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../tools
     devDependencies:
       '@graphorin/memory':
         specifier: workspace:*

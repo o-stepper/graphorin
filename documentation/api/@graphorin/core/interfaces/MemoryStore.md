@@ -6,7 +6,7 @@
 
 # Interface: MemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L37)
+Defined in: [packages/core/src/contracts/memory-store.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L38)
 
 Persistent storage interface for the six memory tiers. Implementations
 live in the storage adapter packages (`@graphorin/store-sqlite` is the
@@ -39,12 +39,12 @@ never stop compiling.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L40) |
-| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L42) |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L41) |
-| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L39) |
-| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L43) |
-| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L38) |
+| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L41) |
+| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L43) |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L42) |
+| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L40) |
+| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L44) |
+| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | [packages/core/src/contracts/memory-store.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L39) |
 
 ## Methods
 
@@ -54,7 +54,7 @@ never stop compiling.
 close(): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L48)
+Defined in: [packages/core/src/contracts/memory-store.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L49)
 
 Cleanly close any underlying handles. Idempotent.
 
@@ -70,7 +70,7 @@ Cleanly close any underlying handles. Idempotent.
 init(): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L46)
+Defined in: [packages/core/src/contracts/memory-store.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L47)
 
 Initialize / migrate the underlying storage. Idempotent.
 

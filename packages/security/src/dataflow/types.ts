@@ -132,6 +132,16 @@ export interface TaintLedger {
    * compiling; the built-in ledger implements it.
    */
   recordAssistantOutput?(text: string): void;
+  /**
+   * B1.5: record message-borne input (channel inbound) with the same
+   * widening semantics as {@link TaintLedger.recordOutput}. A dedicated
+   * entry point because the Rule-of-Two deliberately excludes ordinary
+   * user MESSAGES from the untrusted-input leg - channel messages come
+   * from an authenticated-but-content-untrusted peer and must arm the
+   * gate. Optional so third-party ledgers keep compiling; the built-in
+   * ledger implements it.
+   */
+  recordInboundMessage?(label: TaintLabel, text: string): void;
   /** Probe a sink's serialized arguments for verbatim untrusted carry. */
   inspectArgs(argsText: string): ArgsTaintProbe;
   /** `true` once any untrusted-source output has entered the run. */
@@ -245,10 +255,20 @@ export interface DataFlowPolicyConfig {
  * @stable
  */
 export interface DataFlowEvaluation {
-  /** Name of the sink tool about to run. */
+  /** Name of the sink tool about to run (the stable sink id). */
   readonly toolName: string;
   /** The sink's resolved side-effect class. */
   readonly sideEffectClass: SideEffectClass;
+  /**
+   * B4 (item 14): what KIND of sink this evaluation describes.
+   * `'tool'` (default when absent) - a tool call gated by its
+   * side-effect class. `'assistant-output'` - the run's outgoing
+   * assistant text, a sink by definition regardless of side-effect
+   * class (the reply surface exfiltrates to whoever reads it).
+   * Declassify matching stays on `toolName` (e.g. the stable id
+   * `'assistant-output'` in `declassifySinks`).
+   */
+  readonly sinkKind?: 'tool' | 'assistant-output';
   /** `true` when the sink's arguments carry untrusted content verbatim. */
   readonly carriesUntrustedVerbatim: boolean;
   /** `true` when untrusted content has entered the run. */

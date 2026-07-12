@@ -78,6 +78,8 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '031': '@graphorin/store-sqlite (drop dead trigger_fire_log table)',
   '032': '@graphorin/store-sqlite (workflow durable-timer wake_at enumeration)',
   '033': '@graphorin/store-sqlite (embedding index-mode column)',
+  '034': '@graphorin/channels (pairing requests + paired peers)',
+  '035': '@graphorin/memory (session-message security verdict)',
 };
 
 /**

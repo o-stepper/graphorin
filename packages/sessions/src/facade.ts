@@ -18,6 +18,7 @@ import type {
   Message,
   MessageContent,
   MessageRef,
+  SessionMessagePushOptions,
   SessionScope,
   SystemMessage,
   ToolMessage,
@@ -81,7 +82,11 @@ import {
  * @stable
  */
 export interface SessionMemoryFacade {
-  push(scope: SessionScope, message: Message): Promise<MessageRef>;
+  push(
+    scope: SessionScope,
+    message: Message,
+    options?: SessionMessagePushOptions,
+  ): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
   /**
    * List messages with their persisted identity (RP-5): the stored message id,
@@ -180,8 +185,13 @@ export interface Session {
   /** Effective commentary policy for this session. */
   readonly commentaryPolicy: CommentaryPolicy;
   metadata(): Promise<SessionMetadata>;
-  /** Persist a new message - wraps `memory.session.push(scope, ...)`. */
-  push(message: Message): Promise<MessageRef>;
+  /**
+   * Persist a new message - wraps `memory.session.push(scope, ...)`.
+   * B3: `options.verdict` threads the run loop's per-turn security
+   * verdict (`AgentResult.verdicts`) onto the stored row so the
+   * memory ingest gate can act on it.
+   */
+  push(message: Message, options?: SessionMessagePushOptions): Promise<MessageRef>;
   /** List messages - wraps `memory.session.list(scope, ...)`. */
   list(opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
   /** Hybrid (FTS5) search over messages - wraps `memory.session.search(...)`. */
@@ -584,14 +594,14 @@ class SessionImpl implements Session {
     return meta;
   }
 
-  async push(message: Message): Promise<MessageRef> {
+  async push(message: Message, options?: SessionMessagePushOptions): Promise<MessageRef> {
     // RP-6: close() is a real lifecycle boundary - pushing to a closed session
     // is rejected rather than silently accepted. (Multi-writer last-write-wins:
     // this guards the common same-instance case; a session closed by another
     // writer is caught on the next reload.)
     if (this.#closed) throw new SessionClosedError(this.id);
     const sanitized = this.#sanitize(message, 'session-push');
-    return this.#args.memory.push(this.scope, sanitized);
+    return this.#args.memory.push(this.scope, sanitized, options);
   }
 
   async list(opts: SessionListOptions = {}): Promise<ReadonlyArray<Message>> {

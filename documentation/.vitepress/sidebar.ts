@@ -43,6 +43,7 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Tools', link: '/guide/tools' },
       { text: 'Skills', link: '/guide/skills' },
       { text: 'MCP client', link: '/guide/mcp-client' },
+      { text: 'Channels', link: '/guide/channels' },
       { text: 'Providers', link: '/guide/providers' },
       { text: 'Embedders', link: '/guide/embedders' },
       { text: 'Rerankers', link: '/guide/rerankers' },

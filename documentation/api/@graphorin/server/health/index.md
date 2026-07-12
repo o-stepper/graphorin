@@ -18,6 +18,12 @@ Re-exports [BaseHealthCheck](/api/@graphorin/server/interfaces/BaseHealthCheck.m
 
 ***
 
+### ChannelsCheck
+
+Re-exports [ChannelsCheck](/api/@graphorin/server/interfaces/ChannelsCheck.md)
+
+***
+
 ### collectHealth
 
 Re-exports [collectHealth](/api/@graphorin/server/functions/collectHealth.md)

@@ -6,7 +6,7 @@
 
 # Interface: BaseHealthCheck
 
-Defined in: [packages/server/src/health/checks.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L41)
+Defined in: [packages/server/src/health/checks.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L42)
 
 Common discriminator carried on every per-subsystem check entry.
 Concrete shapes extend this with subsystem-specific fields per the
@@ -16,6 +16,7 @@ documented contract.
 
 ## Extended by
 
+- [`ChannelsCheck`](/api/@graphorin/server/interfaces/ChannelsCheck.md)
 - [`ConsolidatorCheck`](/api/@graphorin/server/interfaces/ConsolidatorCheck.md)
 - [`EmbedderCheck`](/api/@graphorin/server/interfaces/EmbedderCheck.md)
 - [`EncryptionCheck`](/api/@graphorin/server/interfaces/EncryptionCheck.md)
@@ -28,5 +29,5 @@ documented contract.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-message"></a> `message?` | `readonly` | `string` | [packages/server/src/health/checks.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L43) |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [packages/server/src/health/checks.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L42) |
+| <a id="property-message"></a> `message?` | `readonly` | `string` | [packages/server/src/health/checks.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L44) |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [packages/server/src/health/checks.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L43) |

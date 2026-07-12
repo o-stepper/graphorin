@@ -4,19 +4,16 @@
  * boundary, Phase 11) and `@graphorin/server/commentary` (the
  * delivery-layer event-emission boundary, Phase 14b).
  *
- * The two catalogues live in two packages so the server can sanitize
- * without forcing a hard dependency on the optional sessions peer.
- * They are required to be **structurally equivalent** + **bytes-equal
- * on identical input** so the defense-in-depth posture composes
- * cleanly: a string sanitized by the session-output boundary is a
- * fixed point of the delivery-layer sanitizer (no double-wrap), and
- * vice-versa.
- *
- * This test pins both invariants so a future divergence on either
- * side surfaces as a failing test.
+ * Since B2 (bot-adoption wave B) both packages re-export the single
+ * shared catalogue from `@graphorin/tools/outbound`, so equivalence
+ * is now guaranteed by construction (same array reference). The
+ * structural assertions stay as a regression guard for the day either
+ * side reintroduces a local copy; the identity assertion pins the
+ * single-source property itself.
  */
 
 import { BUILT_IN_COMMENTARY_PATTERNS as SESSIONS_PATTERNS } from '@graphorin/sessions/commentary';
+import { OUTBOUND_COMMENTARY_PATTERNS as SHARED_PATTERNS } from '@graphorin/tools/outbound';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -25,6 +22,11 @@ import {
 } from '../src/commentary/index.js';
 
 describe('Commentary catalogue cross-package equivalence', () => {
+  it('both packages re-export the shared @graphorin/tools/outbound catalogue by reference', () => {
+    expect(Object.is(SERVER_PATTERNS, SHARED_PATTERNS)).toBe(true);
+    expect(Object.is(SESSIONS_PATTERNS, SHARED_PATTERNS)).toBe(true);
+  });
+
   it('exposes the same `reason` discriminator set in both packages', () => {
     const serverReasons = new Set(SERVER_PATTERNS.map((p) => p.reason));
     const sessionsReasons = new Set(SESSIONS_PATTERNS.map((p) => p.reason));

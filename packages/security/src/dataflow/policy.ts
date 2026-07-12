@@ -15,6 +15,8 @@ import type {
 
 /** Is this side-effect class a sink (can it exfiltrate / mutate state)? */
 function isSink(evaluation: DataFlowEvaluation): boolean {
+  // B4: the outgoing assistant text is a sink by definition.
+  if (evaluation.sinkKind === 'assistant-output') return true;
   return (
     evaluation.sideEffectClass === 'side-effecting' ||
     evaluation.sideEffectClass === 'external-stateful'

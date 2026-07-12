@@ -25,6 +25,7 @@ import {
   scanImperativePatterns,
   stripImperativePatterns,
 } from '@graphorin/observability/redaction';
+import { type InjectionClassifier, runInjectionClassifier } from '@graphorin/security/inspect';
 
 import {
   neutralizeEnvelopeDelimiters,
@@ -204,4 +205,50 @@ function wrapEnvelope(
 
 function escapeAttr(raw: string): string {
   return raw.replace(/"/g, '&quot;');
+}
+
+/** Options for {@link applyInboundSanitizationWithClassifier}. @stable */
+export interface InboundSanitizationWithClassifierOptions {
+  readonly body: string;
+  readonly policy: InboundSanitizationPolicy;
+  readonly trustClass: ToolTrustClass;
+  readonly toolName: string;
+  readonly contentOrigin?: string;
+  readonly failClosed?: boolean;
+  readonly patterns?: ReadonlyArray<ImperativePattern>;
+  readonly budgetMs?: number;
+  /**
+   * B4 (D-12): optional pluggable injection classifier consulted
+   * AFTER the regex pass, on the already-sanitized body. A flagged
+   * verdict appends `classifier:<id>` to `patternsHit` (audit
+   * signal); the body is never modified by the classifier (it names
+   * no spans to strip). Errors are swallowed by the resilience
+   * contract - the regex outcome stands alone.
+   */
+  readonly classifier?: InjectionClassifier;
+}
+
+/**
+ * Async variant of {@link applyInboundSanitization} that additionally
+ * consults an optional {@link InjectionClassifier} (B4 seam, default
+ * off). Identical to the sync pass when no classifier is supplied.
+ *
+ * @stable
+ */
+export async function applyInboundSanitizationWithClassifier(
+  opts: InboundSanitizationWithClassifierOptions,
+): Promise<SanitizationOutcome> {
+  const { classifier, ...rest } = opts;
+  const outcome = applyInboundSanitization(rest);
+  if (classifier === undefined || outcome.blocked) return outcome;
+  const verdict = await runInjectionClassifier(classifier, {
+    text: outcome.body,
+    surface: 'tool-inbound',
+    ...(rest.contentOrigin !== undefined ? { origin: rest.contentOrigin } : {}),
+  });
+  if (verdict === null || !verdict.flagged) return outcome;
+  return {
+    ...outcome,
+    patternsHit: [...outcome.patternsHit, `classifier:${classifier.id}`],
+  };
 }

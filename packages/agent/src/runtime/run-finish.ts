@@ -85,6 +85,7 @@ export function createRunFinisher<TOutput>(
       usage: state.usage,
       status: state.status,
       ...(state.error !== undefined ? { error: state.error } : {}),
+      ...(state.verdicts !== undefined ? { verdicts: state.verdicts } : {}),
       state,
     };
   }
