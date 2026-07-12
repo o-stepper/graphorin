@@ -45,6 +45,7 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 | `@graphorin/tools` | stable | Typed tool definitions and execution. |
 | `@graphorin/skills` | stable | Loader for the public Agent Skills `SKILL.md` packaging format with three-tier progressive disclosure. |
 | `@graphorin/mcp` | stable | Model Context Protocol client (stdio + Streamable HTTP). |
+| `@graphorin/channels` | stable | Channel SPI + gateway runtime for messenger front doors - identity routing, pairing, trust boundary, testkit. Ships no vendor adapters. |
 
 ## Tier 4 - Memory & Sessions
 

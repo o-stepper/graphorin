@@ -12,6 +12,7 @@
     "../packages/tools",
     "../packages/skills",
     "../packages/mcp",
+    "../packages/channels",
     "../packages/provider",
     "../packages/embedder-transformersjs",
     "../packages/embedder-ollama",
