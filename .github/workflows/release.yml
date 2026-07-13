@@ -14,21 +14,32 @@ on:
 # provenance continues to ride the same OIDC identity
 # (`.npmrc provenance=true` + per-package `publishConfig.provenance`).
 #
-# Registry-side checklist (manual, one-time per package - all 27
-# `@graphorin/*` packages need it BEFORE the first OIDC release):
+# Registry-side checklist (manual, one-time per package - every
+# published `@graphorin/*` package needs it, 29 as of 0.9.0):
 #   npmjs.com -> package -> Settings -> Trusted publisher ->
 #     GitHub Actions / repository `o-stepper/graphorin` /
-#     workflow `release.yml` (no environment).
-# Rollback (first OIDC release only): the `NPM_TOKEN` secret stays in
-# repo settings until one OIDC release passes the C4 provenance smoke;
-# if the publish job goes red, re-add
-#   `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}`
-# to the changesets/action env below (one line) and re-run. Both
-# mechanisms must NEVER be active together: while the env is present,
-# changesets/action writes a token-based .npmrc and npm publishes by
-# token - the OIDC path would not be exercised at all. After the first
-# verified OIDC release: delete the NPM_TOKEN secret and this rollback
-# note's escape hatch.
+#     workflow `release.yml` (no environment, only "Allow npm publish").
+#
+# FIRST publication of a NEW package (the 0.9.0 lesson): npm cannot
+# configure a trusted publisher on a package that does not exist yet
+# (npm/cli#8544), so a release train that introduces a package needs a
+# ONE-RELEASE token path:
+#   1. Relax the npm account 2FA write requirement (Account Settings ->
+#      Two-Factor Authentication -> "Authorization" only), then mint a
+#      FRESH granular access token (Read and write, the whole
+#      `@graphorin` scope, short expiry) with the per-token 2FA
+#      requirement disabled - tokens minted under "auth-and-writes"
+#      carry a baked-in OTP-on-publish default that survives account
+#      setting flips and fails package CREATION with EOTP.
+#   2. `gh secret set NPM_TOKEN` + re-add
+#      `NPM_TOKEN: ${{ secrets.NPM_TOKEN }}` to the changesets/action
+#      env below. Token-based publish still signs Sigstore provenance
+#      (`id-token: write` + NPM_CONFIG_PROVENANCE).
+#   3. After the green run: configure the new packages' trusted
+#      publishers, restore the 2FA setting, delete the secret AND the
+#      env line (an empty secret writes an empty-token .npmrc that
+#      breaks the OIDC exchange). Partial-publish reruns are safe:
+#      `changeset publish` skips versions already on the registry.
 #
 # The publish step is gated on the `RELEASE_ENABLED` **repository
 # variable** so an accidental main-branch push never publishes before
@@ -160,19 +171,13 @@ jobs:
           # (Alternative: enable "Allow GitHub Actions to create and approve
           # pull requests" in repo settings and keep GITHUB_TOKEN.)
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
-          # 0.9.0 ONLY (remove right after): token-based publish for ONE
-          # release, because @graphorin/channels and @graphorin/proactive
-          # publish for the FIRST time this train and npm cannot configure a
-          # trusted publisher on a package that does not exist yet
-          # (npm/cli#8544). With this env present changesets/action writes a
-          # token-based .npmrc and every package publishes by token; Sigstore
-          # provenance still rides `id-token: write` +
-          # NPM_CONFIG_PROVENANCE, exactly as in the pre-W-139 releases.
-          # After the release: configure trusted publishers for the two new
-          # packages, delete the NPM_TOKEN secret AND this line (an empty
-          # secret would write an empty-token .npmrc that breaks the OIDC
-          # exchange).
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Deliberately NO `NPM_TOKEN` here (W-139) - publishing
+          # authenticates via OIDC trusted publishing (see the header).
+          # While an NPM_TOKEN env is present, changesets/action writes a
+          # token-based .npmrc and the OIDC path is never exercised; an
+          # EMPTY secret is worse (an empty-token .npmrc breaks the OIDC
+          # exchange). The env line comes back only for a release that
+          # first-publishes a NEW package - see the header checklist.
           NPM_CONFIG_PROVENANCE: 'true'
 
       # C4 / Wave-4 acceptance gate: after a real publish, verify the release
