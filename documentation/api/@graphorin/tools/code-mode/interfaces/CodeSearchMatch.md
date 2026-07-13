@@ -6,7 +6,7 @@
 
 # Interface: CodeSearchMatch
 
-Defined in: [packages/tools/src/code-mode/meta-tools.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L44)
+Defined in: [packages/tools/src/code-mode/meta-tools.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L40)
 
 A tool-search match `code_search` can fold in (deferred pool).
 
@@ -14,7 +14,7 @@ A tool-search match `code_search` can fold in (deferred pool).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description` | `readonly` | `string` | - | [packages/tools/src/code-mode/meta-tools.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L46) |
-| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | [packages/tools/src/code-mode/meta-tools.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L47) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/tools/src/code-mode/meta-tools.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L45) |
-| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | A5: the matched tool's output schema, when declared (renders a return type). | [packages/tools/src/code-mode/meta-tools.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L49) |
+| <a id="property-description"></a> `description` | `readonly` | `string` | - | [packages/tools/src/code-mode/meta-tools.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L42) |
+| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | [packages/tools/src/code-mode/meta-tools.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L43) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/tools/src/code-mode/meta-tools.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L41) |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | A5: the matched tool's output schema, when declared (renders a return type). | [packages/tools/src/code-mode/meta-tools.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L45) |
