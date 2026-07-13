@@ -29,11 +29,7 @@
  */
 
 import type { Tool, ToolExecutionContext } from '@graphorin/core';
-import type {
-  BridgedSourceOptions,
-  BridgedToolCall,
-  CodeModeRunner,
-} from '@graphorin/security/sandbox';
+import type { BridgedToolCall, CodeModeRunner } from '@graphorin/security/sandbox';
 import { runBridgedSource } from '@graphorin/security/sandbox';
 import { z } from 'zod';
 import { incrementCounter } from '../audit/index.js';
