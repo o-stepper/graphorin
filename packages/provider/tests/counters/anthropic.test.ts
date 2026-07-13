@@ -1,36 +1,14 @@
 /**
  * Coverage for the Anthropic native count-tokens counter. The fixture
- * uses an injected fetchImpl + stubbed JsTiktoken module so the suite
- * never touches the network or the real peer dependency.
+ * always injects fetchImpl, so the suite never touches the network;
+ * the fallback tests DO exercise the real `js-tiktoken` workspace peer
+ * (the counter builds its own fallback and offers no injection seam).
  */
 import type { Message } from '@graphorin/core';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { AnthropicAPICounter } from '../../src/counters/anthropic.js';
-import { __resetTiktokenCache } from '../../src/counters/js-tiktoken.js';
-
-interface TiktokenEncoding {
-  readonly name?: string;
-  encode(text: string): { length: number };
-}
-
-interface TiktokenModule {
-  getEncoding(name: string): TiktokenEncoding;
-  encodingForModel?: (model: string) => TiktokenEncoding;
-}
-
-function stubTiktokenModule(): TiktokenModule {
-  // One token per char so the fallback count is deterministic.
-  return {
-    getEncoding(): TiktokenEncoding {
-      return {
-        encode(text: string) {
-          return { length: text.length };
-        },
-      };
-    },
-  };
-}
+import { __resetTiktokenCache, JsTiktokenCounter } from '../../src/counters/js-tiktoken.js';
 
 function makeJsonResponse(payload: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(payload), {
@@ -41,6 +19,18 @@ function makeJsonResponse(payload: unknown, init: ResponseInit = {}): Response {
 }
 
 const MESSAGES: ReadonlyArray<Message> = [{ role: 'user', content: 'hello' }];
+
+// The first dynamic import of `js-tiktoken` parses the bundled
+// multi-megabyte rankings, and every encoder build decodes the cl100k
+// table; on a loaded shared CI runner the cold path has blown past
+// vitest's 5s default timeout. Pay the import once here, and give the
+// peer-hitting tests below a generous explicit timeout.
+beforeAll(async () => {
+  await new JsTiktokenCounter({
+    encoding: 'cl100k_base',
+    modelId: 'claude-haiku-4-5',
+  }).countText('warm-up');
+}, 60_000);
 
 describe('AnthropicAPICounter', () => {
   afterEach(() => {
@@ -65,9 +55,7 @@ describe('AnthropicAPICounter', () => {
     expect(headers?.['anthropic-version']).toBe('2023-06-01');
   });
 
-  it('falls back to the JsTiktoken proxy on a non-2xx response', async () => {
-    const moduleOverride = stubTiktokenModule();
-    // Re-create the counter so that constructing the fallback uses the stub
+  it('falls back to the JsTiktoken proxy on a non-2xx response', { timeout: 20_000 }, async () => {
     const fetchImpl = (async () =>
       makeJsonResponse({}, { status: 500 })) as unknown as typeof fetch;
     const counter = new AnthropicAPICounter({
@@ -75,18 +63,12 @@ describe('AnthropicAPICounter', () => {
       apiKey: 'sk-ant-x',
       fetchImpl,
     });
-    // Inject the stub via the global cache by tricking JsTiktoken to use moduleOverride.
-    // Since AnthropicAPICounter builds its own fallback, we provide a parallel one:
-    void moduleOverride;
-    // We can still verify behaviour: with the stub-of-stubs-not-installed, count
-    // should resolve to a finite number via the dynamic `js-tiktoken` import; the
-    // peer is installed in the workspace, so this call resolves.
     const total = await counter.count(MESSAGES);
     expect(typeof total).toBe('number');
     expect(total).toBeGreaterThan(0);
   });
 
-  it('falls back to the JsTiktoken proxy on a network error', async () => {
+  it('falls back to the JsTiktoken proxy on a network error', { timeout: 20_000 }, async () => {
     const fetchImpl = (async () => {
       throw new Error('ECONNREFUSED');
     }) as unknown as typeof fetch;
@@ -100,7 +82,9 @@ describe('AnthropicAPICounter', () => {
     expect(total).toBeGreaterThan(0);
   });
 
-  it('falls back to the proxy when the response shape is missing input_tokens', async () => {
+  it('falls back to the proxy when the response shape is missing input_tokens', {
+    timeout: 20_000,
+  }, async () => {
     const fetchImpl = (async () =>
       makeJsonResponse({ unrelated: true })) as unknown as typeof fetch;
     const counter = new AnthropicAPICounter({
@@ -113,7 +97,7 @@ describe('AnthropicAPICounter', () => {
     expect(total).toBeGreaterThan(0);
   });
 
-  it('uses the proxy outright when no apiKey is configured', async () => {
+  it('uses the proxy outright when no apiKey is configured', { timeout: 20_000 }, async () => {
     let fetched = false;
     const fetchImpl = (async () => {
       fetched = true;
@@ -129,7 +113,7 @@ describe('AnthropicAPICounter', () => {
     expect(total).toBeGreaterThan(0);
   });
 
-  it('countText() always uses the JsTiktoken proxy', async () => {
+  it('countText() always uses the JsTiktoken proxy', { timeout: 20_000 }, async () => {
     let fetched = false;
     const fetchImpl = (async () => {
       fetched = true;
@@ -221,7 +205,7 @@ describe('AnthropicAPICounter wire shape', () => {
     expect(messages[1]?.role).toBe('assistant');
   });
 
-  it('warns once (not per call) when the native path degrades', async () => {
+  it('warns once (not per call) when the native path degrades', { timeout: 20_000 }, async () => {
     const warnings: string[] = [];
     const fetchImpl = (async () =>
       makeJsonResponse({}, { status: 400 })) as unknown as typeof fetch;
@@ -237,7 +221,9 @@ describe('AnthropicAPICounter wire shape', () => {
     expect(warnings[0]).toContain('falling back');
   });
 
-  it('skips the HTTP call entirely when nothing countable remains', async () => {
+  it('skips the HTTP call entirely when nothing countable remains', {
+    timeout: 20_000,
+  }, async () => {
     let fetched = false;
     const fetchImpl = (async () => {
       fetched = true;
