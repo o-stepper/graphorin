@@ -98,8 +98,16 @@ export interface ServerWorkflowLike {
     value?: unknown,
     opts?: { readonly signal?: AbortSignal },
   ): AsyncIterable<unknown>;
-  /** W-119: fork a new thread from a checkpoint (`POST /:id/fork`). */
-  fork?(threadId: string, fromCheckpointId: string): Promise<{ readonly newThreadId: string }>;
+  /**
+   * W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
+   * `opts.patch` merges channel-level state into the forked root (the
+   * `state` field of the fork body).
+   */
+  fork?(
+    threadId: string,
+    fromCheckpointId: string,
+    opts?: { readonly patch?: Readonly<Record<string, unknown>> },
+  ): Promise<{ readonly newThreadId: string }>;
   getState?(threadId: string): Promise<unknown>;
   listCheckpoints?(threadId: string): Promise<ReadonlyArray<unknown>>;
   /** W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`). */

@@ -239,6 +239,7 @@ export function createWorkflow<
     async fork(
       threadId: string,
       fromCheckpointId: CheckpointId,
+      opts?: { readonly patch?: Readonly<Record<string, unknown>> },
     ): Promise<{ readonly newThreadId: string }> {
       const probe = await config.checkpointStore.getTuple(threadId, namespace, fromCheckpointId);
       if (!probe) throw new CheckpointNotFoundError(threadId, fromCheckpointId);
@@ -246,6 +247,7 @@ export function createWorkflow<
         config,
         threadId,
         fromCheckpointId,
+        ...(opts?.patch !== undefined ? { patch: opts.patch } : {}),
       });
     },
   });

@@ -221,3 +221,8 @@ export {
   type TriggersPruneResult,
   type TriggersStatusOptions,
 } from './triggers.js';
+export {
+  runWorkflowCheckpoints,
+  runWorkflowInspect,
+  type WorkflowCommonOptions,
+} from './workflow.js';

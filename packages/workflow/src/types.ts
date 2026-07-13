@@ -491,5 +491,17 @@ export interface Workflow<
    * timer / awakeable) destroys its resume state - the caller decides.
    */
   deleteThread(threadId: string): Promise<void>;
-  fork(threadId: string, fromCheckpointId: CheckpointId): Promise<{ readonly newThreadId: string }>;
+  /**
+   * Clone `threadId`'s timeline at `fromCheckpointId` into a fresh
+   * thread (the original stays untouched). E2: `opts.patch` merges
+   * channel-level values into the forked root's state (branch here,
+   * but with these corrected values) - keys must name declared
+   * channels, and the merged state re-runs the JSON-safety guard.
+   * `channelVersions` and pending writes ride along unchanged.
+   */
+  fork(
+    threadId: string,
+    fromCheckpointId: CheckpointId,
+    opts?: { readonly patch?: Readonly<Record<string, unknown>> },
+  ): Promise<{ readonly newThreadId: string }>;
 }

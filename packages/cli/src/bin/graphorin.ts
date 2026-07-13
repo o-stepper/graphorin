@@ -100,6 +100,8 @@ import {
   runTriggersList,
   runTriggersPrune,
   runTriggersStatus,
+  runWorkflowCheckpoints,
+  runWorkflowInspect,
   VERSION,
 } from '../index.js';
 import { isOfflineMode } from '../internal/offline.js';
@@ -117,7 +119,7 @@ async function main(): Promise<void> {
         '  Runtime:      start',
         '  Diagnostics:  doctor, telemetry, traces, guard',
         '  Auth:         token, secrets, auth',
-        '  Storage:      storage, audit, memory, consolidator, triggers, migrate-export',
+        '  Storage:      storage, audit, memory, consolidator, triggers, workflow, migrate-export',
         '  Catalogue:    pricing, skills, tools',
         '',
         'Honours GRAPHORIN_OFFLINE=1 - the v0.1 surface never makes implicit network calls.',
@@ -134,6 +136,7 @@ async function main(): Promise<void> {
   registerMemoryCommands(program);
   registerConsolidatorCommands(program);
   registerTriggersCommands(program);
+  registerWorkflowCommands(program);
   registerAuthCommands(program);
   registerPricingCommands(program);
   registerSkillsCommands(program);
@@ -990,6 +993,48 @@ function registerTriggersCommands(program: Command): void {
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });
     });
+}
+
+function registerWorkflowCommands(program: Command): void {
+  const w = program
+    .command('workflow')
+    .description('[Storage] Inspect durable workflow threads in the checkpoint store.');
+  w.command('inspect <threadId>')
+    .description('Latest checkpoint of one thread: status, pending pauses, state keys.')
+    .requiredOption(
+      '--workflow <name>',
+      'Workflow name the thread belongs to (derives the checkpoint namespace).',
+    )
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (threadId: string, opts: { workflow: string; config?: string; json?: boolean }) => {
+        await runWorkflowInspect({
+          threadId,
+          workflow: opts.workflow,
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
+  w.command('checkpoints <threadId>')
+    .description('Every persisted checkpoint of the thread.')
+    .requiredOption(
+      '--workflow <name>',
+      'Workflow name the thread belongs to (derives the checkpoint namespace).',
+    )
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (threadId: string, opts: { workflow: string; config?: string; json?: boolean }) => {
+        await runWorkflowCheckpoints({
+          threadId,
+          workflow: opts.workflow,
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
 }
 
 function registerAuthCommands(program: Command): void {

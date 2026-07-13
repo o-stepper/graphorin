@@ -29,6 +29,7 @@ graphorin audit <subcommand>    - verify / prune / export
 graphorin memory <subcommand>   - status / inspect / activity / why / review / prune-history / migrate
 graphorin consolidator <subcommand> - status / set-tier / stop
 graphorin triggers <subcommand> - list / status / fire / disable / prune
+graphorin workflow <subcommand> - inspect / checkpoints (durable thread state)
 graphorin auth <subcommand>     - login / list / refresh / revoke / status (OAuth flows)
 graphorin pricing <subcommand>  - status / refresh / diff / lookup / missing
 graphorin skills <subcommand>   - install / inspect / audit / migrate-frontmatter
@@ -217,6 +218,15 @@ graphorin triggers fire <id>                  # exit 2 - use the server route in
 ```
 
 Operates directly on the durable trigger registry in the store; all subcommands accept `--config` and `--json`. `status` exits `1` when the id does not exist. `prune` removes **disabled** rows only, and only those whose last activity (`lastFiredAt`, or `createdAt` when never fired) is older than the `--before` cutoff - always pass `--before`; without it no dated row qualifies. `triggers fire` is honest about not being wired: a daemon-side poll does not exist yet, so it exits with code `2` (UNSUPPORTED) and prints the working alternative - `POST /v1/triggers/:id/fire` (scope `triggers:fire`) on the running server.
+
+## `graphorin workflow`
+
+```bash
+graphorin workflow inspect <threadId> --workflow <name>      # latest checkpoint: status, pauses, state keys
+graphorin workflow checkpoints <threadId> --workflow <name>  # every persisted checkpoint of the thread
+```
+
+Read-only inspection of durable workflow threads straight from the checkpoint store (E2): the CLI has no node graph to rebuild a `Workflow` handle from, so `--workflow <name>` supplies the workflow NAME and the command derives the same `workflow/<name>` namespace `createWorkflow` uses. `inspect` prints the thread status, step number, checkpoint id, and the full pending-pause frontier - durable timers show their `wakeAt`, awakeables/approvals their `name` (an approval parked with a defer deadline shows both). Both subcommands accept `--config` and `--json` and exit `1` when the thread does not exist under that workflow. Neither command mutates anything - resume/approve/tick stay on the server routes (`POST /v1/workflows/:id/resume` and friends).
 
 ## `graphorin migrate-export`
 

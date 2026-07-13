@@ -2285,12 +2285,17 @@ function restoreState<TState extends object>(
 /**
  * @internal - restore a `Workflow.fork` clone. Copies the source
  * thread's state into a fresh thread id while leaving the original
- * timeline untouched.
+ * timeline untouched. E2: an optional channel-level `patch` merges
+ * into the forked root's state ("branch here, but with these corrected
+ * values") - patched keys must name declared channels, and the merged
+ * object re-runs the WF-10 JSON-safety serialization so a patch cannot
+ * smuggle non-JSON-safe values past the envelope guard.
  */
 export async function forkThread<TState extends object>(input: {
   readonly config: WorkflowConfig<TState>;
   readonly threadId: string;
   readonly fromCheckpointId: string;
+  readonly patch?: Readonly<Record<string, unknown>>;
 }): Promise<{ readonly newThreadId: string }> {
   const namespace = namespaceFor(input.config);
   const tuple = await input.config.checkpointStore.getTuple(
@@ -2305,11 +2310,33 @@ export async function forkThread<TState extends object>(input: {
   // WF-17: the forked root is self-contained - its parentId must NOT
   // dangle into the source thread (the parent only exists there).
   const { parentId: _droppedParentId, ...rest } = tuple.checkpoint;
+  let patchedState: PersistedStateEnvelope | undefined;
+  if (input.patch !== undefined && Object.keys(input.patch).length > 0) {
+    for (const key of Object.keys(input.patch)) {
+      if (!(key in input.config.channels)) {
+        throw new TypeError(
+          `[graphorin/workflow] fork patch key '${key}' does not name a declared channel of ` +
+            `workflow '${input.config.name}'`,
+        );
+      }
+    }
+    const unwrapped = unwrapPersistedState(tuple.checkpoint.state);
+    if (typeof unwrapped !== 'object' || unwrapped === null || Array.isArray(unwrapped)) {
+      throw new TypeError(
+        '[graphorin/workflow] fork patch: the source checkpoint state is not a channel record',
+      );
+    }
+    patchedState = serializeState({
+      ...(unwrapped as Record<string, unknown>),
+      ...input.patch,
+    } as TState);
+  }
   const newCheckpoint: Checkpoint = {
     ...rest,
     id: newCheckpointId,
     threadId: newThreadId,
     namespace,
+    ...(patchedState !== undefined ? { state: patchedState } : {}),
   };
   await input.config.checkpointStore.put(newThreadId, namespace, newCheckpoint, {
     source: 'sync',
