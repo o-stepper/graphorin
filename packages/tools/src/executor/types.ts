@@ -63,12 +63,22 @@ export interface ExecutorOptions {
   /**
    * Declarative tool-argument policy guard (D4 / Progent). Consulted
    * AFTER schema validation + approval, BEFORE the data-flow sink gate,
-   * on every tool call. A `forbid` verdict blocks the call with a
-   * `capability_blocked` outcome. The pure decision engine lives in
-   * `@graphorin/security/policy` (`evaluateToolArgumentPolicy`); the
-   * agent runtime injects this adapter. Absent ⇒ no policy (legacy).
+   * on every tool call. A `forbid`/`deny` verdict blocks the call with
+   * a `capability_blocked` outcome; `ask`/`defer` verdicts (E1, via the
+   * optional `decide`) fail closed here unless the batch is
+   * pre-approved - only the agent pre-screen can suspend. The pure
+   * decision engine lives in `@graphorin/security/policy`
+   * (`evaluatePermissionDecision`); the agent runtime injects this
+   * adapter. Absent ⇒ no policy (legacy).
    */
   readonly argumentPolicy?: ToolArgumentPolicyGuard;
+  /**
+   * E1 pre-tool permission hook. Runs as its own phase AFTER schema
+   * validation (+ repair), BEFORE the approval phase - see
+   * {@link PermissionHook} for the decision semantics and the
+   * `updatedInput` rewrite contract. Absent ⇒ phase skipped.
+   */
+  readonly permissionHook?: PermissionHook;
   /** Tool repair hook (single-round). */
   readonly repair?: ToolRepairHook;
   /** Per-provider token counter used by the truncation pipeline. */
@@ -295,6 +305,16 @@ export interface ExecuteBatchOptions {
    */
   readonly disableRepair?: boolean;
   /**
+   * E1: this batch replays calls a human ALREADY granted through the
+   * agent's durable-HITL pre-screen. `ask`/`defer` verdicts from the
+   * permission hook / argument policy are treated as satisfied (the
+   * grant IS their resolution) instead of failing closed; `deny` still
+   * blocks, and a hook rewrite of the granted args fails the call
+   * (tools-02). Set together with `disableRepair` by the agent's
+   * resume dispatch.
+   */
+  readonly preApproved?: boolean;
+  /**
    * Run-level capability restriction (D2 - single-writer constraint).
    * `'read-only'` deterministically blocks every `side-effecting` /
    * `external-stateful` tool with a `capability_blocked` outcome, no
@@ -304,27 +324,108 @@ export interface ExecuteBatchOptions {
   readonly capability?: 'read-only';
 }
 
+/** Facts a policy guard decides over (shared by both evaluation shapes). */
+export interface ToolArgumentPolicyFacts {
+  readonly toolName: string;
+  readonly sideEffectClass: SideEffectClass;
+  readonly sensitive: boolean;
+  /**
+   * Trust class of the tool under evaluation (W-101) - lets guards
+   * enforce trust-taxonomy rules (Rule-of-Two `untrustedInput`).
+   */
+  readonly trustClass: ToolTrustClass;
+  readonly args: unknown;
+}
+
 /**
  * Structural adapter for the D4 tool-argument policy (Progent). The
- * agent runtime wires `evaluateToolArgumentPolicy` from
- * `@graphorin/security/policy`; `@graphorin/tools` stays dependency-free
- * on security.
+ * agent runtime wires `evaluateToolArgumentPolicy` /
+ * `evaluatePermissionDecision` from `@graphorin/security/policy`;
+ * `@graphorin/tools` stays dependency-free on security.
  *
  * @stable
  */
 export interface ToolArgumentPolicyGuard {
-  evaluate(input: {
-    readonly toolName: string;
-    readonly sideEffectClass: SideEffectClass;
-    readonly sensitive: boolean;
-    /**
-     * Trust class of the tool under evaluation (W-101) - lets guards
-     * enforce trust-taxonomy rules (Rule-of-Two `untrustedInput`).
-     */
-    readonly trustClass: ToolTrustClass;
-    readonly args: unknown;
-  }): { readonly effect: 'allow' } | { readonly effect: 'forbid'; readonly reason: string };
+  evaluate(
+    input: ToolArgumentPolicyFacts,
+  ): { readonly effect: 'allow' } | { readonly effect: 'forbid'; readonly reason: string };
+  /**
+   * E1: four-value evaluation (`deny > defer > ask > allow`). When
+   * present the executor's policy phase prefers it over the binary
+   * `evaluate`; `ask`/`defer` verdicts fail closed at the executor
+   * unless the batch is pre-approved (only the agent pre-screen can
+   * suspend a run).
+   */
+  decide?(
+    input: ToolArgumentPolicyFacts,
+  ):
+    | { readonly effect: 'allow' }
+    | { readonly effect: 'deny' | 'ask' | 'defer'; readonly reason: string };
+  /**
+   * E1 deny-by-name: advertise-time check consulted with NO args (the
+   * per-step catalogue filter, `tool_search` exclusion and the
+   * executor's early mirror). Implementations must honour only
+   * predicate-free deny rules so the answer is deterministic for a
+   * given name.
+   */
+  deniesName?(
+    toolName: string,
+  ): { readonly denied: false } | { readonly denied: true; readonly reason: string };
 }
+
+/**
+ * E1: input handed to a {@link PermissionHook}.
+ *
+ * @stable
+ */
+export interface PermissionHookInput {
+  /** The original wire-level call (raw model-generated args). */
+  readonly call: ToolCall;
+  /** The schema-validated (possibly coerced) input the tool would execute on. */
+  readonly validatedInput: unknown;
+  readonly toolName: string;
+  readonly sideEffectClass: SideEffectClass;
+  readonly trustClass: ToolTrustClass;
+  readonly sensitivity?: Sensitivity;
+  readonly runContext: RunContext;
+}
+
+/**
+ * E1: verdict returned by a {@link PermissionHook}.
+ *
+ * @stable
+ */
+export interface PermissionHookResult {
+  readonly decision: 'allow' | 'deny' | 'ask' | 'defer';
+  /**
+   * Optional raw-shaped replacement args (a sandbox-redirect rewrite).
+   * Re-validated against the tool's input schema; on success it
+   * replaces BOTH the validated input and the effective args before the
+   * approval phase, so the approval gate, the argument policy and the
+   * data-flow sink gate all see what will actually run (W-118). A
+   * rewrite that fails re-validation fails the call as
+   * `invalid_input`. On a pre-approved resume replay the hook must not
+   * rewrite the granted args: a differing `updatedInput` fails the call
+   * instead of executing a payload nobody saw (tools-02).
+   */
+  readonly updatedInput?: unknown;
+  /** Human-readable reason surfaced on non-allow decisions and audits. */
+  readonly reason?: string;
+}
+
+/**
+ * E1 pre-tool permission hook: one caller-supplied decision point over
+ * every tool call, evaluated after schema validation and BEFORE the
+ * approval phase. The hook must be pure/idempotent over its input - the
+ * agent pre-screen and the executor phase may each invoke it for the
+ * same logical call. A throwing hook fails the call closed
+ * (`capability_blocked`), never open.
+ *
+ * @stable
+ */
+export type PermissionHook = (
+  input: PermissionHookInput,
+) => PermissionHookResult | Promise<PermissionHookResult>;
 
 /** Public executor surface. */
 export interface ToolExecutor {
@@ -338,6 +439,8 @@ export interface ToolExecutor {
     readonly trustLevel?: SandboxTrustLevel;
     /** See {@link ExecuteBatchOptions.disableRepair}. */
     readonly disableRepair?: boolean;
+    /** See {@link ExecuteBatchOptions.preApproved}. */
+    readonly preApproved?: boolean;
     /** See {@link ExecuteBatchOptions.capability}. */
     readonly capability?: 'read-only';
   }): Promise<CompletedToolCall>;

@@ -14,12 +14,15 @@
 import { isUntrustedTrustClass } from '@graphorin/security/dataflow';
 import {
   buildRuleOfTwoPolicy,
+  evaluatePermissionDecision,
   evaluateToolArgumentPolicy,
+  isToolDeniedByName,
   type PolicySideEffectClass,
   type RuleOfTwoProfile,
   type ToolArgumentPolicy,
+  type ToolCallFacts,
 } from '@graphorin/security/policy';
-import type { ToolArgumentPolicyGuard } from '@graphorin/tools/executor';
+import type { ToolArgumentPolicyFacts, ToolArgumentPolicyGuard } from '@graphorin/tools/executor';
 
 export type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/policy';
 
@@ -27,9 +30,12 @@ export type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/p
  * Compile the agent's opt-in tool-argument policy + Rule-of-Two profile
  * into a single guard. `ruleOfTwo` is compiled first (yielding a base
  * policy + optional read-only floor); an explicit `toolPolicy` is
- * appended so its rules compose - a forbid in either always wins
- * (forbid-before-allow). Returns `{ guard: undefined }` when neither is
- * configured (zero overhead on the default path).
+ * appended so its rules compose - a deny in either always wins
+ * (`deny > defer > ask > allow`, E1). The guard carries all three
+ * evaluation shapes: the legacy binary `evaluate`, the four-value
+ * `decide`, and the advertise-time `deniesName`. Returns
+ * `{ guard: undefined }` when neither is configured (zero overhead on
+ * the default path).
  */
 export function buildToolArgumentPolicy(
   toolPolicy: ToolArgumentPolicy | undefined,
@@ -47,18 +53,21 @@ export function buildToolArgumentPolicy(
       (toolPolicy?.defaultDenySensitive ?? false),
   };
 
+  // W-101: `untrustedSource` derived with the same taxonomy the taint
+  // engine uses, so the Rule-of-Two untrustedInput leg and dataflow
+  // policy can never disagree about what "untrusted source" means.
+  const toFacts = (input: ToolArgumentPolicyFacts): ToolCallFacts => ({
+    toolName: input.toolName,
+    sideEffectClass: input.sideEffectClass as PolicySideEffectClass,
+    sensitive: input.sensitive,
+    untrustedSource: isUntrustedTrustClass(input.trustClass),
+    args: input.args,
+  });
+
   const guard: ToolArgumentPolicyGuard = {
-    evaluate: (input) =>
-      evaluateToolArgumentPolicy(merged, {
-        toolName: input.toolName,
-        sideEffectClass: input.sideEffectClass as PolicySideEffectClass,
-        sensitive: input.sensitive,
-        // W-101: derived with the same taxonomy the taint engine uses,
-        // so the Rule-of-Two untrustedInput leg and dataflow policy can
-        // never disagree about what "untrusted source" means.
-        untrustedSource: isUntrustedTrustClass(input.trustClass),
-        args: input.args,
-      }),
+    evaluate: (input) => evaluateToolArgumentPolicy(merged, toFacts(input)),
+    decide: (input) => evaluatePermissionDecision(merged, toFacts(input)),
+    deniesName: (toolName) => isToolDeniedByName(merged, toolName),
   };
 
   return compiled?.capability !== undefined

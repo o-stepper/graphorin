@@ -36,6 +36,15 @@ export interface ToolSearchToolOptions {
    * for the current run.
    */
   readonly availability?: 'next-step' | 'next-run';
+  /**
+   * E1 deny-by-name: matches returning `true` are dropped from the
+   * results BEFORE the model sees them, so a name-denied deferred tool
+   * is neither discoverable nor promoted into the advertised set (its
+   * name and schema would otherwise leak while execution stays
+   * blocked). The agent wires the permission policy's name-level deny
+   * here; absent ⇒ no exclusion.
+   */
+  readonly excludeTool?: (toolName: string) => boolean;
 }
 
 const inputSchema = z.object({
@@ -106,7 +115,11 @@ export function createToolSearchTool(
       const k = Math.min(maxK, input.k ?? defaultK);
       const matches = await opts.registry.searchDeferred(input.query, k);
       incrementCounter('tool.retrieval.search.executed.total', undefined);
-      return { matches: [...matches] };
+      const visible =
+        opts.excludeTool === undefined
+          ? [...matches]
+          : matches.filter((m) => !opts.excludeTool?.(m.name));
+      return { matches: visible };
     },
   });
 }

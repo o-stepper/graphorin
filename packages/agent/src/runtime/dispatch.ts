@@ -35,7 +35,7 @@ export type DispatchBatchFn<TDeps, TOutput> = (
   executor: ToolExecutor,
   runContext: RunContext<TDeps>,
   stepNum: number,
-  dispatchOpts?: { readonly disableRepair?: boolean },
+  dispatchOpts?: { readonly disableRepair?: boolean; readonly preApproved?: boolean },
 ) => AsyncGenerator<AgentEvent<TOutput>, void, void>;
 
 /**
@@ -82,7 +82,7 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
   executor: ToolExecutor,
   runContext: RunContext<TDeps>,
   stepNum: number,
-  dispatchOpts: { readonly disableRepair?: boolean } = {},
+  dispatchOpts: { readonly disableRepair?: boolean; readonly preApproved?: boolean } = {},
 ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
   const { state, messages, causalityMonitor, promotedDeferred, activeRunCapability } = env;
   const { executorBridgeSlot } = env;
@@ -101,6 +101,8 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
     ...(dispatchOpts.disableRepair !== undefined
       ? { disableRepair: dispatchOpts.disableRepair }
       : {}),
+    // E1: resumed pre-approved batches satisfy ask/defer verdicts.
+    ...(dispatchOpts.preApproved !== undefined ? { preApproved: dispatchOpts.preApproved } : {}),
     // D2: the run's capability restriction rides every batch.
     ...(activeRunCapability !== undefined ? { capability: activeRunCapability } : {}),
   });

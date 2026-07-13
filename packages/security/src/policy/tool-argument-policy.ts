@@ -6,13 +6,16 @@
  * inert `sandboxPolicy` advisory into an enforced default-deny.
  *
  * Progent policy (`ToolArgumentPolicy`):
- * - forbid-before-allow: a matching `forbid` rule always wins over an
- *   `allow` rule, so narrowing composes safely and a later broad allow
- *   can never re-open a denied call,
+ * - four-value vocabulary (E1): rule effects are `allow | deny | ask |
+ *   defer` with priority `deny > defer > ask > allow` (`'forbid'` stays
+ *   accepted as the pre-E1 alias of `'deny'`), so narrowing composes
+ *   safely and a later broad allow can never re-open a denied call,
  * - default-deny for sensitive tools: when `defaultDenySensitive` is on,
  *   a tool flagged `sensitive` with no matching `allow` is blocked,
  * - argument predicates: rules match on tool name (exact / glob) plus an
- *   optional pure predicate over the validated args.
+ *   optional pure predicate over the validated args; predicate-free
+ *   `deny` rules additionally power the advertise-time deny-by-name
+ *   check ({@link isToolDeniedByName}).
  *
  * Rule-of-Two (`buildRuleOfTwoPolicy`): a session preset declaring which
  * of the three lethal-trifecta legs {untrusted input, sensitive data,
@@ -48,9 +51,36 @@ export interface ToolCallFacts {
   readonly args?: unknown;
 }
 
-/** A single Progent rule. `forbid` always beats `allow` (see module doc). */
+/**
+ * Four-value permission vocabulary (E1 / item 11):
+ *
+ * - `'allow'` - the call may run.
+ * - `'deny'`  - the call must not run (deterministic block).
+ * - `'ask'`   - the call needs a human decision BEFORE it runs; only a
+ *   surface that can durably suspend (the agent pre-screen) can honour
+ *   it - a bare executor fails it closed.
+ * - `'defer'` - the decision is parked for ASYNCHRONOUS resolution
+ *   (messenger button, workflow awakeable) with a timeout that
+ *   auto-denies; like `'ask'`, honoured only by a suspending surface.
+ *
+ * Priority when several rules match: `deny > defer > ask > allow`.
+ *
+ * @stable
+ */
+export type PermissionEffect = 'allow' | 'deny' | 'ask' | 'defer';
+
+/**
+ * Effect accepted on a {@link ToolArgumentRule}: the four-value
+ * vocabulary plus `'forbid'`, the pre-E1 spelling kept as a back-compat
+ * alias of `'deny'` (existing policies keep working byte-for-byte).
+ *
+ * @stable
+ */
+export type ToolRuleEffect = PermissionEffect | 'forbid';
+
+/** A single Progent rule. `deny`/`forbid` always beats `allow` (see module doc). */
 export interface ToolArgumentRule {
-  readonly effect: 'allow' | 'forbid';
+  readonly effect: ToolRuleEffect;
   /**
    * Tool-name matcher: an exact name, `'*'` for any, or a trailing-`*`
    * prefix glob (e.g. `'fs_*'`). Matching is case-sensitive.
@@ -58,7 +88,7 @@ export interface ToolArgumentRule {
   readonly tool: string;
   /** Optional pure predicate over the call facts (args, sensitivity). */
   readonly when?: (facts: ToolCallFacts) => boolean;
-  /** Human-readable reason surfaced on a `forbid` match. */
+  /** Human-readable reason surfaced on a non-`allow` match. */
   readonly reason?: string;
 }
 
@@ -78,17 +108,92 @@ export type ToolPolicyDecision =
   | { readonly effect: 'allow' }
   | { readonly effect: 'forbid'; readonly reason: string };
 
+/**
+ * Four-value decision returned by {@link evaluatePermissionDecision}
+ * (E1). Non-`allow` effects always carry a reason.
+ *
+ * @stable
+ */
+export type PermissionDecision =
+  | { readonly effect: 'allow' }
+  | { readonly effect: 'deny' | 'ask' | 'defer'; readonly reason: string };
+
 function toolMatches(pattern: string, toolName: string): boolean {
   if (pattern === '*') return true;
   if (pattern.endsWith('*')) return toolName.startsWith(pattern.slice(0, -1));
   return pattern === toolName;
 }
 
+/** `'forbid'` is the pre-E1 spelling of `'deny'` - normalise once here. */
+function normalisedEffect(effect: ToolRuleEffect): PermissionEffect {
+  return effect === 'forbid' ? 'deny' : effect;
+}
+
+const EFFECT_PRIORITY: Readonly<Record<PermissionEffect, number>> = {
+  deny: 3,
+  defer: 2,
+  ask: 1,
+  allow: 0,
+};
+
 /**
- * Evaluate a policy against one tool call. Forbid-before-allow: any
- * matching `forbid` rule wins immediately; otherwise a matching `allow`
- * permits the call; otherwise the `defaultDenySensitive` posture (for
- * sensitive tools) or a plain allow applies. Pure + deterministic.
+ * Evaluate a policy against one tool call under the four-value
+ * vocabulary (E1). Every matching rule contributes its (normalised)
+ * effect; the strongest wins with priority `deny > defer > ask >
+ * allow`, so a broad late `allow` can never re-open a denied call and
+ * an `ask`/`defer` narrows an `allow` but yields to a `deny`. When no
+ * rule matches, `defaultDenySensitive` denies sensitive tools; anything
+ * else is allowed. Pure + deterministic.
+ *
+ * @stable
+ */
+export function evaluatePermissionDecision(
+  policy: ToolArgumentPolicy,
+  facts: ToolCallFacts,
+): PermissionDecision {
+  let strongest: PermissionEffect | undefined;
+  let strongestReason: string | undefined;
+  for (const rule of policy.rules) {
+    if (!toolMatches(rule.tool, facts.toolName)) continue;
+    if (rule.when !== undefined && !rule.when(facts)) continue;
+    const effect = normalisedEffect(rule.effect);
+    if (effect === 'deny') {
+      // Nothing outranks deny - short-circuit.
+      return {
+        effect: 'deny',
+        reason: rule.reason ?? `tool '${facts.toolName}' is denied by policy`,
+      };
+    }
+    if (strongest === undefined || EFFECT_PRIORITY[effect] > EFFECT_PRIORITY[strongest]) {
+      strongest = effect;
+      strongestReason = rule.reason;
+    }
+  }
+  if (strongest === 'defer' || strongest === 'ask') {
+    return {
+      effect: strongest,
+      reason:
+        strongestReason ??
+        `tool '${facts.toolName}' requires a${strongest === 'ask' ? 'n interactive' : ' deferred'} approval by policy`,
+    };
+  }
+  if (strongest === 'allow') return { effect: 'allow' };
+  if (policy.defaultDenySensitive === true && facts.sensitive === true) {
+    return {
+      effect: 'deny',
+      reason: `sensitive tool '${facts.toolName}' has no explicit allow rule (default-deny)`,
+    };
+  }
+  return { effect: 'allow' };
+}
+
+/**
+ * Evaluate a policy against one tool call, projected onto the binary
+ * pre-E1 vocabulary. Delegates to {@link evaluatePermissionDecision}
+ * and maps every non-`allow` effect to `'forbid'`: a consumer that
+ * cannot ask or defer must not run the call (fail-closed). Policies
+ * written before E1 contain only `allow`/`forbid` rules, for which this
+ * is byte-identical to the original forbid-before-allow semantics.
  *
  * @stable
  */
@@ -96,26 +201,41 @@ export function evaluateToolArgumentPolicy(
   policy: ToolArgumentPolicy,
   facts: ToolCallFacts,
 ): ToolPolicyDecision {
-  let matchedAllow = false;
+  const decision = evaluatePermissionDecision(policy, facts);
+  if (decision.effect === 'allow') return { effect: 'allow' };
+  return { effect: 'forbid', reason: decision.reason };
+}
+
+/** Result of {@link isToolDeniedByName}. */
+export type NameDenialDecision =
+  | { readonly denied: false }
+  | { readonly denied: true; readonly reason: string };
+
+/**
+ * Name-level deny check (E1 deny-by-name): does a PREDICATE-FREE
+ * `deny`/`forbid` rule match this tool name? Used at advertise time -
+ * the per-step catalogue, `tool_search` results/promotion and the
+ * executor's early mirror all consult it BEFORE any args exist. A rule
+ * with a `when` predicate is call-time only (its predicate reasons over
+ * validated args) and never participates here, so the check stays
+ * deterministic for a given policy + name.
+ *
+ * @stable
+ */
+export function isToolDeniedByName(
+  policy: ToolArgumentPolicy,
+  toolName: string,
+): NameDenialDecision {
   for (const rule of policy.rules) {
-    if (!toolMatches(rule.tool, facts.toolName)) continue;
-    if (rule.when !== undefined && !rule.when(facts)) continue;
-    if (rule.effect === 'forbid') {
-      return {
-        effect: 'forbid',
-        reason: rule.reason ?? `tool '${facts.toolName}' is forbidden by policy`,
-      };
-    }
-    matchedAllow = true;
-  }
-  if (matchedAllow) return { effect: 'allow' };
-  if (policy.defaultDenySensitive === true && facts.sensitive === true) {
+    if (rule.when !== undefined) continue;
+    if (normalisedEffect(rule.effect) !== 'deny') continue;
+    if (!toolMatches(rule.tool, toolName)) continue;
     return {
-      effect: 'forbid',
-      reason: `sensitive tool '${facts.toolName}' has no explicit allow rule (default-deny)`,
+      denied: true,
+      reason: rule.reason ?? `tool '${toolName}' is denied by name by policy`,
     };
   }
-  return { effect: 'allow' };
+  return { denied: false };
 }
 
 /**

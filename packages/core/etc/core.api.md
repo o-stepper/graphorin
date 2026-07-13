@@ -314,6 +314,8 @@ export interface ApprovalPauseValue {
     readonly kind: typeof APPROVAL_PAUSE_KIND;
     readonly name: string;
     readonly payload?: unknown;
+    readonly timeoutDecision?: unknown;
+    readonly wakeAt?: number;
 }
 
 // @public
@@ -605,6 +607,12 @@ export function createAsyncContext<T>(_name?: string): AsyncContext<T>;
 
 // @public
 export type CustomSpanType = `x.${string}`;
+
+// @public
+export const DEFAULT_APPROVAL_TIMEOUT_DECISION: {
+    readonly granted: false;
+    readonly reason: string;
+};
 
 // @public
 export class Directive<TUpdate = Record<string, unknown>, TResume = unknown> {
@@ -1782,7 +1790,13 @@ export class ReplayDivergenceSignal extends Error {
 }
 
 // @public
-export function requestApproval<TDecision = unknown>(name: string, payload?: unknown): TDecision;
+export function requestApproval<TDecision = unknown>(name: string, payload?: unknown, options?: RequestApprovalOptions): TDecision;
+
+// @public
+export interface RequestApprovalOptions {
+    readonly timeoutAt?: string | number | Date;
+    readonly timeoutDecision?: unknown;
+}
 
 // @public
 export interface ResolvedTool<TInput = unknown, TOutput = unknown, TDeps = unknown> extends Tool<TInput, TOutput, TDeps> {
@@ -2518,6 +2532,7 @@ export const TOOL_RETURN_BRAND: unique symbol;
 export interface ToolApproval {
     // (undocumented)
     readonly args: unknown;
+    readonly mode?: 'ask' | 'defer';
     // (undocumented)
     readonly reason?: string;
     // (undocumented)
@@ -2549,6 +2564,7 @@ export interface ToolApprovalGrantedEvent {
 
 // @public (undocumented)
 export interface ToolApprovalRequestedEvent {
+    readonly mode?: 'ask' | 'defer';
     // (undocumented)
     readonly reason?: string;
     // (undocumented)

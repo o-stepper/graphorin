@@ -8,7 +8,12 @@
 
 export {
   buildRuleOfTwoPolicy,
+  evaluatePermissionDecision,
   evaluateToolArgumentPolicy,
+  isToolDeniedByName,
+  type NameDenialDecision,
+  type PermissionDecision,
+  type PermissionEffect,
   type PolicySideEffectClass,
   type RuleOfTwoCompilation,
   type RuleOfTwoProfile,
@@ -16,5 +21,6 @@ export {
   type ToolArgumentRule,
   type ToolCallFacts,
   type ToolPolicyDecision,
+  type ToolRuleEffect,
   type TrifectaLeg,
 } from './tool-argument-policy.js';

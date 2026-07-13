@@ -41,11 +41,19 @@ export const TOOL_SEARCH_NAME = 'tool_search';
 export function registerToolSearch(
   registry: ToolRegistry,
   availability?: 'next-step' | 'next-run',
+  excludeTool?: (toolName: string) => boolean,
 ): void {
   if (registry.listDeferred().length === 0) return;
   if (registry.get(TOOL_SEARCH_NAME) !== undefined) return;
   registry.register(
-    createToolSearchTool({ registry, ...(availability !== undefined ? { availability } : {}) }),
+    createToolSearchTool({
+      registry,
+      ...(availability !== undefined ? { availability } : {}),
+      // E1 deny-by-name: a name-denied deferred tool must be neither
+      // discoverable nor promotable - its name/schema would leak while
+      // execution stays blocked.
+      ...(excludeTool !== undefined ? { excludeTool } : {}),
+    }),
     {
       kind: 'built-in',
       subsystem: 'tool-discovery',

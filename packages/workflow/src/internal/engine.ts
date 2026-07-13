@@ -1238,6 +1238,12 @@ async function* driveRun<TState extends object>(
         ...(isAwakeablePauseValue(pauseValue) || isApprovalPauseValue(pauseValue)
           ? { name: pauseValue.name }
           : {}),
+        // E1 defer-timeout: an approval carrying a deadline is ALSO a
+        // timer - stamping its wakeAt puts the thread into the
+        // suspended-checkpoint enumeration the timer daemon sweeps.
+        ...(isApprovalPauseValue(pauseValue) && typeof pauseValue.wakeAt === 'number'
+          ? { wakeAt: pauseValue.wakeAt }
+          : {}),
       });
     }
 

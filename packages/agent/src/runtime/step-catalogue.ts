@@ -20,7 +20,7 @@ import type {
   ToolDefinition,
   ToolDefinitionExample,
 } from '@graphorin/core';
-import type { ToolExecutor } from '@graphorin/tools/executor';
+import type { ToolArgumentPolicyGuard, ToolExecutor } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import { projectSchemaToJsonSchema } from '@graphorin/tools/schema';
@@ -128,6 +128,13 @@ export interface StepCatalogueEnv<TDeps, TOutput> {
   readonly promotedDeferred: Set<string>;
   readonly runStartPromotions: Set<string> | undefined;
   /**
+   * E1: the compiled argument-policy guard. Its name-level deny filters
+   * the advertised catalogue (eager + handoffs + promotions) so a
+   * denied tool's name/schema never reach the model; the executor's
+   * mirror blocks fabricated calls anyway.
+   */
+  readonly argumentPolicyGuard?: ToolArgumentPolicyGuard | undefined;
+  /**
    * C1/C2: per-run pinned provider (`AgentCallOptions.pinnedProvider`).
    * When set, every step resolves to exactly this provider - it wins
    * over `prepareStep` overrides and the whole preference ladder, and
@@ -181,6 +188,10 @@ export function resolveStepToolContext<TDeps, TOutput>(
     registerToolSearch(
       stepRegistry,
       config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
+      env.argumentPolicyGuard?.deniesName !== undefined
+        ? (toolName: string): boolean =>
+            env.argumentPolicyGuard?.deniesName?.(toolName).denied === true
+        : undefined,
     );
     registerReadResult(stepRegistry, resultReader);
   }
@@ -236,6 +247,13 @@ export function resolveStepToolContext<TDeps, TOutput>(
     stepTools = readOnlyRun
       ? [...eagerTools.filter(keepReadOnly), ...promotedTools.filter(keepReadOnly)]
       : [...eagerTools, ...handoffTools, ...promotedTools];
+  }
+  // E1 deny-by-name (advertise half): drop name-denied tools from the
+  // FINAL catalogue - after promotions fold in, so a promotion
+  // rehydrated from a pre-deny run state cannot resurface the name.
+  const deniesName = env.argumentPolicyGuard?.deniesName;
+  if (deniesName !== undefined) {
+    stepTools = stepTools.filter((t) => deniesName(t.name).denied !== true);
   }
 
   // AG-15: consult the hints of the tools the model CALLED on the

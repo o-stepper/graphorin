@@ -32,8 +32,18 @@ import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@gr
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
 import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
 import type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/policy';
+import type { PermissionHook } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
+
+// E1: the hook contract lives with the executor; re-exported here for
+// config ergonomics (mirrors the guardrail re-exports in index.ts).
+export type {
+  PermissionHook,
+  PermissionHookInput,
+  PermissionHookResult,
+} from '@graphorin/tools/executor';
+
 import type { AgentFallbackPolicy } from './fallback/index.js';
 import type { FanOutOptions, FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
 import type { CausalityMonitorConfig } from './lateral-leak/causality-monitor.js';
@@ -416,6 +426,22 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * the preset is designed to prevent. See `@graphorin/security/policy`.
    */
   readonly ruleOfTwo?: RuleOfTwoProfile;
+  /**
+   * E1 pre-tool permission hook: one caller-supplied decision point
+   * (`allow | deny | ask | defer`, optional `updatedInput` rewrite)
+   * over every executor-bound tool call. The run loop pre-screens it on
+   * validated args so `ask`/`defer` durably suspend the run exactly
+   * like `needsApproval` (the `ToolApproval` carries `mode`), `deny`
+   * fails the call deterministically, and an allowed rewrite is what
+   * the approval record / policy / data-flow gates see (W-118). The
+   * executor evaluates the hook again at dispatch as its own phase
+   * (before approval), so the hook must be pure/idempotent; on resume
+   * replays it must not rewrite granted args (tools-02). Handoff and
+   * `toTool` sub-agent calls are outside the hook's scope (govern the
+   * child through its own config); deny-by-name still covers their
+   * names. See `PermissionHook` in `@graphorin/tools/executor`.
+   */
+  readonly permissionHook?: PermissionHook;
   /**
    * Register the D6 structured plan tool (`update_plan`, TodoWrite-style)
    * and recite the plan back into each step's prompt (attention

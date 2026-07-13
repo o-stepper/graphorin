@@ -213,6 +213,13 @@ export interface ToolApprovalRequestedEvent {
   readonly type: 'tool.approval.requested';
   readonly toolCallId: string;
   readonly reason?: string;
+  /**
+   * E1: which permission verdict parked the approval (`'ask'` |
+   * `'defer'`); absent for plain `needsApproval` gates. Mirrors
+   * `ToolApproval.mode` so a subscriber can route deferred approvals
+   * without re-reading the run state.
+   */
+  readonly mode?: 'ask' | 'defer';
 }
 
 /** @stable */

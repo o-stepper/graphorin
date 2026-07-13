@@ -301,6 +301,15 @@ export interface ToolApproval {
   readonly reason?: string;
   readonly requestedAt: string;
   /**
+   * E1: which permission verdict parked this approval. `'ask'` wants an
+   * interactive human decision now; `'defer'` is parked for
+   * asynchronous resolution (e.g. a workflow awakeable with a
+   * durable-timer auto-deny) - the harness routes the two differently.
+   * Absent on approvals raised by a plain `needsApproval` gate
+   * (semantically `'ask'`).
+   */
+  readonly mode?: 'ask' | 'defer';
+  /**
    * W-001: set when this approval belongs to a PARKED sub-agent run.
    * It is the PARENT's toolCallId of the parked handoff / sub-agent
    * call (the `RunState.pendingSubRuns` key), never a child-local id.
