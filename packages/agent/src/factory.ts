@@ -251,6 +251,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     makeToolExecutor,
     toolExecutor,
     toolDataFlowGuard,
+    toolArgumentPolicyGuard,
     ruleOfTwoCapabilityFloor,
     isCodeMode,
     codeModeAdvertised,
@@ -581,6 +582,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       codeModeAdvertised,
       causalityMonitor,
       toolDataFlowGuard,
+      // E1: one guard + hook pair shared by the pre-screen, the
+      // advertise filter and the executor phases.
+      argumentPolicyGuard: toolArgumentPolicyGuard,
+      permissionHook: config.permissionHook,
       promotedDeferred,
       runStartPromotions,
       activeRunCapability,

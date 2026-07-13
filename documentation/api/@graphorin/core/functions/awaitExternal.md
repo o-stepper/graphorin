@@ -10,7 +10,7 @@
 function awaitExternal<TResume>(name, options?): TResume;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L197)
+Defined in: [packages/core/src/channels/durable.ts:226](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L226)
 
 Suspend on a named durable promise. The thread stays suspended (and
 survives restarts) until an external caller resolves it via

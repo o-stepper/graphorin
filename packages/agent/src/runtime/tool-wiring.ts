@@ -8,9 +8,11 @@
  */
 
 import type { Tool } from '@graphorin/core';
+import type { CodeModeRunner } from '@graphorin/security/sandbox';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
   type CodeExecuteBridge,
+  type CodeExecuteLimits,
   createCodeExecuteTool,
   createCodeSearchTool,
   type ProjectableTool,
@@ -41,11 +43,19 @@ export const TOOL_SEARCH_NAME = 'tool_search';
 export function registerToolSearch(
   registry: ToolRegistry,
   availability?: 'next-step' | 'next-run',
+  excludeTool?: (toolName: string) => boolean,
 ): void {
   if (registry.listDeferred().length === 0) return;
   if (registry.get(TOOL_SEARCH_NAME) !== undefined) return;
   registry.register(
-    createToolSearchTool({ registry, ...(availability !== undefined ? { availability } : {}) }),
+    createToolSearchTool({
+      registry,
+      ...(availability !== undefined ? { availability } : {}),
+      // E1 deny-by-name: a name-denied deferred tool must be neither
+      // discoverable nor promotable - its name/schema would leak while
+      // execution stays blocked.
+      ...(excludeTool !== undefined ? { excludeTool } : {}),
+    }),
     {
       kind: 'built-in',
       subsystem: 'tool-discovery',
@@ -141,6 +151,10 @@ export function registerCodeMode(
   quietExecutor: ToolExecutor,
   reservedNames: ReadonlySet<string>,
   getRunCapability?: () => 'read-only' | undefined,
+  codeMode?: {
+    readonly run?: CodeModeRunner;
+    readonly limits?: CodeExecuteLimits;
+  },
 ): ReadonlyArray<Tool<unknown, unknown, unknown>> {
   if (registry.get(CODE_EXECUTE_NAME) !== undefined) return []; // already wired
   const codeTools = registry
@@ -190,11 +204,15 @@ export function registerCodeMode(
     searchDeferred: async (query, k) =>
       (await registry.searchDeferred(query, k)).filter((match) => allowedSet.has(match.name)),
   });
+  // E3: the caller-chosen runtime + limits ride into the meta-tool; the
+  // default stays the in-process worker runner.
   const codeExecute = createCodeExecuteTool({
     projection,
     allowedTools,
     executeTool,
     approvalGatedTools,
+    ...(codeMode?.run !== undefined ? { run: codeMode.run } : {}),
+    ...(codeMode?.limits !== undefined ? { limits: codeMode.limits } : {}),
   });
   registry.register(codeSearch, { kind: 'built-in', subsystem: 'code-mode' });
   registry.register(codeExecute, { kind: 'built-in', subsystem: 'code-mode' });

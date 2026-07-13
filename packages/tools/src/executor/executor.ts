@@ -25,6 +25,7 @@
  *  - `phase-batch.ts`        - batch partitioning + bounded scheduling
  *  - `phase-retry.ts`        - C3 transparent bounded retry
  *  - `phase-validate.ts`     - schema validation + single-round repair
+ *  - `phase-permission.ts`   - E1 pre-tool permission hook (before approval)
  *  - `phase-approval.ts`     - `needsApproval` predicate + approval gate
  *  - `phase-policy.ts`       - D4 / Progent tool-argument policy
  *  - `phase-dataflow.ts`     - WI-12 data-flow provenance sink gate
@@ -64,6 +65,7 @@ import { runDataFlowSinkGate } from './phase-dataflow.js';
 import { completeExecutionFailure, dispatchToolCall } from './phase-dispatch.js';
 import { buildEnvelopePhase } from './phase-envelope.js';
 import { snapshotMemoryGuard, verifyMemoryGuard } from './phase-memory-guard.js';
+import { runPermissionPhase } from './phase-permission.js';
 import { runArgumentPolicyPhase } from './phase-policy.js';
 import { assembleResultPhase } from './phase-result.js';
 import { runWithRetry } from './phase-retry.js';
@@ -88,6 +90,10 @@ export {
   type ExecuteBatchOptions,
   type ExecutorEvent,
   type ExecutorOptions,
+  type PermissionHook,
+  type PermissionHookInput,
+  type PermissionHookResult,
+  type ToolArgumentPolicyFacts,
   type ToolArgumentPolicyGuard,
   type ToolExecutor,
   type ToolRepairHook,
@@ -135,11 +141,13 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     readonly stepNumber: number;
     readonly trustLevel?: SandboxTrustLevel;
     readonly disableRepair?: boolean;
+    readonly preApproved?: boolean;
     readonly capability?: 'read-only';
   }): Promise<CompletedToolCall> {
     const { call, runContext, stepNumber } = opts2;
     const trustLevel = opts2.trustLevel ?? 'user-defined';
     const disableRepair = opts2.disableRepair === true;
+    const preApproved = opts2.preApproved === true;
     const tool = rt.options.registry.get(call.toolName);
 
     if (tool === undefined) {
@@ -149,6 +157,26 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         kind: 'unknown_tool',
         message: `Unknown tool: ${call.toolName}`,
       };
+      emitErrorAudit(rt, error, runContext, stepNumber);
+      return frozenCompleted(call, error, stepNumber);
+    }
+
+    // E1 deny-by-name mirror: a predicate-free deny rule removes the
+    // tool from the advertised catalogue AND from tool_search - this is
+    // the enforcement half, so a model (or injected instruction) calling
+    // the denied name anyway still cannot execute. Deterministic and
+    // args-independent, hence checked before validation like the
+    // capability gate below.
+    const nameDenial = rt.options.argumentPolicy?.deniesName?.(call.toolName);
+    if (nameDenial?.denied === true) {
+      const error: ToolError = {
+        toolCallId: call.toolCallId,
+        toolName: call.toolName,
+        kind: 'capability_blocked',
+        message: `Tool '${call.toolName}' is denied by name: ${nameDenial.reason}`,
+        hint: nameDenial.reason,
+      };
+      incrementCounter('tool.executor.name-denied.total', { toolName: call.toolName });
       emitErrorAudit(rt, error, runContext, stepNumber);
       return frozenCompleted(call, error, stepNumber);
     }
@@ -203,7 +231,16 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           },
         },
         (span) =>
-          executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
+          executeOneInSpan(
+            call,
+            tool,
+            runContext,
+            stepNumber,
+            trustLevel,
+            span,
+            disableRepair,
+            preApproved,
+          ),
       );
 
     return runWithRetry(rt, tool, runContext, attempt);
@@ -217,6 +254,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     trustLevel: SandboxTrustLevel,
     span: AISpan<'tool.execute'>,
     disableRepair = false,
+    preApproved = false,
   ): Promise<CompletedToolCall> {
     incrementCounter('tool.executor.invocations.total', { toolName: tool.name });
     if (tool.__streamingHint) {
@@ -233,7 +271,21 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       disableRepair,
     });
     if (!validated.ok) return validated.completed;
-    const { validatedInput, effectiveArgs } = validated;
+
+    // E1 permission hook - the caller's decision point, evaluated on the
+    // validated input BEFORE approval; an allowed rewrite replaces both
+    // the validated input and the effective args from here on (W-118).
+    const permission = await runPermissionPhase(rt, {
+      call,
+      tool,
+      runContext,
+      stepNumber,
+      validatedInput: validated.validatedInput,
+      effectiveArgs: validated.effectiveArgs,
+      preApproved,
+    });
+    if (!permission.ok) return permission.completed;
+    const { validatedInput, effectiveArgs } = permission;
 
     // Approval flow - evaluated on the validated input.
     const approval = await runApprovalPhase(rt, {
@@ -254,6 +306,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       runContext,
       stepNumber,
       validatedInput,
+      preApproved,
     });
     if (policyBlock !== null) return policyBlock;
 

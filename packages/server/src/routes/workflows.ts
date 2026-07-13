@@ -70,6 +70,13 @@ const ForkBodySchema = z
   .object({
     fromThreadId: z.string().min(1),
     fromCheckpointId: z.string().min(1).optional(),
+    /**
+     * E2: channel-level state patch applied to the forked root
+     * ("branch here, but with these corrected values"). Keys must name
+     * declared channels of the workflow; the engine re-runs its
+     * JSON-safety guard over the merged state.
+     */
+    state: z.record(z.string(), z.unknown()).optional(),
   })
   .strict();
 
@@ -478,7 +485,11 @@ export function createWorkflowRoutes(
           }
           fromCheckpointId = state.checkpointId;
         }
-        const forked = await workflow.fork(parsed.data.fromThreadId, fromCheckpointId);
+        const forked = await workflow.fork(
+          parsed.data.fromThreadId,
+          fromCheckpointId,
+          parsed.data.state !== undefined ? { patch: parsed.data.state } : undefined,
+        );
         return c.json(
           {
             workflowId: id,

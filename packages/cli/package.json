@@ -71,6 +71,7 @@
     "@graphorin/sessions": "workspace:*",
     "@graphorin/skills": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/workflow": "workspace:*",
     "commander": "^10.0.0"
   },
   "publishConfig": {

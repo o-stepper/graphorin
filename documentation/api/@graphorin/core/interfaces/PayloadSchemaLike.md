@@ -6,7 +6,7 @@
 
 # Interface: PayloadSchemaLike\&lt;T\&gt;
 
-Defined in: [packages/core/src/channels/durable.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L127)
+Defined in: [packages/core/src/channels/durable.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L156)
 
 Structural schema slice `awaitExternal({ schema })` validates the
 resolved payload against. Matches zod v3 and v4 (and anything else
@@ -39,7 +39,7 @@ safeParse(value):
 };
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L128)
+Defined in: [packages/core/src/channels/durable.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L157)
 
 #### Parameters
 

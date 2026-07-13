@@ -6,7 +6,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildRuleOfTwoPolicy,
+  evaluatePermissionDecision,
   evaluateToolArgumentPolicy,
+  isToolDeniedByName,
   type ToolArgumentPolicy,
 } from '../../src/policy/index.js';
 
@@ -212,5 +214,120 @@ describe('buildRuleOfTwoPolicy - capability profiles', () => {
         sideEffectClass: 'external-stateful',
       }).effect,
     ).toBe('allow');
+  });
+});
+
+describe('evaluatePermissionDecision - four-value vocabulary (E1)', () => {
+  it('deny > defer > ask > allow across matching rules', () => {
+    const policy: ToolArgumentPolicy = {
+      rules: [
+        { effect: 'allow', tool: '*' },
+        { effect: 'ask', tool: 'send_*', reason: 'outbound needs a human' },
+        { effect: 'defer', tool: 'send_money', reason: 'park it' },
+        { effect: 'deny', tool: 'send_money_prod', reason: 'never' },
+      ],
+    };
+    const facts = (toolName: string) =>
+      ({ toolName, sideEffectClass: 'external-stateful' }) as const;
+    expect(evaluatePermissionDecision(policy, facts('read_file')).effect).toBe('allow');
+    const asked = evaluatePermissionDecision(policy, facts('send_email'));
+    expect(asked).toEqual({ effect: 'ask', reason: 'outbound needs a human' });
+    // send_money matches ask AND defer - defer outranks ask.
+    const deferred = evaluatePermissionDecision(policy, facts('send_money'));
+    expect(deferred).toEqual({ effect: 'defer', reason: 'park it' });
+    // send_money_prod matches ask, defer (prefix) and deny - deny wins.
+    const denied = evaluatePermissionDecision(policy, facts('send_money_prod'));
+    expect(denied.effect).toBe('deny');
+    if (denied.effect === 'deny') expect(denied.reason).toBe('never');
+  });
+
+  it("'forbid' stays accepted as the alias of 'deny'", () => {
+    const policy: ToolArgumentPolicy = {
+      rules: [{ effect: 'forbid', tool: 'rm_*', reason: 'legacy spelling' }],
+    };
+    const decision = evaluatePermissionDecision(policy, {
+      toolName: 'rm_rf',
+      sideEffectClass: 'side-effecting',
+    });
+    expect(decision).toEqual({ effect: 'deny', reason: 'legacy spelling' });
+  });
+
+  it('a broad late allow never re-opens an ask/defer/deny', () => {
+    const policy: ToolArgumentPolicy = {
+      rules: [
+        { effect: 'ask', tool: 'deploy' },
+        { effect: 'allow', tool: '*' },
+      ],
+    };
+    expect(
+      evaluatePermissionDecision(policy, {
+        toolName: 'deploy',
+        sideEffectClass: 'external-stateful',
+      }).effect,
+    ).toBe('ask');
+  });
+
+  it('default-deny sensitive applies only when nothing matched', () => {
+    const policy: ToolArgumentPolicy = { rules: [], defaultDenySensitive: true };
+    expect(
+      evaluatePermissionDecision(policy, {
+        toolName: 'read_secret',
+        sideEffectClass: 'read-only',
+        sensitive: true,
+      }).effect,
+    ).toBe('deny');
+    const withAllow: ToolArgumentPolicy = {
+      rules: [{ effect: 'allow', tool: 'read_secret' }],
+      defaultDenySensitive: true,
+    };
+    expect(
+      evaluatePermissionDecision(withAllow, {
+        toolName: 'read_secret',
+        sideEffectClass: 'read-only',
+        sensitive: true,
+      }).effect,
+    ).toBe('allow');
+  });
+
+  it('binary projection maps every non-allow effect to forbid (fail-closed)', () => {
+    const policy: ToolArgumentPolicy = {
+      rules: [
+        { effect: 'ask', tool: 'deploy', reason: 'needs approval' },
+        { effect: 'defer', tool: 'send_money', reason: 'park it' },
+      ],
+    };
+    const projectedAsk = evaluateToolArgumentPolicy(policy, {
+      toolName: 'deploy',
+      sideEffectClass: 'external-stateful',
+    });
+    expect(projectedAsk).toEqual({ effect: 'forbid', reason: 'needs approval' });
+    const projectedDefer = evaluateToolArgumentPolicy(policy, {
+      toolName: 'send_money',
+      sideEffectClass: 'external-stateful',
+    });
+    expect(projectedDefer.effect).toBe('forbid');
+  });
+});
+
+describe('isToolDeniedByName - advertise-time deny-by-name (E1)', () => {
+  it('matches predicate-free deny/forbid rules only', () => {
+    const policy: ToolArgumentPolicy = {
+      rules: [
+        { effect: 'deny', tool: 'schedule_*', reason: 'no recursive scheduling' },
+        { effect: 'forbid', tool: 'rm_rf' },
+        { effect: 'deny', tool: 'transfer', when: () => true, reason: 'arg-dependent' },
+        { effect: 'ask', tool: 'deploy' },
+      ],
+    };
+    expect(isToolDeniedByName(policy, 'schedule_cron')).toEqual({
+      denied: true,
+      reason: 'no recursive scheduling',
+    });
+    expect(isToolDeniedByName(policy, 'rm_rf').denied).toBe(true);
+    // A when-predicate rule is call-time only - names stay advertised.
+    expect(isToolDeniedByName(policy, 'transfer')).toEqual({ denied: false });
+    // ask/defer never deny a name.
+    expect(isToolDeniedByName(policy, 'deploy')).toEqual({ denied: false });
+    expect(isToolDeniedByName(policy, 'read_file')).toEqual({ denied: false });
   });
 });

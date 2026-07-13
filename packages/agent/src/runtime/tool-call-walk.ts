@@ -16,15 +16,16 @@
 import type {
   AgentEvent,
   CompletedToolCall,
+  ResolvedTool,
   RunContext,
   ToolApproval,
   ToolCall,
   ToolError,
 } from '@graphorin/core';
-import type { ToolExecutor } from '@graphorin/tools/executor';
+import type { ToolArgumentPolicyGuard, ToolExecutor } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import { serializeRunState } from '../run-state/index.js';
-import type { AgentConfig } from '../types.js';
+import type { AgentConfig, PermissionHook } from '../types.js';
 import { getSubAgentToolRefs, type SubAgentToolRefs } from './agent-to-tool.js';
 import { invokeNeedsApproval, safeParseGatedArgs } from './approvals.js';
 import type { DispatchBatchFn } from './dispatch.js';
@@ -35,6 +36,7 @@ import {
   runSubAgentCall,
 } from './handoff.js';
 import { renderToolErrorMessage } from './messages.js';
+import { hasPermissionLayer, preScreenPermission } from './permission.js';
 import type { AssistantCommitEnv } from './run-gates.js';
 import { isApprovalGated } from './tool-wiring.js';
 
@@ -49,6 +51,10 @@ export interface ToolCallWalkEnv<TDeps, TOutput> extends HandoffRunEnv<TDeps, TO
   readonly toolDataFlowGuard: AssistantCommitEnv['toolDataFlowGuard'];
   readonly promotedDeferred: Set<string>;
   readonly dispatchBatch: DispatchBatchFn<TDeps, TOutput>;
+  /** E1: the caller's pre-tool permission hook (absent ⇒ skipped). */
+  readonly permissionHook?: PermissionHook | undefined;
+  /** E1: the compiled argument-policy guard (four-value + name-level). */
+  readonly argumentPolicyGuard?: ToolArgumentPolicyGuard | undefined;
 }
 
 /**
@@ -77,10 +83,52 @@ export async function* processStepToolCalls<TDeps, TOutput>(
 > {
   const { config, state, messages, signal, handoffMap } = env;
   const { toolDataFlowGuard, promotedDeferred, dispatchBatch } = env;
+  const permissionEnv = {
+    permissionHook: env.permissionHook,
+    argumentPolicyGuard: env.argumentPolicyGuard,
+  };
+  const screenPermission = hasPermissionLayer(permissionEnv);
   let batch: ToolCall[] = [];
   let stepApprovalsRequested = 0;
 
+  // Shared fail-fast bookkeeping: journal the outcome, write the tool
+  // message pair, and hand back the start/error events to yield.
+  const failFast = (call: ToolCall, toolError: ToolError): ReadonlyArray<AgentEvent<TOutput>> => {
+    const stepEntry = state.steps[state.steps.length - 1];
+    if (stepEntry !== undefined) {
+      (stepEntry.toolCalls as CompletedToolCall[]).push({ call, outcome: toolError, stepNumber });
+    }
+    const text = renderToolErrorMessage(toolError);
+    messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+    state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+    return [
+      { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName },
+      {
+        type: 'tool.execute.error',
+        toolCallId: call.toolCallId,
+        toolName: call.toolName,
+        error: toolError,
+      },
+    ];
+  };
+
   for (const call of finalCalls) {
+    // E1 deny-by-name: deterministic and args-independent, so it runs
+    // first and covers EVERY call kind - handoffs and `toTool`
+    // sub-agents execute inline and would otherwise bypass the
+    // executor's mirror entirely.
+    const nameDenial = env.argumentPolicyGuard?.deniesName?.(call.toolName);
+    if (nameDenial?.denied === true) {
+      yield* failFast(call, {
+        toolCallId: call.toolCallId,
+        toolName: call.toolName,
+        kind: 'capability_blocked',
+        message: `Tool '${call.toolName}' is denied by name: ${nameDenial.reason}`,
+        hint: nameDenial.reason,
+      });
+      continue;
+    }
+
     const handoff = handoffMap.get(call.toolName);
     if (handoff !== undefined) {
       if (batch.length > 0) {
@@ -105,6 +153,7 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     // never executed and never approvable, leaving dangling
     // `tool_use` ids in the persisted transcript).
     const resolvedTool = stepRegistry.get(call.toolName);
+    const subRefs = getSubAgentToolRefs(resolvedTool);
     // tools-02 (agent mirror): the approval decision must be made
     // on the input that will actually execute. For gated tools the
     // args are validated HERE: a schema failure fails the call fast
@@ -112,45 +161,78 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     // that cannot run, and the resumed dispatch can therefore never
     // hit the repair hook), and the predicate receives the parsed
     // value its typed signature promises - not raw pre-coercion
-    // JSON.
+    // JSON. E1 reuses the same parse for the permission pre-screen
+    // (hook + four-value policy) on executor-bound calls; `toTool`
+    // sub-agent calls are excluded - the child's own config governs
+    // them (the typed bridge composes through W-001 instead).
     let gateInput: unknown = call.args;
-    if (resolvedTool !== undefined && isApprovalGated(resolvedTool)) {
+    let approvalArgs: unknown = call.args;
+    let permissionMode: 'ask' | 'defer' | undefined;
+    let permissionReason: string | undefined;
+    const screenThisCall = screenPermission && subRefs === undefined;
+    if (resolvedTool !== undefined && (isApprovalGated(resolvedTool) || screenThisCall)) {
       const parsed = safeParseGatedArgs(resolvedTool, call.args);
       if (parsed !== undefined && !parsed.success) {
-        const toolError: ToolError = {
-          toolCallId: call.toolCallId,
-          toolName: call.toolName,
-          kind: 'invalid_input',
-          message: `Invalid arguments for approval-gated tool '${call.toolName}': ${parsed.message}`,
-        };
-        const stepEntry = state.steps[state.steps.length - 1];
-        if (stepEntry !== undefined) {
-          (stepEntry.toolCalls as CompletedToolCall[]).push({
-            call,
-            outcome: toolError,
-            stepNumber,
+        if (isApprovalGated(resolvedTool)) {
+          yield* failFast(call, {
+            toolCallId: call.toolCallId,
+            toolName: call.toolName,
+            kind: 'invalid_input',
+            message: `Invalid arguments for approval-gated tool '${call.toolName}': ${parsed.message}`,
           });
+          continue;
         }
-        yield { type: 'tool.execute.start', toolCallId: call.toolCallId, toolName: call.toolName };
-        yield {
-          type: 'tool.execute.error',
-          toolCallId: call.toolCallId,
-          toolName: call.toolName,
-          error: toolError,
-        };
-        const text = renderToolErrorMessage(toolError);
-        messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-        state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-        continue;
+        // Non-gated invalid args fall through to the executor, whose
+        // repair hook may fix them; the executor's permission phase
+        // fails an unresolved ask/defer closed there, so nothing
+        // slips past the pre-screen via the repair path.
+      } else if (parsed !== undefined) {
+        gateInput = parsed.data;
+        if (screenThisCall) {
+          const screened = await preScreenPermission(permissionEnv, {
+            call,
+            tool: resolvedTool as ResolvedTool,
+            validatedInput: parsed.data,
+            runContext: execRunContext as RunContext,
+          });
+          if (screened.kind === 'invalid') {
+            yield* failFast(call, {
+              toolCallId: call.toolCallId,
+              toolName: call.toolName,
+              kind: 'invalid_input',
+              message: screened.message,
+            });
+            continue;
+          }
+          if (screened.kind === 'deny') {
+            yield* failFast(call, {
+              toolCallId: call.toolCallId,
+              toolName: call.toolName,
+              kind: 'capability_blocked',
+              message: `Blocked by permission decision: ${screened.reason}`,
+              hint: screened.reason,
+            });
+            continue;
+          }
+          if (screened.kind === 'allow') {
+            // Carry the (possibly hook-rewritten) input into
+            // `needsApproval` and any approval record (W-118).
+            gateInput = screened.validatedInput;
+            approvalArgs = screened.effectiveArgs;
+          } else {
+            // 'ask' | 'defer' - park below via the shared approval path.
+            permissionMode = screened.kind;
+            permissionReason = screened.reason;
+            approvalArgs = screened.effectiveArgs;
+          }
+        }
       }
-      if (parsed !== undefined) gateInput = parsed.data;
     }
-    const needsApproval = await invokeNeedsApproval(
-      resolvedTool,
-      gateInput,
-      execRunContext,
-      signal,
-    );
+    // An ask/defer verdict subsumes `needsApproval` - the human (or
+    // deferred resolver) decision covers the call either way.
+    const needsApproval =
+      permissionMode !== undefined ||
+      (await invokeNeedsApproval(resolvedTool, gateInput, execRunContext, signal));
     if (needsApproval) {
       if (batch.length > 0) {
         yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
@@ -160,14 +242,18 @@ export async function* processStepToolCalls<TDeps, TOutput>(
       const approval: ToolApproval = {
         toolCallId: call.toolCallId,
         toolName: call.toolName,
-        args: call.args,
+        args: approvalArgs,
         requestedAt: new Date().toISOString(),
+        ...(permissionMode !== undefined ? { mode: permissionMode } : {}),
+        ...(permissionReason !== undefined ? { reason: permissionReason } : {}),
       };
       state.pendingApprovals.push(approval);
       stepApprovalsRequested += 1;
       yield {
         type: 'tool.approval.requested',
         toolCallId: call.toolCallId,
+        ...(permissionMode !== undefined ? { mode: permissionMode } : {}),
+        ...(permissionReason !== undefined ? { reason: permissionReason } : {}),
       };
       continue;
     }
@@ -176,7 +262,6 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     // seam as a handoff (never through the executor, which cannot
     // suspend a run) - a child that parks on `awaiting_approval`
     // suspends the parent instead of surfacing a terminal tool error.
-    const subRefs = getSubAgentToolRefs(resolvedTool);
     if (subRefs !== undefined) {
       if (batch.length > 0) {
         yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);

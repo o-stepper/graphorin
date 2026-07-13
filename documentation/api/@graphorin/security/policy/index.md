@@ -18,9 +18,39 @@ Re-exports [buildRuleOfTwoPolicy](/api/@graphorin/security/functions/buildRuleOf
 
 ***
 
+### evaluatePermissionDecision
+
+Re-exports [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
+
+***
+
 ### evaluateToolArgumentPolicy
 
 Re-exports [evaluateToolArgumentPolicy](/api/@graphorin/security/functions/evaluateToolArgumentPolicy.md)
+
+***
+
+### isToolDeniedByName
+
+Re-exports [isToolDeniedByName](/api/@graphorin/security/functions/isToolDeniedByName.md)
+
+***
+
+### NameDenialDecision
+
+Re-exports [NameDenialDecision](/api/@graphorin/security/type-aliases/NameDenialDecision.md)
+
+***
+
+### PermissionDecision
+
+Re-exports [PermissionDecision](/api/@graphorin/security/type-aliases/PermissionDecision.md)
+
+***
+
+### PermissionEffect
+
+Re-exports [PermissionEffect](/api/@graphorin/security/type-aliases/PermissionEffect.md)
 
 ***
 
@@ -63,6 +93,12 @@ Re-exports [ToolCallFacts](/api/@graphorin/security/interfaces/ToolCallFacts.md)
 ### ToolPolicyDecision
 
 Re-exports [ToolPolicyDecision](/api/@graphorin/security/type-aliases/ToolPolicyDecision.md)
+
+***
+
+### ToolRuleEffect
+
+Re-exports [ToolRuleEffect](/api/@graphorin/security/type-aliases/ToolRuleEffect.md)
 
 ***
 

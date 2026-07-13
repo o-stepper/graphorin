@@ -29,7 +29,7 @@
  */
 
 import type { Tool, ToolExecutionContext } from '@graphorin/core';
-import type { BridgedSourceOptions, BridgedToolCall } from '@graphorin/security/sandbox';
+import type { BridgedToolCall, CodeModeRunner } from '@graphorin/security/sandbox';
 import { runBridgedSource } from '@graphorin/security/sandbox';
 import { z } from 'zod';
 import { incrementCounter } from '../audit/index.js';
@@ -161,8 +161,15 @@ export interface CodeExecuteToolOptions {
   readonly executeTool: CodeExecuteBridge;
   /** Sandbox limits. */
   readonly limits?: CodeExecuteLimits;
-  /** Override the runner (tests inject a fake). Default {@link runBridgedSource}. */
-  readonly run?: (o: BridgedSourceOptions) => ReturnType<typeof runBridgedSource>;
+  /**
+   * The code-mode runtime executing the script (E3): any
+   * {@link CodeModeRunner} - a subprocess provider, a remote runner, a
+   * test fake. Default {@link runBridgedSource} (in-process
+   * `worker_threads`). The runner receives only the script source, the
+   * allowed tool names, the `dispatch` bridge and limits - credentials,
+   * RunState and policy stay on the harness side.
+   */
+  readonly run?: CodeModeRunner;
   /**
    * Approval-gated tool names (TL-8) - listed in the catalogue with a
    * call-directly marker (they cannot suspend for HITL mid-script).

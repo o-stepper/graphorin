@@ -55,7 +55,36 @@ export interface ApprovalPauseValue {
   readonly name: string;
   /** Free-form payload surfaced to the approver (what is being approved). */
   readonly payload?: unknown;
+  /**
+   * E1 defer-timeout: epoch-ms deadline. An approval carrying one joins
+   * the durable-timer enumeration (the suspended checkpoint's `wakeAt`
+   * metadata, which the workflow timer daemon already scans); once due,
+   * `workflow.tick(threadId)` resolves the approval with
+   * {@link ApprovalPauseValue.timeoutDecision} instead of waiting for a
+   * human - the auto-deny composition for deferred permission
+   * decisions. Absent ⇒ the approval waits indefinitely (pre-E1
+   * behaviour).
+   */
+  readonly wakeAt?: number;
+  /**
+   * JSON-safe decision delivered when the deadline fires. Defaults to
+   * {@link DEFAULT_APPROVAL_TIMEOUT_DECISION} (an auto-deny). The
+   * timeout VALUE itself (how long to wait) is caller policy.
+   */
+  readonly timeoutDecision?: unknown;
 }
+
+/**
+ * The decision a deadline-carrying approval resolves with when its
+ * timeout fires and no explicit `timeoutDecision` was supplied: a
+ * deny, so an unattended deferred permission fails closed.
+ *
+ * @stable
+ */
+export const DEFAULT_APPROVAL_TIMEOUT_DECISION: {
+  readonly granted: false;
+  readonly reason: string;
+} = Object.freeze({ granted: false as const, reason: 'defer-timeout' });
 
 /** Type guard for {@link TimerPauseValue}. @stable */
 export function isTimerPauseValue(value: unknown): value is TimerPauseValue {
@@ -213,21 +242,57 @@ export function awaitExternal<TResume = unknown>(
   return value;
 }
 
+/** Options for {@link requestApproval} (E1 defer-timeout). @stable */
+export interface RequestApprovalOptions {
+  /**
+   * Absolute deadline. When it passes with the approval still pending,
+   * `workflow.tick(threadId)` resolves it with `timeoutDecision` (the
+   * auto-deny composition); the workflow timer daemon enumerates the
+   * deadline exactly like a `sleepUntil` timer. How long to wait is
+   * caller policy - the framework only provides the mechanism.
+   */
+  readonly timeoutAt?: string | number | Date;
+  /**
+   * JSON-safe decision delivered on timeout. Default
+   * {@link DEFAULT_APPROVAL_TIMEOUT_DECISION} (a deny) - an unattended
+   * deferred permission fails closed.
+   */
+  readonly timeoutDecision?: unknown;
+}
+
 /**
  * Suspend on a named persisted approval. Resolved by
  * `workflow.approve(threadId, name, decision)`; the decision is returned
  * here. The optional payload is surfaced on the pending pause record so
- * an approval UI can show what is being approved.
+ * an approval UI can show what is being approved. With
+ * `options.timeoutAt` the approval also carries a durable deadline -
+ * see {@link RequestApprovalOptions}.
  *
  * @stable
  */
-export function requestApproval<TDecision = unknown>(name: string, payload?: unknown): TDecision {
+export function requestApproval<TDecision = unknown>(
+  name: string,
+  payload?: unknown,
+  options?: RequestApprovalOptions,
+): TDecision {
   if (typeof name !== 'string' || name.length === 0) {
     throw new TypeError('[graphorin/core] requestApproval(name) needs a non-empty name');
+  }
+  let wakeAt: number | undefined;
+  if (options?.timeoutAt !== undefined) {
+    const at = options.timeoutAt;
+    wakeAt = typeof at === 'number' ? at : at instanceof Date ? at.getTime() : Date.parse(at);
+    if (!Number.isFinite(wakeAt)) {
+      throw new TypeError(
+        `[graphorin/core] requestApproval(...) got an unparseable timeoutAt: ${String(at)}`,
+      );
+    }
   }
   return pause<ApprovalPauseValue, TDecision>({
     kind: APPROVAL_PAUSE_KIND,
     name,
     ...(payload !== undefined ? { payload } : {}),
+    ...(wakeAt !== undefined ? { wakeAt } : {}),
+    ...(options?.timeoutDecision !== undefined ? { timeoutDecision: options.timeoutDecision } : {}),
   });
 }

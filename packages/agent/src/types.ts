@@ -32,8 +32,20 @@ import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@gr
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
 import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
 import type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/policy';
+import type { CodeModeRunner } from '@graphorin/security/sandbox';
+import type { CodeExecuteLimits } from '@graphorin/tools/code-mode';
+import type { PermissionHook } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
+
+// E1: the hook contract lives with the executor; re-exported here for
+// config ergonomics (mirrors the guardrail re-exports in index.ts).
+export type {
+  PermissionHook,
+  PermissionHookInput,
+  PermissionHookResult,
+} from '@graphorin/tools/executor';
+
 import type { AgentFallbackPolicy } from './fallback/index.js';
 import type { FanOutOptions, FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
 import type { CausalityMonitorConfig } from './lateral-leak/causality-monitor.js';
@@ -265,6 +277,23 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * @default 'direct'
    */
   readonly toolInvocation?: 'direct' | 'code-mode';
+  /**
+   * E3 (item 13, step 1): the code-mode runtime and its limits. `run`
+   * substitutes WHERE the model-written script executes (a subprocess
+   * provider, a remote runner) - any {@link CodeModeRunner}; default is
+   * the in-process `worker_threads` runner (`runBridgedSource`).
+   * `limits` bound the script (wall-clock, memory, bridged-call count)
+   * whatever the runtime. Fixed invariant: the runner receives only
+   * the script source, the allowed tool names, the host dispatch
+   * bridge and these limits - credentials, RunState and policy stay on
+   * the harness side (every in-script tool call routes back through
+   * the executor's governance). Only meaningful with
+   * `toolInvocation: 'code-mode'`; ignored otherwise.
+   */
+  readonly codeMode?: {
+    readonly run?: CodeModeRunner;
+    readonly limits?: CodeExecuteLimits;
+  };
   readonly fallbackModels?: ReadonlyArray<ModelSpec>;
   readonly fallbackPolicy?: AgentFallbackPolicy;
   readonly preferredModel?: ModelHint | ModelSpec;
@@ -416,6 +445,22 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * the preset is designed to prevent. See `@graphorin/security/policy`.
    */
   readonly ruleOfTwo?: RuleOfTwoProfile;
+  /**
+   * E1 pre-tool permission hook: one caller-supplied decision point
+   * (`allow | deny | ask | defer`, optional `updatedInput` rewrite)
+   * over every executor-bound tool call. The run loop pre-screens it on
+   * validated args so `ask`/`defer` durably suspend the run exactly
+   * like `needsApproval` (the `ToolApproval` carries `mode`), `deny`
+   * fails the call deterministically, and an allowed rewrite is what
+   * the approval record / policy / data-flow gates see (W-118). The
+   * executor evaluates the hook again at dispatch as its own phase
+   * (before approval), so the hook must be pure/idempotent; on resume
+   * replays it must not rewrite granted args (tools-02). Handoff and
+   * `toTool` sub-agent calls are outside the hook's scope (govern the
+   * child through its own config); deny-by-name still covers their
+   * names. See `PermissionHook` in `@graphorin/tools/executor`.
+   */
+  readonly permissionHook?: PermissionHook;
   /**
    * Register the D6 structured plan tool (`update_plan`, TodoWrite-style)
    * and recite the plan back into each step's prompt (attention

@@ -27,7 +27,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 optional deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L106)
+Defined in: [packages/server/src/registry/index.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L114)
 
 W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
@@ -69,14 +69,19 @@ Defined in: [packages/server/src/registry/index.ts:75](https://github.com/o-step
 ### fork()?
 
 ```ts
-optional fork(threadId, fromCheckpointId): Promise<{
+optional fork(
+   threadId, 
+   fromCheckpointId, 
+   opts?): Promise<{
   newThreadId: string;
 }>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L102)
+Defined in: [packages/server/src/registry/index.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L106)
 
-W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
+W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
+`opts.patch` merges channel-level state into the forked root (the
+`state` field of the fork body).
 
 #### Parameters
 
@@ -84,6 +89,8 @@ W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
 | ------ | ------ |
 | `threadId` | `string` |
 | `fromCheckpointId` | `string` |
+| `opts?` | \{ `patch?`: `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>; \} |
+| `opts.patch?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 
@@ -99,7 +106,7 @@ W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
 optional getState(threadId): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L103)
+Defined in: [packages/server/src/registry/index.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L111)
 
 #### Parameters
 
@@ -119,7 +126,7 @@ Defined in: [packages/server/src/registry/index.ts:103](https://github.com/o-ste
 optional listCheckpoints(threadId): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L104)
+Defined in: [packages/server/src/registry/index.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L112)
 
 #### Parameters
 

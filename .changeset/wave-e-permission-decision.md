@@ -1,0 +1,9 @@
+---
+'@graphorin/security': minor
+'@graphorin/tools': minor
+'@graphorin/agent': minor
+'@graphorin/core': minor
+'@graphorin/workflow': minor
+---
+
+Four-value permissionDecision (wave-E E1, plan item 11). The tool-argument policy vocabulary widens to `allow | deny | ask | defer` with priority `deny > defer > ask > allow` (`'forbid'` stays accepted as the alias of `'deny'`): `evaluatePermissionDecision` is the four-value engine, `evaluateToolArgumentPolicy` its fail-closed binary projection, and `isToolDeniedByName` the advertise-time check over predicate-free deny rules. The executor gains the E1 `permissionHook` phase - one caller decision point evaluated on the validated input after schema validation and BEFORE approval; an allowed `updatedInput` rewrite is re-validated and substituted into both the validated input and the effective args (W-118), a throwing hook fails closed, and on `preApproved` resume replays a rewrite of the granted args is refused (tools-02). `ask`/`defer` verdicts ride the agent pre-screen's durable suspend (`ToolApproval.mode`, mirrored on `tool.approval.requested`); the bare executor fails them closed (`approval_denied`), and a granted resume satisfies them (`deny` still outranks the grant). Deny-by-name filters all three surfaces: the advertised per-step catalogue (post-promotions), `tool_search` results/promotion (`excludeTool`), and execution (executor mirror before validation + the run loop's inline handoff/sub-agent check). The defer parking half: `requestApproval(name, payload, { timeoutAt, timeoutDecision? })` stamps a durable deadline on the approval pause (enumerated by the existing timer daemon); a due `tick` resolves it with the timeout decision - `DEFAULT_APPROVAL_TIMEOUT_DECISION` (auto-deny) unless overridden. Sub-agent asks project through the W-001 composite key unchanged.

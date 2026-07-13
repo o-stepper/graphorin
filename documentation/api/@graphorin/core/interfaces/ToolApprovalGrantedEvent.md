@@ -6,7 +6,7 @@
 
 # Interface: ToolApprovalGrantedEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L219)
+Defined in: [packages/core/src/types/agent-event.ts:226](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L226)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: [packages/core/src/types/agent-event.ts:219](https://github.com/o-st
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L221) |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.granted"` | [packages/core/src/types/agent-event.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L220) |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:228](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L228) |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.granted"` | [packages/core/src/types/agent-event.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L227) |

@@ -804,6 +804,18 @@ Re-exports [runTriggersStatus](/api/@graphorin/cli/functions/runTriggersStatus.m
 
 ***
 
+### runWorkflowCheckpoints
+
+Re-exports [runWorkflowCheckpoints](/api/@graphorin/cli/functions/runWorkflowCheckpoints.md)
+
+***
+
+### runWorkflowInspect
+
+Re-exports [runWorkflowInspect](/api/@graphorin/cli/functions/runWorkflowInspect.md)
+
+***
+
 ### SecretsCommonOptions
 
 Re-exports [SecretsCommonOptions](/api/@graphorin/cli/interfaces/SecretsCommonOptions.md)
@@ -1101,3 +1113,9 @@ Re-exports [TriggersPruneResult](/api/@graphorin/cli/interfaces/TriggersPruneRes
 ### TriggersStatusOptions
 
 Re-exports [TriggersStatusOptions](/api/@graphorin/cli/interfaces/TriggersStatusOptions.md)
+
+***
+
+### WorkflowCommonOptions
+
+Re-exports [WorkflowCommonOptions](/api/@graphorin/cli/interfaces/WorkflowCommonOptions.md)

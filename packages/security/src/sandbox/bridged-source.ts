@@ -106,6 +106,27 @@ export type BridgedSourceResult =
       readonly durationMs: number;
     };
 
+/**
+ * E3 (item 13, step 1): the code-mode RUNTIME contract - the seam
+ * through which a harness substitutes WHERE model-written code
+ * executes (a different worker pool, a subprocess, a remote runner).
+ * {@link runBridgedSource} is the built-in `worker_threads`
+ * implementation; a provider conforms by accepting the same options
+ * and settling with the same result union.
+ *
+ * Invariant (fixed): the options carry ONLY the script source, the
+ * allowed tool names, the host `dispatch` bridge, the cancellation
+ * signal and resource limits. Credentials, `RunState` and policy stay
+ * on the harness side - every in-script `tools.<name>(args)` call
+ * routes back through `dispatch` into the host's tool executor, where
+ * ACL / sanitization / taint / permission governance applies. A
+ * provider therefore never needs (and must never be handed) secret
+ * material or run internals.
+ *
+ * @stable
+ */
+export type CodeModeRunner = (options: BridgedSourceOptions) => Promise<BridgedSourceResult>;
+
 const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_ABORT_GRACE_MS = 100;
 const DEFAULT_MAX_TOOL_CALLS = 64;

@@ -65,6 +65,7 @@ export async function runExecuteBatch(
         stepNumber: batch.stepNumber,
         trustLevel,
         ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
+        ...(batch.preApproved !== undefined ? { preApproved: batch.preApproved } : {}),
         ...(batch.capability !== undefined ? { capability: batch.capability } : {}),
       });
     } catch (cause) {
@@ -89,6 +90,7 @@ export async function runExecuteBatch(
           stepNumber: batch.stepNumber,
           trustLevel,
           ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
+          ...(batch.preApproved !== undefined ? { preApproved: batch.preApproved } : {}),
           ...(batch.capability !== undefined ? { capability: batch.capability } : {}),
         })
           .catch((cause: unknown) => synthesizeFailure(call, cause))

@@ -278,7 +278,7 @@ Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` - 
 
 The data-flow policy above is *detective* (it flags/blocks at the sink after taint is observed). Two *preventive* layers deny disallowed calls before they run, and compose with it:
 
-**Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are forbid-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. A `forbid` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
+**Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are deny-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. Rule effects use the four-value vocabulary `allow | deny | ask | defer` (`'forbid'` stays accepted as the pre-E1 alias of `'deny'`); a `deny` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
 
 ```ts
 import { createAgent } from '@graphorin/agent';
@@ -300,7 +300,7 @@ createAgent({
 });
 ```
 
-A matching `forbid` always beats an `allow`, so narrowing composes safely and a later broad allow can never re-open a denied call.
+A matching `deny` always beats an `allow`, so narrowing composes safely and a later broad allow can never re-open a denied call. When several rules match, the strongest effect wins with priority `deny > defer > ask > allow`.
 
 **Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools; denying `untrustedInput` deterministically blocks calling untrusted-SOURCE tools - those whose trust class the taint engine treats as injection-bearing (`mcp-derived`, `web-search`, `skill-untrusted`; one shared taxonomy, W-101). Note the scope: the leg gates untrusted tool SOURCES; untrusted content arriving in user messages is outside it. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the dropped leg is deterministically blocked, not merely flagged.
 
@@ -320,7 +320,79 @@ createAgent({
 });
 ```
 
-The pure decision engines live in `@graphorin/security/policy` (`evaluateToolArgumentPolicy`, `buildRuleOfTwoPolicy`).
+The pure decision engines live in `@graphorin/security/policy` (`evaluatePermissionDecision`, `evaluateToolArgumentPolicy`, `buildRuleOfTwoPolicy`, `isToolDeniedByName`).
+
+### Four-value permission decisions (E1)
+
+Beyond the binary allow/deny, two verdicts route a call to a HUMAN instead of deciding it in code:
+
+- **`ask`** - the run durably suspends before the call executes, exactly like a `needsApproval` gate: the call lands on `RunState.pendingApprovals` with `mode: 'ask'`, the `tool.approval.requested` event carries the same `mode`, and a `ResumeDirective` decision resolves it. Use for interactive sign-off.
+- **`defer`** - same durable suspend, but marked `mode: 'defer'`: the decision is parked for ASYNCHRONOUS resolution (a messenger button, an email link) rather than an interactive prompt. The harness routes deferred approvals into a workflow `requestApproval` with a durable deadline (see below); the timeout auto-denies.
+
+Only the agent run loop can suspend, so `ask`/`defer` are resolved by its pre-screen BEFORE dispatch. A bare `ToolExecutor` (or a call whose arguments only became schema-valid through the in-executor repair hook) fails them closed with `approval_denied` - never open. On a granted resume the replay dispatch marks the batch pre-approved: the grant is the resolution, `deny` still outranks it.
+
+### The pre-tool permission hook
+
+`AgentConfig.permissionHook` is one caller-supplied decision point over every executor-bound tool call, evaluated on the schema-validated input:
+
+```ts
+import { createAgent, type PermissionHookResult } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+
+createAgent({
+  name: 'hooked-ops',
+  instructions: 'Operate within the permission ruleset.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+  ),
+  permissionHook: ({ toolName, validatedInput }): PermissionHookResult => {
+    if (toolName === 'send_email') {
+      const input = validatedInput as { to: string };
+      // Sandbox-redirect rewrite: what runs is what the gates see.
+      if (!input.to.endsWith('@example.test')) {
+        return { decision: 'ask', reason: `outbound to ${input.to} needs sign-off` };
+      }
+    }
+    if (toolName.startsWith('rm_')) return { decision: 'deny', reason: 'destructive' };
+    return { decision: 'allow' };
+  },
+});
+```
+
+Rules the hook lives by:
+
+- **`updatedInput` rewrites** (e.g. redirecting a dangerous tool at a sandbox target) are re-validated against the tool's input schema and then replace BOTH the validated input and the effective args - the approval record a human sees, the argument policy, and the data-flow sink gate all evaluate what will actually run (the W-118 plumbing). A rewrite that fails re-validation fails the call as `invalid_input`.
+- **Purity**: the hook may run more than once per logical call (the run loop's pre-screen and the executor's own phase); it must be pure/idempotent over its input. A throwing hook fails the call closed (`capability_blocked`).
+- **Pre-approved replays**: on a durable-HITL resume the hook must not rewrite the granted args - a differing `updatedInput` fails the call as `invalid_input` instead of executing a payload nobody saw (the same tools-02 rule that disables the repair hook there). An identical echo passes.
+- **Scope**: handoff and `toTool` sub-agent calls are outside the hook (govern the child through its own config - a child's `ask` parks on the parent with the composite `subRunToolCallId` key and resumes through it, W-001). Deny-by-name still covers their names.
+
+### Deferred approvals with a durable deadline
+
+The `defer` composition uses two existing durable primitives: `requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the decision on a workflow thread with an epoch deadline, and the workflow timer daemon (which already sweeps `wakeAt`) resolves a due approval with its timeout decision - `{ granted: false, reason: 'defer-timeout' }` by default (`DEFAULT_APPROVAL_TIMEOUT_DECISION`), so an unattended permission fails closed. The awakeable address triple serializes through `serializeAwakeableRef` for messenger callback data (A3). How long to wait is caller policy; the framework provides the mechanism. A human `workflow.approve(...)` before the deadline wins. The resolved decision maps 1:1 onto the agent's `ResumeDirective`.
+
+### Deny-by-name (three surfaces)
+
+A predicate-free `deny` rule removes the tool by NAME everywhere at once:
+
+1. **Advertised catalogue** - the per-step tool list is filtered after promotions fold in, so the name/schema never reach the model (even a promotion rehydrated from an older run state).
+2. **`tool_search`** - matches are excluded before the model sees them, so a denied deferred tool is neither discoverable nor promotable.
+3. **Execution** - the executor blocks a fabricated call to the denied name before validation (mirroring the read-only capability gate), and the run loop applies the same check to inline handoff / sub-agent calls that never reach the executor.
+
+A rule with a `when` predicate is call-time only (its predicate reasons over validated args) and does not participate in name-level filtering.
+
+### Tool-call evaluation order
+
+The executor evaluates one call's gates in this fixed order (documented from the code, D-11):
+
+1. deny-by-name mirror + read-only capability gate (args-independent),
+2. schema validation with the optional single-round repair (tools-02),
+3. the permission hook (rewrites land here, before anything human-facing),
+4. the approval phase (`needsApproval` + gate),
+5. the tool-argument policy (`toolPolicy` / Rule-of-Two),
+6. the data-flow sink gate (detective taint layer),
+7. execution (sandbox resolve, memory guard, dispatch).
+
+In the agent run loop the pre-screen mirrors steps 3-5 BEFORE dispatch so `ask`/`defer` can suspend durably. Any reordering is a separate decision with a written rationale. Known limitation (inherited): the data-flow verbatim probe runs on raw-shaped post-repair args before Zod coercion - spans introduced purely by `transform`/`default` are invisible to it, and the caveat applies to `updatedInput` rewrites the same way.
 
 ## Memory safety: provenance & quarantine
 

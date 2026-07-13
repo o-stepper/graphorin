@@ -7,7 +7,10 @@
 # Function: requestApproval()
 
 ```ts
-function requestApproval<TDecision>(name, payload?): TDecision;
+function requestApproval<TDecision>(
+   name, 
+   payload?, 
+   options?): TDecision;
 ```
 
 Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
@@ -15,7 +18,9 @@ Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-step
 Suspend on a named persisted approval. Resolved by
 `workflow.approve(threadId, name, decision)`; the decision is returned
 here. The optional payload is surfaced on the pending pause record so
-an approval UI can show what is being approved.
+an approval UI can show what is being approved. With
+`options.timeoutAt` the approval also carries a durable deadline -
+see [RequestApprovalOptions](/api/@graphorin/core/interfaces/RequestApprovalOptions.md).
 
 ## Type Parameters
 
@@ -29,6 +34,7 @@ an approval UI can show what is being approved.
 | ------ | ------ |
 | `name` | `string` |
 | `payload?` | `unknown` |
+| `options?` | [`RequestApprovalOptions`](/api/@graphorin/core/interfaces/RequestApprovalOptions.md) |
 
 ## Returns
 

@@ -37,6 +37,7 @@ export type {
   AwaitExternalOptions,
   AwakeablePauseValue,
   PayloadSchemaLike,
+  RequestApprovalOptions,
   TimerPauseValue,
 } from './durable.js';
 export {
@@ -44,6 +45,7 @@ export {
   AWAKEABLE_PAUSE_KIND,
   AwakeablePayloadError,
   awaitExternal,
+  DEFAULT_APPROVAL_TIMEOUT_DECISION,
   isApprovalPauseValue,
   isAwakeablePauseValue,
   isAwakeablePayloadError,

@@ -306,6 +306,31 @@ describe('W-119 - server workflow surface', () => {
     expect((await wf.getState(body.newThreadId)).status).toBe('suspended');
   });
 
+  it('POST /:id/fork with a state patch seeds the forked root (E2)', async () => {
+    const wf = pairWorkflow();
+    server?.workflows.register({ id: 'pair-patch', workflow: wf as never });
+    await drain(wf.execute({} as never, { threadId: 'fp-src' }));
+
+    const res = await post('/v1/workflows/pair-patch/fork', {
+      fromThreadId: 'fp-src',
+      state: { a: 'patched-a' },
+    });
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as { newThreadId: string };
+    const forked = await wf.getState(body.newThreadId);
+    expect((forked.state as PairState).a).toBe('patched-a');
+    // The source keeps its own state.
+    expect((await wf.getState('fp-src')).state).not.toMatchObject({ a: 'patched-a' });
+
+    // A patch key that names no channel is a 400 with the engine's message.
+    const bad = await post('/v1/workflows/pair-patch/fork', {
+      fromThreadId: 'fp-src',
+      state: { nope: 1 },
+    });
+    expect(bad.status).toBe(400);
+    expect(((await bad.json()) as { message: string }).message).toContain('declared channel');
+  });
+
   it('unsupported methods answer 400 with a typed error', async () => {
     server?.workflows.register({
       id: 'bare',

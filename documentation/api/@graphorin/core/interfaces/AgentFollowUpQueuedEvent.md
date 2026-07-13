@@ -6,7 +6,7 @@
 
 # Interface: AgentFollowUpQueuedEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:342](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L342)
+Defined in: [packages/core/src/types/agent-event.ts:349](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L349)
 
 Emitted when `agent.followUp(...)` queues a follow-up turn to fire
 after the current turn completes.
@@ -17,5 +17,5 @@ after the current turn completes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:344](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L344) |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | [packages/core/src/types/agent-event.ts:343](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L343) |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:351](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L351) |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | [packages/core/src/types/agent-event.ts:350](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L350) |

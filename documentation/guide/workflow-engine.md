@@ -199,6 +199,10 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 
 `getState(threadId).pendingPauses` surfaces the full pending set - timers carry `wakeAt`, awakeables/approvals carry `name` - so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
 
+#### Approvals with a durable deadline (defer-timeout)
+
+`requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the approval WITH an epoch deadline (E1): the pause record carries both `name` and `wakeAt`, so the thread joins the same due-thread enumeration the timer daemon already sweeps. Once the deadline passes un-resolved, `workflow.tick(threadId)` resolves the approval with `timeoutDecision` - `DEFAULT_APPROVAL_TIMEOUT_DECISION` (`{ granted: false, reason: 'defer-timeout' }`) when none is supplied, so an unattended decision fails closed. A human `approve(...)` before the deadline wins as usual. This is the parking half of the agent's `defer` permission verdict (see the [security guide](./security.md#deferred-approvals-with-a-durable-deadline)); how long to wait is caller policy.
+
 #### Validating resolved payloads
 
 `awaitExternal(name, { schema })` validates the resolved payload on delivery. The schema is structural (`PayloadSchemaLike`: anything with zod's `safeParse` shape, v3 or v4) and runs at the **replay delivery point** - the node re-executing with the resumed value - because that is the only place the schema object exists: pause records persist `name`/`wakeAt` only, and a schema is not serializable across processes. On failure the engine **restores the suspension** instead of failing the thread: the invalid value is discarded (it never persists as a satisfied answer), the thread stays suspended on the same awakeable, and the resolver receives a typed `awakeable-payload-invalid` error - resolve again with a conforming payload. Keep schemas stable across deploys: a previously accepted value is re-validated on every later replay.
@@ -310,7 +314,17 @@ workflow.execute(input, { stream: 'updates' });
 
 ## Forking
 
-`workflow.fork(threadId, fromCheckpointId)` creates a parallel timeline branched off a previous checkpoint without touching the original thread.
+`workflow.fork(threadId, fromCheckpointId)` creates a parallel timeline branched off a previous checkpoint without touching the original thread. The forked root is self-contained (its `parentId` never dangles into the source thread) and copies the source checkpoint's pending writes, so a forked `failed` thread stays `retry()`-able without re-running the tasks that already succeeded.
+
+**Fork with a state patch (E2).** `fork(threadId, fromCheckpointId, { patch })` merges channel-level values into the forked root's state before it is written - "branch here, but with these corrected values". Patch keys must name declared channels (a typo throws), and the merged state re-runs the same JSON-safety guard every checkpoint passes, so a patch cannot smuggle a `Map`/`Date`/class instance past the envelope. `channelVersions` and pending writes ride along unchanged. Over HTTP the same patch is the optional `state` field of `POST /v1/workflows/:id/fork`.
+
+### Cross-process durability (the invariant)
+
+The whole suspend surface is process-independent: a thread parked on an approval inside one process - even one killed with `SIGKILL` while holding live database handles - resumes from SQLite in a fresh process that merely rebuilds the workflow definition over the same store. This is pinned by an end-to-end test that spawns a child process, kills it mid-approval, and completes the thread from the parent (`e2-cross-process.test.ts`); concurrent resumes across processes stay safe through the store-level checkpoint CAS (two drivers racing the same thread - the loser's `checkpoint-version-conflict` is benign).
+
+### Inspecting threads without the graph
+
+`readThreadState(checkpointStore, workflowName, threadId)` and `listThreadCheckpoints(...)` decode a thread's latest checkpoint (status, unwrapped channel state, the full pending-pause frontier) and its timeline straight off a bare `CheckpointStore`, keyed by the workflow NAME - the same namespace derivation `createWorkflow` uses. They exist for operator surfaces that cannot rebuild a `Workflow` handle (no node graph at hand); the `graphorin workflow inspect` / `graphorin workflow checkpoints` CLI commands are thin wrappers over them (see the [CLI guide](./cli.md#graphorin-workflow)).
 
 ## Composition with `@graphorin/agent`
 

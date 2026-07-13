@@ -8,6 +8,7 @@
  */
 
 import type { Checkpoint, CheckpointId, Directive, WorkflowEvent } from '@graphorin/core';
+import { DEFAULT_APPROVAL_TIMEOUT_DECISION } from '@graphorin/core';
 
 import {
   CheckpointNotFoundError,
@@ -128,11 +129,21 @@ export function createWorkflow<
       // Resume targeting the earliest due timer; drain the resulting
       // events internally, surfacing the first workflow.error as a throw.
       const earliest = due.reduce((min, p) => (p.wakeAt < min.wakeAt ? p : min));
+      // E1 defer-timeout: a due pause that carries a NAME is a pending
+      // approval/awakeable with a deadline, not a bare `sleepUntil` -
+      // resolve it with its timeout decision (auto-deny by default) so
+      // an unattended deferred permission fails closed.
+      const timeoutValue =
+        earliest.name !== undefined
+          ? ((earliest.value as { readonly timeoutDecision?: unknown } | null | undefined)
+              ?.timeoutDecision ?? DEFAULT_APPROVAL_TIMEOUT_DECISION)
+          : undefined;
       const events = resumeEngine<TState>({
         config,
         threadId,
         streamMode: 'values',
         resumeLock,
+        ...(earliest.name !== undefined ? { directive: { resume: timeoutValue } } : {}),
         selectPause: (p) => p.wakeAt === earliest.wakeAt && p.nodeName === earliest.nodeName,
         selectPauseLabel: `timer@${earliest.wakeAt}`,
       });
@@ -228,6 +239,7 @@ export function createWorkflow<
     async fork(
       threadId: string,
       fromCheckpointId: CheckpointId,
+      opts?: { readonly patch?: Readonly<Record<string, unknown>> },
     ): Promise<{ readonly newThreadId: string }> {
       const probe = await config.checkpointStore.getTuple(threadId, namespace, fromCheckpointId);
       if (!probe) throw new CheckpointNotFoundError(threadId, fromCheckpointId);
@@ -235,6 +247,7 @@ export function createWorkflow<
         config,
         threadId,
         fromCheckpointId,
+        ...(opts?.patch !== undefined ? { patch: opts.patch } : {}),
       });
     },
   });

@@ -635,6 +635,9 @@ importers:
       '@graphorin/store-sqlite':
         specifier: workspace:*
         version: link:../store-sqlite
+      '@graphorin/workflow':
+        specifier: workspace:*
+        version: link:../workflow
       commander:
         specifier: ^10.0.0
         version: 10.0.1

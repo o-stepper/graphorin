@@ -70,6 +70,14 @@ export interface ExecutorWiring<TDeps> {
   ) => ToolExecutor;
   readonly toolExecutor: ToolExecutor;
   readonly toolDataFlowGuard: ReturnType<typeof buildDataFlowGuard> | undefined;
+  /**
+   * E1: the compiled argument-policy guard, shared with the run loop -
+   * the walk's permission pre-screen (four-value `decide`) and the
+   * deny-by-name surfaces (catalogue filter, `tool_search` exclusion,
+   * inline handoff/sub-agent check) all consult the same object the
+   * executor enforces with.
+   */
+  readonly toolArgumentPolicyGuard: ReturnType<typeof buildToolArgumentPolicy>['guard'];
   readonly ruleOfTwoCapabilityFloor: 'read-only' | undefined;
   readonly isCodeMode: boolean;
   readonly codeModeAdvertised: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
@@ -121,6 +129,22 @@ export function wireToolExecution<TDeps, TOutput>(
     ...(config.scaffold === 'minimal' ? { deferLoadingByDefault: true } : {}),
   }).registry;
 
+  // D4 Progent tool-argument policy + Rule-of-Two floor. `ruleOfTwo`
+  // compiles to a policy (+ a read-only capability floor when it denies
+  // external side effects); an explicit `toolPolicy` composes on top
+  // (its rules are appended, so an explicit deny still wins). Built
+  // once, shared by every executor AND by the run loop's permission
+  // pre-screen / deny-by-name surfaces (E1). Compiled before
+  // `registerToolSearch` so name-denied deferred tools are excluded
+  // from discovery.
+  const { guard: toolArgumentPolicyGuard, capabilityFloor: ruleOfTwoCapabilityFloor } =
+    buildToolArgumentPolicy(config.toolPolicy, config.ruleOfTwo);
+  const excludeDeniedName =
+    toolArgumentPolicyGuard?.deniesName !== undefined
+      ? (toolName: string): boolean =>
+          toolArgumentPolicyGuard.deniesName?.(toolName).denied === true
+      : undefined;
+
   // WI-05 (deferred loading + tool_search / P0-3): if any registered
   // tool sets `defer_loading: true`, register the built-in `tool_search`
   // so the model can discover those tools on demand. Tools that defer are
@@ -130,6 +154,7 @@ export function wireToolExecution<TDeps, TOutput>(
   registerToolSearch(
     toolRegistry,
     config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
+    excludeDeniedName,
   );
 
   // D6: opt-in structured plan tool (TodoWrite-style, journaled). It
@@ -253,13 +278,6 @@ export function wireToolExecution<TDeps, TOutput>(
       );
     }
   }
-  // D4 Progent tool-argument policy + Rule-of-Two floor. `ruleOfTwo`
-  // compiles to a policy (+ a read-only capability floor when it denies
-  // external side effects); an explicit `toolPolicy` composes on top
-  // (its rules are appended, so an explicit forbid still wins). Built
-  // once, shared by every executor.
-  const { guard: toolArgumentPolicyGuard, capabilityFloor: ruleOfTwoCapabilityFloor } =
-    buildToolArgumentPolicy(config.toolPolicy, config.ruleOfTwo);
   const toolStreamingSink: NonNullable<ExecutorOptions['streamingSink']> = (event) =>
     executorBridgeSlot.current?.sink(event);
   // `quiet` builds an executor without the streaming sink - used for
@@ -281,6 +299,9 @@ export function wireToolExecution<TDeps, TOutput>(
       spill: spillWriter,
       ...(toolDataFlowGuard !== undefined ? { dataFlowGuard: toolDataFlowGuard } : {}),
       ...(toolArgumentPolicyGuard !== undefined ? { argumentPolicy: toolArgumentPolicyGuard } : {}),
+      // E1: the permission hook rides every executor (direct + quiet
+      // code-mode), so in-script tool calls face the same decision point.
+      ...(config.permissionHook !== undefined ? { permissionHook: config.permissionHook } : {}),
       ...(opts?.quiet === true ? {} : { streamingSink: toolStreamingSink }),
       ...(config.maxParallelTools !== undefined
         ? { maxParallelTools: config.maxParallelTools }
@@ -312,6 +333,8 @@ export function wireToolExecution<TDeps, TOutput>(
       makeToolExecutor(toolRegistry, { quiet: true }),
       reserved,
       getActiveRunCapability,
+      // E3: the caller-chosen code-mode runtime + limits.
+      config.codeMode,
     );
     registerReadResult(toolRegistry, resultReader);
     const readResult = toolRegistry.get(READ_RESULT_NAME);
@@ -328,6 +351,7 @@ export function wireToolExecution<TDeps, TOutput>(
     makeToolExecutor,
     toolExecutor,
     toolDataFlowGuard,
+    toolArgumentPolicyGuard,
     ruleOfTwoCapabilityFloor,
     isCodeMode,
     codeModeAdvertised,

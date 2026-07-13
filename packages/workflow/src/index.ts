@@ -113,6 +113,8 @@ export {
   WorkflowVersionMismatchError,
 } from './errors/index.js';
 export { createWorkflow } from './factory.js';
+export type { ThreadCheckpointSummary, ThreadInspection } from './inspect.js';
+export { listThreadCheckpoints, readThreadState } from './inspect.js';
 export { CHECKPOINT_SCHEMA_VERSION, namespaceFor } from './internal/engine.js';
 export { createNode } from './node.js';
 export {

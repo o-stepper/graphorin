@@ -6,7 +6,7 @@
 
 # Interface: RunBudget
 
-Defined in: [packages/agent/src/types.ts:545](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L545)
+Defined in: [packages/agent/src/types.ts:590](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L590)
 
 Run-level budget (C5 / W-084 residual, decision D-8). Enforced as a
 between-step precheck against the run's accumulated usage - the step
@@ -28,6 +28,6 @@ a provider-independent ceiling.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | [packages/agent/src/types.ts:547](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L547) |
-| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | [packages/agent/src/types.ts:553](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L553) |
-| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | [packages/agent/src/types.ts:563](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L563) |
+| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | [packages/agent/src/types.ts:592](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L592) |
+| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | [packages/agent/src/types.ts:598](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L598) |
+| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | [packages/agent/src/types.ts:608](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L608) |
