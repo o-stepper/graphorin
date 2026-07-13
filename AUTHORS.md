@@ -16,4 +16,4 @@ Contributions are welcome under the project's MIT License. See [`LICENSE`](./LIC
 
 ---
 
-**Graphorin** · v0.8.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.9.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

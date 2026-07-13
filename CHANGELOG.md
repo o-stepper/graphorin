@@ -14,6 +14,141 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.9.0 - 2026-07-13
+
+The **bot-adoption release**: five feature waves (PRs #170, #171,
+#172, #176, #177) that turn the framework into a complete substrate
+for a long-living personal assistant developed in a separate
+repository - a channel front door, proactivity, a provable memory
+quality loop, fine-grained permissions, and the workflow durability
+tail. Two packages publish for the first time:
+`@graphorin/channels` and `@graphorin/proactive`. Per-package details
+live in each package's `CHANGELOG.md`; upgrade notes are in the
+migration guide.
+
+### Channels front door (new package `@graphorin/channels`)
+
+- Vendor-neutral adapter SPI (`ChannelAdapter`, identity triple
+  routing, capability flags), deterministic access policies
+  (`pairing | allowlist | open | disabled`) with a persisted pairing
+  store (migration 034), and a conformance testkit
+  (`@graphorin/channels/testkit`) with an in-memory loopback adapter -
+  a messenger adapter is written against the testkit, no vendor code
+  ships in the framework.
+- Inbound trust boundary: channel text enters through sanitization +
+  a new `channel-inbound` trust class, seeds the run's taint ledger
+  (`InboundTaintSeed`), and message-borne untrusted input arms the
+  same data-flow policy tools do. Outbound `deliver()` cleans agent
+  scaffolding through the shared commentary catalogue on every
+  channel.
+- Gateway daemons compose into the server lifecycle by structural
+  typing (bounded inbound queues, health aggregation, activity
+  signals); `SttAdapter` seam for voice transcripts (provenance
+  `channel-inbound`).
+
+### Proactivity (new package `@graphorin/proactive`)
+
+- `createHeartbeat(...)`: checklist-driven quiet-hours-aware heartbeat
+  on a cheap isolated profile; skips on empty checklists, defers while
+  another run is active (`Agent.isBusy()`), strips sentinel replies.
+- Durable cron leg: fresh session per fire with fail-closed model
+  pinning (`pinnedProvider`) and a deterministic no-recursive-
+  scheduling posture; composes with the workflow timer daemon.
+- Escalation ladder `notify | question | review | act`: questions and
+  reviews ride durable HITL (agent approvals or workflow awakeables,
+  addressable through awakeable refs); `act` requires an explicit
+  per-task grant AND a configured memory ingest gate - refused
+  fail-closed otherwise. The server resume endpoint for agent HITL is
+  real (the honest 501 retired).
+- Scheduler guardrails (interval floor, per-task jitter, task limit,
+  auto-expiry) and a run-level budget
+  (`budget: { maxCostUsd, onExceed }`) enforced between steps.
+- `scaffold: 'minimal'` agent preset: instructions-only prompt,
+  defer-everything tool catalogue behind `tool_search`, no plan tool -
+  the cheap posture for proactive fires.
+
+### Memory quality loop
+
+- Operation-level eval metrics: a HaluMem-format dataset loader,
+  deterministic extraction recall/precision and update-omission
+  scorers, a judged QA-hallucination scorer, and the
+  `benchmarks/halumem` harness that replays cases through the REAL
+  ingest path with a `--conflict-pipeline on|off` A/B - the
+  reconcile path's value is now measurable, not asserted.
+- Profile projection: the consolidator materializes a read-only,
+  user-scoped `profile` working block from ACTIVE facts only (never
+  quarantined or contested values), with fact-id provenance and an
+  explicit erasure path (`WorkingMemory.purge`).
+- Tool profiles `interactive | reviser | full` (interactive never
+  constructs write tools), generalized curated-block passes
+  (`consolidator.curatedBlocks`), and a `reviserConsolidatorPreset`
+  for a cheap sleep-time revision agent.
+- Closed promotion loop behind fail-closed gates: a pre-compaction
+  `memoryFlushHook` salvages durable facts (quarantined, through the
+  ingest gate), a persistent recall ledger (migration 036) counts
+  distinct queries per fact, and the deterministic `PromotionPolicy`
+  promotes only multi-signal evidence through the audited validate
+  path. Enabling promotion or `autoPromoteExtraction` without an
+  `ingestGate` now throws (`IngestGateRequiredError`). Opt-in
+  `procedureInduction.auto` distils completed runs into quarantined
+  procedures.
+- Index hygiene: the embedder migration is resumable across processes
+  (`graphorin memory migrate` is a real command: `--embedders`,
+  `--batch-size`, `--reclaim`, `--json`), sqlite-vec absence can
+  degrade to a linear-fallback KNN instead of failing, retired vector
+  tables reclaim their space, and the chunking mode participates in
+  the index version key.
+
+### Permissions (four-value permissionDecision)
+
+- Tool policy vocabulary widens to `allow | deny | ask | defer`
+  (priority `deny > defer > ask > allow`; `'forbid'` stays as the
+  alias of `'deny'`). `ask`/`defer` suspend the run durably exactly
+  like `needsApproval` (`ToolApproval.mode`); `deny` blocks
+  deterministically.
+- Pre-tool `permissionHook`: one caller decision point over every
+  executor-bound call, with schema-revalidated `updatedInput`
+  rewrites that are what the approval record, policy and data-flow
+  gates all see; rewrites of already-granted args are refused on
+  resume replays.
+- Deny-by-name removes a tool everywhere at once: the advertised
+  catalogue, `tool_search` discovery/promotion, and execution
+  (including inline handoff/sub-agent calls).
+- Deferred decisions park as workflow approvals with a durable
+  deadline (`requestApproval(name, payload, { timeoutAt })`); an
+  unattended deadline auto-denies.
+
+### Workflow durability tail
+
+- `fork(threadId, checkpointId, { patch })` branches a thread with
+  corrected channel values (JSON-safety re-checked); the fork route
+  accepts the patch as `state`.
+- Read-only thread inspection without the node graph
+  (`readThreadState` / `listThreadCheckpoints`) and the operator CLI
+  `graphorin workflow inspect|checkpoints`.
+- The cross-process durability invariant is pinned end-to-end: a
+  thread suspended on an approval in a SIGKILLed process resumes from
+  SQLite in a fresh one.
+- Code-mode runtime is a named seam (`CodeModeRunner` +
+  `AgentConfig.codeMode { run, limits }`): substitute where
+  model-written scripts execute; credentials, `RunState` and policy
+  never cross the boundary.
+
+### Foundations (wave A)
+
+- Triggers: orphaned persisted triggers WARN + emit a typed event,
+  register-time catch-up waits for `start()`, prune detects true
+  orphans, and cron declarations accept an IANA `timezone` with a
+  pinned DST policy.
+- Consolidation: new `buffer:N` trigger ("consolidate once N tokens of
+  unprocessed transcript accumulate") plus server-side activity
+  signals that make `idle:T` a real debounce.
+- Workflow deploy tail: `awaitExternal(name, { schema })` validates
+  resolved payloads at delivery (invalid payload restores the
+  suspension), awakeable addresses serialize for messenger callback
+  data, and the server warns loudly when workflows are registered
+  without a timer driver.
+
 ## 0.8.0 - 2026-07-11
 
 The first **behavioral audit release**. A full end-to-end campaign ran

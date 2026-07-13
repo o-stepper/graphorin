@@ -1,5 +1,18 @@
 # @graphorin/triggers
 
+## 0.9.0
+
+### Minor Changes
+
+- [#170](https://github.com/o-stepper/graphorin/pull/170) [`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e) Thanks [@o-stepper](https://github.com/o-stepper)! - Triggers hardening (W-123 + W-124). Scheduler: persisted rows without a re-registered declaration are surfaced at `start()` with a WARN and a new `orphaned` scheduler event instead of being skipped silently, and `Scheduler.orphans()` lists them; register-time catch-up is deferred to `start()` so user callbacks never fire on a not-started scheduler. Cron: new `timezone` option (IANA, validated eagerly) evaluates the expression against the zone's wall clock with Vixie DST semantics - fixed-time jobs swallowed by a spring-forward gap run once immediately after the transition and fall-back repeats run only on the first pass, while wildcard minute/hour jobs follow the new wall clock without compensation; `isValidTimeZone` is exported. Server: `POST /v1/triggers/prune` accepts `{ disabled?: boolean = true, orphaned?: boolean = false }` and reports per-bucket removals; the triggers daemon status gains an `orphaned` count.
+
+- [#172](https://github.com/o-stepper/graphorin/pull/172) [`da7952b`](https://github.com/o-stepper/graphorin/commit/da7952b6b543958838aee8bfab249d24d1061a69) Thanks [@o-stepper](https://github.com/o-stepper)! - Scheduler harness for proactive task fleets: opt-in `limits` on `createScheduler` (interval/idle period floor, default 60s, plus a declaration cap) enforced fail-fast at `register(...)` via the new `TriggerLimitError`; per-declaration `jitterMs` (deterministic per-id offset applied to the armed delay only, stable across restarts) and `expiresAt` (auto-pause past expiry: non-destructive disabled flag, WARN, and a new `'expired'` scheduler event). Without `limits` the scheduler behaves exactly as before.
+
+### Patch Changes
+
+- Updated dependencies [[`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`9b389be`](https://github.com/o-stepper/graphorin/commit/9b389be2ac436f66d62b3ede9c64cd70808cfe9f)]:
+  - @graphorin/core@0.9.0
+
 ## 0.8.0
 
 ### Patch Changes

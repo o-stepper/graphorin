@@ -1,7 +1,0 @@
----
-'@graphorin/store-sqlite': minor
-'@graphorin/memory': minor
-'@graphorin/cli': minor
----
-
-Resumable embedder migration, real CLI migrate, KNN fallback and space reclaim (wave-D D5, plan item 10 steps 3-4; MST-12 and N-2 closed). The dead `migration_state` table is revived as a persisted cross-process cursor (`store.embedderMigration.state`); `migrateEmbedder({ state })` records progress after every batch and RESUMES from the cursor on the next invocation - kills and explicit aborts both stay resumable. The store now ships the `nextBatch` pager the runner always lacked (`store.embedderMigration.nextBatch`: pages live facts/episodes, re-embeds into the target sidecar, deletes the source row, flips `embedder_id`). `graphorin memory migrate --from --to --strategy --embedders <module>` is real (local factory-module import per DEC-154, `--batch-size`, `--json`), and `--reclaim` drops retired embedders' vector sidecar tables + runs `PRAGMA incremental_vacuum` (`store.embedderMigration.dropRetiredVectorTables()`). `SqliteVecMissingError` softens into policy: `createSqliteStore({ onMissingSqliteVec: 'linear-fallback' })` serves vectors from plain sidecar tables with a batched in-process cosine KNN (`setImmediate` yields, vec0 top-k parity pinned by test); a database stays in ONE mode, guarded both ways with actionable errors. The storage guide gains the migration/reclaim runbook and a `memory migrate` row in the live-server concurrency matrix.

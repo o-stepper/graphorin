@@ -1,8 +1,0 @@
----
-'@graphorin/memory': minor
-'@graphorin/agent': minor
-'@graphorin/store-sqlite': minor
-'@graphorin/core': minor
----
-
-Pre-compaction flush, recall ledger, PromotionPolicy and auto-induction (wave-D D4, plan item 3). The context engine gains a `preCompactionHooks` seam (fired before the summarizer with the full buffer; side-effect only, failures fold into `hookFailures`) and the built-in `memoryFlushHook({ provider })` - one budgeted LLM call salvages durable facts from content about to be summarized away, passes candidates through the B3 ingest gate when configured, and writes them QUARANTINED; `SessionMemory.flushImportant` is deprecated in its favour. Migration 036 adds the recall ledger (`fact_recall_queries`: DISTINCT queries per fact by normalized-query hash, fed from the semantic search path, erased with its fact). The deterministic `PromotionPolicy` (`consolidator.promotion: { minSalience?, minRecalls?, minUniqueQueries?, minAgeMs?, allowedProvenance?, maxPerRun? }`) promotes quarantined facts whose recall evidence clears every threshold through the audited `validate` path (injection-flagged refused, pending W-019 supersedes completed; `PhaseOutcome.factsPromoted`). Fail-closed gates: `promotion` or `autoPromoteExtraction: true` without `ingestGate` now throws `IngestGateRequiredError`, and the W-083 guard forces autoPromote update/conflict decisions against QUARANTINED or USER-provenance targets onto the pending-supersede path. On the agent, `createAgent({ procedureInduction: { auto, minSteps?, minToolCalls?, minCostUsd? } })` distils COMPLETED runs above the thresholds via `memory.procedural.induceFromRun` (result stays quarantined; failures WARN once and never fail the run). SpanType gains `memory.consolidate.promotion`.

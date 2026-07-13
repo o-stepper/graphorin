@@ -1,8 +1,0 @@
----
-'@graphorin/channels': minor
-'@graphorin/core': minor
-'@graphorin/store-sqlite': minor
-'@graphorin/server': minor
----
-
-New package `@graphorin/channels` - the messenger front door (bot-adoption wave B, item 1). The vendor-neutral adapter SPI (`ChannelAdapter`, `InboundChannelMessage`, the `ChannelIdentity` triple, `ChannelCapabilities`, `DeliveryPayload` with the optional `question` HITL placeholder, typed fire-and-forget `ChannelDeliveryError`); a deterministic identity router (ordered route table, first-match-wins, mandatory catch-all, stable per-peer `defaultSessionKey`; sessionKey is a routing selector, never an authz token); the access policy (`pairing` default with one-time TTL codes and a per-channel pending cap, `allowlist`, `open`, `disabled`) over the new `PairingStore` contract in `@graphorin/core/contracts` (sqlite implementation behind migration 034, exposed as `createSqliteStore(...).pairing`); the gateway runtime (bounded per-adapter queues with shed-on-overflow, access check before any routing or model spend, inbound sanitisation + ready-made `inboundTaint` seed, reply/proactive delivery through the shared outbound catalogue with channel-default `'strip'`); and `@graphorin/channels/testkit` (loopback adapter, in-memory pairing store, framework-agnostic adapter conformance suite). Core also gains the canonical `SttAdapter` contract whose transcripts pin `trustClass: 'channel-inbound'`. The server hosts the gateway structurally (`createServer({ channels })`, new `@graphorin/server/channels` subpath): started last / stopped first in the lifecycle, aggregated into `/v1/health`, and bridged so accepted inbound messages call `scheduler.recordActivity()`. No vendor adapters ship with the framework.

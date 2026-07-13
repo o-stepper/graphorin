@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-halumem",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "private": true,
   "description": "Operation-level memory benchmark for the Graphorin framework (HaluMem-format): replays sessions through the real ingest pipeline (session push, consolidator extraction, conflict pipeline) and grades extraction recall/precision, update omission and QA hallucination with the @graphorin/evals staged scorers. The --conflict-pipeline A/B leg measures the neighbour-aware extract-reconcile-supersede path. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
