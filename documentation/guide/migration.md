@@ -52,6 +52,43 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.8.x -> 0.9.0
+
+0.9.0 is the bot-adoption release (channels, proactivity, memory
+quality loop, four-value permissions, workflow durability tail). The
+upgrade is a lockstep bump; almost everything is additive and off by
+default. What can be observable:
+
+- **`autoPromoteExtraction: true` (or `consolidator.promotion`) now
+  requires an `ingestGate`** - `createMemory` throws
+  `IngestGateRequiredError` otherwise. This enforces a precondition
+  that was previously documented but not checked: auto-promoted
+  writes skip the quarantine review, so the guardrail-verdict gate is
+  the only thing standing between a poisoned turn and active memory.
+  Fix: pass `ingestGate: verdictIngestGate` (or your own gate) next
+  to the flag.
+- **Schema migrations 034-036 apply on first `store.init()`**
+  (pairing store, session-message security verdict, fact recall
+  ledger). Forward-only as always - take
+  `graphorin storage backup <dest>` before upgrading.
+- **Tool-argument policies**: the rule vocabulary widens to
+  `allow | deny | ask | defer`. Existing `allow`/`forbid` policies
+  behave byte-identically (`forbid` is now an alias of `deny`). The
+  binary `evaluateToolArgumentPolicy` projects `ask`/`defer` to
+  `forbid` (fail-closed) - only relevant once you write the new
+  effects; use the agent runtime (or `evaluatePermissionDecision`)
+  to get real ask/defer semantics.
+- **`SessionMemory.flushImportant` is deprecated** (inert since it
+  shipped); the pre-compaction `memoryFlushHook` is the real flush
+  path. The method still exists and warns.
+- **The server warns at `start()`** when workflows are registered
+  without a durable-timer driver - previously a `sleepFor` thread
+  silently never woke. Wire `createTimerDriver` (or ignore the WARN
+  if you tick manually).
+- New packages `@graphorin/channels` and `@graphorin/proactive` join
+  the lockstep scope - install them at the same version as the rest
+  when you adopt them.
+
 ### 0.7.x -> 0.8.0
 
 0.8.0 fixes the 30 defects confirmed by the 2026-07-11 end-to-end

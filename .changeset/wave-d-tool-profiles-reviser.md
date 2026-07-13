@@ -1,6 +1,0 @@
----
-'@graphorin/memory': minor
-'@graphorin/core': minor
----
-
-Memory tool profiles + curated blocks + the reviser preset (wave-D D3, plan item 5). `buildMemoryTools(deps, { profile: 'interactive' | 'reviser' | 'full' })` / `createMemory({ toolProfile })` split the tool surface single-writer-style: `'interactive'` constructs ONLY the read tools (a front-line agent cannot write memory by construction), `'reviser'` is the full read+write surface for the sleep-time curation agent, `'full'` (default) keeps the canonical stable order; unknown values throw. The learned-context pass generalises to a registered curated-block list - `consolidator.curatedBlocks[{ label, prompt?, maxChars? }]` gives each block its own resilient deep-phase rewrite (`learnedContext: true` stays byte-compatible sugar for the `learned_context` entry); labels are validated (unique, non-empty, never the reserved `profile`) via `CuratedBlocksMisconfiguredError`, and `PhaseOutcome.curatedBlocksUpdated` counts rewrites. `reviserConsolidatorPreset({ provider, defaultScope, curatedBlocks?, schedule?, onExceed?, ceilings? })` packages the reviser: standard tier, cheap provider on every phase, idle+cron cadence (cron reaches the deep phase), and a HARD budget posture - `onExceed: 'log'` is rejected. SpanType gains `memory.consolidate.curated-block`.

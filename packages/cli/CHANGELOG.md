@@ -1,5 +1,27 @@
 # @graphorin/cli
 
+## 0.9.0
+
+### Minor Changes
+
+- [#176](https://github.com/o-stepper/graphorin/pull/176) [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160) Thanks [@o-stepper](https://github.com/o-stepper)! - Resumable embedder migration, real CLI migrate, KNN fallback and space reclaim (wave-D D5, plan item 10 steps 3-4; MST-12 and N-2 closed). The dead `migration_state` table is revived as a persisted cross-process cursor (`store.embedderMigration.state`); `migrateEmbedder({ state })` records progress after every batch and RESUMES from the cursor on the next invocation - kills and explicit aborts both stay resumable. The store now ships the `nextBatch` pager the runner always lacked (`store.embedderMigration.nextBatch`: pages live facts/episodes, re-embeds into the target sidecar, deletes the source row, flips `embedder_id`). `graphorin memory migrate --from --to --strategy --embedders <module>` is real (local factory-module import per DEC-154, `--batch-size`, `--json`), and `--reclaim` drops retired embedders' vector sidecar tables + runs `PRAGMA incremental_vacuum` (`store.embedderMigration.dropRetiredVectorTables()`). `SqliteVecMissingError` softens into policy: `createSqliteStore({ onMissingSqliteVec: 'linear-fallback' })` serves vectors from plain sidecar tables with a batched in-process cosine KNN (`setImmediate` yields, vec0 top-k parity pinned by test); a database stays in ONE mode, guarded both ways with actionable errors. The storage guide gains the migration/reclaim runbook and a `memory migrate` row in the live-server concurrency matrix.
+
+- [#177](https://github.com/o-stepper/graphorin/pull/177) [`9b389be`](https://github.com/o-stepper/graphorin/commit/9b389be2ac436f66d62b3ede9c64cd70808cfe9f) Thanks [@o-stepper](https://github.com/o-stepper)! - Workflow durability tail (wave-E E2, plan item 16). `fork(threadId, fromCheckpointId, { patch })` merges channel-level values into the forked root's state ("branch here, but with these corrected values"): patch keys must name declared channels and the merged state re-runs the WF-10 JSON-safety guard; over HTTP the same patch is the optional `state` field of `POST /v1/workflows/:id/fork`. New read-only inspection helpers `readThreadState(store, workflowName, threadId)` / `listThreadCheckpoints(...)` decode a thread's latest checkpoint (status, unwrapped channel state, the full pending-pause frontier) and its timeline off a bare `CheckpointStore` by workflow NAME - and back the new operator commands `graphorin workflow inspect <threadId> --workflow <name>` and `graphorin workflow checkpoints <threadId> --workflow <name>` (read-only, exit 1 on unknown thread). The cross-process durability invariant is now pinned end-to-end: a thread suspended on an approval in a SIGKILLed process resumes from SQLite in a fresh one. `multiResume` intentionally not built (decision D-2).
+
+### Patch Changes
+
+- Updated dependencies [[`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e), [`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e), [`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e), [`24241a3`](https://github.com/o-stepper/graphorin/commit/24241a3cdb9c684338f02d4d66510c248eb47d7e), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`08cf387`](https://github.com/o-stepper/graphorin/commit/08cf387a4dc5f4cc9b62462a384efe990309e041), [`da7952b`](https://github.com/o-stepper/graphorin/commit/da7952b6b543958838aee8bfab249d24d1061a69), [`da7952b`](https://github.com/o-stepper/graphorin/commit/da7952b6b543958838aee8bfab249d24d1061a69), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`7ac0470`](https://github.com/o-stepper/graphorin/commit/7ac0470bdfc579ee864c2ee54e119c94d24ad160), [`9b389be`](https://github.com/o-stepper/graphorin/commit/9b389be2ac436f66d62b3ede9c64cd70808cfe9f), [`9b389be`](https://github.com/o-stepper/graphorin/commit/9b389be2ac436f66d62b3ede9c64cd70808cfe9f), [`9b389be`](https://github.com/o-stepper/graphorin/commit/9b389be2ac436f66d62b3ede9c64cd70808cfe9f)]:
+  - @graphorin/memory@0.9.0
+  - @graphorin/server@0.9.0
+  - @graphorin/store-sqlite@0.9.0
+  - @graphorin/core@0.9.0
+  - @graphorin/workflow@0.9.0
+  - @graphorin/security@0.9.0
+  - @graphorin/sessions@0.9.0
+  - @graphorin/pricing@0.9.0
+  - @graphorin/skills@0.9.0
+  - @graphorin/eslint-plugin@0.9.0
+
 ## 0.8.0
 
 ### Minor Changes

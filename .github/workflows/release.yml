@@ -160,12 +160,19 @@ jobs:
           # (Alternative: enable "Allow GitHub Actions to create and approve
           # pull requests" in repo settings and keep GITHUB_TOKEN.)
           GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
-          # W-139: deliberately NO `NPM_TOKEN` here - publishing authenticates
-          # via OIDC trusted publishing (see the header). While an NPM_TOKEN
-          # env is present, changesets/action writes a token-based .npmrc and
-          # the OIDC path is never exercised; the secret remains in repo
-          # settings only as the documented one-line rollback until the first
-          # OIDC release passes the C4 smoke below.
+          # 0.9.0 ONLY (remove right after): token-based publish for ONE
+          # release, because @graphorin/channels and @graphorin/proactive
+          # publish for the FIRST time this train and npm cannot configure a
+          # trusted publisher on a package that does not exist yet
+          # (npm/cli#8544). With this env present changesets/action writes a
+          # token-based .npmrc and every package publishes by token; Sigstore
+          # provenance still rides `id-token: write` +
+          # NPM_CONFIG_PROVENANCE, exactly as in the pre-W-139 releases.
+          # After the release: configure trusted publishers for the two new
+          # packages, delete the NPM_TOKEN secret AND this line (an empty
+          # secret would write an empty-token .npmrc that breaks the OIDC
+          # exchange).
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
 
       # C4 / Wave-4 acceptance gate: after a real publish, verify the release
