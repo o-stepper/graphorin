@@ -30,6 +30,12 @@ Re-exports [FromTracesOptions](/api/@graphorin/evals/interfaces/FromTracesOption
 
 ***
 
+### HaluMemStage
+
+Re-exports [HaluMemStage](/api/@graphorin/evals/type-aliases/HaluMemStage.md)
+
+***
+
 ### loadCsvDataset
 
 Re-exports [loadCsvDataset](/api/@graphorin/evals/functions/loadCsvDataset.md)
@@ -57,6 +63,18 @@ Re-exports [loadDmrDataset](/api/@graphorin/evals/functions/loadDmrDataset.md)
 ### LoadDmrOptions
 
 Re-exports [LoadDmrOptions](/api/@graphorin/evals/interfaces/LoadDmrOptions.md)
+
+***
+
+### loadHaluMemDataset
+
+Re-exports [loadHaluMemDataset](/api/@graphorin/evals/functions/loadHaluMemDataset.md)
+
+***
+
+### LoadHaluMemOptions
+
+Re-exports [LoadHaluMemOptions](/api/@graphorin/evals/interfaces/LoadHaluMemOptions.md)
 
 ***
 
@@ -120,6 +138,30 @@ Re-exports [MemoryEvalTurn](/api/@graphorin/evals/interfaces/MemoryEvalTurn.md)
 
 ***
 
+### MemoryGoldPoint
+
+Re-exports [MemoryGoldPoint](/api/@graphorin/evals/interfaces/MemoryGoldPoint.md)
+
+***
+
+### MemoryOperationKind
+
+Re-exports [MemoryOperationKind](/api/@graphorin/evals/type-aliases/MemoryOperationKind.md)
+
+***
+
+### MemoryOperationsEvalInput
+
+Re-exports [MemoryOperationsEvalInput](/api/@graphorin/evals/interfaces/MemoryOperationsEvalInput.md)
+
+***
+
+### MemoryOperationsObservation
+
+Re-exports [MemoryOperationsObservation](/api/@graphorin/evals/interfaces/MemoryOperationsObservation.md)
+
+***
+
 ### parseCsv
 
 Re-exports [parseCsv](/api/@graphorin/evals/functions/parseCsv.md)
@@ -129,6 +171,12 @@ Re-exports [parseCsv](/api/@graphorin/evals/functions/parseCsv.md)
 ### parseDmr
 
 Re-exports [parseDmr](/api/@graphorin/evals/functions/parseDmr.md)
+
+***
+
+### parseHaluMem
+
+Re-exports [parseHaluMem](/api/@graphorin/evals/functions/parseHaluMem.md)
 
 ***
 

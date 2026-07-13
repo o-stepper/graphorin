@@ -22,6 +22,12 @@ export {
   loadDatasetFromTraces,
   type TraceEvent,
 } from './from-traces.js';
+export {
+  type HaluMemStage,
+  type LoadHaluMemOptions,
+  loadHaluMemDataset,
+  parseHaluMem,
+} from './halumem.js';
 export { fromIterable } from './iterable.js';
 export {
   type LoadJsonlOptions,
@@ -43,4 +49,8 @@ export type {
   MemoryEvalInput,
   MemoryEvalSession,
   MemoryEvalTurn,
+  MemoryGoldPoint,
+  MemoryOperationKind,
+  MemoryOperationsEvalInput,
+  MemoryOperationsObservation,
 } from './memory-eval.js';

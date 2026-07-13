@@ -1,0 +1,84 @@
+[
+  {
+    "case_id": "u1",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          {
+            "role": "user",
+            "content": "I live in Berlin and I work as a nurse.",
+            "timestamp": "2025-11-02T10:00:00Z"
+          },
+          {
+            "role": "assistant",
+            "content": "Noted - Berlin, and nursing. How is the shift schedule?"
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "turns": [
+          {
+            "role": "user",
+            "content": "Big news: I moved to Kyiv last month.",
+            "timestamp": "2025-12-14T18:30:00Z"
+          }
+        ]
+      }
+    ],
+    "memory_points": [
+      { "kind": "extract", "content": "User works as a nurse", "session_id": "s1" },
+      { "kind": "extract", "content": "User lives in Kyiv", "session_id": "s2" },
+      {
+        "kind": "update",
+        "content": "User lives in Kyiv",
+        "previous": "User lives in Berlin",
+        "session_id": "s2"
+      }
+    ],
+    "questions": [
+      {
+        "question": "Where does the user live now?",
+        "answer": "Kyiv",
+        "asked_at": "2026-01-05T09:00:00Z"
+      },
+      { "question": "What is the name of the user's dog?", "unanswerable": true }
+    ]
+  },
+  {
+    "case_id": "u2",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [{ "role": "user", "content": "I subscribed to MusicApp premium yesterday." }]
+      },
+      {
+        "id": "s2",
+        "turns": [
+          { "role": "user", "content": "I cancelled MusicApp - please forget I ever had it." }
+        ]
+      }
+    ],
+    "memory_points": [
+      {
+        "kind": "delete",
+        "content": "User has an active MusicApp subscription",
+        "session_id": "s2"
+      }
+    ],
+    "questions": []
+  },
+  {
+    "case_id": "u3",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [{ "role": "user", "content": "My sister Anna is a violinist." }]
+      }
+    ],
+    "memory_points": [
+      { "kind": "extract", "content": "User's sister Anna plays the violin", "session_id": "s1" }
+    ]
+  }
+]

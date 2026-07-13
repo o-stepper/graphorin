@@ -71,7 +71,8 @@ Deletion in a memory-bearing framework spans roughly a dozen persistence surface
 | Surface | What it stores | Deleted by | Not covered by |
 |---|---|---|---|
 | `sessions`, `session_messages`, `episodes` (+ FTS/vec rows) | conversation transcript and episode summaries | `deleteSession` / `pruneSessions` cascade | - |
-| `facts`, `insights`, `rules`, `working_blocks` (+ FTS/vec rows, entity links) | distilled memory | session-scoped rows: the same cascade; user-scoped rows: `MemoryStore.purge(id)` per record | a session delete never touches user-level rows (`scope_session_id IS NULL`) |
+| `facts`, `insights`, `rules` (+ FTS/vec rows, entity links) | distilled memory | session-scoped rows: the same cascade; user-scoped rows: `MemoryStore.purge(id)` per record | a session delete never touches user-level rows (`scope_session_id IS NULL`) |
+| `working_blocks` (incl. the user-scoped `profile` projection block, wave-D D2) | working blocks / projected profile slots | session-scoped rows: the same cascade; user-scoped rows: `memory.working.purge(userScope, label)` (hard delete; `forget()` is only a tombstone) | a session delete never touches user-scoped blocks - the `profile` block deliberately survives session deletion and MUST be purged explicitly during user erasure |
 | `memory_history` | audit trail of memory mutations | values are scrubbed to event skeletons by the cascade and by `purge()`; row skeletons remain | full row deletion (use `graphorin memory prune-history --older-than`) |
 | `workflow_checkpoints`, `workflow_pending_writes` | suspended-run snapshots (full serialized conversation) | session cascade (via the `sessionId` metadata stamped on HITL suspends and the workflow-run mapping); age-based: `CheckpointStoreExt.pruneThreads`; per-thread: `deleteThread` / `compactThread` | - |
 | `spans` | run traces (tool names, error strings, memory-search ids) | session cascade; age-based: `graphorin traces prune --before` / `pruneSpans` | spans with no session id are only deleted by age |
@@ -88,7 +89,7 @@ Deletion in a memory-bearing framework spans roughly a dozen persistence surface
 ### Erasing a person end-to-end
 
 1. `listSessions({ userId })` on the sessions facade (or `GET /v1/sessions?userId=...`), then `deleteSession(id)` for each - the cascade removes transcripts, episodes, session-scoped facts/insights/rules/blocks, suspended-run checkpoints and spans.
-2. Purge user-scoped memory: enumerate the user's remaining facts/insights/rules (they carry `scope_user_id`) and call `MemoryStore.purge(id)` per record - this also scrubs `memory_history` values.
+2. Purge user-scoped memory: enumerate the user's remaining facts/insights/rules (they carry `scope_user_id`) and call `MemoryStore.purge(id)` per record - this also scrubs `memory_history` values. Then hard-delete the user-scoped working blocks: `memory.working.purge({ userId }, 'profile')` (and any other user-level labels) - the soft `forget()` tombstone is not erasure.
 3. Sweep the residuals: `graphorin traces prune` for any unsessioned spans in the retention window, `graphorin audit prune` if the audit chain must forget (mind the Merkle re-anchor runbook), `graphorin memory prune-history` for history skeletons.
 4. Apply the backup caveat above to every backup that predates the erasure.
 

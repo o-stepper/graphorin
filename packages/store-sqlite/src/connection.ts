@@ -33,6 +33,13 @@ export interface SqliteConnection {
   readonly encrypted: boolean;
   /** Whether the connection wraps a `:memory:` database. */
   readonly inMemory: boolean;
+  /**
+   * How vector sidecars are served (wave-D D5): `'vec0'` (sqlite-vec
+   * loaded), `'linear-fallback'` (plain tables + in-process cosine
+   * scan), or `'disabled'` (`skipSqliteVec`). Optional so existing
+   * structural stubs keep compiling; absent reads as `'vec0'`.
+   */
+  readonly vectorSearchMode?: 'vec0' | 'linear-fallback' | 'disabled';
   pragma(query: string, options?: { simple?: boolean }): unknown;
   exec(query: string): void;
   execMany(sql: string): void;
@@ -77,6 +84,19 @@ export interface OpenConnectionOptions {
    * that exercise the migration runner without the vector adapter.
    */
   readonly skipSqliteVec?: boolean;
+  /**
+   * Wave-D D5 (item 10 step 3): policy when the `sqlite-vec` peer is
+   * missing or fails to load. `'fail'` (default) rethrows
+   * {@link SqliteVecMissingError} - the pre-wave behaviour.
+   * `'linear-fallback'` degrades instead of dying: vector sidecars are
+   * kept in PLAIN tables (same names/columns) and KNN runs as an
+   * in-process batched cosine scan with `setImmediate` yields. Suits
+   * environments where the native build is unavailable and degraded
+   * vector recall beats a crash. A database must stay in ONE mode: the
+   * table manager refuses to open vec0 tables in fallback mode (and
+   * plain fallback tables in vec0 mode) with an actionable error.
+   */
+  readonly onMissingSqliteVec?: 'fail' | 'linear-fallback';
   /**
    * Override the constructor used to open the underlying database.
    * Used by the test suite to inject a stub. When unset the connection
@@ -259,15 +279,33 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     db.pragma(`busy_timeout = ${Math.floor(busyTimeoutMs)}`);
   }
 
+  let vectorSearchMode: 'vec0' | 'linear-fallback' | 'disabled' = skipSqliteVec
+    ? 'disabled'
+    : 'vec0';
   if (!skipSqliteVec) {
-    const loader = loadVecExtension ?? (await loadDefaultVecLoader());
-    loader(db);
+    try {
+      const loader = loadVecExtension ?? (await loadDefaultVecLoader());
+      loader(db);
+    } catch (err) {
+      // Wave-D D5: soften the hard SqliteVecMissingError into a policy.
+      if (options.onMissingSqliteVec === 'linear-fallback') {
+        vectorSearchMode = 'linear-fallback';
+        process.stderr.write(
+          '[graphorin/store-sqlite] sqlite-vec is unavailable - vector search degrades to the ' +
+            'in-process linear-fallback scan (onMissingSqliteVec). Install the sqlite-vec peer ' +
+            'for indexed KNN.\n',
+        );
+      } else {
+        throw err;
+      }
+    }
   }
 
   const connection: SqliteConnection = {
     path: absolutePath,
     encrypted: resolvedEncryption.enabled,
     inMemory,
+    vectorSearchMode,
     pragma(query, opts) {
       return db.pragma(query, opts);
     },

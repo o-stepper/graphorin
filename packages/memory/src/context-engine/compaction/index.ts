@@ -16,6 +16,7 @@ export {
   type ExecuteCompactionInput,
   executeCompaction,
 } from './compactor.js';
+export { type MemoryFlushHookOptions, memoryFlushHook } from './hooks/memory-flush.js';
 export { reanchorPersonaBlock } from './hooks/reanchor-persona-block.js';
 export { reanchorPinnedFacts } from './hooks/reanchor-pinned-facts.js';
 export { reanchorProjectRules } from './hooks/reanchor-project-rules.js';
@@ -55,6 +56,9 @@ export type {
   CompactionStrategy,
   CompactionSummarizer,
   CompactionTriggerConfig,
+  NamedPreCompactionHook,
   PostCompactionHook,
   PostCompactionHookContext,
+  PreCompactionHook,
+  PreCompactionHookContext,
 } from './types.js';

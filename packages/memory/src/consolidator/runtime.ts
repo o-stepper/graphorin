@@ -19,6 +19,7 @@
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
+import { withMemorySpan } from '../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   DlqBatchRow,
@@ -30,15 +31,33 @@ import type { WorkingMemory } from '../tiers/working-memory.js';
 import { BudgetTracker } from './budget.js';
 import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
-import { CustomTierMisconfiguredError, ProviderNotConfiguredError } from './errors.js';
+import {
+  CuratedBlocksMisconfiguredError,
+  CustomTierMisconfiguredError,
+  ProviderNotConfiguredError,
+} from './errors.js';
 import { tipMessageId } from './idempotency.js';
 import { LockManager, scopeKey } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
-import { runLearnedContextPass } from './phases/learned-context.js';
+import {
+  LEARNED_CONTEXT_BLOCK_LABEL,
+  type ResolvedCuratedBlock,
+  runCuratedBlockPass,
+} from './phases/learned-context.js';
 import { runLightPhase } from './phases/light.js';
+import {
+  PROFILE_BLOCK_LABEL,
+  resolveProfileProjectionConfig,
+  runProfileProjectionPass,
+} from './phases/profile-projection.js';
 import { runReflectionPass } from './phases/reflect.js';
 import { renderTranscript, runStandardPhase } from './phases/standard.js';
+import {
+  type ResolvedPromotionPolicy,
+  resolvePromotionPolicy,
+  shouldPromote,
+} from './promotion.js';
 import {
   type RegisterTriggersResult,
   registerConsolidatorTriggers,
@@ -924,12 +943,21 @@ class ConsolidatorImpl implements Consolidator {
       now: this.#now,
       ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
     });
+    let out: PhaseOutcome = deepOut;
+    // Wave-D D4: the deterministic promotion step runs right after the
+    // conflict drain, so freshly-settled facts are candidates and every
+    // later pass (reflection, curated blocks, profile projection) sees
+    // the promoted state. No LLM call - pure policy over recall
+    // evidence, executed through the audited validate path.
+    if (this.#config.promotion !== null) {
+      const factsPromoted = await this.#runPromotionStep(scope, this.#config.promotion);
+      out = { ...out, factsPromoted };
+    }
     // Reflection pass (P1-1) runs after the conflict drain, reusing the
     // deep run's lock + budget + audit window. Triple-gated: enabled by
     // config, an episodic tier present (importance source), and an
     // insight-capable storage adapter. The accumulated-importance
     // threshold is enforced inside the pass.
-    let out: PhaseOutcome = deepOut;
     const insightStore = this.#store.insights;
     if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
       // MCON-13: read the persisted reflection watermark so the gate only
@@ -970,34 +998,115 @@ class ConsolidatorImpl implements Consolidator {
             : (out.llmCostUsd ?? 0) + reflection.costUsd,
       };
     }
-    // Learned-context pass (D3) runs last, folding the run's fresh
-    // synthesis into the standing digest block. Double-gated: enabled by
-    // config and a working-tier handle wired. Rides the deep provider +
-    // budget like reflection.
-    if (this.#config.learnedContext && this.#working !== null) {
-      const learned = await runLearnedContextPass({
+    // Curated-block passes (D3, generalised in wave-D): the registered
+    // list - incl. the learned_context entry contributed by the
+    // `learnedContext: true` sugar - is rewritten block by block.
+    // Double-gated: a non-empty list and a working-tier handle wired.
+    // Rides the deep provider + budget like reflection.
+    if (this.#config.curatedBlocks.length > 0 && this.#working !== null) {
+      let curatedBlocksUpdated = 0;
+      for (const block of this.#config.curatedBlocks) {
+        const rewritten = await runCuratedBlockPass({
+          provider: deepProvider,
+          tracer: this.#tracer,
+          scope,
+          working: this.#working,
+          episodic: this.#episodic,
+          store: this.#store,
+          budget: this.#budget,
+          maxChars: block.maxChars,
+          label: block.label,
+          ...(block.prompt !== null ? { systemPrompt: block.prompt } : {}),
+          now: this.#now,
+          ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
+        });
+        if (rewritten.updated) curatedBlocksUpdated += 1;
+        out = {
+          ...out,
+          ...(block.label === LEARNED_CONTEXT_BLOCK_LABEL
+            ? { learnedContextUpdated: rewritten.updated }
+            : {}),
+          llmTokensUsed: out.llmTokensUsed + rewritten.tokens,
+          llmCostUsd:
+            out.llmCostUsd === null && rewritten.costUsd === 0
+              ? null
+              : (out.llmCostUsd ?? 0) + rewritten.costUsd,
+        };
+      }
+      out = { ...out, curatedBlocksUpdated };
+    }
+    // Profile-projection pass (wave-D D2) runs last: it reads the facts
+    // the drain above may have just settled. Same double-gate + deep
+    // provider + budget envelope as the learned-context pass.
+    if (this.#config.profileProjection !== null && this.#working !== null) {
+      const projected = await runProfileProjectionPass({
         provider: deepProvider,
         tracer: this.#tracer,
         scope,
         working: this.#working,
-        episodic: this.#episodic,
         store: this.#store,
         budget: this.#budget,
-        maxChars: this.#config.learnedContextMaxChars,
+        config: this.#config.profileProjection,
         now: this.#now,
         ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
       });
       out = {
         ...out,
-        learnedContextUpdated: learned.updated,
-        llmTokensUsed: out.llmTokensUsed + learned.tokens,
+        profileProjectionUpdated: projected.updated,
+        llmTokensUsed: out.llmTokensUsed + projected.tokens,
         llmCostUsd:
-          out.llmCostUsd === null && learned.costUsd === 0
+          out.llmCostUsd === null && projected.costUsd === 0
             ? null
-            : (out.llmCostUsd ?? 0) + learned.costUsd,
+            : (out.llmCostUsd ?? 0) + projected.costUsd,
       };
     }
     return out;
+  }
+
+  /**
+   * Wave-D D4: execute the deterministic promotion policy - list the
+   * quarantined candidates with their recall stats, apply the pure
+   * `shouldPromote` verdict, and promote each winner through the
+   * audited `SemanticMemory.validate` path (which refuses
+   * injection-flagged facts - those are counted and skipped, never
+   * forced). Returns the number of facts promoted.
+   */
+  async #runPromotionStep(scope: SessionScope, policy: ResolvedPromotionPolicy): Promise<number> {
+    return withMemorySpan(
+      this.#tracer,
+      'memory.consolidate.promotion',
+      scope,
+      { 'consolidator.phase': 'promotion' },
+      async (span) => {
+        const listCandidates = this.#store.semantic.listPromotionCandidates;
+        if (typeof listCandidates !== 'function') {
+          span.setAttributes({ 'consolidator.promotion.skipped': 'no-candidate-surface' });
+          return 0;
+        }
+        const candidates = await listCandidates.call(this.#store.semantic, scope, {});
+        const nowMs = this.#now();
+        let promoted = 0;
+        let refused = 0;
+        for (const candidate of candidates) {
+          if (promoted >= policy.maxPerRun) break;
+          if (!shouldPromote(candidate, policy, nowMs)) continue;
+          try {
+            await this.#semantic.validate(scope, candidate.fact.id, 'promotion-policy');
+            promoted += 1;
+          } catch {
+            // QuarantinePromotionRefusedError (injection-flagged) or a
+            // storage hiccup - never force, never fail the deep phase.
+            refused += 1;
+          }
+        }
+        span.setAttributes({
+          'consolidator.promotion.candidates': candidates.length,
+          'consolidator.promotion.promoted': promoted,
+          'consolidator.promotion.refused': refused,
+        });
+        return promoted;
+      },
+    );
   }
 
   #emit(
@@ -1091,7 +1200,54 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
     learnedContext: opts.learnedContext ?? preset.learnedContext,
     learnedContextMaxChars: opts.learnedContextMaxChars ?? preset.learnedContextMaxChars,
+    curatedBlocks: resolveCuratedBlocks(opts, preset),
+    // Wave-D D2: not per-tier - configured via createMemory({ profile }).
+    profileProjection:
+      opts.profileProjection === undefined
+        ? null
+        : resolveProfileProjectionConfig(opts.profileProjection),
+    // Wave-D D4: not per-tier - opt-in, ingest-gate-gated at the facade.
+    promotion: opts.promotion === undefined ? null : resolvePromotionPolicy(opts.promotion),
   });
+}
+
+/**
+ * Wave-D D3: merge the `learnedContext: true` sugar with the explicit
+ * `curatedBlocks` list into the resolved config, validating labels
+ * (unique, non-empty, never the reserved `profile`).
+ */
+function resolveCuratedBlocks(
+  opts: CreateConsolidatorOptions,
+  preset: { readonly learnedContext: boolean; readonly learnedContextMaxChars: number },
+): ReadonlyArray<ResolvedCuratedBlock> {
+  const learnedContext = opts.learnedContext ?? preset.learnedContext;
+  const learnedContextMaxChars = opts.learnedContextMaxChars ?? preset.learnedContextMaxChars;
+  const out: ResolvedCuratedBlock[] = [];
+  if (learnedContext) {
+    out.push({
+      label: LEARNED_CONTEXT_BLOCK_LABEL,
+      prompt: null,
+      maxChars: learnedContextMaxChars,
+    });
+  }
+  for (const spec of opts.curatedBlocks ?? []) {
+    const label = typeof spec.label === 'string' ? spec.label.trim() : '';
+    if (label.length === 0) {
+      throw new CuratedBlocksMisconfiguredError(String(spec.label), 'empty');
+    }
+    if (label === PROFILE_BLOCK_LABEL) {
+      throw new CuratedBlocksMisconfiguredError(label, 'reserved');
+    }
+    if (out.some((entry) => entry.label === label)) {
+      throw new CuratedBlocksMisconfiguredError(label, 'duplicate');
+    }
+    out.push({
+      label,
+      prompt: spec.prompt ?? null,
+      maxChars: spec.maxChars ?? learnedContextMaxChars,
+    });
+  }
+  return Object.freeze(out);
 }
 
 function defaultTriggers(): ConsolidatorTriggerSpec[] {

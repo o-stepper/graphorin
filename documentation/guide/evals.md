@@ -63,6 +63,7 @@ A scorer takes the case input + the agent's output and returns a `{ pass, score,
 
 - **`code/`** - deterministic, no model: `exactMatch`, `regexMatch` (stateless - `/g`/`/y` flags are stripped per case), `jsonPath`, and arbitrary `predicate` scorers.
 - **`llm/`** - an LLM-as-judge scorer (`llmJudge`) for open-ended answers. Hardened against prompt injection in the candidate output; a judge that fails to parse surfaces a scorer error rather than a silent zero.
+- **`memory/`** - operation-level memory metrics over HaluMem-format gold points: deterministic `memoryExtractionRecall` / `memoryExtractionPrecision` / `memoryUpdateOmission` (token-F1 matching by default, custom matchers supported) plus the judged `memoryQaHallucination`. They grade the memory *write pipeline* - what was extracted, updated, deleted - not just final answers.
 - **`prebuilt/`** - ready-made `toxicityScorer`, `factualityScorer`, `helpfulnessScorer`.
 - **`trajectory/`** - score the *path*, not just the answer: correct-tool-selected, argument-validity, redundant-call detection, recovery-after-error, and final-state-correctness.
 
@@ -74,6 +75,7 @@ Loaders return a uniform case list:
 - **`loadDatasetFromTraces`** - replay persisted run traces as eval cases.
 - **`loadLongMemEvalDataset`** - the real [LongMemEval](https://arxiv.org/abs/2410.10813) long-term-memory benchmark (ICLR 2025).
 - **`loadLocomoDataset`** - the real [LOCOMO](https://arxiv.org/abs/2402.17753) multi-session conversational-memory benchmark.
+- **`loadHaluMemDataset`** - operation-level (HaluMem-style, [arXiv:2511.03506](https://arxiv.org/abs/2511.03506)) datasets carrying per-session gold memory points (`extract` / `update` / `delete`) plus QA probes. `stage: 'operations'` expands one case per sample for the write-pipeline scorers; `stage: 'qa'` one case per probe question. The loader reads a user-supplied local JSON path in the documented shape (see the `halumem.ts` module docs); obtaining a real dataset is a manual, user-initiated step - small synthetic fixtures in the same format keep CI deterministic.
 
 The LongMemEval / LOCOMO datasets are not bundled; fetch them with `scripts/fetch-eval-datasets.mjs` (an explicit, user-initiated download), then point the loader at the local path. Downloads are integrity-checked: every dataset is pinned in `scripts/datasets.lock.json` (SHA-256 + immutable-revision source URL), already-present files are re-verified rather than trusted, and a `GRAPHORIN_*_URL` env override changes the source but not the required hash. A hash mismatch fails loudly; re-pin deliberately with `--force --update-lock`.
 
@@ -89,7 +91,9 @@ Reports now carry honest statistics: `summary.passRateCi` is a 95% Wilson interv
 
 ## Benchmarks
 
-The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-longmemeval`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, `benchmark-scale` (see [Performance & scale](/guide/performance)), and others. The `longmemeval` benchmark ships the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
+The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-longmemeval`, `benchmark-halumem`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, `benchmark-scale` (see [Performance & scale](/guide/performance)), and others. The `longmemeval` and `halumem` benchmarks ship the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
+
+`benchmark-halumem` is the operation-level counterpart to the QA-level `longmemeval` suite: each case's sessions replay through the REAL ingest pipeline (`session.push` -> consolidator standard phase -> extraction -> conflict pipeline) into a fresh in-memory store, the post-ingest memory state is observed, and the staged `memory/` scorers grade it. Its `--conflict-pipeline on|off` axis is the value proof for the neighbour-aware extract-reconcile-supersede path: run both legs and compare `memory-update-omission`. Both legs hold `autoPromoteExtraction: true` constant so the A/B isolates the reconcile path rather than the quarantine workflow.
 
 > Real-provider benchmark runs cost real model calls; they are never run by default. The offline stub mode is what keeps the suite green in CI.
 
@@ -120,6 +124,16 @@ block, so a number always says what configuration produced it:
 - `--iterations N` repeats every case and RESULTS reports the pass rate as
   mean ± stddev; the abstention rate over abstention-ability cases is
   always reported.
+- `--conflict-pipeline on|off` (D1) A/Bs the conflict pipeline instead of the
+  historic hardcoded `off`; the mode is stamped into `benchConfig` and the
+  RESULTS header. The update-omission A/B itself lives in
+  `benchmark-halumem` - here the switch measures the pipeline's effect on
+  QA quality.
+- `--max-cost-usd N` (W-084) puts a run-level USD ceiling over the resolved
+  SUT + judge providers (`withCostLimit` composed over `withCostTracking`).
+  The ceiling observes the cost the providers themselves report; when a
+  provider reports no usage cost the runner WARNs that the cap was
+  effectively unenforced instead of pretending otherwise.
 
 The adaptive injected-task scenarios (verbatim / unicode-obfuscated /
 split / paraphrase exfiltration against the dataflow policy) live in

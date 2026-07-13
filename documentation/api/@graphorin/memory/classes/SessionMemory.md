@@ -45,7 +45,7 @@ Defined in: [packages/memory/src/tiers/session-memory.ts:56](https://github.com/
 attributedFor(scope): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:262](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L262)
+Defined in: [packages/memory/src/tiers/session-memory.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L268)
 
 NOT IMPLEMENTED (MRET-12) - always resolves `[]`. The agent
 registry lives in `@graphorin/sessions` and has never been
@@ -71,7 +71,7 @@ the sessions facade for participant attribution.
 compact(scope, opts?): Promise<SessionCompactionResult>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:194](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L194)
+Defined in: [packages/memory/src/tiers/session-memory.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L200)
 
 NOT IMPLEMENTED (MRET-12) - always resolves
 `{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
@@ -97,7 +97,7 @@ exists at this layer.
 
 ***
 
-### flushImportant()
+### ~~flushImportant()~~
 
 ```ts
 flushImportant(scope, opts?): Promise<{
@@ -105,7 +105,7 @@ flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:169](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L169)
+Defined in: [packages/memory/src/tiers/session-memory.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L175)
 
 NOT IMPLEMENTED (MRET-12) - always resolves `{ flushed: 0 }` and
 performs no work. The consolidator pipeline (extraction → facts /
@@ -125,6 +125,14 @@ remains only for contract stability. Do not branch on its counter.
 `Promise`\<\{
   `flushed`: `number`;
 \}\>
+
+#### Deprecated
+
+Wave-D D4 retired this surface in favour of the
+pre-compaction `memoryFlushHook` (`contextEngine: { compaction: {
+preCompactionHooks: [memoryFlushHook({ provider })] } }`) - the
+single flush surface, fired exactly when content is about to be
+summarized away.
 
 ***
 
@@ -240,7 +248,7 @@ Hybrid (FTS5) search over the session messages.
 shouldCompact(scope, contextWindowOrOptions?): Promise<boolean>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L230)
+Defined in: [packages/memory/src/tiers/session-memory.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L236)
 
 Returns `true` when the cached message tokens exceed
 `compactAtRatio * contextWindow` (default `0.9` per DEC-104). The

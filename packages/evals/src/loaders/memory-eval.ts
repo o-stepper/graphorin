@@ -78,3 +78,77 @@ export interface MemoryEvalInput {
   /** Mapped ability ({@link MemoryEvalAbility}); the raw category lives in metadata. */
   readonly ability?: MemoryEvalAbility;
 }
+
+/**
+ * Kind of an operation-level gold memory point (HaluMem-style):
+ * `extract` - the point must exist in memory after ingest; `update` -
+ * the point must have replaced {@link MemoryGoldPoint.previous};
+ * `delete` - the point must be gone from memory after ingest.
+ *
+ * @stable
+ */
+export type MemoryOperationKind = 'extract' | 'update' | 'delete';
+
+/**
+ * One operation-level ground-truth memory point. Per-operation gold
+ * labels are what distinguish HaluMem-format datasets from the
+ * QA-level loaders above: they grade the memory system's *write*
+ * pipeline (extraction recall/precision, update omission) instead of
+ * only its final answers.
+ *
+ * @stable
+ */
+export interface MemoryGoldPoint {
+  readonly kind: MemoryOperationKind;
+  /**
+   * The expected memory content: for `extract` the fact that must be
+   * present, for `update` the NEW value, for `delete` the fact that
+   * must be absent.
+   */
+  readonly content: string;
+  /** For `update`: the superseded (old) content. */
+  readonly previous?: string;
+  /** Which haystack session this point is grounded in, when known. */
+  readonly sessionId?: string;
+}
+
+/**
+ * Input handed to the memory system under test for one
+ * operation-level eval case. The gold labels ride the input (not
+ * `Case.expected`) so a single observation type can serve the
+ * extraction, update and QA stages.
+ *
+ * @stable
+ */
+export interface MemoryOperationsEvalInput {
+  /** Sessions to ingest before memory is observed. */
+  readonly haystackSessions: ReadonlyArray<MemoryEvalSession>;
+  /** Per-operation ground truth for this case. */
+  readonly goldPoints: ReadonlyArray<MemoryGoldPoint>;
+  /** QA-stage probe question (absent on operations-stage cases). */
+  readonly question?: string;
+  /** Reference answer for the QA probe. */
+  readonly referenceAnswer?: string;
+  /** `true` when the correct QA behaviour is to abstain. */
+  readonly unanswerable?: boolean;
+  /** When the question is asked; dataset-native string. */
+  readonly askedAt?: string;
+  /** Mapped ability ({@link MemoryEvalAbility}); the raw category lives in metadata. */
+  readonly ability?: MemoryEvalAbility;
+}
+
+/**
+ * What the system under test exposes for scoring after replaying one
+ * operation-level case: the observable memory contents post-ingest
+ * plus the QA answer when the case carried a question. Produced by
+ * the replaying harness in `benchmarks/` - this package stays
+ * type-only with respect to `@graphorin/memory`.
+ *
+ * @stable
+ */
+export interface MemoryOperationsObservation {
+  /** Textual contents of every recall-eligible memory point after ingest. */
+  readonly memoryPoints: ReadonlyArray<string>;
+  /** The answer produced for {@link MemoryOperationsEvalInput.question}. */
+  readonly answer?: string;
+}

@@ -29,7 +29,7 @@ flowchart LR
 | Tier | What it stores | Read surface | Write surface |
 |---|---|---|---|
 | **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `append`, `replace`, `rethink`, `attach`, `detach`, `forget` |
-| **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant`, `compact` |
+| **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant` (deprecated - see the pre-compaction flush), `compact` |
 | **episodic** | Things that happened - decisions, events, milestones - captured with proper bi-temporal validity. | `recent`, `search` | `record` |
 | **semantic** | Facts about you, the world, the task. Conflicts resolved through a multi-stage pipeline. | `search`, `searchIterative`, `history` | `remember`, `supersede`, `forget`, `validate` |
 | **procedural** | How to do things - workflows, recipes, learned patterns. | `list`, `activate` | `define`, `remove`, `induce` |
@@ -116,7 +116,17 @@ export const scope: SessionScope = { userId: 'alex' };
 | `recall_episodes` | episodic | Triple-signal episode retrieval. |
 | `conversation_search` | session | FTS5 search over the active session messages. |
 
-These eleven are always registered. A **twelfth**, `deep_recall` (iterative grade-then-reformulate recall), is appended **only when** you configure `iterativeRetrieval` - so the default offline surface stays at exactly eleven and the original tool indices never shift.
+These eleven are always registered on the default profile. A **twelfth**, `deep_recall` (iterative grade-then-reformulate recall), is appended **only when** you configure `iterativeRetrieval`, and a thirteenth, `runbook_search`, with `runbookSearch: true` - so the default offline surface stays at exactly eleven and the original tool indices never shift.
+
+### Tool profiles (wave-D D3)
+
+`createMemory({ toolProfile })` (or `buildMemoryTools(deps, { profile })`) selects which slice of the canonical set `memory.tools` carries:
+
+- `'full'` (default) - the stable-order read+write set above.
+- `'interactive'` - ONLY the read tools (`fact_search`, `recall_episodes`, `conversation_search`, `fact_history`, plus the gated read appendices). The write factories are never constructed, so a front-line conversational agent **cannot write memory by construction** - not by filtering, and with nothing for a prompt injection to reach.
+- `'reviser'` - the full read+write surface, semantically reserved for the sleep-time curation agent.
+
+The intended split is single-writer: interactive agents observe memory, the reviser (and the consolidator pipeline) mutate it. An unknown profile value throws at `createMemory` time.
 
 ## Hybrid search
 
@@ -332,7 +342,7 @@ const pending = await memory.semantic.search(scope, '', { includeQuarantined: tr
 
 The same `validate(...)` exists on **every derived tier** - `memory.episodic.validate`, `memory.insights.validate`, and `memory.procedural.validate` (so an induced procedure can finally reach `activate()`) - each with the identical injection-refusal gate. Operators review and promote the whole queue from the CLI: **`graphorin memory review`** lists what is quarantined across all four tiers, and `--promote <id>` promotes a reviewed item (refused for injection-flagged rows unless `--force`).
 
-Quarantine is **fail-safe by default** - paid distillation stays invisible until validated. Where that trade-off is wrong for a deployment, the consolidator's opt-in `autoPromoteExtraction` flag (`createMemory({ consolidator: { autoPromoteExtraction: true } })`, **off by default**) admits **injection-clean extraction facts** as `active` directly. Injection-flagged facts always stay quarantined, and episodes / insights / induced procedures are unaffected - they remain quarantined-until-validated.
+Quarantine is **fail-safe by default** - paid distillation stays invisible until validated. Where that trade-off is wrong for a deployment, the consolidator's opt-in `autoPromoteExtraction` flag (`createMemory({ ingestGate: verdictIngestGate, consolidator: { autoPromoteExtraction: true } })`, **off by default**, and since wave-D D4 REQUIRING the ingest gate fail-closed) admits **injection-clean extraction facts** as `active` directly. Injection-flagged facts always stay quarantined, and episodes / insights / induced procedures are unaffected - they remain quarantined-until-validated. The W-083 guard additionally forces update/conflict decisions against QUARANTINED or USER-provenance targets onto the pending-supersede path even with the hatch on - an extraction can never instantly retire content a human wrote.
 
 When the reconciler routes a candidate as an **update / conflict** of an existing ACTIVE fact, the supersede is **pending** by default (W-019): the successor lands quarantined and the old fact's validity interval stays OPEN, so default recall keeps returning the old knowledge instead of nothing. Validating the successor (`fact_validate`, `graphorin memory review --promote`, or `semantic.validate`) promotes it AND completes the supersede - the old interval closes at that moment. With `autoPromoteExtraction` the injection-clean successor is active immediately and the interval closes right away, on the add and update/conflict routes alike. At no point in the lifecycle are both versions hidden.
 
@@ -370,7 +380,7 @@ const memory = createMemory({
 });
 ```
 
-The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for memory auto-promotion (a later wave) and for the proactive [`act` grant](/guide/proactivity#the-act-grant-is-gated-on-the-ingest-gate); see the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
+The gate runs on BOTH consolidator batch paths before noise filtering. Two invariants are test-pinned: the idempotency cursor advances THROUGH excluded messages (a blocked turn can never wedge consolidation), and a throwing gate excludes the record (fail-closed). The ingest gate is a REQUIRED precondition for memory auto-promotion and for the proactive [`act` grant](/guide/proactivity#the-act-grant-is-gated-on-the-ingest-gate) - since wave-D D4 this is ENFORCED at `createMemory` time: `consolidator.promotion` or `autoPromoteExtraction: true` without an `ingestGate` throws `IngestGateRequiredError`. See the ordering invariant in [Security](/guide/security#memory-writes-strictly-after-guardrails-b3).
 
 ### Principal / owner dimension
 
@@ -410,7 +420,7 @@ A background pipeline (`Consolidator`) distils long conversations into long-term
 | **Standard** | One LLM extraction pass over new session slices (**temporally anchored** - per-message timestamps + "today is" so relative dates resolve), **neighbour-aware** reconciliation (add / update / noop / conflict), an embedder-independent exact-duplicate guard, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. Extracted facts land **quarantined** until validated. |
 | **Deep** | An LLM judge drains the pending CONFLICT-CHECK queue (supersede / soft dedup / admit) and, at the `full` tier, runs **reflection / insight synthesis**. |
 
-Procedural induction is **not** phase-scheduled - call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself; there is no cross-agent shared-tier promotion.
+Procedural induction is **not** phase-scheduled. You can call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself, or - wave-D D4, opt-in - let the AGENT do it: `createAgent({ procedureInduction: { auto: true, minSteps?, minToolCalls?, minCostUsd? } })` calls `induceFromRun` after every run that COMPLETES at or above the thresholds (defaults: 3 steps, 3 tool calls, cost ignored). Failed / aborted / suspended runs never induce, the induced rule still lands quarantined, an inducer failure WARNs once and never fails the run, and the call is awaited before `agent.end` - wire a cheap inducer model on `createMemory({ procedureInduction })`. There is no cross-agent shared-tier promotion.
 
 ### Making it run
 
@@ -470,6 +480,28 @@ Use-it-or-lose-it decay (ExpeL) applies to **validated** insights only: each ref
 ### Learned-context digest (opt-in)
 
 `consolidator: { learnedContext: true }` adds a Letta-style sleep-time pass after the deep phase: one budgeted LLM call rewrites the reserved `learned_context` working block from the previous digest + recent episodes + active insights + active procedures. Because it is an ordinary working block, the digest is spliced into layer 3 of the assembled system prompt automatically (inside the stable KV-cache prefix), survives compaction via the persona-block re-anchor pattern (`reanchorPersonaBlock({ blockLabel: 'learned_context' })`), and stays editable by the agent through the `block_*` tools - the pass folds any agent edits into its next rewrite. Size-bounded by `learnedContextMaxChars` (default 1200). Off by default at **every** tier; a silent no-op when the facade has no working tier or the pass finds no evidence (no paid call).
+
+### Promotion policy (opt-in, wave-D D4)
+
+Quarantine needs an exit that is neither manual-only (`fact_validate`) nor write-time (`autoPromoteExtraction`). `consolidator: { promotion: { minSalience?, minRecalls?, minUniqueQueries?, minAgeMs?, allowedProvenance?, maxPerRun? } }` adds a **deterministic** step to the deep phase: quarantined facts whose recall evidence clears EVERY threshold are promoted through the audited `SemanticMemory.validate` path (which refuses injection-flagged facts - never forced - and completes any pending W-019 supersede). No LLM call. The evidence comes from two persistent counters: `access_count` (every recall, migration 027) and the **recall ledger** (DISTINCT queries by hash, migration 036) - a fact recalled 50 times by one repeated query is weaker evidence than one recalled by 5 different questions. Defaults: 3 recalls, 2 distinct queries, 24h age, synthesized provenance only (`extraction`/`reflection`/`induction`), 10 promotions per pass.
+
+Note default recall EXCLUDES quarantined facts, so with the default thresholds promotion follows demonstrated usage through quarantine-inclusive surfaces (review / inspector reads, `deep_recall`); a bot that wants age + salience-only promotion sets `minRecalls: 0, minUniqueQueries: 0` explicitly. Enabling `promotion` REQUIRES the [ingest gate](#the-ingest-gate-memory-writes-strictly-after-guardrails-b3) - fail-closed at `createMemory` time - and is deliberately separate from `autoPromoteExtraction` (which also now requires the gate, plus a W-083 guard: with the hatch on, an update/conflict decision against a quarantined or user-written target is forced onto the pending-supersede path instead of closing it immediately).
+
+### Pre-compaction memory flush (opt-in, wave-D D4)
+
+Compaction summarizes content away; the flush salvages the durable part first. `contextEngine: { compaction: { preCompactionHooks: [memoryFlushHook({ provider, maxFacts?, maxInputChars?, maxOutputTokens? })] } }` fires ONE budgeted LLM call before the summarizer (auto, manual and emergency passes alike), extracts self-contained facts from the model-visible buffer, and writes them with `provenance: 'extraction'` - so every flushed fact lands **quarantined** and exits only via validation or the promotion policy. When the facade carries an `ingestGate`, the hook applies it to every candidate message (fail-closed). A provider failure WARNs and flushes nothing - compaction is never blocked. The flush call happens outside the agent loop, so agent run budgets do not observe it: bound it here and pick a cheap model. `preCompactionHooks` is a general seam (side-effect only, failures land in `hookFailures`); the old `SessionMemory.flushImportant` stub is deprecated in favour of this hook.
+
+### Curated blocks and the reviser preset (wave-D D3)
+
+The learned-context pass generalises to a **registered list of curated blocks**: `consolidator: { curatedBlocks: [{ label: 'persona' }, { label: 'scratch', prompt: '...', maxChars: 800 }] }` gives each entry its own deep-phase rewrite with the same resilience + budget envelope (`learnedContext: true` remains sugar for a `learned_context` entry and composes with the list). Labels must be unique and never the reserved `profile` (the projection owns that block); violations throw `CuratedBlocksMisconfiguredError` at `createMemory` time. `PhaseOutcome.curatedBlocksUpdated` counts the rewrites per deep pass.
+
+`reviserConsolidatorPreset({ provider, defaultScope, curatedBlocks?, schedule?, onExceed?, ceilings? })` packages the sleep-time reviser: a cheap provider profile routed to every phase, an `idle:15m` + `cron:0 5 * * *` cadence (the cron leg is what reaches the deep phase), and a HARD budget posture - the preset requires `onExceed: 'pause' | 'throw'` and rejects `'log'` (the tier defaults log-and-continue, which is wrong for an unattended reviser). Pass the result directly as `createMemory({ consolidator: reviserConsolidatorPreset({...}) })`. The cheapest reviser available today is still configuration only: `learnedContext: true` on your existing tier.
+
+### Profile projection (opt-in, wave-D D2)
+
+Where the learned-context digest is free prose, `createMemory({ profile: { topics?, maxSlots?, maxChars?, scope? } })` maintains a **structured** profile: after each deep phase, one budgeted LLM call projects facts into topic / sub-topic / content slots with fact-id provenance (`identity:` / `- name: Alex [fact_abc]`), rendered deterministically (taxonomy order, alphabetical sub-topics) into the reserved `profile` working block. Sourcing is conservative by construction: only **active** facts feed the projection - quarantined facts never appear, and neither do facts whose W-019 supersede is still pending validation (a contested value is not profile truth). Slots whose topic is outside the configured `topics` taxonomy or whose provenance references do not resolve to real fact ids are dropped deterministically.
+
+The block is registered `readOnly: true`: the agent's `block_*` tools refuse to mutate it - the consolidator is the single writer. It is written **user-scoped** by default (one profile across sessions), which has an erasure consequence: session deletion deliberately does not remove it, and the erasure path is `memory.working.purge(userScope, 'profile')` (hard delete; `forget()` only writes a tombstone) - see the [erasure table](/guide/privacy#erasure-and-retention). `profile: { scope: 'session' }` keeps per-session (per-peer) profiles instead, which the session cascade purges for free. Requires an enabled consolidator (the pass rides the deep phase); configuring `profile` without one writes a one-time WARN and never runs.
 
 ### Multi-signal forgetting
 

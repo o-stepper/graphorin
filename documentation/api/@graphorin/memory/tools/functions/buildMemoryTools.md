@@ -10,14 +10,18 @@
 function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unknown>[];
 ```
 
-Defined in: [packages/memory/src/tools/index.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L85)
+Defined in: [packages/memory/src/tools/index.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L122)
 
-Build the canonical eleven-memory-tool array. Order is stable -
-consumers can rely on the indices for snapshot tests. `fact_history`
-(P0-2) and `fact_validate` (P1-4) are appended last so the original
-nine indices are unchanged. With `{ includeDeepRecall: true }` the
-gated `deep_recall` tool (P2-4) is appended as a twelfth, after the
-stable eleven.
+Build the canonical memory-tool array for a profile. Order is stable
+for `'full'` / `'reviser'` - consumers can rely on the indices for
+snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are
+appended last so the original nine indices are unchanged. With
+`{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is
+appended after the stable eleven; `runbook_search` after it. Both
+gated appendices are reads, so they appear in every profile.
+
+`'interactive'` returns ONLY the read tools, preserving their
+relative order from the canonical set.
 
 ## Parameters
 

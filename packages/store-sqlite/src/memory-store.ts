@@ -317,6 +317,23 @@ class WorkingMemoryStoreImpl implements WorkingMemoryStore {
     );
     void reason;
   }
+
+  /**
+   * Hard-delete a block row (wave-D D2, GDPR path). Unlike `delete`
+   * (tombstone), the row is gone - this is the erasure surface for
+   * USER-scoped blocks (e.g. the profile projection), which the
+   * session-delete cascade deliberately never touches
+   * (`scope_session_id IS NULL`). Surfaced through
+   * `WorkingMemoryStoreExt.purge`.
+   *
+   * @stable
+   */
+  async purge(scope: SessionScope, label: string): Promise<void> {
+    this.#conn.run(
+      "DELETE FROM working_blocks WHERE scope_user_id = ? AND COALESCE(scope_session_id, '') = COALESCE(?, '') AND COALESCE(scope_agent_id, '') = COALESCE(?, '') AND label = ?",
+      [scope.userId, scope.sessionId ?? null, scope.agentId ?? null, label],
+    );
+  }
 }
 
 class SessionMemoryStoreImpl implements SessionMemoryStore {
@@ -783,6 +800,41 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     }
     const tableName = this.#vectorMgr.ensureTable('episodes', meta);
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    // Wave-D D5: linear-fallback (see the facts twin above).
+    if (this.#vectorMgr.mode === 'linear-fallback') {
+      const candidates = await this.#vectorMgr.linearKnn(
+        tableName,
+        'episode_id',
+        embedding,
+        Math.max(topK * 4, 64),
+      );
+      if (candidates.length === 0) return [];
+      const distanceById = new Map(candidates.map((c) => [c.id, c.distance]));
+      const ids = candidates.map((c) => c.id);
+      const binds: Array<string | number> = [scope.userId, embedderId];
+      if (asOfEpoch !== null) binds.push(asOfEpoch);
+      binds.push(...ids);
+      const rows = this.#conn.all<EpisodeRow>(
+        `SELECT e.* FROM episodes e
+         WHERE e.scope_user_id = ?
+           AND e.embedder_id = ?
+           AND e.deleted_at IS NULL
+           AND e.archived = 0
+           ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
+           AND e.id IN (${ids.map(() => '?').join(', ')})`,
+        binds,
+      );
+      return rows
+        .map((row) => ({ row, distance: distanceById.get(row.id) ?? 2 }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, topK)
+        .map(({ row, distance }) => ({
+          record: rowToEpisode(row),
+          score: scoreFromDistance(meta.distanceMetric, distance),
+          signals: { vector: scoreFromDistance(meta.distanceMetric, distance) },
+        }));
+    }
     const runKnn = (k: number): ReadonlyArray<EpisodeRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         f32ToBlob(embedding),
@@ -1101,6 +1153,45 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const asOfEpoch = resolveFactValidityEpoch(asOf, includeSuperseded);
     // D3: retrieval-time principal filter - absent ⇒ no predicate.
     const owners = normalizeOwnerFilter(owner);
+    // Wave-D D5: linear-fallback mode - in-process cosine KNN over the
+    // plain sidecar, then the SAME base-table filters over the candidate
+    // ids (over-fetched so post-filters cannot starve the caller).
+    if (this.#vectorMgr.mode === 'linear-fallback') {
+      const candidates = await this.#vectorMgr.linearKnn(
+        tableName,
+        'fact_id',
+        embedding,
+        Math.max(topK * 4, 64),
+      );
+      if (candidates.length === 0) return [];
+      const distanceById = new Map(candidates.map((c) => [c.id, c.distance]));
+      const ids = candidates.map((c) => c.id);
+      const binds: Array<string | number> = [scope.userId, embedderId];
+      if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
+      if (owners !== null) binds.push(...owners);
+      binds.push(...ids);
+      const rows = this.#conn.all<FactRow>(
+        `SELECT f.* FROM facts f
+         WHERE f.scope_user_id = ?
+           AND f.embedder_id = ?
+           AND f.deleted_at IS NULL
+           AND f.archived = 0
+           ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
+           ${owners !== null ? ownerPredicate('f', owners.length) : ''}
+           AND f.id IN (${ids.map(() => '?').join(', ')})`,
+        binds,
+      );
+      return rows
+        .map((row) => ({ row, distance: distanceById.get(row.id) ?? 2 }))
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, topK)
+        .map(({ row, distance }) => ({
+          record: rowToFact(row),
+          score: scoreFromDistance(meta.distanceMetric, distance),
+          signals: { vector: scoreFromDistance(meta.distanceMetric, distance) },
+        }));
+    }
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         f32ToBlob(embedding),
@@ -1224,6 +1315,81 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       return av !== bv ? av - bv : a.created_at - b.created_at;
     });
     return rows.map(rowToFact);
+  }
+
+  /**
+   * Enumerate the recall-eligible facts for the scope (wave-D): the
+   * same default filters as `count()` / FTS search (live,
+   * non-archived, `status = 'active'`, validity at NOW), returned as a
+   * deterministic `created_at`-ordered list. With
+   * `excludePendingSupersede` facts whose W-019 supersede is still
+   * pending (a live quarantined successor links to them) are dropped
+   * too. Surfaced through `SemanticMemoryStoreExt.listActive`; powers
+   * the D2 profile projection and the operation-level benchmarks.
+   *
+   * @stable
+   */
+  async listActive(
+    scope: SessionScope,
+    options: { readonly limit?: number; readonly excludePendingSupersede?: boolean } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    const limit = options.limit ?? 1000;
+    const now = Date.now();
+    const pendingPredicate =
+      options.excludePendingSupersede === true
+        ? `AND NOT EXISTS (
+             SELECT 1 FROM facts s
+             WHERE s.supersedes = f.id AND s.deleted_at IS NULL AND s.status = 'quarantined'
+           )`
+        : '';
+    const rows = this.#conn.all<FactRow>(
+      `SELECT f.* FROM facts f
+       WHERE f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         AND f.status = 'active'
+         AND (f.valid_from IS NULL OR f.valid_from <= ?)
+         AND (f.valid_to IS NULL OR f.valid_to > ?)
+         ${pendingPredicate}
+       ORDER BY f.created_at ASC, f.id ASC
+       LIMIT ?`,
+      [scope.userId, now, now, limit],
+    );
+    return rows.map(rowToFact);
+  }
+
+  /**
+   * Quarantined, live, non-archived facts + their recall statistics
+   * (wave-D D4) - the deterministic candidate feed for the
+   * PromotionPolicy. Surfaced through
+   * `SemanticMemoryStoreExt.listPromotionCandidates`.
+   *
+   * @stable
+   */
+  async listPromotionCandidates(
+    scope: SessionScope,
+    options: { readonly limit?: number } = {},
+  ): Promise<
+    ReadonlyArray<{
+      readonly fact: Fact;
+      readonly accessCount: number;
+      readonly uniqueQueryCount: number;
+    }>
+  > {
+    const limit = options.limit ?? 200;
+    const rows = this.#conn.all<FactRow & { unique_queries: number }>(
+      `SELECT f.*,
+              (SELECT COUNT(*) FROM fact_recall_queries q WHERE q.fact_id = f.id) AS unique_queries
+       FROM facts f
+       WHERE f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         AND f.status = 'quarantined'
+       ORDER BY f.created_at ASC, f.id ASC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map((row) => ({
+      fact: rowToFact(row),
+      accessCount: (row as { access_count?: number }).access_count ?? 0,
+      uniqueQueryCount: row.unique_queries,
+    }));
   }
 
   async forget(id: string, reason?: string, scope?: SessionScope): Promise<void> {
@@ -1389,6 +1555,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     ids: ReadonlyArray<string>,
     accessedAt?: number,
     scope?: SessionScope,
+    queryHash?: string,
   ): Promise<void> {
     if (ids.length === 0) return;
     const at = accessedAt ?? Date.now();
@@ -1404,6 +1571,24 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
        WHERE id IN (${placeholders})${scope !== undefined ? ' AND scope_user_id = ?' : ''}`,
       scope !== undefined ? [at, ...ids, scope.userId] : [at, ...ids],
     );
+    // Wave-D D4 (migration 036): the recall ledger counts DISTINCT
+    // queries per fact - INSERT OR IGNORE makes replays of the same
+    // query a no-op. Scope-guarded like the UPDATE above.
+    if (queryHash !== undefined && queryHash.length > 0) {
+      for (const id of ids) {
+        if (scope !== undefined) {
+          const owned = this.#conn.get<{ one: number }>(
+            'SELECT 1 AS one FROM facts WHERE id = ? AND scope_user_id = ?',
+            [id, scope.userId],
+          );
+          if (owned === undefined) continue;
+        }
+        this.#conn.run(
+          'INSERT OR IGNORE INTO fact_recall_queries (fact_id, query_hash, first_seen) VALUES (?, ?, ?)',
+          [id, queryHash, at],
+        );
+      }
+    }
   }
 
   /**
@@ -1549,6 +1734,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       // the PURGE audit row). The canonical `entities` are shared data and are
       // intentionally left intact - only this fact's links are removed.
       this.#conn.run('DELETE FROM fact_entities WHERE fact_id = ?', [id]);
+      // Wave-D D4: the recall ledger rides its fact (query hashes are
+      // usage metadata - they must not survive a GDPR purge).
+      this.#conn.run('DELETE FROM fact_recall_queries WHERE fact_id = ?', [id]);
       this.#conn.run('DELETE FROM facts WHERE id = ?', [id]);
     });
   }

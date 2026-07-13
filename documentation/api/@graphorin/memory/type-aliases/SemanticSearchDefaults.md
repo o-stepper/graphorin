@@ -18,7 +18,7 @@ type SemanticSearchDefaults = Pick<FactSearchOptions,
 | "candidateTopK">;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L147)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L148)
 
 Search options an operator may default at construction time via
 `createMemory({ searchDefaults })` (W-086) - the advanced-retrieval

@@ -183,6 +183,41 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * `@graphorin/store-sqlite` adapter implements it.
    */
   historyOf?(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>>;
+  /**
+   * Enumerate the recall-eligible facts for the scope (wave-D): live,
+   * non-archived, `status = 'active'`, validity interval containing
+   * now - the same view default recall sees, but as a deterministic
+   * list (`created_at` order) instead of a ranked search. Powers the
+   * profile-projection pass (D2) and the operation-level benchmark
+   * observation (D1). `excludePendingSupersede` additionally drops
+   * facts whose supersede is still pending W-019 validation (a
+   * quarantined successor links to them) - a projection must not
+   * present a value that is already known to be contested.
+   */
+  listActive?(
+    scope: SessionScope,
+    options?: {
+      readonly limit?: number;
+      readonly excludePendingSupersede?: boolean;
+    },
+  ): Promise<ReadonlyArray<Fact>>;
+  /**
+   * Enumerate quarantined, live, non-archived facts together with
+   * their recall statistics (wave-D D4) - the candidate feed for the
+   * deterministic PromotionPolicy: `accessCount` is the monotonic
+   * migration-027 counter, `uniqueQueryCount` the migration-036
+   * distinct-query ledger count. Deterministic `created_at` order.
+   */
+  listPromotionCandidates?(
+    scope: SessionScope,
+    options?: { readonly limit?: number },
+  ): Promise<
+    ReadonlyArray<{
+      readonly fact: Fact;
+      readonly accessCount: number;
+      readonly uniqueQueryCount: number;
+    }>
+  >;
 }
 
 /**
@@ -639,12 +674,15 @@ export interface DecayMemoryStoreExt {
    * `lastAccessedAt` and reinforce `strength` (implementation-capped).
    * Optional - adapters without decay columns may omit it; callers
    * MUST treat failures as non-fatal (the read path never breaks on a
-   * bookkeeping write).
+   * bookkeeping write). With `queryHash` (wave-D D4) the adapter also
+   * feeds the persistent recall ledger - the DISTINCT-query counter
+   * behind the PromotionPolicy `minUniqueQueries` threshold.
    */
   markAccessed?(
     ids: ReadonlyArray<string>,
     accessedAt?: number,
     scope?: SessionScope,
+    queryHash?: string,
   ): Promise<void>;
   /**
    * Narrow decay-column read for exactly the given fact ids (MRET-8) -

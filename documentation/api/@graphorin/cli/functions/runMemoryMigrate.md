@@ -7,15 +7,18 @@
 # Function: runMemoryMigrate()
 
 ```ts
-function runMemoryMigrate(options): Promise<never>;
+function runMemoryMigrate(options): Promise<MemoryMigrateResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L134)
+Defined in: [packages/cli/src/commands/memory.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L160)
 
-`graphorin memory migrate` - embedder swap. The migration logic lives
-in `@graphorin/memory`'s `migrateEmbedder(...)`; the CLI prints a
-pointer when the operator did not supply the embedder factory module
-(the framework cannot guess the operator's embedder configuration).
+`graphorin memory migrate` - embedder swap (wave-D D5, real
+implementation). Loads the operator's `--embedders` factory module,
+opens the configured store, and drives `@graphorin/memory`'s
+`migrateEmbedder(...)` with the store-side pager + the PERSISTED
+`migration_state` cursor - so a killed / aborted migration resumes
+from where it stopped on the next invocation. `--reclaim`
+additionally drops retired vector tables and compacts free pages.
 
 ## Parameters
 
@@ -25,6 +28,6 @@ pointer when the operator did not supply the embedder factory module
 
 ## Returns
 
-`Promise`\&lt;`never`\&gt;
+`Promise`\&lt;`MemoryMigrateResult`\&gt;
 
 ## Stable

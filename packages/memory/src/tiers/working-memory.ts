@@ -215,6 +215,35 @@ export class WorkingMemory {
   }
 
   /**
+   * Hard-delete a block (wave-D D2, GDPR path). Unlike {@link forget}
+   * (soft tombstone), the stored value is gone. This is the erasure
+   * surface for USER-scoped blocks (e.g. the `profile` projection): the
+   * session-delete cascade never reaches rows without a session id, so
+   * user-level erasure must call this explicitly. Throws when the
+   * storage adapter does not implement the optional
+   * `WorkingMemoryStoreExt.purge` - a silent soft-delete fallback would
+   * misreport erasure.
+   */
+  async purge(scope: SessionScope, label: string): Promise<void> {
+    await withMemorySpan(
+      this.#tracer,
+      'memory.write.working',
+      scope,
+      { 'memory.block.label': label, 'memory.write.working.action': 'purge' },
+      async () => {
+        if (typeof this.#store.working.purge !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] the storage adapter does not implement working.purge ' +
+              '(hard block erasure). Upgrade the adapter or fall back to forget() ' +
+              '(soft-delete) explicitly.',
+          );
+        }
+        await this.#store.working.purge(scope, label);
+      },
+    );
+  }
+
+  /**
    * Attach a working block to an additional agent. Backed by the
    * adapter's `shared.attach(...)` join table so multi-agent crews
    * can share the same block without duplicating storage.

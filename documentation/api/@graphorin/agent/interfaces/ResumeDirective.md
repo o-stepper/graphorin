@@ -6,7 +6,7 @@
 
 # Interface: ResumeDirective
 
-Defined in: [packages/agent/src/types.ts:475](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L475)
+Defined in: [packages/agent/src/types.ts:497](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L497)
 
 Resume directive accepted by `agent.run(input | RunState, { directive })`.
 
@@ -22,4 +22,4 @@ approvals: [...] } })` to resume.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | [packages/agent/src/types.ts:476](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L476) |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | [packages/agent/src/types.ts:498](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L498) |

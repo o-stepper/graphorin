@@ -6,7 +6,7 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:591](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L591)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:626](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L626)
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -28,7 +28,7 @@ archiveFact(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:636](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L636)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:671](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L671)
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -58,7 +58,7 @@ optional listDecaySignals(ids): Promise<readonly {
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:655](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L655)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:693](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L693)
 
 Narrow decay-column read for exactly the given fact ids (MRET-8) -
 powers per-search decay re-ranking without the old O(scope)
@@ -102,7 +102,7 @@ listForDecay(
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:606](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L606)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:641](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L641)
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
@@ -149,16 +149,19 @@ salience score that orders capacity-bounded eviction.
 optional markAccessed(
    ids, 
    accessedAt?, 
-scope?): Promise<void>;
+   scope?, 
+queryHash?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:644](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L644)
+Defined in: [packages/memory/src/internal/storage-adapter.ts:681](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L681)
 
 Record a retrieval access for the given facts (MRET-7): stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).
 Optional - adapters without decay columns may omit it; callers
 MUST treat failures as non-fatal (the read path never breaks on a
-bookkeeping write).
+bookkeeping write). With `queryHash` (wave-D D4) the adapter also
+feeds the persistent recall ledger - the DISTINCT-query counter
+behind the PromotionPolicy `minUniqueQueries` threshold.
 
 #### Parameters
 
@@ -167,6 +170,7 @@ bookkeeping write).
 | `ids` | readonly `string`[] |
 | `accessedAt?` | `number` |
 | `scope?` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `queryHash?` | `string` |
 
 #### Returns
 

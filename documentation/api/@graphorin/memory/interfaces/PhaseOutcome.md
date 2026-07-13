@@ -6,7 +6,7 @@
 
 # Interface: PhaseOutcome
 
-Defined in: [packages/memory/src/consolidator/types.ts:361](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L361)
+Defined in: [packages/memory/src/consolidator/types.ts:393](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L393)
 
 Outcome surfaced by every phase invocation. Recorded into
 `consolidator_runs` and emitted on the AISpan.
@@ -17,16 +17,19 @@ Outcome surfaced by every phase invocation. Recorded into
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-conflictsresolved"></a> `conflictsResolved` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:366](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L366) |
-| <a id="property-emptyextractions"></a> `emptyExtractions` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:374](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L374) |
-| <a id="property-episodesformed"></a> `episodesFormed` | `readonly` | `number` | Episodes auto-formed from the processed slice (P1-2). | [packages/memory/src/consolidator/types.ts:368](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L368) |
-| <a id="property-errormessage"></a> `errorMessage` | `readonly` | `string` \| `null` | - | [packages/memory/src/consolidator/types.ts:377](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L377) |
-| <a id="property-factscreated"></a> `factsCreated` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:364](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L364) |
-| <a id="property-factsupdated"></a> `factsUpdated` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:365](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L365) |
-| <a id="property-insightscreated"></a> `insightsCreated` | `readonly` | `number` | Insights synthesized by the deep-phase reflection pass (P1-1). | [packages/memory/src/consolidator/types.ts:370](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L370) |
-| <a id="property-learnedcontextupdated"></a> `learnedContextUpdated?` | `readonly` | `boolean` | True when the learned-context digest block was rewritten (D3). | [packages/memory/src/consolidator/types.ts:372](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L372) |
-| <a id="property-llmcostusd"></a> `llmCostUsd` | `readonly` | `number` \| `null` | - | [packages/memory/src/consolidator/types.ts:376](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L376) |
-| <a id="property-llmtokensused"></a> `llmTokensUsed` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:375](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L375) |
-| <a id="property-noisefilteredcount"></a> `noiseFilteredCount` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:373](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L373) |
-| <a id="property-phase"></a> `phase` | `readonly` | [`ConsolidatorPhase`](/api/@graphorin/memory/type-aliases/ConsolidatorPhase.md) | - | [packages/memory/src/consolidator/types.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L362) |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | - | [packages/memory/src/consolidator/types.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L363) |
+| <a id="property-conflictsresolved"></a> `conflictsResolved` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:398](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L398) |
+| <a id="property-curatedblocksupdated"></a> `curatedBlocksUpdated?` | `readonly` | `number` | How many curated blocks were rewritten this pass (wave-D D3). | [packages/memory/src/consolidator/types.ts:406](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L406) |
+| <a id="property-emptyextractions"></a> `emptyExtractions` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:412](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L412) |
+| <a id="property-episodesformed"></a> `episodesFormed` | `readonly` | `number` | Episodes auto-formed from the processed slice (P1-2). | [packages/memory/src/consolidator/types.ts:400](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L400) |
+| <a id="property-errormessage"></a> `errorMessage` | `readonly` | `string` \| `null` | - | [packages/memory/src/consolidator/types.ts:415](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L415) |
+| <a id="property-factscreated"></a> `factsCreated` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:396](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L396) |
+| <a id="property-factspromoted"></a> `factsPromoted?` | `readonly` | `number` | Facts promoted out of quarantine by the promotion step (wave-D D4). | [packages/memory/src/consolidator/types.ts:410](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L410) |
+| <a id="property-factsupdated"></a> `factsUpdated` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:397](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L397) |
+| <a id="property-insightscreated"></a> `insightsCreated` | `readonly` | `number` | Insights synthesized by the deep-phase reflection pass (P1-1). | [packages/memory/src/consolidator/types.ts:402](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L402) |
+| <a id="property-learnedcontextupdated"></a> `learnedContextUpdated?` | `readonly` | `boolean` | True when the learned-context digest block was rewritten (D3). | [packages/memory/src/consolidator/types.ts:404](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L404) |
+| <a id="property-llmcostusd"></a> `llmCostUsd` | `readonly` | `number` \| `null` | - | [packages/memory/src/consolidator/types.ts:414](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L414) |
+| <a id="property-llmtokensused"></a> `llmTokensUsed` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:413](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L413) |
+| <a id="property-noisefilteredcount"></a> `noiseFilteredCount` | `readonly` | `number` | - | [packages/memory/src/consolidator/types.ts:411](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L411) |
+| <a id="property-phase"></a> `phase` | `readonly` | [`ConsolidatorPhase`](/api/@graphorin/memory/type-aliases/ConsolidatorPhase.md) | - | [packages/memory/src/consolidator/types.ts:394](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L394) |
+| <a id="property-profileprojectionupdated"></a> `profileProjectionUpdated?` | `readonly` | `boolean` | True when the profile block content changed (wave-D D2). | [packages/memory/src/consolidator/types.ts:408](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L408) |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | - | [packages/memory/src/consolidator/types.ts:395](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L395) |

@@ -47,13 +47,19 @@ export {
 } from './cli/index.js';
 export type {
   FromTracesOptions,
+  HaluMemStage,
   LoadDmrOptions,
+  LoadHaluMemOptions,
   LoadLocomoOptions,
   LoadLongMemEvalOptions,
   MemoryEvalAbility,
   MemoryEvalInput,
   MemoryEvalSession,
   MemoryEvalTurn,
+  MemoryGoldPoint,
+  MemoryOperationKind,
+  MemoryOperationsEvalInput,
+  MemoryOperationsObservation,
   TraceEvent,
 } from './loaders/index.js';
 export {
@@ -63,11 +69,13 @@ export {
   loadCsvDataset,
   loadDatasetFromTraces,
   loadDmrDataset,
+  loadHaluMemDataset,
   loadJsonlDataset,
   loadLocomoDataset,
   loadLongMemEvalDataset,
   parseCsv,
   parseDmr,
+  parseHaluMem,
   parseJsonl,
   parseLocomo,
   parseLongMemEval,
@@ -83,6 +91,7 @@ export {
 export { EvalConcurrencyError, runEvals } from './runner.js';
 export {
   type ArgumentValidityOptions,
+  anyMatch,
   argumentValidity,
   type CorrectToolSelectedOptions,
   correctToolSelected,
@@ -97,6 +106,15 @@ export {
   jsonPath,
   type LlmJudgeOptions,
   llmJudge,
+  type MemoryPointMatcher,
+  type MemoryPointScorerOptions,
+  type MemoryQaHallucinationOptions,
+  type MemoryUpdateOmissionOptions,
+  memoryExtractionPrecision,
+  memoryExtractionRecall,
+  memoryPointTokens,
+  memoryQaHallucination,
+  memoryUpdateOmission,
   type PrebuiltScorerOptions,
   type PredicateOptions,
   parseScore,
@@ -110,6 +128,8 @@ export {
   scoreContract,
   type Trajectory,
   type TrajectoryToolCall,
+  tokenF1,
+  tokenF1Matcher,
   toxicityScorer,
 } from './scorers/index.js';
 export {

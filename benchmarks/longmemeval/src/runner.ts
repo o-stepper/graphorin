@@ -48,10 +48,14 @@ import {
 } from '@graphorin/evals';
 import { createMemory, type Memory } from '@graphorin/memory';
 import {
+  composeProviderMiddleware,
+  createCostAccumulator,
   createProvider,
   llamaCppServerAdapter,
   ollamaAdapter,
   openAICompatibleAdapter,
+  withCostLimit,
+  withCostTracking,
 } from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
@@ -94,6 +98,35 @@ export interface BenchProviderSpec {
 export interface ResolvedBenchProvider {
   readonly provider: Provider;
   readonly label: string;
+}
+
+/**
+ * D1 (W-084 residual): wrap resolved bench providers with a shared run-level
+ * USD ceiling. Observed spend is what the providers themselves report via
+ * usage cost (`withCostTracking`); a provider that reports no cost keeps the
+ * ceiling inert - the returned `observedCostUsd()` lets `main()` warn about
+ * that instead of pretending the cap was enforced. Trips as a
+ * `CostBudgetExceededError` from the next `generate()`/`stream()` call.
+ */
+export function withBenchCostCeiling(maxCostUsd: number): {
+  wrap: (provider: Provider) => Provider;
+  observedCostUsd: () => number;
+} {
+  const accumulator = createCostAccumulator();
+  const observedCostUsd = (): number => {
+    let total = 0;
+    for (const totals of accumulator.totals().values()) total += totals.costUsd;
+    return total;
+  };
+  const wrap = composeProviderMiddleware([
+    withCostLimit({
+      maxPerRun: maxCostUsd,
+      onExceed: 'throw',
+      resolveObservedCost: () => observedCostUsd(),
+    }),
+    withCostTracking({ onUsage: accumulator.onUsage }),
+  ]);
+  return { wrap, observedCostUsd };
 }
 
 /**
@@ -188,6 +221,15 @@ export type RetrievalMode =
 
 /** Which embedder the memory system runs with (evals-01). */
 export type EmbedderMode = 'none' | 'fake';
+
+/**
+ * Conflict-pipeline master switch under test (D1/N-1). Historically every
+ * benchmark hardcoded `{ mode: 'off' }`, so the neighbour-aware
+ * extract-reconcile-supersede path - the memory system's main claimed
+ * advantage - was never measured. `'off'` stays the default so existing
+ * baselines remain comparable; pass `--conflict-pipeline on` for the A/B leg.
+ */
+export type ConflictPipelineMode = 'on' | 'off';
 
 /** Iterative-retrieval abstention accounting (C8). */
 export interface RetrievalStats {
@@ -366,6 +408,8 @@ export interface MemorySystemAgentOptions {
   readonly retrieval?: RetrievalMode;
   /** Embedder under test (C8). Default `'none'` (FTS-only). */
   readonly embedder?: EmbedderMode;
+  /** Conflict-pipeline switch under test (D1/N-1). Default `'off'`. */
+  readonly conflictPipeline?: ConflictPipelineMode;
   /** Iterative-retrieval abstention stats sink (C8). */
   readonly retrievalStats?: RetrievalStats;
   /**
@@ -415,7 +459,8 @@ export function createMemorySystemAgent(
         store: store.memory as never,
         embeddings: store.embeddings,
         resolveScope: () => scope,
-        conflictPipeline: { mode: 'off' },
+        // D1/N-1: A/B-able instead of hardcoded 'off'.
+        conflictPipeline: { mode: options.conflictPipeline ?? 'off' },
         // C8 (evals-01/02): the A/B switches wire the REAL library config.
         ...(options.embedder === 'fake' ? { embedder: createFakeEmbedder() } : {}),
         ...(retrieval === 'multi-query' || retrieval === 'hyde'
@@ -530,6 +575,8 @@ export interface RunLongMemEvalOptions {
   readonly retrieval?: RetrievalMode;
   /** Embedder under test (C8). Default `'none'`. */
   readonly embedder?: EmbedderMode;
+  /** Conflict-pipeline switch under test (D1/N-1). Default `'off'`. */
+  readonly conflictPipeline?: ConflictPipelineMode;
   /** Iterative-retrieval abstention stats sink (C8). */
   readonly retrievalStats?: RetrievalStats;
   /** Repeat every case N times for variance reporting (C8). Default 1. */
@@ -561,6 +608,9 @@ export async function runLongMemEvalBenchmark(
           ...(options.meter !== undefined ? { meter: options.meter } : {}),
           ...(options.retrieval !== undefined ? { retrieval: options.retrieval } : {}),
           ...(options.embedder !== undefined ? { embedder: options.embedder } : {}),
+          ...(options.conflictPipeline !== undefined
+            ? { conflictPipeline: options.conflictPipeline }
+            : {}),
           ...(options.retrievalStats !== undefined
             ? { retrievalStats: options.retrievalStats }
             : {}),
@@ -668,6 +718,10 @@ export interface CliArgs {
   /** C8 (evals-01/02): A/B switches. */
   retrieval?: RetrievalMode;
   embedder?: EmbedderMode;
+  /** D1 (N-1): conflict-pipeline A/B switch. */
+  conflictPipeline?: ConflictPipelineMode;
+  /** D1 (W-084): run-level USD ceiling on the resolved bench providers. */
+  maxCostUsd?: number;
   /** C8 (evals-05): repeat cases for variance. */
   iterations?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
@@ -714,6 +768,10 @@ Flags:
   --allow-self-judge          Permit a --json baseline from a self-judged run
   --retrieval <mode>          default | multi-query | hyde | iterative | graph | ppr | entity
   --embedder <none|fake>      Embedder under test (default: none)
+  --conflict-pipeline <on|off> Conflict pipeline under test (default: off; the
+                              A/B axis for update-omission - see benchmark-halumem)
+  --max-cost-usd <n>          Abort the run when observed provider spend exceeds
+                              n USD (needs a provider that reports usage cost)
   --iterations <n>            Repeat cases for variance reporting
   --help, -h                  Show this help
 
@@ -807,6 +865,20 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     } else if (a === '--embedder') {
       args.embedder = value(a, next) as EmbedderMode;
       i++;
+    } else if (a === '--conflict-pipeline') {
+      const mode = value(a, next);
+      if (mode !== 'on' && mode !== 'off') {
+        throw new CliUsageError(`--conflict-pipeline must be 'on' or 'off', got '${mode}'`);
+      }
+      args.conflictPipeline = mode;
+      i++;
+    } else if (a === '--max-cost-usd') {
+      const ceiling = Number.parseFloat(value(a, next));
+      if (!Number.isFinite(ceiling) || ceiling <= 0) {
+        throw new CliUsageError(`--max-cost-usd must be a positive number, got '${next}'`);
+      }
+      args.maxCostUsd = ceiling;
+      i++;
     } else if (a === '--iterations') {
       args.iterations = Number.parseInt(value(a, next), 10);
       i++;
@@ -837,6 +909,8 @@ export interface ResultsMeta {
   /** C8 (evals-01): the retrieval configuration the run measured. */
   readonly retrieval?: RetrievalMode;
   readonly embedder?: EmbedderMode;
+  /** D1 (N-1): conflict-pipeline switch the run measured. */
+  readonly conflictPipeline?: ConflictPipelineMode;
   readonly topK?: number;
   readonly consolidate?: boolean;
   /** C8 (evals-04): who graded - and whether it graded itself. */
@@ -868,7 +942,7 @@ export function buildResultsHeader(providerLabel: string, meta: ResultsMeta = {}
   if (meta.mode !== undefined) lines.push(`**Mode:** ${meta.mode}`);
   if (meta.retrieval !== undefined || meta.embedder !== undefined || meta.topK !== undefined) {
     lines.push(
-      `**Retrieval config:** retrieval=${meta.retrieval ?? 'default'} embedder=${meta.embedder ?? 'none'} topK=${meta.topK ?? DEFAULT_TOP_K} consolidate=${meta.consolidate === true}`,
+      `**Retrieval config:** retrieval=${meta.retrieval ?? 'default'} embedder=${meta.embedder ?? 'none'} topK=${meta.topK ?? DEFAULT_TOP_K} consolidate=${meta.consolidate === true} conflictPipeline=${meta.conflictPipeline ?? 'off'}`,
     );
   }
   if (meta.judge !== undefined) {
@@ -998,8 +1072,19 @@ export async function main(): Promise<void> {
     process.env,
     apiKey,
   );
-  const judgeResolved = judgeSpec !== undefined ? resolveBenchProvider(judgeSpec) : undefined;
+  let judgeResolved = judgeSpec !== undefined ? resolveBenchProvider(judgeSpec) : undefined;
   const judgeLabel = judgeResolved?.label ?? label;
+  // D1 (W-084): one shared ceiling caps the run's TOTAL spend (SUT + judge).
+  let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
+  let sutProvider = provider;
+  if (args.maxCostUsd !== undefined) {
+    ceiling = withBenchCostCeiling(args.maxCostUsd);
+    sutProvider = ceiling.wrap(provider);
+    if (judgeResolved !== undefined) {
+      judgeResolved = { ...judgeResolved, provider: ceiling.wrap(judgeResolved.provider) };
+    }
+    console.log(`[benchmark-longmemeval] run-level cost ceiling: $${args.maxCostUsd}`);
+  }
   const selfJudged = judgeResolved === undefined && !label.startsWith('stub');
   if (selfJudged) {
     console.warn(
@@ -1027,13 +1112,20 @@ export async function main(): Promise<void> {
     consolidate: args.consolidate,
     mode,
     meter,
-    provider,
+    provider: sutProvider,
     ...(judgeResolved !== undefined ? { judgeProvider: judgeResolved.provider } : {}),
     ...(args.retrieval !== undefined ? { retrieval: args.retrieval } : {}),
     ...(args.embedder !== undefined ? { embedder: args.embedder } : {}),
+    ...(args.conflictPipeline !== undefined ? { conflictPipeline: args.conflictPipeline } : {}),
     ...(args.iterations !== undefined ? { iterations: args.iterations } : {}),
     retrievalStats,
   });
+  if (ceiling !== undefined && ceiling.observedCostUsd() === 0) {
+    console.warn(
+      '[benchmark-longmemeval] --max-cost-usd was set but the providers reported zero usage ' +
+        'cost, so the ceiling could not observe spend (PS-8) - it was effectively UNENFORCED.',
+    );
+  }
   const tokensPerQuery = meter.queries > 0 ? meter.totalTokens / meter.queries : 0;
   const aggregates = computeBenchAggregates(report);
   console.log(
@@ -1049,6 +1141,7 @@ export async function main(): Promise<void> {
     mode,
     retrieval: args.retrieval ?? 'default',
     embedder: args.embedder ?? 'none',
+    conflictPipeline: args.conflictPipeline ?? 'off',
     topK: args.topK ?? DEFAULT_TOP_K,
     consolidate: args.consolidate,
     provider: label,
@@ -1058,12 +1151,14 @@ export async function main(): Promise<void> {
     loader: args.loader,
     ...(args.variant !== undefined ? { variant: args.variant } : {}),
     ...(args.ability !== undefined ? { ability: args.ability } : {}),
+    ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
   };
   await writeResults(args.results, report, label, {
     mode,
     tokensPerQuery,
     retrieval: benchConfig.retrieval,
     embedder: benchConfig.embedder,
+    conflictPipeline: benchConfig.conflictPipeline,
     topK: benchConfig.topK,
     consolidate: args.consolidate,
     judge: judgeLabel,

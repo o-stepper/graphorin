@@ -10,7 +10,7 @@
 type MemoryIngestGate = (record) => boolean;
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L33)
+Defined in: [packages/memory/src/consolidator/types.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L39)
 
 B3 (item 15): deterministic pre-extraction admission gate. Runs on
 every fetched [SessionMessageRecord](/api/@graphorin/memory/interfaces/SessionMessageRecord.md) BEFORE noise filtering on

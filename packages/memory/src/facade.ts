@@ -23,12 +23,16 @@ import {
   type ConsolidatorPhase,
   type ConsolidatorTier,
   type ConsolidatorTriggerSpec,
+  type CuratedBlockSpec,
   createConsolidator,
   createConsolidatorPlaceholder,
   createProviderWorkflowInducer,
+  IngestGateRequiredError,
   type MemoryIngestGate,
   type OnBudgetExceed,
   type PhaseListener,
+  type ProfileProjectionConfig,
+  type PromotionPolicyConfig,
   type SalienceWeights,
 } from './consolidator/index.js';
 import { createContextEngine } from './context-engine/engine.js';
@@ -60,7 +64,7 @@ import { SemanticMemory, type SemanticSearchDefaults } from './tiers/semantic-me
 import { SessionMemory } from './tiers/session-memory.js';
 import { SharedMemory } from './tiers/shared-memory.js';
 import { type BlockDefinition, WorkingMemory } from './tiers/working-memory.js';
-import { buildMemoryTools, type ScopeResolver } from './tools/index.js';
+import { buildMemoryTools, type MemoryToolProfile, type ScopeResolver } from './tools/index.js';
 
 /**
  * Options accepted by {@link createMemory}.
@@ -244,11 +248,35 @@ export interface CreateMemoryOptions {
    */
   readonly runbookSearch?: boolean;
   /**
+   * Memory tool profile (wave-D D3): which slice of the canonical set
+   * `memory.tools` carries. `'full'` (default) is the stable-order
+   * read+write set; `'interactive'` builds ONLY the read tools - a
+   * front-line agent wired with it cannot write memory by construction
+   * (curation belongs to the reviser); `'reviser'` is the full surface,
+   * semantically reserved for the sleep-time curation agent. The gated
+   * read appendices (`deep_recall`, `runbook_search`) appear in every
+   * profile when enabled.
+   */
+  readonly toolProfile?: MemoryToolProfile;
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws - the
    * agent runtime overrides it in Phase 12.
    */
   readonly resolveScope?: ScopeResolver;
+  /**
+   * Profile projection (wave-D D2, plan item 6): after each deep
+   * consolidation phase, one budgeted LLM call projects ACTIVE facts
+   * (never quarantined, never pending-supersede) into the reserved
+   * read-only `profile` working block as topic / sub-topic / content
+   * slots with fact-id provenance. The block is written USER-scoped by
+   * default - session deletion deliberately does not erase it; the
+   * erasure path is `memory.working.purge(userScope, 'profile')`.
+   * Requires an enabled consolidator (the pass rides the deep phase);
+   * configured here without one, a one-time WARN is written and the
+   * projection never runs.
+   */
+  readonly profile?: ProfileProjectionConfig;
   /**
    * Consolidator configuration. When omitted, empty, or
    * `enabled: false`, the facade installs the Phase 10a no-op
@@ -300,8 +328,22 @@ export interface CreateMemoryOptions {
     readonly formEpisodes?: boolean;
     /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
     readonly importanceScoring?: boolean;
-    /** Opt in to auto-promotion of injection-clean extraction facts (MCON-2). Default off. */
+    /**
+     * Opt in to auto-promotion of injection-clean extraction facts
+     * (MCON-2). Default off. Wave-D D4: REQUIRES `ingestGate` - the
+     * documented precondition is now enforced fail-closed at
+     * `createMemory` time ({@link IngestGateRequiredError}).
+     */
     readonly autoPromoteExtraction?: boolean;
+    /**
+     * Deterministic quarantine-exit policy (wave-D D4, D-7): the deep
+     * phase promotes quarantined facts whose recall evidence clears
+     * every threshold through the audited validate path. Default off.
+     * REQUIRES `ingestGate` (fail-closed) - promotion without the B3
+     * admission gate would move unvetted content into default recall.
+     * Distinct from `autoPromoteExtraction` (write-time hatch).
+     */
+    readonly promotion?: PromotionPolicyConfig;
     /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
     readonly reflection?: boolean;
     /** Accumulated-importance threshold at which reflection fires (P1-1). */
@@ -328,6 +370,14 @@ export interface CreateMemoryOptions {
     readonly learnedContext?: boolean;
     /** Character bound for the learned-context digest (D3). Default `1200`. */
     readonly learnedContextMaxChars?: number;
+    /**
+     * Curated working blocks the deep phase maintains (wave-D D3) -
+     * the generalisation of the learned-context pass to a registered
+     * list (`learnedContext: true` remains sugar for
+     * `[{ label: 'learned_context' }]` and composes with this).
+     * Labels must be unique and never the reserved `profile`.
+     */
+    readonly curatedBlocks?: ReadonlyArray<CuratedBlockSpec>;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock - used by tests. */
@@ -557,22 +607,49 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     // P2-4: the gated `deep_recall` tool is registered only when a grader
     // is configured - the offline default stays at exactly eleven tools.
     // D3: `runbook_search` is a second gated appendix, opt-in via
-    // `runbookSearch: true`.
+    // `runbookSearch: true`; `toolProfile` selects the wave-D D3 slice.
     {
+      ...(options.toolProfile !== undefined ? { profile: options.toolProfile } : {}),
       includeDeepRecall: grader !== null,
       includeRunbookSearch: options.runbookSearch === true,
     },
   );
 
   const consolidatorOpts = options.consolidator;
+  // Wave-D D4 (fail-closed): every auto-promotion surface requires the
+  // B3 ingest gate as configured evidence - same posture as the
+  // proactive 'act' grant. Checked before anything is constructed.
+  if (options.ingestGate === undefined) {
+    if (consolidatorOpts?.promotion !== undefined) {
+      throw new IngestGateRequiredError('promotion');
+    }
+    if (consolidatorOpts?.autoPromoteExtraction === true) {
+      throw new IngestGateRequiredError('autoPromoteExtraction');
+    }
+  }
+  // Wave-D D2: the profile projection rides the deep phase - without an
+  // enabled consolidator it can never run. Warn once instead of
+  // silently accepting dead config.
+  const consolidatorEnabled =
+    consolidatorOpts !== undefined && shouldEnableConsolidator(consolidatorOpts);
+  if (options.profile !== undefined && !consolidatorEnabled && !profileConfigIgnoredWarned) {
+    profileConfigIgnoredWarned = true;
+    process.stderr.write(
+      '[graphorin/memory] `profile` (profile projection) was configured without an enabled ' +
+        'consolidator - the projection rides the deep consolidation phase and will never run. ' +
+        'Enable `consolidator` (with a provider) to activate it.\n',
+    );
+  }
   const consolidator: Consolidator = buildConsolidator(
     consolidatorOpts,
+    consolidatorEnabled,
     options.store,
     semantic,
     episodic,
     working,
     tracer,
     options.ingestGate,
+    options.profile,
   );
   consolidatorForSpend = consolidator;
   const contextEngineConfig = options.contextEngine ?? {};
@@ -713,17 +790,18 @@ function escapeXml(value: string): string {
 
 function buildConsolidator(
   opts: CreateMemoryOptions['consolidator'],
+  enabled: boolean,
   store: CreateMemoryOptions['store'],
   semantic: SemanticMemory,
   episodic: EpisodicMemory,
   working: WorkingMemory,
   tracer: Tracer,
   ingestGate?: MemoryIngestGate,
+  profile?: ProfileProjectionConfig,
 ): Consolidator {
   if (opts === undefined) {
     return createConsolidatorPlaceholder();
   }
-  const enabled = shouldEnableConsolidator(opts);
   if (!enabled) {
     return createConsolidatorPlaceholder({
       ...(opts.triggers !== undefined ? { triggers: opts.triggers } : {}),
@@ -792,6 +870,9 @@ function buildConsolidator(
     ...(opts.learnedContextMaxChars !== undefined
       ? { learnedContextMaxChars: opts.learnedContextMaxChars }
       : {}),
+    ...(opts.curatedBlocks !== undefined ? { curatedBlocks: opts.curatedBlocks } : {}),
+    ...(opts.promotion !== undefined ? { promotion: opts.promotion } : {}),
+    ...(profile !== undefined ? { profileProjection: profile } : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });
   if (opts.onPhaseFinished !== undefined) {
@@ -801,10 +882,12 @@ function buildConsolidator(
 }
 
 let consolidatorConfigIgnoredWarned = false;
+let profileConfigIgnoredWarned = false;
 
 /** @internal - test seam for the one-time disabled-config warning. */
 export function _resetConsolidatorConfigWarningForTesting(): void {
   consolidatorConfigIgnoredWarned = false;
+  profileConfigIgnoredWarned = false;
 }
 
 function shouldEnableConsolidator(opts: NonNullable<CreateMemoryOptions['consolidator']>): boolean {

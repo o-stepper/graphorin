@@ -60,7 +60,9 @@ export {
 } from './dlq.js';
 export {
   BudgetExceededError,
+  CuratedBlocksMisconfiguredError,
   CustomTierMisconfiguredError,
+  IngestGateRequiredError,
   ProviderNotConfiguredError,
 } from './errors.js';
 export { tipMessageId } from './idempotency.js';
@@ -91,14 +93,55 @@ export {
   type WorkflowInductionOptions,
 } from './phases/induce.js';
 export {
+  buildLearnedContextRequest,
+  type CuratedBlockDeps,
+  type CuratedBlockSpec,
+  curatedBlockSystemPrompt,
+  DEFAULT_LEARNED_CONTEXT_MAX_CHARS,
+  LEARNED_CONTEXT_BLOCK_LABEL,
+  type LearnedContextDeps,
+  type LearnedContextOutcome,
+  normalizeLearnedContext,
+  type ResolvedCuratedBlock,
+  runCuratedBlockPass,
+  runLearnedContextPass,
+} from './phases/learned-context.js';
+export {
   type LightPhaseDeps,
   runLightPhase,
 } from './phases/light.js';
+export {
+  buildProfileProjectionRequest,
+  DEFAULT_PROFILE_MAX_CHARS,
+  DEFAULT_PROFILE_MAX_SLOTS,
+  PROFILE_BLOCK_LABEL,
+  type ProfileProjectionConfig,
+  type ProfileProjectionDeps,
+  type ProfileProjectionOutcome,
+  type ProfileSlot,
+  parseProfileSlots,
+  type ResolvedProfileProjectionConfig,
+  renderProfileBlock,
+  resolveProfileProjectionConfig,
+  runProfileProjectionPass,
+} from './phases/profile-projection.js';
 export {
   parseExtraction,
   runStandardPhase,
   type StandardPhaseDeps,
 } from './phases/standard.js';
+export {
+  type ReviserConsolidatorConfig,
+  type ReviserPresetOptions,
+  reviserConsolidatorPreset,
+} from './presets.js';
+export {
+  type PromotionCandidate,
+  type PromotionPolicyConfig,
+  type ResolvedPromotionPolicy,
+  resolvePromotionPolicy,
+  shouldPromote,
+} from './promotion.js';
 export { type Consolidator, createConsolidator } from './runtime.js';
 export {
   type ConsolidatorCatchupPolicy,
@@ -196,6 +239,9 @@ export function createConsolidatorPlaceholder(
     contextualRetrieval: 'late-chunk',
     learnedContext: false,
     learnedContextMaxChars: 1200,
+    curatedBlocks: [],
+    profileProjection: null,
+    promotion: null,
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

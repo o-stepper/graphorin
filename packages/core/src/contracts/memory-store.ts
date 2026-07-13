@@ -78,6 +78,15 @@ export interface WorkingMemoryStore {
   get(scope: SessionScope, label: string): Promise<Block | null>;
   upsert(scope: SessionScope, block: Block): Promise<void>;
   delete(scope: SessionScope, label: string, reason?: string): Promise<void>;
+  /**
+   * Hard-delete a block row - no tombstone left behind (wave-D D2).
+   * `delete` stays the soft tombstone; `purge` is the GDPR path for
+   * USER-scoped blocks (e.g. the `profile` projection), which the
+   * session-delete cascade never reaches (`scope_session_id IS NULL`).
+   * Optional-additive: adapters that do not implement it make
+   * `WorkingMemory.purge` throw instead of silently soft-deleting.
+   */
+  purge?(scope: SessionScope, label: string): Promise<void>;
 }
 
 /**

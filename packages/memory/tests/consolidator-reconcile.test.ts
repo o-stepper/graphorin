@@ -119,6 +119,8 @@ async function setup(opts: {
     store,
     embeddings: new InMemoryEmbeddingRegistry(),
     embedder: opts.embedder,
+    // Wave-D D4: autoPromoteExtraction is ingest-gate-gated (fail-closed).
+    ...(opts.consolidator?.autoPromoteExtraction === true ? { ingestGate: () => true } : {}),
     consolidator: {
       tier: 'standard',
       provider: opts.provider,
@@ -231,6 +233,43 @@ describe('consolidator standard phase - neighbour-aware reconcile (P0-3)', () =>
     expect(chain[1]?.status).toBe('active');
     expect(chain[0]?.supersededBy).toBe(chain[1]?.id);
     expect(chain[0]?.validTo).toBeDefined();
+  });
+
+  it('W-083 guard (wave-D D4): autoPromote never closes a USER-provenance target immediately', async () => {
+    const provider = reconcileProvider({
+      facts: [{ text: 'The user now uses Rust as their main language' }],
+      reconcile: (content) => ({
+        action: 'update',
+        targetId: firstNeighborId(content),
+        reason: 'switched to Rust',
+      }),
+    });
+    const { memory } = await setup({
+      embedder: zoneEmbedder(
+        [
+          ['python', [1, 0, 0]],
+          ['rust', [0.6, 0.8, 0]],
+        ],
+        [0, 0, 1],
+      ),
+      provider,
+      consolidator: { autoPromoteExtraction: true },
+    });
+    // The target the user wrote THEMSELVES - the hatch must not let an
+    // extraction instantly retire it.
+    const python = await memory.semantic.remember(SCOPE, {
+      text: 'Primary programming language is Python',
+      provenance: 'user',
+    });
+    await memory.session.push(SCOPE, { role: 'user', content: 'I switched to Rust this year.' });
+    const outcome = await memory.consolidator.fireNow('standard', SCOPE);
+    expect(outcome?.factsUpdated).toBe(1);
+    const chain = await memory.semantic.history(SCOPE, python.id);
+    expect(chain).toHaveLength(2);
+    // Forced pending path: successor quarantined, old interval OPEN.
+    expect(chain[1]?.status).toBe('quarantined');
+    expect(chain[0]?.validTo).toBeUndefined();
+    expect(chain[0]?.supersededBy).toBeUndefined();
   });
 
   it('noop: a near-duplicate is deduped without an LLM call and writes no new fact', async () => {

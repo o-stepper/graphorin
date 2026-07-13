@@ -17,9 +17,13 @@
  * @packageDocumentation
  */
 
+import { resolve } from 'node:path';
 import process from 'node:process';
+import { pathToFileURL } from 'node:url';
 
-import { createMemory } from '@graphorin/memory';
+import type { EmbedderProvider } from '@graphorin/core';
+import { createMemory, migrateEmbedder } from '@graphorin/memory';
+import { createSqliteStore } from '@graphorin/store-sqlite';
 import { EXIT_CODES } from '../internal/exit.js';
 import {
   brand,
@@ -114,24 +118,48 @@ export interface MemoryMigrateOptions extends MemoryCommonOptions {
   readonly to: string;
   readonly strategy: 'lock-on-first' | 'auto-migrate' | 'multi-active';
   /**
-   * Optional path to a JS / TS module exporting an
-   * `embedders` object: `{ <id>: () => EmbedderProvider }`. The CLI
-   * imports this module so it can construct the source / target
-   * embedder instances the runner needs. Without the module the
-   * command exits `2` with a pointer to the documentation.
+   * Path to a JS module exporting an `embedders` object keyed by
+   * canonical embedder id, each value a zero-arg factory returning an
+   * `EmbedderProvider` (sync or promise). The CLI imports this module
+   * so it can construct the source / target embedder instances the
+   * runner needs (DEC-154: the framework never downloads models
+   * implicitly). Without the module the command exits `2` with a
+   * pointer.
    */
   readonly embeddersModule?: string;
+  /** Rows per re-embed batch (wave-D D5). Default `512`. */
+  readonly batchSize?: number;
+  /**
+   * After a committed migration, drop the RETIRED embedders' vector
+   * sidecar tables and run `PRAGMA incremental_vacuum` (wave-D D5
+   * space reclaim). Default `false`.
+   */
+  readonly reclaim?: boolean;
+}
+
+/** @stable */
+export interface MemoryMigrateResult {
+  readonly migrationId: string;
+  readonly status: 'committed';
+  readonly processed: number;
+  /** Vector tables dropped by `--reclaim` (empty without the flag). */
+  readonly reclaimedTables: ReadonlyArray<string>;
 }
 
 /**
- * `graphorin memory migrate` - embedder swap. The migration logic lives
- * in `@graphorin/memory`'s `migrateEmbedder(...)`; the CLI prints a
- * pointer when the operator did not supply the embedder factory module
- * (the framework cannot guess the operator's embedder configuration).
+ * `graphorin memory migrate` - embedder swap (wave-D D5, real
+ * implementation). Loads the operator's `--embedders` factory module,
+ * opens the configured store, and drives `@graphorin/memory`'s
+ * `migrateEmbedder(...)` with the store-side pager + the PERSISTED
+ * `migration_state` cursor - so a killed / aborted migration resumes
+ * from where it stopped on the next invocation. `--reclaim`
+ * additionally drops retired vector tables and compacts free pages.
  *
  * @stable
  */
-export async function runMemoryMigrate(options: MemoryMigrateOptions): Promise<never> {
+export async function runMemoryMigrate(
+  options: MemoryMigrateOptions,
+): Promise<MemoryMigrateResult> {
   const print = options.print ?? defaultPrintSink;
   if (options.embeddersModule === undefined) {
     print(
@@ -151,15 +179,105 @@ export async function runMemoryMigrate(options: MemoryMigrateOptions): Promise<n
     );
     process.exit(EXIT_CODES.UNSUPPORTED);
   }
-  // The full --embeddersModule wiring is out of scope for the v0.1
-  // surface; the helpful message above plus the programmatic pointer
-  // are the contract per the working plan acceptance criteria.
-  print(
-    brand(
-      '--embeddersModule resolution is planned for v0.2; use migrateEmbedder() programmatically.',
-    ),
-  );
-  process.exit(EXIT_CODES.UNSUPPORTED);
+  const moduleUrl = pathToFileURL(resolve(process.cwd(), options.embeddersModule)).href;
+  const imported = (await import(moduleUrl)) as {
+    embedders?: Record<string, () => unknown | Promise<unknown>>;
+    default?: { embedders?: Record<string, () => unknown | Promise<unknown>> };
+  };
+  const embedders = imported.embedders ?? imported.default?.embedders;
+  if (embedders === undefined || typeof embedders !== 'object') {
+    print(
+      brand(
+        `--embedders module '${options.embeddersModule}' does not export an { embedders } object.`,
+      ),
+    );
+    process.exit(EXIT_CODES.UNSUPPORTED);
+  }
+  const resolveFactory = async (id: string): Promise<EmbedderProvider> => {
+    const factory = embedders[id];
+    if (typeof factory !== 'function') {
+      print(
+        brand(
+          `--embedders module has no factory for '${id}'. Available: ${Object.keys(embedders).join(', ') || '(none)'}.`,
+        ),
+      );
+      process.exit(EXIT_CODES.UNSUPPORTED);
+    }
+    return (await factory()) as EmbedderProvider;
+  };
+  const source = await resolveFactory(options.from);
+  const target = await resolveFactory(options.to);
+
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+    // A migration necessarily has two live embedders in flight - the
+    // default lock-on-first policy would refuse to register the target.
+    storeFactory: (storeOpts) =>
+      createSqliteStore({ ...storeOpts, embedderPolicy: 'multi-active' }),
+  });
+  try {
+    let migrationId = '';
+    let processed = 0;
+    const progress = migrateEmbedder({
+      source,
+      target,
+      embeddings: ctx.store.embeddings,
+      strategy: options.strategy,
+      ...(options.batchSize !== undefined ? { batchSize: options.batchSize } : {}),
+      nextBatch: ctx.store.embedderMigration.nextBatch,
+      state: ctx.store.embedderMigration.state,
+    });
+    for await (const event of progress) {
+      migrationId = event.migrationId;
+      if (event.phase === 'running') {
+        processed += 0; // running events report per-kind counts below
+        print(
+          brand(
+            `migrate: kind=${event.kind} processed=${event.processed} (${event.source} -> ${event.target})`,
+          ),
+        );
+        processed = Math.max(processed, event.processed);
+      } else {
+        print(brand(`migrate: phase=${event.phase}`));
+      }
+    }
+    const reclaimedTables: string[] = [];
+    if (options.reclaim === true) {
+      const { dropped } = ctx.store.embedderMigration.dropRetiredVectorTables();
+      reclaimedTables.push(...dropped);
+      // Freed pages return via incremental_vacuum on auto_vacuum=2
+      // databases; older databases keep the high-water mark (see the
+      // storage runbook).
+      const autoVacuum = ctx.store.connection.pragma('auto_vacuum', { simple: true }) as number;
+      if (autoVacuum === 2) {
+        ctx.store.connection.pragma('wal_checkpoint(TRUNCATE)');
+        ctx.store.connection.pragma('incremental_vacuum');
+        print(brand(`reclaim: dropped ${dropped.length} table(s), free pages returned.`));
+      } else {
+        print(
+          brand(
+            `reclaim: dropped ${dropped.length} table(s); auto_vacuum is off for this database, so the file keeps its high-water size ('graphorin storage compact' explains the options).`,
+          ),
+        );
+      }
+    }
+    const out: MemoryMigrateResult = {
+      migrationId,
+      status: 'committed',
+      processed,
+      reclaimedTables,
+    };
+    emitReport(options, out, () => {
+      print(
+        brand(
+          `${statusMarker('ok')} migration ${out.migrationId} committed (processed=${out.processed}${out.reclaimedTables.length > 0 ? `, reclaimed=${out.reclaimedTables.length}` : ''}).`,
+        ),
+      );
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
 }
 
 // ---------------------------------------------------------------------------

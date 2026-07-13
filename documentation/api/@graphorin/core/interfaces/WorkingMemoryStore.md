@@ -78,6 +78,34 @@ Defined in: [packages/core/src/contracts/memory-store.ts:77](https://github.com/
 
 ***
 
+### purge()?
+
+```ts
+optional purge(scope, label): Promise<void>;
+```
+
+Defined in: [packages/core/src/contracts/memory-store.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L89)
+
+Hard-delete a block row - no tombstone left behind (wave-D D2).
+`delete` stays the soft tombstone; `purge` is the GDPR path for
+USER-scoped blocks (e.g. the `profile` projection), which the
+session-delete cascade never reaches (`scope_session_id IS NULL`).
+Optional-additive: adapters that do not implement it make
+`WorkingMemory.purge` throw instead of silently soft-deleting.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `label` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### upsert()
 
 ```ts

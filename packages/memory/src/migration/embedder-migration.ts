@@ -39,13 +39,49 @@ export interface MigrationProgress {
   /** Identifier of the target embedder. */
   readonly target: string;
   /**
-   * Identifier for this migration run. MST-12: this is an in-memory id for
-   * the current run - there is no persisted `migration_state` cursor today, so
-   * a migration does not resume across processes.
+   * Identifier for this migration run. With a `state` store wired
+   * (wave-D D5 / MST-12) this is the PERSISTED `migration_state` row id
+   * - a resumed run reports the original id. Without one it is an
+   * in-memory id and the migration does not resume across processes.
    */
   readonly migrationId: string;
   /** Phase discriminator. */
   readonly phase: 'planning' | 'running' | 'paused' | 'committed' | 'aborted';
+}
+
+/**
+ * Structural view of the persisted `migration_state` cursor store
+ * (wave-D D5 / MST-12). The default implementation is
+ * `@graphorin/store-sqlite`'s `store.embedderMigration.state`; declared
+ * structurally here so this package never imports the storage package.
+ *
+ * @stable
+ */
+export interface MigrationStateStoreLike {
+  findResumable(
+    sourceEmbedder: string,
+    targetEmbedder: string,
+  ): Promise<{
+    readonly id: string;
+    readonly processed: number;
+    readonly lastRecordId: string | null;
+  } | null>;
+  create(state: {
+    readonly id: string;
+    readonly sourceEmbedder: string;
+    readonly targetEmbedder: string;
+    readonly strategy: string;
+    readonly totalRecords: number;
+  }): Promise<void>;
+  update(
+    id: string,
+    patch: {
+      readonly processed?: number;
+      readonly lastRecordId?: string | null;
+      readonly status?: 'running' | 'committed' | 'aborted' | 'failed';
+      readonly errorMessage?: string | null;
+    },
+  ): Promise<void>;
 }
 
 /**
@@ -71,12 +107,22 @@ export interface MigrateEmbedderOptions {
   /** Optional cap on the number of rows to migrate per kind. */
   readonly maxRecordsPerKind?: number;
   /**
-   * Hook that returns the next batch of rows to re-embed for a given kind.
-   * MST-12: this is **caller-supplied** - there is no store-side helper that
-   * auto-wires it today, and `auto-migrate` throws without it. Pass a paging
-   * function over your source rows to drive the migration.
+   * Hook that returns the next batch of rows to re-embed for a given
+   * kind. `auto-migrate` throws without it. The default
+   * `@graphorin/store-sqlite` adapter ships one as
+   * `store.embedderMigration.nextBatch` (wave-D D5); custom adapters
+   * pass their own paging function.
    */
   readonly nextBatch?: NextBatchHook;
+  /**
+   * Persisted cursor store (wave-D D5 / MST-12). When supplied,
+   * `auto-migrate` records progress after every batch into
+   * `migration_state` and RESUMES from the persisted cursor on the
+   * next invocation (same source/target pair) - across process
+   * restarts and kills. An explicit abort marks the row `aborted`
+   * (still resumable); commit marks it `committed`.
+   */
+  readonly state?: MigrationStateStoreLike;
   /** Optional abort signal - aborting yields one final progress event. */
   readonly signal?: AbortSignal;
 }
@@ -168,28 +214,70 @@ export async function* migrateEmbedder(
   // strategy === 'auto-migrate'
   if (options.nextBatch === undefined) {
     throw new EmbedderMigrationStateError(
-      "'auto-migrate' requires a `nextBatch` hook supplied by the storage adapter.",
+      "'auto-migrate' requires a `nextBatch` hook supplied by the storage adapter " +
+        '(the default sqlite adapter ships one as store.embedderMigration.nextBatch).',
     );
   }
 
   const batchSize = options.batchSize ?? 512;
   const cap = options.maxRecordsPerKind ?? Number.POSITIVE_INFINITY;
+  const kinds = ['fact', 'episode', 'message'] as const;
 
-  for (const kind of ['fact', 'episode', 'message'] as const) {
-    let cursor: string | null = null;
+  // Wave-D D5 / MST-12: with a state store wired, resume from the
+  // persisted composite cursor (`<kind>:<cursor>`; '<done>' marks a
+  // finished kind) instead of starting over.
+  let persistedId = migrationId;
+  let resumeKindIndex = 0;
+  let resumeCursor: string | null = null;
+  let processedTotal = 0;
+  if (options.state !== undefined) {
+    const resumable = await options.state.findResumable(sourceId, targetId);
+    if (resumable !== null) {
+      persistedId = resumable.id;
+      processedTotal = resumable.processed;
+      const parsed = parseCompositeCursor(resumable.lastRecordId);
+      if (parsed !== null) {
+        const idx = kinds.indexOf(parsed.kind);
+        if (idx >= 0) {
+          if (parsed.cursor === DONE_CURSOR) {
+            resumeKindIndex = idx + 1;
+          } else {
+            resumeKindIndex = idx;
+            resumeCursor = parsed.cursor;
+          }
+        }
+      }
+      await options.state.update(persistedId, { status: 'running' });
+    } else {
+      await options.state.create({
+        id: persistedId,
+        sourceEmbedder: sourceId,
+        targetEmbedder: targetId,
+        strategy: 'auto-migrate',
+        totalRecords: 0,
+      });
+    }
+  }
+
+  for (let kindIndex = resumeKindIndex; kindIndex < kinds.length; kindIndex++) {
+    const kind = kinds[kindIndex] as (typeof kinds)[number];
+    let cursor: string | null = kindIndex === resumeKindIndex ? resumeCursor : null;
     let processed = 0;
     while (processed < cap) {
       if (options.signal?.aborted === true) {
+        // The persisted cursor stays where the last batch left it - an
+        // aborted run resumes from there.
+        await options.state?.update(persistedId, { status: 'aborted' });
         yield {
           kind,
           processed,
           total: processed,
           source: sourceId,
           target: targetId,
-          migrationId,
+          migrationId: persistedId,
           phase: 'aborted',
         };
-        throw new EmbedderMigrationAbortedError(migrationId);
+        throw new EmbedderMigrationAbortedError(persistedId);
       }
       const batch = await options.nextBatch({
         kind,
@@ -210,28 +298,50 @@ export async function* migrateEmbedder(
         await row.write(vector);
       }
       processed += batch.rows.length;
+      processedTotal += batch.rows.length;
       cursor = batch.nextCursor;
+      await options.state?.update(persistedId, {
+        processed: processedTotal,
+        lastRecordId: `${kind}:${cursor ?? DONE_CURSOR}`,
+      });
       yield {
         kind,
         processed,
         total: processed,
         source: sourceId,
         target: targetId,
-        migrationId,
+        migrationId: persistedId,
         phase: 'running',
       };
       if (cursor === null) break;
     }
+    await options.state?.update(persistedId, { lastRecordId: `${kind}:${DONE_CURSOR}` });
   }
 
   embeddings.retire(sourceId);
+  await options.state?.update(persistedId, { status: 'committed' });
   yield {
     kind: 'fact',
     processed: 0,
     total: 0,
     source: sourceId,
     target: targetId,
-    migrationId,
+    migrationId: persistedId,
     phase: 'committed',
   };
+}
+
+/** Sentinel cursor marking a fully-drained kind in the composite cursor. */
+const DONE_CURSOR = '<done>';
+
+/** Parse the persisted `<kind>:<cursor>` composite (null on junk). */
+function parseCompositeCursor(
+  value: string | null,
+): { readonly kind: 'fact' | 'episode' | 'message'; readonly cursor: string } | null {
+  if (value === null) return null;
+  const sep = value.indexOf(':');
+  if (sep <= 0) return null;
+  const kind = value.slice(0, sep);
+  if (kind !== 'fact' && kind !== 'episode' && kind !== 'message') return null;
+  return { kind, cursor: value.slice(sep + 1) };
 }

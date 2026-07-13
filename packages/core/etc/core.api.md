@@ -959,7 +959,7 @@ export function isToolReturnEnvelope<TOutput = unknown>(value: unknown): value i
 export function isUnbrandedToolReturn(value: unknown): boolean;
 
 // @public
-export type KnownSpanType = 'agent.run' | 'agent.step' | 'agent.handoff' | 'agent.suspend' | 'agent.resume' | 'provider.generate' | 'provider.stream' | 'tool.execute' | 'tool.approval' | 'memory.read.working' | 'memory.read.session' | 'memory.read.episodic' | 'memory.read.semantic' | 'memory.read.procedural' | 'memory.read.shared' | 'memory.write.working' | 'memory.write.session' | 'memory.write.episodic' | 'memory.write.semantic' | 'memory.write.procedural' | 'memory.write.shared' | 'memory.search.working' | 'memory.search.session' | 'memory.search.episodic' | 'memory.search.semantic' | 'memory.search.procedural' | 'memory.search.shared' | 'memory.consolidate.light' | 'memory.consolidate.standard' | 'memory.consolidate.deep' | 'memory.consolidate.reflect' | 'memory.consolidate.learned-context' | 'memory.search.insight' | 'memory.read.insight' | 'memory.write.insight' | 'memory.conflict' | 'memory.embed' | 'workflow.run' | 'workflow.step' | 'workflow.task' | 'workflow.checkpoint' | 'skill.activate' | 'skill.load' | 'mcp.connect' | 'mcp.call' | 'mcp.list-tools';
+export type KnownSpanType = 'agent.run' | 'agent.step' | 'agent.handoff' | 'agent.suspend' | 'agent.resume' | 'provider.generate' | 'provider.stream' | 'tool.execute' | 'tool.approval' | 'memory.read.working' | 'memory.read.session' | 'memory.read.episodic' | 'memory.read.semantic' | 'memory.read.procedural' | 'memory.read.shared' | 'memory.write.working' | 'memory.write.session' | 'memory.write.episodic' | 'memory.write.semantic' | 'memory.write.procedural' | 'memory.write.shared' | 'memory.search.working' | 'memory.search.session' | 'memory.search.episodic' | 'memory.search.semantic' | 'memory.search.procedural' | 'memory.search.shared' | 'memory.consolidate.light' | 'memory.consolidate.standard' | 'memory.consolidate.deep' | 'memory.consolidate.reflect' | 'memory.consolidate.learned-context' | 'memory.consolidate.curated-block' | 'memory.consolidate.profile-projection' | 'memory.consolidate.promotion' | 'memory.search.insight' | 'memory.read.insight' | 'memory.write.insight' | 'memory.conflict' | 'memory.embed' | 'workflow.run' | 'workflow.step' | 'workflow.task' | 'workflow.checkpoint' | 'skill.activate' | 'skill.load' | 'mcp.connect' | 'mcp.call' | 'mcp.list-tools';
 
 // @public
 export type LateralLeakVector = 'causality-laundering' | 'commentary-phase' | 'sideways-injection' | 'protocol-header';
@@ -3204,6 +3204,7 @@ export interface WorkingMemoryStore {
     get(scope: SessionScope, label: string): Promise<Block | null>;
     // (undocumented)
     list(scope: SessionScope): Promise<ReadonlyArray<Block>>;
+    purge?(scope: SessionScope, label: string): Promise<void>;
     // (undocumented)
     upsert(scope: SessionScope, block: Block): Promise<void>;
 }

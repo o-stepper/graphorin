@@ -714,26 +714,39 @@ function registerMemoryCommands(program: Command): void {
     });
   memory
     .command('migrate')
-    .description('Embedder swap. Requires --embedders module that exports the factories.')
+    .description(
+      'Embedder swap with a persisted resumable cursor. Requires --embedders module that exports the factories.',
+    )
     .requiredOption('--from <id>', 'Source embedder id.')
     .requiredOption('--to <id>', 'Target embedder id.')
     .requiredOption('--strategy <s>', 'lock-on-first | auto-migrate | multi-active.')
     .option('--embedders <path>', 'Path to a module exporting embedder factories.')
+    .option('--batch-size <n>', 'Rows per re-embed batch (default 512).')
+    .option('--reclaim', 'Drop retired vector tables + run incremental_vacuum after commit.')
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
     .action(
       async (opts: {
         from: string;
         to: string;
         strategy: string;
         embedders?: string;
+        batchSize?: string;
+        reclaim?: boolean;
         config?: string;
+        json?: boolean;
       }) => {
         await runMemoryMigrate({
           from: opts.from,
           to: opts.to,
           strategy: opts.strategy as 'lock-on-first' | 'auto-migrate' | 'multi-active',
           ...(opts.embedders !== undefined ? { embeddersModule: opts.embedders } : {}),
+          ...(opts.batchSize !== undefined
+            ? { batchSize: Number.parseInt(opts.batchSize, 10) }
+            : {}),
+          ...(opts.reclaim !== undefined ? { reclaim: opts.reclaim } : {}),
           ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
         });
       },
     );

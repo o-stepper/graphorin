@@ -76,12 +76,30 @@ describe('benchmarks/longmemeval CLI args', () => {
       '--allow-self-judge',
       '--retrieval',
       '--embedder',
+      '--conflict-pipeline',
+      '--max-cost-usd',
       '--iterations',
       '--help',
     ];
     for (const flag of flags) {
       expect(USAGE).toContain(flag);
     }
+  });
+
+  it('D1: validates --conflict-pipeline and --max-cost-usd values', () => {
+    expect(parseArgs(['node', 'runner.js', '--conflict-pipeline', 'on']).conflictPipeline).toBe(
+      'on',
+    );
+    expect(parseArgs(['node', 'runner.js', '--conflict-pipeline', 'off']).conflictPipeline).toBe(
+      'off',
+    );
+    expect(parseArgs(['node', 'runner.js']).conflictPipeline).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--conflict-pipeline', 'auto'])).toThrow(
+      CliUsageError,
+    );
+    expect(parseArgs(['node', 'runner.js', '--max-cost-usd', '2.5']).maxCostUsd).toBe(2.5);
+    expect(() => parseArgs(['node', 'runner.js', '--max-cost-usd', '-1'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--max-cost-usd', 'free'])).toThrow(CliUsageError);
   });
 });
 

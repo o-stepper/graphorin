@@ -34,6 +34,28 @@ export const LEARNED_CONTEXT_BLOCK_LABEL = 'learned_context';
 /** Default character bound for the digest block. */
 export const DEFAULT_LEARNED_CONTEXT_MAX_CHARS = 1200;
 
+/**
+ * One curated-block declaration (wave-D D3): the deep phase maintains
+ * a rewrite pass per entry - `learnedContext: true` is sugar for
+ * `[{ label: 'learned_context' }]`. `prompt` overrides the maintenance
+ * system prompt (the default is a generic fold-the-evidence rewrite,
+ * parameterised by the label); `maxChars` bounds the stored value.
+ *
+ * @stable
+ */
+export interface CuratedBlockSpec {
+  readonly label: string;
+  readonly prompt?: string;
+  readonly maxChars?: number;
+}
+
+/** Resolved (defaulted) curated-block entry on the consolidator config. */
+export interface ResolvedCuratedBlock {
+  readonly label: string;
+  readonly prompt: string | null;
+  readonly maxChars: number;
+}
+
 /** How many recent episode summaries feed one rewrite. */
 const EPISODE_CONTEXT_LIMIT = 15;
 
@@ -70,6 +92,14 @@ export interface LearnedContextDeps {
   readonly now?: () => number;
 }
 
+/** Inputs accepted by {@link runCuratedBlockPass} (wave-D D3). */
+export interface CuratedBlockDeps extends LearnedContextDeps {
+  /** Which working block this pass maintains. */
+  readonly label: string;
+  /** Maintenance system prompt override (default: generic rewrite). */
+  readonly systemPrompt?: string;
+}
+
 /** Summary returned by {@link runLearnedContextPass}. */
 export interface LearnedContextOutcome {
   /** True when the block was rewritten this pass. */
@@ -95,6 +125,21 @@ export function normalizeLearnedContext(raw: string, maxChars: number): string |
   return text.length > maxChars ? text.slice(0, maxChars).trimEnd() : text;
 }
 
+/**
+ * Generic maintenance prompt for a curated block that is not the
+ * learned-context digest (wave-D D3).
+ */
+export function curatedBlockSystemPrompt(label: string): string {
+  return [
+    `You maintain the '${label}' working block of a long-running personal-assistant memory:`,
+    'a compact standing text the operator curates for this agent. Rewrite it by folding the',
+    'new evidence into the previous content: keep what is still true, drop what is stale or',
+    'superseded, and never invent anything the evidence does not support. Write plain prose',
+    'or short dashed lines - no markdown headings, no code fences, no preamble. Stay',
+    'strictly under the character budget.',
+  ].join(' ');
+}
+
 /** Build the single rewrite request (pure - testable offline). */
 export function buildLearnedContextRequest(args: {
   readonly previous: string;
@@ -102,6 +147,8 @@ export function buildLearnedContextRequest(args: {
   readonly insights: ReadonlyArray<string>;
   readonly procedures: ReadonlyArray<string>;
   readonly maxChars: number;
+  /** Maintenance system prompt override (wave-D D3 curated blocks). */
+  readonly systemPrompt?: string;
 }): ProviderRequest {
   const sections: string[] = [
     `Character budget: ${args.maxChars}.`,
@@ -121,7 +168,7 @@ export function buildLearnedContextRequest(args: {
   sections.push('Return ONLY the rewritten digest text.');
   return {
     messages: [{ role: 'user', content: sections.join('\n\n') }],
-    systemMessage: LEARNED_CONTEXT_SYSTEM_PROMPT,
+    systemMessage: args.systemPrompt ?? LEARNED_CONTEXT_SYSTEM_PROMPT,
     temperature: 0,
     maxTokens: Math.max(256, Math.ceil(args.maxChars / 2)),
   };
@@ -130,16 +177,33 @@ export function buildLearnedContextRequest(args: {
 /**
  * Run the learned-context rewrite. Resilient by construction: a
  * provider failure or empty rewrite leaves the existing block untouched
- * and never throws; only storage errors propagate.
+ * and never throws; only storage errors propagate. Since wave-D D3 this
+ * is sugar over {@link runCuratedBlockPass} with the reserved
+ * `learned_context` label + its canonical prompt.
  */
 export async function runLearnedContextPass(
   deps: LearnedContextDeps,
 ): Promise<LearnedContextOutcome> {
+  return runCuratedBlockPass({ ...deps, label: LEARNED_CONTEXT_BLOCK_LABEL });
+}
+
+/**
+ * Run one curated-block rewrite (wave-D D3) - the generalised
+ * learned-context pass: previous block value + recent episodes +
+ * active insights + active procedures fold into a size-bounded
+ * rewrite of the block named by `deps.label`. Same resilience
+ * contract as the learned-context pass.
+ */
+export async function runCuratedBlockPass(deps: CuratedBlockDeps): Promise<LearnedContextOutcome> {
+  const isLearnedContext = deps.label === LEARNED_CONTEXT_BLOCK_LABEL;
   return withMemorySpan(
     deps.tracer,
-    'memory.consolidate.learned-context',
+    isLearnedContext ? 'memory.consolidate.learned-context' : 'memory.consolidate.curated-block',
     deps.scope,
-    { 'consolidator.phase': 'learned-context' },
+    {
+      'consolidator.phase': isLearnedContext ? 'learned-context' : 'curated-block',
+      'consolidator.block.label': deps.label,
+    },
     async (span) => {
       const skip = (
         reason: NonNullable<LearnedContextOutcome['skippedReason']>,
@@ -150,19 +214,20 @@ export async function runLearnedContextPass(
       };
       if (deps.budget.snapshot().paused) return skip('budget');
 
-      // Ensure the reserved block is registered so write() can create it.
-      if (deps.working.definitionFor(LEARNED_CONTEXT_BLOCK_LABEL) === undefined) {
+      // Ensure the block is registered so write() can create it.
+      if (deps.working.definitionFor(deps.label) === undefined) {
         deps.working.define(
           defineBlock({
-            label: LEARNED_CONTEXT_BLOCK_LABEL,
-            description:
-              'Standing digest of durable knowledge about the user and active work, ' +
-              'maintained by the deep-phase learned-context pass.',
+            label: deps.label,
+            description: isLearnedContext
+              ? 'Standing digest of durable knowledge about the user and active work, ' +
+                'maintained by the deep-phase learned-context pass.'
+              : `Curated working block maintained by the deep-phase curated-block pass ('${deps.label}').`,
             charLimit: deps.maxChars,
           }),
         );
       }
-      const previous = (await deps.working.read(deps.scope, LEARNED_CONTEXT_BLOCK_LABEL)) ?? '';
+      const previous = (await deps.working.read(deps.scope, deps.label)) ?? '';
 
       // Evidence: recent episodes (incl. quarantined auto-formed ones -
       // they carry the importance signal), ACTIVE insights only (the
@@ -202,6 +267,11 @@ export async function runLearnedContextPass(
             insights,
             procedures,
             maxChars: deps.maxChars,
+            ...(deps.systemPrompt !== undefined
+              ? { systemPrompt: deps.systemPrompt }
+              : isLearnedContext
+                ? {}
+                : { systemPrompt: curatedBlockSystemPrompt(deps.label) }),
           }),
         );
         tokens =
@@ -218,7 +288,7 @@ export async function runLearnedContextPass(
         if (next === null) {
           return { ...skip('empty-rewrite', previous.length), tokens, costUsd };
         }
-        await deps.working.write(deps.scope, LEARNED_CONTEXT_BLOCK_LABEL, next);
+        await deps.working.write(deps.scope, deps.label, next);
         span.setAttributes({
           'consolidator.learned_context.updated': true,
           'consolidator.learned_context.chars': next.length,

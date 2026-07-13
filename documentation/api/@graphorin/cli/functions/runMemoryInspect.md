@@ -10,7 +10,7 @@
 function runMemoryInspect(options): Promise<MemoryInspectResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:272](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L272)
+Defined in: [packages/cli/src/commands/memory.ts:390](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L390)
 
 `graphorin memory inspect <factId>` - surface everything the store
 knows about one fact: its retrieval-trust status + provenance, the

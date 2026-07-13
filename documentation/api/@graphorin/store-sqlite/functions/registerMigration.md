@@ -10,7 +10,7 @@
 function registerMigration(migration): void;
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/registry.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L182)
+Defined in: [packages/store-sqlite/src/migrations/registry.ts:183](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L183)
 
 Register a runtime-supplied migration. Used by downstream packages
 that want to ship their schema alongside the bundled set without

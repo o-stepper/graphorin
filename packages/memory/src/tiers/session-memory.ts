@@ -165,6 +165,12 @@ export class SessionMemory {
    * performs no work. The consolidator pipeline (extraction → facts /
    * episodes) superseded the planned "silent flush turn"; this method
    * remains only for contract stability. Do not branch on its counter.
+   *
+   * @deprecated Wave-D D4 retired this surface in favour of the
+   * pre-compaction `memoryFlushHook` (`contextEngine: { compaction: {
+   * preCompactionHooks: [memoryFlushHook({ provider })] } }`) - the
+   * single flush surface, fired exactly when content is about to be
+   * summarized away.
    */
   async flushImportant(
     scope: SessionScope,

@@ -18,6 +18,7 @@ import { type EntityResolver, normalizeEntityName } from '../graph/entity-resolv
 import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
 import { detectMemoryInjection, type InjectionScan } from '../internal/injection-heuristics.js';
+import { hashRecallQuery } from '../internal/recall-hash.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
@@ -1003,13 +1004,15 @@ export class SemanticMemory {
         // MRET-7: recall reinforces the recalled facts - stamp
         // last-accessed + bump strength so "recently accessed facts decay
         // slower" actually holds. Bookkeeping only: a failure here must
-        // never break the read path.
+        // never break the read path. Wave-D D4: the query hash feeds the
+        // persistent recall ledger (distinct-query promotion evidence).
         if (ranked.length > 0 && typeof this.#store.semantic.markAccessed === 'function') {
           try {
             await this.#store.semantic.markAccessed(
               ranked.map((h) => h.record.id),
               undefined,
               scope,
+              hashRecallQuery(query),
             );
           } catch {
             // Best-effort: decay reinforcement is advisory.

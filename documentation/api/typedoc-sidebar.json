@@ -1121,6 +1121,26 @@
             ]
           },
           {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MemoryToolProfile",
+                "link": "/api/@graphorin/memory/tools/type-aliases/MemoryToolProfile.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MEMORY_TOOL_PROFILES",
+                "link": "/api/@graphorin/memory/tools/variables/MEMORY_TOOL_PROFILES.md"
+              }
+            ]
+          },
+          {
             "text": "Functions",
             "collapsed": true,
             "items": [

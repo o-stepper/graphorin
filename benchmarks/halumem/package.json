@@ -1,0 +1,52 @@
+{
+  "name": "@graphorin/benchmark-halumem",
+  "version": "0.8.0",
+  "private": true,
+  "description": "Operation-level memory benchmark for the Graphorin framework (HaluMem-format): replays sessions through the real ingest pipeline (session push, consolidator extraction, conflict pipeline) and grades extraction recall/precision, update omission and QA hallucination with the @graphorin/evals staged scorers. The --conflict-pipeline A/B leg measures the neighbour-aware extract-reconcile-supersede path. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/halumem",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/halumem"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation",
+    "halumem"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js",
+    "benchmark:smoke": "node ./dist/runner.js --smoke"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/evals": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/provider": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-halumem": "./dist/runner.js"
+  }
+}

@@ -166,6 +166,28 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly skills?: SkillsRegistryLike;
   readonly memory?: Memory;
   /**
+   * Opt-in auto-induction (wave-D D4): after a run COMPLETES at or
+   * above every complexity threshold, the runtime calls
+   * `memory.procedural.induceFromRun(...)` to distil the trajectory
+   * into a procedure candidate. The induced rule always lands
+   * QUARANTINED - it reaches the prompt only after validation (or the
+   * D4 promotion policy). Requires `memory` (and a workflow inducer
+   * configured on it - `procedureInduction` on `createMemory`);
+   * induction failures WARN once and never fail the run. The call is
+   * awaited before `agent.end`, so wire a cheap inducer model. Failed
+   * / aborted / suspended runs never induce.
+   */
+  readonly procedureInduction?: {
+    /** Master switch. Default `false`. */
+    readonly auto?: boolean;
+    /** Minimum completed steps. Default `3`. */
+    readonly minSteps?: number;
+    /** Minimum total tool calls across steps. Default `3`. */
+    readonly minToolCalls?: number;
+    /** Minimum observed run cost in USD (0 = ignore cost). Default `0`. */
+    readonly minCostUsd?: number;
+  };
+  /**
    * Opt in to building the per-run system prompt from the memory
    * `ContextEngine` (CE-1). When `true` **and** `memory` is wired, the
    * runtime calls `memory.contextEngine.assemble(...)` once at run start: the
