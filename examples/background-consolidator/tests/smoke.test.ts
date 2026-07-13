@@ -76,7 +76,13 @@ describe('examples/background-consolidator - smoke', () => {
         turns: 3,
         durationMs: 250,
       });
-      expect(Date.now() - startedAt).toBeLessThan(5_000);
+      // The bound proves the cycle was driven DETERMINISTICALLY
+      // (scheduler.fire) rather than by waiting out the 60s wall-clock
+      // interval - any value comfortably below 60s demonstrates that.
+      // Loaded CI runners have pushed the full app-init + 3-turn cycle
+      // past a tight 5s (5293ms observed on shared macOS), so the bound
+      // carries headroom without weakening what it asserts.
+      expect(Date.now() - startedAt).toBeLessThan(20_000);
       expect(cycle.turnsDriven).toBe(3);
       // The light phase ran at least once via either the per-turn
       // `consolidator.trigger({ kind: 'turn' })` calls or the
