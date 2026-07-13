@@ -32,6 +32,8 @@ import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@gr
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
 import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
 import type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/policy';
+import type { CodeModeRunner } from '@graphorin/security/sandbox';
+import type { CodeExecuteLimits } from '@graphorin/tools/code-mode';
 import type { PermissionHook } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
@@ -275,6 +277,23 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * @default 'direct'
    */
   readonly toolInvocation?: 'direct' | 'code-mode';
+  /**
+   * E3 (item 13, step 1): the code-mode runtime and its limits. `run`
+   * substitutes WHERE the model-written script executes (a subprocess
+   * provider, a remote runner) - any {@link CodeModeRunner}; default is
+   * the in-process `worker_threads` runner (`runBridgedSource`).
+   * `limits` bound the script (wall-clock, memory, bridged-call count)
+   * whatever the runtime. Fixed invariant: the runner receives only
+   * the script source, the allowed tool names, the host dispatch
+   * bridge and these limits - credentials, RunState and policy stay on
+   * the harness side (every in-script tool call routes back through
+   * the executor's governance). Only meaningful with
+   * `toolInvocation: 'code-mode'`; ignored otherwise.
+   */
+  readonly codeMode?: {
+    readonly run?: CodeModeRunner;
+    readonly limits?: CodeExecuteLimits;
+  };
   readonly fallbackModels?: ReadonlyArray<ModelSpec>;
   readonly fallbackPolicy?: AgentFallbackPolicy;
   readonly preferredModel?: ModelHint | ModelSpec;

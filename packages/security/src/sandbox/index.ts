@@ -10,6 +10,7 @@ export {
   type BridgedSourceOptions,
   type BridgedSourceResult,
   type BridgedToolCall,
+  type CodeModeRunner,
   runBridgedSource,
 } from './bridged-source.js';
 export {

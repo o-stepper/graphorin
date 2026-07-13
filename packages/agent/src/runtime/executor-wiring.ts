@@ -333,6 +333,8 @@ export function wireToolExecution<TDeps, TOutput>(
       makeToolExecutor(toolRegistry, { quiet: true }),
       reserved,
       getActiveRunCapability,
+      // E3: the caller-chosen code-mode runtime + limits.
+      config.codeMode,
     );
     registerReadResult(toolRegistry, resultReader);
     const readResult = toolRegistry.get(READ_RESULT_NAME);

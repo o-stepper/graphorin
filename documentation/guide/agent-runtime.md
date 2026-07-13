@@ -173,6 +173,22 @@ const agent = createAgent({
 
 Governance is preserved: each in-script call runs through the **same executor**, so per-tool `secretsAllowed` / `inboundSanitization` / `maxResultTokens` still apply to the value handed back to the script (set a tool's `maxResultTokens` high when the script must process its full output). The sandbox blocks network and filesystem access and exposes **no** host object beyond the bound tools. Two limitations to note: **approval-gated tools** (`needsApproval`) are excluded from the code API (there is no durable-HITL suspend mid-script - call those in `'direct'` mode), and code-mode does **not** honour a per-step `prepareStep` `tools` override. The default `'direct'` path is completely unchanged. See [code-mode](/guide/tools#code-mode) in the tools guide for the building blocks.
 
+**Choosing the runtime (E3).** `codeMode: { run, limits }` selects WHERE the script executes and how tightly it is bounded: `run` is any `CodeModeRunner` (from `@graphorin/security/sandbox`) - the default is the in-process `worker_threads` runner; a subprocess or remote provider conforms by accepting the same options and settling with the same result union. `limits` (`timeoutMs` / `maxMemoryMb` / `maxToolCalls`) apply whatever the runtime. The seam's fixed invariant: the runner sees only the script source, the allowed tool names, the `dispatch` bridge and the limits - credentials, `RunState` and policy stay on the harness side, since every in-script tool call routes back through the executor's governance.
+
+```ts no-check
+const agent = createAgent({
+  name: 'analyst',
+  instructions: '…',
+  provider,
+  tools: [listOrders, fetchInvoice, summarize],
+  toolInvocation: 'code-mode',
+  codeMode: {
+    run: mySubprocessRunner, // CodeModeRunner; default: in-process worker_threads
+    limits: { timeoutMs: 20_000, maxMemoryMb: 256, maxToolCalls: 16 },
+  },
+});
+```
+
 ## Tool-failure recovery envelope
 
 Every failed tool call reaches the model with its typed kind plus a recovery envelope, not just a bare message:

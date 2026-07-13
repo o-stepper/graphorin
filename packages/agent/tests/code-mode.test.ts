@@ -254,3 +254,66 @@ describe('TL-8 - gated tools are visible in code-mode instead of silently absent
     expect(surfaced).toContain('directly');
   });
 });
+
+// --- E3: the code-mode runtime seam ------------------------------------------
+
+describe('E3 - AgentConfig.codeMode runtime pass-through', () => {
+  it('routes code_execute through the injected runner with the configured limits', async () => {
+    const seen: Array<{
+      source: string;
+      allowedTools: ReadonlyArray<string>;
+      timeoutMs?: number;
+      maxMemoryMb?: number;
+      maxToolCalls?: number;
+    }> = [];
+    const provider = recordingProvider([
+      toolCallScript({
+        toolCallId: 'tc-rt',
+        toolName: 'code_execute',
+        args: { source: 'return await tools.fetch_big({});' },
+      }),
+      textOnlyScript('done'),
+    ]);
+    const agent = createAgent({
+      name: 'cm-runtime',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      tools: [fetchBig],
+      toolInvocation: 'code-mode',
+      codeMode: {
+        run: async (options) => {
+          seen.push({
+            source: options.source,
+            allowedTools: options.allowedTools,
+            ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
+            ...(options.maxMemoryMb !== undefined ? { maxMemoryMb: options.maxMemoryMb } : {}),
+            ...(options.maxToolCalls !== undefined ? { maxToolCalls: options.maxToolCalls } : {}),
+          });
+          // The provider contract: dispatch keeps every in-script call
+          // on the host's governed executor.
+          const bridged = await options.dispatch({ name: 'fetch_big', args: {} });
+          return {
+            ok: true,
+            output: `runner saw ${String(bridged).length} bytes`,
+            toolCalls: 1,
+            durationMs: 1,
+          };
+        },
+        limits: { timeoutMs: 12_345, maxMemoryMb: 128, maxToolCalls: 3 },
+      },
+    });
+    let surfaced = '';
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'tool.execute.end' && ev.toolCallId === 'tc-rt') {
+        surfaced = String(ev.result ?? '');
+      }
+    }
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.source).toBe('return await tools.fetch_big({});');
+    expect(seen[0]?.allowedTools).toContain('fetch_big');
+    expect(seen[0]?.timeoutMs).toBe(12_345);
+    expect(seen[0]?.maxMemoryMb).toBe(128);
+    expect(seen[0]?.maxToolCalls).toBe(3);
+    expect(surfaced).toContain('runner saw 100000 bytes');
+  });
+});
