@@ -6,7 +6,7 @@
 
 # Interface: ToolAuditBridge
 
-Defined in: [packages/server/src/tools-audit-bridge.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L75)
+Defined in: [packages/server/src/tools-audit-bridge.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L78)
 
 Handle returned by [bridgeToolAuditToAudit](/api/@graphorin/server/functions/bridgeToolAuditToAudit.md).
 
@@ -16,5 +16,5 @@ Handle returned by [bridgeToolAuditToAudit](/api/@graphorin/server/functions/bri
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | [packages/server/src/tools-audit-bridge.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L79) |
-| <a id="property-stop"></a> `stop` | `readonly` | () => `void` | Unsubscribe from the tool-audit bus. | [packages/server/src/tools-audit-bridge.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L77) |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | [packages/server/src/tools-audit-bridge.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L82) |
+| <a id="property-stop"></a> `stop` | `readonly` | () => `void` | Unsubscribe from the tool-audit bus. | [packages/server/src/tools-audit-bridge.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L80) |

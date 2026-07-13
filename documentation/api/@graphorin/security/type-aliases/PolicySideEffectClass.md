@@ -10,6 +10,6 @@
 type PolicySideEffectClass = "pure" | "read-only" | "side-effecting" | "external-stateful";
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L30)
+Defined in: [packages/security/src/policy/tool-argument-policy.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L33)
 
 Side-effect classes the policy engine reasons about.

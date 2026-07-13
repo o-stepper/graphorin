@@ -19,6 +19,7 @@ type ToolAuditAction =
   | "tool:approval:requested"
   | "tool:approval:granted"
   | "tool:approval:denied"
+  | "tool:permission:rewritten"
   | "tool:result:truncated"
   | "tool:result:spill:written"
   | "tool:result:sanitization:hit"

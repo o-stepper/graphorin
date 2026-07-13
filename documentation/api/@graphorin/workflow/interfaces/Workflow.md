@@ -108,12 +108,22 @@ Defined in: [packages/workflow/src/types.ts:437](https://github.com/o-stepper/gr
 ### fork()
 
 ```ts
-fork(threadId, fromCheckpointId): Promise<{
+fork(
+   threadId, 
+   fromCheckpointId, 
+   opts?): Promise<{
   newThreadId: string;
 }>;
 ```
 
-Defined in: [packages/workflow/src/types.ts:494](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L494)
+Defined in: [packages/workflow/src/types.ts:502](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L502)
+
+Clone `threadId`'s timeline at `fromCheckpointId` into a fresh
+thread (the original stays untouched). E2: `opts.patch` merges
+channel-level values into the forked root's state (branch here,
+but with these corrected values) - keys must name declared
+channels, and the merged state re-runs the JSON-safety guard.
+`channelVersions` and pending writes ride along unchanged.
 
 #### Parameters
 
@@ -121,6 +131,8 @@ Defined in: [packages/workflow/src/types.ts:494](https://github.com/o-stepper/gr
 | ------ | ------ |
 | `threadId` | `string` |
 | `fromCheckpointId` | `string` |
+| `opts?` | \{ `patch?`: `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>; \} |
+| `opts.patch?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 

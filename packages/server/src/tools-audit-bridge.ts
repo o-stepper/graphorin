@@ -42,6 +42,9 @@ const SECURITY_ACTIONS: ReadonlySet<string> = new Set([
   'tool:approval:requested',
   'tool:approval:granted',
   'tool:approval:denied',
+  // E1: a permission-hook rewrite changed what a tool executes -
+  // exactly the kind of decision an operator reviews.
+  'tool:permission:rewritten',
   'tool:collision:detected',
   'tool:collision:priority-resolved',
   'tool:collision:auto-prefix-applied',

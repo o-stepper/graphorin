@@ -10,7 +10,7 @@
 type ToolAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L94)
+Defined in: [packages/tools/src/audit/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L95)
 
 Decision recorded by an audit event.
 

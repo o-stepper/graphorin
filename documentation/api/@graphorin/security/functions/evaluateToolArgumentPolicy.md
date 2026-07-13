@@ -10,12 +10,14 @@
 function evaluateToolArgumentPolicy(policy, facts): ToolPolicyDecision;
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L95)
+Defined in: [packages/security/src/policy/tool-argument-policy.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L200)
 
-Evaluate a policy against one tool call. Forbid-before-allow: any
-matching `forbid` rule wins immediately; otherwise a matching `allow`
-permits the call; otherwise the `defaultDenySensitive` posture (for
-sensitive tools) or a plain allow applies. Pure + deterministic.
+Evaluate a policy against one tool call, projected onto the binary
+pre-E1 vocabulary. Delegates to [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
+and maps every non-`allow` effect to `'forbid'`: a consumer that
+cannot ask or defer must not run the call (fail-closed). Policies
+written before E1 contain only `allow`/`forbid` rules, for which this
+is byte-identical to the original forbid-before-allow semantics.
 
 ## Parameters
 

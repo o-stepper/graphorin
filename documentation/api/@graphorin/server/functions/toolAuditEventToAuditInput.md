@@ -10,7 +10,7 @@
 function toolAuditEventToAuditInput(event): AuditEntryInput;
 ```
 
-Defined in: [packages/server/src/tools-audit-bridge.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L54)
+Defined in: [packages/server/src/tools-audit-bridge.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L57)
 
 Translate a tools audit event into an audit-chain entry.
 

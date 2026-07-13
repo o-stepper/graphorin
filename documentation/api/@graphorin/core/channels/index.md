@@ -92,6 +92,12 @@ Re-exports [ChannelKind](/api/@graphorin/core/type-aliases/ChannelKind.md)
 
 ***
 
+### DEFAULT\_APPROVAL\_TIMEOUT\_DECISION
+
+Re-exports [DEFAULT_APPROVAL_TIMEOUT_DECISION](/api/@graphorin/core/variables/DEFAULT_APPROVAL_TIMEOUT_DECISION.md)
+
+***
+
 ### Directive
 
 Re-exports [Directive](/api/@graphorin/core/classes/Directive.md)
@@ -251,6 +257,12 @@ Re-exports [ReplayDivergenceSignal](/api/@graphorin/core/classes/ReplayDivergenc
 ### requestApproval
 
 Re-exports [requestApproval](/api/@graphorin/core/functions/requestApproval.md)
+
+***
+
+### RequestApprovalOptions
+
+Re-exports [RequestApprovalOptions](/api/@graphorin/core/interfaces/RequestApprovalOptions.md)
 
 ***
 

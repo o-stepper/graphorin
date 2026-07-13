@@ -30,6 +30,12 @@ Re-exports [BridgedToolCall](/api/@graphorin/security/interfaces/BridgedToolCall
 
 ***
 
+### CodeModeRunner
+
+Re-exports [CodeModeRunner](/api/@graphorin/security/type-aliases/CodeModeRunner.md)
+
+***
+
 ### createDockerSandbox
 
 Re-exports [createDockerSandbox](/api/@graphorin/security/functions/createDockerSandbox.md)

@@ -64,6 +64,30 @@ Re-exports [ExecutorOptions](/api/@graphorin/tools/interfaces/ExecutorOptions.md
 
 ***
 
+### PermissionHook
+
+Re-exports [PermissionHook](/api/@graphorin/tools/type-aliases/PermissionHook.md)
+
+***
+
+### PermissionHookInput
+
+Re-exports [PermissionHookInput](/api/@graphorin/tools/interfaces/PermissionHookInput.md)
+
+***
+
+### PermissionHookResult
+
+Re-exports [PermissionHookResult](/api/@graphorin/tools/interfaces/PermissionHookResult.md)
+
+***
+
+### ToolArgumentPolicyFacts
+
+Re-exports [ToolArgumentPolicyFacts](/api/@graphorin/tools/interfaces/ToolArgumentPolicyFacts.md)
+
+***
+
 ### ToolArgumentPolicyGuard
 
 Re-exports [ToolArgumentPolicyGuard](/api/@graphorin/tools/interfaces/ToolArgumentPolicyGuard.md)

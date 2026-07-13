@@ -6,7 +6,7 @@
 
 # Interface: ApprovalGate
 
-Defined in: [packages/tools/src/executor/types.ts:270](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L270)
+Defined in: [packages/tools/src/executor/types.ts:280](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L280)
 
 Approval gate the executor consults before executing a gated tool.
 
@@ -18,7 +18,7 @@ Approval gate the executor consults before executing a gated tool.
 request(call, approval): Promise<ApprovalDecision>;
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L275)
+Defined in: [packages/tools/src/executor/types.ts:285](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L285)
 
 Request approval for the tool call. Returns `{ granted: true }` to
 proceed, `{ granted: false, reason? }` to deny.

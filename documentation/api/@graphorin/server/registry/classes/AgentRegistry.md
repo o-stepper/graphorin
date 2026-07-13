@@ -6,7 +6,7 @@
 
 # Class: AgentRegistry
 
-Defined in: [packages/server/src/registry/index.ts:188](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L188)
+Defined in: [packages/server/src/registry/index.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L196)
 
 Read/write registry for agents the server should expose. Every
 mutation is synchronous and the lookup is `O(1)`.
@@ -39,7 +39,7 @@ describe(id):
   | undefined;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L224)
+Defined in: [packages/server/src/registry/index.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L232)
 
 #### Parameters
 
@@ -62,7 +62,7 @@ get(id):
   | undefined;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L204)
+Defined in: [packages/server/src/registry/index.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L212)
 
 #### Parameters
 
@@ -83,7 +83,7 @@ Defined in: [packages/server/src/registry/index.ts:204](https://github.com/o-ste
 has(id): boolean;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L208)
+Defined in: [packages/server/src/registry/index.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L216)
 
 #### Parameters
 
@@ -103,7 +103,7 @@ Defined in: [packages/server/src/registry/index.ts:208](https://github.com/o-ste
 list(): readonly AgentSummary[];
 ```
 
-Defined in: [packages/server/src/registry/index.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L212)
+Defined in: [packages/server/src/registry/index.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L220)
 
 #### Returns
 
@@ -117,7 +117,7 @@ readonly [`AgentSummary`](/api/@graphorin/server/registry/interfaces/AgentSummar
 register(entry): void;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L191)
+Defined in: [packages/server/src/registry/index.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L199)
 
 #### Parameters
 
@@ -137,7 +137,7 @@ Defined in: [packages/server/src/registry/index.ts:191](https://github.com/o-ste
 size(): number;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:234](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L234)
+Defined in: [packages/server/src/registry/index.ts:242](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L242)
 
 #### Returns
 
@@ -151,7 +151,7 @@ Defined in: [packages/server/src/registry/index.ts:234](https://github.com/o-ste
 unregister(id): boolean;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L200)
+Defined in: [packages/server/src/registry/index.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L208)
 
 #### Parameters
 
