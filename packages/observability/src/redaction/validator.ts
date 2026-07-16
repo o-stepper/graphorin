@@ -8,7 +8,7 @@
 import { SENSITIVITY_ORDER, type Sensitivity } from '@graphorin/core';
 
 import { RedactionValidationError } from './errors.js';
-import { BUILT_IN_PATTERNS, type RedactionPattern } from './patterns.js';
+import { ALL_BUILT_IN_PATTERNS, BUILT_IN_PATTERNS, type RedactionPattern } from './patterns.js';
 import type {
   RedactionCounters,
   RedactionInput,
@@ -174,11 +174,16 @@ export function createRedactionValidator(
   const id = opts.id ?? 'default';
   const minTier: Sensitivity = opts.minTier ?? 'public';
   const failOnUnredacted = opts.failOnUnredactedSensitive === true;
-  const patterns = selectPatterns(
-    opts.patterns ?? BUILT_IN_PATTERNS,
-    opts.enabledPatterns,
-    opts.disabledPatterns,
-  );
+  // OBS-PRIC-02: `enabledPatterns` is an allow-list. When it is set (and no
+  // custom catalogue is supplied) select from the FULL built-in catalogue so
+  // the opt-in patterns (ipv4/ipv6/gcp-service-account) can actually be
+  // enabled by name - they are absent from the default-on set, so filtering
+  // over it alone made naming them a silent no-op. With no allow-list the
+  // default remains the 14 default-on patterns.
+  const baseCatalogue =
+    opts.patterns ??
+    (opts.enabledPatterns !== undefined ? ALL_BUILT_IN_PATTERNS : BUILT_IN_PATTERNS);
+  const patterns = selectPatterns(baseCatalogue, opts.enabledPatterns, opts.disabledPatterns);
   const onViolation = opts.onViolation;
   const custom = opts.customValidator;
 
