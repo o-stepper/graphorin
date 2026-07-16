@@ -10,7 +10,7 @@
 function isErrorFrame(message): message is { code: string; data?: unknown; fatal?: boolean; kind: "error"; message: string; subscriptionId?: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L213)
+Defined in: [packages/protocol/src/server-message.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L220)
 
 ## Parameters
 

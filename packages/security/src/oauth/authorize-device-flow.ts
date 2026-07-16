@@ -6,7 +6,7 @@
  */
 
 import { buildOAuthSession } from './authorize-code-flow.js';
-import { OAuthAuthorizationError, OAuthFlowAbortedError } from './errors.js';
+import { OAuthAuthorizationError, OAuthFlowAbortedError, readOAuthErrorFields } from './errors.js';
 import { encodeBasicAuth, postToTokenEndpoint } from './token-endpoint.js';
 import type {
   AuthorizeDeviceOptions,
@@ -84,9 +84,12 @@ export async function runDeviceAuthorizationFlow(
 
   const initResponse = await postFormJson(endpoint, initParams, signal);
   if (!initResponse.ok) {
+    // OAUTH-ADV-02: preserve the RFC 8628 spec error code from the body instead
+    // of collapsing every failure to a generic 'device_authorization_failed'.
+    const fields = await readOAuthErrorFields(initResponse.json);
     throw new OAuthAuthorizationError(
-      'device_authorization_failed',
-      `${initResponse.status} ${initResponse.statusText ?? ''}`.trim(),
+      fields.error ?? 'device_authorization_failed',
+      fields.error_description ?? `${initResponse.status} ${initResponse.statusText ?? ''}`.trim(),
     );
   }
   const initBody = (await initResponse.json()) as DeviceAuthorizationResponse;

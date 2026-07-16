@@ -16,7 +16,7 @@
  * @packageDocumentation
  */
 
-import { writeFile } from 'node:fs/promises';
+import { chmod, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, resolve } from 'node:path';
 import process from 'node:process';
 
@@ -200,6 +200,13 @@ export async function runAuditExport(options: AuditExportOptions): Promise<Audit
       ...(options.toSeq !== undefined ? { toSeq: options.toSeq } : {}),
     });
     await writeFile(targetPath, lines.join(''), { mode: 0o600 });
+    // TOOL-AUDI-02: `writeFile`'s `mode` only applies when the file is created;
+    // a pre-existing export keeps its old (potentially world-readable) mode. The
+    // CLI claims "(mode 0600)", so enforce it explicitly on every export. Windows
+    // has no POSIX mode bits - chmod there is a documented no-op, so guard it.
+    if (process.platform !== 'win32') {
+      await chmod(targetPath, 0o600);
+    }
     const out: AuditExportResult = Object.freeze({ path: targetPath, rows });
     emitReport(options, out, () => {
       const print = options.print ?? defaultPrintSink;

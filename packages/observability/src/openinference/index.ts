@@ -51,24 +51,34 @@ const KIND_TABLE: ReadonlyArray<readonly [SpanType, OpenInferenceSpanKind]> = Ob
   ['memory.read.semantic', 'RETRIEVER'],
   ['memory.read.procedural', 'RETRIEVER'],
   ['memory.read.shared', 'RETRIEVER'],
+  ['memory.read.insight', 'RETRIEVER'], // ORPHAN-SU-01
   ['memory.write.working', 'RETRIEVER'],
   ['memory.write.session', 'RETRIEVER'],
   ['memory.write.episodic', 'RETRIEVER'],
   ['memory.write.semantic', 'RETRIEVER'],
   ['memory.write.procedural', 'RETRIEVER'],
   ['memory.write.shared', 'RETRIEVER'],
+  ['memory.write.insight', 'RETRIEVER'], // ORPHAN-SU-01
   ['memory.search.working', 'RETRIEVER'],
   ['memory.search.session', 'RETRIEVER'],
   ['memory.search.episodic', 'RETRIEVER'],
   ['memory.search.semantic', 'RETRIEVER'],
   ['memory.search.procedural', 'RETRIEVER'],
   ['memory.search.shared', 'RETRIEVER'],
+  ['memory.search.insight', 'RETRIEVER'], // ORPHAN-SU-01
 
   ['memory.embed', 'EMBEDDING'],
 
   ['memory.consolidate.light', 'CHAIN'],
   ['memory.consolidate.standard', 'CHAIN'],
   ['memory.consolidate.deep', 'CHAIN'],
+  // ORPHAN-SU-01: the insight tier + learned-context / curated-block /
+  // profile-projection / promotion consolidate phases are all reasoning chains.
+  ['memory.consolidate.reflect', 'CHAIN'],
+  ['memory.consolidate.learned-context', 'CHAIN'],
+  ['memory.consolidate.curated-block', 'CHAIN'],
+  ['memory.consolidate.profile-projection', 'CHAIN'],
+  ['memory.consolidate.promotion', 'CHAIN'],
   ['memory.conflict', 'CHAIN'],
   ['workflow.run', 'CHAIN'],
   ['workflow.step', 'CHAIN'],

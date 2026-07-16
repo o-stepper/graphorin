@@ -50,7 +50,14 @@ const RpcSuccess = z
     id: RpcId,
     result: z.unknown(),
   })
-  .strict();
+  .strict()
+  // CORE-PRO-01: `z.unknown()` makes the key optional, so a frame carrying
+  // neither `result` nor `error` validated as a success. JSON-RPC 2.0 requires
+  // exactly one - require the `result` key to be present (any value, incl.
+  // null), so a result-less frame fails both RpcSuccess and RpcFailure.
+  .refine((v): boolean => 'result' in v, {
+    message: 'JSON-RPC success frame must carry a result member',
+  });
 
 const RpcFailure = z
   .object({

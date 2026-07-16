@@ -1,4 +1,4 @@
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { chmod, mkdtemp, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { resolveSecret } from '@graphorin/security';
@@ -6,7 +6,7 @@ import { appendAudit, openAuditDb } from '@graphorin/security/audit';
 import { ensureStoreAuditBinding } from '@graphorin/server';
 import { describe, expect, it } from 'vitest';
 
-import { runAuditPrune, runAuditVerify } from '../src/commands/audit.js';
+import { runAuditExport, runAuditPrune, runAuditVerify } from '../src/commands/audit.js';
 
 async function fixtureWithoutAudit(): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-audit-'));
@@ -123,4 +123,52 @@ describe('graphorin audit prune (W-062)', () => {
     });
     expect(lines.join('\n')).not.toContain('Merkle checkpoints');
   });
+});
+
+describe('graphorin audit export (TOOL-AUDI-02)', () => {
+  it.skipIf(process.platform === 'win32')(
+    'forces mode 0600 on a pre-existing (world-readable) export file',
+    async () => {
+      process.env.GRAPHORIN_TEST_AUDIT_PASS = 'test-passphrase-1234567890';
+      const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-audit-export-'));
+      const auditPath = join(dir, 'audit.db');
+      const exportPath = join(dir, 'audit-export.jsonl');
+      const cfg = join(dir, 'graphorin.config.json');
+      await writeFile(
+        cfg,
+        JSON.stringify({
+          storage: { path: join(dir, 'data.db'), mode: 'lib' },
+          auth: { kind: 'none' },
+          audit: {
+            enabled: true,
+            path: auditPath,
+            passphraseRef: 'env:GRAPHORIN_TEST_AUDIT_PASS',
+          },
+        }),
+        'utf8',
+      );
+      ensureStoreAuditBinding();
+      const passphrase = await resolveSecret('env:GRAPHORIN_TEST_AUDIT_PASS');
+      const db = await openAuditDb({ path: auditPath, passphrase });
+      await appendAudit(db, {
+        actor: { kind: 'system', id: 'graphorin' },
+        action: 'secret:get',
+        target: 'KEY_0',
+        decision: 'success',
+        ts: 1_700_000_000_000,
+      });
+      await db.close();
+
+      // Pre-create the target as a world-readable file. `writeFile(..., { mode })`
+      // only applies its mode when it CREATES the file, so without an explicit
+      // chmod the export would inherit these 0644 bits while the CLI claims 0600.
+      await writeFile(exportPath, 'stale contents\n', { mode: 0o644 });
+      await chmod(exportPath, 0o644);
+      expect((await stat(exportPath)).mode & 0o777).toBe(0o644);
+
+      await runAuditExport({ config: cfg, to: exportPath, print: () => undefined });
+
+      expect((await stat(exportPath)).mode & 0o777).toBe(0o600);
+    },
+  );
 });

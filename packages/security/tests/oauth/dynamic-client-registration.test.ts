@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   _setDcrFetcherForTesting,
+  OAuthRegistrationError,
   OAuthRegistrationUnsupportedError,
   registerDynamicClient,
 } from '../../src/oauth/index.js';
@@ -75,6 +76,37 @@ describe('@graphorin/security/oauth - Dynamic Client Registration', () => {
     await expect(registerDynamicClient(metadata, { clientName: 'graphorin/test' })).rejects.toThrow(
       /Dynamic Client Registration failed: 401/u,
     );
+  });
+
+  it('OAUTH-ADV-01: surfaces the RFC 7591 error body on a non-2xx response', async () => {
+    _setDcrFetcherForTesting(async () => ({
+      ok: false,
+      status: 400,
+      statusText: 'Bad Request',
+      json: async () => ({
+        error: 'invalid_client_metadata',
+        error_description: 'redirect_uris required',
+      }),
+    }));
+    const metadata = {
+      server: buildSyntheticServerMetadata({
+        registrationEndpoint: 'https://issuer.example.com/oauth/register',
+      }),
+    };
+    const err = await registerDynamicClient(metadata, { clientName: 'graphorin/test' }).then(
+      () => {
+        throw new Error('expected a throw');
+      },
+      (e: unknown) => e,
+    );
+    expect(err).toBeInstanceOf(OAuthRegistrationError);
+    const reg = err as OAuthRegistrationError;
+    expect(reg.kind).toBe('registration-failed');
+    expect(reg.status).toBe(400);
+    expect(reg.oauthError).toBe('invalid_client_metadata');
+    expect(reg.oauthErrorDescription).toBe('redirect_uris required');
+    // The spec code is also in the message so string-sniffing callers see it.
+    expect(reg.message).toContain('invalid_client_metadata');
   });
 
   it('respects the abort signal before posting', async () => {

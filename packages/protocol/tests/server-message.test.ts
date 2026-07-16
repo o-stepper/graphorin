@@ -135,6 +135,26 @@ describe('ServerMessageSchema (negative paths)', () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it('CORE-PRO-01: rejects rpc frames with NEITHER result nor error', () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '1',
+      jsonrpc: '2.0',
+      id: 'req-1',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('CORE-PRO-01: accepts a success frame whose result is explicitly null', () => {
+    const result = ServerMessageSchema.safeParse({
+      v: '1',
+      jsonrpc: '2.0',
+      id: 'req-1',
+      result: null,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(isRpcSuccess(result.data)).toBe(true);
+  });
 });
 
 describe('W-109 - lockstep envelope vs additive extension points', () => {

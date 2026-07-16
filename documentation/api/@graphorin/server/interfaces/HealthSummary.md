@@ -6,7 +6,7 @@
 
 # Interface: HealthSummary
 
-Defined in: [packages/server/src/health/checks.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L151)
+Defined in: [packages/server/src/health/checks.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L158)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: [packages/server/src/health/checks.ts:151](https://github.com/o-step
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-checks"></a> `checks` | `readonly` | [`HealthChecks`](/api/@graphorin/server/interfaces/HealthChecks.md) | [packages/server/src/health/checks.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L153) |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthRollup`](/api/@graphorin/server/type-aliases/HealthRollup.md) | [packages/server/src/health/checks.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L152) |
+| <a id="property-checks"></a> `checks` | `readonly` | [`HealthChecks`](/api/@graphorin/server/interfaces/HealthChecks.md) | [packages/server/src/health/checks.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L160) |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthRollup`](/api/@graphorin/server/type-aliases/HealthRollup.md) | [packages/server/src/health/checks.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L159) |

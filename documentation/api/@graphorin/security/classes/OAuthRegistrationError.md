@@ -1,0 +1,164 @@
+[**Graphorin API reference v0.10.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / OAuthRegistrationError
+
+# Class: OAuthRegistrationError
+
+Defined in: [packages/security/src/oauth/errors.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L71)
+
+Thrown when the Dynamic Client Registration endpoint returns a non-2xx
+response (OAUTH-ADV-01). Carries the RFC 7591 `error` / `error_description`
+body fields so callers see the spec-defined cause (e.g.
+`invalid_client_metadata`) instead of only the bare HTTP status.
+
+## Stable
+
+## Extends
+
+- [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md)
+
+## Constructors
+
+### Constructor
+
+```ts
+new OAuthRegistrationError(
+   status, 
+   statusText, 
+   fields): OAuthRegistrationError;
+```
+
+Defined in: [packages/security/src/oauth/errors.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L75)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `status` | `number` |
+| `statusText` | `string` \| `undefined` |
+| `fields` | \{ `error?`: `string`; `error_description?`: `string`; \} |
+| `fields.error?` | `string` |
+| `fields.error_description?` | `string` |
+
+#### Returns
+
+`OAuthRegistrationError`
+
+#### Overrides
+
+[`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`constructor`](/api/@graphorin/security/classes/GraphorinOAuthError.md#constructor)
+
+## Properties
+
+| Property | Modifier | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`cause`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-cause) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es2022.error.d.ts#L26) |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`hint`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-hint) | [packages/security/src/oauth/errors.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L17) |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`kind`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-kind) | [packages/security/src/oauth/errors.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L16) |
+| <a id="property-message"></a> `message` | `public` | `string` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`message`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-message) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
+| <a id="property-name"></a> `name` | `public` | `string` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`name`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-name) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1076) |
+| <a id="property-oautherror"></a> `oauthError?` | `readonly` | `string` | - | - | [packages/security/src/oauth/errors.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L73) |
+| <a id="property-oautherrordescription"></a> `oauthErrorDescription?` | `readonly` | `string` | - | - | [packages/security/src/oauth/errors.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L74) |
+| <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`stack`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-stack) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |
+| <a id="property-status"></a> `status` | `readonly` | `number` | - | - | [packages/security/src/oauth/errors.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L72) |
+| <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | [`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`stackTraceLimit`](/api/@graphorin/security/classes/GraphorinOAuthError.md#property-stacktracelimit) | [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L68) |
+
+## Methods
+
+### captureStackTrace()
+
+```ts
+static captureStackTrace(targetObject, constructorOpt?): void;
+```
+
+Defined in: [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:52](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L52)
+
+Creates a `.stack` property on `targetObject`, which when accessed returns
+a string representing the location in the code at which
+`Error.captureStackTrace()` was called.
+
+```js
+const myObject = {};
+Error.captureStackTrace(myObject);
+myObject.stack;  // Similar to `new Error().stack`
+```
+
+The first line of the trace will be prefixed with
+`${myObject.name}: ${myObject.message}`.
+
+The optional `constructorOpt` argument accepts a function. If given, all frames
+above `constructorOpt`, including `constructorOpt`, will be omitted from the
+generated stack trace.
+
+The `constructorOpt` argument is useful for hiding implementation
+details of error generation from the user. For instance:
+
+```js
+function a() {
+  b();
+}
+
+function b() {
+  c();
+}
+
+function c() {
+  // Create an error without stack trace to avoid calculating the stack trace twice.
+  const { stackTraceLimit } = Error;
+  Error.stackTraceLimit = 0;
+  const error = new Error();
+  Error.stackTraceLimit = stackTraceLimit;
+
+  // Capture the stack trace above function b
+  Error.captureStackTrace(error, b); // Neither function c, nor b is included in the stack trace
+  throw error;
+}
+
+a();
+```
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `targetObject` | `object` |
+| `constructorOpt?` | `Function` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`captureStackTrace`](/api/@graphorin/security/classes/GraphorinOAuthError.md#capturestacktrace)
+
+***
+
+### prepareStackTrace()
+
+```ts
+static prepareStackTrace(err, stackTraces): any;
+```
+
+Defined in: [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:56](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L56)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `err` | `Error` |
+| `stackTraces` | `CallSite`[] |
+
+#### Returns
+
+`any`
+
+#### See
+
+https://v8.dev/docs/stack-trace-api#customizing-stack-traces
+
+#### Inherited from
+
+[`GraphorinOAuthError`](/api/@graphorin/security/classes/GraphorinOAuthError.md).[`prepareStackTrace`](/api/@graphorin/security/classes/GraphorinOAuthError.md#preparestacktrace)

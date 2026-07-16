@@ -128,6 +128,36 @@ describe('@graphorin/security/oauth - Device Authorization Grant', () => {
     ).rejects.toBeInstanceOf(OAuthAuthorizationError);
   });
 
+  it('OAUTH-ADV-02: preserves the RFC 8628 spec error from a device-authorization failure', async () => {
+    _setDeviceAuthFetcherForTesting(async () => ({
+      ok: false,
+      status: 400,
+      statusText: 'Bad Request',
+      json: async () => ({ error: 'invalid_scope', error_description: 'unknown scope xyz' }),
+    }));
+    const err = await runDeviceAuthorizationFlow({
+      serverId: 'mcp-test',
+      metadata: {
+        server: buildSyntheticServerMetadata({
+          deviceAuthorizationEndpoint: 'https://issuer.example.com/device_authorization',
+        }),
+      },
+      registration: { clientId: 'cli_test' },
+      options: { scope: 'xyz' },
+      sleep: async () => undefined,
+    }).then(
+      () => {
+        throw new Error('expected a throw');
+      },
+      (e: unknown) => e,
+    );
+    expect(err).toBeInstanceOf(OAuthAuthorizationError);
+    const authErr = err as OAuthAuthorizationError;
+    // The generic 'device_authorization_failed' must NOT mask the spec code.
+    expect(authErr.oauthError).toBe('invalid_scope');
+    expect(authErr.oauthErrorDescription).toBe('unknown scope xyz');
+  });
+
   it('cancels mid-poll when the abort signal fires', async () => {
     _setDeviceAuthFetcherForTesting(async () => ({
       ok: true,

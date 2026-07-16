@@ -66,8 +66,10 @@ export {
   OAuthFlowAbortedError,
   OAuthPeerDependencyMissingError,
   OAuthRefreshError,
+  OAuthRegistrationError,
   OAuthRegistrationUnsupportedError,
   OAuthRevokedError,
+  readOAuthErrorFields,
 } from './errors.js';
 export {
   _resetOAuthLifecycleListenersForTesting,

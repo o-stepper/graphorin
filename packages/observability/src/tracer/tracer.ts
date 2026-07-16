@@ -115,6 +115,16 @@ const DEFAULT_VALIDATION: RedactionValidatorOptions = Object.freeze({
  *
  * @stable
  */
+/**
+ * SESSION-R-01: opaque correlation identifiers that must survive any export
+ * validation floor - the span exporter keys replay rows on
+ * `graphorin.session.id`, and these ids carry no sensitive content.
+ */
+const ROUTING_ID_ATTRIBUTES: ReadonlySet<string> = new Set([
+  'graphorin.session.id',
+  'graphorin.run.id',
+]);
+
 export function createTracer(opts: TracerOptions): GraphorinTracer {
   const serviceName = opts.serviceName ?? 'graphorin';
   const sampler = createSampler(opts.sampling ?? {});
@@ -269,7 +279,15 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     // here makes the knob effective - untagged framework attributes carry the
     // configured tier instead of the validator's hardcoded fallback.
     const out: Record<string, Sensitivity> = {};
-    for (const key of Object.keys(attrs)) out[key] = defaultAttrSensitivity;
+    for (const key of Object.keys(attrs)) {
+      // SESSION-R-01: correlation/routing identifiers are opaque keys, never
+      // sensitive content, and the span exporter keys replay rows on
+      // `graphorin.session.id`. Tagging them 'public' keeps them below any
+      // validation floor so a span stays keyed (and replayable) instead of
+      // being silently un-keyed when the default 'public' export floor strips
+      // the otherwise-'internal' identifier.
+      out[key] = ROUTING_ID_ATTRIBUTES.has(key) ? 'public' : defaultAttrSensitivity;
+    }
     return Object.freeze(out);
   }
 

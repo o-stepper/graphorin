@@ -1,9 +1,10 @@
 /**
  * Per-provider model-tier auto-classifier - returns
- * `'fast' | 'balanced' | 'smart' | undefined` for any model id. The
- * classifier is consumed by the agent runtime (Phase 12) to validate
- * operator-supplied tier mappings and to surface tier-not-mapped
- * recommendations.
+ * `'fast' | 'balanced' | 'smart' | undefined` for any model id. It is a
+ * standalone inspection helper (for CLIs, dashboards, lint rules); it has
+ * no agent-runtime consumers - the agent resolves the per-step tier from
+ * `Agent.modelTierMap` directly, and `createAgent()` validates that map
+ * structurally rather than by consulting this classifier.
  *
  * The dispatcher is a pure function; it reads from a small static
  * rule table keyed on regex patterns matched against the lowercased
@@ -62,8 +63,11 @@ export const CLASSIFIER_RULES: readonly ClassifierRule[] = Object.freeze([
     pattern: /^anthropic\.claude(?:-[\d.]+)*-?opus/,
   },
   // OpenAI.
-  { tier: 'fast', family: 'openai-mini', pattern: /^gpt-(\d|\d+\.\d+)-?mini/ },
-  { tier: 'fast', family: 'openai-nano', pattern: /^gpt-(\d|\d+\.\d+)-?nano/ },
+  // MODEL-FAL-01: allow an 'o' version suffix so the gpt-4o family classifies
+  // (the old `(\d|\d+\.\d+)` stopped at the 'o' in `gpt-4o-mini`, leaving it
+  // unclassified - and the balanced rule's mini/nano lookahead excludes it).
+  { tier: 'fast', family: 'openai-mini', pattern: /^gpt-[\d.]+o?-?mini/ },
+  { tier: 'fast', family: 'openai-nano', pattern: /^gpt-[\d.]+o?-?nano/ },
   { tier: 'balanced', family: 'openai-gpt', pattern: /^gpt-(?!.*(?:mini|nano))/ },
   { tier: 'smart', family: 'openai-reasoning', pattern: /^o[1-9]\b/ },
   { tier: 'smart', family: 'openai-reasoning-extended', pattern: /^o[1-9][a-z-]/ },

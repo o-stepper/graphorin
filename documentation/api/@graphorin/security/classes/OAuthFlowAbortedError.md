@@ -6,7 +6,7 @@
 
 # Class: OAuthFlowAbortedError
 
-Defined in: [packages/security/src/oauth/errors.ts:145](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L145)
+Defined in: [packages/security/src/oauth/errors.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L210)
 
 Thrown when the OAuth flow is aborted via an `AbortSignal`.
 
@@ -24,7 +24,7 @@ Thrown when the OAuth flow is aborted via an `AbortSignal`.
 new OAuthFlowAbortedError(stage): OAuthFlowAbortedError;
 ```
 
-Defined in: [packages/security/src/oauth/errors.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L146)
+Defined in: [packages/security/src/oauth/errors.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L211)
 
 #### Parameters
 

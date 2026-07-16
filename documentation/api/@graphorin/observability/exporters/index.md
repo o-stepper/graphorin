@@ -70,6 +70,12 @@ Re-exports [SpanRecordEvent](/api/@graphorin/observability/interfaces/SpanRecord
 
 ***
 
+### toOtlpEnvelope
+
+Re-exports [toOtlpEnvelope](/api/@graphorin/observability/functions/toOtlpEnvelope.md)
+
+***
+
 ### TraceExporter
 
 Re-exports [TraceExporter](/api/@graphorin/observability/interfaces/TraceExporter.md)

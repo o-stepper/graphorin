@@ -6,7 +6,7 @@
 
 # Class: OAuthCallbackError
 
-Defined in: [packages/security/src/oauth/errors.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L111)
+Defined in: [packages/security/src/oauth/errors.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L176)
 
 Thrown when the localhost callback handler receives a request that
 does not match the original PKCE verifier / state parameter.
@@ -25,7 +25,7 @@ does not match the original PKCE verifier / state parameter.
 new OAuthCallbackError(message, options?): OAuthCallbackError;
 ```
 
-Defined in: [packages/security/src/oauth/errors.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L112)
+Defined in: [packages/security/src/oauth/errors.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L177)
 
 #### Parameters
 

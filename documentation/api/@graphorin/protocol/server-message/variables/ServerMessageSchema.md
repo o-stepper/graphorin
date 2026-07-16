@@ -7,12 +7,22 @@
 # Variable: ServerMessageSchema
 
 ```ts
-const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodObject<{
+const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodEffects<ZodObject<{
   id: ZodUnion<[ZodString, ZodNumber]>;
   jsonrpc: ZodLiteral<"2.0">;
   result: ZodUnknown;
   v: ZodLiteral<"1">;
 }, "strict", ZodTypeAny, {
+  id: string | number;
+  jsonrpc: "2.0";
+  result?: unknown;
+  v: "1";
+}, {
+  id: string | number;
+  jsonrpc: "2.0";
+  result?: unknown;
+  v: "1";
+}>, {
   id: string | number;
   jsonrpc: "2.0";
   result?: unknown;
@@ -114,7 +124,7 @@ const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodObject<{
 }>]>]>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:163](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L163)
+Defined in: [packages/protocol/src/server-message.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L170)
 
 Zod schema for every legal server → client frame. Validation runs
 twice in the server pipeline: first when a route handler enqueues

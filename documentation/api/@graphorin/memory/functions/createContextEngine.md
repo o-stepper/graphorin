@@ -10,7 +10,7 @@
 function createContextEngine(config?): ContextEngine;
 ```
 
-Defined in: [packages/memory/src/context-engine/engine.ts:261](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/engine.ts#L261)
+Defined in: [packages/memory/src/context-engine/engine.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/engine.ts#L243)
 
 Build a ContextEngine instance from the supplied configuration.
 

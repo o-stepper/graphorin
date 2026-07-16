@@ -6,7 +6,7 @@
 
 # Class: OAuthCallbackPortError
 
-Defined in: [packages/security/src/oauth/errors.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L158)
+Defined in: [packages/security/src/oauth/errors.ts:223](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L223)
 
 Thrown when no localhost port in the configured range can accept a
 binding (e.g. another process has every port in the range open).
@@ -28,7 +28,7 @@ new OAuthCallbackPortError(
    attempts): OAuthCallbackPortError;
 ```
 
-Defined in: [packages/security/src/oauth/errors.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L159)
+Defined in: [packages/security/src/oauth/errors.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/errors.ts#L224)
 
 #### Parameters
 

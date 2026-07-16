@@ -10,7 +10,7 @@
 function rollup(checks): HealthRollup;
 ```
 
-Defined in: [packages/server/src/health/checks.ts:353](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L353)
+Defined in: [packages/server/src/health/checks.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L362)
 
 Promote the worst per-check status to the rollup label.
 

@@ -69,6 +69,33 @@ describe('@graphorin/observability/gen-ai - per-attribute sensitivity defaults c
     expect(attrs['gen_ai.tool.call.id']).toBe('call_001');
     expect(attrs['gen_ai.tool.description']).toBe('Search the web for the supplied query.');
   });
+
+  it('SESSION-R-01: graphorin.session.id / run.id survive the default minTier=public exporter (routing keys)', async () => {
+    const records: SpanRecord[] = [];
+    // defaultAttributeSensitivity 'internal' would strip these under the
+    // default 'public' floor - but routing ids must stay keyable.
+    const tracer = createTracer({ exporters: [collector(records)], warnSink: () => {} });
+    await tracer.span(
+      {
+        type: 'agent.run',
+        attrs: {
+          'graphorin.session.id': 'sess-keyed',
+          'graphorin.run.id': 'run-keyed',
+          'graphorin.some.internal': 'stripped',
+        },
+      },
+      async () => {},
+    );
+    await tracer.shutdown();
+    const record = records[0];
+    const attrs = record?.attributes ?? {};
+    // Routing ids survive; the untagged 'internal' attribute is stripped.
+    expect(attrs['graphorin.session.id']).toBe('sess-keyed');
+    expect(attrs['graphorin.run.id']).toBe('run-keyed');
+    expect(attrs['graphorin.some.internal']).toBeUndefined();
+    // Their sensitivity tier is recorded as 'public'.
+    expect(record?.sensitivityByAttribute?.['graphorin.session.id']).toBe('public');
+  });
 });
 
 function collector(records: SpanRecord[]): TraceExporter {

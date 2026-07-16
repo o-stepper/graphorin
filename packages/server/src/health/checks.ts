@@ -87,6 +87,13 @@ export interface TriggersCheck extends BaseHealthCheck {
   readonly active: number;
   readonly disabled: number;
   readonly deferred: number;
+  /**
+   * SERVER-DO-01: count of persisted triggers whose declaration is not
+   * registered in this process (they will never fire until re-registered or
+   * pruned). The daemon status already exposes this; the health check now
+   * surfaces it too.
+   */
+  readonly orphaned: number;
   readonly lastFireAt?: string;
 }
 
@@ -263,6 +270,7 @@ export async function collectHealth(options: HealthCheckOptions): Promise<Health
         active: status.active,
         disabled: status.disabled,
         deferred: status.deferred,
+        orphaned: status.orphaned ?? 0,
         ...(status.lastFireAt !== undefined ? { lastFireAt: status.lastFireAt } : {}),
       };
     } catch (err) {
@@ -272,6 +280,7 @@ export async function collectHealth(options: HealthCheckOptions): Promise<Health
         active: 0,
         disabled: 0,
         deferred: 0,
+        orphaned: 0,
         message: err instanceof Error ? err.message : String(err),
       };
     }

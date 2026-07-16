@@ -66,7 +66,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1342](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1342)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1348](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1348)
 
 Soft-delete a fact (kept for replay; never hard-deleted).
 
@@ -93,7 +93,7 @@ fuse(
 options?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1380](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1380)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1386](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1386)
 
 Fuse multiple ranked lists outside of a `search()` call.
 
@@ -119,7 +119,7 @@ Fuse multiple ranked lists outside of a `search()` call.
 get(scope, factId): Promise<Fact | null>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1158](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1158)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1164](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1164)
 
 Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
@@ -142,7 +142,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 history(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1188](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1188)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1194](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1194)
 
 Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
@@ -175,7 +175,7 @@ neighbors(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1149](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1149)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1155](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1155)
 
 Raw vector KNN neighbours for the consolidator's reconcile
 pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
@@ -213,7 +213,7 @@ purge(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1361](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1361)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1367](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1367)
 
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
@@ -349,7 +349,7 @@ searchIterative(
 opts?): Promise<IterativeRecallResult>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1072](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1072)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1078](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1078)
 
 Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
@@ -419,7 +419,7 @@ supersede(
 }>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1302](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1302)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1308](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1308)
 
 Mark `oldId` superseded by a new fact. Returns the new record.
 
@@ -466,7 +466,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1228](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1228)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1234](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1234)
 
 Promote a quarantined fact to `active` (P1-4). The validation path
 that admits a synthesized memory into action-driving recall once a
@@ -509,7 +509,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1389](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1389)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1395](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1395)
 
 Pure-fusion helper - exposed for callers that already collected results.
 
@@ -541,7 +541,7 @@ static fuseWeighted<TRecord>(
    k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:1402](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1402)
+Defined in: [packages/memory/src/tiers/semantic-memory.ts:1408](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L1408)
 
 Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by

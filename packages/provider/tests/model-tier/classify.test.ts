@@ -52,6 +52,11 @@ describe('classifyModelTier - per-family fixtures', () => {
     ['gpt-5.5-mini', 'fast'],
     ['gpt-5.5-nano', 'fast'],
     ['gpt-5.5', 'balanced'],
+    // MODEL-FAL-01: the gpt-4o family carries an 'o' version suffix.
+    ['gpt-4o-mini', 'fast'],
+    ['gpt-4o-mini-2024-07-18', 'fast'],
+    ['gpt-4o', 'balanced'],
+    ['gpt-4.1-mini', 'fast'],
     ['o1', 'smart'],
     ['o3-pro', 'smart'],
     ['gemini-2.5-flash', 'fast'],

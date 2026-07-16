@@ -12,7 +12,7 @@ function classifyModelTier(provider):
   | undefined;
 ```
 
-Defined in: [packages/provider/src/model-tier/classify.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/model-tier/classify.ts#L83)
+Defined in: [packages/provider/src/model-tier/classify.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/model-tier/classify.ts#L87)
 
 Classify a `Provider`'s `modelId` into one of `'fast' | 'balanced' |
 'smart'`. Returns `undefined` when the model id matches none of the

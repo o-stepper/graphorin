@@ -108,8 +108,15 @@ const store = await createSqliteStore({ path: './assistant.db' });
 await store.init();
 const memory = createMemory({ store: store.memory, embeddings: store.embeddings });
 
-// Persist every span, keyed by the `graphorin.session.id` attribute.
-const tracer = createTracer({ exporters: [withValidation(createSqliteSpanExporter(store.connection))] });
+// Persist every span, keyed by the `graphorin.session.id` attribute. Raise the
+// export floor to `internal` so the run's framework telemetry (tagged
+// `internal` by default) is persisted rather than stripped by the default
+// `public` floor - the routing ids (`graphorin.session.id` / `graphorin.run.id`)
+// are always `public` so a span stays keyed regardless. Secret-tier attributes
+// are still stripped at export, and replay masks secret/PII patterns.
+const tracer = createTracer({
+  exporters: [withValidation(createSqliteSpanExporter(store.connection), { minTier: 'internal' })],
+});
 
 // Read a session's spans back as the `traceSource` Session.replay() consumes.
 const manager = createSessionManager({
@@ -119,7 +126,7 @@ const manager = createSessionManager({
 });
 ```
 
-With that wiring, `session.replay()` (no arguments) reproduces the real run instead of emitting only `replay.start` / `replay.end`. Without it, replay falls back to the empty source. Replays are sanitised by default. The `spans` table grows until you prune it: `graphorin traces prune --before <date>` (or the `pruneSpans` primitive from `@graphorin/store-sqlite`) deletes spans that finished before the cutoff, and a session hard-delete removes that session's spans as part of the erasure cascade; the same `spans` table backs the `graphorin memory why` introspection. See [Standalone server](/guide/standalone-server) for the REST surface.
+With that wiring, `session.replay()` (no arguments) reproduces the real run instead of emitting only `replay.start` / `replay.end`. Without it, replay falls back to the empty source. Replays are sanitised by default: the replay floor defaults to `internal` (framework spans are `internal`), so secret-tier attributes are excluded and secret/PII pattern hits are masked; pass `minSensitivity: 'public'` for a stricter replay or `raw: true` (gated on `traces:read:raw`) to bypass sanitisation. The `spans` table grows until you prune it: `graphorin traces prune --before <date>` (or the `pruneSpans` primitive from `@graphorin/store-sqlite`) deletes spans that finished before the cutoff, and a session hard-delete removes that session's spans as part of the erasure cascade; the same `spans` table backs the `graphorin memory why` introspection. See [Standalone server](/guide/standalone-server) for the REST surface.
 
 ## GenAI Semantic Convention attributes
 

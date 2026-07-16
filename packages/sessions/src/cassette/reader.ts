@@ -88,6 +88,12 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
     } catch {
       throw new CassetteFormatInvalidError(`malformed JSONL on line ${i + 1}`);
     }
+    // SESSION-R-03: a JSON `null` / array / scalar line parses cleanly but is
+    // not a record - reading `.kind` off it threw a raw TypeError instead of
+    // the typed format error. Reject it here.
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      throw new CassetteFormatInvalidError(`line ${i + 1} is not a JSON object`);
+    }
     if (parsed.kind === 'footer') {
       footer = parsed as unknown as ToolCassetteFooterRecord;
       continue;

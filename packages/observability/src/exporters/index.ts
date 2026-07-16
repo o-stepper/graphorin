@@ -21,6 +21,7 @@ export {
 export {
   createOTLPHttpExporter,
   type OTLPHttpExporterOptions,
+  toOtlpEnvelope,
 } from './otlp-http.js';
 export type {
   SpanRecord,
