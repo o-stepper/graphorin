@@ -394,6 +394,12 @@ Re-exports [OAuthRegistration](/api/@graphorin/security/interfaces/OAuthRegistra
 
 ***
 
+### OAuthRegistrationError
+
+Re-exports [OAuthRegistrationError](/api/@graphorin/security/classes/OAuthRegistrationError.md)
+
+***
+
 ### OAuthRegistrationUnsupportedError
 
 Re-exports [OAuthRegistrationUnsupportedError](/api/@graphorin/security/classes/OAuthRegistrationUnsupportedError.md)
@@ -463,6 +469,12 @@ Re-exports [postToTokenEndpoint](/api/@graphorin/security/functions/postToTokenE
 ### ProtectedResourceMetadata
 
 Re-exports [ProtectedResourceMetadata](/api/@graphorin/security/interfaces/ProtectedResourceMetadata.md)
+
+***
+
+### readOAuthErrorFields
+
+Re-exports [readOAuthErrorFields](/api/@graphorin/security/functions/readOAuthErrorFields.md)
 
 ***
 

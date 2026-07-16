@@ -106,7 +106,12 @@ export function createSessionReplayer(opts: CreateSessionReplayerOptions = {}): 
         throw new ReplayAccessDeniedError(input.target);
       }
       const mode: ReplayMode = raw ? 'raw' : 'sanitized';
-      const minSensitivity: Sensitivity = input.minSensitivity ?? 'public';
+      // SESSION-R-02: default the sanitized-replay floor to 'internal' so the
+      // documented no-argument session.replay() reproduces the run - framework
+      // spans carry 'internal' attributes, so a 'public' floor skipped every
+      // one of them. Secret-tier attributes stay excluded, and sanitized mode
+      // still masks secret/PII pattern hits.
+      const minSensitivity: Sensitivity = input.minSensitivity ?? 'internal';
       const traceSource = input.traceSource ?? emptySource;
       const runInput: ReplayRunInput = {
         source: traceSource,

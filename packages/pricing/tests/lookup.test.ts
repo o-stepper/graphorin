@@ -216,6 +216,32 @@ describe('prompt-cache write pricing + date-suffix fallback (core-provider-02/03
     const inputRate = price?.inputUsdPerToken ?? 0;
     expect((withWrite?.amount ?? 0) - (base?.amount ?? 0)).toBeCloseTo(inputRate * 2_000, 12);
   });
+
+  it('falls back to the input rate for cached reads when the entry has no read price (PROVIDER-01)', () => {
+    // mistral-large declares an input rate but no cachedReadUsdPerToken; the
+    // documented fallback bills cached reads at the full input rate (never $0),
+    // mirroring the cache-write leg.
+    const price = lookupPrice({ provider: 'mistral', model: 'mistral-large-2411' });
+    expect(price?.cachedReadUsdPerToken).toBeUndefined();
+    const base = calculateCost({
+      provider: 'mistral',
+      model: 'mistral-large-2411',
+      inputTokens: 0,
+      outputTokens: 0,
+    });
+    const withCachedRead = calculateCost({
+      provider: 'mistral',
+      model: 'mistral-large-2411',
+      inputTokens: 0,
+      outputTokens: 0,
+      cachedReadTokens: 2_000,
+    });
+    const inputRate = price?.inputUsdPerToken ?? 0;
+    expect(inputRate).toBeGreaterThan(0);
+    const delta = (withCachedRead?.amount ?? 0) - (base?.amount ?? 0);
+    expect(delta).toBeCloseTo(inputRate * 2_000, 12);
+    expect(delta).toBeGreaterThan(0); // NOT $0
+  });
 });
 
 describe('W-045 - Cost.amount units pin (whole dollars, never minor units)', () => {

@@ -54,7 +54,10 @@ export function createReplay(opts: ReplayOptions = {}): Replay {
   return {
     async *run(input: ReplayRunInput): AsyncIterable<ReplayEvent> {
       const mode = input.mode ?? 'sanitized';
-      const minSensitivity: Sensitivity = input.minSensitivity ?? 'public';
+      // SESSION-R-02: default the sanitized-replay floor to 'internal' so
+      // 'internal'-tier framework spans replay by default (secret-tier stays
+      // excluded; sanitized mode still masks secret/PII patterns).
+      const minSensitivity: Sensitivity = input.minSensitivity ?? 'internal';
       const actor = input.actor ?? defaultActor;
       const start = Date.now();
 

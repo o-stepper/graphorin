@@ -422,6 +422,15 @@ class SchedulerImpl implements Scheduler {
   #parsedCron: Map<string, ParsedCron> = new Map();
   #declarations: Map<string, TriggerDeclaration> = new Map();
   /**
+   * TRIGGERS-01: ids whose persistent `disabled` flag is set. Mirrors the
+   * store's `disabled` column for the triggers this process manages so `fire()`
+   * can reject a paused trigger synchronously - a per-fire `store.get()` would
+   * add latency to the hot path and reorder event emission under a fake clock.
+   * Kept in sync at every disable/enable mutation (register / start /
+   * setDisabled / auto-pause / unregister).
+   */
+  #disabled: Set<string> = new Set();
+  /**
    * Triggers whose register-time catch-up was deferred because the
    * scheduler had not started yet (W-123): user callbacks must never
    * fire before `start()`. Drained by `start()`.
@@ -481,6 +490,10 @@ class SchedulerImpl implements Scheduler {
       ...(existing !== null ? { updatedAt: new Date(now).toISOString() } : {}),
     };
     await this.#store.upsert(state);
+    // TRIGGERS-01: keep the in-memory disabled mirror in step with the row we
+    // just wrote (a re-registered trigger inherits the persisted disabled flag).
+    if (state.disabled) this.#disabled.add(declaration.id);
+    else this.#disabled.delete(declaration.id);
 
     this.#publish({ type: 'registered', id: declaration.id, kind: declaration.kind });
 
@@ -501,6 +514,7 @@ class SchedulerImpl implements Scheduler {
 
   async unregister(id: string): Promise<void> {
     this.#cancelHandle(id);
+    this.#disabled.delete(id);
     this.#declarations.delete(id);
     this.#parsedCron.delete(id);
     this.#pendingCatchup.delete(id);
@@ -529,7 +543,13 @@ class SchedulerImpl implements Scheduler {
         this.#publish({ type: 'orphaned', id: state.id });
         continue;
       }
-      if (state.disabled) continue;
+      if (state.disabled) {
+        // TRIGGERS-01: durable-disabled rows must stay paused after a restart
+        // on the emit()/manual paths too, not only skip timer scheduling.
+        this.#disabled.add(state.id);
+        continue;
+      }
+      this.#disabled.delete(state.id);
       this.#schedule(state.id, state);
     }
     await this.#drainPendingCatchup();
@@ -565,6 +585,14 @@ class SchedulerImpl implements Scheduler {
       // fire() / catch-up must honour expiry too - auto-pause, never
       // run the callback.
       await this.#autoPauseExpired(id);
+      return;
+    }
+    // TRIGGERS-01: a paused (disabled) trigger must not fire on ANY path.
+    // The timer loop already skips disabled rows, but emit() / manual fire()
+    // only checked expiry, so event triggers could not actually be paused.
+    // Checked against the in-memory mirror so the hot path stays synchronous
+    // (see the #disabled field note).
+    if (this.#disabled.has(id)) {
       return;
     }
     const firedAt = this.#now();
@@ -638,6 +666,7 @@ class SchedulerImpl implements Scheduler {
     const nowIso = new Date(this.#now()).toISOString();
     if (disabled) {
       this.#cancelHandle(id);
+      this.#disabled.add(id); // TRIGGERS-01: gate emit()/manual fire() too.
       const updated: TriggerState = { ...state, disabled: true, updatedAt: nowIso };
       await this.#store.upsert(updated);
       return updated;
@@ -656,6 +685,7 @@ class SchedulerImpl implements Scheduler {
       ...(nextMs !== null ? { nextFireAt: new Date(nextMs).toISOString() } : {}),
       updatedAt: nowIso,
     };
+    this.#disabled.delete(id); // TRIGGERS-01: re-enable clears the fire gate.
     await this.#store.upsert(updated);
     if (this.#started) this.#schedule(id, updated);
     return updated;
@@ -781,6 +811,7 @@ class SchedulerImpl implements Scheduler {
         disabled: true,
         updatedAt: new Date(this.#now()).toISOString(),
       });
+      this.#disabled.add(id); // TRIGGERS-01: auto-pause gates fire() too.
       console.warn(
         `[graphorin/triggers] trigger '${id}' passed its expiresAt - auto-paused ` +
           `(non-destructive). Re-register with a later expiresAt and re-enable, or prune ` +

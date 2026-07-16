@@ -10,6 +10,6 @@
 type ServerErrorFrame = z.infer<typeof ErrorFrame>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L182)
+Defined in: [packages/protocol/src/server-message.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L189)
 
 ## Stable

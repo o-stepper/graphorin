@@ -61,6 +61,20 @@ describe('weighted fusion via search() (X-2)', () => {
     });
     expect(zeroed.length).toBeGreaterThan(0);
     for (const hit of zeroed) expect(hit.signals?.rrf).toBe(0); // vector contribution zeroed
+  });
+
+  it('MEMORY-R-02: a malformed per-call weight degrades to neutral instead of throwing', async () => {
+    const memory = seededMemory();
+    await memory.semantic.remember(scope, { text: 'alpha gizmo' }, PIPELINE_OFF);
+    await memory.semantic.remember(scope, { text: 'beta widget' }, PIPELINE_OFF);
+    // A NaN weight used to reach the WeightedRRFReranker constructor and throw,
+    // failing the whole search; it must degrade to the neutral default.
+    const def = await memory.semantic.search(scope, 'alpha');
+    const malformed = await memory.semantic.search(scope, 'alpha', {
+      fusion: { strategy: 'weighted', weights: { fts: Number.NaN, vector: -3 } },
+    });
+    // Both weights degrade to 1 => identical to the default RRF ranking.
+    expect(ids(malformed)).toEqual(ids(def));
 
     const baseline = await memory.semantic.search(scope, 'zzz');
     expect(baseline.some((hit) => (hit.signals?.rrf ?? 0) > 0)).toBe(true); // default counts it

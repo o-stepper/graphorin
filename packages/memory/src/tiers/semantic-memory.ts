@@ -822,10 +822,16 @@ export class SemanticMemory {
         // fusion runs through the configured reranker (RRF by default).
         const weighted =
           opts.fusion !== undefined && opts.fusion.strategy === 'weighted' ? opts.fusion : null;
-        const wFts = weighted?.weights.fts ?? 1;
-        const wVector = weighted?.weights.vector ?? 1;
-        const wGraph = weighted?.weights.graph ?? 1;
-        const wEntity = weighted?.weights.entity ?? 1;
+        // MEMORY-R-02: a malformed per-call weight (NaN / negative / non-number)
+        // must degrade to the neutral default rather than throw from the
+        // WeightedRRFReranker constructor and fail the whole search - `?? 1`
+        // only covered missing keys.
+        const neutralWeight = (v: number | undefined): number =>
+          typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : 1;
+        const wFts = neutralWeight(weighted?.weights.fts);
+        const wVector = neutralWeight(weighted?.weights.vector);
+        const wGraph = neutralWeight(weighted?.weights.graph);
+        const wEntity = neutralWeight(weighted?.weights.entity);
         // P2-3: fan the query into reworded variants when opted-in *and*
         // a transformer is configured; otherwise this is just `[query]`
         // (single-shot, no provider call - the offline default).

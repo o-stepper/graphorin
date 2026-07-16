@@ -24,6 +24,20 @@ const DEFAULT_AVG_SCORE_DROP = 0.05;
 const DEFAULT_AVG_DURATION_INCREASE_MS = Number.POSITIVE_INFINITY;
 
 /**
+ * EVALS-REP-01: the boundary is EXCLUSIVE - a metric regresses only when it moves
+ * BEYOND its tolerance (a drop exactly equal to the tolerance is tolerated). But
+ * naive float subtraction makes an at-tolerance drop (e.g. a 5.00pp drop that
+ * `(1 - 0.95) * 100` computes as `5.000000000000004`) overshoot by ~1e-15 and
+ * flip to a spurious regression. Require the overshoot to exceed a small epsilon
+ * so exact-boundary values never count while any real drop still does.
+ */
+const REGRESSION_EPSILON = 1e-9;
+
+function exceedsTolerance(value: number, tolerance: number): boolean {
+  return value - tolerance > REGRESSION_EPSILON;
+}
+
+/**
  * Detect regressions between `current` and `baseline` reports.
  *
  * @stable
@@ -42,7 +56,7 @@ export function detectRegressions<I, O>(
   const currentPassRate = total(current) === 0 ? 0 : current.summary.passed / total(current);
   const baselinePassRate = total(baseline) === 0 ? 0 : baseline.summary.passed / total(baseline);
   const passRateDropPct = (baselinePassRate - currentPassRate) * 100;
-  if (passRateDropPct > maxPassRateDropPct) {
+  if (exceedsTolerance(passRateDropPct, maxPassRateDropPct)) {
     // E8 (evals-05/08): the fixed tolerance is sample-size blind, so pair the
     // shared cases and run McNemar's test. The p-value is always attached for
     // the report; it VETOES the finding only under opt-in requireSignificance.
@@ -72,7 +86,7 @@ export function detectRegressions<I, O>(
   }
 
   const durationDelta = current.summary.avgDurationMs - baseline.summary.avgDurationMs;
-  if (durationDelta > maxAvgDurationIncreaseMs) {
+  if (exceedsTolerance(durationDelta, maxAvgDurationIncreaseMs)) {
     findings.push({
       kind: 'avg-duration-increase',
       message:
@@ -96,7 +110,7 @@ export function detectRegressions<I, O>(
     }
     if (typeof baselineRow.avgScore === 'number' && typeof currentRow.avgScore === 'number') {
       const drop = baselineRow.avgScore - currentRow.avgScore;
-      if (drop > maxAvgScoreDrop) {
+      if (exceedsTolerance(drop, maxAvgScoreDrop)) {
         findings.push({
           kind: 'avg-score-drop',
           scorer,

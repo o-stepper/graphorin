@@ -150,4 +150,64 @@ describe('detectRegressions', () => {
     });
     expect(r.hasRegressions).toBe(false);
   });
+
+  // EVALS-REP-01: the boundary is exclusive and float-robust. A pass-rate drop
+  // that lands EXACTLY on the tolerance must not flag, even when float
+  // subtraction overshoots by ~1e-15 (e.g. (1 - 0.95) * 100 = 5.000000000000004).
+  it('does NOT flag a pass-rate drop that lands exactly on the tolerance', () => {
+    const baseline = makeReport({
+      total: 20,
+      passed: 20,
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 20, failed: 0, avgScore: 1 } },
+    });
+    const current = makeReport({
+      total: 20,
+      passed: 19, // 95% -> a 5.00pp drop, computed as 5.000000000000004
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 19, failed: 1, avgScore: 0.95 } },
+    });
+    // Sanity: the raw delta really does overshoot, so a naive `> 5` would flag.
+    expect((1 - 19 / 20) * 100).toBeGreaterThan(5);
+    const r = detectRegressions(current, baseline, { maxPassRateDropPct: 5 });
+    expect(r.hasRegressions).toBe(false);
+  });
+
+  it('DOES flag a pass-rate drop that genuinely exceeds the tolerance', () => {
+    const baseline = makeReport({
+      total: 20,
+      passed: 20,
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 20, failed: 0, avgScore: 1 } },
+    });
+    const current = makeReport({
+      total: 20,
+      passed: 18, // 90% -> a 10pp drop, well beyond a 5pp tolerance
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 18, failed: 2, avgScore: 0.9 } },
+    });
+    const r = detectRegressions(current, baseline, { maxPassRateDropPct: 5 });
+    expect(r.hasRegressions).toBe(true);
+    expect(r.findings.some((f) => f.kind === 'pass-rate-drop')).toBe(true);
+  });
+
+  // EVALS-REP-01: same exclusive+epsilon contract on the per-scorer avg-score gate.
+  it('does NOT flag an avg-score drop that lands exactly on the tolerance', () => {
+    const baseline = makeReport({
+      total: 10,
+      passed: 10,
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 10, failed: 0, avgScore: 0.9 } },
+    });
+    const current = makeReport({
+      total: 10,
+      passed: 10,
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 10, failed: 0, avgScore: 0.7 } }, // 0.9 - 0.7 = 0.20000000000000007
+    });
+    // Sanity: the raw drop overshoots 0.2, so a naive `> 0.2` would flag.
+    expect(0.9 - 0.7).toBeGreaterThan(0.2);
+    const r = detectRegressions(current, baseline, { maxAvgScoreDrop: 0.2 });
+    expect(r.findings.some((f) => f.kind === 'avg-score-drop')).toBe(false);
+  });
 });

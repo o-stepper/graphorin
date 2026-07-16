@@ -208,25 +208,7 @@ const DEFAULT_LAYER_CAPS: Readonly<
   autoRecall: undefined,
 };
 
-let compactionIneffectiveWarned = false;
 let heuristicCounterWarned = false;
-
-/** Emit the "compaction enabled but ineffective" warning at most once (CE-12). */
-function warnCompactionIneffective(message: string): void {
-  if (compactionIneffectiveWarned) return;
-  compactionIneffectiveWarned = true;
-  process.stderr.write(`[graphorin/memory] ${message}\n`);
-}
-
-/**
- * Test-only - reset the one-time CE-12 compaction warning so a test can assert
- * it fires.
- *
- * @internal
- */
-export function _resetCompactionWarningForTesting(): void {
-  compactionIneffectiveWarned = false;
-}
 
 /** @internal - test seam for the one-time heuristic-counter warning (CE-13). */
 export function _resetHeuristicCounterWarningForTesting(): void {
@@ -314,13 +296,19 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   // Compaction config resolution.
   const compactionInput = config.compaction;
   const compactionAutoDefault = resolveAutoCompactionDefault(providerTrust);
+  const providerContextWindow = config.providerContextWindow ?? null;
+  // MEMORY-C-03: the trust-based default-on only takes effect when a
+  // `providerContextWindow` is actually present. Without a window the trigger
+  // threshold is Infinity and compaction can never fire, so leaving a bare
+  // `createMemory()` "on" was a dead default that warned on every construction.
+  // Gate the default so the bare case is simply off (and silent); an EXPLICIT
+  // compaction config without a window still throws below (CE-12).
   const compactionEnabled =
     compactionInput === false
       ? false
       : compactionInput === undefined
-        ? compactionAutoDefault === 'enabled'
+        ? compactionAutoDefault === 'enabled' && providerContextWindow !== null
         : compactionInput.trigger !== 'never';
-  const providerContextWindow = config.providerContextWindow ?? null;
   const triggerSpec =
     compactionInput === false || compactionInput === undefined
       ? undefined
@@ -334,22 +322,20 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
           reservedForCompaction,
         })
       : Number.POSITIVE_INFINITY;
-  // CE-12: compaction enabled without a `providerContextWindow` leaves the
-  // threshold at Infinity, so `shouldCompact` returns false forever - a
-  // silently-dead default-on protection. Surface it: throw if the operator
-  // explicitly configured compaction, warn (once) if it is on by the default
-  // trust policy. Auto-detecting the window from the provider is not
-  // implemented.
+  // CE-12: an EXPLICITLY-configured compaction with no `providerContextWindow`
+  // leaves the threshold at Infinity, so it could never fire - fail loudly
+  // instead of silently no-opping. The default-on path is gated on the window
+  // (MEMORY-C-03), so this branch is only reachable for explicit config; a bare
+  // `createMemory()` just leaves compaction off. Auto-detecting the window from
+  // the provider is not implemented.
   const compactionEffective = compactionEnabled && providerContextWindow !== null;
   if (compactionEnabled && providerContextWindow === null) {
-    const message =
-      'context-engine compaction is enabled but `providerContextWindow` is not set, so the ' +
-      'trigger threshold is Infinity and compaction will never fire. Pass `providerContextWindow` ' +
-      "(your model's context window, in tokens) - auto-detection from the provider is not implemented.";
-    if (compactionInput !== undefined && compactionInput !== false) {
-      throw new Error(`[graphorin/memory] ${message}`);
-    }
-    warnCompactionIneffective(message);
+    throw new Error(
+      '[graphorin/memory] context-engine compaction is enabled but `providerContextWindow` is ' +
+        'not set, so the trigger threshold is Infinity and compaction will never fire. Pass ' +
+        "`providerContextWindow` (your model's context window, in tokens) - auto-detection from " +
+        'the provider is not implemented.',
+    );
   }
   const compactionStrategy: CompactionStrategy =
     compactionInput === false ||

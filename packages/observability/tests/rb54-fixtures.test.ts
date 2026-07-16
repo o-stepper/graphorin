@@ -4,7 +4,7 @@
  * the working plan so a future audit grep finds them verbatim.
  */
 
-import type { SpanType } from '@graphorin/core';
+import type { KnownSpanType, SpanType } from '@graphorin/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { SpanRecord, TraceExporter } from '../src/exporters/index.js';
@@ -189,6 +189,74 @@ describe('openInferenceSpanKindAllApplicableTypes', () => {
     for (const [type, kind] of OPEN_INFERENCE_KIND_TABLE) {
       expect(openInferenceKindFor(type)).toBe(kind);
     }
+  });
+
+  // ORPHAN-SU-01: every KnownSpanType must be either mapped to an OpenInference
+  // kind or explicitly excluded - a new type that silently returns null from
+  // openInferenceKindFor is the exact gap that dropped the insight tier + the
+  // learned-context / curated-block / profile-projection / promotion phases.
+  // This record is compile-time exhaustive: adding a KnownSpanType without a row
+  // here is a type error, so the coverage check can never silently fall behind.
+  const ALL_KNOWN_SPAN_TYPES: Record<KnownSpanType, true> = {
+    'agent.run': true,
+    'agent.step': true,
+    'agent.handoff': true,
+    'agent.suspend': true,
+    'agent.resume': true,
+    'provider.generate': true,
+    'provider.stream': true,
+    'tool.execute': true,
+    'tool.approval': true,
+    'memory.read.working': true,
+    'memory.read.session': true,
+    'memory.read.episodic': true,
+    'memory.read.semantic': true,
+    'memory.read.procedural': true,
+    'memory.read.shared': true,
+    'memory.read.insight': true,
+    'memory.write.working': true,
+    'memory.write.session': true,
+    'memory.write.episodic': true,
+    'memory.write.semantic': true,
+    'memory.write.procedural': true,
+    'memory.write.shared': true,
+    'memory.write.insight': true,
+    'memory.search.working': true,
+    'memory.search.session': true,
+    'memory.search.episodic': true,
+    'memory.search.semantic': true,
+    'memory.search.procedural': true,
+    'memory.search.shared': true,
+    'memory.search.insight': true,
+    'memory.consolidate.light': true,
+    'memory.consolidate.standard': true,
+    'memory.consolidate.deep': true,
+    'memory.consolidate.reflect': true,
+    'memory.consolidate.learned-context': true,
+    'memory.consolidate.curated-block': true,
+    'memory.consolidate.profile-projection': true,
+    'memory.consolidate.promotion': true,
+    'memory.conflict': true,
+    'memory.embed': true,
+    'workflow.run': true,
+    'workflow.step': true,
+    'workflow.task': true,
+    'workflow.checkpoint': true,
+    'skill.activate': true,
+    'skill.load': true,
+    'mcp.connect': true,
+    'mcp.call': true,
+    'mcp.list-tools': true,
+  };
+
+  it('every KnownSpanType is mapped or explicitly excluded (ORPHAN-SU-01)', () => {
+    const excluded = new Set<SpanType>(OPEN_INFERENCE_EXCLUDED_TYPES);
+    const gaps: string[] = [];
+    for (const type of Object.keys(ALL_KNOWN_SPAN_TYPES) as KnownSpanType[]) {
+      const mapped = openInferenceKindFor(type) !== null;
+      if (!mapped && !excluded.has(type)) gaps.push(type);
+    }
+    expect(gaps).toEqual([]);
   });
 
   it('framework explicitly skips skill.* / mcp.connect / mcp.list-tools / replay.*', () => {

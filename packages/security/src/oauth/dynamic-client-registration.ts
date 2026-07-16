@@ -8,7 +8,12 @@
  */
 
 import { SecretValue } from '../secrets/secret-value.js';
-import { OAuthFlowAbortedError, OAuthRegistrationUnsupportedError } from './errors.js';
+import {
+  OAuthFlowAbortedError,
+  OAuthRegistrationError,
+  OAuthRegistrationUnsupportedError,
+  readOAuthErrorFields,
+} from './errors.js';
 import type { DiscoveredMetadata, DynamicClientRegistrationResult } from './types.js';
 
 /** Strategy hook used by tests to inject a synthetic registration response. */
@@ -106,9 +111,9 @@ export async function registerDynamicClient(
 
   const response = await postJson(endpoint, body, options.signal);
   if (!response.ok) {
-    throw new Error(
-      `Dynamic Client Registration failed: ${response.status} ${response.statusText ?? ''}`.trim(),
-    );
+    // OAUTH-ADV-01: surface the RFC 7591 error body, not just the HTTP status.
+    const fields = await readOAuthErrorFields(response.json);
+    throw new OAuthRegistrationError(response.status, response.statusText, fields);
   }
   const raw = (await response.json()) as Record<string, unknown>;
   const clientId = raw.client_id;

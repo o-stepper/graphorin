@@ -101,7 +101,12 @@ export function createOTLPHttpExporter(opts: OTLPHttpExporterOptions): TraceExpo
 }
 
 /**
- * @internal - exposed for unit tests
+ * Convert a finished {@link SpanRecord} into an OTLP-HTTP `resourceSpans`
+ * envelope. Exposed (OBS-PRIC-01) so an upstream OTel SDK pipeline can adapt
+ * Graphorin spans inside its own exporter, as the observability and migration
+ * guides document.
+ *
+ * @stable
  */
 export function toOtlpEnvelope(record: SpanRecord, serviceName: string): unknown {
   const otelStatus = record.status === 'ok' ? 1 : record.status === 'error' ? 2 : 0;

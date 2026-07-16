@@ -113,6 +113,21 @@ describe('Session replayer', () => {
     expect(events.some((e) => e.type === 'replay.skipped')).toBe(true);
   });
 
+  it('SESSION-R-02: the default replay floor is internal, so framework spans replay', async () => {
+    const replayer = createSessionReplayer();
+    const events: { type: string }[] = [];
+    // No minSensitivity - internal-tier framework spans must NOT be skipped by
+    // default (they were under the old 'public' default, making replay empty).
+    for await (const event of replayer.run({
+      target: 'session:s-1',
+      traceSource: [makeSpan('span-internal', 'internal')],
+    })) {
+      events.push(event);
+    }
+    expect(events.some((e) => e.type === 'replay.event')).toBe(true);
+    expect(events.some((e) => e.type === 'replay.skipped')).toBe(false);
+  });
+
   it('emits cassette substitution events after the trace replay completes', async () => {
     const replayer = createSessionReplayer();
     const cassetteRecord: ToolCallRecord = {

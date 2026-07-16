@@ -238,6 +238,12 @@ class ConsolidatorImpl implements Consolidator {
 
     this.#config = resolveConfig(opts);
     this.#bufferThresholdTokens = minBufferThreshold(this.#config.triggers);
+    // BUFFER-N-01: registerConsolidatorTriggers throws on a malformed spec, but
+    // a library-mode (buffer-only) deployment never calls it - createMemory
+    // would otherwise accept e.g. 'buffer:0' silently and leave notifyActivity()
+    // inert forever. Surface each unparseable spec as a one-shot construction
+    // WARN so the operator learns the loop it configured will never fire.
+    warnInvalidTriggerSpecs(this.#config.triggers);
     this.#lockManager = new LockManager({
       store: this.#consolidatorStore,
       waitMs: this.#config.lockWaitMs,
@@ -1281,4 +1287,24 @@ function minBufferThreshold(specs: ReadonlyArray<ConsolidatorTriggerSpec>): numb
     if (min === null || tokens < min) min = tokens;
   }
   return min;
+}
+
+/**
+ * BUFFER-N-01: emit a construction-time WARN for every trigger spec that fails
+ * to parse. `minBufferThreshold` swallows these silently (they are meant to fail
+ * loudly at registration), but a buffer-only library deployment never registers
+ * with a scheduler, so without this the invalid spec vanishes without a trace.
+ */
+function warnInvalidTriggerSpecs(specs: ReadonlyArray<ConsolidatorTriggerSpec>): void {
+  for (const spec of specs) {
+    try {
+      parseTriggerSpec(spec);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      process.stderr.write(
+        `${detail} This spec is IGNORED at construction, so the loop it was meant to arm ` +
+          `(e.g. the buffer memory-formation cycle) never fires. Fix the spec and re-create the consolidator.\n`,
+      );
+    }
+  }
 }

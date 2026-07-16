@@ -26,6 +26,7 @@ the project-wide convention of typed `kind` discriminators.
 - [`OAuthFlowAbortedError`](/api/@graphorin/security/classes/OAuthFlowAbortedError.md)
 - [`OAuthPeerDependencyMissingError`](/api/@graphorin/security/classes/OAuthPeerDependencyMissingError.md)
 - [`OAuthRefreshError`](/api/@graphorin/security/classes/OAuthRefreshError.md)
+- [`OAuthRegistrationError`](/api/@graphorin/security/classes/OAuthRegistrationError.md)
 - [`OAuthRegistrationUnsupportedError`](/api/@graphorin/security/classes/OAuthRegistrationUnsupportedError.md)
 - [`OAuthRevokedError`](/api/@graphorin/security/classes/OAuthRevokedError.md)
 

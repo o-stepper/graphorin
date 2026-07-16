@@ -1,9 +1,6 @@
 import type { Message } from '@graphorin/core';
 import { describe, expect, it, vi } from 'vitest';
-import {
-  _resetCompactionWarningForTesting,
-  _resetHeuristicCounterWarningForTesting,
-} from '../src/context-engine/engine.js';
+import { _resetHeuristicCounterWarningForTesting } from '../src/context-engine/engine.js';
 import {
   buildSummarizerPrompt,
   type CompactionSummarizer,
@@ -501,29 +498,28 @@ describe('context-engine - trigger evaluation perf (RB-46; Phase 10d)', () => {
 });
 
 describe('context-engine - compaction effectiveness (CE-12)', () => {
-  it('warns once + reports compactionEffective:false when enabled without a providerContextWindow', () => {
-    _resetCompactionWarningForTesting();
+  it('MEMORY-C-03: leaves compaction OFF and silent when the default trust would enable it but no window is set', () => {
     const writes: string[] = [];
     const spy = vi.spyOn(process.stderr, 'write').mockImplementation((chunk: unknown) => {
       writes.push(String(chunk));
       return true;
     });
     try {
-      // `public-tls` trust ⇒ compaction is default-enabled; no window supplied.
+      // `public-tls` trust would default-enable compaction, but without a
+      // providerContextWindow the trigger is a dead Infinity, so the default is
+      // gated off - and must NOT warn on construction (the bare createMemory UX).
       const engine = createContextEngine({ privacy: { providerTrust: 'public-tls' } });
       const cfg = engine.config();
-      expect(cfg.compactionEnabled).toBe(true);
+      expect(cfg.compactionEnabled).toBe(false);
       expect(cfg.compactionEffective).toBe(false);
-      // A second engine with the same misconfig does not re-warn (one-time).
       createContextEngine({ privacy: { providerTrust: 'public-tls' } });
-      expect(writes.filter((w) => w.includes('providerContextWindow')).length).toBe(1);
+      expect(writes.filter((w) => w.includes('providerContextWindow')).length).toBe(0);
     } finally {
       spy.mockRestore();
     }
   });
 
   it('throws when compaction is explicitly configured without a providerContextWindow', () => {
-    _resetCompactionWarningForTesting();
     expect(() =>
       createContextEngine({ compaction: { trigger: { thresholdTokens: 100 } } }),
     ).toThrow(/providerContextWindow/);

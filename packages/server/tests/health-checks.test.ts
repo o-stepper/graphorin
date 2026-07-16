@@ -140,4 +140,43 @@ describe('health/checks', () => {
     expect(summary.checks.consolidator?.status).toBe('fail');
     expect(summary.checks.consolidator?.message).toBe('store unavailable');
   });
+
+  it('surfaces the triggers orphaned count on the health check (SERVER-DO-01)', async () => {
+    const summary = await collectHealth({
+      triggers: {
+        async start() {},
+        async stop() {},
+        metrics: () => ({}) as never,
+        scheduler: {} as never,
+        async status() {
+          return {
+            running: true,
+            active: 2,
+            disabled: 1,
+            deferred: 0,
+            orphaned: 3,
+          };
+        },
+      },
+    });
+    expect(summary.checks.triggers?.status).toBe('ok');
+    // The daemon reports orphaned; the health check must copy it, not drop it.
+    expect(summary.checks.triggers?.orphaned).toBe(3);
+  });
+
+  it('reports orphaned:0 when the triggers status() throws (SERVER-DO-01)', async () => {
+    const summary = await collectHealth({
+      triggers: {
+        async start() {},
+        async stop() {},
+        metrics: () => ({}) as never,
+        scheduler: {} as never,
+        async status() {
+          throw new Error('daemon offline');
+        },
+      },
+    });
+    expect(summary.checks.triggers?.status).toBe('fail');
+    expect(summary.checks.triggers?.orphaned).toBe(0);
+  });
 });

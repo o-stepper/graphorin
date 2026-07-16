@@ -12,7 +12,7 @@ function openInferenceKindFor<T>(type):
   | null;
 ```
 
-Defined in: [packages/observability/src/openinference/index.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/openinference/index.ts#L104)
+Defined in: [packages/observability/src/openinference/index.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/openinference/index.ts#L114)
 
 Resolve the OpenInference span kind for a Graphorin span type.
 Returns `null` for types intentionally excluded from emission.

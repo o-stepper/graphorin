@@ -157,4 +157,26 @@ describe('consolidator notifyActivity - buffer:N trigger (item 7)', () => {
     expect(await memory.consolidator.notifyActivity(SCOPE)).toBeNull();
     expect(provider.calls.length).toBe(1);
   });
+
+  // BUFFER-N-01: a buffer-only library deployment never calls
+  // registerConsolidatorTriggers (where a malformed spec throws), so an invalid
+  // spec like 'buffer:0' must not vanish silently at construction.
+  it('warns at construction for an invalid buffer spec instead of silently ignoring it', async () => {
+    const chunks: string[] = [];
+    const orig = process.stderr.write.bind(process.stderr);
+    process.stderr.write = ((chunk: unknown) => {
+      chunks.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write;
+    try {
+      // Must not throw - createMemory does not reject the spec, it warns.
+      const { memory } = build(['buffer:0']);
+      // The invalid spec leaves the buffer loop inert (no threshold parsed).
+      expect(await memory.consolidator.notifyActivity(SCOPE)).toBeNull();
+    } finally {
+      process.stderr.write = orig;
+    }
+    expect(chunks.some((c) => /invalid buffer trigger 'buffer:0'/.test(c))).toBe(true);
+    expect(chunks.some((c) => /never fires/i.test(c))).toBe(true);
+  });
 });

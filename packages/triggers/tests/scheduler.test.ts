@@ -147,6 +147,23 @@ describe('Scheduler', () => {
     expect(seen).toEqual([{ from: 'a', to: 'b' }]);
   });
 
+  it('TRIGGERS-01: a disabled trigger does not fire via emit() or manual fire()', async () => {
+    let fires = 0;
+    const t = event('on-x', 'session.x', () => {
+      fires += 1;
+    });
+    await scheduler.register(t);
+    await scheduler.start();
+    await scheduler.setDisabled('on-x', true);
+    await scheduler.emit('session.x', {});
+    await scheduler.fire('on-x', {});
+    expect(fires).toBe(0);
+    // Re-enabling restores firing.
+    await scheduler.setDisabled('on-x', false);
+    await scheduler.emit('session.x', {});
+    expect(fires).toBe(1);
+  });
+
   it('events() AsyncIterable surfaces fire-start / fire-end', async () => {
     const t = interval('poll', 1_000, () => undefined);
     await scheduler.register(t);

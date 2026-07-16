@@ -10,6 +10,6 @@
 type ServerReplayMarkerFrame = z.infer<typeof ReplayMarkerFrame>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:190](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L190)
+Defined in: [packages/protocol/src/server-message.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L197)
 
 ## Stable

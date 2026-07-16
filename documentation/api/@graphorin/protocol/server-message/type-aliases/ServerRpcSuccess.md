@@ -10,6 +10,6 @@
 type ServerRpcSuccess = z.infer<typeof RpcSuccess>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:192](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L192)
+Defined in: [packages/protocol/src/server-message.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L199)
 
 ## Stable

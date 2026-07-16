@@ -15,7 +15,7 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: [packages/pricing/src/lookup.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L132)
+Defined in: [packages/pricing/src/lookup.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L135)
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost
@@ -27,6 +27,9 @@ Token-count contract (PS-19):
   non-cached prompt count to avoid double-billing.
 - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
   declares an explicit `reasoningUsdPerToken`.
+- `cachedReadTokens` are billed at `cachedReadUsdPerToken` when the entry
+  declares one, else at the full input rate (never $0 - a cached read is at
+  minimum a normal input token; the fallback never under-bills).
 - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
   declares one, else at the full input rate (a cache write is at minimum a
   normal input token - the fallback never under-bills relative to no cache).

@@ -118,6 +118,9 @@ function warnOnce(args: LookupPriceArgs): void {
  *   non-cached prompt count to avoid double-billing.
  * - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
  *   declares an explicit `reasoningUsdPerToken`.
+ * - `cachedReadTokens` are billed at `cachedReadUsdPerToken` when the entry
+ *   declares one, else at the full input rate (never $0 - a cached read is at
+ *   minimum a normal input token; the fallback never under-bills).
  * - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
  *   declares one, else at the full input rate (a cache write is at minimum a
  *   normal input token - the fallback never under-bills relative to no cache).
@@ -148,8 +151,11 @@ export function calculateCost(
   // avoid double-counting (PS-19).
   amount += price.inputUsdPerToken * args.inputTokens;
   amount += price.outputUsdPerToken * args.outputTokens;
-  if (args.cachedReadTokens !== undefined && price.cachedReadUsdPerToken !== undefined) {
-    amount += price.cachedReadUsdPerToken * args.cachedReadTokens;
+  if (args.cachedReadTokens !== undefined) {
+    // PROVIDER-01: bill cached reads at the full input rate when the entry
+    // declares no cache-read rate (the documented fallback, mirroring the
+    // cache-write leg) instead of silently billing them at $0.
+    amount += (price.cachedReadUsdPerToken ?? price.inputUsdPerToken) * args.cachedReadTokens;
   }
   if (args.cacheWriteTokens !== undefined) {
     amount += (price.cacheWriteUsdPerToken ?? price.inputUsdPerToken) * args.cacheWriteTokens;

@@ -1,0 +1,6 @@
+---
+'@graphorin/observability': patch
+'@graphorin/sessions': patch
+---
+
+Fix documented session replay reproducing nothing (e2e 2026-07-16, SESSION-R-01 / SESSION-R-02, major). Two problems combined so `session.replay()` (no arguments) emitted only `replay.start` / `replay.end`: (1) the `graphorin.session.id` attribute defaulted to the `internal` tier, so the default `public` export floor stripped it and `createSqliteSpanExporter` persisted spans with `session_id` NULL - un-keyed and unfindable; and (2) the sanitized replay floor defaulted to `public`, so every `internal`-tier framework span was skipped with reason `sensitivity`. The tracer now tags routing identifiers (`graphorin.session.id`, `graphorin.run.id`) as `public` so a span stays keyable under any export floor, and the default sanitized-replay floor is now `internal` so framework spans replay by default while secret-tier attributes stay excluded and secret/PII patterns are still masked. The observability guide's replay wiring now raises the export floor to `internal` (so the run's telemetry is persisted, not stripped) and documents the floor. Regression tests pin that routing ids survive the default exporter and that a default replay includes internal-tier spans.

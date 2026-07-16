@@ -106,9 +106,10 @@ import { classifyModelTier } from '@graphorin/provider/model-tier';
 classifyModelTier(provider); // ⇒ 'fast' | 'balanced' | 'smart' | undefined
 ```
 
-The classifier is consumed by the agent runtime (Phase 12) to validate
-operator-supplied per-tier mappings and to surface tier-not-mapped
-recommendations.
+The classifier is a standalone inspection helper (for CLIs, dashboards, and
+lint rules) with no agent-runtime consumers: the agent resolves the per-step
+tier from `Agent.modelTierMap` directly, and `createAgent()` validates that map
+structurally (key/spec shape), not by consulting this classifier.
 
 ## Project metadata
 

@@ -150,6 +150,28 @@ describe('Tool cassette format', () => {
     expect(() => readToolCassette('not a cassette')).toThrow(CassetteFormatInvalidError);
   });
 
+  it('SESSION-R-03: a JSON `null` body line throws the typed format error, not a TypeError', () => {
+    const meta = JSON.stringify({
+      kind: 'meta',
+      version: '1.0',
+      format: 'graphorin-tool-cassette',
+      createdAt: '2026-07-16T00:00:00.000Z',
+      writer: 'w',
+      sessionId: 's',
+      runId: 'r',
+      minRuntimeVersion: '0.1.0',
+    });
+    const footer = JSON.stringify({
+      kind: 'footer',
+      recordCount: 0,
+      toolCallCount: 0,
+      writtenAtIso: '2026-07-16T00:00:00.000Z',
+    });
+    expect(() => readToolCassette(`${meta}\nnull\n${footer}\n`)).toThrow(
+      CassetteFormatInvalidError,
+    );
+  });
+
   it('forward-parses unknown record kinds with a WARN', async () => {
     const buffer = createCassetteBufferSink();
     const writer = createToolCassetteWriter(buffer.sink, {

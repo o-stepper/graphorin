@@ -10,6 +10,6 @@
 type ServerRpcFailure = z.infer<typeof RpcFailure>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:194](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L194)
+Defined in: [packages/protocol/src/server-message.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L201)
 
 ## Stable
