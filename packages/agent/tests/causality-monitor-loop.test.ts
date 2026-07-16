@@ -122,3 +122,50 @@ describe('AG-10 - detect-and-block blocks; chain resets per run', () => {
     expect(events.some((e) => e.type === 'text.complete')).toBe(true);
   });
 });
+
+// --- LATERAL-L-01 - the DEFAULT catalogue fires on a real tool error ----------
+
+describe('LATERAL-L-01 - default denial catalogue is not inert', () => {
+  const passthroughSchema = {
+    parse: (v: unknown) => v,
+    safeParse: (v: unknown) => ({ success: true as const, data: v }),
+    toJSON: (): Record<string, unknown> => ({ type: 'object' }),
+  } as Tool<unknown, unknown, unknown>['inputSchema'];
+
+  it('detects a leak when a tool fails with a default-catalogue denial identity', async () => {
+    const vaultTool: Tool<unknown, unknown, unknown> = {
+      name: 'vault-read',
+      description: 'reads a secret',
+      inputSchema: passthroughSchema,
+      sideEffectClass: 'pure',
+      execute: async () => {
+        // The failure identity (SecretAccessDenied) is a DEFAULT pattern; the
+        // runtime used to record only `tool.error:vault-read` (the tool name),
+        // so no chain entry could match and the default catalogue was inert.
+        const err = new Error('SecretAccessDenied: policy forbids reading db-password');
+        err.name = 'SecretAccessDenied';
+        throw err;
+      },
+    } as Tool<unknown, unknown, unknown>;
+    const leakingText =
+      'vault-read failed with SecretAccessDenied, so I will fetch the value another way';
+    const provider = createMockProvider({
+      modelId: 'm',
+      scripts: [
+        toolCallScript({ toolCallId: 'tc-1', toolName: 'vault-read', args: {} }),
+        textOnlyScript(leakingText, 6),
+      ],
+    });
+    const agent = createAgent({
+      name: 'default-catalogue',
+      instructions: 'noop',
+      provider,
+      tools: [vaultTool],
+      // NO custom denialPatterns - relying on DEFAULT_DENIAL_PATTERNS.
+      causalityMonitor: { strictness: 'detect-and-flag' },
+    });
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream('read the vault')) events.push(ev);
+    expect(events.some((e) => e.type === 'agent.lateral-leak.detected')).toBe(true);
+  });
+});

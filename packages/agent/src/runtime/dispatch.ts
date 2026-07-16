@@ -140,7 +140,14 @@ export async function* dispatchToolBatch<TDeps, TOutput>(
       const text = renderToolErrorMessage(outcome);
       messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
       state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-      causalityMonitor?.recordCall(`tool.error:${call.toolName}`);
+      // LATERAL-L-01: record the error IDENTITY (kind + bounded message), not
+      // just the tool name - the DEFAULT_DENIAL_PATTERNS match error names
+      // like SecretAccessDenied / SandboxViolation, so recording only
+      // `tool.error:<toolName>` left the default catalogue unable to fire.
+      const errKind = 'kind' in outcome ? outcome.kind : 'error';
+      const errMessage =
+        'message' in outcome && outcome.message ? `:${outcome.message.slice(0, 200)}` : '';
+      causalityMonitor?.recordCall(`tool.error:${call.toolName}:${errKind}${errMessage}`);
     } else {
       const output = outcome.output;
       yield {
