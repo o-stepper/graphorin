@@ -189,6 +189,8 @@ async function* streamOllama(
   yield makeStreamStartEvent({ providerName, modelId: options.model });
   let usage: Usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
   let finishReason: FinishReason = 'stop';
+  let sawToolCall = false;
+  let finishedNaturally = false;
   for await (const line of parseNdJsonStream(
     resp.body,
     req.signal !== undefined ? { signal: req.signal } : {},
@@ -223,6 +225,7 @@ async function* streamOllama(
         const toolCallId = tc.id ?? `call_${randomUUID()}`;
         const toolName = tc.function?.name ?? '';
         if (toolName.length === 0) continue;
+        sawToolCall = true;
         yield { type: 'tool-call-start', toolCallId, toolName };
         yield {
           type: 'tool-call-end',
@@ -234,9 +237,18 @@ async function* streamOllama(
     if (chunk.done === true) {
       finishReason = mapFinishReason(chunk.done_reason);
       usage = mapUsage(chunk);
+      finishedNaturally = true;
       break;
     }
   }
+  // OLLAMA-AD-02: parseNdJsonStream ends cleanly on abort, so the
+  // top-of-loop check is bypassed when the abort races the iterator's end -
+  // re-check here so an aborted stream reports the honest 'aborted' reason.
+  if (!finishedNaturally && req.signal?.aborted) finishReason = 'aborted';
+  // OLLAMA-AD-01: Ollama's /api/chat reports done_reason 'stop' even when it
+  // emitted tool_calls; surface the actionable 'tool-calls' outcome (the
+  // OpenAI-compatible path against the same backend already does).
+  if (sawToolCall && finishReason === 'stop') finishReason = 'tool-calls';
   yield { type: 'finish', finishReason, usage };
 }
 
@@ -262,15 +274,21 @@ async function generateOllama(
   } catch (cause) {
     throw new ProviderStreamParseError(providerName, 'response body was not valid JSON', cause);
   }
+  const hasToolCalls =
+    Array.isArray(json.message?.tool_calls) && json.message.tool_calls.length > 0;
+  let finishReason = mapFinishReason(json.done_reason);
+  // OLLAMA-AD-01: report 'tool-calls' when the turn ended requesting tools,
+  // even though Ollama reports done_reason 'stop' alongside them.
+  if (hasToolCalls && finishReason === 'stop') finishReason = 'tool-calls';
   return {
     usage: mapUsage(json),
-    finishReason: mapFinishReason(json.done_reason),
+    finishReason,
     ...(typeof json.message?.content === 'string' && json.message.content.length > 0
       ? { text: json.message.content }
       : {}),
-    ...(Array.isArray(json.message?.tool_calls) && json.message.tool_calls.length > 0
+    ...(hasToolCalls
       ? {
-          toolCalls: json.message.tool_calls.map((tc) => ({
+          toolCalls: (json.message?.tool_calls ?? []).map((tc) => ({
             toolCallId: tc.id ?? `call_${randomUUID()}`,
             toolName: tc.function?.name ?? '',
             args: tc.function?.arguments ?? {},

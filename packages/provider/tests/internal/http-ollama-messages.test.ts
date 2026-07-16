@@ -5,7 +5,36 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { toOllamaChatMessages } from '../../src/internal/http.js';
+import { toOllamaChatMessages, toOpenAIChatMessages } from '../../src/internal/http.js';
+
+describe('REASONING-01 - preserved reasoning parts reach the wire reasoning slot', () => {
+  const assistantWithReasoning = {
+    role: 'assistant' as const,
+    content: [
+      { type: 'reasoning', text: 'CHAIN-abc' },
+      { type: 'text', text: 'final answer' },
+    ],
+  };
+
+  it('serializes reasoning onto Ollama native `thinking`, not dropped', () => {
+    const [msg] = toOllamaChatMessages([assistantWithReasoning]);
+    expect(msg?.content).toBe('final answer');
+    expect(msg?.thinking).toBe('CHAIN-abc');
+  });
+
+  it('serializes reasoning onto OpenAI-compat `reasoning_content`, not dropped', () => {
+    const [msg] = toOpenAIChatMessages([assistantWithReasoning]);
+    expect(msg?.content).toBe('final answer');
+    expect(msg?.reasoning_content).toBe('CHAIN-abc');
+  });
+
+  it('emits no reasoning slot when there is no reasoning part', () => {
+    const [ollama] = toOllamaChatMessages([{ role: 'assistant', content: 'plain' }]);
+    const [openai] = toOpenAIChatMessages([{ role: 'assistant', content: 'plain' }]);
+    expect(ollama?.thinking).toBeUndefined();
+    expect(openai?.reasoning_content).toBeUndefined();
+  });
+});
 
 describe('toOllamaChatMessages (PS-13)', () => {
   it('emits object arguments and drops OpenAI-only id/type on tool_calls', () => {

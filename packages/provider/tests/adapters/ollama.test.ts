@@ -170,6 +170,64 @@ describe('ollamaAdapter - streaming', () => {
     expect(finish.finishReason).toBe('tool-calls');
   });
 
+  it('OLLAMA-AD-01: reports finishReason tool-calls even when done_reason is stop (stream)', async () => {
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([
+          {
+            message: {
+              tool_calls: [{ id: 'tc-1', function: { name: 'lookup', arguments: { q: 'x' } } }],
+            },
+          },
+          // Ollama's /api/chat reports done_reason 'stop' alongside tool_calls.
+          { done: true, done_reason: 'stop' },
+        ]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.finishReason).toBe('tool-calls');
+  });
+
+  it('OLLAMA-AD-01: reports finishReason tool-calls even when done_reason is stop (generate)', async () => {
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({
+        jsonOnce: {
+          message: {
+            tool_calls: [{ id: 'tc-1', function: { name: 'lookup', arguments: { q: 'x' } } }],
+          },
+          done: true,
+          done_reason: 'stop',
+        },
+      }),
+      logger: () => {},
+    });
+    const result = await provider.generate({ messages: [{ role: 'user', content: 'hi' }] });
+    expect(result.finishReason).toBe('tool-calls');
+    expect(result.toolCalls?.[0]).toMatchObject({ toolCallId: 'tc-1', toolName: 'lookup' });
+  });
+
+  it('OLLAMA-AD-02: an aborted stream reports finishReason aborted, not stop', async () => {
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      // A stream that never sends a done chunk; the aborted signal ends it.
+      fetchImpl: makeFetchImpl({ body: makeNdJsonStream([{ message: { content: 'partial' } }]) }),
+      logger: () => {},
+    });
+    const controller = new AbortController();
+    controller.abort();
+    const events = await collect(
+      provider.stream({ messages: [{ role: 'user', content: 'hi' }], signal: controller.signal }),
+    );
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.finishReason).toBe('aborted');
+  });
+
   it('forwards systemMessage, tools, temperature, maxTokens to the request body', async () => {
     const capture: { url?: string; init?: RequestInit } = {};
     const provider = ollamaAdapter({

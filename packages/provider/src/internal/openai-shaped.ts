@@ -201,6 +201,7 @@ async function* streamOpenAIShaped(
   yield makeStreamStartEvent({ providerName: opts.providerName, modelId: opts.model });
 
   let finishReason: FinishReason = 'stop';
+  let finishedNaturally = false;
   let usage: Usage | undefined;
   const toolCallBuffer = new Map<
     number,
@@ -271,6 +272,7 @@ async function* streamOpenAIShaped(
     }
     if (typeof choice.finish_reason === 'string') {
       finishReason = mapFinishReason(choice.finish_reason);
+      finishedNaturally = true;
       for (const slot of toolCallBuffer.values()) {
         const finalArgs = parseFinalArgs(slot.args);
         yield {
@@ -282,6 +284,11 @@ async function* streamOpenAIShaped(
     }
     if (parsed.usage !== undefined) usage = mapOpenAIUsage(parsed.usage);
   }
+
+  // OLLAMA-AD-02: parseEventStream ends cleanly on abort, so the top-of-loop
+  // check is bypassed when the abort races the iterator's end - re-check here
+  // so an aborted stream reports 'aborted' instead of the default 'stop'.
+  if (!finishedNaturally && req.signal?.aborted) finishReason = 'aborted';
 
   yield {
     type: 'finish',

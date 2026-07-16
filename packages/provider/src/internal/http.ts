@@ -55,15 +55,21 @@ export function toOpenAIChatMessages(
 ): ReadonlyArray<Record<string, unknown>> {
   const dropped = new Set<string>();
   const converted = messages.map((msg) => {
+    // REASONING-01: a reasoning part is present only because the effective
+    // retention kept it (buildAssistantMessage). Round-trip it onto the wire's
+    // reasoning slot instead of dropping it - openai-compatible servers that
+    // support extended reasoning read `reasoning_content` on assistant input.
+    const reasoning: string[] = [];
     const out: Record<string, unknown> = {
       role: msg.role,
       content:
         typeof msg.content === 'string'
           ? msg.content
           : opts.multimodal
-            ? toOpenAIParts(msg.content, dropped)
-            : flattenContent(msg.content, dropped),
+            ? toOpenAIParts(msg.content, dropped, reasoning)
+            : flattenContent(msg.content, dropped, reasoning),
     };
+    if (reasoning.length > 0) out.reasoning_content = reasoning.join('');
     if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
       out.tool_calls = msg.toolCalls.map((tc) => ({
         id: tc.toolCallId,
@@ -87,6 +93,7 @@ export function toOpenAIChatMessages(
 function toOpenAIParts(
   parts: ReadonlyArray<unknown>,
   dropped: Set<string>,
+  reasoning?: string[],
 ): ReadonlyArray<Record<string, unknown>> {
   const out: Record<string, unknown>[] = [];
   for (const part of parts) {
@@ -98,6 +105,12 @@ function toOpenAIParts(
     const obj = part as { type?: string; text?: string; image?: unknown; mimeType?: string };
     if (obj.type === 'text' && typeof obj.text === 'string') {
       out.push({ type: 'text', text: obj.text });
+      continue;
+    }
+    // REASONING-01: reasoning has no content-part slot; the caller lifts it
+    // to the top-level `reasoning_content` field instead of dropping it.
+    if (obj.type === 'reasoning' && typeof obj.text === 'string' && reasoning !== undefined) {
+      reasoning.push(obj.text);
       continue;
     }
     if (obj.type === 'image') {
@@ -163,6 +176,10 @@ export function toOllamaChatMessages(
   const converted = messages.map((msg) => {
     let content: string;
     let images: string[] | undefined;
+    // REASONING-01: round-trip preserved reasoning onto Ollama's native
+    // `thinking` field (the same field its stream response uses) rather
+    // than dropping it with a misleading multimodal warning.
+    const reasoning: string[] = [];
     if (typeof msg.content === 'string') {
       content = msg.content;
     } else if (opts.multimodal) {
@@ -170,14 +187,15 @@ export function toOllamaChatMessages(
       // of RAW base64 strings (no data: prefix). URL images cannot be
       // inlined on this path (the adapter never fetches) - dropped
       // loudly.
-      const split = toOllamaContent(msg.content, dropped);
+      const split = toOllamaContent(msg.content, dropped, reasoning);
       content = split.text;
       images = split.images.length > 0 ? split.images : undefined;
     } else {
-      content = flattenContent(msg.content, dropped);
+      content = flattenContent(msg.content, dropped, reasoning);
     }
     const out: Record<string, unknown> = { role: msg.role, content };
     if (images !== undefined) out.images = images;
+    if (reasoning.length > 0) out.thinking = reasoning.join('');
     if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
       out.tool_calls = msg.toolCalls.map((tc) => ({
         function: {
@@ -196,6 +214,7 @@ export function toOllamaChatMessages(
 function toOllamaContent(
   parts: ReadonlyArray<unknown>,
   dropped: Set<string>,
+  reasoning?: string[],
 ): { readonly text: string; readonly images: string[] } {
   const buffer: string[] = [];
   const images: string[] = [];
@@ -208,6 +227,11 @@ function toOllamaContent(
     const obj = part as { type?: string; text?: string; image?: unknown };
     if (obj.type === 'text' && typeof obj.text === 'string') {
       buffer.push(obj.text);
+      continue;
+    }
+    // REASONING-01: lifted to the `thinking` field by the caller.
+    if (obj.type === 'reasoning' && typeof obj.text === 'string' && reasoning !== undefined) {
+      reasoning.push(obj.text);
       continue;
     }
     if (obj.type === 'image' && obj.image instanceof Uint8Array) {
@@ -242,7 +266,11 @@ function toArgsObject(args: unknown): Record<string, unknown> {
   return typeof args === 'object' && args !== null ? (args as Record<string, unknown>) : {};
 }
 
-function flattenContent(parts: ReadonlyArray<unknown>, dropped?: Set<string>): string {
+function flattenContent(
+  parts: ReadonlyArray<unknown>,
+  dropped?: Set<string>,
+  reasoning?: string[],
+): string {
   const buffer: string[] = [];
   for (const part of parts) {
     if (typeof part === 'string') {
@@ -253,6 +281,13 @@ function flattenContent(parts: ReadonlyArray<unknown>, dropped?: Set<string>): s
       const obj = part as { type?: string; text?: string };
       if (obj.type === 'text' && typeof obj.text === 'string') {
         buffer.push(obj.text);
+      } else if (
+        obj.type === 'reasoning' &&
+        typeof obj.text === 'string' &&
+        reasoning !== undefined
+      ) {
+        // REASONING-01: captured for the wire's reasoning slot, not dropped.
+        reasoning.push(obj.text);
       } else if (typeof obj.type === 'string') {
         // W-095: silently vanishing multimodal content was the bug -
         // collect the kind so the caller can WARN once.

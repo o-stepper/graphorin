@@ -104,6 +104,33 @@ describe('W-024 - thinking-block signatures survive to the NEXT step request', (
   });
 });
 
+describe('REASONING-02 - contract-driven retention defaults mirror REASONING_RETENTION_DEFAULTS', () => {
+  const providerWith = (contract: ReasoningContract | undefined): Provider =>
+    ({
+      name: 'mock',
+      modelId: 'mock',
+      capabilities: contract === undefined ? {} : { reasoningContract: contract },
+    }) as unknown as Provider;
+
+  it("defaults 'optional' to 'strip' (not 'pass-through-all') so CoT is not persisted by default", () => {
+    expect(effectiveReasoningRetention(undefined, providerWith('optional'))).toBe('strip');
+  });
+
+  it('keeps the other contract defaults intact', () => {
+    expect(effectiveReasoningRetention(undefined, providerWith('round-trip-required'))).toBe(
+      'pass-through-claude',
+    );
+    expect(effectiveReasoningRetention(undefined, providerWith('hidden'))).toBe('strip');
+    expect(effectiveReasoningRetention(undefined, providerWith(undefined))).toBe('strip');
+  });
+
+  it('an explicit agent-level override still wins over the contract default', () => {
+    expect(effectiveReasoningRetention('pass-through-all', providerWith('optional'))).toBe(
+      'pass-through-all',
+    );
+  });
+});
+
 describe('Agent - intra-loop reasoning preservation (RB-42)', () => {
   it('preserves reasoning content parts on the assistant message when retention != strip', async () => {
     let captured: Message[] = [];
