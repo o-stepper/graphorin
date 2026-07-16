@@ -50,6 +50,9 @@ describe('applyInboundSanitization', () => {
     expect(result.stripped).toBe(true);
     expect(result.body).toContain('[REDACTED:imperative-pattern]');
     expect(result.body).not.toContain('ignore previous instructions');
+    // TOOLS-EX-01 / CHANNELS-01: bytesStripped must never go negative even
+    // when the redaction mask is longer than the matched text.
+    expect(result.bytesStripped).toBeGreaterThanOrEqual(0);
   });
 
   it("'detect-and-wrap' wraps the body in <<<untrusted_content>>> ... <<</untrusted_content>>>", () => {
