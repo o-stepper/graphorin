@@ -1,3 +1,6 @@
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   _resetResolversForTesting,
   _resetSecretsFactoryForTesting,
@@ -55,6 +58,48 @@ describe('graphorin secrets', () => {
     });
     const after = await runSecretsList({ print });
     expect(after.some((m) => m.key === 'graphorin_test_secret')).toBe(false);
+  });
+
+  it('SECRETS-S-02: activates the encrypted-file store from GRAPHORIN_MASTER_PASSPHRASE', async () => {
+    // Requires the @node-rs/argon2 peer; skip cleanly when it is absent so
+    // this does not fail on hosts without the optional native dependency.
+    let hasArgon2 = true;
+    // Non-literal specifier so tsc does not require the optional peer's types.
+    const argon2Module = '@node-rs/argon2';
+    try {
+      await import(argon2Module);
+    } catch {
+      hasArgon2 = false;
+    }
+    if (!hasArgon2) return;
+
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-encfile-'));
+    const prevPass = process.env.GRAPHORIN_MASTER_PASSPHRASE;
+    const prevFile = process.env.GRAPHORIN_SECRETS_FILE;
+    process.env.GRAPHORIN_MASTER_PASSPHRASE = 'test-passphrase-for-secrets-s-02';
+    process.env.GRAPHORIN_SECRETS_FILE = join(dir, 'secrets.enc');
+    try {
+      const print = (): void => {};
+      await runSecretsSet({
+        key: 'enc_key',
+        value: 'enc_value',
+        secretsSource: 'encrypted-file',
+        print,
+      });
+      const got = await runSecretsGet({
+        key: 'enc_key',
+        reveal: true,
+        secretsSource: 'encrypted-file',
+        print,
+      });
+      expect(got.found).toBe(true);
+      expect(got.value).toBe('enc_value');
+    } finally {
+      if (prevPass === undefined) delete process.env.GRAPHORIN_MASTER_PASSPHRASE;
+      else process.env.GRAPHORIN_MASTER_PASSPHRASE = prevPass;
+      if (prevFile === undefined) delete process.env.GRAPHORIN_SECRETS_FILE;
+      else process.env.GRAPHORIN_SECRETS_FILE = prevFile;
+    }
   });
 
   it('secrets ref reports a structural failure on an unknown scheme', async () => {
