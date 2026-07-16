@@ -1,5 +1,17 @@
 # @graphorin/provider
 
+## 0.10.0
+
+### Minor Changes
+
+- [#181](https://github.com/o-stepper/graphorin/pull/181) [`214c20f`](https://github.com/o-stepper/graphorin/commit/214c20f1b2dc7463b683a86f50bc6b10c11ca3f0) Thanks [@o-stepper](https://github.com/o-stepper)! - Ollama adapter operational controls (external audit 2026-07-16, P1-4/P1-5/P1-6). `ollamaAdapter` gains three options: `think` (`false | true | 'low' | 'medium' | 'high'`, mapped to Ollama's top-level `think` field - thinking-capable models like qwen3 think by default and can spend most of their latency in the hidden chain; a truthy value also defaults `capabilities.reasoning` to `true`), `numCtx` (sent as `options.num_ctx` on every request AND used as the default `capabilities.contextWindow`, so the server allocation, the declared capability, and the memory compaction budget stop being three silently different numbers), and `keepAlive` (Ollama's `keep_alive`). Streamed `message.thinking` chunks now surface as `reasoning-delta` provider events instead of being dropped. `toolChoice` handling is honest instead of silent: `'none'` is enforced by withholding the tool catalogue, `'auto'` passes through, and a forced choice (`'required'` / `{ tool }`) throws the new `ProviderToolChoiceUnsupportedError` - the native `/api/chat` API has no `tool_choice` field, so the old behaviour silently degraded a contract to a suggestion (the OpenAI-compatible adapter against `http://127.0.0.1:11434/v1` maps it properly). `ProviderRequest.providerOptions` with a nested `options` object now MERGES into the built options block instead of clobbering `temperature` / `num_predict` / `num_ctx`.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.10.0
+  - @graphorin/observability@0.10.0
+
 ## 0.9.0
 
 ### Patch Changes

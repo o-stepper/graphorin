@@ -1,5 +1,13 @@
 # @graphorin/channels
 
+## 0.10.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.10.0
+  - @graphorin/tools@0.10.0
+
 ## 0.9.0
 
 ### Minor Changes

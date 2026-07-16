@@ -52,6 +52,40 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.9.x -> 0.10.0
+
+0.10.0 is the external-audit remediation release (Ollama adapter
+operational controls, actionable native-binding failures). The upgrade
+is a lockstep bump; everything is additive or a sharpened failure
+mode. What can be observable:
+
+- **A forced `toolChoice` on the native Ollama adapter now throws.**
+  `ollamaAdapter` never could enforce `'required'` / `{ tool: name }`
+  (the native `/api/chat` API has no `tool_choice` field) - it used
+  to silently treat the forced choice as `'auto'`. It now throws the
+  typed `ProviderToolChoiceUnsupportedError` at request time. Fix:
+  drop the forced choice and steer via the prompt, or use
+  `openAICompatibleAdapter` against the server's OpenAI-compatible
+  endpoint (`http://127.0.0.1:11434/v1`), which maps `tool_choice`.
+  `toolChoice: 'none'` is now actually enforced - the tool catalogue
+  is withheld for that step.
+- **Thinking models surface reasoning events on the Ollama adapter.**
+  Streamed `message.thinking` becomes `reasoning-delta` (agent
+  `reasoning.delta`) events instead of being dropped, so event
+  consumers that assumed text-only streams from this adapter will now
+  also see reasoning deltas when the model thinks. Pass
+  `think: false` to disable thinking (qwen3-style models think by
+  default on recent Ollama releases).
+- **`providerOptions.options` merges instead of replacing.** A nested
+  `options` object passed through `providerOptions` used to clobber
+  the adapter-built block (dropping `temperature` / `num_predict`);
+  it now merges key-by-key with the per-request values winning.
+- **Missing native bindings fail with `SqliteNativeBindingError`.**
+  Code that matched the raw `Could not locate the bindings file`
+  message from `bindings.js` should match the typed error (kind
+  `sqlite-native-binding`) instead; the original driver error stays
+  on `cause`.
+
 ### 0.8.x -> 0.9.0
 
 0.9.0 is the bot-adoption release (channels, proactivity, memory

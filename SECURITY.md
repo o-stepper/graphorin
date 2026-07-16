@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---------|-----------|
-| 0.9.x   | Yes (current pre-release line) |
+| 0.10.x   | Yes (current pre-release line) |
 
 While Graphorin is on the 0.x line, only the latest minor receives security fixes. After 1.0, the latest two minor lines will be supported.
 
@@ -68,4 +68,4 @@ Implementation details and rationale are published in the [security guide](https
 
 ---
 
-**Graphorin** · v0.9.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

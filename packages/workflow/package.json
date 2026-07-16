@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/workflow",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Step-graph workflow engine for the Graphorin framework: createWorkflow({...}) factory, Workflow.execute / resume / getState / listCheckpoints / fork APIs, the Graphorin-named primitives (Directive, Dispatch, pause, LatestValue, AnyValue, Reducer, ListAggregate, Stream, Barrier, Ephemeral), pluggable CheckpointStore-backed durable execution with sync / exit durability modes, dynamic parallelism via Dispatch, the per-channel atomic merge resolver, the HITL pause/resume lifecycle (programmatic pause + static pauseAt before/after node lists), the AbortSignal-aware hard-kill / drain cancellation contract, the per-task pending-write log for mid-step recovery, seven stream modes (values / updates / messages / tasks / checkpoints / debug / custom), and per-step / per-task / per-checkpoint observability spans (workflow.run, workflow.step, workflow.task, workflow.checkpoint). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
