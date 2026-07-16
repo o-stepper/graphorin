@@ -22,7 +22,11 @@ import type {
   Usage,
 } from '@graphorin/core';
 
-import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
+import {
+  LocalProviderInsecureTransportError,
+  ProviderStreamParseError,
+  ProviderToolChoiceUnsupportedError,
+} from '../errors/errors.js';
 import {
   type ChatMessageConversionOptions,
   callJsonHttp,
@@ -62,6 +66,34 @@ export interface OllamaAdapterOptions {
    * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
    */
   readonly timeoutMs?: number;
+  /**
+   * Thinking control for reasoning-capable models (audit 2026-07-16,
+   * P1-4). Sent as Ollama's top-level `think` field: `false` disables
+   * thinking on models that default to it (e.g. qwen3), `true` enables
+   * it, and `'low' | 'medium' | 'high'` select an effort level on
+   * models that grade it (e.g. gpt-oss). Omitted -> the model's own
+   * default. Any truthy value also flips `capabilities.reasoning` to
+   * `true` unless an explicit `capabilities` override says otherwise.
+   * Streamed `message.thinking` chunks are normalized into
+   * `reasoning-delta` events either way.
+   */
+  readonly think?: boolean | 'low' | 'medium' | 'high';
+  /**
+   * Context window to request from the Ollama server, sent as
+   * `options.num_ctx` on every call (audit 2026-07-16, P1-5). Without
+   * it Ollama sizes the context itself (4096 by default) while this
+   * adapter declares `capabilities.contextWindow` 8192 - three numbers
+   * that silently disagree. Setting `numCtx` uses ONE value for both
+   * the server request and `capabilities.contextWindow` (an explicit
+   * `capabilities.contextWindow` override still wins).
+   */
+  readonly numCtx?: number;
+  /**
+   * How long the server keeps the model loaded after the request,
+   * sent as Ollama's top-level `keep_alive` field (e.g. `'10m'`,
+   * `-1` for indefinitely). Omitted -> the server default (5m).
+   */
+  readonly keepAlive?: string | number;
   readonly allowInsecureTransport?: boolean;
   readonly acceptsSensitivity?: ReadonlyArray<Sensitivity>;
   readonly capabilities?: Partial<ProviderCapabilities>;
@@ -100,6 +132,10 @@ export function ollamaAdapter(options: OllamaAdapterOptions): Provider {
   const providerName = options.name ?? `ollama-${options.model}`;
   const capabilities: ProviderCapabilities = {
     ...DEFAULT_CAPABILITIES,
+    // One source of truth for the context budget: numCtx drives both the
+    // per-request options.num_ctx and the declared window.
+    ...(options.numCtx !== undefined ? { contextWindow: options.numCtx } : {}),
+    ...(options.think !== undefined && options.think !== false ? { reasoning: true } : {}),
     ...options.capabilities,
   };
   const chatPath = options.chatPath ?? '/api/chat';
@@ -140,13 +176,7 @@ async function* streamOllama(
   url: string,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const body = buildBody(
-    options.model,
-    req,
-    true,
-    options.capabilities?.structuredOutput ?? true,
-    conversionOptionsFor(options),
-  );
+  const body = buildBody(options, providerName, req, true, conversionOptionsFor(options));
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -176,6 +206,14 @@ async function* streamOllama(
         `failed to parse ndjson line: ${(cause as Error).message}`,
         cause,
       );
+    }
+    // Thinking models stream their chain in `message.thinking`
+    // alongside (and usually before) `message.content`. Normalize it
+    // into reasoning-delta events instead of dropping it on the floor
+    // (audit 2026-07-16, P1-4); the agent loop collapses the deltas
+    // into a single ReasoningContent part at finish.
+    if (chunk.message?.thinking !== undefined && chunk.message.thinking.length > 0) {
+      yield { type: 'reasoning-delta', delta: chunk.message.thinking };
     }
     if (chunk.message?.content !== undefined && chunk.message.content.length > 0) {
       yield { type: 'text-delta', delta: chunk.message.content };
@@ -208,13 +246,7 @@ async function generateOllama(
   url: string,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(
-    options.model,
-    req,
-    false,
-    options.capabilities?.structuredOutput ?? true,
-    conversionOptionsFor(options),
-  );
+  const body = buildBody(options, providerName, req, false, conversionOptionsFor(options));
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -249,28 +281,45 @@ async function generateOllama(
 }
 
 function buildBody(
-  model: string,
+  adapterOptions: OllamaAdapterOptions,
+  providerName: string,
   req: ProviderRequest,
   stream: boolean,
-  structuredOutput: boolean,
   conversion: ChatMessageConversionOptions,
 ): Record<string, unknown> {
+  // The native /api/chat API has no tool_choice field. 'none' is
+  // enforceable by withholding the tool catalogue; a forced choice is
+  // not - fail fast instead of silently degrading it to 'auto'
+  // (audit 2026-07-16, P1-6).
+  if (req.toolChoice === 'required' || typeof req.toolChoice === 'object') {
+    throw new ProviderToolChoiceUnsupportedError({
+      providerName,
+      toolChoice: JSON.stringify(req.toolChoice),
+    });
+  }
   const messages =
     req.systemMessage !== undefined
       ? [{ role: 'system' as const, content: req.systemMessage }, ...req.messages]
       : req.messages;
   const body: Record<string, unknown> = {
-    model,
+    model: adapterOptions.model,
     messages: toOllamaChatMessages(messages, conversion),
     stream,
   };
-  if (req.temperature !== undefined || req.maxTokens !== undefined) {
+  if (adapterOptions.think !== undefined) body.think = adapterOptions.think;
+  if (adapterOptions.keepAlive !== undefined) body.keep_alive = adapterOptions.keepAlive;
+  if (
+    req.temperature !== undefined ||
+    req.maxTokens !== undefined ||
+    adapterOptions.numCtx !== undefined
+  ) {
     const optionsBlock: Record<string, unknown> = {};
     if (req.temperature !== undefined) optionsBlock.temperature = req.temperature;
     if (req.maxTokens !== undefined) optionsBlock.num_predict = req.maxTokens;
+    if (adapterOptions.numCtx !== undefined) optionsBlock.num_ctx = adapterOptions.numCtx;
     body.options = optionsBlock;
   }
-  if (req.tools !== undefined && req.tools.length > 0) {
+  if (req.tools !== undefined && req.tools.length > 0 && req.toolChoice !== 'none') {
     // C2: fold worked examples in the adapter itself (idempotent when an
     // upstream createProvider fold already ran).
     body.tools = foldToolExamples(req.tools).map((t) => ({
@@ -284,13 +333,28 @@ function buildBody(
   }
   // PS-24: Ollama's native structured output - `format` takes a JSON
   // schema object (or 'json' for schema-less JSON mode).
+  const structuredOutput = adapterOptions.capabilities?.structuredOutput ?? true;
   if (structuredOutput && req.outputType?.kind === 'structured') {
     body.format = req.outputType.jsonSchema ?? 'json';
   }
   if (req.providerOptions !== undefined) {
-    Object.assign(body, req.providerOptions);
+    // Per-request escape hatch: top-level keys override the built body,
+    // but a nested `options` object MERGES into the built options block
+    // instead of clobbering temperature / num_predict / num_ctx.
+    const { options: extraOptions, ...rest } = req.providerOptions;
+    Object.assign(body, rest);
+    if (extraOptions !== undefined) {
+      body.options =
+        isRecord(extraOptions) && isRecord(body.options)
+          ? { ...body.options, ...extraOptions }
+          : extraOptions;
+    }
   }
   return body;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function buildHeaders(options: OllamaAdapterOptions): Record<string, string> {
@@ -370,6 +434,8 @@ interface OllamaChatChunk {
   readonly message?: {
     readonly role?: string;
     readonly content?: string;
+    /** Chain-of-thought stream from thinking-capable models. */
+    readonly thinking?: string;
     readonly tool_calls?: ReadonlyArray<{
       readonly id?: string;
       readonly function?: { readonly name?: string; readonly arguments?: unknown };

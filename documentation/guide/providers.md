@@ -173,11 +173,24 @@ import { ollamaAdapter, createProvider } from '@graphorin/provider';
 const provider = createProvider(
   ollamaAdapter({
     baseUrl: 'http://127.0.0.1:11434',
-    model: 'qwen2.5:7b-instruct-q4_K_M',
+    model: 'qwen3:8b-q4_K_M',
+    think: false, // thinking control: false | true | 'low' | 'medium' | 'high'
+    numCtx: 40_960, // one number for the server request AND capabilities.contextWindow
+    keepAlive: '10m', // keep the model loaded between turns
   }),
   { acceptsSensitivity: ['public', 'internal'] },
 );
 ```
+
+Three operational knobs matter on this adapter:
+
+- **Thinking.** Thinking-capable models (qwen3, deepseek-r1, gpt-oss) think **by default** on recent Ollama releases, and on an 8B model the hidden chain can dominate latency - a two-step tool task that answers in seconds with `think: false` can take minutes without it. `think` maps to Ollama's top-level `think` field (`'low' | 'medium' | 'high'` grade effort on models that support levels), a truthy value flips `capabilities.reasoning` to `true`, and streamed `message.thinking` chunks surface as `reasoning.delta` agent events instead of being dropped.
+- **Context sync.** Ollama sizes the actual context itself (4096 by default) no matter what the model card advertises, while this adapter used to declare 8192 - three numbers silently disagreeing, so the memory compaction budget and the real server limit could drift apart on long dialogues. `numCtx` sends `options.num_ctx` on every request **and** becomes the default `capabilities.contextWindow`, so the server, the declared capability, and the [context engine budget](/guide/memory-system) all use one number (an explicit `capabilities.contextWindow` override still wins).
+- **Keep-alive.** `keepAlive` maps to Ollama's `keep_alive` (default 5m server-side). Raise it for interactive assistants so the model does not unload between turns.
+
+**Forced `toolChoice` is refused, not faked.** The native `/api/chat` API has no `tool_choice` field. This adapter honours `toolChoice: 'none'` by withholding the tool catalogue and `'auto'` as the default, but a forced choice (`'required'` or `{ tool: name }`) throws a typed `ProviderToolChoiceUnsupportedError` instead of silently degrading the contract to a suggestion. If you need forced tool calls against Ollama, point the [OpenAI-compatible adapter](#openai-compatible-http) at `http://127.0.0.1:11434/v1` - that wire format carries `tool_choice`.
+
+Per-request escape hatch: any `ProviderRequest.providerOptions` keys are passed through to the request body verbatim (top-level keys override the built body; a nested `options` object merges into the built `options` block).
 
 ### OpenAI-compatible HTTP
 

@@ -7,7 +7,10 @@ import type { ProviderEvent } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_OLLAMA_BASE_URL, ollamaAdapter } from '../../src/adapters/ollama.js';
-import { LocalProviderInsecureTransportError } from '../../src/errors/errors.js';
+import {
+  LocalProviderInsecureTransportError,
+  ProviderToolChoiceUnsupportedError,
+} from '../../src/errors/errors.js';
 
 interface LogCall {
   level: 'warn' | 'info';
@@ -286,5 +289,179 @@ describe('W-095 - native images array', () => {
     expect(body.messages[0]?.images).toBeUndefined();
     expect(body.messages[0]?.content).toBe('describe');
     expect(warns.filter((w) => w.includes('capabilities.multimodal'))).toHaveLength(1);
+  });
+});
+
+describe('audit 2026-07-16 - thinking / context / keep-alive controls', () => {
+  it('forwards think, keepAlive, numCtx onto the wire body', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = ollamaAdapter({
+      model: 'qwen3:8b',
+      think: false,
+      keepAlive: '10m',
+      numCtx: 40_960,
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const body = JSON.parse(String(capture.init?.body)) as {
+      think: boolean;
+      keep_alive: string;
+      options: { num_ctx: number };
+    };
+    expect(body.think).toBe(false);
+    expect(body.keep_alive).toBe('10m');
+    expect(body.options.num_ctx).toBe(40_960);
+  });
+
+  it('numCtx drives capabilities.contextWindow; explicit capabilities still win', () => {
+    const base = { fetchImpl: makeFetchImpl({}), logger: () => {} };
+    expect(ollamaAdapter({ model: 'm', ...base }).capabilities.contextWindow).toBe(8_192);
+    expect(ollamaAdapter({ model: 'm', numCtx: 40_960, ...base }).capabilities.contextWindow).toBe(
+      40_960,
+    );
+    expect(
+      ollamaAdapter({
+        model: 'm',
+        numCtx: 40_960,
+        capabilities: { contextWindow: 16_384 },
+        ...base,
+      }).capabilities.contextWindow,
+    ).toBe(16_384);
+  });
+
+  it('a truthy think flips capabilities.reasoning; think: false does not', () => {
+    const base = { fetchImpl: makeFetchImpl({}), logger: () => {} };
+    expect(ollamaAdapter({ model: 'm', ...base }).capabilities.reasoning).toBe(false);
+    expect(ollamaAdapter({ model: 'm', think: false, ...base }).capabilities.reasoning).toBe(false);
+    expect(ollamaAdapter({ model: 'm', think: true, ...base }).capabilities.reasoning).toBe(true);
+    expect(ollamaAdapter({ model: 'm', think: 'high', ...base }).capabilities.reasoning).toBe(true);
+    expect(
+      ollamaAdapter({ model: 'm', think: true, capabilities: { reasoning: false }, ...base })
+        .capabilities.reasoning,
+    ).toBe(false);
+  });
+
+  it('normalizes streamed message.thinking into reasoning-delta events', async () => {
+    const provider = ollamaAdapter({
+      model: 'qwen3:8b',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([
+          { message: { role: 'assistant', thinking: 'weigh the ' } },
+          { message: { thinking: 'options' } },
+          { message: { content: '42' } },
+          { done: true, done_reason: 'stop', prompt_eval_count: 4, eval_count: 9 },
+        ]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const reasoning = events.filter((e) => e.type === 'reasoning-delta');
+    expect(reasoning.map((e) => (e as { delta: string }).delta).join('')).toBe('weigh the options');
+    const text = events.filter((e) => e.type === 'text-delta');
+    expect(text.map((e) => (e as { delta: string }).delta).join('')).toBe('42');
+  });
+});
+
+describe('audit 2026-07-16 - honest toolChoice', () => {
+  const TOOLS = [{ name: 'lookup', description: 'd', inputSchema: { type: 'object' } }];
+
+  it("toolChoice 'none' withholds the tool catalogue from the request", async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: TOOLS,
+        toolChoice: 'none',
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body)) as { tools?: unknown };
+    expect(body.tools).toBeUndefined();
+  });
+
+  it("toolChoice 'auto' keeps the catalogue", async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: TOOLS,
+        toolChoice: 'auto',
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body)) as { tools?: unknown[] };
+    expect(body.tools).toHaveLength(1);
+  });
+
+  it('a forced tool fails fast instead of silently degrading to auto', async () => {
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+      }),
+      logger: () => {},
+    });
+    await expect(
+      collect(
+        provider.stream({
+          messages: [{ role: 'user', content: 'hi' }],
+          tools: TOOLS,
+          toolChoice: { tool: 'lookup' },
+        }),
+      ),
+    ).rejects.toThrow(ProviderToolChoiceUnsupportedError);
+    await expect(
+      provider.generate({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: TOOLS,
+        toolChoice: 'required',
+      }),
+    ).rejects.toThrow(ProviderToolChoiceUnsupportedError);
+  });
+});
+
+describe('audit 2026-07-16 - providerOptions options-block merge', () => {
+  it('nested options merge into the built block instead of clobbering it', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = ollamaAdapter({
+      model: 'llama3.1',
+      numCtx: 2_048,
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        temperature: 0.5,
+        providerOptions: { options: { num_ctx: 1_024, top_k: 20 } },
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body)) as {
+      options: { temperature: number; num_ctx: number; top_k: number };
+    };
+    expect(body.options.temperature).toBe(0.5);
+    expect(body.options.num_ctx).toBe(1_024);
+    expect(body.options.top_k).toBe(20);
   });
 });

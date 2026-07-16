@@ -16,5 +16,6 @@ export {
   PromptRedactionError,
   ProviderHttpError,
   ProviderStreamParseError,
+  ProviderToolChoiceUnsupportedError,
   RateLimitExceededError,
 } from './errors.js';

@@ -300,6 +300,37 @@ export class ProviderStreamParseError extends GraphorinProviderError {
 }
 
 /**
+ * The caller requested a forced `toolChoice` (`'required'` or
+ * `{ tool: name }`) on an adapter whose wire protocol has no way to
+ * enforce it (the native Ollama `/api/chat` API has no `tool_choice`
+ * field). Thrown at request time instead of silently degrading the
+ * forced choice to `'auto'` - a forced tool call is a contract, not a
+ * hint.
+ *
+ * @stable
+ */
+export class ProviderToolChoiceUnsupportedError extends GraphorinProviderError {
+  override readonly name = 'ProviderToolChoiceUnsupportedError';
+  readonly providerName: string;
+  readonly toolChoice: string;
+
+  constructor(args: { providerName: string; toolChoice: string }) {
+    super(
+      'tool-choice-unsupported',
+      `[${args.providerName}] toolChoice ${args.toolChoice} cannot be enforced: the native Ollama ` +
+        `/api/chat API has no tool_choice field, so the model would treat the forced tool as a mere suggestion.`,
+      {
+        hint:
+          "Use openAICompatibleAdapter against the server's OpenAI-compatible endpoint (e.g. http://127.0.0.1:11434/v1) " +
+          "which maps toolChoice onto tool_choice, or drop the forced choice and instruct the model in the prompt ('auto' and 'none' work on this adapter).",
+      },
+    );
+    this.providerName = args.providerName;
+    this.toolChoice = args.toolChoice;
+  }
+}
+
+/**
  * The classifier dispatcher was given a non-Provider value. Programming
  * error; fail-fast at the boundary.
  *
