@@ -86,7 +86,7 @@ describe('PS-24 - structured output plumbing', () => {
     );
   });
 
-  it('openai-shaped path maps schema-less structured output to json_object mode', async () => {
+  it('LIVE-EVAL-01: schema-less structured output uses a permissive json_schema (not json_object)', async () => {
     const capture: { body?: unknown } = {};
     const provider = llamaCppServerAdapter({
       model: 'qwen2.5',
@@ -94,8 +94,17 @@ describe('PS-24 - structured output plumbing', () => {
       fetchImpl: captureFetch(capture),
     });
     await provider.generate({ ...REQ, outputType: { kind: 'structured' } });
-    const body = capture.body as { response_format?: { type?: string } };
-    expect(body.response_format?.type).toBe('json_object');
+    const body = capture.body as {
+      response_format?: { type?: string; json_schema?: { schema?: unknown; strict?: boolean } };
+    };
+    // The Anthropic OpenAI-compat endpoint rejects json_object, so a schema-less
+    // structured request now sends a permissive json_schema with strict:false.
+    expect(body.response_format?.type).toBe('json_schema');
+    expect(body.response_format?.json_schema?.strict).toBe(false);
+    expect(body.response_format?.json_schema?.schema).toEqual({
+      type: 'object',
+      additionalProperties: true,
+    });
   });
 
   it('ollama native path maps outputType.jsonSchema to the format field', async () => {

@@ -398,6 +398,12 @@ function buildBody(
   // PS-24: structured output finally reaches the wire - gated on the
   // declared capability so a structuredOutput:false override keeps the
   // request clean for servers that reject response_format.
+  // LIVE-EVAL-01/02: always use the `json_schema` response_format, even when
+  // no explicit schema was supplied - the Anthropic OpenAI-compat endpoint
+  // rejects `json_object` ("response_format.type: Input should be
+  // 'json_schema'"), which silently broke structured memory extraction. A
+  // schema-less request gets a permissive object schema with `strict: false`
+  // (accepted by OpenAI's lenient json_schema and by the compat endpoints).
   if (structuredOutput && req.outputType?.kind === 'structured') {
     body.response_format =
       req.outputType.jsonSchema !== undefined
@@ -405,7 +411,14 @@ function buildBody(
             type: 'json_schema',
             json_schema: { name: 'output', schema: req.outputType.jsonSchema, strict: true },
           }
-        : { type: 'json_object' };
+        : {
+            type: 'json_schema',
+            json_schema: {
+              name: 'output',
+              schema: { type: 'object', additionalProperties: true },
+              strict: false,
+            },
+          };
   }
   if (req.providerOptions !== undefined) {
     Object.assign(body, req.providerOptions);
