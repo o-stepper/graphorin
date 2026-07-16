@@ -1,5 +1,0 @@
----
-'@graphorin/server': patch
----
-
-Fix two server defects (e2e 2026-07-16/13). TOKENS-RE-01 (major, security): `DELETE /v1/tokens/:id` revoked the persisted row but never invalidated the live `TokenVerifier` LRU, so a just-used token kept authenticating from cache for up to `cacheTtlMaxMs` (default 60s) after revocation. The route now threads the live verifier and passes it to `revokeToken`, which evicts the cache entry immediately (the SPL-9 seam that was already available). SERVER-C-01 (major): a failing workflow yields a `workflow.error` EVENT and ends its stream without throwing, so the background runner's catch never fired - it emitted the raw event (`{ threadId, error }`, no `runId`/top-level `code`/`message`) and marked the run `completed`. The runner now re-shapes a `workflow.error` event to the documented `{ runId, code, message }` wire envelope and settles the run as `failed` with the error (on the execute, resume, and iterate paths). Regression tests added: a warm revoked token stops authenticating after a REST revoke, and a failing workflow execute reports run status `failed` with the error code.

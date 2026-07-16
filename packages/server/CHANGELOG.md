@@ -1,5 +1,30 @@
 # @graphorin/server
 
+## 0.10.1
+
+### Patch Changes
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix a failed server start stranding already-started daemons (e2e 2026-07-16, SERVER-CH-01, major). The domain gateway starts LAST, so a vendor channel adapter throwing during `start()` left the consolidator, scheduler, and workflow-timer daemons running with no way to stop them - and because the failed start reset `started`, a follow-up `stop()` threw `LifecycleNotStartedError`, so the public handle could not unwind the leak (an always-on deployment could only recover by killing the process). `start()` now unwinds every already-started daemon (in reverse order) and closes a bound listener before rethrowing, and `stop()` after a failed start is a safe no-op instead of throwing. Regression test injects a gateway whose `start()` throws and asserts the earlier-started timer driver is stopped and `stop()` resolves.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix two server defects (e2e 2026-07-16/13). TOKENS-RE-01 (major, security): `DELETE /v1/tokens/:id` revoked the persisted row but never invalidated the live `TokenVerifier` LRU, so a just-used token kept authenticating from cache for up to `cacheTtlMaxMs` (default 60s) after revocation. The route now threads the live verifier and passes it to `revokeToken`, which evicts the cache entry immediately (the SPL-9 seam that was already available). SERVER-C-01 (major): a failing workflow yields a `workflow.error` EVENT and ends its stream without throwing, so the background runner's catch never fired - it emitted the raw event (`{ threadId, error }`, no `runId`/top-level `code`/`message`) and marked the run `completed`. The runner now re-shapes a `workflow.error` event to the documented `{ runId, code, message }` wire envelope and settles the run as `failed` with the error (on the execute, resume, and iterate paths). Regression tests added: a warm revoked token stops authenticating after a REST revoke, and a failing workflow execute reports run status `failed` with the error code.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix graceful shutdown hanging forever with a connected WebSocket client (e2e 2026-07-16, WS-LIFECY-02, critical; also WS-LIFECY-01). `dispatcher.shutdown()` sent each subscription a `lifecycle`/`aborted` frame and cleared in-memory state but never closed the underlying sockets, so `http.Server.close()` waited on idle subscribers indefinitely and `stop()` (the SIGTERM path the CLI installs) never resolved - an always-on deployment's restart/deploy could only be forced with SIGKILL. `shutdown()` now closes every connected socket with the documented `server.shutdown` close code (4007), which also fixes the previously-unemitted 4007 code, and `stop()` gains a drain-budget fallback that force-closes any lingering connection so it cannot hang even on a stalled close handshake. A regression test asserts `stop()` completes promptly with an idle and a subscribed WebSocket client connected, and that the client receives close code 4007.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(server): SERVER-DO-01 surface the triggers orphaned count on /v1/health
+
+  The triggers daemon status reports `orphaned` (persisted rows with no registered
+  declaration), but the `/v1/health` `checks.triggers` block dropped the field even
+  though the docs promise it. `TriggersCheck` now carries `orphaned` and the health
+  collector copies it (0 on the failure branch).
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+  - @graphorin/protocol@0.10.1
+  - @graphorin/store-sqlite@0.10.1
+  - @graphorin/tools@0.10.1
+  - @graphorin/triggers@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

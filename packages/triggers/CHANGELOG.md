@@ -1,5 +1,14 @@
 # @graphorin/triggers
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix disabled triggers still firing via `emit()` / manual `fire()` (e2e 2026-07-16, TRIGGERS-01, minor). `fire()` honoured only the expiry check, not the persisted `disabled` flag, and `emit()` delegates to `fire()` - so an event trigger could not actually be paused (only the timer loop skipped disabled rows). `fire()` now short-circuits on every path when the trigger is disabled, checked against an in-memory `#disabled` mirror kept in sync at register / start / setDisabled / auto-pause / unregister (a per-fire `store.get()` would add latency to the hot path and reorder event emission). Regression test pins that a `setDisabled(true)` trigger fires on neither `emit()` nor `fire()`, and resumes after re-enabling.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7)]:
+  - @graphorin/core@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

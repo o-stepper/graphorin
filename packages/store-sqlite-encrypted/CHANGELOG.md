@@ -1,5 +1,12 @@
 # @graphorin/store-sqlite-encrypted
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a)]:
+  - @graphorin/store-sqlite@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

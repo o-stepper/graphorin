@@ -1,5 +1,19 @@
 # @graphorin/store-sqlite
 
+## 0.10.1
+
+### Patch Changes
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix a working-block second mutation crashing under a partial (NULL) scope (e2e 2026-07-13, MEMORY-C-01, critical). A block written under a scope with a NULL session or agent id (for example the wave-D user-only profile block, scope `{ userId }`) could not be mutated a second time: the `(scope_user_id, scope_session_id, scope_agent_id, label)` UNIQUE index does not treat NULLs as equal, so the `ON CONFLICT` upsert never matched and the write collided on the PRIMARY KEY `id` with `UNIQUE constraint failed: working_blocks.id`. `WorkingMemoryStoreImpl.upsert` now resolves the existing row with the same NULL-safe `COALESCE` semantics the rest of the store already uses for reads/deletes, then updates it in place (preserving `id` and `created_at`, reviving a soft-deleted row) or inserts fresh. A regression test covers repeated upserts under both a user-only scope and a user+session scope.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix session-tier reads ignoring `SessionScope.userId` (e2e 2026-07-13, SESSIONS-01, security). `SessionMemoryStore.list`, `listWithMetadata`, `count`, and `search` filtered on `scope_session_id` alone, so a caller who knew another user's session id could read that user's transcript. All four reads now also scope by `scope_user_id`, so a mismatched user sees nothing while the owner reads their own session unchanged. Regression test pins that a different user with the same session id gets zero rows.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix session erasure crashing in the default vec0 mode (e2e 2026-07-16, STORE-SQ-02, critical). `deleteSession` / `pruneSessions` discovered per-embedder vec0 sidecars with a `LIKE 'episodes_vec_%'` scan over `sqlite_master`, which also matched a vec0 virtual table's SHADOW tables (`_info`, `_chunks`, `_rowids`, `_vector_chunks00`). Those shadow tables reject `DELETE` ("table ... may not be modified"), so the whole IMMEDIATE-transaction erasure cascade rolled back and nothing was deleted - the documented GDPR-style erasure path (guide/privacy.md, session-store RP-6) was broken for any session with embedded content in the default vector mode. `#contentVecTables` now filters to the addressable tables only (the vec0 main or a linear-fallback sidecar), mirroring `VectorTableManager`'s existing shadow-table filter. A new regression test exercises the real vec0 path (previous erasure tests ran with `skipSqliteVec: true`, so the shadow tables never existed).
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/observability@0.10.1
+
 ## 0.10.0
 
 ### Minor Changes

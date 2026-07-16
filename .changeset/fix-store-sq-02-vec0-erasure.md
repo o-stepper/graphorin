@@ -1,5 +1,0 @@
----
-'@graphorin/store-sqlite': patch
----
-
-Fix session erasure crashing in the default vec0 mode (e2e 2026-07-16, STORE-SQ-02, critical). `deleteSession` / `pruneSessions` discovered per-embedder vec0 sidecars with a `LIKE 'episodes_vec_%'` scan over `sqlite_master`, which also matched a vec0 virtual table's SHADOW tables (`_info`, `_chunks`, `_rowids`, `_vector_chunks00`). Those shadow tables reject `DELETE` ("table ... may not be modified"), so the whole IMMEDIATE-transaction erasure cascade rolled back and nothing was deleted - the documented GDPR-style erasure path (guide/privacy.md, session-store RP-6) was broken for any session with embedded content in the default vector mode. `#contentVecTables` now filters to the addressable tables only (the vec0 main or a linear-fallback sidecar), mirroring `VectorTableManager`'s existing shadow-table filter. A new regression test exercises the real vec0 path (previous erasure tests ran with `skipSqliteVec: true`, so the shadow tables never existed).

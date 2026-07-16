@@ -1,5 +1,16 @@
 # @graphorin/mcp
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Correct the MCP client downgrade-audit documentation (e2e 2026-07-16, MCP-SKIL-01, doc-drift). The guide referenced `AdaptedToolsResult.downgradedTools` as the audit surface for per-tool trust downgrades, but no such type is exported and `toTools()` returns a plain `Tool[]`. The guide now states the auditable record is the one WARN logged per downgrade at adaptation time.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+  - @graphorin/tools@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

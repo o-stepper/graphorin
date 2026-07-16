@@ -1,5 +1,14 @@
 # @graphorin/workflow
 
+## 0.10.1
+
+### Patch Changes
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the durable timer driver never re-arming at the earliest future wake (e2e 2026-07-13, WORKFLOW-01, major). Each sweep only queried threads already due (`listSuspended({ dueBefore: now })`) and computed the next wake-up from THEIR results, so a thread suspended with a short future timer never contributed - `nextWakeAt` stayed undefined and the next pass was scheduled a full `pollIntervalMs` (default 30s) away, making a `sleepFor(300ms)` durable timer wait out the whole interval. The sweep now looks one poll interval ahead (`dueBefore: now + pollIntervalMs`): threads already due still fire, and the earliest not-yet-due thread within the window sets `nextWakeAt`, so `schedule()` re-arms at `min(pollIntervalMs, earliest wakeAt)`. Regression test pins that a not-yet-due timer inside the poll window populates `nextWakeAt` and shortens the re-arm delay.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7)]:
+  - @graphorin/core@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

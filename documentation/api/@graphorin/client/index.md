@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.10.0**](../../index.md)
+[**Graphorin API reference v0.10.1**](../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.10.0
+- **Version:** v0.10.1
 - **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/client>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
@@ -95,7 +95,7 @@ MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/gra
 
 ---
 
-**Project Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.10.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

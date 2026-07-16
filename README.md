@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.10.0](https://img.shields.io/badge/version-v0.10.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.10.1](https://img.shields.io/badge/version-v0.10.1-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.10.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.10.1`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.10.0** (2026-07-16) - the external-audit remediation release: an independent consumer audit of 0.9.0 confirmed the framework end to end (cloud + local Ollama legs) and this release closes its P1 list. Highlights: Ollama adapter operational controls (`think`, `numCtx`, `keepAlive`, streamed thinking surfaced as `reasoning.delta`, and a forced `toolChoice` now refused honestly instead of silently degraded); a typed `SqliteNativeBindingError` that turns the pnpm-10 skipped-build trap into an actionable fix with a matching installation-guide recipe; a warning-free quickstart with a coherent context profile; and a weekly consumer-install smoke against the published packages. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-9-x-0-10-0) for upgrade notes.
+Latest release: **0.10.1** (2026-07-16) - the external-audit remediation release: an independent consumer audit of 0.9.0 confirmed the framework end to end (cloud + local Ollama legs) and this release closes its P1 list. Highlights: Ollama adapter operational controls (`think`, `numCtx`, `keepAlive`, streamed thinking surfaced as `reasoning.delta`, and a forced `toolChoice` now refused honestly instead of silently degraded); a typed `SqliteNativeBindingError` that turns the pnpm-10 skipped-build trap into an actionable fix with a matching installation-guide recipe; a warning-free quickstart with a coherent context profile; and a weekly consumer-install smoke against the published packages. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-9-x-0-10-0) for upgrade notes.
 
 ## Use cases
 
@@ -323,7 +323,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.10.1 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

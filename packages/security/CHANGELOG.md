@@ -1,5 +1,27 @@
 # @graphorin/security
 
+## 0.10.1
+
+### Patch Changes
+
+- [#186](https://github.com/o-stepper/graphorin/pull/186) [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7) Thanks [@o-stepper](https://github.com/o-stepper)! - P3 documentation-drift sweep from the 2026-07 e2e campaign - docstring corrections only, no behavior changes: binary-json's `URL` corruption claim (a URL stringifies to its `href`, not `{}`; CORE-PRO-02); `isAgentFallbackEligible`'s bypass list now names the real `ProviderErrorKind` values (MODEL-FAL-02); `bySensitivity` / `stripSensitiveOutputs` document their actual weak redaction-token contract with an explicit warning instead of a nonexistent part-level sensitivity annotation (AGENT-FIL-01/02); `ProtocolGuardConfig` no longer advertises a nonexistent `Agent.protocolGuard` key (LATERAL-L-03); the token-counter serializer documents the real `[file:<mimeType>]` placeholder and the counter dispatch table the real per-family OpenAI encodings (PROVIDER-CT-02/03); `RegressionOptions` tolerances document their strictly-exceeds semantics (EVALS-REP-01); the reconnect backoff formula matches the implementation (`2^(attempt-1)`; ORPHAN-SU-02); the memory guard states its five tiers (CLI-05); the proactive cron-task docs speak about E1 deny-by-name in the present tense.
+
+- [#186](https://github.com/o-stepper/graphorin/pull/186) [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7) Thanks [@o-stepper](https://github.com/o-stepper)! - Dedupe concurrent OAuth `refresh()` side effects onto a single cycle (e2e 2026-07-16, ORPHAN-SU-03). The HTTP layer already coalesced concurrent refreshes into one token-endpoint round-trip (SPL-12), but every joining caller then re-ran the client-level tail on the shared result - so one actual rotation emitted one `oauth:refreshed` audit row, one `oauth.refreshed` lifecycle event, and one rotation strategy hook PER CALLER, and audit consumers counted a single rotation N times. `createOAuthClient().refresh()` now shares one full cycle (network + persist + audit + lifecycle + hooks) across concurrent callers, honoring the documented "reuses the in-flight refresh promise" contract end to end; a `force: true` refresh bypasses the join and installs itself as the shared promise, exactly like the HTTP-level dedupe. Regression tests pin one-cycle side effects for three concurrent callers, slot reset after settlement, and the forced-bypass path.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(security): OAUTH-ADV-01/02 surface RFC error codes on DCR + device-authorization failures
+
+  - OAUTH-ADV-01: Dynamic Client Registration failures throw the new
+    `OAuthRegistrationError` (kind `registration-failed`) carrying the RFC 7591
+    `error` / `error_description` body fields, not just the HTTP status.
+  - OAUTH-ADV-02: a device-authorization request failure preserves the RFC 8628
+    spec error code from the body instead of collapsing to a generic
+    `device_authorization_failed`.
+
+  Adds `OAuthRegistrationError` and `readOAuthErrorFields` to the public surface.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7)]:
+  - @graphorin/core@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

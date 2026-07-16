@@ -1,5 +1,13 @@
 # @graphorin/channels
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/tools@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes
