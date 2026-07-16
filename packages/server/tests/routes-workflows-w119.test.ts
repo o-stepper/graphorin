@@ -245,6 +245,31 @@ describe('W-119 - server workflow surface', () => {
     await waitFor(async () => (await wf.getState('r-1')).status === 'completed');
   });
 
+  it('SERVER-C-01: a failing workflow execute marks the run failed (not completed) with the error code', async () => {
+    const wf = retryableWorkflow();
+    server?.workflows.register({ id: 'server-c-01', workflow: wf as never });
+    // The engine yields a workflow.error EVENT (no throw) on the first
+    // attempt; the run used to be tracked 'completed' with no error.
+    const exec = await post('/v1/workflows/server-c-01/execute', { threadId: 'sc1-1' });
+    expect(exec.status).toBe(202);
+    const { runId } = (await exec.json()) as { runId: string };
+
+    if (server === undefined || bearer === undefined) throw new Error('not booted');
+    const getState = async (): Promise<{ status: string; error?: { code?: string } }> => {
+      const r = await server!.app.request(`/v1/runs/${runId}/state`, {
+        headers: { Authorization: `Bearer ${bearer}` },
+      });
+      return (await r.json()) as { status: string; error?: { code?: string } };
+    };
+    await waitFor(async () => {
+      const s = (await getState()).status;
+      return s === 'failed' || s === 'completed' || s === 'aborted';
+    });
+    const state = await getState();
+    expect(state.status).toBe('failed');
+    expect(state.error?.code).toBe('node-execution-failed');
+  });
+
   it('POST /:id/tick reports not-due timers and fires due ones', async () => {
     const wf = timerWorkflow();
     server?.workflows.register({ id: 'timers', workflow: wf as never });

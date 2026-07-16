@@ -147,3 +147,27 @@ describe('W-106 - attenuation-only minting', () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe('TOKENS-RE-01 - REST revoke invalidates the verifier cache', () => {
+  it('a warm (just-used) token stops authenticating immediately after DELETE /v1/tokens/:id', async () => {
+    const bearer = await bootWithToken(['admin:*']);
+    if (server === undefined) throw new Error('not booted');
+    const call = (method: string, path: string) =>
+      server!.app.request(path, { method, headers: { Authorization: `Bearer ${bearer}` } });
+
+    // Warm the TokenVerifier LRU by using the token once.
+    const warm = await call('GET', '/v1/tokens');
+    expect(warm.status).toBe(200);
+    const list = (await warm.json()) as { tokens: Array<{ id: string }> };
+    const id = list.tokens[0]?.id;
+    expect(typeof id).toBe('string');
+
+    // Revoke it over REST.
+    const del = await call('DELETE', `/v1/tokens/${id}`);
+    expect(del.status).toBe(204);
+
+    // The just-used (warm) token must NOT keep authenticating from the cache.
+    const after = await call('GET', '/v1/tokens');
+    expect(after.status).toBe(401);
+  });
+});

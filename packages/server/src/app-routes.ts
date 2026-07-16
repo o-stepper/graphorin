@@ -228,6 +228,9 @@ export function mountRoutes(
         pepper: ctx.pepper,
         defaultEnv: 'live',
         allowedEnvs: config.auth.tokenEnvironments,
+        // TOKENS-RE-01: thread the live verifier so a REST revoke evicts its
+        // LRU cache entry immediately (no up-to-60s fail-open window).
+        ...(ctx.verifier !== undefined ? { verifier: ctx.verifier } : {}),
       }),
     );
   }
