@@ -66,4 +66,4 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 
 ---
 
-**Project Graphorin** · v0.9.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

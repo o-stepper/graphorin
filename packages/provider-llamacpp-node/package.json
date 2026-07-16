@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/provider-llamacpp-node",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "In-process GGUF execution adapter for the Graphorin framework. Wraps node-llama-cpp@^3.5 to load .gguf model files directly into the same Node process - no daemon, no port to manage, no GPU contention with other processes. Declares trust: 'loopback' permanently because the model lives in the same trust boundary as the host process. Ships LlamaCppNativeCounter that wraps model.tokenize() from the loaded GGUF for byte-exact token counts.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

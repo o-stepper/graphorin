@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-secure-replay-agent",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Security and replay demo for the Graphorin framework: dataFlowPolicy shadow-to-enforce on an untrusted tool + secret + blocked sink with a declassifySinks escape, cachePolicy anchors with cache legs from Usage, a deterministic replay provider, and a read-only sub-agent - fully offline. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

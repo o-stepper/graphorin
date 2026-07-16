@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.9.0](https://img.shields.io/badge/version-v0.9.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.10.0](https://img.shields.io/badge/version-v0.10.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.9.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.10.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.9.0** (2026-07-13) - the bot-adoption release: five feature waves that make the framework a complete substrate for a long-living personal assistant. Highlights: a vendor-neutral channel front door with pairing, an inbound taint boundary and a conformance testkit (new `@graphorin/channels`); proactivity - heartbeat, durable cron with fail-closed model pinning, and a notify/question/review/act escalation ladder with gated `act` (new `@graphorin/proactive`); a provable memory quality loop (operation-level eval metrics with a conflict-pipeline A/B, profile projection, a reviser tool split, and evidence-gated promotion behind an enforced ingest gate); four-value tool permissions (`allow | deny | ask | defer` with durable human-in-the-loop and deny-by-name); and the workflow durability tail (fork-with-patch, an operator CLI, cross-process resume pinned end-to-end). See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-8-x-0-9-0) for upgrade notes.
+Latest release: **0.10.0** (2026-07-13) - the bot-adoption release: five feature waves that make the framework a complete substrate for a long-living personal assistant. Highlights: a vendor-neutral channel front door with pairing, an inbound taint boundary and a conformance testkit (new `@graphorin/channels`); proactivity - heartbeat, durable cron with fail-closed model pinning, and a notify/question/review/act escalation ladder with gated `act` (new `@graphorin/proactive`); a provable memory quality loop (operation-level eval metrics with a conflict-pipeline A/B, profile projection, a reviser tool split, and evidence-gated promotion behind an enforced ingest gate); four-value tool permissions (`allow | deny | ask | defer` with durable human-in-the-loop and deny-by-name); and the workflow durability tail (fork-with-patch, an operator CLI, cross-process resume pinned end-to-end). See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-8-x-0-9-0) for upgrade notes.
 
 ## Use cases
 
@@ -323,7 +323,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.9.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 
