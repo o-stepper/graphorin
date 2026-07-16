@@ -36,7 +36,10 @@ const baseConfig = defineConfig({
   metaChunk: true,
   appearance: 'dark',
   srcDir: '.',
-  srcExclude: ['README.md', 'node_modules/**'],
+  // CHANGELOG.md is the @graphorin/docs package changelog stub the
+  // changesets action reads when composing the Version Packages PR - it
+  // is package metadata, not a site page.
+  srcExclude: ['README.md', 'CHANGELOG.md', 'node_modules/**'],
   outDir: '.vitepress/dist',
   cacheDir: '.vitepress/cache',
 
