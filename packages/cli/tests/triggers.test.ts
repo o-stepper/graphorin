@@ -1,9 +1,16 @@
+import { execFile } from 'node:child_process';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
 
 import { createSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
+
+const execFileAsync = promisify(execFile);
+// `test` dependsOn `build` in turbo.json, so the CLI dist is present here.
+const BIN = fileURLToPath(new URL('../dist/bin/graphorin.js', import.meta.url));
 
 import {
   runTriggersDisable,
@@ -145,5 +152,27 @@ describe('IP-4 - fire reports UNSUPPORTED honestly', () => {
     expect(out.unsupported).toBe(true);
     expect(process.exitCode).toBe(2);
     process.exitCode = before;
+  });
+});
+
+// OPERATOR-01: the `prune` help claimed a bare invocation would "drop every
+// disabled row", but the epoch-0 default made it a no-op for every dated row.
+// `--before` is now required (mirroring `audit prune` / `traces prune`) and the
+// help text no longer makes the false promise.
+describe('graphorin triggers prune --before contract (OPERATOR-01)', () => {
+  it('requires --before instead of silently no-opping', async () => {
+    const cfg = await fixture();
+    await expect(
+      execFileAsync('node', [BIN, 'triggers', 'prune', '--config', cfg]),
+    ).rejects.toMatchObject({
+      code: expect.any(Number),
+      stderr: expect.stringMatching(/required option.*--before/i),
+    });
+  });
+
+  it('help text no longer promises to "drop every disabled row"', async () => {
+    const { stdout } = await execFileAsync('node', [BIN, 'triggers', 'prune', '--help']);
+    expect(stdout).not.toContain('drop every disabled row');
+    expect(stdout).toContain('before this are dropped');
   });
 });

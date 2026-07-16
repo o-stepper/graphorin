@@ -144,4 +144,30 @@ describe('graphorin memory review (MCON-2)', () => {
     await store.close();
     expect(row).toBeUndefined();
   });
+
+  // MEMORY-CL-02: `--promote <bad-id>` must emit a structured error document on
+  // the JSON payload (stdout) instead of an empty stdout, so `--json` consumers
+  // get a machine-readable failure. The exit code stays the machine signal.
+  it('emits a structured error on the payload when a --promote id is not quarantined', async () => {
+    const cfg = await seededReviewConfig();
+    const prevExit = process.exitCode;
+    const jsonDocs: unknown[] = [];
+    const out = await runMemoryReview({
+      config: cfg,
+      promote: 'no-such-id',
+      json: true,
+      jsonPrint: (doc) => jsonDocs.push(doc),
+      print: () => undefined,
+    });
+    expect(out.promoted).toBeUndefined();
+    expect(out.error).toEqual({
+      code: 'not-quarantined',
+      message: expect.stringContaining('not a quarantined memory'),
+    });
+    // The JSON sink received exactly the failure document (not empty stdout).
+    expect(jsonDocs).toHaveLength(1);
+    expect((jsonDocs[0] as MemoryReviewResult).error?.code).toBe('not-quarantined');
+    expect(process.exitCode).toBe(1);
+    process.exitCode = prevExit; // the failure sets a non-zero exit; reset for the suite
+  });
 });

@@ -483,13 +483,27 @@ function registerSecretsCommands(program: Command): void {
       .command('ref <uri>')
       .description('Test resolution of a SecretRef URI.')
       .option('--reveal', 'Include the resolved value in the report.'),
-  ).action(async (uri: string, opts: { reveal?: boolean; json?: boolean }) => {
-    await runSecretsRef({
-      uri,
-      ...(opts.reveal !== undefined ? { reveal: opts.reveal } : {}),
-      ...(opts.json !== undefined ? { json: opts.json } : {}),
-    });
-  });
+  ).action(
+    async (
+      uri: string,
+      opts: {
+        reveal?: boolean;
+        json?: boolean;
+        secretsSource?: 'auto' | 'keyring' | 'encrypted-file' | 'env';
+        strictSecrets?: boolean;
+      },
+    ) => {
+      // SECRETS-S-03: thread the --secrets-source / --strict-secrets flags that
+      // commonOpts registers; the ref action previously dropped them.
+      await runSecretsRef({
+        uri,
+        ...(opts.reveal !== undefined ? { reveal: opts.reveal } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+        ...(opts.secretsSource !== undefined ? { secretsSource: opts.secretsSource } : {}),
+        ...(opts.strictSecrets !== undefined ? { strictSecrets: opts.strictSecrets } : {}),
+      });
+    },
+  );
   commonOpts(
     secrets
       .command('rotate <key>')
@@ -980,9 +994,14 @@ function registerTriggersCommands(program: Command): void {
     });
   t.command('prune')
     .description('Drop disabled triggers older than --before.')
-    .option(
+    // OPERATOR-01: `--before` is required (mirrors `audit prune` / `traces
+    // prune`). The old optional form defaulted the cutoff to epoch 0, so a bare
+    // `prune` silently dropped nothing for any dated row while the help claimed
+    // it "drop[s] every disabled row" - the guide already says to always pass
+    // `--before`, so enforce it instead of shipping a misleading no-op default.
+    .requiredOption(
       '--before <date>',
-      'ISO date / epoch ms cutoff. Defaults to 0 (drop every disabled row).',
+      'ISO date / epoch ms cutoff. Disabled triggers last fired (or created, if never fired) before this are dropped.',
     )
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
