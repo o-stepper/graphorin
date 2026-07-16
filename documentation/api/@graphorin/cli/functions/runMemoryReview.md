@@ -10,7 +10,7 @@
 function runMemoryReview(options?): Promise<MemoryReviewResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:846](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L846)
+Defined in: [packages/cli/src/commands/memory.ts:862](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L862)
 
 `graphorin memory review` - list the facts / episodes / insights / induced
 procedures the consolidator left in quarantine (read-only), or promote a

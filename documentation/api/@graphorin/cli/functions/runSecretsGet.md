@@ -10,7 +10,7 @@
 function runSecretsGet(options): Promise<SecretsGetResult>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L97)
+Defined in: [packages/cli/src/commands/secrets.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L99)
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: JsTiktokenCounterOptions
 
-Defined in: [packages/provider/src/counters/js-tiktoken.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L36)
+Defined in: [packages/provider/src/counters/js-tiktoken.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L52)
 
 Options for [JsTiktokenCounter](/api/@graphorin/provider/classes/JsTiktokenCounter.md).
 
@@ -16,7 +16,7 @@ Options for [JsTiktokenCounter](/api/@graphorin/provider/classes/JsTiktokenCount
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-encoding"></a> `encoding?` | `readonly` | `string` | Encoding name (`'cl100k_base'`, `'o200k_base'`, …). Default `'cl100k_base'`. | [packages/provider/src/counters/js-tiktoken.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L38) |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | Identifier carried on the produced counter. | [packages/provider/src/counters/js-tiktoken.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L47) |
-| <a id="property-modelid"></a> `modelId?` | `readonly` | `string` | Optional model id used by `encodingForModel`. Falls back to the explicit `encoding`. | [packages/provider/src/counters/js-tiktoken.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L40) |
-| <a id="property-moduleoverride"></a> `moduleOverride?` | `readonly` | `TiktokenModule` | Override the dynamically-loaded module. Used by tests to inject a stub without taking the real `js-tiktoken` peer dependency. | [packages/provider/src/counters/js-tiktoken.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L45) |
+| <a id="property-encoding"></a> `encoding?` | `readonly` | `string` | Encoding name (`'cl100k_base'`, `'o200k_base'`, …). Default `'cl100k_base'`. | [packages/provider/src/counters/js-tiktoken.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L54) |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | Identifier carried on the produced counter. | [packages/provider/src/counters/js-tiktoken.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L63) |
+| <a id="property-modelid"></a> `modelId?` | `readonly` | `string` | Optional model id used by `encodingForModel`. Falls back to the explicit `encoding`. | [packages/provider/src/counters/js-tiktoken.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L56) |
+| <a id="property-moduleoverride"></a> `moduleOverride?` | `readonly` | `TiktokenModule` | Override the dynamically-loaded module. Used by tests to inject a stub without taking the real `js-tiktoken` peer dependency. | [packages/provider/src/counters/js-tiktoken.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L61) |

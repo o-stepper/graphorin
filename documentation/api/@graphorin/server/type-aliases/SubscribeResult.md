@@ -24,7 +24,7 @@ type SubscribeResult =
 };
 ```
 
-Defined in: [packages/server/src/ws/dispatcher.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L116)
+Defined in: [packages/server/src/ws/dispatcher.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L117)
 
 Result of [WsDispatcher.subscribe](/api/@graphorin/server/interfaces/WsDispatcher.md#subscribe).
 
@@ -44,11 +44,11 @@ Result of [WsDispatcher.subscribe](/api/@graphorin/server/interfaces/WsDispatche
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `ok` | `true` | - | [packages/server/src/ws/dispatcher.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L118) |
-| `replayedCount` | `number` | - | [packages/server/src/ws/dispatcher.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L120) |
-| `snapshotEventId` | `string` \| `undefined` | - | [packages/server/src/ws/dispatcher.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L121) |
-| `subscription` | [`WsSubscriptionSnapshot`](/api/@graphorin/server/interfaces/WsSubscriptionSnapshot.md) | - | [packages/server/src/ws/dispatcher.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L119) |
-| `dispatchReplay()` | () => `void` | E-02 (S-15/8): deliver the replay frames captured at subscribe time. Idempotent - the second call is a no-op. When `deferReplay` was not requested the frames were already dispatched inside `subscribe()` and this is a no-op too. | [packages/server/src/ws/dispatcher.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L128) |
+| `ok` | `true` | - | [packages/server/src/ws/dispatcher.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L119) |
+| `replayedCount` | `number` | - | [packages/server/src/ws/dispatcher.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L121) |
+| `snapshotEventId` | `string` \| `undefined` | - | [packages/server/src/ws/dispatcher.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L122) |
+| `subscription` | [`WsSubscriptionSnapshot`](/api/@graphorin/server/interfaces/WsSubscriptionSnapshot.md) | - | [packages/server/src/ws/dispatcher.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L120) |
+| `dispatchReplay()` | () => `void` | E-02 (S-15/8): deliver the replay frames captured at subscribe time. Idempotent - the second call is a no-op. When `deferReplay` was not requested the frames were already dispatched inside `subscribe()` and this is a no-op too. | [packages/server/src/ws/dispatcher.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L129) |
 
 ***
 

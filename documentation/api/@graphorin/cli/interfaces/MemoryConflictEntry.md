@@ -6,7 +6,7 @@
 
 # Interface: MemoryConflictEntry
 
-Defined in: [packages/cli/src/commands/memory.ts:347](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L347)
+Defined in: [packages/cli/src/commands/memory.ts:359](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L359)
 
 ## Stable
 
@@ -14,9 +14,9 @@ Defined in: [packages/cli/src/commands/memory.ts:347](https://github.com/o-stepp
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L348) |
-| <a id="property-decision"></a> `decision` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:350](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L350) |
-| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:353](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L353) |
-| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | [packages/cli/src/commands/memory.ts:349](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L349) |
-| <a id="property-similarity"></a> `similarity` | `readonly` | `number` \| `null` | [packages/cli/src/commands/memory.ts:352](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L352) |
-| <a id="property-stage"></a> `stage` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:351](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L351) |
+| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:360](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L360) |
+| <a id="property-decision"></a> `decision` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L362) |
+| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:365](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L365) |
+| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | [packages/cli/src/commands/memory.ts:361](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L361) |
+| <a id="property-similarity"></a> `similarity` | `readonly` | `number` \| `null` | [packages/cli/src/commands/memory.ts:364](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L364) |
+| <a id="property-stage"></a> `stage` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L363) |

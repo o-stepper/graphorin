@@ -6,7 +6,7 @@
 
 # Interface: MemoryPruneHistoryResult
 
-Defined in: [packages/cli/src/commands/memory.ts:1097](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1097)
+Defined in: [packages/cli/src/commands/memory.ts:1117](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1117)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: [packages/cli/src/commands/memory.ts:1097](https://github.com/o-step
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | [packages/cli/src/commands/memory.ts:1098](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1098) |
-| <a id="property-olderthanms"></a> `olderThanMs` | `readonly` | `number` | The resolved AGE in milliseconds passed to `pruneHistory`. | [packages/cli/src/commands/memory.ts:1100](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1100) |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | [packages/cli/src/commands/memory.ts:1118](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1118) |
+| <a id="property-olderthanms"></a> `olderThanMs` | `readonly` | `number` | The resolved AGE in milliseconds passed to `pruneHistory`. | [packages/cli/src/commands/memory.ts:1120](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L1120) |

@@ -6,7 +6,7 @@
 
 # Interface: MemoryWhyResult
 
-Defined in: [packages/cli/src/commands/memory.ts:703](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L703)
+Defined in: [packages/cli/src/commands/memory.ts:715](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L715)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: [packages/cli/src/commands/memory.ts:703](https://github.com/o-stepp
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-recalls"></a> `recalls` | `readonly` | readonly [`MemoryWhyRecall`](/api/@graphorin/cli/interfaces/MemoryWhyRecall.md)[] | [packages/cli/src/commands/memory.ts:704](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L704) |
+| <a id="property-recalls"></a> `recalls` | `readonly` | readonly [`MemoryWhyRecall`](/api/@graphorin/cli/interfaces/MemoryWhyRecall.md)[] | [packages/cli/src/commands/memory.ts:716](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L716) |
