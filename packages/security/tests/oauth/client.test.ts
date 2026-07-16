@@ -221,4 +221,82 @@ describe('@graphorin/security/oauth - high-level client', () => {
     });
     await expect(client.refresh()).rejects.toThrow(/no refresh token/u);
   });
+
+  // ORPHAN-SU-03: N concurrent refresh() callers share ONE full cycle -
+  // one audit row, one lifecycle event, one persisted session - instead
+  // of re-emitting the shared HTTP result once per caller.
+  it('dedupes concurrent refresh() side effects onto a single cycle', async () => {
+    const storage = createInMemoryOAuthServerStore();
+    const client = createOAuthClient({
+      serverId: 'mcp-test',
+      serverUrl: 'https://mcp.example.com',
+      storage,
+      registration: { clientId: 'cli_test' },
+    });
+    await client.authorizeCode({ scope: 'read', callbackTimeoutMs: 5_000 });
+
+    const lifecycle: string[] = [];
+    const auditActions: string[] = [];
+    onOAuthLifecycle((event) => lifecycle.push(event.type));
+    onOAuthAudit((row) => auditActions.push(row.action));
+    let tokenEndpointCalls = 0;
+    _setTokenEndpointFetcherForTesting(async () => {
+      tokenEndpointCalls += 1;
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      return {
+        ok: true,
+        status: 200,
+        body: {
+          access_token: `access-${tokenEndpointCalls}`,
+          refresh_token: `refresh-${tokenEndpointCalls}`,
+          token_type: 'Bearer',
+          expires_in: 3600,
+        },
+      };
+    });
+
+    const [a, b, c] = await Promise.all([client.refresh(), client.refresh(), client.refresh()]);
+    expect(a).toBe(b);
+    expect(b).toBe(c);
+    expect(tokenEndpointCalls).toBe(1);
+    expect(lifecycle.filter((t) => t === 'oauth.refreshed')).toHaveLength(1);
+    expect(auditActions.filter((x) => x === 'oauth:refreshed')).toHaveLength(1);
+
+    // The slot clears after settlement: a later refresh runs a new cycle.
+    await client.refresh();
+    expect(lifecycle.filter((t) => t === 'oauth.refreshed')).toHaveLength(2);
+  });
+
+  it('a forced refresh bypasses the shared in-flight cycle', async () => {
+    const storage = createInMemoryOAuthServerStore();
+    const client = createOAuthClient({
+      serverId: 'mcp-test',
+      serverUrl: 'https://mcp.example.com',
+      storage,
+      registration: { clientId: 'cli_test' },
+    });
+    await client.authorizeCode({ scope: 'read', callbackTimeoutMs: 5_000 });
+
+    const lifecycle: string[] = [];
+    onOAuthLifecycle((event) => lifecycle.push(event.type));
+    _setTokenEndpointFetcherForTesting(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      return {
+        ok: true,
+        status: 200,
+        body: {
+          access_token: 'access-n',
+          refresh_token: 'refresh-n',
+          token_type: 'Bearer',
+          expires_in: 3600,
+        },
+      };
+    });
+
+    const plain = client.refresh();
+    const forced = client.refresh({ force: true });
+    const [plainSession, forcedSession] = await Promise.all([plain, forced]);
+    expect(plainSession).not.toBe(forcedSession);
+    expect(lifecycle.filter((t) => t === 'oauth.refreshed')).toHaveLength(2);
+  });
 });

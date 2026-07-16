@@ -251,6 +251,77 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
     });
   };
 
+  // ORPHAN-SU-03: the one full refresh cycle (network + persist + audit +
+  // lifecycle + hooks) concurrent refresh() callers share. The slot is
+  // per-client, which is per-serverId - matching the HTTP-level dedupe key.
+  let inflightRefresh: Promise<OAuthSession> | undefined;
+
+  const performRefresh = async (opts?: {
+    force?: boolean;
+    signal?: AbortSignal;
+  }): Promise<OAuthSession> => {
+    const metadata = await ensureMetadata(opts?.signal);
+    const registration = await ensureRegistration(opts?.signal);
+    const refreshToken = await loadToken('refresh');
+    if (refreshToken === undefined) {
+      recordAudit('oauth:expired', 'denied', { reason: 'no_refresh_token' });
+      emitOAuthLifecycle({
+        type: 'mcp.auth.expired',
+        serverId: options.serverId,
+        ts: Date.now(),
+        reason: 'no_refresh_token',
+      });
+      throw new Error(
+        `OAuth client for '${options.serverId}' has no refresh token; run loginInteractive first.`,
+      );
+    }
+    const previousScope = (await options.storage.get(options.serverId))?.scope;
+    try {
+      const session = await refreshAccessToken({
+        serverId: options.serverId,
+        metadata,
+        registration,
+        refreshToken,
+        ...(opts?.signal === undefined ? {} : { signal: opts.signal }),
+        ...(previousScope === undefined ? {} : { scope: previousScope }),
+        ...(opts?.force === true ? { force: true } : {}),
+      });
+      await persistSession(session);
+      recordAudit('oauth:refreshed', 'success', {
+        ...(session.expiresAt === undefined ? {} : { expiresAt: session.expiresAt }),
+        ...(session.scope === undefined ? {} : { scope: session.scope }),
+      });
+      emitOAuthLifecycle({
+        type: 'oauth.refreshed',
+        serverId: options.serverId,
+        ts: Date.now(),
+      });
+      await handleStrategyHooks('rotation', {
+        serverId: options.serverId,
+        serverUrl: options.serverUrl,
+        ...(previousScope === undefined ? {} : { previousScope }),
+        ...(session.scope === undefined ? {} : { nextScope: session.scope }),
+        issuedAt: session.issuedAt,
+      });
+      return session;
+    } catch (err) {
+      recordAudit('oauth:expired', 'error', { error: String(err) });
+      emitOAuthLifecycle({
+        type: 'mcp.auth.expired',
+        serverId: options.serverId,
+        ts: Date.now(),
+        reason: String((err as { kind?: string }).kind ?? 'refresh-failed'),
+      });
+      await handleStrategyHooks('failure', {
+        serverId: options.serverId,
+        serverUrl: options.serverUrl,
+        reason: String((err as { kind?: string }).kind ?? 'refresh-failed'),
+        attemptedAt: Date.now(),
+      });
+      throw err;
+    }
+  };
+
   return {
     serverId: options.serverId,
     serverUrl: options.serverUrl,
@@ -369,66 +440,20 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
       }
     },
     async refresh(opts) {
-      const metadata = await ensureMetadata(opts?.signal);
-      const registration = await ensureRegistration(opts?.signal);
-      const refreshToken = await loadToken('refresh');
-      if (refreshToken === undefined) {
-        recordAudit('oauth:expired', 'denied', { reason: 'no_refresh_token' });
-        emitOAuthLifecycle({
-          type: 'mcp.auth.expired',
-          serverId: options.serverId,
-          ts: Date.now(),
-          reason: 'no_refresh_token',
-        });
-        throw new Error(
-          `OAuth client for '${options.serverId}' has no refresh token; run loginInteractive first.`,
-        );
-      }
-      const previousScope = (await options.storage.get(options.serverId))?.scope;
-      try {
-        const session = await refreshAccessToken({
-          serverId: options.serverId,
-          metadata,
-          registration,
-          refreshToken,
-          ...(opts?.signal === undefined ? {} : { signal: opts.signal }),
-          ...(previousScope === undefined ? {} : { scope: previousScope }),
-          ...(opts?.force === true ? { force: true } : {}),
-        });
-        await persistSession(session);
-        recordAudit('oauth:refreshed', 'success', {
-          ...(session.expiresAt === undefined ? {} : { expiresAt: session.expiresAt }),
-          ...(session.scope === undefined ? {} : { scope: session.scope }),
-        });
-        emitOAuthLifecycle({
-          type: 'oauth.refreshed',
-          serverId: options.serverId,
-          ts: Date.now(),
-        });
-        await handleStrategyHooks('rotation', {
-          serverId: options.serverId,
-          serverUrl: options.serverUrl,
-          ...(previousScope === undefined ? {} : { previousScope }),
-          ...(session.scope === undefined ? {} : { nextScope: session.scope }),
-          issuedAt: session.issuedAt,
-        });
-        return session;
-      } catch (err) {
-        recordAudit('oauth:expired', 'error', { error: String(err) });
-        emitOAuthLifecycle({
-          type: 'mcp.auth.expired',
-          serverId: options.serverId,
-          ts: Date.now(),
-          reason: String((err as { kind?: string }).kind ?? 'refresh-failed'),
-        });
-        await handleStrategyHooks('failure', {
-          serverId: options.serverId,
-          serverUrl: options.serverUrl,
-          reason: String((err as { kind?: string }).kind ?? 'refresh-failed'),
-          attemptedAt: Date.now(),
-        });
-        throw err;
-      }
+      // ORPHAN-SU-03: dedupe concurrent refresh() calls at the client
+      // level so one actual rotation emits exactly one audit row /
+      // lifecycle event / rotation hook - the HTTP layer already
+      // coalesced the round-trip (SPL-12), but every joiner used to
+      // re-run persist + audit + hooks on the shared result, so audit
+      // consumers counted a single rotation N times. Mirrors
+      // refreshAccessToken: a forced refresh bypasses the join and
+      // installs itself as the shared promise.
+      if (opts?.force !== true && inflightRefresh !== undefined) return inflightRefresh;
+      const promise = performRefresh(opts).finally(() => {
+        if (inflightRefresh === promise) inflightRefresh = undefined;
+      });
+      inflightRefresh = promise;
+      return promise;
     },
     async revoke(opts) {
       const metadata = await ensureMetadata(opts?.signal);
