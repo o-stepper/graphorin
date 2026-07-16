@@ -357,6 +357,7 @@ export async function createSqliteStore(
   };
 }
 
+export { SqliteNativeBindingError } from './native-binding-error.js';
 export type { BetterSqlite3Constructor, SqliteConnection, SqliteVecMissingError };
 export {
   // migrations

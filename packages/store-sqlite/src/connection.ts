@@ -11,6 +11,7 @@ import {
   loadCipherDriver,
   resolvePassphrase,
 } from './encryption/index.js';
+import { isMissingNativeBindingError, SqliteNativeBindingError } from './native-binding-error.js';
 
 // The structural driver types are defined in `./driver-types.ts` to
 // break the `connection.ts <-> encryption/index.ts` import cycle;
@@ -149,9 +150,20 @@ let DEFAULT_DRIVER_CTOR: BetterSqlite3Constructor | null = null;
  */
 async function loadDefaultDriver(): Promise<BetterSqlite3Constructor> {
   if (DEFAULT_DRIVER_CTOR !== null) return DEFAULT_DRIVER_CTOR;
-  const mod = (await import('better-sqlite3')) as unknown as {
-    default: BetterSqlite3Constructor;
-  };
+  let mod: { default: BetterSqlite3Constructor };
+  try {
+    mod = (await import('better-sqlite3')) as unknown as {
+      default: BetterSqlite3Constructor;
+    };
+  } catch (err) {
+    // Audit 2026-07-16 P1-3: a pnpm-10 consumer install that skipped the
+    // build script fails HERE with a raw bindings.js stack - rethrow it
+    // with the actual fix attached.
+    if (isMissingNativeBindingError(err)) {
+      throw new SqliteNativeBindingError('better-sqlite3', err);
+    }
+    throw err;
+  }
   DEFAULT_DRIVER_CTOR = mod.default;
   return DEFAULT_DRIVER_CTOR;
 }
