@@ -44,12 +44,6 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
   const inMemoryRefresh = new Map<string, SecretValue>();
   const inMemoryId = new Map<string, SecretValue>();
 
-  // ORPHAN-SU-03: dedupe concurrent refresh() calls at the client level so a
-  // single actual rotation emits exactly one audit row / lifecycle event /
-  // rotation hook, mirroring the HTTP-level dedupe in refreshAccessToken. A
-  // forced refresh bypasses the shared promise, matching refreshAccessToken.
-  let inflightRefresh: Promise<OAuthSession> | undefined;
-
   // SPL-1: the previously-phantom `keyring:oauth:*` refs become real -
   // tokens are written to / loaded from the supplied SecretsStore under
   // the scheme-stripped key, so refresh / revoke / the MCP bridge work

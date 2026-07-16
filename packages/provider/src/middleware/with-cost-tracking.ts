@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { Provider, ProviderEvent, ProviderResponse, Usage } from '@graphorin/core';
+import type { Provider, ProviderEvent, Usage } from '@graphorin/core';
 
 import { defineProviderMiddleware } from './compose.js';
 
