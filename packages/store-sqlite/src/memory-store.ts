@@ -279,20 +279,44 @@ class WorkingMemoryStoreImpl implements WorkingMemoryStore {
   }
   async upsert(scope: SessionScope, block: Block): Promise<void> {
     const now = block.updatedAt ?? block.createdAt;
+    // The (scope_user_id, scope_session_id, scope_agent_id, label) UNIQUE
+    // index cannot serve as an ON CONFLICT target when session/agent are
+    // NULL - SQLite treats NULLs as distinct, so a repeat upsert on a
+    // user-only scope (e.g. the D2 profile block) skips the DO UPDATE and
+    // collides on the PRIMARY KEY id instead. Resolve the existing row
+    // with the same NULL-safe COALESCE semantics list/get/delete use, then
+    // UPDATE it in place (preserving its id + created_at, reviving a
+    // soft-deleted row) or INSERT fresh. This method issues only
+    // synchronous connection calls, so the read-then-write is atomic in
+    // this single-process store.
+    const existing = this.#conn.get<{ id: string }>(
+      "SELECT id FROM working_blocks WHERE scope_user_id = ? AND COALESCE(scope_session_id, '') = COALESCE(?, '') AND COALESCE(scope_agent_id, '') = COALESCE(?, '') AND label = ?",
+      [scope.userId, scope.sessionId ?? null, scope.agentId ?? null, block.label],
+    );
+    if (existing) {
+      this.#conn.run(
+        `UPDATE working_blocks SET
+           value = ?, description = ?, char_limit = ?, read_only = ?,
+           sensitivity = ?, tags_json = ?, updated_at = ?, deleted_at = NULL
+         WHERE id = ?`,
+        [
+          block.value,
+          block.description ?? null,
+          block.charLimit,
+          block.readOnly ? 1 : 0,
+          block.sensitivity,
+          block.tags ? JSON.stringify(block.tags) : null,
+          toEpoch(now),
+          existing.id,
+        ],
+      );
+      return;
+    }
     this.#conn.run(
       `INSERT INTO working_blocks (
          id, scope_user_id, scope_session_id, scope_agent_id, label, description, value,
          char_limit, read_only, sensitivity, tags_json, created_at, updated_at, deleted_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-       ON CONFLICT(scope_user_id, scope_session_id, scope_agent_id, label) DO UPDATE SET
-         value = excluded.value,
-         description = excluded.description,
-         char_limit = excluded.char_limit,
-         read_only = excluded.read_only,
-         sensitivity = excluded.sensitivity,
-         tags_json = excluded.tags_json,
-         updated_at = excluded.updated_at,
-         deleted_at = NULL`,
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
       [
         block.id,
         scope.userId,
@@ -413,8 +437,11 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     if (scope.sessionId === undefined) {
       throw new Error('[graphorin/store-sqlite] SessionMemoryStore.list requires scope.sessionId');
     }
-    const conditions = ['scope_session_id = ?', 'deleted_at IS NULL'];
-    const params: unknown[] = [scope.sessionId];
+    // SESSIONS-01: scope the read by the owning user too - filtering on
+    // scope_session_id alone let a caller read another user's transcript with
+    // a known sessionId.
+    const conditions = ['scope_session_id = ?', 'scope_user_id = ?', 'deleted_at IS NULL'];
+    const params: unknown[] = [scope.sessionId, scope.userId];
     if (opts.agentId !== undefined) {
       conditions.push('agent_id = ?');
       params.push(opts.agentId);
@@ -449,8 +476,9 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
         '[graphorin/store-sqlite] SessionMemoryStore.listWithMetadata requires scope.sessionId',
       );
     }
-    const conditions = ['scope_session_id = ?', 'deleted_at IS NULL'];
-    const params: unknown[] = [scope.sessionId];
+    // SESSIONS-01: scope by the owning user (see list()).
+    const conditions = ['scope_session_id = ?', 'scope_user_id = ?', 'deleted_at IS NULL'];
+    const params: unknown[] = [scope.sessionId, scope.userId];
     if (opts.agentId !== undefined) {
       conditions.push('agent_id = ?');
       params.push(opts.agentId);
@@ -483,8 +511,9 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
   async count(scope: SessionScope): Promise<number> {
     if (scope.sessionId === undefined) return 0;
     const row = this.#conn.get<{ n: number }>(
-      'SELECT COUNT(*) AS n FROM session_messages WHERE scope_session_id = ? AND deleted_at IS NULL',
-      [scope.sessionId],
+      // SESSIONS-01: scope by the owning user (see list()).
+      'SELECT COUNT(*) AS n FROM session_messages WHERE scope_session_id = ? AND scope_user_id = ? AND deleted_at IS NULL',
+      [scope.sessionId, scope.userId],
     );
     return row?.n ?? 0;
   }
@@ -506,10 +535,11 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
               bm25(session_messages_fts) AS bm25_score
        FROM session_messages_fts
        JOIN session_messages m ON m.rowid = session_messages_fts.rowid
-       WHERE session_messages_fts MATCH ? AND m.scope_session_id = ?
+       WHERE session_messages_fts MATCH ? AND m.scope_session_id = ? AND m.scope_user_id = ?
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(query), scope.sessionId, topK],
+      // SESSIONS-01: scope by the owning user (see list()).
+      [escapeFtsQuery(query), scope.sessionId, scope.userId, topK],
     );
     return rows.map((row) => {
       const record: MemoryRecord = {

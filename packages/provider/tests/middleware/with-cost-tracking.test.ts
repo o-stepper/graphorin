@@ -203,6 +203,58 @@ describe('withCostTracking', () => {
     expect(capturedMetadata).toMatchObject({ sessionId: 's1' });
   });
 
+  // R-01: withCostTracking must STAMP the computed cost onto usage.cost so
+  // the agent run loop folds it into state.usage.cost and RunBudget.maxCostUsd
+  // can enforce. The onUsage hook alone never reached the run-level aggregate.
+  it('stamps usage.cost on the generate() result when priceLookup is present', async () => {
+    const wrapped = withCostTracking({
+      priceLookup: () => ({ inputPerMtok: 1_000_000, outputPerMtok: 2_000_000 }),
+    })(bareAdapter());
+    const result = await wrapped.generate(REQ);
+    // 5 input @ $1 + 3 output @ $2 = 11 USD
+    expect(result.usage.cost).toEqual({ amount: 11, currency: 'USD' });
+  });
+
+  it('stamps usage.cost on the stream finish event when priceLookup is present', async () => {
+    const wrapped = withCostTracking({
+      priceLookup: () => ({ inputPerMtok: 1_000_000, outputPerMtok: 2_000_000 }),
+    })(bareAdapter());
+    let finishCost: unknown;
+    for await (const event of wrapped.stream(REQ)) {
+      if (event.type === 'finish') finishCost = event.usage.cost;
+    }
+    expect(finishCost).toEqual({ amount: 11, currency: 'USD' });
+  });
+
+  it('stamps usage.cost even when onUsage is absent (budget-only wiring)', async () => {
+    const wrapped = withCostTracking({
+      priceLookup: () => ({ inputPerMtok: 1_000_000, outputPerMtok: 2_000_000 }),
+    })(bareAdapter());
+    const result = await wrapped.generate(REQ);
+    expect(result.usage.cost).toEqual({ amount: 11, currency: 'USD' });
+  });
+
+  it('does NOT stamp usage.cost when priceLookup is absent (leaves provider cost untouched)', async () => {
+    const base = bareAdapter();
+    const providerReportsCost = {
+      ...base,
+      generate: async () => ({
+        text: 'ok',
+        usage: {
+          promptTokens: 5,
+          completionTokens: 3,
+          totalTokens: 8,
+          cost: { amount: 0.42, currency: 'USD' as const },
+        },
+        finishReason: 'stop' as const,
+      }),
+    };
+    const wrapped = withCostTracking({})(providerReportsCost);
+    const result = await wrapped.generate(REQ);
+    // Provider-reported cost survives; the middleware did not overwrite it.
+    expect(result.usage.cost).toEqual({ amount: 0.42, currency: 'USD' });
+  });
+
   it('bills separately-reported reasoningTokens at the output rate (PS-19)', async () => {
     const base = bareAdapter();
     const reasoningProvider = {

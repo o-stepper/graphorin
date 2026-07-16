@@ -45,6 +45,13 @@ export function lastUserText(messages: ReadonlyArray<Message>): string | undefin
  * agent-level setting wins over the provider-level default; when
  * neither is supplied, the provider's `reasoningContract`
  * capability drives the default per RB-42 / suggested DEC-158.
+ *
+ * The contract-driven defaults mirror `REASONING_RETENTION_DEFAULTS` in
+ * `@graphorin/provider` (the documented, conservative defaults - see
+ * providers.md). REASONING-02: `optional` resolves to `'strip'`, not
+ * `'pass-through-all'` - the conservative default keeps chain-of-thought
+ * out of the persisted transcript and off the next provider call unless a
+ * caller opts in via an agent- or provider-level override.
  */
 export function effectiveReasoningRetention(
   agentOverride: ReasoningRetention | undefined,
@@ -56,7 +63,7 @@ export function effectiveReasoningRetention(
     case 'round-trip-required':
       return 'pass-through-claude';
     case 'optional':
-      return 'pass-through-all';
+      return 'strip';
     case 'hidden':
       return 'strip';
     default:

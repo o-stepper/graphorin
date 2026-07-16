@@ -98,7 +98,16 @@ export function createConflictPipeline(options: ConflictPipelineOptions = {}): C
         'memory.conflict.locale_pack': localePack.id,
       },
       async (span) => {
-        const existing = await collectVectorCandidates(deps, candidate, stage2TopK);
+        let existing = await collectVectorCandidates(deps, candidate, stage2TopK);
+        if (existing.length === 0) {
+          // MEMORY-C-02: with no vector candidates (no embedder, or the
+          // vector extension unavailable) stage-1 exact dedup had nothing to
+          // compare, so byte-identical duplicates were admitted. Surface
+          // exact-text candidates through the store's FTS search so the
+          // canonical-hash comparison can still catch them (the same seam the
+          // consolidator uses via findExactTextDuplicate).
+          existing = await collectExactTextCandidates(deps, candidate, stage2TopK);
+        }
         const ctx: StageContext = {
           candidate,
           existing,
@@ -326,6 +335,42 @@ async function collectVectorCandidates(
     return [];
   }
   return [...hits].filter((hit) => hit.record.id !== candidate.id);
+}
+
+/**
+ * MEMORY-C-02: gather exact-text-match candidates via the store's FTS
+ * search - the embedder-independent path stage-1 exact dedup needs when no
+ * vector candidates were surfaced. FTS ranks fuzzily; stage 1 then confirms
+ * exactness with its canonical-hash comparison, so only true duplicates
+ * dedup. Degrades to "no candidates" on any adapter/search failure so the
+ * write path never blocks (AbortError re-raised for cancellation).
+ */
+async function collectExactTextCandidates(
+  deps: ConflictPipelineDeps,
+  candidate: Fact,
+  topK: number,
+): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+  if (candidate.text.length === 0) return [];
+  checkAbort(deps.signal);
+  const scope = {
+    userId: candidate.userId,
+    ...(candidate.sessionId !== undefined ? { sessionId: candidate.sessionId } : {}),
+    ...(candidate.agentId !== undefined ? { agentId: candidate.agentId } : {}),
+  };
+  try {
+    // includeQuarantined: extraction output lands quarantined, and a replay
+    // would duplicate exactly such a row (mirrors findExactTextDuplicate).
+    const hits = await deps.store.semantic.search(scope, {
+      query: candidate.text,
+      topK,
+      includeQuarantined: true,
+      ...(deps.signal !== undefined ? { signal: deps.signal } : {}),
+    });
+    return hits.filter((hit) => hit.record.id !== candidate.id);
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') throw err;
+    return [];
+  }
 }
 
 function validateThresholds(thresholds: ConflictThresholds): void {

@@ -16,7 +16,7 @@ function parseAuthority(authority):
   | undefined;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:444](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L444)
+Defined in: [packages/security/src/secrets/secret-ref.ts:451](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L451)
 
 Split an authority string of the form `[userinfo@]host[:port]` into
 its components. `host` is lowercased per RFC 3986; userinfo and port

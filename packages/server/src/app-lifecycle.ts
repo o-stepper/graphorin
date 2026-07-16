@@ -131,6 +131,10 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
   let listening: { readonly host: string; readonly port: number } | undefined;
   let started = false;
   let stopped = false;
+  // SERVER-CH-01: set when start() failed after starting some daemons, so a
+  // follow-up stop() is a safe no-op (the daemons were already unwound in the
+  // start() catch) instead of throwing LifecycleNotStartedError.
+  let startFailed = false;
   // IP-16: stops the periodic terminal-run prune sweep on shutdown.
   let stopRunPruning: (() => void) | undefined;
   // W-028: stops the periodic WS replay-buffer TTL sweep on shutdown.
@@ -149,6 +153,41 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
   let dispatcher = deps.ws.dispatcher;
   let tickets = deps.ws.tickets;
   let wsAdapter = deps.ws.wsAdapter;
+
+  // Stop the domain daemons in reverse start order (gateway first, then
+  // timers, scheduler, consolidator). Best-effort - each error is surfaced
+  // but never blocks the rest. Shared by stop() and the start() unwind path
+  // (SERVER-CH-01) so a failed start cannot leave zombie daemons running.
+  async function stopDaemons(): Promise<void> {
+    if (channelsDaemon !== undefined) {
+      try {
+        await channelsDaemon.stop();
+      } catch (err) {
+        await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+      }
+    }
+    if (workflowTimerDaemon !== undefined) {
+      try {
+        await workflowTimerDaemon.stop();
+      } catch (err) {
+        await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+      }
+    }
+    if (triggersDaemon !== undefined) {
+      try {
+        await triggersDaemon.stop();
+      } catch (err) {
+        await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+      }
+    }
+    if (consolidatorDaemon !== undefined) {
+      try {
+        await consolidatorDaemon.stop();
+      } catch (err) {
+        await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+      }
+    }
+  }
 
   return {
     get listeningOn() {
@@ -372,13 +411,35 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         }
         return listening;
       } catch (err) {
+        // SERVER-CH-01: unwind any daemons that already started (the gateway
+        // starts LAST, so a vendor adapter failing to start would otherwise
+        // strand the scheduler/consolidator/timer daemons as zombies) and
+        // close a bound listener, so the failed start leaks nothing and a
+        // follow-up stop() is a safe no-op.
         started = false;
+        startFailed = true;
+        await stopDaemons();
+        if (serverInstance !== undefined) {
+          try {
+            await new Promise<void>((resolve) => {
+              (serverInstance as unknown as { close(cb: () => void): void }).close(() => resolve());
+            });
+          } catch {
+            // Best-effort during the failed-start unwind.
+          }
+          serverInstance = undefined;
+        }
         await emitError(options.hooks, { error: err, phase: 'beforeStart' });
         throw err;
       }
     },
     async stop({ force }: { readonly force?: boolean } = {}): Promise<void> {
-      if (!started) throw new LifecycleNotStartedError();
+      // SERVER-CH-01: after a failed start the daemons were already unwound,
+      // so stop() is a safe no-op rather than throwing.
+      if (!started) {
+        if (startFailed) return;
+        throw new LifecycleNotStartedError();
+      }
       if (stopped) return;
       stopped = true;
       // IP-16: halt the prune sweep before draining.
@@ -417,34 +478,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       // B1.6: the gateway stops FIRST - the front door closes before
       // the daemons behind it, so shutdown drains only work that is
       // already in flight.
-      if (channelsDaemon !== undefined) {
-        try {
-          await channelsDaemon.stop();
-        } catch (err) {
-          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
-        }
-      }
-      if (workflowTimerDaemon !== undefined) {
-        try {
-          await workflowTimerDaemon.stop();
-        } catch (err) {
-          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
-        }
-      }
-      if (triggersDaemon !== undefined) {
-        try {
-          await triggersDaemon.stop();
-        } catch (err) {
-          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
-        }
-      }
-      if (consolidatorDaemon !== undefined) {
-        try {
-          await consolidatorDaemon.stop();
-        } catch (err) {
-          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
-        }
-      }
+      await stopDaemons();
 
       // Pending reservations (e.g. awaited WS subscriptions for the
       // streaming endpoints) hold no work in progress; abort them
@@ -465,8 +499,37 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       }
 
       if (serverInstance !== undefined) {
+        const srv = serverInstance as unknown as {
+          close(cb: () => void): void;
+          closeAllConnections?: () => void;
+        };
         await new Promise<void>((resolve) => {
-          (serverInstance as unknown as { close(cb: () => void): void }).close(() => resolve());
+          let settled = false;
+          const done = (): void => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve();
+          };
+          // WS-LIFECY-02 belt-and-suspenders: dispatcher.shutdown() above
+          // already closed every tracked WebSocket, so close() normally
+          // completes at once. This fallback guarantees stop() cannot hang
+          // even on a stalled close handshake or an untracked lingering
+          // socket - after the drain budget, force every remaining
+          // connection shut (force:true drives drainTimeoutMs to 0 => now).
+          const timer = setTimeout(
+            () => {
+              try {
+                srv.closeAllConnections?.();
+              } catch {
+                // ignore - best-effort force close.
+              }
+              done();
+            },
+            Math.max(0, drainTimeoutMs),
+          );
+          (timer as { unref?: () => void }).unref?.();
+          srv.close(() => done());
         });
         serverInstance = undefined;
       }

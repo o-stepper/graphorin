@@ -287,16 +287,22 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     if (!permission.ok) return permission.completed;
     const { validatedInput, effectiveArgs } = permission;
 
-    // Approval flow - evaluated on the validated input.
-    const approval = await runApprovalPhase(rt, {
-      call,
-      tool,
-      runContext,
-      stepNumber,
-      trustLevel,
-      validatedInput,
-      effectiveArgs,
-    });
+    // Approval flow - evaluated on the validated input. TOOL-AUDI-01: a
+    // pre-approved replay already resolved the approval durably in the agent
+    // (which owns the requested/granted/denied audit rows across the
+    // suspend/resume boundary), so skip the executor's approval phase to
+    // avoid re-emitting a duplicate requested/granted row at dispatch time.
+    const approval = preApproved
+      ? ({ ok: true } as const)
+      : await runApprovalPhase(rt, {
+          call,
+          tool,
+          runContext,
+          stepNumber,
+          trustLevel,
+          validatedInput,
+          effectiveArgs,
+        });
     if (!approval.ok) return approval.completed;
 
     // D4 Progent tool-argument policy: deterministic pre-execution block.

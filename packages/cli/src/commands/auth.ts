@@ -182,6 +182,16 @@ export interface AuthRevokeOptions extends AuthCommonOptions {
 
 /** @stable */
 export async function runAuthRevoke(options: AuthRevokeOptions): Promise<{ readonly ok: true }> {
+  // AUTH-CLI-01: revoke makes an outbound RFC 7009 call, so it must honour
+  // GRAPHORIN_OFFLINE like login/refresh (the documented "no implicit network
+  // calls" contract) instead of silently POSTing the live token.
+  if (
+    !checkOfflineModeBlocked('auth revoke', {
+      ...(options.print !== undefined ? { print: options.print } : {}),
+    })
+  ) {
+    process.exit(EXIT_CODES.RECOVERABLE_FAILURE);
+  }
   const ctx = await openStoreContext({
     ...(options.config !== undefined ? { config: options.config } : {}),
   });

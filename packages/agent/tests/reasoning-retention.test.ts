@@ -1,6 +1,14 @@
-import type { AssistantMessage, Message, ProviderEvent, ProviderRequest } from '@graphorin/core';
+import type {
+  AssistantMessage,
+  Message,
+  Provider,
+  ProviderEvent,
+  ProviderRequest,
+  ReasoningContract,
+} from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
+import { effectiveReasoningRetention } from '../src/runtime/messages.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
 const reasoningScript = (reasoning: string, text: string): { events: ProviderEvent[] } => ({
@@ -93,6 +101,33 @@ describe('W-024 - thinking-block signatures survive to the NEXT step request', (
     expect(reasoningParts[0]?.text).toBe('block one thinking');
     expect(reasoningParts[1]?.meta?.signature).toBe('sig-block-2');
     expect(reasoningParts[1]?.text).toBe('block two thinking');
+  });
+});
+
+describe('REASONING-02 - contract-driven retention defaults mirror REASONING_RETENTION_DEFAULTS', () => {
+  const providerWith = (contract: ReasoningContract | undefined): Provider =>
+    ({
+      name: 'mock',
+      modelId: 'mock',
+      capabilities: contract === undefined ? {} : { reasoningContract: contract },
+    }) as unknown as Provider;
+
+  it("defaults 'optional' to 'strip' (not 'pass-through-all') so CoT is not persisted by default", () => {
+    expect(effectiveReasoningRetention(undefined, providerWith('optional'))).toBe('strip');
+  });
+
+  it('keeps the other contract defaults intact', () => {
+    expect(effectiveReasoningRetention(undefined, providerWith('round-trip-required'))).toBe(
+      'pass-through-claude',
+    );
+    expect(effectiveReasoningRetention(undefined, providerWith('hidden'))).toBe('strip');
+    expect(effectiveReasoningRetention(undefined, providerWith(undefined))).toBe('strip');
+  });
+
+  it('an explicit agent-level override still wins over the contract default', () => {
+    expect(effectiveReasoningRetention('pass-through-all', providerWith('optional'))).toBe(
+      'pass-through-all',
+    );
   });
 });
 

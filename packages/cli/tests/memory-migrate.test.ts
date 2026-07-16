@@ -171,4 +171,34 @@ describe('graphorin memory migrate (wave-D D5)', () => {
       process.exit = originalExit;
     }
   });
+
+  it('CLI-03: an invalid --strategy exits UNSUPPORTED instead of running a destructive auto-migrate', async () => {
+    const { cfg, modulePath } = await seededSetup();
+    const exitCalls: Array<string | number | null | undefined> = [];
+    const originalExit = process.exit;
+    process.exit = ((code?: string | number | null) => {
+      exitCalls.push(code);
+      throw new Error(`exit:${code}`);
+    }) as typeof process.exit;
+    const lines: string[] = [];
+    try {
+      await expect(
+        runMemoryMigrate({
+          from: 'a',
+          to: 'b',
+          // A typo used to fall through to the destructive auto-migrate branch.
+          strategy: 'definitely-not-a-strategy' as never,
+          embeddersModule: modulePath,
+          config: cfg,
+          print: (l) => lines.push(l),
+        }),
+      ).rejects.toThrow('exit:2');
+      expect(exitCalls).toEqual([2]);
+      expect(lines.some((l) => l.includes("invalid --strategy 'definitely-not-a-strategy'"))).toBe(
+        true,
+      );
+    } finally {
+      process.exit = originalExit;
+    }
+  });
 });

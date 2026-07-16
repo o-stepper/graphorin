@@ -526,18 +526,21 @@ function backgroundExecute(
   const opts: { signal?: AbortSignal; threadId?: string } = { signal: tracker.signal };
   if (body.threadId !== undefined) opts.threadId = body.threadId;
   void (async () => {
+    let failure: { readonly code: string; readonly message: string } | undefined;
     try {
       // IP-2: every workflow event reaches the dispatcher - the old
       // loop iterated the stream and threw each event away.
       for await (const ev of workflow.execute(body.input ?? {}, opts)) {
         if (tracker.signal.aborted) break;
-        const type =
-          typeof (ev as { type?: unknown }).type === 'string'
-            ? (ev as { type: string }).type
-            : 'workflow.event';
-        streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
+        failure = emitWorkflowEvent(ev, runId, streaming) ?? failure;
       }
-      runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
+      if (tracker.signal.aborted) {
+        runs.complete(runId, 'aborted');
+      } else if (failure !== undefined) {
+        runs.complete(runId, 'failed', failure);
+      } else {
+        runs.complete(runId, 'completed');
+      }
     } catch (err) {
       // W-052: the frame carries the normalized machine-readable code
       // next to the unchanged message, so clients can retry
@@ -608,16 +611,19 @@ function backgroundIterate(
   },
 ): void {
   void (async () => {
+    let failure: { readonly code: string; readonly message: string } | undefined;
     try {
       for await (const ev of factory()) {
         if (tracker.signal.aborted) break;
-        const type =
-          typeof (ev as { type?: unknown }).type === 'string'
-            ? (ev as { type: string }).type
-            : 'workflow.event';
-        streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
+        failure = emitWorkflowEvent(ev, runId, streaming) ?? failure;
       }
-      runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
+      if (tracker.signal.aborted) {
+        runs.complete(runId, 'aborted');
+      } else if (failure !== undefined) {
+        runs.complete(runId, 'failed', failure);
+      } else {
+        runs.complete(runId, 'completed');
+      }
     } catch (err) {
       // W-052: same envelope as the execute path.
       streaming.dispatcher?.emit(streaming.subject, {
@@ -627,6 +633,40 @@ function backgroundIterate(
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'failed', err);
     }
   })();
+}
+
+/**
+ * SERVER-C-01: emit one workflow event to the dispatcher. A `workflow.error`
+ * event - which the engine yields WITHOUT throwing, so the surrounding catch
+ * never fires - is re-shaped to the documented { runId, code, message } wire
+ * envelope, and the returned failure tells the caller to settle the run as
+ * 'failed' instead of 'completed'. All other events pass through unchanged.
+ */
+function emitWorkflowEvent(
+  ev: unknown,
+  runId: string,
+  streaming: {
+    readonly subject: string;
+    readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
+  },
+): { readonly code: string; readonly message: string } | undefined {
+  const type =
+    typeof (ev as { type?: unknown }).type === 'string'
+      ? (ev as { type: string }).type
+      : 'workflow.event';
+  if (type === 'workflow.error') {
+    const nested = (ev as { error?: { code?: unknown; message?: unknown } }).error;
+    const code = typeof nested?.code === 'string' ? nested.code : 'workflow-error';
+    const message = typeof nested?.message === 'string' ? nested.message : 'workflow node failed';
+    const threadId = (ev as { threadId?: unknown }).threadId;
+    streaming.dispatcher?.emit(streaming.subject, {
+      type: 'workflow.error',
+      payload: { runId, code, message, ...(typeof threadId === 'string' ? { threadId } : {}) },
+    });
+    return { code, message };
+  }
+  streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
+  return undefined;
 }
 
 async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {

@@ -1,4 +1,5 @@
 import type { AgentEvent, Tool } from '@graphorin/core';
+import { onToolAudit, type ToolAuditEvent } from '@graphorin/tools/audit';
 import { describe, expect, it } from 'vitest';
 import { createAgent, runStateFromJSON, runStateToJSON } from '../src/index.js';
 import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
@@ -220,6 +221,61 @@ describe('Agent - HITL approval flow', () => {
       events.push(ev);
     }
     expect(events.some((e) => e.type === 'tool.approval.denied')).toBe(true);
+  });
+
+  it('TOOL-AUDI-01: a denied durable-HITL approval emits a tool:approval:denied audit event', async () => {
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [textOnlyScript('aborted send', 4)],
+    });
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider,
+      tools: [buildSendEmailTool()],
+    });
+    const suspended = {
+      version: 'graphorin-run-state/1.0',
+      id: 'run-audi',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 'sess-audi',
+      status: 'awaiting_approval',
+      steps: [],
+      messages: [{ role: 'user', content: 'email Bob' }],
+      pendingApprovals: [
+        {
+          toolCallId: 'tc-audi',
+          toolName: 'send_email',
+          args: { to: 'b@c.d', body: 'hey' },
+          requestedAt: new Date().toISOString(),
+        },
+      ],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: new Date().toISOString(),
+    } as const;
+    const auditEvents: ToolAuditEvent[] = [];
+    const off = onToolAudit((e) => auditEvents.push(e));
+    try {
+      for await (const _ of agent.stream(runStateFromJSON(JSON.stringify(suspended)), {
+        directive: {
+          approvals: [{ toolCallId: 'tc-audi', granted: false, reason: 'user cancelled' }],
+        },
+      })) {
+        void _;
+      }
+    } finally {
+      off();
+    }
+    const denied = auditEvents.filter((e) => e.action === 'tool:approval:denied');
+    expect(denied).toHaveLength(1);
+    expect(denied[0]).toMatchObject({
+      action: 'tool:approval:denied',
+      decision: 'denied',
+      target: 'send_email',
+      context: { toolCallId: 'tc-audi' },
+    });
   });
 
   it('resuming an awaiting-approval run WITHOUT a directive stays suspended - no provider call (AG-14)', async () => {

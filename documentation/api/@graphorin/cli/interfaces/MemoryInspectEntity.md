@@ -6,7 +6,7 @@
 
 # Interface: MemoryInspectEntity
 
-Defined in: [packages/cli/src/commands/memory.ts:331](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L331)
+Defined in: [packages/cli/src/commands/memory.ts:343](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L343)
 
 A canonical entity a fact links to (P2-1 / migration 016). `name` follows
 `merged_into` to the surviving entity, so a merged link shows its canonical.
@@ -17,7 +17,7 @@ A canonical entity a fact links to (P2-1 / migration 016). `name` follows
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-entityid"></a> `entityId` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:332](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L332) |
-| <a id="property-mergedfrom"></a> `mergedFrom` | `readonly` | `string` \| `null` | Set when the linked entity was merged into `entityId`/`name`. | [packages/cli/src/commands/memory.ts:336](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L336) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:333](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L333) |
-| <a id="property-role"></a> `role` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:334](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L334) |
+| <a id="property-entityid"></a> `entityId` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:344](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L344) |
+| <a id="property-mergedfrom"></a> `mergedFrom` | `readonly` | `string` \| `null` | Set when the linked entity was merged into `entityId`/`name`. | [packages/cli/src/commands/memory.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L348) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:345](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L345) |
+| <a id="property-role"></a> `role` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:346](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L346) |

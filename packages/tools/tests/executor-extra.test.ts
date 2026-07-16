@@ -1,4 +1,5 @@
 import type { AISpan, RunContext, SpanAttributes } from '@graphorin/core';
+import { onSecretsAudit, type SecretsAuditEvent } from '@graphorin/security/secrets';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import {
@@ -53,6 +54,49 @@ describe('ToolExecutor - secrets ACL enforcement (DoD)', () => {
     });
     expect(captured.ok).toBe(false);
     expect(captured.reason).toMatch(/FORBIDDEN_KEY/i);
+  });
+
+  it('SECRETS-S-01: a denied ctx.secrets.require() emits a denied audit event', async () => {
+    const events: SecretsAuditEvent[] = [];
+    const off = onSecretsAudit((e) => events.push(e));
+    try {
+      const registry = createToolRegistry();
+      registry.register(
+        tool({
+          name: 'grabby',
+          description: 'grabs a non-allowlisted secret',
+          inputSchema: z.object({}),
+          sideEffectClass: 'pure',
+          secretsAllowed: ['ALLOWED_KEY'],
+          async execute(_input, ctx) {
+            await ctx.secrets.require('FORBIDDEN_KEY').catch(() => undefined);
+            return null;
+          },
+        }),
+      );
+      const executor = createToolExecutor({
+        registry,
+        secretResolver: {
+          async resolve() {
+            return null;
+          },
+        },
+      });
+      await executor.executeBatch({
+        calls: [{ toolCallId: 'c1', toolName: 'grabby', args: {} }],
+        runContext: makeRunContext(),
+        stepNumber: 1,
+      });
+    } finally {
+      off();
+    }
+    const denied = events.filter((e) => e.decision === 'denied');
+    expect(denied).toHaveLength(1);
+    expect(denied[0]).toMatchObject({
+      decision: 'denied',
+      target: 'FORBIDDEN_KEY',
+      actor: { kind: 'tool', toolName: 'grabby' },
+    });
   });
 
   it('succeeds when `ctx.secrets.require()` asks for an allowlisted key', async () => {

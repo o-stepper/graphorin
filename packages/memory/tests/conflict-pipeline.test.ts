@@ -182,6 +182,38 @@ describe('runConflictPipeline - outcomes', () => {
     expect(conflicts.audit[0]?.decision).toBe('admit');
   });
 
+  it('MEMORY-C-02: dedupes an exact-text duplicate without an embedder (FTS fallback)', async () => {
+    const pipeline = createConflictPipeline();
+    const conflicts = recordingConflictStore();
+    const existing = fact('Alex drinks oat milk.', { id: 'old-oat' });
+    const candidate = fact('Alex drinks oat milk.', { id: 'dup-oat' });
+    // No embedder + no vector candidates: the exact-text fallback must
+    // surface the existing fact via the store's FTS search.
+    const base = fakeStore([], conflicts);
+    const deps: ConflictPipelineDeps = {
+      ...base,
+      embedder: null,
+      embedderId: null,
+      store: {
+        ...base.store,
+        semantic: {
+          ...base.store.semantic,
+          async search(_scope, opts) {
+            return opts.query.toLowerCase().includes('oat milk')
+              ? [{ record: existing, score: 1, signals: { bm25: 1 } }]
+              : [];
+          },
+        },
+      },
+    };
+    const decision = await pipeline.run(deps, candidate);
+    expect(decision.kind).toBe('dedup');
+    if (decision.kind === 'dedup') {
+      expect(decision.existingId).toBe('old-oat');
+      expect(decision.stage).toBe('exact-dedup');
+    }
+  });
+
   it('dedupes when the embedding similarity sits in the HOT zone', async () => {
     const pipeline = createConflictPipeline();
     const conflicts = recordingConflictStore();

@@ -10,6 +10,7 @@
  */
 
 import {
+  closeCodeFor,
   isEventFrame,
   type ServerEventFrame,
   type ServerLifecycleFrame,
@@ -516,6 +517,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
   }
 
   function shutdown(): void {
+    // First tell every active subscription its stream is aborting.
     for (const subscription of subscriptions.values()) {
       const subscriber = subscribers.get(subscription.subscriberId);
       try {
@@ -528,6 +530,22 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
         });
       } catch {
         // swallow - we are tearing down.
+      }
+    }
+    // WS-LIFECY-02/01: then CLOSE every connected socket with the
+    // documented server.shutdown code (4007). Sending a lifecycle frame
+    // alone leaves the underlying WebSocket open, so http.Server.close()
+    // waits on idle subscribers forever and SIGTERM never completes. Every
+    // connection registers a subscriber on open (even before it
+    // subscribes), so closing the subscriber handles drains them all.
+    // Snapshot first: handle.close() triggers onClose -> unregister, which
+    // mutates the map we would otherwise be iterating.
+    const handles = Array.from(subscribers.values(), (s) => s.handle);
+    for (const handle of handles) {
+      try {
+        handle.close(closeCodeFor('server.shutdown'), 'server.shutdown');
+      } catch {
+        // ignore - best-effort teardown.
       }
     }
     subscriptions.clear();

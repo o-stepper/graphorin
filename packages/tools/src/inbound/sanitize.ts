@@ -49,7 +49,12 @@ export interface SanitizationOutcome {
   readonly wrapped: boolean;
   /** Whether matches were stripped. */
   readonly stripped: boolean;
-  /** Bytes removed by the strip pass. */
+  /**
+   * Net bytes removed by the strip pass (always `>= 0`). Redaction replaces
+   * each match with a mask, so this is `max(0, before - after)` - it is `0`
+   * when the masks are at least as long as the text they covered even though
+   * matches were stripped (see `stripped` / `patternsHit`).
+   */
   readonly bytesStripped: number;
   /** Time spent on the scan in microseconds. */
   readonly scanDurationUs: number;
@@ -163,7 +168,11 @@ export function applyInboundSanitization(opts: {
     const next = stripImperativePatterns(body, patterns);
     if (next !== body) {
       stripped = true;
-      bytesStripped = body.length - next.length;
+      // TOOLS-EX-01 / CHANNELS-01: the strip REPLACES each match with a
+      // redaction mask, so the net length delta goes negative when a mask is
+      // longer than the text it covers (the canonical patterns do). Clamp to
+      // a non-negative "bytes removed" metric as the field documents.
+      bytesStripped = Math.max(0, body.length - next.length);
       body = next;
     }
   }

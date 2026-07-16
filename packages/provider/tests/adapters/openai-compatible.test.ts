@@ -134,6 +134,26 @@ describe('openAICompatibleAdapter', () => {
     expect(headers.authorization).toBe('Bearer lm-key');
   });
 
+  it('OLLAMA-AD-02: an aborted stream reports finishReason aborted, not stop', async () => {
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      // A stream with no finish_reason chunk; the aborted signal ends it.
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([{ choices: [{ delta: { content: 'partial' } }] }]),
+      }),
+      logger: () => {},
+    });
+    const controller = new AbortController();
+    controller.abort();
+    const events = await collect(
+      provider.stream({ messages: [{ role: 'user', content: 'hi' }], signal: controller.signal }),
+    );
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.finishReason).toBe('aborted');
+  });
+
   it('respects custom chatPath option', async () => {
     const capture: { url?: string; init?: RequestInit } = {};
     const provider = openAICompatibleAdapter({

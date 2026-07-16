@@ -10,7 +10,7 @@
 function getQueryParamRequired(ref, key): string;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:529](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L529)
+Defined in: [packages/security/src/secrets/secret-ref.ts:536](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L536)
 
 Read a query parameter and throw if it is missing. Useful for
 resolver implementations that require a configuration value.

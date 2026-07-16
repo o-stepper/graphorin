@@ -22,6 +22,8 @@
  * @packageDocumentation
  */
 
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { stdin } from 'node:process';
 
 import type { SecretMetadata } from '@graphorin/core/contracts';
@@ -290,9 +292,26 @@ async function openStore(options: SecretsCommonOptions) {
     const active = getActiveSecretsStore();
     if (active !== undefined) return active;
   }
+  // SECRETS-S-02: build the encrypted-file config from the environment so the
+  // documented `--secrets-source encrypted-file` (and the auto chain's
+  // encrypted-file leg) can actually activate - the factory requires an
+  // explicit { path, passphrase } and the CLI never forwarded one. The
+  // passphrase resolves from GRAPHORIN_MASTER_PASSPHRASE; the bundle path
+  // defaults to ~/.graphorin/secrets.enc (override with GRAPHORIN_SECRETS_FILE).
+  const masterPassphrase = process.env.GRAPHORIN_MASTER_PASSPHRASE;
+  const encryptedFile =
+    masterPassphrase !== undefined && masterPassphrase.length > 0
+      ? {
+          path: process.env.GRAPHORIN_SECRETS_FILE ?? join(homedir(), '.graphorin', 'secrets.enc'),
+          passphrase: SecretValue.fromString(masterPassphrase, {
+            source: { resolver: 'env', ref: 'env:GRAPHORIN_MASTER_PASSPHRASE' },
+          }),
+        }
+      : undefined;
   return await createSecretsStore({
     ...(options.secretsSource !== undefined ? { kind: options.secretsSource } : {}),
     ...(options.strictSecrets !== undefined ? { strict: options.strictSecrets } : {}),
+    ...(encryptedFile !== undefined ? { encryptedFile } : {}),
   });
 }
 

@@ -22,6 +22,7 @@ import type {
   ToolCall,
   ToolError,
 } from '@graphorin/core';
+import { emitToolAudit } from '@graphorin/tools/audit';
 import type { ToolArgumentPolicyGuard, ToolExecutor } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import { serializeRunState } from '../run-state/index.js';
@@ -249,6 +250,17 @@ export async function* processStepToolCalls<TDeps, TOutput>(
       };
       state.pendingApprovals.push(approval);
       stepApprovalsRequested += 1;
+      // TOOL-AUDI-01: the durable-HITL suspend happens in the agent (the
+      // executor's approval phase never runs for it), so emit the audited
+      // request here instead of only retroactively when a grant is dispatched.
+      emitToolAudit({
+        action: 'tool:approval:requested',
+        actor: { kind: 'tool', id: call.toolName },
+        target: call.toolName,
+        decision: 'success',
+        ts: Date.now(),
+        context: { runId: execRunContext.runId, stepNumber, toolCallId: call.toolCallId },
+      });
       yield {
         type: 'tool.approval.requested',
         toolCallId: call.toolCallId,

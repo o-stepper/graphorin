@@ -25,6 +25,12 @@ export interface TokensRoutesDeps {
   readonly pepper: SecretValue;
   readonly defaultEnv: string;
   readonly allowedEnvs: ReadonlyArray<string>;
+  /**
+   * TOKENS-RE-01 / SPL-9: the live token verifier, so a REST revoke
+   * invalidates its LRU entry immediately - otherwise a just-used token
+   * keeps authenticating from the cache for up to `cacheTtlMaxMs` (60s).
+   */
+  readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
 }
 
 const CreateBodySchema = z
@@ -147,7 +153,11 @@ export function createTokensRoutes(deps: TokensRoutesDeps): Hono<{ Variables: Se
 
   app.delete('/:id', createScopeMiddleware('tokens:revoke'), async (c) => {
     const id = c.req.param('id');
-    const updated = await revokeToken(deps.tokenStore, id);
+    const updated = await revokeToken(
+      deps.tokenStore,
+      id,
+      deps.verifier !== undefined ? { verifier: deps.verifier } : {},
+    );
     if (updated === undefined) {
       return c.json({ error: 'token-not-found', message: `Token '${id}' not found.` }, 404);
     }

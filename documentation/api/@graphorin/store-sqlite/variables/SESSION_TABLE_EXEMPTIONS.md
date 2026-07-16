@@ -10,7 +10,7 @@
 const SESSION_TABLE_EXEMPTIONS: Readonly<Record<string, string>>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:507](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L507)
+Defined in: [packages/store-sqlite/src/session-store.ts:519](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L519)
 
 Session-column-bearing tables intentionally NOT in
 [SESSION\_SCOPED\_PURGES](/api/@graphorin/store-sqlite/variables/SESSION_SCOPED_PURGES.md), each with the reason erasure is still

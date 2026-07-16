@@ -384,11 +384,23 @@ export class SqliteSessionStore implements SessionStoreExt {
     // Registry prefixes are compile-time literals validated by
     // VALID_IDENTIFIER below; escape their underscores for LIKE.
     const pattern = `${prefix.replaceAll('_', '\\_')}%`;
-    const rows = this.#conn.all<{ name: string }>(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ? ESCAPE '\\'",
+    const rows = this.#conn.all<{ name: string; sql: string | null }>(
+      "SELECT name, sql FROM sqlite_master WHERE type='table' AND name LIKE ? ESCAPE '\\'",
       [pattern],
     );
-    return rows.map((r) => r.name).filter((name) => /^[A-Za-z0-9_]+$/.test(name));
+    // The LIKE prefix also matches a vec0 virtual table's SHADOW tables
+    // (`_info`, `_chunks`, `_rowids`, `_vector_chunks00`), which reject
+    // DELETE ("may not be modified") and would roll back the whole
+    // erasure cascade. Keep only the addressable tables - the vec0 main
+    // (`USING vec0`) or a linear-fallback sidecar (`embedding BLOB`) -
+    // mirroring VectorTableManager.#hydrateExisting's shadow filter.
+    return rows
+      .filter((r) => {
+        const sql = (r.sql ?? '').toUpperCase();
+        return sql.includes('USING VEC0') || sql.includes('EMBEDDING BLOB');
+      })
+      .map((r) => r.name)
+      .filter((name) => /^[A-Za-z0-9_]+$/.test(name));
   }
 }
 

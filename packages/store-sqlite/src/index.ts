@@ -51,7 +51,7 @@ import {
   readWalSize,
   SqliteBusyError,
   type SqliteConnection,
-  type SqliteVecMissingError,
+  SqliteVecMissingError,
   WAL_HARDENING_PRAGMAS,
   WalCheckpointManager,
 } from './connection.js';
@@ -358,7 +358,7 @@ export async function createSqliteStore(
 }
 
 export { SqliteNativeBindingError } from './native-binding-error.js';
-export type { BetterSqlite3Constructor, SqliteConnection, SqliteVecMissingError };
+export type { BetterSqlite3Constructor, SqliteConnection };
 export {
   // migrations
   type AppliedMigration,
@@ -436,6 +436,10 @@ export {
   SqlitePairingStore,
   SqliteSessionStore,
   SqliteTriggerStore,
+  // STORE-SQ-01: value-export the class so the documented `instanceof
+  // SqliteVecMissingError` works against the root barrel, not just the
+  // `/connection` subpath.
+  SqliteVecMissingError,
   slugifyEmbedderId,
   traceSourceForSession,
   UnknownEmbedderIdError,

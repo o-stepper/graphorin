@@ -73,6 +73,23 @@ describe('@graphorin/observability/redaction - validator', () => {
     expect(text).toContain('sk-12345678901234567890');
   });
 
+  it('OBS-PRIC-02: enabledPatterns can enable an opt-in pattern (ipv4)', () => {
+    // ipv4 is opt-in (off by default) - the allow-list must reach it.
+    const v = createRedactionValidator({
+      minTier: 'internal',
+      enabledPatterns: ['ipv4'],
+    });
+    const out = v.validate({ value: 'peer at 10.1.2.3 talked', tier: 'public' });
+    expect(String(out?.value)).toContain('[REDACTED ipv4]');
+  });
+
+  it('OBS-PRIC-02: an opt-in pattern stays off by default (no enabledPatterns)', () => {
+    const v = createRedactionValidator({ minTier: 'internal' });
+    const out = v.validate({ value: 'peer at 10.1.2.3 talked', tier: 'public' });
+    // Default-on catalogue excludes ipv4, so the address passes through.
+    expect(String(out?.value)).toContain('10.1.2.3');
+  });
+
   it('honours disabledPatterns as a deny-list', () => {
     const v = createRedactionValidator({
       minTier: 'internal',

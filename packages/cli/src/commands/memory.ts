@@ -161,6 +161,18 @@ export async function runMemoryMigrate(
   options: MemoryMigrateOptions,
 ): Promise<MemoryMigrateResult> {
   const print = options.print ?? defaultPrintSink;
+  // CLI-03: validate --strategy before doing anything. A typo used to fall
+  // through to the destructive auto-migrate branch (all facts re-embedded,
+  // the source embedder retired) with exit 0.
+  const VALID_STRATEGIES = ['lock-on-first', 'auto-migrate', 'multi-active'] as const;
+  if (!(VALID_STRATEGIES as readonly string[]).includes(options.strategy)) {
+    print(
+      brand(
+        `invalid --strategy '${options.strategy}'. Expected one of: ${VALID_STRATEGIES.join(', ')}.`,
+      ),
+    );
+    process.exit(EXIT_CODES.UNSUPPORTED);
+  }
   if (options.embeddersModule === undefined) {
     print(
       brand(
@@ -728,6 +740,10 @@ interface SpanExplainRow {
  */
 export async function runMemoryWhy(options: MemoryWhyOptions): Promise<MemoryWhyResult> {
   const ctx = await openStoreContext({
+    // MEMORY-CL-01 / W-068: read-only command - never auto-migrate a live
+    // database (matches inspect/activity; a newer CLI must not silently
+    // upgrade a schema owned by a running older server).
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -848,6 +864,10 @@ export async function runMemoryReview(
 ): Promise<MemoryReviewResult> {
   const limit = Math.max(1, options.limit ?? 20);
   const ctx = await openStoreContext({
+    // MEMORY-CL-01 / W-068: the listing path is read-only and must not
+    // auto-migrate a live database. `--promote` is an explicit write and
+    // keeps the default (migrate) policy since it needs the current schema.
+    ...(options.promote === undefined ? { migrationPolicy: 'check' as const } : {}),
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
