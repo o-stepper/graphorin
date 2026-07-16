@@ -20,7 +20,23 @@ import { serialiseMessageForCount, serializedToString } from './serialize.js';
  */
 interface TiktokenEncoding {
   readonly name?: string;
-  encode(text: string): { length: number };
+  encode(
+    text: string,
+    allowedSpecial?: readonly string[] | 'all',
+    disallowedSpecial?: readonly string[] | 'all',
+  ): { length: number };
+}
+
+/**
+ * PROVIDER-CT-01: js-tiktoken's `encode` defaults `disallowedSpecial` to
+ * `'all'` and THROWS when the input contains a special-token sequence
+ * (e.g. `<|endoftext|>`). For token COUNTING of arbitrary user/model text
+ * that is a crash on ordinary input, so we disallow nothing and treat any
+ * such sequence as regular text (`allowedSpecial=[]` => encoded as its BPE
+ * pieces, not as one special token).
+ */
+function encodeCount(enc: TiktokenEncoding, text: string): number {
+  return enc.encode(text, [], []).length;
 }
 
 interface TiktokenModule {
@@ -77,7 +93,7 @@ export class JsTiktokenCounter implements TokenCounter {
     let total = 0;
     for (const msg of messages) {
       const serialised = serialiseMessageForCount(msg);
-      total += enc.encode(serializedToString(serialised)).length;
+      total += encodeCount(enc, serializedToString(serialised));
     }
     return total;
   }
@@ -85,7 +101,7 @@ export class JsTiktokenCounter implements TokenCounter {
   async countText(text: string): Promise<number> {
     if (text.length === 0) return 0;
     const enc = await this.#getEncoder();
-    return enc.encode(text).length;
+    return encodeCount(enc, text);
   }
 
   async #getEncoder(): Promise<TiktokenEncoding> {

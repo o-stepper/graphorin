@@ -465,8 +465,37 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       }
 
       if (serverInstance !== undefined) {
+        const srv = serverInstance as unknown as {
+          close(cb: () => void): void;
+          closeAllConnections?: () => void;
+        };
         await new Promise<void>((resolve) => {
-          (serverInstance as unknown as { close(cb: () => void): void }).close(() => resolve());
+          let settled = false;
+          const done = (): void => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve();
+          };
+          // WS-LIFECY-02 belt-and-suspenders: dispatcher.shutdown() above
+          // already closed every tracked WebSocket, so close() normally
+          // completes at once. This fallback guarantees stop() cannot hang
+          // even on a stalled close handshake or an untracked lingering
+          // socket - after the drain budget, force every remaining
+          // connection shut (force:true drives drainTimeoutMs to 0 => now).
+          const timer = setTimeout(
+            () => {
+              try {
+                srv.closeAllConnections?.();
+              } catch {
+                // ignore - best-effort force close.
+              }
+              done();
+            },
+            Math.max(0, drainTimeoutMs),
+          );
+          (timer as { unref?: () => void }).unref?.();
+          srv.close(() => done());
         });
         serverInstance = undefined;
       }

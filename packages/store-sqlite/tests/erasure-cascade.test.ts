@@ -355,3 +355,139 @@ describe('W-005 - checkpoint session linkage + delete cascade', () => {
     expect(row?.session_id).toBe('s-legacy');
   });
 });
+
+/**
+ * STORE-SQ-02 regression: the shipped erasure tests above open the store
+ * with `skipSqliteVec: true`, so a vec0 virtual table's SHADOW tables
+ * (`_info`, `_chunks`, `_rowids`, `_vector_chunks00`) never exist. In the
+ * DEFAULT vec0 mode, session hard-delete used to crash on those shadow
+ * tables ("table ... may not be modified") and roll the whole cascade
+ * back, leaving GDPR-style erasure broken. This block runs against a real
+ * sqlite-vec store to pin the fix.
+ */
+describe('STORE-SQ-02 - session erasure in the default vec0 mode', () => {
+  async function makeVecStore(): Promise<GraphorinSqliteStore> {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-erasure-vec0-'));
+    // No skipSqliteVec: the connection loads sqlite-vec and runs vec0.
+    const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
+    await store.init();
+    return store;
+  }
+
+  function makeVector(dim: number, seed: number): Float32Array {
+    const raw: number[] = [];
+    let s = seed >>> 0;
+    let norm = 0;
+    for (let i = 0; i < dim; i++) {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      const val = (s / 0xffffffff) * 2 - 1;
+      raw.push(val);
+      norm += val * val;
+    }
+    norm = Math.sqrt(norm) || 1;
+    return new Float32Array(raw.map((x) => x / norm));
+  }
+
+  it('deleteSession erases a vec0-embedded episode without crashing on shadow tables', async () => {
+    const store = await makeVecStore();
+    expect(store.connection.vectorSearchMode).toBe('vec0');
+    const meta = store.embeddings.registerOrReturn({
+      id: 'custom:test-model-a@8',
+      embedderKind: 'custom',
+      model: 'test-model-a',
+      dim: 8,
+      distanceMetric: 'cosine',
+      configHash: 'hash-a',
+    });
+    await createSession(store, 'sess-vec');
+    const now = new Date().toISOString();
+    const episodic = store.memory.episodic as unknown as {
+      putWithEmbedding(
+        e: import('@graphorin/core').Episode,
+        opts: { embedding: { embedderId: string; vector: Float32Array } },
+      ): Promise<void>;
+    };
+    await episodic.putWithEmbedding(
+      {
+        id: 'ep-vec',
+        kind: 'episodic',
+        userId: 'alex',
+        sessionId: 'sess-vec',
+        sensitivity: 'internal',
+        createdAt: now,
+        summary: 'session-scoped episode',
+        startedAt: now,
+        endedAt: now,
+      },
+      { embedding: { embedderId: meta.id, vector: makeVector(8, 42) } },
+    );
+    // The vec0 sidecar and its shadow tables now exist in the DB.
+    const beforeVec = store.connection.get<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM ${meta.vecTableEpisodes}`,
+    );
+    expect(beforeVec?.n).toBe(1);
+
+    // Documented RP-6 behavior: this must succeed and erase the session.
+    await store.sessions.deleteSession('sess-vec');
+
+    const count = (sql: string) => store.connection.get<{ n: number }>(sql)?.n ?? -1;
+    expect(count("SELECT COUNT(*) AS n FROM sessions WHERE id = 'sess-vec'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM episodes WHERE id = 'ep-vec'")).toBe(0);
+    expect(count(`SELECT COUNT(*) AS n FROM ${meta.vecTableEpisodes}`)).toBe(0);
+    await store.close();
+  });
+});
+
+/**
+ * MEMORY-C-01 regression: a working block written under a scope with a NULL
+ * session/agent id (e.g. the D2 user-only profile block) could not be
+ * mutated a second time - the (user, session, agent, label) UNIQUE index
+ * does not treat NULLs as equal, so the ON CONFLICT upsert missed and the
+ * write collided on the PRIMARY KEY id instead. Pin the NULL-safe upsert.
+ */
+describe('MEMORY-C-01 - working-block upsert under a partial (NULL) scope', () => {
+  it('a second mutation of a user-only-scope block updates in place instead of throwing', async () => {
+    const store = await makeStore();
+    const now = new Date().toISOString();
+    const userScope = { userId: 'alex' };
+    const block = (value: string) => ({
+      id: 'b-user-only',
+      kind: 'working' as const,
+      userId: 'alex',
+      sensitivity: 'internal' as const,
+      label: 'persona',
+      value,
+      charLimit: 200,
+      createdAt: now,
+    });
+    await store.memory.working.upsert(userScope, block('v1'));
+    // Used to throw "UNIQUE constraint failed: working_blocks.id".
+    await expect(store.memory.working.upsert(userScope, block('v2'))).resolves.toBeUndefined();
+
+    const rows = store.connection.all<{ id: string; value: string }>(
+      "SELECT id, value FROM working_blocks WHERE scope_user_id = 'alex' AND scope_session_id IS NULL AND scope_agent_id IS NULL AND label = 'persona' AND deleted_at IS NULL",
+    );
+    expect(rows.length).toBe(1);
+    expect(rows[0]?.value).toBe('v2');
+
+    // The userId+sessionId scope (agentId NULL) is the same NULL hazard.
+    const sessionScope = { userId: 'bob', sessionId: 's9' };
+    const sessionBlock = (value: string) => ({
+      id: 'b-session',
+      kind: 'working' as const,
+      userId: 'bob',
+      sessionId: 's9',
+      sensitivity: 'internal' as const,
+      label: 'persona',
+      value,
+      charLimit: 200,
+      createdAt: now,
+    });
+    await store.memory.working.upsert(sessionScope, sessionBlock('a'));
+    await expect(
+      store.memory.working.upsert(sessionScope, sessionBlock('b')),
+    ).resolves.toBeUndefined();
+    const got = await store.memory.working.get(sessionScope, 'persona');
+    expect(got?.value).toBe('b');
+  });
+});

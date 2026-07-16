@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { Provider, ProviderEvent, ProviderResponse } from '@graphorin/core';
+import type { Provider, ProviderEvent, ProviderResponse, Usage } from '@graphorin/core';
 
 import { defineProviderMiddleware } from './compose.js';
 
@@ -146,8 +146,13 @@ export const withCostTracking = defineProviderMiddleware<WithCostTrackingOptions
       },
       async generate(req) {
         const result = await next.generate(req);
-        emitUsage(result, next, opts, asRecord(req.metadata));
-        return result;
+        const priced = priceUsage(result.usage, next, opts);
+        emitUsage(priced, next, opts, asRecord(req.metadata));
+        // R-01: return the cost-stamped usage so the agent run loop's
+        // accumulateUsage folds it into state.usage.cost and
+        // RunBudget.maxCostUsd can actually enforce (the onUsage hook
+        // alone never reaches the run-level aggregate).
+        return priced.stamped ? { ...result, usage: priced.usage } : result;
       },
       ...(next.countTokens ? { countTokens: next.countTokens.bind(next) } : {}),
     });
@@ -161,9 +166,14 @@ async function* trackingStream(
 ): AsyncIterable<ProviderEvent> {
   const metadata = asRecord(req.metadata);
   for await (const event of next.stream(req)) {
-    yield event;
     if (event.type === 'finish') {
-      emitUsage({ usage: event.usage, finishReason: event.finishReason }, next, opts, metadata);
+      const priced = priceUsage(event.usage, next, opts);
+      // R-01: stamp the computed cost BEFORE yielding so the consumer
+      // (the run loop) sees usage.cost on the finish event.
+      yield priced.stamped ? { ...event, usage: priced.usage } : event;
+      emitUsage(priced, next, opts, metadata);
+    } else {
+      yield event;
     }
   }
 }
@@ -173,17 +183,27 @@ function asRecord(value: unknown): Readonly<Record<string, unknown>> | undefined
   return value as Readonly<Record<string, unknown>>;
 }
 
-function emitUsage(
-  result:
-    | ProviderResponse
-    | { usage: ProviderResponse['usage']; finishReason: ProviderResponse['finishReason'] },
-  next: Provider,
-  opts: WithCostTrackingOptions,
-  metadata: Readonly<Record<string, unknown>> | undefined,
-): void {
-  if (opts.onUsage === undefined) return;
-  const usage = result.usage;
+interface PricedUsage {
+  /** Usage, cost-stamped when a price was resolved (else the original). */
+  readonly usage: Usage;
+  /** Cost surfaced on the onUsage hook. */
+  readonly costUsd: number;
+  /** True when `usage.cost` was set from a resolved price. */
+  readonly stamped: boolean;
+}
+
+/**
+ * Resolve the price for `next` and compute the call cost. When a price is
+ * available the cost is STAMPED onto a copy of the usage so downstream
+ * accumulators (the agent run loop, per-model breakdowns) fold it into the
+ * run-level aggregate; without a price a provider-reported `usage.cost` is
+ * left untouched.
+ */
+function priceUsage(usage: Usage, next: Provider, opts: WithCostTrackingOptions): PricedUsage {
   const price = opts.priceLookup?.({ providerName: next.name, modelId: next.modelId }) ?? null;
+  if (price === null) {
+    return { usage, costUsd: usage.cost?.amount ?? 0, stamped: false };
+  }
   // Reasoning tokens are billed at the output rate (the PS-19 contract
   // in @graphorin/pricing) - providers that report them separately from
   // completionTokens must not get them for free.
@@ -193,15 +213,28 @@ function emitUsage(
   const cachedRead = usage.cachedReadTokens ?? 0;
   const cacheWrite = usage.cacheWriteTokens ?? 0;
   const basePromptTokens = Math.max(0, usage.promptTokens - cachedRead - cacheWrite);
-  const inputRate = price?.inputPerMtok ?? 0;
+  const inputRate = price.inputPerMtok ?? 0;
   const costUsd =
-    price !== null
-      ? (basePromptTokens * inputRate +
-          cachedRead * (price.cachedReadPerMtok ?? inputRate) +
-          cacheWrite * (price.cacheWritePerMtok ?? inputRate) +
-          (usage.completionTokens + (usage.reasoningTokens ?? 0)) * (price.outputPerMtok ?? 0)) /
-        1_000_000
-      : (usage.cost?.amount ?? 0);
+    (basePromptTokens * inputRate +
+      cachedRead * (price.cachedReadPerMtok ?? inputRate) +
+      cacheWrite * (price.cacheWritePerMtok ?? inputRate) +
+      (usage.completionTokens + (usage.reasoningTokens ?? 0)) * (price.outputPerMtok ?? 0)) /
+    1_000_000;
+  return {
+    usage: { ...usage, cost: { amount: costUsd, currency: 'USD' } },
+    costUsd,
+    stamped: true,
+  };
+}
+
+function emitUsage(
+  priced: PricedUsage,
+  next: Provider,
+  opts: WithCostTrackingOptions,
+  metadata: Readonly<Record<string, unknown>> | undefined,
+): void {
+  if (opts.onUsage === undefined) return;
+  const usage = priced.usage;
   opts.onUsage({
     providerName: next.name,
     modelId: next.modelId,
@@ -210,7 +243,7 @@ function emitUsage(
     totalTokens: usage.totalTokens,
     ...(usage.cachedReadTokens !== undefined ? { cachedReadTokens: usage.cachedReadTokens } : {}),
     ...(usage.cacheWriteTokens !== undefined ? { cacheWriteTokens: usage.cacheWriteTokens } : {}),
-    costUsd,
+    costUsd: priced.costUsd,
     metadata,
   });
 }

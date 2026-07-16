@@ -1,6 +1,14 @@
-import type { AssistantMessage, Message, ProviderEvent, ProviderRequest } from '@graphorin/core';
+import type {
+  AssistantMessage,
+  Message,
+  Provider,
+  ProviderEvent,
+  ProviderRequest,
+  ReasoningContract,
+} from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
+import { effectiveReasoningRetention } from '../src/runtime/messages.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
 const reasoningScript = (reasoning: string, text: string): { events: ProviderEvent[] } => ({

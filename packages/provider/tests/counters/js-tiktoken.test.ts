@@ -139,4 +139,37 @@ describe('JsTiktokenCounter', () => {
   it('__resetTiktokenCache clears the module cache', () => {
     expect(() => __resetTiktokenCache()).not.toThrow();
   });
+
+  // PROVIDER-CT-01: real js-tiktoken defaults disallowedSpecial to 'all'
+  // and THROWS on a special-token sequence in the input. The counter must
+  // treat such sequences as ordinary text (disallowedSpecial=[]) so counting
+  // arbitrary user/model input never crashes.
+  it('does not throw on text containing a special-token sequence', async () => {
+    // Stub mirroring js-tiktoken: throws unless the caller disallows nothing.
+    const specialGuardModule: TiktokenModule = {
+      getEncoding() {
+        return {
+          name: 'special-guard',
+          encode(
+            text: string,
+            _allowedSpecial?: readonly string[] | 'all',
+            disallowedSpecial?: readonly string[] | 'all',
+          ) {
+            const guardsAll = disallowedSpecial === undefined || disallowedSpecial === 'all';
+            if (guardsAll && text.includes('<|endoftext|>')) {
+              throw new Error(
+                'The text contains a special token that is not allowed: <|endoftext|>',
+              );
+            }
+            return { length: text.length };
+          },
+        };
+      },
+    };
+    const counter = new JsTiktokenCounter({ moduleOverride: specialGuardModule });
+    await expect(counter.countText('summarize <|endoftext|> please')).resolves.toBe(30);
+    await expect(counter.count([userMessage('hi <|endoftext|> there')])).resolves.toBeGreaterThan(
+      0,
+    );
+  });
 });

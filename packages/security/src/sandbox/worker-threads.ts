@@ -231,7 +231,8 @@ for (const k of Object.keys(process.env)) {
     parentPort.postMessage({ ok: true, output: out });
   } catch (err) {
     const name = err && err.name;
-    const kind = (name === 'SandboxFsAccessDenied' || name === 'SandboxNetworkAccessDenied')
+    const kind = (name === 'SandboxFsAccessDenied' || name === 'SandboxNetworkAccessDenied'
+      || name === 'SandboxModuleAccessDenied')
       ? 'sandbox-violation' : 'execution-failed';
     parentPort.postMessage({
       ok: false,

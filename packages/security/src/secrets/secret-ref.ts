@@ -233,7 +233,14 @@ function readPath(
       i += 1;
       continue;
     }
-    if (ch === undefined || (!isPchar(ch) && ch !== '%')) {
+    // OBS-PRIC-04: tolerate a raw ASCII space in a path segment. RFC 3986
+    // forbids it, but real-world refs commonly carry one - a 1Password
+    // `op://Vault/Stripe API/credential` item name, a `file:` path with a
+    // space - and the underlying CLI/filesystem accepts it. The space is a
+    // no-op through percentDecode, so `.path` still round-trips verbatim and
+    // resolvers that forward `.raw` (e.g. op://) hand the CLI an unescaped
+    // value rather than a `%20` the CLI would treat as a literal.
+    if (ch === undefined || (!isPchar(ch) && ch !== '%' && ch !== ' ')) {
       throw new SecretRefParseError(
         'malformed-uri',
         `Invalid character '${ch ?? ''}' in path at position ${i}.`,
