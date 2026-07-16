@@ -15,15 +15,15 @@
  * - a rung above the task's grant is denied fail-closed: pending
  *   approvals are auto-denied and the fire reports `escalationBlocked`.
  *
- * Grant -> capability mapping (deterministic enforcement before E1's
- * permission vocabulary exists): `notify` / `question` tasks run
+ * Grant -> capability mapping (deterministic enforcement, independent
+ * of E1's permission vocabulary): `notify` / `question` tasks run
  * `capability: 'read-only'` - writer tools are never advertised and
  * the executor blocks fabricated writer calls, so acting without the
  * grant is impossible by construction. Recursive scheduling is blocked
  * the same way: the dedicated agent's toolset must not carry
  * trigger-registering tools (checked at creation via
- * `schedulingToolNames`); after E1 lands, deny-by-name adds a second
- * layer.
+ * `schedulingToolNames`); E1's deny-by-name rules (shipped in 0.9.0)
+ * add a second, policy-driven layer on top.
  *
  * Composes with the existing workflow timer-daemon rather than
  * re-hosting it (D-9): a task that parks inside a durable workflow
@@ -155,7 +155,8 @@ export interface CreateProactiveCronTaskOptions<TDeps = unknown> {
    * creation time; a hit throws {@link ProactiveConfigError} unless
    * `allowRecursiveScheduling` grants it explicitly. Default `[]` -
    * the by-construction contract (a curated toolset without scheduling
-   * tools) is the primary enforcement until E1's deny-by-name lands.
+   * tools) stays the primary enforcement; E1's deny-by-name rules
+   * (shipped in 0.9.0) compose on top as a policy layer.
    */
   readonly schedulingToolNames?: ReadonlyArray<string>;
   /** Explicit recursive-scheduling grant. Default `false`. */
@@ -262,9 +263,10 @@ export function createProactiveCronTask<TDeps = unknown>(
         `(createMemory({ ingestGate })) - fail-closed until the B3 gate is wired`,
     );
   }
-  // Deterministic no-recursive-scheduling guard (pre-E1 enforcement):
-  // a declared scheduling tool reachable from the task's agent is a
-  // config error unless explicitly granted.
+  // Deterministic no-recursive-scheduling guard (by-construction layer,
+  // independent of E1 deny-by-name): a declared scheduling tool
+  // reachable from the task's agent is a config error unless
+  // explicitly granted.
   if (options.allowRecursiveScheduling !== true) {
     for (const name of options.schedulingToolNames ?? []) {
       if (options.agent.registry?.get(name) !== undefined) {

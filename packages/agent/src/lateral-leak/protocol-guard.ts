@@ -37,8 +37,10 @@ export type ProtocolBoundary = 'sse' | 'http-header' | 'ws' | 'rest-body' | 'aud
 export type ProtocolEscapePolicy = 'strict' | 'replace' | 'reject';
 
 /**
- * Configurable per-boundary policy table. Operators may override
- * specific boundaries via `Agent.protocolGuard?: { ... }`.
+ * Configurable per-boundary policy table. There is no agent-level
+ * config key for it in the current slice - the embedding surface
+ * (server route, channel adapter, custom harness) constructs the
+ * table and passes it to the escape helpers explicitly.
  *
  * @stable
  */

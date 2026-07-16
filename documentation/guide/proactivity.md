@@ -78,7 +78,7 @@ await nightly.start();
 
 Every fire creates a **fresh session** and runs on a **required, fail-closed model pin**: the run resolves to exactly the task's `provider`, winning over `prepareStep` overrides and the whole preference ladder, and the agent-level fallback chain is never consulted - a 03:00 fire must not silently escalate to a more expensive model because the cheap one rate-limited.
 
-**No recursive scheduling.** A proactive run must not register triggers or schedules. The primary enforcement is by construction - dedicate an agent whose toolset simply has no scheduling tools - and `schedulingToolNames` adds a deterministic creation-time check: any listed name reachable from the task's agent registry throws `ProactiveConfigError` unless `allowRecursiveScheduling: true` grants it explicitly. (E1's deny-by-name vocabulary will add a third layer later.)
+**No recursive scheduling.** A proactive run must not register triggers or schedules. The primary enforcement is by construction - dedicate an agent whose toolset simply has no scheduling tools - and `schedulingToolNames` adds a deterministic creation-time check: any listed name reachable from the task's agent registry throws `ProactiveConfigError` unless `allowRecursiveScheduling: true` grants it explicitly. [E1's deny-by-name rules](/guide/security#deny-by-name-three-surfaces) (shipped in 0.9.0) compose as a third, policy-driven layer on top.
 
 ## The escalation ladder
 
@@ -120,7 +120,7 @@ Proactive spend is bounded at three layers:
 
 1. **Per-fire run budget** (C5) - `profile.budgetUsd` / `budget.maxCostUsd` (+ `maxTokens`) pass through to the agent's [run-level budget](/guide/agent-runtime#run-budget) with `onExceed: 'stop'`; sub-agent usage counts. The cost leg needs USD-priced usage (pricing middleware); `maxTokens` works everywhere.
 2. **Fail-closed model pin** - the fire cannot silently escalate to a pricier model through fallback.
-3. **Scheduler harness** (C4) - the [interval floor, declaration cap, deterministic jitter and auto-expiry](/guide/standalone-server#scheduler-harness-for-proactive-fleets) bound how often anything fires at all; heartbeat and cron schedules pass `jitterMs` / `expiresAt` straight through.
+3. **Scheduler harness** (C4) - the [interval floor, declaration cap, deterministic jitter and auto-expiry](/guide/standalone-server#scheduler-harness-for-proactive-fleets) bound how often anything fires at all; heartbeat and cron schedules pass `jitterMs` / `expiresAt` straight through. Note the floor also applies to the heartbeat example above: with the harness enabled, a dev-speed beat faster than the floor (for example `every: 300` in a test) makes `scheduler.register` throw `TriggerLimitError('interval-floor')` - pass `intervalFloorMs: 0` in the harness limits for tests, or keep dev beats at or above the floor.
 
 ## Cost posture
 

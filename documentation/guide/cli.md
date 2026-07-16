@@ -118,11 +118,11 @@ Use `--secrets-source <auto|keyring|encrypted-file|env>` and `--strict-secrets` 
 graphorin pricing status
 graphorin pricing refresh --url <url>         # fetches a fresh snapshot on demand (network)
 graphorin pricing diff --snapshot ./snapshot.json            # diff a supplied snapshot against the bundled one
-graphorin pricing lookup --provider openai --model gpt-4o    # resolve one (provider, model) entry
+graphorin pricing lookup --provider openai --model gpt-4o-2024-11-20    # resolve one (provider, model) entry
 graphorin pricing missing --spans ./spans.json               # models with no pricing data
 ```
 
-The bundled snapshot is **never refreshed automatically** - only an explicit invocation of `graphorin pricing refresh` reaches the network. See [Pricing](/reference/pricing).
+The bundled snapshot is **never refreshed automatically** - only an explicit invocation of `graphorin pricing refresh` reaches the network. Snapshot entries are keyed by the DATED model ids the upstream dataset publishes (`gpt-4o-2024-11-20`, not the `gpt-4o` alias) - an alias lookup reports "no pricing entry" with a WARN instead of resolving. See [Pricing](/reference/pricing).
 
 ## `graphorin skills`
 
@@ -133,6 +133,10 @@ graphorin skills inspect <path-or-package>
 graphorin skills audit                       # checks signatures + sandbox tier
 graphorin skills migrate-frontmatter --path <dir>  # dry-run by default: lists the files --apply would rewrite
 ```
+
+::: warning The supply-chain registry is process-local in the current slice
+`skills install` records its supply-chain entry in an in-memory registry that does not outlive the process, so a later `skills audit` / `skills inspect` invocation (a NEW process) does not see earlier installs - each command audits what it is pointed at, not an accumulated ledger. Treat the three subcommands as independent probes rather than a sequential install-then-audit workflow; a persistent registry is future work.
+:::
 
 ## `graphorin auth`
 
@@ -177,7 +181,7 @@ The audit trail's operator surface lives on the security-focused pages; this sec
 Read-only operator inspection of the long-term memory store, the quarantine review surface, plus the explicit embedder swap. `inspect`, `activity`, `why`, and `review` query the store directly and never load an embedder.
 
 ```bash
-graphorin memory status                  # counts + active embedder + migration state
+graphorin memory status                  # counts + active embedder
 graphorin memory inspect <fact-id>       # one fact: supersede chain, quarantine, conflicts, citing insights
 graphorin memory activity --limit 20     # store-wide consolidator / reflection activity
 graphorin memory why --session s1 --limit 5   # explain why facts were recalled (ranking signals) from persisted spans
@@ -239,13 +243,13 @@ Produces a deterministic JSONL export - see [Sessions § JSONL export schema 1.0
 ## `graphorin telemetry`
 
 ```bash
-graphorin telemetry status
-graphorin telemetry inspect           # dump the resolved exporter + redaction config
+graphorin telemetry status            # the phone-home policy: always "disabled (zero-default)"
+graphorin telemetry inspect           # same policy document, structured (--json friendly)
 graphorin telemetry enable            # refuses (exit 1) - zero phone-home is the contract
 graphorin telemetry disable           # no-op - telemetry is always disabled
 ```
 
-`status` prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime - there is no way to disable redaction from the CLI.
+`status` and `inspect` report the **phone-home policy**, not your runtime tracing configuration: the framework has no built-in collector, so both print the fixed zero-default policy document (disabled, with the privacy reference). Your OpenTelemetry wiring - exporters, `withValidation(...)` redaction, sensitivity floors - lives in application code and is inspected there, not through this command group.
 
 `enable` and `disable` encode the zero-default-telemetry promise (DEC-154 / ADR-041) as commands: `enable` **refuses** with exit code `1` and points at `SECURITY.md § Privacy & telemetry` (an opt-in collector is roadmap, not reality), and `disable` is a no-op that confirms the already-permanent state. They exist so an operator probing the surface gets the policy as an answer instead of silence.
 
@@ -261,11 +265,11 @@ Both operate on the `spans` table written by the SQLite span exporter (the same 
 ## `graphorin guard`
 
 ```bash
-graphorin guard status                        # the four guard tiers + their variants
+graphorin guard status                        # the five guard tiers + their variants
 graphorin guard explain my-tool --tags web,write --trust-level user-defined
 ```
 
-Inspection surface for the memory-modification guard (no store access, purely the classifier). `status` prints the four tiers and the variants each accepts. `explain <toolName>` derives the tier the classifier **would** assign to a tool with the supplied metadata - feed it `--tags`, `--secrets-allowed`, `--trust-level built-in|user-defined|trusted|untrusted`, or `--explicit-tier` to answer "why did my tool end up memory-aware?" before wiring it. Both accept `--json`.
+Inspection surface for the memory-modification guard (no store access, purely the classifier). `status` prints the five tiers (`pure`, `side-effecting-no-memory`, `memory-aware`, `unknown`, `untrusted`) and the variants each accepts. `explain <toolName>` derives the tier the classifier **would** assign to a tool with the supplied metadata - feed it `--tags`, `--secrets-allowed`, `--trust-level built-in|user-defined|trusted|untrusted`, or `--explicit-tier` to answer "why did my tool end up memory-aware?" before wiring it. Both accept `--json`.
 
 ## `graphorin tools lint`
 
@@ -279,7 +283,7 @@ Text-based static scan (no runtime probe, no `tsc`): discovers every `tool({...}
 
 ## Privacy
 
-The CLI never phones home. The only outbound calls happen on commands that explicitly initiate a network operation (`graphorin pricing refresh`, `graphorin auth login`, `graphorin skills install npm:<name>`). Each one is documented in `--help` and audited.
+The CLI never phones home. The only outbound calls happen on commands that explicitly initiate a network operation (`graphorin pricing refresh`, `graphorin auth login`, `graphorin auth refresh`, `graphorin auth revoke` - the RFC 7009 revocation POST, `graphorin skills install npm:<name>`). Each one is documented in `--help` and audited.
 
 ## Next steps
 

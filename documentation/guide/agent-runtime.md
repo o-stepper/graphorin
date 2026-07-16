@@ -306,8 +306,8 @@ Handoffs use a built-in filter library to shape the payload that crosses the bou
 
 | Filter | What it does |
 |---|---|
-| `filters.lastN(n)` | Keep only the last N messages. |
-| `filters.lastUser()` | Keep only the latest user turn. |
+| `filters.lastN(n)` | Keep the last N non-system messages - system prompts are ALWAYS retained on top of the N, so `lastN(2)` over a history with system messages returns more than 2 entries. |
+| `filters.lastUser()` | Keep only the latest user turn (system prompts are retained the same way). |
 | `filters.summary(text)` | Replace history with a caller-supplied summary. |
 | `filters.bySensitivity({ maxTier? })` | Drop message parts above the `maxTier` sensitivity ceiling (default `'public'`). |
 | `filters.stripReasoning()` | Drop reasoning content parts. |

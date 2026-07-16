@@ -65,7 +65,8 @@ const DEFAULT_POLICY: Required<AgentFallbackPolicy> = {
 /**
  * Pure dispatcher that maps a {@link ProviderError} to one of four
  * eligible reasons or to `eligible: false` if the error is on the
- * bypass list (`auth | invalid-input | content-filter | cancelled`).
+ * bypass list - the `ProviderErrorKind` values `invalid-request`,
+ * `unauthorized`, `content-filter`, and `unknown`.
  *
  * The function is intentionally allocation-free on the hot path so
  * the agent runtime can call it once per provider error per step

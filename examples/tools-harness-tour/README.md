@@ -4,7 +4,7 @@
 
 This example is the smallest end-to-end demonstration of the tool plumbing every graphorin agent stands on. It wires the four tool sources the runtime knows (MCP-derived, skill-declared, first-party, built-in) into a single registry, then exercises the executor paths that matter in production: trust-class-aware inbound sanitization (MCP and untrusted-skill outputs come back inside the `<<<untrusted_content ...>>>` envelope), deferred-tool discovery, sandboxed programmatic tool calling, and the run-scoped spill-handle round trip for >100 KB results.
 
-CI exercises the tour fully offline - the MCP server lives in the same process on an `InMemoryTransport` linked pair, so there is no network, no child process, no daemon, and no API key. The example tracks graphorin v0.6.1.
+CI exercises the tour fully offline - the MCP server lives in the same process on an `InMemoryTransport` linked pair, so there is no network, no child process, no daemon, and no API key. The example tracks the workspace version (lockstep with every other `@graphorin/*` package).
 
 ---
 

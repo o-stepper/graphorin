@@ -28,10 +28,10 @@ pnpm --filter ./examples/background-consolidator dev
 Expected output:
 
 ```
-graphorin v0.10.0 background-consolidator - recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=4, standardPhases=4, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
+graphorin v0.10.0 background-consolidator - recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=2, standardPhases=1, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
 ```
 
-The dev script boots the app against `:memory:` SQLite, drives one cycle through `runConsolidatorCycle({ ... })`, prints the consolidator status, and exits cleanly.
+The dev script boots the app against `:memory:` SQLite, drives one cycle through `runConsolidatorCycle({ ... })`, prints the consolidator status, and exits cleanly. The counts are deterministic: four turns are driven, but the `tier: 'cheap'` budget envelope enforces a 60-second cooldown between paid phases, so only the first turn's light+standard pass runs inside the cycle plus one more light pass from the scheduler fire - `lightPhases=2, standardPhases=1`, the later turns' phases are deferred by design.
 
 ---
 
@@ -42,7 +42,7 @@ The example wires four moving parts together:
 1. **`Memory` with a real consolidator.** `createMemory({ consolidator: { enabled: true, tier: 'cheap', triggers, provider, defaultScope } })` swaps the Phase 10a placeholder for the production runtime so the `light` + `standard` phases actually execute.
 2. **`Scheduler` from `@graphorin/triggers`.** The scheduler is constructed against the SQLite-backed `TriggerStore`. Trigger declarations become rows in `trigger_state`; the durable layer is what survives process restart per DEC-150.
 3. **`registerConsolidatorTriggers(consolidator, scheduler, { scope })`.** The bridge walks the consolidator's `triggers: [...]` list, parses each spec, and registers the cron / idle / interval kinds with the scheduler. The callback fires `consolidator.trigger(reason, scope)` so the lib-mode + server paths converge on the same handler. Turn / event / budget triggers are skipped here - the scheduler cannot count user turns autonomously.
-4. **`createServer({ consolidator, triggers: { scheduler } })`.** The standalone server hosts the consolidator daemon under its own lifecycle hooks. `GET /v1/health` reports `consolidator.running`, `consolidator.queueDepth`, and the active budget envelope; `graphorin consolidator status` (CLI, Phase 15) reads from the same daemon.
+4. **`createServer({ consolidator, triggers: { scheduler } })`.** The standalone server hosts the consolidator daemon under its own lifecycle hooks. `GET /v1/health` reports it under `checks.consolidator` - `{ tier, running, paused, queueDepth, dlqSize, budgetRemaining: { tokens, costUsd } }`; `graphorin consolidator status` (CLI, Phase 15) reads from the same daemon.
 
 ```ts
 import {

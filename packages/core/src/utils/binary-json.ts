@@ -3,8 +3,10 @@
  *
  * `Message` and `ToolResult.contentParts` carry `Uint8Array | URL`
  * payloads that a naive `JSON.stringify` silently corrupts: a
- * `Uint8Array` turns into an object with numeric keys and a `URL`
- * into `{}`. The wire types below replace those fields with explicit
+ * `Uint8Array` turns into an object with numeric keys, and a `URL`
+ * collapses to its `href` string (its `toJSON`), so the instance type
+ * is lost on the way back. The wire types below replace those fields
+ * with explicit
  * {@link EncodedBytes} / {@link EncodedUrl} envelopes so a run state
  * (or any message transcript) survives `JSON.parse(JSON.stringify(x))`
  * byte-for-byte.
@@ -42,7 +44,8 @@ export interface EncodedBytes {
 
 /**
  * URL reference as it appears on the wire (`URL` instances do not
- * survive `JSON.stringify`).
+ * survive `JSON.stringify` as instances - they serialize to their
+ * `href` string).
  *
  * @stable
  */
@@ -252,8 +255,10 @@ function decodeBinary(value: unknown): Uint8Array | URL | unknown {
     return new URL(value.href);
   }
   // Legacy repair path: schema 1.0/1.1 checkpoints stringified the raw
-  // Uint8Array into a numeric-key object. A corrupted URL serialized to
-  // `{}` and is unrecoverable - it stays as-is.
+  // Uint8Array into a numeric-key object. A legacy URL serialized to its
+  // plain href STRING (never an object), so it can not reach this
+  // object-shaped branch and stays a string - unrecoverable as a URL
+  // instance.
   const repaired = repairNumericKeyBytes(value);
   return repaired ?? value;
 }

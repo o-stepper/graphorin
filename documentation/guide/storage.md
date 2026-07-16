@@ -140,9 +140,16 @@ pepper is held to the same bar via the framework's weak-secret detector.
 
 ```bash
 graphorin init --encrypted          # scaffold an encrypted store
-graphorin storage encrypt <db>      # convert an existing plaintext DB
-graphorin storage rekey <db>        # rotate the passphrase
+graphorin storage encrypt --passphrase-from file:./passphrase          # convert an existing plaintext DB
+graphorin storage rekey --old-passphrase-from file:./old --new-passphrase-from file:./new   # rotate the passphrase
 ```
+
+Both commands operate on the database from the resolved config (`-c/--config`);
+there is **no positional `<db>` argument** - the passphrases arrive as
+[SecretRef URIs](/guide/secrets) via the required `--passphrase-from` /
+`--old-passphrase-from` / `--new-passphrase-from` flags, never as raw CLI
+values. `encrypt` writes `<storage>.encrypted` by default (`--target-path`
+overrides).
 
 `storage encrypt --swap` replaces the plaintext file in place and **requires a
 stopped server**: the swap renames the source, and a live writer would keep

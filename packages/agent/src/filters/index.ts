@@ -168,18 +168,21 @@ export function summary(text: string): DescribedFilter {
 }
 
 /**
- * Drop messages whose effective sensitivity ceiling exceeds
- * `maxTier`. Messages without sensitivity metadata default to
- * `'public'` and are always kept.
+ * Drop messages that carry the literal `[REDACTED:secret]` redaction
+ * token when `maxTier` sits below `'secret'`.
  *
- * The framework currently records sensitivity at the
- * `MessageContent` part level via the `inboundTrust` / `secret`
- * annotations. v0.1 ships a coarse-grained heuristic: a message is
- * kept iff every text part's content does not contain the literal
- * `[REDACTED:secret]` token AND every part's annotated sensitivity
- * is acceptable to `maxTier`. Operators that need a stricter
- * filter compose the function with `stripSensitiveOutputs()` or a
- * custom predicate.
+ * WEAK CONTRACT - read before relying on it at a trust boundary
+ * (AGENT-FIL-01): `MessageContent` has NO part-level sensitivity /
+ * `secret` / `inboundTrust` annotation in the current surface, so
+ * this filter can only key on the redaction token the framework's
+ * redaction layer stamps into text. Content that was never
+ * redaction-stamped - an annotated-elsewhere secret, plaintext
+ * credentials the model echoed - passes through untouched. It is a
+ * best-effort hygiene filter, NOT a sensitivity gate; do not treat a
+ * sub-agent handoff filtered by it as a secrecy boundary. Operators
+ * that need a real gate must scrub content upstream (redaction
+ * middleware, `withRedaction`) or compose a custom predicate over
+ * their own metadata.
  *
  * @stable
  */
@@ -216,11 +219,13 @@ export function stripReasoning(): DescribedFilter {
 }
 
 /**
- * Strip tool messages whose `content` carries the literal token
- * `[REDACTED:secret]` or whose `secret` annotation marks the body as
- * sensitive. Conservative-by-design: the agent runtime tags
- * sensitive tool outputs at session-write time so this filter has
- * stable bytes to scan against.
+ * Strip tool messages whose `content` carries a literal
+ * `[REDACTED:` redaction token - ANY redaction tier trips it, not
+ * only `secret` (AGENT-FIL-02). There is no `secret` annotation on
+ * the message surface in the current slice; the token stamped by the
+ * redaction layer at session-write time is the only signal this
+ * filter scans, so an output that was never redaction-stamped passes
+ * through. Same weak-contract caveat as {@link bySensitivity}.
  *
  * @stable
  */

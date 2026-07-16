@@ -101,9 +101,17 @@ export interface ProgressEvent {
  * @stable
  */
 export interface RegressionOptions {
-  /** Minimum drop in pass-rate (in percentage points) that counts as a regression. */
+  /**
+   * Tolerated drop in pass-rate (in percentage points). A drop must
+   * strictly EXCEED this value to count as a regression - a drop equal
+   * to the tolerance passes (and raw float deltas can sit a hair above
+   * or below an exact boundary).
+   */
   readonly maxPassRateDropPct?: number;
-  /** Minimum drop in average score per scorer that counts as a regression. */
+  /**
+   * Tolerated drop in average score per scorer. Strictly-exceeds
+   * semantics, same as {@link RegressionOptions.maxPassRateDropPct}.
+   */
   readonly maxAvgScoreDrop?: number;
   /**
    * Maximum allowed increase in `avgDurationMs` before it counts as a

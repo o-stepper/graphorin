@@ -276,6 +276,11 @@ export async function runCrew(options: RunCrewOptions = {}): Promise<RunCrewResu
   const memory: Memory = createMemory({
     store: store.memory,
     embeddings: store.embeddings,
+    // The deterministic stub recipe never approaches a context limit, so
+    // the auto-compaction safety net has nothing to do - keeping it off
+    // makes every run start clean instead of WARNing that
+    // providerContextWindow is unset (e2e 2026-07-13, EXAMPLES-02).
+    contextEngine: { compaction: false },
   });
 
   const sessionManager = createSessionManager({
