@@ -2,14 +2,18 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider](/api/@graphorin/provider/index.md) / [](/api/@graphorin/provider/README.md) / InvalidProviderError
+[Graphorin API reference](/api/index.md) / [@graphorin/provider](/api/@graphorin/provider/index.md) / [](/api/@graphorin/provider/README.md) / ProviderToolChoiceUnsupportedError
 
-# Class: InvalidProviderError
+# Class: ProviderToolChoiceUnsupportedError
 
-Defined in: [packages/provider/src/errors/errors.ts:339](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L339)
+Defined in: [packages/provider/src/errors/errors.ts:312](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L312)
 
-The classifier dispatcher was given a non-Provider value. Programming
-error; fail-fast at the boundary.
+The caller requested a forced `toolChoice` (`'required'` or
+`{ tool: name }`) on an adapter whose wire protocol has no way to
+enforce it (the native Ollama `/api/chat` API has no `tool_choice`
+field). Thrown at request time instead of silently degrading the
+forced choice to `'auto'` - a forced tool call is a contract, not a
+hint.
 
 ## Stable
 
@@ -22,20 +26,22 @@ error; fail-fast at the boundary.
 ### Constructor
 
 ```ts
-new InvalidProviderError(message): InvalidProviderError;
+new ProviderToolChoiceUnsupportedError(args): ProviderToolChoiceUnsupportedError;
 ```
 
-Defined in: [packages/provider/src/errors/errors.ts:342](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L342)
+Defined in: [packages/provider/src/errors/errors.ts:317](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L317)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `message` | `string` |
+| `args` | \{ `providerName`: `string`; `toolChoice`: `string`; \} |
+| `args.providerName` | `string` |
+| `args.toolChoice` | `string` |
 
 #### Returns
 
-`InvalidProviderError`
+`ProviderToolChoiceUnsupportedError`
 
 #### Overrides
 
@@ -49,8 +55,10 @@ Defined in: [packages/provider/src/errors/errors.ts:342](https://github.com/o-st
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | [packages/provider/src/errors/errors.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L23) |
 | <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | [packages/provider/src/errors/errors.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L21) |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
-| <a id="property-name"></a> `name` | `readonly` | `"InvalidProviderError"` | `'InvalidProviderError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | [packages/provider/src/errors/errors.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L340) |
+| <a id="property-name"></a> `name` | `readonly` | `"ProviderToolChoiceUnsupportedError"` | `'ProviderToolChoiceUnsupportedError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | [packages/provider/src/errors/errors.ts:313](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L313) |
+| <a id="property-providername"></a> `providerName` | `readonly` | `string` | `undefined` | - | - | - | [packages/provider/src/errors/errors.ts:314](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L314) |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stack`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stack) | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |
+| <a id="property-toolchoice"></a> `toolChoice` | `readonly` | `string` | `undefined` | - | - | - | [packages/provider/src/errors/errors.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L315) |
 | <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | `undefined` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stackTraceLimit`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stacktracelimit) | [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L68) |
 
 ## Methods

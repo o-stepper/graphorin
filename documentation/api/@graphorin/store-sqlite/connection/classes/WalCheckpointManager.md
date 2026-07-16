@@ -6,7 +6,7 @@
 
 # Class: WalCheckpointManager
 
-Defined in: [packages/store-sqlite/src/connection.ts:403](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L403)
+Defined in: [packages/store-sqlite/src/connection.ts:415](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L415)
 
 Periodic `wal_checkpoint(RESTART)` runner. Invoked by the worker
 pool every `intervalMs` to bound WAL growth on long-running servers.
@@ -21,7 +21,7 @@ pool every `intervalMs` to bound WAL growth on long-running servers.
 new WalCheckpointManager(conn, intervalMs): WalCheckpointManager;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:408](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L408)
+Defined in: [packages/store-sqlite/src/connection.ts:420](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L420)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:408](https://github.com/o-s
 start(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:413](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L413)
+Defined in: [packages/store-sqlite/src/connection.ts:425](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L425)
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: [packages/store-sqlite/src/connection.ts:413](https://github.com/o-s
 stop(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:426](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L426)
+Defined in: [packages/store-sqlite/src/connection.ts:438](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L438)
 
 #### Returns
 

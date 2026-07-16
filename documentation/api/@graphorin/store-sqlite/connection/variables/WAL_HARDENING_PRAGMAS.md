@@ -10,7 +10,7 @@
 const WAL_HARDENING_PRAGMAS: readonly ["journal_mode = WAL", "synchronous = NORMAL", "busy_timeout = 5000", "mmap_size = 134217728", "temp_store = MEMORY", "cache_size = -64000", "foreign_keys = ON"];
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L63)
+Defined in: [packages/store-sqlite/src/connection.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L64)
 
 Mandatory WAL hardening pragmas applied at connection open. Any
 deviation must be documented in the calling site's TSDoc per the
