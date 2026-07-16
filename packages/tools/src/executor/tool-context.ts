@@ -27,7 +27,13 @@ import type {
   Tracer,
 } from '@graphorin/core';
 import { NOOP_LOGGER, NOOP_TRACER } from '@graphorin/core';
-import { enforceSecretAcl, withChildToolSecretsContext } from '@graphorin/security/secrets';
+import {
+  emitSecretsAudit,
+  enforceSecretAcl,
+  getActiveToolSecretsContext,
+  SecretAccessDeniedError,
+  withChildToolSecretsContext,
+} from '@graphorin/security/secrets';
 
 import type { StreamingChannel } from '../streaming/channel.js';
 
@@ -102,7 +108,32 @@ function makeSecretsAccessor(
     key: string,
     options?: { readonly optional?: boolean },
   ): Promise<SecretValue | SecretValue | null> {
-    enforceSecretAcl(key);
+    try {
+      enforceSecretAcl(key);
+    } catch (err) {
+      // SECRETS-S-01: the ctx.secrets accessor gates through the ACL
+      // directly, so a denied access is NOT wrapped by the store-path
+      // auditStoreOperation. Emit the one documented denied audit row here
+      // before re-throwing (the store path audits its own denials).
+      if (err instanceof SecretAccessDeniedError) {
+        const ctx = getActiveToolSecretsContext();
+        emitSecretsAudit({
+          action: 'secret:get',
+          decision: 'denied',
+          ts: Date.now(),
+          source: 'tool-acl',
+          target: key,
+          actor: {
+            kind: 'tool',
+            toolName,
+            ...(ctx?.runId !== undefined ? { runId: ctx.runId } : {}),
+            ...(ctx?.sessionId !== undefined ? { sessionId: ctx.sessionId } : {}),
+            ...(ctx?.agentId !== undefined ? { id: ctx.agentId } : {}),
+          },
+        });
+      }
+      throw err;
+    }
     if (resolver === undefined) {
       if (options?.optional === true) return Promise.resolve(null);
       const err = new Error(
