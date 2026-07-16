@@ -230,6 +230,21 @@ describe('createSqliteStore', () => {
     expect(withMeta?.[0]?.message.role).toBe('user');
   });
 
+  it('SESSIONS-01: session reads are scoped by userId (no cross-user read with a known sessionId)', async () => {
+    const alice = { userId: 'alice', sessionId: 'sess-shared' };
+    await store.memory.session.push(alice, {
+      role: 'user',
+      content: 'alice private note about her bank change',
+    });
+    // Same sessionId, different user: must see nothing.
+    const mallory = { userId: 'mallory', sessionId: 'sess-shared' };
+    expect((await store.memory.session.list(mallory)).length).toBe(0);
+    expect((await store.memory.session.search(mallory, 'bank')).length).toBe(0);
+    expect((await store.memory.session.listWithMetadata?.(mallory))?.length ?? 0).toBe(0);
+    // The owner still reads her own transcript.
+    expect((await store.memory.session.list(alice)).length).toBe(1);
+  });
+
   it('shared memory: attach / listFor / detach', async () => {
     await store.memory.shared.attach('rec-1', 'agent-A');
     await store.memory.shared.attach('rec-2', 'agent-A');

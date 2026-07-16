@@ -437,8 +437,11 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     if (scope.sessionId === undefined) {
       throw new Error('[graphorin/store-sqlite] SessionMemoryStore.list requires scope.sessionId');
     }
-    const conditions = ['scope_session_id = ?', 'deleted_at IS NULL'];
-    const params: unknown[] = [scope.sessionId];
+    // SESSIONS-01: scope the read by the owning user too - filtering on
+    // scope_session_id alone let a caller read another user's transcript with
+    // a known sessionId.
+    const conditions = ['scope_session_id = ?', 'scope_user_id = ?', 'deleted_at IS NULL'];
+    const params: unknown[] = [scope.sessionId, scope.userId];
     if (opts.agentId !== undefined) {
       conditions.push('agent_id = ?');
       params.push(opts.agentId);
@@ -473,8 +476,9 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
         '[graphorin/store-sqlite] SessionMemoryStore.listWithMetadata requires scope.sessionId',
       );
     }
-    const conditions = ['scope_session_id = ?', 'deleted_at IS NULL'];
-    const params: unknown[] = [scope.sessionId];
+    // SESSIONS-01: scope by the owning user (see list()).
+    const conditions = ['scope_session_id = ?', 'scope_user_id = ?', 'deleted_at IS NULL'];
+    const params: unknown[] = [scope.sessionId, scope.userId];
     if (opts.agentId !== undefined) {
       conditions.push('agent_id = ?');
       params.push(opts.agentId);
@@ -507,8 +511,9 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
   async count(scope: SessionScope): Promise<number> {
     if (scope.sessionId === undefined) return 0;
     const row = this.#conn.get<{ n: number }>(
-      'SELECT COUNT(*) AS n FROM session_messages WHERE scope_session_id = ? AND deleted_at IS NULL',
-      [scope.sessionId],
+      // SESSIONS-01: scope by the owning user (see list()).
+      'SELECT COUNT(*) AS n FROM session_messages WHERE scope_session_id = ? AND scope_user_id = ? AND deleted_at IS NULL',
+      [scope.sessionId, scope.userId],
     );
     return row?.n ?? 0;
   }
@@ -530,10 +535,11 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
               bm25(session_messages_fts) AS bm25_score
        FROM session_messages_fts
        JOIN session_messages m ON m.rowid = session_messages_fts.rowid
-       WHERE session_messages_fts MATCH ? AND m.scope_session_id = ?
+       WHERE session_messages_fts MATCH ? AND m.scope_session_id = ? AND m.scope_user_id = ?
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(query), scope.sessionId, topK],
+      // SESSIONS-01: scope by the owning user (see list()).
+      [escapeFtsQuery(query), scope.sessionId, scope.userId, topK],
     );
     return rows.map((row) => {
       const record: MemoryRecord = {
