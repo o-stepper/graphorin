@@ -130,6 +130,40 @@ describe('W-032 - createTimerDriver', () => {
     expect(state.status).toBe('suspended');
   });
 
+  it('WORKFLOW-01: a not-yet-due timer within the poll interval re-arms to its wakeAt', async () => {
+    const store = new InMemoryCheckpointStore();
+    const wf = timerWorkflow(store);
+    await drain(wf.execute({} as never, { threadId: 'timer-soon' }));
+    const nowAt = WAKE_AT - 5_000; // 5s before the deadline, inside the poll window
+    const scheduled: Array<{ fn: () => void; ms: number }> = [];
+    const driver = createTimerDriver({
+      workflows: [{ workflow: wf, checkpointStore: store }],
+      now: () => nowAt,
+      pollIntervalMs: 30_000,
+      setTimeoutImpl: (fn, ms) => {
+        scheduled.push({ fn, ms });
+        return scheduled.length;
+      },
+      clearTimeoutImpl: () => {},
+    });
+    // A pre-deadline sweep fires nothing but records the UPCOMING wake -
+    // before the fix, only already-due threads set nextWakeAt, so a short
+    // future timer left it undefined and the re-arm defaulted to 30s.
+    expect(await driver.sweep()).toBe(0);
+    expect(driver.status().nextWakeAt).toBe(WAKE_AT);
+
+    // start() schedules an immediate pass (ms 0); running it re-arms to
+    // ~5s (min(pollInterval, wakeAt - now)), not the full 30s interval.
+    driver.start();
+    expect(scheduled[0]?.ms).toBe(0);
+    scheduled[0]?.fn();
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const rearm = scheduled[1];
+    expect(rearm?.ms).toBeGreaterThan(0);
+    expect(rearm?.ms).toBeLessThanOrEqual(5_000);
+    driver.stop();
+  });
+
   it('per-thread tick errors are isolated - the sweep continues and reports them', async () => {
     const store = new InMemoryCheckpointStore();
     const wf = timerWorkflow(store);

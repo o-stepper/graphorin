@@ -147,12 +147,18 @@ export function createTimerDriver(options: CreateTimerDriverOptions): TimerDrive
     sweeps += 1;
     let fired = 0;
     let earliestNext: number | undefined;
+    // WORKFLOW-01: look one poll interval ahead. A thread whose timer is not
+    // yet due contributes its wakeAt to `earliestNext`, so `schedule()`
+    // re-arms at min(pollIntervalMs, earliest wakeAt) instead of waiting out
+    // the full interval - a short durable timer used to sleep until the next
+    // poll tick because only ALREADY-DUE threads set earliestNext.
+    const lookahead = at + pollIntervalMs;
     for (const entry of entries) {
-      let due: ReadonlyArray<{ readonly threadId: string; readonly wakeAt: number }>;
+      let suspended: ReadonlyArray<{ readonly threadId: string; readonly wakeAt: number }>;
       try {
-        due =
+        suspended =
           (await entry.store.listSuspended?.(entry.namespace, {
-            dueBefore: at,
+            dueBefore: lookahead,
             limit: batchLimit,
           })) ?? [];
       } catch (error) {
@@ -160,7 +166,13 @@ export function createTimerDriver(options: CreateTimerDriverOptions): TimerDrive
         options.onError?.(entry.workflow.name, '(listSuspended)', error);
         continue;
       }
-      for (const item of due) {
+      for (const item of suspended) {
+        // Not yet due: only inform the next wake-up, do not tick it early.
+        if (item.wakeAt > at) {
+          earliestNext =
+            earliestNext === undefined ? item.wakeAt : Math.min(earliestNext, item.wakeAt);
+          continue;
+        }
         try {
           const result = await entry.workflow.tick(item.threadId, { now: now() });
           if (result.fired) fired += 1;
