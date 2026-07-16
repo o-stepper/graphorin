@@ -68,6 +68,32 @@ yarn add @graphorin/agent @graphorin/memory @graphorin/provider \
 
 `zod` is a non-optional peer dependency of every `@graphorin/*` package that touches a public schema. Bring whichever Zod version your application already uses (`^3.23` or `^4`).
 
+## Native modules and pnpm 10
+
+::: warning First run fails with "Could not locate the bindings file"?
+That is pnpm 10's build-script policy, not a broken install. The fix is the `onlyBuiltDependencies` block below.
+:::
+
+`better-sqlite3` (and the optional cipher peer `better-sqlite3-multiple-ciphers`) fetch their prebuilt native binaries from an **install script**. pnpm 10 and newer do not run dependency install scripts unless they are explicitly approved - the install still exits `0` and prints one easy-to-miss line:
+
+```text
+Ignored build scripts: better-sqlite3@12.9.0.
+```
+
+The failure then surfaces only at the first database open. Graphorin raises a typed `SqliteNativeBindingError` naming this exact fix instead of the raw `bindings.js` stack:
+
+```json
+{
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3", "sqlite-vec"]
+  }
+}
+```
+
+Add that block to your **application's** `package.json` (append `"better-sqlite3-multiple-ciphers"` when you enable encryption-at-rest), then reinstall - `pnpm install && pnpm rebuild better-sqlite3` - or run the interactive `pnpm approve-builds` instead. The Graphorin repository itself carries this block, but pnpm scopes the approval to each project, so every consumer project needs its own copy.
+
+npm and yarn run dependency install scripts by default; nothing to approve there.
+
 Heads-up on install size: `@graphorin/embedder-transformersjs` requires the `@huggingface/transformers` peer, which pulls in `onnxruntime-node` and `sharp` - on the order of 350 MB of native runtime on top of the roughly 58 MB framework stack. That is the price of a fully in-process default embedder. If you run a local [Ollama](https://ollama.com) daemon anyway, swap it for `@graphorin/embedder-ollama` and the install stays near the 58 MB baseline. The [Minimal profile](/guide/minimal-profile) guide covers this lean path end to end - including the embedder-less variant and the matching `scaffold: 'minimal'` agent posture for cheap always-on runs.
 
 ## What each package does
