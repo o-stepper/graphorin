@@ -38,7 +38,7 @@ documented in the agent-loop reference.
 
 | Function | Description |
 | ------ | ------ |
-| [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) | Drop messages whose effective sensitivity ceiling exceeds `maxTier`. Messages without sensitivity metadata default to `'public'` and are always kept. |
+| [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) | Drop messages that carry the literal `[REDACTED:secret]` redaction token when `maxTier` sits below `'secret'`. |
 | [compose](/api/@graphorin/agent/filters/functions/compose.md) | Compose multiple filters left-to-right. The composer **always** appends `stripReasoning()` at the end so reasoning content never crosses a handoff boundary regardless of caller intent. |
 | [custom](/api/@graphorin/agent/filters/functions/custom.md) | Wrap a caller-supplied function as a [DescribedFilter](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) with the canonical `'custom'` descriptor. |
 | [defaultHandoffFilter](/api/@graphorin/agent/filters/functions/defaultHandoffFilter.md) | The canonical default applied by the agent runtime to every `Agent.toTool(...)` and `handoff(...)` invocation when the caller does not supply an explicit filter. |
@@ -46,6 +46,6 @@ documented in the agent-loop reference.
 | [lastN](/api/@graphorin/agent/filters/functions/lastN.md) | Keep the parent's system prompt and the last `n` non-system messages. Default `n = 10` per DEC-146 / RB-40 security-first compose. |
 | [lastUser](/api/@graphorin/agent/filters/functions/lastUser.md) | Keep only the parent's system prompt and the most recent user message. Useful for simple sub-agents that only need the question. |
 | [stripReasoning](/api/@graphorin/agent/filters/functions/stripReasoning.md) | Strip every `ReasoningContent` part from each message. Always applied at the handoff boundary (the `compose(...)` helper appends this filter automatically). |
-| [stripSensitiveOutputs](/api/@graphorin/agent/filters/functions/stripSensitiveOutputs.md) | Strip tool messages whose `content` carries the literal token `[REDACTED:secret]` or whose `secret` annotation marks the body as sensitive. Conservative-by-design: the agent runtime tags sensitive tool outputs at session-write time so this filter has stable bytes to scan against. |
+| [stripSensitiveOutputs](/api/@graphorin/agent/filters/functions/stripSensitiveOutputs.md) | Strip tool messages whose `content` carries a literal `[REDACTED:` redaction token - ANY redaction tier trips it, not only `secret` (AGENT-FIL-02). There is no `secret` annotation on the message surface in the current slice; the token stamped by the redaction layer at session-write time is the only signal this filter scans, so an output that was never redaction-stamped passes through. Same weak-contract caveat as [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md). |
 | [stripToolCalls](/api/@graphorin/agent/filters/functions/stripToolCalls.md) | Drop every assistant `toolCalls` array AND every `tool` message. Useful when a sub-agent should only see the textual conversation. |
 | [summary](/api/@graphorin/agent/filters/functions/summary.md) | Replace the parent's history with a single system message carrying the supplied summary. Used by callers that wire in an LLM-based summarizer outside the framework. |

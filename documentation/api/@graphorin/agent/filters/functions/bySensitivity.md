@@ -10,20 +10,23 @@
 function bySensitivity(args?): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L186)
+Defined in: [packages/agent/src/filters/index.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L189)
 
-Drop messages whose effective sensitivity ceiling exceeds
-`maxTier`. Messages without sensitivity metadata default to
-`'public'` and are always kept.
+Drop messages that carry the literal `[REDACTED:secret]` redaction
+token when `maxTier` sits below `'secret'`.
 
-The framework currently records sensitivity at the
-`MessageContent` part level via the `inboundTrust` / `secret`
-annotations. v0.1 ships a coarse-grained heuristic: a message is
-kept iff every text part's content does not contain the literal
-`[REDACTED:secret]` token AND every part's annotated sensitivity
-is acceptable to `maxTier`. Operators that need a stricter
-filter compose the function with `stripSensitiveOutputs()` or a
-custom predicate.
+WEAK CONTRACT - read before relying on it at a trust boundary
+(AGENT-FIL-01): `MessageContent` has NO part-level sensitivity /
+`secret` / `inboundTrust` annotation in the current surface, so
+this filter can only key on the redaction token the framework's
+redaction layer stamps into text. Content that was never
+redaction-stamped - an annotated-elsewhere secret, plaintext
+credentials the model echoed - passes through untouched. It is a
+best-effort hygiene filter, NOT a sensitivity gate; do not treat a
+sub-agent handoff filtered by it as a secrecy boundary. Operators
+that need a real gate must scrub content upstream (redaction
+middleware, `withRedaction`) or compose a custom predicate over
+their own metadata.
 
 ## Parameters
 

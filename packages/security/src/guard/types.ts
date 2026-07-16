@@ -6,10 +6,11 @@
  * sanctioned `ctx.memory.*` surface - not through a direct file or
  * SQL escape hatch - and to record any non-tool-mediated mutation.
  *
- * The guard is **tier-based** per DEC-153. The four tiers trade
- * runtime cost against attack-surface coverage; the framework default
- * (`'unknown'` → `AUDIT_ONLY_GUARD`) is a sub-millisecond audit-only
- * checkpoint.
+ * The guard is **tier-based** per DEC-153. The five tiers (`pure`,
+ * `side-effecting-no-memory`, `memory-aware`, `unknown`, `untrusted`)
+ * trade runtime cost against attack-surface coverage; the framework
+ * default (`'unknown'` → `AUDIT_ONLY_GUARD`) is a sub-millisecond
+ * audit-only checkpoint.
  *
  * @packageDocumentation
  */

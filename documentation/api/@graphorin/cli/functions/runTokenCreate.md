@@ -10,7 +10,7 @@
 function runTokenCreate(options): Promise<TokenCreateResult>;
 ```
 
-Defined in: [packages/cli/src/commands/token.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L80)
+Defined in: [packages/cli/src/commands/token.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L84)
 
 Create a token. Returns the raw value once + the persisted record.
 

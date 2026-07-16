@@ -23,7 +23,7 @@ type GuardVerifyResult =
 };
 ```
 
-Defined in: [packages/security/src/guard/types.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L50)
+Defined in: [packages/security/src/guard/types.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L51)
 
 Result returned by `Guard.verify(...)`. The `ok` discriminator
 matches the rest of the package so callers can switch uniformly.

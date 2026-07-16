@@ -68,9 +68,9 @@ The framework never texts a peer on its own: when a check ends in a pairing chal
 
 Channel peers are authenticated by the pairing policy, but their CONTENT is still attacker-influenceable (forwarded posts, quoted articles, pasted text). The gateway therefore treats every inbound body as untrusted:
 
-1. **Inbound sanitisation** - `sanitizeChannelInbound` pins `applyInboundSanitization` from `@graphorin/tools/inbound` to the `'channel-inbound'` trust class: imperative injection patterns are stripped, chat-template tokens are neutralized, and the remainder is wrapped in the untrusted-content envelope. The handler receives `sanitizedText`; the original stays on `message.text` for audit and taint seeding only.
-2. **Taint seed** - the handler context carries a ready-made `inboundTaint` object. Pass it to the run (`agent.run(ctx.sanitizedText, { inboundTaint: ctx.inboundTaint })`) and the run's data-flow ledger is armed BEFORE the first step: the new `'channel-inbound'` trust class is registered in the same `isUntrustedTrustClass` source the taint engine and the Rule-of-Two consume, so both layers agree that channel input arms the untrusted leg even though it arrives as a user message rather than a tool output.
-3. **Outbound scaffolding sanitisation** - every `deliver()` (replies and proactive sends alike) runs through the shared outbound commentary catalogue from `@graphorin/tools/outbound`. The channel default policy is `'strip'`: matched fragments AND fragments an upstream boundary already wrapped are removed entirely, because a messenger peer has no UI that could collapse a `<<<commentary>>>` envelope. The catalogue is the same single source the server delivery layer and the session-output boundary consume, so tool-call payloads can never leak on one surface while being scrubbed on another.
+1. **Inbound sanitisation** - `sanitizeChannelInbound` pins `applyInboundSanitization` from `@graphorin/tools/inbound` to the `'channel-inbound'` trust class: imperative injection patterns are stripped, chat-template tokens are neutralized, and the remainder is wrapped in the untrusted-content envelope. The handler receives `sanitizedText`; the original stays on `message.text` for audit and taint seeding only. Note `sanitizedText` is **not** tidy plain text - it is the cleaned body still inside the boundary envelope, roughly `<<<untrusted_content source="channel:...">>> hello there <<</untrusted_content>>>`. That is exactly what the model should see (the envelope IS the trust boundary); pass it to the run as-is, and do not log or display it expecting bare text.
+2. **Taint seed** - the handler context carries a ready-made `inboundTaint` object. Pass it to the run (`agent.run(ctx.sanitizedText, { inboundTaint: ctx.inboundTaint })`) and the run's data-flow ledger is armed BEFORE the first step: the new `'channel-inbound'` trust class is registered in the same `isUntrustedTrustClass` source the taint engine and the Rule-of-Two consume, so both layers agree that channel input arms the untrusted leg even though it arrives as a user message rather than a tool output. **The seed only arms if the agent has a `dataFlowPolicy`** - the gateway hands you `inboundTaint` unconditionally, but `agent.run(...)` treats it as a no-op when the agent config carries no data-flow policy, so wiring the plumbing without the policy gives you an UNARMED run that looks armed. Configure both halves (see the snippet below).
+3. **Outbound scaffolding sanitisation** - every `deliver()` (replies and proactive sends alike) runs through the shared outbound commentary catalogue from `@graphorin/tools/outbound`. The channel default policy is `'strip'`: matched fragments - including a `<<<commentary>>>` fragment an upstream boundary already wrapped - are removed entirely, because a messenger peer has no UI that could collapse the envelope. The catalogue is the same single source the server delivery layer and the session-output boundary consume, so tool-call payloads can never leak on one surface while being scrubbed on another. Scope honestly: the strip catalogue targets the **commentary envelope only**. The inbound `<<<untrusted_content>>>` envelope is model-visible context by design and is NOT stripped outbound - a handler (or scripted provider) that echoes its input verbatim will deliver the envelope markers to the peer, so never echo `sanitizedText` back as a reply.
 4. **Optional injection classifier** - `injectionClassifier` on the gateway consults a pluggable classifier (see [Security](/guide/security)) after the regex pass; flagged verdicts land in `sanitization.patternsHit` as `classifier:<id>`. Default off; classifier errors never break the pipeline.
 
 ## The gateway
@@ -93,6 +93,9 @@ const gateway = createChannelGateway({
     }
   },
   onMessage: async (ctx) => {
+    // The taint seed arms only because the agent was created WITH a
+    // dataFlowPolicy - without one, inboundTaint is a silent no-op:
+    //   createAgent({ ..., dataFlowPolicy: { mode: 'enforce' } })
     const result = await agent.run(ctx.sanitizedText, {
       sessionId: ctx.route.sessionKey,
       inboundTaint: ctx.inboundTaint,
@@ -104,7 +107,7 @@ const gateway = createChannelGateway({
 await gateway.start();
 ```
 
-Pipeline per message: bounded queue (shed on overflow, typed `queue-full` acceptance back to the adapter) -> access policy -> inbound sanitisation + taint seed -> routing -> your handler -> reply delivery with outbound sanitisation. Handler errors are contained (counted + warned), never fatal to the gateway. `gateway.status()` exposes per-channel counters (`queued`, `dropped`, `processed`, `denied`, `failed`, `delivered`, `deliveryFailures`).
+Pipeline per message: bounded queue (shed on overflow, typed `queue-full` acceptance back to the adapter) -> access policy -> inbound sanitisation + taint seed -> routing -> your handler -> reply delivery with outbound sanitisation. Handler errors are contained (counted + warned), never fatal to the gateway. `await gateway.status()` (async - it returns a `Promise`) exposes per-channel counters (`queued`, `dropped`, `processed`, `denied`, `failed`, `delivered`, `deliveryFailures`).
 
 Delivery is fire-and-forget by design: the adapter owns bounded in-call retries and throws the typed `ChannelDeliveryError` (with a `retryable` hint) when they are exhausted. There is no durable outbox in the framework.
 
@@ -182,3 +185,15 @@ Notes on the preset:
 - In `enforce` mode the final assistant reply is itself a sink (stable id `'assistant-output'`): on a lethal-trifecta run the reply is withheld and replaced by a notice unless you explicitly declassify the reply surface. See [Security](/guide/security).
 - `treatPiiAsSensitive` stays opt-in framework-wide (W-103 / D-13): the recommendation here is preset policy, not a framework default.
 - Memory hygiene: pair the gateway with `ingestGate: verdictIngestGate` so blocked turns cannot become long-term memories - the write path is gated by persisted verdicts, not by trust in the conversation loop.
+
+## Composing the full bot
+
+There is no single `createBot(...)` entry point yet - a real assistant composes five subsystems, each documented in its own guide, and the seams have three easy-to-miss couplings called out above: `gateway.status()` is async, `inboundTaint` arms only next to an agent-level `dataFlowPolicy`, and the scheduler's interval floor rejects dev-speed heartbeats unless the harness lowers it. The wiring order that works:
+
+1. one `createSqliteStore` + `createMemory` (with `ingestGate`) shared by everything;
+2. the agent (`createAgent` with `memory`, `tools`, `dataFlowPolicy`, guardrails);
+3. the channel gateway from this guide, passing `ctx.inboundTaint` into every run;
+4. proactivity (heartbeat / cron tasks) against the same agent and store - see [Proactivity](/guide/proactivity);
+5. optionally the [standalone server](/guide/standalone-server) to host all of it behind one lifecycle.
+
+The runnable [example apps](/guide/examples) cover each subsystem in isolation; `personal-assistant-cli` is the closest end-to-end composition today.

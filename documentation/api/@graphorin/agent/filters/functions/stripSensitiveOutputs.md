@@ -10,13 +10,15 @@
 function stripSensitiveOutputs(): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L227)
+Defined in: [packages/agent/src/filters/index.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L232)
 
-Strip tool messages whose `content` carries the literal token
-`[REDACTED:secret]` or whose `secret` annotation marks the body as
-sensitive. Conservative-by-design: the agent runtime tags
-sensitive tool outputs at session-write time so this filter has
-stable bytes to scan against.
+Strip tool messages whose `content` carries a literal
+`[REDACTED:` redaction token - ANY redaction tier trips it, not
+only `secret` (AGENT-FIL-02). There is no `secret` annotation on
+the message surface in the current slice; the token stamped by the
+redaction layer at session-write time is the only signal this
+filter scans, so an output that was never redaction-stamped passes
+through. Same weak-contract caveat as [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md).
 
 ## Returns
 

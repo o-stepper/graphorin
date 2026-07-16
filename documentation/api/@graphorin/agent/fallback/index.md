@@ -38,4 +38,4 @@ transient errors inside one `provider.stream(...)` call.
 
 | Function | Description |
 | ------ | ------ |
-| [isAgentFallbackEligible](/api/@graphorin/agent/fallback/functions/isAgentFallbackEligible.md) | Pure dispatcher that maps a [ProviderError](/api/@graphorin/core/interfaces/ProviderError.md) to one of four eligible reasons or to `eligible: false` if the error is on the bypass list (`auth | invalid-input | content-filter | cancelled`). |
+| [isAgentFallbackEligible](/api/@graphorin/agent/fallback/functions/isAgentFallbackEligible.md) | Pure dispatcher that maps a [ProviderError](/api/@graphorin/core/interfaces/ProviderError.md) to one of four eligible reasons or to `eligible: false` if the error is on the bypass list - the `ProviderErrorKind` values `invalid-request`, `unauthorized`, `content-filter`, and `unknown`. |

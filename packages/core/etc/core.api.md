@@ -3266,7 +3266,7 @@ export interface ZodLikeSchema<TOutput = unknown, TInput = unknown> {
 
 // Warnings were encountered during analysis:
 //
-// src/utils/binary-json.ts:153:3 - (ae-forgotten-export) The symbol "WirePendingSubRun" needs to be exported by the entry point index.d.ts
+// src/utils/binary-json.ts:156:3 - (ae-forgotten-export) The symbol "WirePendingSubRun" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

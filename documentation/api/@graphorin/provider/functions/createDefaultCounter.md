@@ -10,14 +10,17 @@
 function createDefaultCounter(options): TokenCounter;
 ```
 
-Defined in: [packages/provider/src/counters/dispatcher.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/dispatcher.ts#L86)
+Defined in: [packages/provider/src/counters/dispatcher.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/dispatcher.ts#L89)
 
 Build the recommended [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) for the given
 `(provider, model)` pair. The dispatch table:
 
 - Anthropic Claude → `AnthropicAPICounter` (native if `apiKey` set,
   otherwise `cl100k_base` proxy).
-- OpenAI / OpenAI-compatible → `JsTiktokenCounter('cl100k_base')`.
+- OpenAI / OpenAI-compatible → `JsTiktokenCounter` with the
+  family-correct encoding (`o200k_base` for gpt-4o / gpt-4.1 /
+  gpt-5+ / o-series ids, `cl100k_base` otherwise - see
+  `defaultOpenAiEncoding`).
 - Google Gemini → `GoogleAPICounter` (cl100k_base proxy in v0.1).
 - Bedrock Claude → `BedrockAPICounter` (cl100k_base proxy in v0.1).
 - Ollama / unknown → `HeuristicCounter` with one WARN per process.

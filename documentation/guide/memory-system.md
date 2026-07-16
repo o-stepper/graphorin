@@ -592,7 +592,7 @@ Configure the engine on the facade, `createMemory({ contextEngine: { ... } })`:
 | `reservedForResponse` | `4096` | Tokens reserved for the model's response. |
 | `reservedForCompaction` | `8192` | Tokens reserved for the compaction summarizer call. |
 | `providerContextWindow` | unset | The active provider's context window; **required when `compaction` is enabled**. |
-| `compaction` / `summarizer` / `tokenCounter` | off / unset / heuristic | The in-flight message-history compaction axis; see [context management in the loop](/guide/agent-runtime#context-management-in-the-loop). |
+| `compaction` / `summarizer` / `tokenCounter` | **on by the default trust policy** / unset / heuristic | The in-flight message-history compaction axis. Compaction is auto-enabled for the default `'public-tls'` provider trust, so a bare `createMemory()` WARNs once that `providerContextWindow` is unset (the trigger threshold stays `Infinity` until you set it). Pass `compaction: false` to opt out explicitly (an offline/stub setup has nothing to compact), or set `providerContextWindow` to arm it; see [context management in the loop](/guide/agent-runtime#context-management-in-the-loop). |
 
 `assemble(...)` returns an `AssembledPrompt`: the single `systemMessage` plus diagnostics, including the per-layer `layerAllocation` snapshot (what each layer was granted under the budget) and the `privacyCounters` record of per-reason filter decisions.
 

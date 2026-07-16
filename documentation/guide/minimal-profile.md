@@ -39,7 +39,7 @@ Known limitation: the code-mode API projection covers **eager** tools only, so a
 
 ### Curating the toolset
 
-The preset controls the scaffolding, not the tool list - curation is composition. For proactive runners the recommended set is the read-only subset of the memory tools (`fact_search`, `recall_episodes`, `conversation_search`, `fact_history`, `fact_validate`): the run can consult memory but cannot write it, which composes with the [memory-writes-after-guardrails invariant](/guide/security#memory-writes-strictly-after-guardrails-b3). A dedicated `buildMemoryTools` profile option ships with the memory wave; until then pass the read tools explicitly.
+The preset controls the scaffolding, not the tool list - curation is composition. For proactive runners the recommended set is the read-only subset of the memory tools: the run can consult memory but cannot write it, which composes with the [memory-writes-after-guardrails invariant](/guide/security#memory-writes-strictly-after-guardrails-b3). That subset ships as `buildMemoryTools(deps, { profile: 'interactive' })` (wave-D D3) - read-only by construction, the write tools do not exist in the returned array - so use the profile instead of enumerating tools by hand.
 
 ## Lean install path
 

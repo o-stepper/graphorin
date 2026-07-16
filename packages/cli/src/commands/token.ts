@@ -49,6 +49,12 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 /** @stable */
 export interface TokenCommonOptions extends CommonOutputOptions {
   readonly config?: string;
+  /**
+   * Test seam - capture the raw-token stdout line(s). Raw tokens are
+   * the machine-consumable output of `create` / `rotate` / `rekey`
+   * (S-14b): they go to stdout while log chatter stays on stderr.
+   */
+  readonly stdoutPrint?: PrintSink;
 }
 
 /** @stable */
@@ -59,8 +65,6 @@ export interface TokenCreateOptions extends TokenCommonOptions {
   /** Duration string: `30d`, `12h`, `90m`, `45s`. */
   readonly expiresIn?: string;
   readonly env?: 'live' | 'test';
-  /** Test seam - capture the raw-token stdout line. */
-  readonly stdoutPrint?: PrintSink;
 }
 
 /** @stable */
@@ -240,8 +244,13 @@ export async function runTokenRotate(options: TokenRotateOptions): Promise<Token
     emitReport(options, out, () => {
       const print = options.print ?? defaultPrintSink;
       print(brand(`token '${result.old.id}' revoked + replaced by '${out.id}'`));
-      print(brand('raw token (shown ONCE):'));
-      print(`  ${raw}`);
+      print(brand('raw token (shown ONCE, printed to stdout):'));
+      // S-14b parity (e2e 2026-07-13, CLI-01): like `token create`, the
+      // raw value is the machine-consumable output - stdout, capture-
+      // friendly - while the log chatter above stays on stderr.
+      const stdoutPrint =
+        options.stdoutPrint ?? ((line: string) => process.stdout.write(`${line}\n`));
+      stdoutPrint(raw);
     });
     return out;
   } finally {
@@ -285,10 +294,14 @@ export async function runTokenRekey(
     const frozen = Object.freeze(out);
     emitReport(options, frozen, () => {
       const print = options.print ?? defaultPrintSink;
-      print(brand(`rekeyed ${frozen.length} token(s):`));
+      print(brand(`rekeyed ${frozen.length} token(s) (raw tokens printed to stdout):`));
+      // S-14b parity (e2e 2026-07-13, CLI-01): raw values go to stdout
+      // like `token create`; the per-row mapping chatter stays on stderr.
+      const stdoutPrint =
+        options.stdoutPrint ?? ((line: string) => process.stdout.write(`${line}\n`));
       for (const row of frozen) {
         print(`  - old=${row.oldId} new=${row.newId}`);
-        print(`    raw: ${row.raw}`);
+        stdoutPrint(row.raw);
       }
     });
     return frozen;

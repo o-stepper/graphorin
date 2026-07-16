@@ -85,9 +85,9 @@ incompatible vectors:
 - **`multi-active`** - multiple embedder ids coexist (read across, write to the
   active one).
 - **`auto-migrate`** - re-embed existing rows into the new id batch by batch via
-  the migration runner (`migrateEmbedder(...)` from `@graphorin/memory/migration`;
-  the `graphorin memory migrate` CLI form is not yet supported and exits with
-  code `2`), then retire the old id.
+  the migration runner (`migrateEmbedder(...)` from `@graphorin/memory/migration`,
+  or the resumable `graphorin memory migrate` CLI form - see the
+  [CLI guide](/guide/cli#graphorin-memory)), then retire the old id.
 
 The index version key covers more than the model: the registry records the
 **write-path contextualization mode** (`contextualRetrieval`, plus the

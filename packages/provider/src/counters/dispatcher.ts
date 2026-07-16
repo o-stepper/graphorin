@@ -76,7 +76,10 @@ export function detectProviderFamily(args: {
  *
  * - Anthropic Claude → `AnthropicAPICounter` (native if `apiKey` set,
  *   otherwise `cl100k_base` proxy).
- * - OpenAI / OpenAI-compatible → `JsTiktokenCounter('cl100k_base')`.
+ * - OpenAI / OpenAI-compatible → `JsTiktokenCounter` with the
+ *   family-correct encoding (`o200k_base` for gpt-4o / gpt-4.1 /
+ *   gpt-5+ / o-series ids, `cl100k_base` otherwise - see
+ *   `defaultOpenAiEncoding`).
  * - Google Gemini → `GoogleAPICounter` (cl100k_base proxy in v0.1).
  * - Bedrock Claude → `BedrockAPICounter` (cl100k_base proxy in v0.1).
  * - Ollama / unknown → `HeuristicCounter` with one WARN per process.

@@ -12,7 +12,7 @@ type EncodedBinary =
   | EncodedUrl;
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L59)
+Defined in: [packages/core/src/utils/binary-json.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L62)
 
 Wire form of a `Uint8Array | URL` binary field.
 

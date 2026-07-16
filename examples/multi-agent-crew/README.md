@@ -20,7 +20,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/multi-agent-crew dev
 Expected dev output:
 
 ```
-graphorin v0.10.0 multi-agent-crew - recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis - researcher said: "[researched] Key findings about 'Summarise the design considerations…'.
+graphorin v0.10.0 multi-agent-crew - recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis - researcher said: "[researched] Key findings about 'Summarise the design consid…'.
 ```
 
 **What just happened?**

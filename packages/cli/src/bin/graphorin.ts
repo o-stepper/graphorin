@@ -706,7 +706,7 @@ function registerMemoryCommands(program: Command): void {
     .description('[Storage] Long-term memory operator commands.');
   memory
     .command('status')
-    .description('Report counts + active embedder + migration state.')
+    .description('Report counts + active embedder.')
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { config?: string; json?: boolean }) => {
