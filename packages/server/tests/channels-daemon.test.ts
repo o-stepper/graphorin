@@ -144,6 +144,56 @@ describe('B1.6 - channels daemon lifecycle', () => {
     expect(sequence.indexOf('gateway:stop')).toBeLessThan(sequence.indexOf('timers:stop'));
   });
 
+  it('SERVER-CH-01: a gateway start failure unwinds earlier daemons and stop() is a safe no-op', async () => {
+    store = await makeStore();
+    const sequence: string[] = [];
+    const broken: ChannelGatewayLike = {
+      async start() {
+        throw new Error('vendor webhook registration failed');
+      },
+      async stop() {
+        sequence.push('gateway:stop');
+      },
+      async status(): Promise<ChannelGatewayStatusLike> {
+        return { running: false, channels: [] };
+      },
+      setActivityListener() {},
+    };
+    const driver: WorkflowTimerDriverLike = {
+      start() {
+        sequence.push('timers:start');
+      },
+      stop() {
+        sequence.push('timers:stop');
+      },
+      status() {
+        return { running: true, sweeps: 0, fired: 0, errors: 0 };
+      },
+      async sweep() {
+        return 0;
+      },
+    };
+    server = await createServer({
+      store,
+      skipHardening: true,
+      config: {
+        auth: { kind: 'none' },
+        storage: { path: ':memory:', mode: 'lib' },
+        server: { port: 0 },
+      },
+      channels: { gateway: broken },
+      workflowTimers: { driver },
+    });
+    // start() rejects with the gateway error.
+    await expect(server.start()).rejects.toThrow('vendor webhook registration failed');
+    // The timer driver started BEFORE the gateway (which starts last) and must
+    // be unwound on failure - not left running as a zombie.
+    expect(sequence).toContain('timers:start');
+    expect(sequence).toContain('timers:stop');
+    // stop() after a failed start is a safe no-op, not LifecycleNotStartedError.
+    await expect(server.stop()).resolves.toBeUndefined();
+  });
+
   it('bridges accepted inbound into scheduler.recordActivity (A2)', async () => {
     store = await makeStore();
     const gateway = fakeGateway();
