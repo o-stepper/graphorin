@@ -309,9 +309,9 @@ Handoffs use a built-in filter library to shape the payload that crosses the bou
 | `filters.lastN(n)` | Keep the last N non-system messages - system prompts are ALWAYS retained on top of the N, so `lastN(2)` over a history with system messages returns more than 2 entries. |
 | `filters.lastUser()` | Keep only the latest user turn (system prompts are retained the same way). |
 | `filters.summary(text)` | Replace history with a caller-supplied summary. |
-| `filters.bySensitivity({ maxTier? })` | Drop message parts above the `maxTier` sensitivity ceiling (default `'public'`). |
+| `filters.bySensitivity({ maxTier? })` | Coarse token heuristic (there is no per-part sensitivity annotation yet): drop a message only when its content contains the literal `[REDACTED:secret]` token and `maxTier` is below `'secret'` (default `maxTier` is `'public'`). |
 | `filters.stripReasoning()` | Drop reasoning content parts. |
-| `filters.stripSensitiveOutputs()` | Drop sensitive tool outputs. |
+| `filters.stripSensitiveOutputs()` | Drop `tool` messages whose content carries a `[REDACTED:...]` token (any tier). |
 | `filters.stripToolCalls()` | Drop tool calls. |
 | `filters.compose(...)` | Compose any of the above. |
 
