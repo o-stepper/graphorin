@@ -186,6 +186,33 @@ jobs:
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy documentation/.vitepress/dist --project-name=graphorin-docs --branch=main
 
+      # Audit 2026-07-16 (P0-1): the external audit caught the LIVE site
+      # serving three different versions at once (a v0.6.1 quickstart footer
+      # next to v0.9.0 pages) while every repo-side gate was green - a
+      # deploy/CDN-cache failure mode only a probe of the published URLs can
+      # see. Poll the key pages until their footer carries the version this
+      # run just deployed; fail loudly instead of leaving stale pages up.
+      - name: Post-deploy version smoke (live pages serve the deployed version)
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        run: |
+          set -euo pipefail
+          version="v$(node -p "require('./package.json').version")"
+          for path in guide/ guide/quickstart guide/installation; do
+            ok=0
+            for i in $(seq 1 18); do
+              if curl -fsS -H 'Cache-Control: no-cache' "https://docs.graphorin.com/${path}" | grep -q "${version}"; then
+                echo "OK: /${path} serves ${version} (probe ${i})"
+                ok=1
+                break
+              fi
+              sleep 10
+            done
+            if [ "${ok}" != "1" ]; then
+              echo "::error title=Stale docs deploy::https://docs.graphorin.com/${path} still does not serve ${version} after 180s - CDN cache or deploy drift (the 2026-07-16 audit failure mode)."
+              exit 1
+            fi
+          done
+
   # E3: the nightly cron is what catches docs drift on quiet branches - a
   # silent red run defeats it.
   notify-on-failure:

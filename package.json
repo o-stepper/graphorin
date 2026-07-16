@@ -37,6 +37,7 @@
     "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test && node ./documentation/scripts/build-benchmark-results.mjs --self-test",
     "bump-version": "node ./scripts/bump-version.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
+    "smoke-consumer": "node ./scripts/smoke-consumer.mjs",
     "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
     "docs:dev": "pnpm --filter @graphorin/docs dev",
     "docs:build": "pnpm --filter @graphorin/docs build:site",

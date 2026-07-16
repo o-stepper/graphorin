@@ -10,7 +10,7 @@
 function resolvePassphrase(config): Promise<string>;
 ```
 
-Defined in: [packages/store-sqlite/src/encryption/index.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L127)
+Defined in: [packages/store-sqlite/src/encryption/index.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L135)
 
 Resolves the configured passphrase to a SQL-literal-ready value
 suitable for `PRAGMA key = <literal>`. UTF-8 passphrases are returned

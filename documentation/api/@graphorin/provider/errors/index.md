@@ -76,6 +76,12 @@ Re-exports [ProviderStreamParseError](/api/@graphorin/provider/classes/ProviderS
 
 ***
 
+### ProviderToolChoiceUnsupportedError
+
+Re-exports [ProviderToolChoiceUnsupportedError](/api/@graphorin/provider/classes/ProviderToolChoiceUnsupportedError.md)
+
+***
+
 ### RateLimitExceededError
 
 Re-exports [RateLimitExceededError](/api/@graphorin/provider/classes/RateLimitExceededError.md)

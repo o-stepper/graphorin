@@ -1,17 +1,20 @@
-[**Graphorin API reference v0.9.0**](../../../../index.md)
+[**Graphorin API reference v0.9.0**](../../../index.md)
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [encryption](/api/@graphorin/store-sqlite/encryption/index.md) / CipherPeerMissingError
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [](/api/@graphorin/store-sqlite/README.md) / SqliteNativeBindingError
 
-# Class: CipherPeerMissingError
+# Class: SqliteNativeBindingError
 
-Defined in: [packages/store-sqlite/src/encryption/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L95)
+Defined in: [packages/store-sqlite/src/native-binding-error.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/native-binding-error.ts#L21)
 
-Raised when the operator opts in to encryption-at-rest but the
-cipher peer (`better-sqlite3-multiple-ciphers`) is missing. The
-Phase 05 acceptance criteria require this to be a fatal startup
-error - never silently downgrade to an unencrypted DB.
+Raised when a native SQLite peer is present in `node_modules` but its
+compiled binding cannot be loaded. The dominant cause: pnpm 10+ skips
+dependency build scripts unless they are approved, so
+`better-sqlite3`'s prebuild download never ran - the install LOOKS
+successful (pnpm prints one `Ignored build scripts` line) and the
+process dies at first database open with a raw `bindings.js` stack.
+This error replaces that stack with the actual fix.
 
 ## Stable
 
@@ -24,47 +27,23 @@ error - never silently downgrade to an unencrypted DB.
 ### Constructor
 
 ```ts
-new CipherPeerMissingError(message?): CipherPeerMissingError;
+new SqliteNativeBindingError(packageName, cause): SqliteNativeBindingError;
 ```
 
-Defined in: [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1082](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1082)
+Defined in: [packages/store-sqlite/src/native-binding-error.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/native-binding-error.ts#L28)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `message?` | `string` |
+| `packageName` | `string` |
+| `cause` | `unknown` |
 
 #### Returns
 
-`CipherPeerMissingError`
+`SqliteNativeBindingError`
 
-#### Inherited from
-
-```ts
-Error.constructor
-```
-
-### Constructor
-
-```ts
-new CipherPeerMissingError(message?, options?): CipherPeerMissingError;
-```
-
-Defined in: [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1082](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1082)
-
-#### Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `message?` | `string` |
-| `options?` | `ErrorOptions` |
-
-#### Returns
-
-`CipherPeerMissingError`
-
-#### Inherited from
+#### Overrides
 
 ```ts
 Error.constructor
@@ -75,8 +54,10 @@ Error.constructor
 | Property | Modifier | Type | Default value | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | `Error.cause` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es2022.error.d.ts#L26) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"sqlite-native-binding"` | `'sqlite-native-binding'` | Package-level error kind, matching the repo's `kind` convention. | - | - | [packages/store-sqlite/src/native-binding-error.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/native-binding-error.ts#L24) |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | `Error.message` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1077) |
-| <a id="property-name"></a> `name` | `readonly` | `"CipherPeerMissingError"` | `'CipherPeerMissingError'` | - | `Error.name` | - | [packages/store-sqlite/src/encryption/index.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L96) |
+| <a id="property-name"></a> `name` | `readonly` | `"SqliteNativeBindingError"` | `'SqliteNativeBindingError'` | - | `Error.name` | - | [packages/store-sqlite/src/native-binding-error.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/native-binding-error.ts#L22) |
+| <a id="property-packagename"></a> `packageName` | `readonly` | `string` | `undefined` | The peer whose binding failed to load. | - | - | [packages/store-sqlite/src/native-binding-error.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/native-binding-error.ts#L26) |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `undefined` | - | - | `Error.stack` | [node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/lib/lib.es5.d.ts#L1078) |
 | <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | `undefined` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | - | `Error.stackTraceLimit` | [node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68](https://github.com/o-stepper/graphorin/blob/main/node_modules/.pnpm/@types+node@22.19.17/node_modules/@types/node/globals.d.ts#L68) |
 

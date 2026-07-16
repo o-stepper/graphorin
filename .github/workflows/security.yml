@@ -36,8 +36,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: pnpm audit (production, high+)
-        run: pnpm audit --prod --audit-level=high
+      # 2026-07-16: npm retired the classic audit endpoint
+      # (/-/npm/v1/security/audits now answers HTTP 410), and every pnpm
+      # release to date (incl. 11.13.1) still calls it - `pnpm audit` fails
+      # on infrastructure, not on findings. Scan the lockfile against
+      # OSV.dev (which mirrors the GitHub/npm advisory DB) instead. The
+      # binary is pinned by version AND sha256; osv-scanner exits non-zero
+      # on any actionable finding (no severity knob - suppressions go in a
+      # reviewed osv-scanner.toml if ever needed). Revisit pnpm audit once
+      # it speaks the bulk advisory endpoint.
+      - name: Vulnerability audit (osv-scanner over pnpm-lock.yaml)
+        run: |
+          set -euo pipefail
+          curl -sSL -o /tmp/osv-scanner \
+            https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
+          echo "15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0  /tmp/osv-scanner" | sha256sum -c -
+          chmod +x /tmp/osv-scanner
+          /tmp/osv-scanner scan source --lockfile pnpm-lock.yaml
 
       - name: License allowlist
         run: pnpm run check-licenses

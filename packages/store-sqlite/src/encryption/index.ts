@@ -14,6 +14,7 @@
  */
 
 import type { BetterSqlite3Constructor } from '../driver-types.js';
+import { isMissingNativeBindingError, SqliteNativeBindingError } from '../native-binding-error.js';
 
 /**
  * Cipher selection, validated against the real sqlite3mc vocabulary
@@ -108,6 +109,13 @@ export async function loadCipherDriver(): Promise<BetterSqlite3Constructor> {
     };
     return mod.default;
   } catch (err) {
+    // Audit 2026-07-16 P1-3: an installed-but-unbuilt cipher peer (pnpm
+    // 10 skipped its build script) is NOT a missing peer - reporting it
+    // as one sends the operator to reinstall a package that is already
+    // there. Surface the skipped-build fix instead.
+    if (isMissingNativeBindingError(err)) {
+      throw new SqliteNativeBindingError('better-sqlite3-multiple-ciphers', err);
+    }
     throw new CipherPeerMissingError(
       "encryption-at-rest is enabled but the cipher peer 'better-sqlite3-multiple-ciphers' is not installed. " +
         'Install the optional `@graphorin/store-sqlite-encrypted` subpackage or add the peer manually.',

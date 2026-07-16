@@ -1,0 +1,61 @@
+name: Consumer install smoke
+
+# Audit 2026-07-16 (P1-3): a brand-new pnpm-10 consumer project is the one
+# environment the workspace CI never exercises - build-script approval lives
+# in each project's own package.json, so `pnpm install` can look successful
+# and the first database open then dies on a missing native binding; a
+# packaging regression likewise only exists in the published artifacts. This
+# job replays the documented consumer recipe against the npm registry: temp
+# project + `pnpm.onlyBuiltDependencies` + `pnpm add @graphorin/*`, then a
+# two-process SQLite write / reopen / search. On demand and weekly - it
+# needs registry network and tests the released packages, not the PR head.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Dist-tag or exact version of the @graphorin packages to smoke'
+        required: false
+        default: 'latest'
+  schedule:
+    # Mondays 06:30 UTC, after the docker smoke.
+    - cron: '30 6 * * 1'
+
+concurrency:
+  group: consumer-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  install-and-recall:
+    name: pnpm 10 consumer install + write / reopen / search
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+
+      - name: Consumer smoke
+        env:
+          # Env indirection keeps the user-controlled input out of the
+          # shell template (CodeQL actions expression-injection class).
+          SMOKE_VERSION: ${{ github.event.inputs.version || 'latest' }}
+        run: node ./scripts/smoke-consumer.mjs --version "$SMOKE_VERSION"
+
+  # A red weekly run must not die silently in the Actions tab.
+  notify-on-failure:
+    needs: [install-and-recall]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

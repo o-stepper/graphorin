@@ -28,6 +28,7 @@ work, but discriminants are subclass-friendly.
 - [`PromptRedactionError`](/api/@graphorin/provider/classes/PromptRedactionError.md)
 - [`ProviderHttpError`](/api/@graphorin/provider/classes/ProviderHttpError.md)
 - [`ProviderStreamParseError`](/api/@graphorin/provider/classes/ProviderStreamParseError.md)
+- [`ProviderToolChoiceUnsupportedError`](/api/@graphorin/provider/classes/ProviderToolChoiceUnsupportedError.md)
 - [`RateLimitExceededError`](/api/@graphorin/provider/classes/RateLimitExceededError.md)
 
 ## Constructors

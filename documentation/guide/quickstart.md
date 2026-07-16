@@ -7,6 +7,10 @@ description: A 20-line memory-backed agent that streams tokens and persists fact
 
 This walkthrough is the smallest end-to-end Graphorin assistant. Everything runs on your laptop - SQLite for storage, multilingual embeddings via `@huggingface/transformers`, and a deterministic stub provider for the LLM. No API keys, no telemetry, no phone-home.
 
+::: tip pnpm 10 users
+pnpm 10 skips `better-sqlite3`'s install script unless it is approved, and the first run then dies with a bindings error. Approve it before you start - see [Native modules and pnpm 10](/guide/installation#native-modules-and-pnpm-10).
+:::
+
 ## What you'll build
 
 A memory-backed agent that:
@@ -77,6 +81,11 @@ const memory = createMemory({
   store: sqlite.memory,
   embeddings: sqlite.embeddings,
   embedder: createTransformersJsEmbedder(),
+  // The deterministic stub never approaches a context limit, so the
+  // auto-compaction safety net has nothing to do here. Keeping it off
+  // makes the quickstart start clean; the real-LLM recipe below shows
+  // the production context profile instead.
+  contextEngine: { compaction: false },
 });
 
 const provider = createProvider(createStubProvider(), {
@@ -129,21 +138,44 @@ sequenceDiagram
 
 ## Try it with a real local LLM
 
-Swap the stub provider for one of the local-LLM recipes:
+Swap the stub provider for one of the local-LLM recipes. The three extra
+adapter options keep a thinking-capable model fast and make the context
+budget coherent end to end - one number for the Ollama server, the
+declared provider capabilities, and the memory compaction trigger:
 
 ```ts
-import { ollamaAdapter, createProvider } from '@graphorin/provider';
+import { JsTiktokenCounter, ollamaAdapter, createProvider } from '@graphorin/provider';
+import { createMemory } from '@graphorin/memory';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
 
 const provider = createProvider(
   ollamaAdapter({
     baseUrl: 'http://127.0.0.1:11434',
-    model: 'qwen2.5:7b-instruct-q4_K_M',
+    model: 'qwen3:8b-q4_K_M',
+    think: false, // qwen3 thinks by default; false keeps a simple assistant fast
+    numCtx: 40_960, // one number for the server request AND capabilities.contextWindow
+    keepAlive: '10m', // keep the model loaded between turns
   }),
   { acceptsSensitivity: ['public', 'internal'] },
 );
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+
+const memory = createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder: createTransformersJsEmbedder(),
+  contextEngine: {
+    // Auto-compaction stays on and now has a real budget to work with.
+    providerContextWindow: provider.capabilities.contextWindow,
+    tokenCounter: new JsTiktokenCounter(), // needs the js-tiktoken peer: pnpm add js-tiktoken
+  },
+});
 ```
 
-Or the OpenAI-compatible HTTP adapter for `llama.cpp`'s `llama-server`, LM Studio, LocalAI, or any vendor that speaks the OpenAI Chat Completions wire format. See [Providers](/guide/providers) for the full matrix.
+Or the OpenAI-compatible HTTP adapter for `llama.cpp`'s `llama-server`, LM Studio, LocalAI, or any vendor that speaks the OpenAI Chat Completions wire format. See [Providers](/guide/providers) for the full matrix, including how the Ollama adapter surfaces model thinking as `reasoning.delta` events and what it does (and refuses to do) with a forced `toolChoice`.
 
 ## Sensitivity-aware payloads
 
@@ -190,6 +222,7 @@ const memory = createMemory({
   store: sqlite.memory,
   embeddings: sqlite.embeddings,
   embedder: createTransformersJsEmbedder(),
+  contextEngine: { compaction: false }, // no agent loop here - nothing to compact
 });
 
 await memory.semantic.remember(
