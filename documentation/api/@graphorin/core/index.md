@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.9.0**](../../index.md)
+[**Graphorin API reference v0.10.0**](../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ implementation (sandbox, secrets store, memory store, provider adapters,
 agent runtime, workflow engine, server, …) lives in a sibling package and
 depends on the interfaces declared here.
 
-- **Status:** v0.9.0 - type and contract surface for the v0.1 release line.
+- **Status:** v0.10.0 - type and contract surface for the v0.1 release line.
 - **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Runtime dependencies:** none.
@@ -79,7 +79,7 @@ explicit in review.
 
 ---
 
-**Graphorin** · v0.9.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.10.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

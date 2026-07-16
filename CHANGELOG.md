@@ -14,6 +14,68 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.10.0 - 2026-07-16
+
+The **external-audit remediation release**: an independent consumer
+audit of `0.9.0` (published packages + a repository clone, with both
+an Anthropic and a local Ollama leg) confirmed the framework end to
+end and pinned a P1 list on the local-model path and the
+first-install experience. This release closes that list (PRs #181,
+#182). Per-package details live in each package's `CHANGELOG.md`;
+upgrade notes are in the migration guide.
+
+### Provider - Ollama operational controls (`@graphorin/provider`)
+
+- `ollamaAdapter` gains `think`
+  (`false | true | 'low' | 'medium' | 'high'`, Ollama's top-level
+  thinking field; a truthy value also defaults
+  `capabilities.reasoning` to `true`), `numCtx` (sent as
+  `options.num_ctx` on every request AND used as the default
+  `capabilities.contextWindow`, so the server allocation, the declared
+  capability and the memory compaction budget agree on one number),
+  and `keepAlive` (Ollama's `keep_alive`).
+- Streamed `message.thinking` chunks surface as `reasoning-delta`
+  provider events (agent `reasoning.delta`) instead of being dropped.
+- Honest `toolChoice`: `'none'` is enforced by withholding the tool
+  catalogue, `'auto'` passes through, and a forced choice
+  (`'required'` / `{ tool }`) throws the new
+  `ProviderToolChoiceUnsupportedError` instead of silently degrading
+  the contract to a suggestion - the native `/api/chat` API has no
+  `tool_choice` field; the OpenAI-compatible adapter against
+  `http://127.0.0.1:11434/v1` maps it.
+- `providerOptions` with a nested `options` object merges into the
+  built options block instead of clobbering `temperature` /
+  `num_predict` / `num_ctx`.
+
+### Store - actionable native-binding failure (`@graphorin/store-sqlite`)
+
+- pnpm 10+ skips dependency build scripts unless approved, so a
+  consumer install could look successful while `better-sqlite3`'s
+  prebuilt binary was never downloaded - the first database open then
+  died with a raw `bindings.js` stack. Both driver loaders (default
+  and the cipher peer) now throw the typed `SqliteNativeBindingError`
+  naming the exact fix (`pnpm.onlyBuiltDependencies` + reinstall); the
+  cipher path previously misreported this case as a missing peer.
+
+### Documentation & release tooling
+
+- Installation guide: new "Native modules and pnpm 10" section with
+  the `onlyBuiltDependencies` recipe; the quickstart starts
+  warning-free and its real-local-LLM recipe shows the coherent
+  context profile (`numCtx` + `providerContextWindow` +
+  `JsTiktokenCounter`).
+- Providers guide documents the new Ollama controls, the context-sync
+  rationale, and the forced-`toolChoice` limitation with its
+  workaround.
+- New weekly consumer-install smoke replays the documented pnpm-10
+  recipe against the published packages
+  (`scripts/smoke-consumer.mjs`); the docs deploy gained a
+  post-deploy version smoke; the security audit job moved from the
+  retired npm classic audit endpoint to a pinned `osv-scanner`; every
+  changesets-ignored workspace package now carries a seed
+  `CHANGELOG.md` so the release automation cannot crash on a missing
+  file.
+
 ## 0.9.0 - 2026-07-13
 
 The **bot-adoption release**: five feature waves (PRs #170, #171,
