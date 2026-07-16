@@ -6,7 +6,7 @@
 
 # Interface: ProactiveCronTask
 
-Defined in: [packages/proactive/src/cron-task.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L211)
+Defined in: [packages/proactive/src/cron-task.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L212)
 
 The cron-leg task handle.
 
@@ -16,7 +16,7 @@ The cron-leg task handle.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/proactive/src/cron-task.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L212) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/proactive/src/cron-task.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L213) |
 
 ## Methods
 
@@ -26,7 +26,7 @@ The cron-leg task handle.
 fire(): Promise<ProactiveTaskFireResult>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L218)
+Defined in: [packages/proactive/src/cron-task.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L219)
 
 Fire once now (also the trigger callback).
 
@@ -42,7 +42,7 @@ Fire once now (also the trigger callback).
 start(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:214](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L214)
+Defined in: [packages/proactive/src/cron-task.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L215)
 
 Register the schedule on the scheduler. Idempotent.
 
@@ -58,7 +58,7 @@ Register the schedule on the scheduler. Idempotent.
 status(): ProactiveCronTaskStatus;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L219)
+Defined in: [packages/proactive/src/cron-task.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L220)
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: [packages/proactive/src/cron-task.ts:219](https://github.com/o-stepp
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L216)
+Defined in: [packages/proactive/src/cron-task.ts:217](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L217)
 
 Unregister the schedule.
 

@@ -12,7 +12,7 @@ type WireRunStep = Omit<RunStep, "toolCalls"> & {
 };
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L129)
+Defined in: [packages/core/src/utils/binary-json.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L132)
 
 Wire twin of [RunStep](/api/@graphorin/core/interfaces/RunStep.md).
 
@@ -20,6 +20,6 @@ Wire twin of [RunStep](/api/@graphorin/core/interfaces/RunStep.md).
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `toolCalls` | readonly [`WireCompletedToolCall`](/api/@graphorin/core/type-aliases/WireCompletedToolCall.md)[] | [packages/core/src/utils/binary-json.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L130) |
+| `toolCalls` | readonly [`WireCompletedToolCall`](/api/@graphorin/core/type-aliases/WireCompletedToolCall.md)[] | [packages/core/src/utils/binary-json.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L133) |
 
 ## Stable

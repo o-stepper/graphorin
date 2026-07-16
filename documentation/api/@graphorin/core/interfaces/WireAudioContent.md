@@ -6,7 +6,7 @@
 
 # Interface: WireAudioContent
 
-Defined in: [packages/core/src/utils/binary-json.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L67)
+Defined in: [packages/core/src/utils/binary-json.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L70)
 
 Wire twin of [AudioContent](/api/@graphorin/core/interfaces/AudioContent.md).
 
@@ -20,7 +20,7 @@ Wire twin of [AudioContent](/api/@graphorin/core/interfaces/AudioContent.md).
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-audio"></a> `audio` | `readonly` | [`EncodedBinary`](/api/@graphorin/core/type-aliases/EncodedBinary.md) | - | - | [packages/core/src/utils/binary-json.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L68) |
+| <a id="property-audio"></a> `audio` | `readonly` | [`EncodedBinary`](/api/@graphorin/core/type-aliases/EncodedBinary.md) | - | - | [packages/core/src/utils/binary-json.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L71) |
 | <a id="property-causalitychain"></a> `causalityChain?` | `readonly` | readonly `string`[] | See [TextContent.causalityChain](/api/@graphorin/core/interfaces/TextContent.md#property-causalitychain). | [`AudioContent`](/api/@graphorin/core/interfaces/AudioContent.md).[`causalityChain`](/api/@graphorin/core/interfaces/AudioContent.md#property-causalitychain) | [packages/core/src/types/message.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L63) |
 | <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | - | [`AudioContent`](/api/@graphorin/core/interfaces/AudioContent.md).[`mimeType`](/api/@graphorin/core/interfaces/AudioContent.md#property-mimetype) | [packages/core/src/types/message.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L61) |
 | <a id="property-type"></a> `type` | `readonly` | `"audio"` | - | [`AudioContent`](/api/@graphorin/core/interfaces/AudioContent.md).[`type`](/api/@graphorin/core/interfaces/AudioContent.md#property-type) | [packages/core/src/types/message.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L59) |

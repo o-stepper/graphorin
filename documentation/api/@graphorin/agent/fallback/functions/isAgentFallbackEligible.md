@@ -10,11 +10,12 @@
 function isAgentFallbackEligible(error, policy?): AgentFallbackEligibility;
 ```
 
-Defined in: [packages/agent/src/fallback/index.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L76)
+Defined in: [packages/agent/src/fallback/index.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L77)
 
 Pure dispatcher that maps a [ProviderError](/api/@graphorin/core/interfaces/ProviderError.md) to one of four
 eligible reasons or to `eligible: false` if the error is on the
-bypass list (`auth | invalid-input | content-filter | cancelled`).
+bypass list - the `ProviderErrorKind` values `invalid-request`,
+`unauthorized`, `content-filter`, and `unknown`.
 
 The function is intentionally allocation-free on the hot path so
 the agent runtime can call it once per provider error per step

@@ -6,7 +6,7 @@
 
 # Interface: MemorySnapshot
 
-Defined in: [packages/security/src/guard/types.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L37)
+Defined in: [packages/security/src/guard/types.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L38)
 
 Snapshot a guard takes before / after a tool runs. Implementations
 record the xxhash digest of the regions of memory the tool could
@@ -19,5 +19,5 @@ before-snapshot to detect non-tool-mediated mutation.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-digest"></a> `digest` | `readonly` | readonly \{ `hash`: `string`; `region`: `string`; \}[] | xxhash digest of every relevant region. Empty for `NO_GUARD`. | [packages/security/src/guard/types.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L39) |
-| <a id="property-durationus"></a> `durationUs` | `readonly` | `number` | Total snapshot wall-clock duration in microseconds. | [packages/security/src/guard/types.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L41) |
+| <a id="property-digest"></a> `digest` | `readonly` | readonly \{ `hash`: `string`; `region`: `string`; \}[] | xxhash digest of every relevant region. Empty for `NO_GUARD`. | [packages/security/src/guard/types.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L40) |
+| <a id="property-durationus"></a> `durationUs` | `readonly` | `number` | Total snapshot wall-clock duration in microseconds. | [packages/security/src/guard/types.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/types.ts#L42) |

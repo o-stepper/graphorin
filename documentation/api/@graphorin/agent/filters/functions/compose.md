@@ -10,7 +10,7 @@
 function compose(...filters): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:281](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L281)
+Defined in: [packages/agent/src/filters/index.ts:286](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L286)
 
 Compose multiple filters left-to-right. The composer **always**
 appends `stripReasoning()` at the end so reasoning content never

@@ -17,7 +17,7 @@ Defined in: [packages/provider/src/counters/serialize.ts:31](https://github.com/
 Project a `Message` into a flat string suitable for tokenizers that
 do not understand multimodal content. Image / audio / file parts
 are replaced with the canonical placeholder `[image]` / `[audio]` /
-`[file]` so byte counts stay deterministic.
+`[file:<mimeType>]` so byte counts stay deterministic.
 
 ## Parameters
 

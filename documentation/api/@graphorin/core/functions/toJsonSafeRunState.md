@@ -10,7 +10,7 @@
 function toJsonSafeRunState(state): WireRunState;
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:384](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L384)
+Defined in: [packages/core/src/utils/binary-json.ts:389](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L389)
 
 Project a full [RunState](/api/@graphorin/core/interfaces/RunState.md) into its JSON-safe [WireRunState](/api/@graphorin/core/type-aliases/WireRunState.md)
 twin: `messages` and `steps[].toolCalls[].outcome.contentParts` go
