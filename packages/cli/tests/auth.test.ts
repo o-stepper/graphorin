@@ -4,7 +4,13 @@ import { join } from 'node:path';
 
 import { describe, expect, it, vi } from 'vitest';
 
-import { runAuthList, runAuthLogin, runAuthRefresh, runAuthStatus } from '../src/commands/auth.js';
+import {
+  runAuthList,
+  runAuthLogin,
+  runAuthRefresh,
+  runAuthRevoke,
+  runAuthStatus,
+} from '../src/commands/auth.js';
 
 async function fixture(): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-auth-'));
@@ -34,7 +40,7 @@ describe('graphorin auth', () => {
     expect(status.sessions).toEqual([]);
   });
 
-  it('login + refresh refuse with GRAPHORIN_OFFLINE=1', async () => {
+  it('login + refresh + revoke refuse with GRAPHORIN_OFFLINE=1', async () => {
     const cfg = await fixture();
     process.env.GRAPHORIN_OFFLINE = '1';
     const exit = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
@@ -50,6 +56,15 @@ describe('graphorin auth', () => {
       ).rejects.toThrow();
       await expect(
         runAuthRefresh({
+          config: cfg,
+          id: 'missing',
+          print: () => undefined,
+        }),
+      ).rejects.toThrow();
+      // AUTH-CLI-01: revoke makes an outbound RFC 7009 call and must refuse
+      // offline too (it used to POST the live token regardless).
+      await expect(
+        runAuthRevoke({
           config: cfg,
           id: 'missing',
           print: () => undefined,

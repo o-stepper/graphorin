@@ -90,4 +90,28 @@ describe('graphorin memory why (RP-17)', () => {
     expect(result.recalls).toHaveLength(1);
     expect(result.recalls[0]?.spanId).toBe('sp-b');
   });
+
+  // MEMORY-CL-01 / W-068: `why` is documented read-only and must refuse a
+  // schema-behind DB instead of silently auto-migrating it (inspect/activity
+  // already do). Point at an un-initialized DB so every migration is pending.
+  it('refuses to auto-migrate a behind-schema DB', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-why-behind-'));
+    const dbPath = join(dir, 'data.db');
+    const cfg = join(dir, 'graphorin.config.json');
+    await writeFile(
+      cfg,
+      JSON.stringify({ storage: { path: dbPath, mode: 'lib' }, auth: { kind: 'none' } }),
+      'utf8',
+    );
+    await expect(runMemoryWhy({ config: cfg, print: () => {} })).rejects.toThrow(
+      /graphorin migrate/,
+    );
+    // The refused command changed nothing: schema_migrations was not created.
+    const store = await createSqliteStore({ path: dbPath, mode: 'lib' });
+    const row = store.connection.get<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'",
+    );
+    await store.close();
+    expect(row).toBeUndefined();
+  });
 });

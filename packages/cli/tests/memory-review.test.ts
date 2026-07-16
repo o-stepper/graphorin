@@ -124,4 +124,24 @@ describe('graphorin memory review (MCON-2)', () => {
     const after = await runMemoryReview({ config: cfg, ...SILENT });
     expect(after.procedures.map((r) => r.id)).not.toContain('rPoison');
   });
+
+  // MEMORY-CL-01 / W-068: the review LISTING path is read-only and must
+  // refuse a schema-behind DB instead of auto-migrating it.
+  it('refuses to auto-migrate a behind-schema DB on the listing path', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-review-behind-'));
+    const dbPath = join(dir, 'data.db');
+    const cfg = join(dir, 'graphorin.config.json');
+    await writeFile(
+      cfg,
+      JSON.stringify({ storage: { path: dbPath, mode: 'lib' }, auth: { kind: 'none' } }),
+      'utf8',
+    );
+    await expect(runMemoryReview({ config: cfg, ...SILENT })).rejects.toThrow(/graphorin migrate/);
+    const store = await createSqliteStore({ path: dbPath, mode: 'lib' });
+    const row = store.connection.get<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='schema_migrations'",
+    );
+    await store.close();
+    expect(row).toBeUndefined();
+  });
 });
