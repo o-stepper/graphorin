@@ -1,5 +1,34 @@
 # @graphorin/cli
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(cli): TOOL-AUDI-02 audit export enforces mode 0600 on a pre-existing file
+
+  `graphorin audit export` printed "(mode 0600)" but `writeFile`'s `mode` only
+  applies when it creates the file - re-exporting over an existing world-readable
+  file left it at its old mode. The command now `chmod`s the target to 0600 after
+  every write (a no-op on Windows, which has no POSIX mode bits).
+
+- [#186](https://github.com/o-stepper/graphorin/pull/186) [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7) Thanks [@o-stepper](https://github.com/o-stepper)! - Raw-token stdout parity for `token rotate` / `token rekey` (e2e 2026-07-13, CLI-01) - `token create` moved its one-time raw value to stdout in S-14b ("machine-consumable output"), but rotate and rekey kept printing theirs to stderr, so `TOKEN=$(graphorin token rotate <id>)` captured nothing. Both now print raw values to stdout while the log chatter stays on stderr, and the `stdoutPrint` test seam moves to `TokenCommonOptions`. Also `memory status` no longer promises "migration state" in its `--help` (CLI-02) - the command reports counts + active embedder.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix three CLI defects (e2e 2026-07-13/16). CLI-03 (major): `graphorin memory migrate --strategy <typo>` was cast without validation and fell through to the destructive auto-migrate branch (all facts re-embedded, source embedder retired) with exit 0; the strategy is now validated up front and an unknown value exits UNSUPPORTED with a clear message. AUTH-CLI-01 (major): `graphorin auth revoke` ignored `GRAPHORIN_OFFLINE=1` and made an outbound RFC 7009 POST carrying the live token; it now honours offline mode and refuses like `auth login` / `auth refresh`, matching the documented "no implicit network calls" contract. MEMORY-CL-01 (major): `graphorin memory why` and the `memory review` listing path (both documented read-only) auto-migrated a schema-behind live database, violating the W-068 invariant that `inspect` / `activity` already uphold; they now run with `migrationPolicy: 'check'` and refuse to upgrade a live DB (`review --promote`, an explicit write, keeps the migrate policy). Regression tests added for each.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the encrypted-file secrets store never activating from the CLI (e2e 2026-07-16, SECRETS-S-02, major). `createSecretsStore({ kind: 'encrypted-file' })` requires an explicit `encryptedFile: { path, passphrase }`, but the CLI's `openStore` forwarded only `kind` / `strict`, and `GRAPHORIN_MASTER_PASSPHRASE` was never consulted - so `graphorin secrets ... --secrets-source encrypted-file` (and the `auto` chain's encrypted-file leg) failed as "unavailable" and long-lived keys could not be stored on a headless host. The CLI now builds the encrypted-file config from the environment: the passphrase from `GRAPHORIN_MASTER_PASSPHRASE` and the bundle path from `GRAPHORIN_SECRETS_FILE` (defaulting to `~/.graphorin/secrets.enc`). Regression test round-trips a secret through the encrypted-file store (skipped where the `@node-rs/argon2` peer is absent).
+
+- Updated dependencies [[`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/memory@0.10.1
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+  - @graphorin/store-sqlite@0.10.1
+  - @graphorin/server@0.10.1
+  - @graphorin/sessions@0.10.1
+  - @graphorin/workflow@0.10.1
+  - @graphorin/pricing@0.10.1
+  - @graphorin/skills@0.10.1
+  - @graphorin/eslint-plugin@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

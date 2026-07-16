@@ -1,5 +1,20 @@
 # @graphorin/tools
 
+## 0.10.1
+
+### Patch Changes
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix a denied per-tool secret access leaving no audit row (e2e 2026-07-16, SECRETS-S-01, security). The `ctx.secrets` accessor gates through the per-tool ACL directly, so when a tool asked for a key outside its `secretsAllowed` the `SecretAccessDeniedError` was thrown without an audit event - unlike the store path, whose `auditStoreOperation` already records denials. The accessor now emits one `secret:get` / `decision: 'denied'` audit event (attributed to the tool, with run/session/agent pointers, never the secret value) before re-throwing, so the documented "fails closed AND writes one audit row" contract holds. The emit is on the accessor path only, so the store path is not double-counted. Regression test pins that a denied `ctx.secrets.require()` produces exactly one denied audit event.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix denied durable-HITL approvals leaving no audit trace (e2e 2026-07-16, TOOL-AUDI-01, major). The agent pre-screens `needsApproval` and suspends the run before the tool reaches the executor, so the executor's approval phase - which emits the `tool:approval:requested` / `granted` / `denied` audit rows - only ran retroactively when a granted call was dispatched, and a denied decision (which never reaches the executor) produced no audit row at all. The agent now emits `tool:approval:requested` at the suspend and `tool:approval:granted` / `tool:approval:denied` when the resume directive resolves, so the full approval lifecycle is on the audit chain regardless of the decision. To avoid a duplicate row, the executor skips its own approval phase on a pre-approved replay (the agent already owns the audited grant). Regression test pins that a denied resume emits exactly one `tool:approval:denied` audit event.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix `SanitizationOutcome.bytesStripped` going negative (e2e 2026-07-13, TOOLS-EX-01 / CHANNELS-01, minor). The inbound sanitizer computed `bytesStripped` as the net length delta, but the strip pass REPLACES each match with a redaction mask, and the canonical masks (e.g. `[REDACTED:imperative-pattern]`) are longer than the text they cover, so the value went negative - contradicting its documented "bytes removed" meaning (also surfaced through the `@graphorin/channels` re-export). It is now clamped to a non-negative net-bytes-removed metric (`0` when the masks are at least as long as what they covered, even though matches were stripped - `stripped` / `patternsHit` still report the redaction). Regression assertion added.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+  - @graphorin/observability@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

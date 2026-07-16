@@ -1,5 +1,13 @@
 # @graphorin/skills
 
+## 0.10.1
+
+### Patch Changes
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

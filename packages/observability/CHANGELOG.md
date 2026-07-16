@@ -1,5 +1,28 @@
 # @graphorin/observability
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Export `toOtlpEnvelope` (e2e 2026-07-13, OBS-PRIC-01, minor). The observability and migration guides document `toOtlpEnvelope` as the exported helper for adapting Graphorin spans into an upstream OTel SDK pipeline, but it was marked `@internal` and re-exported from no public entry point, so it was unreachable. It is now a `@stable` export from `@graphorin/observability` (and the `./exporters` subpath).
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix opt-in redaction patterns being unenablable via `validation.enabledPatterns` (e2e 2026-07-13, OBS-PRIC-02, major). `enabledPatterns` is documented as a per-name allow-list, but it filtered over the default-on catalogue only (the 14 built-in patterns), and the opt-in patterns (`ipv4`, `ipv6`, `gcp-service-account`) are not in that set - so naming them was a silent no-op and, for example, IP addresses flowed to exporters unmasked despite being requested. When `enabledPatterns` is set (and no custom catalogue is supplied) the validator now selects from the full built-in catalogue so the opt-in patterns can be enabled by name; with no allow-list the default stays the 14 default-on patterns. Regression tests pin that `enabledPatterns: ['ipv4']` masks an IPv4 address and that ipv4 stays off by default.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix documented session replay reproducing nothing (e2e 2026-07-16, SESSION-R-01 / SESSION-R-02, major). Two problems combined so `session.replay()` (no arguments) emitted only `replay.start` / `replay.end`: (1) the `graphorin.session.id` attribute defaulted to the `internal` tier, so the default `public` export floor stripped it and `createSqliteSpanExporter` persisted spans with `session_id` NULL - un-keyed and unfindable; and (2) the sanitized replay floor defaulted to `public`, so every `internal`-tier framework span was skipped with reason `sensitivity`. The tracer now tags routing identifiers (`graphorin.session.id`, `graphorin.run.id`) as `public` so a span stays keyable under any export floor, and the default sanitized-replay floor is now `internal` so framework spans replay by default while secret-tier attributes stay excluded and secret/PII patterns are still masked. The observability guide's replay wiring now raises the export floor to `internal` (so the run's telemetry is persisted, not stripped) and documents the floor. Regression tests pin that routing ids survive the default exporter and that a default replay includes internal-tier spans.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(observability): ORPHAN-SU-01 map the insight tier + new consolidate phases to OpenInference kinds
+
+  The OpenInference kind table silently omitted 8 `KnownSpanType`s added later:
+  `memory.read/write/search.insight` (-> RETRIEVER) and the
+  `memory.consolidate.reflect / learned-context / curated-block /
+profile-projection / promotion` phases (-> CHAIN). They returned null from
+  `openInferenceKindFor` and were not on the exclusion list, so their spans
+  carried no `openinference.span.kind`. A new compile-time-exhaustive test pins
+  that every `KnownSpanType` is mapped or explicitly excluded.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7)]:
+  - @graphorin/core@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

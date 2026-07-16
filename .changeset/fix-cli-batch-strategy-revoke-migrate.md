@@ -1,5 +1,0 @@
----
-'@graphorin/cli': patch
----
-
-Fix three CLI defects (e2e 2026-07-13/16). CLI-03 (major): `graphorin memory migrate --strategy <typo>` was cast without validation and fell through to the destructive auto-migrate branch (all facts re-embedded, source embedder retired) with exit 0; the strategy is now validated up front and an unknown value exits UNSUPPORTED with a clear message. AUTH-CLI-01 (major): `graphorin auth revoke` ignored `GRAPHORIN_OFFLINE=1` and made an outbound RFC 7009 POST carrying the live token; it now honours offline mode and refuses like `auth login` / `auth refresh`, matching the documented "no implicit network calls" contract. MEMORY-CL-01 (major): `graphorin memory why` and the `memory review` listing path (both documented read-only) auto-migrated a schema-behind live database, violating the W-068 invariant that `inspect` / `activity` already uphold; they now run with `migrationPolicy: 'check'` and refuse to upgrade a live DB (`review --promote`, an explicit write, keeps the migrate policy). Regression tests added for each.

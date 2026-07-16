@@ -1,5 +1,18 @@
 # @graphorin/sessions
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix `readToolCassette` crashing with a raw `TypeError` on a JSON `null` body line (e2e 2026-07-16, SESSION-R-03, minor). A `null` line parsed cleanly, then `parsed.kind` was read before checking the value was a non-null object, so `null` escaped the format guard that already rejects scalars/arrays with the typed `CassetteFormatInvalidError`. The reader now rejects any non-object line (null, array, scalar) with the typed error. Regression test added.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix documented session replay reproducing nothing (e2e 2026-07-16, SESSION-R-01 / SESSION-R-02, major). Two problems combined so `session.replay()` (no arguments) emitted only `replay.start` / `replay.end`: (1) the `graphorin.session.id` attribute defaulted to the `internal` tier, so the default `public` export floor stripped it and `createSqliteSpanExporter` persisted spans with `session_id` NULL - un-keyed and unfindable; and (2) the sanitized replay floor defaulted to `public`, so every `internal`-tier framework span was skipped with reason `sensitivity`. The tracer now tags routing identifiers (`graphorin.session.id`, `graphorin.run.id`) as `public` so a span stays keyable under any export floor, and the default sanitized-replay floor is now `internal` so framework spans replay by default while secret-tier attributes stay excluded and secret/PII patterns are still masked. The observability guide's replay wiring now raises the export floor to `internal` (so the run's telemetry is persisted, not stripped) and documents the floor. Regression tests pin that routing ids survive the default exporter and that a default replay includes internal-tier spans.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/observability@0.10.1
+  - @graphorin/tools@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes

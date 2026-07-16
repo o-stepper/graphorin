@@ -1,5 +1,38 @@
 # @graphorin/memory
 
+## 0.10.1
+
+### Patch Changes
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(memory): BUFFER-N-01 warn at construction for an invalid consolidator trigger spec
+
+  `registerConsolidatorTriggers` throws on a malformed spec, but a buffer-only
+  library deployment never calls it - so `createMemory({ triggers: ['buffer:0'] })`
+  accepted the spec silently and left the buffer memory-formation loop inert
+  (`notifyActivity` always returned null). The consolidator now emits a one-shot
+  stderr WARN for every unparseable trigger spec at construction, naming the spec
+  and stating the loop it was meant to arm will never fire.
+
+- [#184](https://github.com/o-stepper/graphorin/pull/184) [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix exact dedup never firing without an embedder on the conflict pipeline (e2e 2026-07-13, MEMORY-C-02, major). Stage-1 exact dedup only compared the candidate against the vector-search candidate list, which is empty when no embedder is configured (or the vector extension is unavailable) - so byte-identical facts were both admitted in the documented offline default. When no vector candidates are surfaced, the pipeline now also gathers exact-text candidates through the store's FTS search (the same seam the consolidator uses via `findExactTextDuplicate`); stage 1 confirms exactness with its canonical-hash comparison, so only true duplicates dedup and the write path still degrades safely on any search failure. Regression test pins that a byte-identical duplicate is deduped with `embedder: null`.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix a malformed per-call fusion weight failing the whole search (e2e 2026-07-13, MEMORY-R-02, minor). A `weighted` fusion weight that was `NaN`, negative, or non-numeric reached the `WeightedRRFReranker` constructor and threw a `TypeError`, rejecting the entire search rather than degrading as documented. The search path now coerces each per-call weight (`fts` / `vector` / `graph` / `entity`) to the neutral default `1` when it is not a finite non-negative number. Regression test pins that a `NaN` / negative weight yields the default RRF ranking instead of throwing.
+
+- [#187](https://github.com/o-stepper/graphorin/pull/187) [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(memory): MEMORY-C-03 gate the compaction default on a providerContextWindow
+
+  A bare `createMemory()` auto-enabled compaction from the default trust policy
+  with no `providerContextWindow`, leaving a dead-Infinity trigger and warning on
+  every construction. The trust-based default now only enables compaction when a
+  window is present, so the bare case is off and silent (functionally a no-op:
+  compaction could never fire without a window). An explicit `compaction` config
+  without a window still throws (CE-12). Removes the now-dead one-time WARN and its
+  test-only reset.
+
+- Updated dependencies [[`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`79ef389`](https://github.com/o-stepper/graphorin/commit/79ef3894c409c0a6b9d31fac9b6c888d4068d4e7), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`96138c2`](https://github.com/o-stepper/graphorin/commit/96138c2969e79c06a77d02b83bc33606508dea9a), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051), [`15e65b2`](https://github.com/o-stepper/graphorin/commit/15e65b224ebe1170d6f840ea8af393609514e051)]:
+  - @graphorin/core@0.10.1
+  - @graphorin/security@0.10.1
+  - @graphorin/observability@0.10.1
+  - @graphorin/tools@0.10.1
+
 ## 0.10.0
 
 ### Patch Changes
