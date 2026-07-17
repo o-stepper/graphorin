@@ -1,0 +1,53 @@
+{
+  "name": "@graphorin/benchmark-conformance",
+  "version": "0.12.0",
+  "private": true,
+  "description": "Per-release conformance benchmark for the Graphorin framework - a deterministic, offline suite of named behavioral invariants (the framework floor) spanning the agent loop, memory, sessions, workflow checkpoints, security, server durability, and pricing. Runs on every PR via benchmark:ci and stamps a versioned conformance report so a release can prove the promised behaviors still hold. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/conformance",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/conformance"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "conformance"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js",
+    "benchmark:smoke": "node ./dist/runner.js"
+  },
+  "dependencies": {
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/pricing": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/server": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-conformance": "./dist/runner.js"
+  }
+}
