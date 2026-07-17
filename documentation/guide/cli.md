@@ -71,7 +71,7 @@ Runs a sanity audit:
 - The audit-log encryption binding (the SQLite cipher peer).
 - Optional systemd unit validation (Linux).
 
-A bare `graphorin doctor` runs the perms check only; opt in to the others with `--check-secrets` / `--check-encryption` / `--check-systemd`, or run everything with `--all`. Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it never opens a network connection.
+A bare `graphorin doctor` runs the perms check only; opt in to the others with `--check-secrets` / `--check-encryption` / `--check-systemd`, or run everything with `--all`. Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it opens no network connection unless `--smoke-local` is supplied (those legs talk to the local Ollama daemon only).
 
 By default the perms check targets the `~/.graphorin` layout. Pass `--config <path>` to check a project deployment instead - the config file itself plus the storage and audit database paths it resolves to:
 
@@ -79,6 +79,36 @@ By default the perms check targets the `~/.graphorin` layout. Pass `--config <pa
 graphorin doctor --config ./graphorin.config.json
 graphorin doctor --config ./graphorin.config.json --fix-perms
 ```
+
+### `--smoke-local`: the local-first first-run smoke
+
+`graphorin doctor --smoke-local` answers "will a local assistant actually run on this machine?" before you write any code. It exercises the same code paths the framework uses at runtime:
+
+1. **`smoke:native`** - the native SQLite stack loads: the `better-sqlite3` binding plus the `sqlite-vec` extension. A pnpm-10 install that skipped the build scripts surfaces here as the actionable `SqliteNativeBindingError` fix (see [Native modules and pnpm 10](/guide/installation#native-modules-and-pnpm-10)) instead of a raw `bindings.js` stack at first use. A missing `sqlite-vec` degrades to `warn` (FTS recall still works).
+2. **`smoke:sqlite-roundtrip`** - writes a fact to a throwaway store, closes it, reopens from disk and searches it back (FTS-only; no embedding model needed).
+3. **`smoke:ollama`** - daemon reachability (`/api/version`). An unreachable daemon is a `warn`, not a `fail` - the storage legs above still count.
+4. **`smoke:ollama-models`** - installed models; with `--ollama-model <name>` the named model must be present.
+5. **`smoke:embedding`** - one real `/api/embed` call reporting the embedding dimension (default model `nomic-embed-text`; override with `--embed-model`).
+6. **`smoke:chat`** - only with `--ollama-model`: a streamed tool-call round-trip through the real `ollamaAdapter` (`think: false`), reporting the server's load / prompt-eval / generation timings so a slow first answer is attributable to model load rather than generation.
+
+```bash
+graphorin doctor --smoke-local
+graphorin doctor --smoke-local --ollama-model qwen3:8b-q4_K_M
+graphorin doctor --smoke-local --ollama-base-url http://127.0.0.1:11434 --json
+```
+
+A healthy machine with a cold model looks like this - note the load-dominated chat timing:
+
+```text
+  [OK] smoke:native: better-sqlite3 binding + sqlite-vec extension loaded
+  [OK] smoke:sqlite-roundtrip: write / reopen / search round-trip recalled the fact (FTS)
+  [OK] smoke:ollama: daemon reachable at http://127.0.0.1:11434 (version 0.32.0)
+  [OK] smoke:ollama-models: 'qwen3:8b-q4_K_M' is installed (5 model(s) total)
+  [OK] smoke:embedding: 'nomic-embed-text' embeds (dimension 768)
+  [OK] smoke:chat: streamed + tool call in 10521ms (load 9149ms, prompt 680ms, gen 679ms)
+```
+
+`--smoke-local` alone runs only the smoke; combine it with `--all` or any `--check-*` flag to add the host checks in the same report. It is deliberately not implied by `--all`, so CI hosts without an Ollama daemon can keep using `--all` unchanged.
 
 ## `graphorin token`
 

@@ -51,6 +51,7 @@ type ProviderEvent =
 }
   | {
   finishReason: FinishReason;
+  providerMetadata?: Readonly<Record<string, unknown>>;
   type: "finish";
   usage: Usage;
 }
@@ -184,10 +185,19 @@ collapsing the deltas.
 ```ts
 {
   finishReason: FinishReason;
+  providerMetadata?: Readonly<Record<string, unknown>>;
   type: "finish";
   usage: Usage;
 }
 ```
+
+Terminal event. `providerMetadata` mirrors
+[ProviderResponse.providerMetadata](/api/@graphorin/core/interfaces/ProviderResponse.md#property-providermetadata) for the streaming path:
+an optional vendor-namespaced diagnostic payload (e.g. the Ollama
+adapter reports `{ ollama: { loadMs, promptEvalMs, evalMs,
+totalMs } }` from the server's timing fields, so model load,
+prompt processing and generation are distinguishable).
+Adapters without such a payload simply omit the field.
 
 ***
 

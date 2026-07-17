@@ -19,6 +19,7 @@ adapters share the same `LocalProviderTrust` classifier and
 | Interface | Description |
 | ------ | ------ |
 | [OllamaAdapterOptions](/api/@graphorin/provider/adapters/ollama/interfaces/OllamaAdapterOptions.md) | Options accepted by [ollamaAdapter](/api/@graphorin/provider/adapters/ollama/functions/ollamaAdapter.md). |
+| [OllamaTimings](/api/@graphorin/provider/adapters/ollama/interfaces/OllamaTimings.md) | Ollama server timings for one call, in milliseconds (audit 2026-07-16, item 8). The server reports them in nanoseconds on the terminal chunk; normalized here so model load, prompt processing and generation are distinguishable in events and traces. Surfaced under `providerMetadata.ollama` on the `finish` event / `generate()` response, and stamped onto the provider span by `withTracing`. |
 
 ## Variables
 

@@ -192,6 +192,35 @@ Three operational knobs matter on this adapter:
 
 Per-request escape hatch: any `ProviderRequest.providerOptions` keys are passed through to the request body verbatim (top-level keys override the built body; a nested `options` object merges into the built `options` block).
 
+**Server timings in events and traces.** Ollama reports per-call timings on its terminal chunk; the adapter normalizes them to milliseconds and surfaces them as `providerMetadata.ollama` (`OllamaTimings`: `totalMs` / `loadMs` / `promptEvalMs` / `evalMs`) on the streamed `finish` event and the `generate()` response. `withTracing` stamps them onto the provider span as `graphorin.provider.ollama.*` attributes, so a slow answer is attributable at a glance: a cold first call is dominated by `loadMs` (many seconds), a long-context call by `promptEvalMs`, a verbose one by `evalMs`. `graphorin doctor --smoke-local --ollama-model <name>` prints the same split.
+
+#### Measured profile: qwen3:8b-q4_K_M on Apple Silicon
+
+Measured on an M1 Max (32 GB), Ollama 0.32.0, model file 5.2 GB (Q4_K_M). Point-in-time reference numbers, not guarantees - rerun `graphorin doctor --smoke-local --ollama-model qwen3:8b-q4_K_M` on your machine for your own:
+
+| What | Measured |
+|---|---|
+| Resident size, `num_ctx` 32768 (the Ollama 0.32 server default) | ~9.8 GB, 100% GPU |
+| Resident size, `num_ctx` 40960 (the model maximum) | ~11 GB, 100% GPU |
+| Cold load (first request after daemon start) | ~9 s |
+| Warm load overhead per request | ~0.1 s |
+| Re-load when a request CHANGES `num_ctx` | ~6 s (KV cache realloc) |
+| Generation speed (warm) | ~32-38 tok/s |
+| `think: true` on a short factual ask | roughly doubles wall time - the hidden chain consumed more tokens than the visible answer |
+
+Practical settings for an interactive assistant on this class of hardware:
+
+```ts no-check
+ollamaAdapter({
+  model: 'qwen3:8b-q4_K_M',
+  think: false,     // enable selectively for hard reasoning turns
+  numCtx: 40_960,   // pick ONE value and keep it - changing it mid-session costs a ~6s re-load
+  keepAlive: '30m', // avoid the ~9s cold load between conversations
+});
+```
+
+Two version-drift notes this table encodes: Ollama's server-side default context has moved over releases (4096 historically, 32768 as of 0.32), which is exactly why `numCtx` pins one number for the server, the declared `capabilities.contextWindow`, and the memory compaction budget; and qwen3-family models think by default, so an assistant that does not need chains should set `think: false` explicitly rather than relying on server defaults.
+
 ### OpenAI-compatible HTTP
 
 ```ts

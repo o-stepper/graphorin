@@ -1741,6 +1741,10 @@
                   {
                     "text": "OllamaAdapterOptions",
                     "link": "/api/@graphorin/provider/adapters/ollama/interfaces/OllamaAdapterOptions.md"
+                  },
+                  {
+                    "text": "OllamaTimings",
+                    "link": "/api/@graphorin/provider/adapters/ollama/interfaces/OllamaTimings.md"
                   }
                 ]
               },
