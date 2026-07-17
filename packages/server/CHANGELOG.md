@@ -1,5 +1,25 @@
 # @graphorin/server
 
+## 0.12.0
+
+### Minor Changes
+
+- [#195](https://github.com/o-stepper/graphorin/pull/195) [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7) Thanks [@o-stepper](https://github.com/o-stepper)! - Durable suspended agent runs (migration 038): a run parked on durable HITL (`awaiting_approval`) now survives a server restart. The `RunStateTracker` mirrors every park into the new `store.suspendedRuns` sidecar (`suspended_runs` table, session-scoped for the erasure cascade), boot hydration re-registers persisted parks, and `POST /runs/:runId/resume` rehydrates them through the owning agent's new `serializeState` / `deserializeState` codec (version-stamped, binary-safe, secret-redacted - the `Agent` interface gains both methods). Rows are dropped when the run settles (resume completes/fails, or an explicit `POST /runs/:runId/abort`); the graceful-shutdown force-abort deliberately keeps them. Custom `ServerAgentLike` fixtures without the codec keep today's in-memory behaviour and the resume endpoint answers an actionable `409 run-state-unavailable`; an unreadable durable payload answers `500 run-state-invalid`.
+
+- [#195](https://github.com/o-stepper/graphorin/pull/195) [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7) Thanks [@o-stepper](https://github.com/o-stepper)! - BREAKING: `metrics.requireAuth` now defaults to `true` - `GET /v1/metrics` requires a verified token with the `admin:metrics:read` scope out of the box (the exposition leaks operational intel: trigger ids in labels, consolidator budgets). Give your Prometheus scrape job a token (`authorization.credentials_file`) or restore the old behaviour explicitly with `metrics: { requireAuth: false }` for trusted-network scrapes; the existing non-loopback WARN still fires on the opt-out.
+
+### Patch Changes
+
+- [#195](https://github.com/o-stepper/graphorin/pull/195) [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7) Thanks [@o-stepper](https://github.com/o-stepper)! - The server now states its TLS posture explicitly: it serves plaintext HTTP only (no in-process TLS by design), and binding a non-loopback host logs a startup WARN until the operator acknowledges the fronting reverse proxy with the new `server.tlsTerminatedUpstream: true` config flag. The flag records intent and silences the warning; it changes no runtime behaviour.
+
+- Updated dependencies [[`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7)]:
+  - @graphorin/store-sqlite@0.12.0
+  - @graphorin/triggers@0.12.0
+  - @graphorin/core@0.12.0
+  - @graphorin/protocol@0.12.0
+  - @graphorin/security@0.12.0
+  - @graphorin/tools@0.12.0
+
 ## 0.11.0
 
 ### Patch Changes

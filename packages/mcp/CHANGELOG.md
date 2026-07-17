@@ -1,5 +1,14 @@
 # @graphorin/mcp
 
+## 0.12.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.12.0
+  - @graphorin/security@0.12.0
+  - @graphorin/tools@0.12.0
+
 ## 0.11.0
 
 ### Patch Changes

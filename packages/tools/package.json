@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/tools",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Tools surface for the Graphorin framework: typed `tool({...})` builder backed by Zod schemas, ToolRegistry with strategy-aware collision resolution and deferred-loading support, ToolExecutor with parallel/sequential dispatch, approval flow, sandbox enforcement (via @graphorin/security), per-tool secrets ACL, memory-modification guard wiring, hard-kill cancellation with grace, single-round tool repair, inbound prompt-injection sanitization, four-strategy result truncation, streaming tool execution (progress + partial chunks with bounded backpressure), four-class side-effect taxonomy with idempotency-key callbacks, per-tool model-tier hints, and built-in `tool_search` for tool retrieval at scale.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
