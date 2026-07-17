@@ -6,7 +6,7 @@
 
 # Interface: ToolArgumentPolicyGuard
 
-Defined in: [packages/tools/src/executor/types.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L348)
+Defined in: [packages/tools/src/executor/types.ts:347](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L347)
 
 Structural adapter for the D4 tool-argument policy (Progent). The
 agent runtime wires `evaluateToolArgumentPolicy` /
@@ -30,7 +30,7 @@ optional decide(input):
 };
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:359](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L359)
+Defined in: [packages/tools/src/executor/types.ts:358](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L358)
 
 E1: four-value evaluation (`deny > defer > ask > allow`). When
 present the executor's policy phase prefers it over the binary
@@ -69,7 +69,7 @@ optional deniesName(toolName):
 };
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:371](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L371)
+Defined in: [packages/tools/src/executor/types.ts:370](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L370)
 
 E1 deny-by-name: advertise-time check consulted with NO args (the
 per-step catalogue filter, `tool_search` exclusion and the
@@ -108,7 +108,7 @@ evaluate(input):
 };
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:349](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L349)
+Defined in: [packages/tools/src/executor/types.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L348)
 
 #### Parameters
 

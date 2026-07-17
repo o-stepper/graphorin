@@ -105,14 +105,13 @@ export interface ExecutorOptions {
   /** Pluggable imperative patterns override. */
   readonly imperativePatterns?: ReadonlyArray<ImperativePattern>;
   /**
-   * Override for the imperative-pattern scan budget (ms). The
-   * scanner returns `null` (= timed out, strip-pass skipped) when
-   * it exceeds this budget; the production default of `5` ms is
-   * sufficient on hot paths but can flake on cold-start CI runners
-   * where V8 JIT warm-up + shared-CPU jitter routinely pushes the
-   * first scan above 5 ms. Tests that need deterministic strip
-   * behaviour on noisy runners can raise this to e.g. `250` ms.
-   * Defaults to `5` ms (production-safe).
+   * Override for the imperative-pattern scan budget (ms). The scanner returns
+   * `null` (= timed out, strip-pass skipped) when it exceeds this budget.
+   * Defaults to `250` ms (TOOLS-EX-02): 5 ms was the long-term target but is
+   * empirically too tight on cold-start / loaded CI runners, where a skipped
+   * strip pass silently lets injection through. 250 ms stays below any
+   * user-perceptible (one-shot, registration-time) latency. Hot-path callers
+   * that want a stricter budget can lower this explicitly.
    */
   readonly imperativeBudgetMs?: number;
   /**
