@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/embedder-transformersjs",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Default in-process embedder for the Graphorin framework. Wraps `@huggingface/transformers@^4.1.0` to produce dense vectors with the multilingual `Xenova/multilingual-e5-base` model (768-dim) by default. Implements the `EmbedderProvider` contract from `@graphorin/core/contracts` with deterministic `configHash`, batched embed, lazy model download (cache honours `GRAPHORIN_CACHE_DIR`), and an actionable error if the model cannot be fetched.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
