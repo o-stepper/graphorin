@@ -77,6 +77,15 @@ export interface ServerConfigSpec {
       readonly drainTimeoutMs: number;
     };
     readonly trustProxy: boolean;
+    /**
+     * Operator acknowledgement that a TLS-terminating reverse proxy
+     * fronts this server. Graphorin itself serves PLAINTEXT HTTP only -
+     * there is deliberately no in-process TLS - so a non-loopback bind
+     * without this acknowledgement logs a startup WARN (bearer tokens
+     * would otherwise cross the network unencrypted). Setting it `true`
+     * silences the warning; it changes no runtime behaviour.
+     */
+    readonly tlsTerminatedUpstream: boolean;
     readonly stream: {
       readonly disconnectPolicy: 'continue' | 'pause-on-disconnect' | 'abort-on-disconnect';
       readonly disconnectGracePeriodMs: number;
@@ -162,6 +171,13 @@ export interface ServerConfigSpec {
   readonly metrics: {
     readonly enabled: boolean;
     readonly path: string;
+    /**
+     * Require a verified token with `admin:metrics:read` on the
+     * exposition endpoint. Default `true` since 0.11.0: the exposition
+     * leaks operational intel (trigger ids in labels, consolidator
+     * budgets), so scraping is authenticated unless the operator
+     * explicitly opts out for a trusted network.
+     */
     readonly requireAuth: boolean;
   };
   readonly health: {
@@ -286,6 +302,7 @@ const serverSchema = z
     idempotency: idempotencySchema,
     shutdown: shutdownSchema,
     trustProxy: z.boolean().default(false),
+    tlsTerminatedUpstream: z.boolean().default(false),
     stream: streamSchema,
     ws: wsSchema,
     sse: sseSchema,
@@ -393,7 +410,10 @@ const metricsSchema = z
   .object({
     enabled: z.boolean().default(true),
     path: z.string().default('/metrics'),
-    requireAuth: z.boolean().default(false),
+    // IP-23 hardening: authenticated exposition by default since 0.11.0
+    // (the labels leak trigger ids + consolidator budgets). Opt out
+    // explicitly for trusted-network scrapes.
+    requireAuth: z.boolean().default(true),
   })
   .strict()
   .default({});

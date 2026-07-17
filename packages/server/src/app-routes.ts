@@ -129,6 +129,20 @@ export function mountRoutes(
     );
   }
 
+  // Graphorin serves plaintext HTTP only - in-process TLS is deliberately
+  // out of scope (terminate it at a reverse proxy; the deployment guide's
+  // systemd / Docker / k8s templates all do). A non-loopback bind without
+  // the operator acknowledgement means bearer tokens would cross the
+  // network unencrypted - warn loudly rather than silently.
+  if (!isLoopbackHost(config.server.host) && !config.server.tlsTerminatedUpstream) {
+    console.warn(
+      `[graphorin/server] WARN: the server binds the non-loopback host '${config.server.host}' ` +
+        `and serves plaintext HTTP (Graphorin ships no in-process TLS). Terminate TLS at a ` +
+        `reverse proxy and set server.tlsTerminatedUpstream=true to acknowledge, or bind a ` +
+        `loopback host.`,
+    );
+  }
+
   // Auth + audit + idempotency for everything below this line - see
   // `app-middleware.ts` for the boundary semantics and skip list.
   const { anonymousAuth } = attachProtectedMiddleware(app, config, ctx);
@@ -183,7 +197,17 @@ export function mountRoutes(
       ...(ctx.wsDispatcher !== undefined ? { dispatcher: ctx.wsDispatcher } : {}),
     }),
   );
-  app.route(`${base}/runs`, createRunRoutes({ agents: ctx.agents, runs: ctx.runs }));
+  app.route(
+    `${base}/runs`,
+    createRunRoutes({
+      agents: ctx.agents,
+      runs: ctx.runs,
+      // Migration 038: the abort route drops the durable row of a
+      // user-settled park (the tracker's abort() keeps rows so the
+      // shutdown force-abort cannot erase restart-surviving parks).
+      ...(ctx.store.suspendedRuns !== undefined ? { suspendedRuns: ctx.store.suspendedRuns } : {}),
+    }),
+  );
   app.route(
     `${base}/workflows`,
     createWorkflowRoutes({
