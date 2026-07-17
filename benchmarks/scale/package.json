@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-scale",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "private": true,
   "description": "Memory-store scale probe for the Graphorin framework (audit 2026-07-04, E7). Seeds a file-backed SQLite store with 100k+ synthetic facts (vectors via a deterministic bag-of-words embedder + an entity graph via s/p/o) and measures hybrid-search p50/p95, PPR graph-expansion search cost, the offline consolidator light-phase pass time, seeding throughput, and on-disk DB size. Reports numbers; the only gates are deterministic plumbing assertions (--smoke). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

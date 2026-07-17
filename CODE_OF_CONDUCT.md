@@ -123,4 +123,4 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 
 ---
 
-**Graphorin** · v0.10.2 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.11.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
