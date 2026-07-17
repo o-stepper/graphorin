@@ -52,6 +52,23 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.12.0 -> 0.12.1
+
+One patch, one observable behavior change:
+
+- **Schema-less structured requests send no `response_format`.** On the
+  OpenAI-shaped adapters, `outputType: { kind: 'structured' }` WITHOUT
+  `jsonSchema` used to send a permissive `json_schema`
+  (`strict: false`) - the billed live pass showed the Anthropic
+  OpenAI-compat endpoint rejects it (HTTP 400), silently failing
+  schema-less structured runs there. The request body now carries no
+  `response_format`; the agent's trailing JSON instruction and the
+  local `schema.parse` gate carry the contract on every server. If you
+  relied on server-side JSON mode, supply an explicit
+  `outputType.jsonSchema` - and keep it CLOSED
+  (`additionalProperties: false`, all properties required) for the
+  compat endpoint.
+
 ### 0.11.0 -> 0.12.0
 
 0.12.0 is the durable-approvals release. One default flips; the rest

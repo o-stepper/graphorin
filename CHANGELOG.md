@@ -14,6 +14,52 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.12.1 - 2026-07-17
+
+The **live-verification patch** (PRs #197-#205): the first billed
+real-provider pass over the published packages, and the one defect it
+found.
+
+### Provider - schema-less structured requests send no `response_format`
+(`@graphorin/provider`)
+
+- The billed live pass against the Anthropic OpenAI-compat endpoint
+  (the exact target the 0.10.2 LIVE-EVAL-01 fix named but was never run
+  against live) showed the endpoint rejects EVERY permissive
+  `response_format` spelling: `json_object`, `json_schema` with
+  `strict: false`, and `strict: true` over an open schema. A
+  schema-less `outputType: { kind: 'structured' }` request therefore
+  sends **no `response_format` at all** - the agent's trailing JSON
+  instruction plus the local `schema.parse` gate carry the contract.
+  Explicit `outputType.jsonSchema` requests keep the strict
+  `json_schema` mapping (live-verified green with a closed schema).
+  Rule of thumb for the compat endpoint: keep explicit schemas CLOSED
+  (`additionalProperties: false`, all properties required).
+
+### Also in the repository at this version
+
+Not part of any published package, but part of the release line:
+
+- **Coverage thresholds enforced in CI**: a dedicated leg runs
+  `--coverage` across all 29 packages (the declared thresholds used to
+  be aspirational); security's p95 latency canaries skip under
+  instrumentation, proactive's real functions gap was closed with
+  tests, cli's branches threshold was ratcheted to its measured floor.
+- **First real-provider LongMemEval baselines**: all five abilities
+  seeded from the billed run (claude-haiku-4-5 subject, dedicated
+  local qwen3 judge) - 338/500 (67.6%) overall - so the dispatch
+  workflow's regression gates now compare against real numbers. Judges
+  always resolve think-off, and `--max-cost-usd` now observes real
+  spend through the bundled pricing snapshot.
+- **`benchmarks/conformance`** (audit item 10): 13 deterministic
+  framework-floor checks run in `benchmark:ci` with a versioned
+  conformance report.
+- **Two new examples**: `examples/assistant-bot` (the official
+  whole-bot recipe - agent, memory recall, sessions, REST HITL resume,
+  heartbeat, channels front door on one stub-driven stack) and
+  `examples/structured-verifier` (audit item 9 - closed wire schema,
+  zod parse gate, verifier continuation round).
+
 ## 0.12.0 - 2026-07-17
 
 The **durable-approvals release** (PR #195): the top follow-ups from
