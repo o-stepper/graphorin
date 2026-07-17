@@ -47,6 +47,7 @@ import {
   type Scorer,
 } from '@graphorin/evals';
 import { createMemory, type Memory } from '@graphorin/memory';
+import { BUNDLED_SNAPSHOT, lookupPrice } from '@graphorin/pricing';
 import {
   composeProviderMiddleware,
   createCostAccumulator,
@@ -92,6 +93,15 @@ export interface BenchProviderSpec {
   readonly baseUrl?: string;
   /** Bearer key for `openai-compatible` (env-only; never a CLI flag). */
   readonly apiKey?: string;
+  /**
+   * Ollama `think` override. The JUDGE leg always resolves with
+   * `think: false` - a thinking-default model (qwen3) otherwise burns
+   * its whole output budget on the chain and returns an empty reply,
+   * so `llm-judge-j` never sees its `SCORE: <n>` marker (observed live
+   * 2026-07-17: 3/3 judge replies empty). The SUT leg keeps the model
+   * default.
+   */
+  readonly think?: boolean;
 }
 
 /** A resolved {@link Provider} plus the provenance label stamped into RESULTS. */
@@ -124,9 +134,42 @@ export function withBenchCostCeiling(maxCostUsd: number): {
       onExceed: 'throw',
       resolveObservedCost: () => observedCostUsd(),
     }),
-    withCostTracking({ onUsage: accumulator.onUsage }),
+    // The bundled pricing snapshot prices the usage so the ceiling can
+    // actually observe spend (live 2026-07-17: without a priceLookup the
+    // accumulator saw $0 and --max-cost-usd was honestly-warned but
+    // UNENFORCED). Model-only lookup: real runs address cloud models
+    // through the generic openai-compatible adapter, so the provider
+    // name carries no pricing vendor - resolve by model id (with the
+    // dateless-alias fallback) across the whole snapshot instead.
+    withCostTracking({ onUsage: accumulator.onUsage, priceLookup: benchPriceLookup }),
   ]);
   return { wrap, observedCostUsd };
+}
+
+/** Model-id-keyed price lookup over the bundled snapshot (vendor-agnostic). */
+export function benchPriceLookup(info: { readonly modelId: string }): {
+  readonly inputPerMtok?: number;
+  readonly outputPerMtok?: number;
+  readonly cachedReadPerMtok?: number;
+  readonly cacheWritePerMtok?: number;
+} | null {
+  const dateless = info.modelId.replace(/-\d{8}$/, '');
+  const entry =
+    BUNDLED_SNAPSHOT.entries.find((e) => e.model === info.modelId) ??
+    BUNDLED_SNAPSHOT.entries.find((e) => e.model === dateless);
+  if (entry === undefined) return null;
+  const price = lookupPrice({ provider: entry.provider, model: entry.model });
+  if (price === null) return null;
+  return {
+    inputPerMtok: price.inputUsdPerToken * 1_000_000,
+    outputPerMtok: price.outputUsdPerToken * 1_000_000,
+    ...(price.cachedReadUsdPerToken !== undefined
+      ? { cachedReadPerMtok: price.cachedReadUsdPerToken * 1_000_000 }
+      : {}),
+    ...(price.cacheWriteUsdPerToken !== undefined
+      ? { cacheWritePerMtok: price.cacheWriteUsdPerToken * 1_000_000 }
+      : {}),
+  };
 }
 
 /**
@@ -162,7 +205,14 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
   switch (name as RealProviderName) {
     case 'ollama':
       return {
-        provider: createProvider(ollamaAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }), opts),
+        provider: createProvider(
+          ollamaAdapter({
+            model,
+            ...(baseUrl ? { baseUrl } : {}),
+            ...(spec.think !== undefined ? { think: spec.think } : {}),
+          }),
+          opts,
+        ),
         label: `ollama:${model}`,
       };
     case 'llamacpp':
@@ -1072,7 +1122,10 @@ export async function main(): Promise<void> {
     process.env,
     apiKey,
   );
-  let judgeResolved = judgeSpec !== undefined ? resolveBenchProvider(judgeSpec) : undefined;
+  // Judges never think out loud: they must spend their output budget on
+  // the SCORE-marker verdict (see BenchProviderSpec.think).
+  let judgeResolved =
+    judgeSpec !== undefined ? resolveBenchProvider({ ...judgeSpec, think: false }) : undefined;
   const judgeLabel = judgeResolved?.label ?? label;
   // D1 (W-084): one shared ceiling caps the run's TOTAL spend (SUT + judge).
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;

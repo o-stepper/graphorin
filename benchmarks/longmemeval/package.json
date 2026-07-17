@@ -45,6 +45,7 @@
     "@graphorin/core": "workspace:*",
     "@graphorin/evals": "workspace:*",
     "@graphorin/memory": "workspace:*",
+    "@graphorin/pricing": "workspace:*",
     "@graphorin/provider": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*"
   },
