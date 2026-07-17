@@ -119,7 +119,7 @@ GRAPHORIN_TRACE=console GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
 ```
 
-The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the twelve apps.
+The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the thirteen apps.
 
 ## Production deployment templates
 
