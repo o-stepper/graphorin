@@ -47,6 +47,7 @@ import {
   emitReport,
   statusMarker,
 } from '../internal/output.js';
+import { runLocalSmoke } from '../internal/smoke-local.js';
 
 /**
  * @stable
@@ -81,6 +82,27 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
   readonly all?: boolean;
   /** Test seam - supply a custom systemd executor. */
   readonly systemdRun?: (cmd: string) => Promise<string>;
+  /**
+   * Run the local-first smoke (external audit 2026-07-16, item 6):
+   * native SQLite stack, write / reopen / search round-trip, Ollama
+   * reachability + model inventory, an embedding-dimension probe, and
+   * (with {@link ollamaModel}) a streamed tool-call round-trip through
+   * the real adapter. Deliberately NOT implied by `--all` - the Ollama
+   * legs talk to a local daemon, which CI hosts may not run.
+   */
+  readonly smokeLocal?: boolean;
+  /** Ollama base URL for the smoke. Default `http://127.0.0.1:11434`. */
+  readonly ollamaBaseUrl?: string;
+  /** Chat model the smoke exercises end to end (streaming + tool call). */
+  readonly ollamaModel?: string;
+  /** Embedding model for the dimension probe. Default `nomic-embed-text`. */
+  readonly embedModel?: string;
+  /** Wall-clock bound for the smoke's chat leg. Default 60s. */
+  readonly chatTimeoutMs?: number;
+  /** Test seam - injected fetch for the smoke's Ollama calls. */
+  readonly smokeFetchImpl?: typeof fetch;
+  /** Test seam - directory for the smoke's throwaway store. */
+  readonly smokeDir?: string;
 }
 
 /**
@@ -174,6 +196,19 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
     checks.push(...result);
   }
 
+  if (options.smokeLocal === true) {
+    checks.push(
+      ...(await runLocalSmoke({
+        ...(options.ollamaBaseUrl !== undefined ? { ollamaBaseUrl: options.ollamaBaseUrl } : {}),
+        ...(options.ollamaModel !== undefined ? { ollamaModel: options.ollamaModel } : {}),
+        ...(options.embedModel !== undefined ? { embedModel: options.embedModel } : {}),
+        ...(options.chatTimeoutMs !== undefined ? { chatTimeoutMs: options.chatTimeoutMs } : {}),
+        ...(options.smokeFetchImpl !== undefined ? { fetchImpl: options.smokeFetchImpl } : {}),
+        ...(options.smokeDir !== undefined ? { smokeDir: options.smokeDir } : {}),
+      })),
+    );
+  }
+
   const summary: Record<'ok' | 'warn' | 'fail' | 'skip', number> = {
     ok: 0,
     warn: 0,
@@ -265,6 +300,11 @@ function expandFlags(options: DoctorCommandOptions): DoctorChecks {
     options.checkSystemd === true ||
     options.fixPerms === true;
   if (!explicit) {
+    // `--smoke-local` alone selects only the smoke; the host checks
+    // still compose with it via the explicit `--check-*` flags / `--all`.
+    if (options.smokeLocal === true) {
+      return { perms: false, secrets: false, encryption: false, systemd: false };
+    }
     return { perms: true, secrets: false, encryption: false, systemd: false };
   }
   return {

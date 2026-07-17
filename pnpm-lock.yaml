@@ -620,6 +620,9 @@ importers:
       '@graphorin/pricing':
         specifier: workspace:*
         version: link:../pricing
+      '@graphorin/provider':
+        specifier: workspace:*
+        version: link:../provider
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security

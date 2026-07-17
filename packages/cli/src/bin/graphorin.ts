@@ -260,7 +260,20 @@ function registerDoctorCommand(program: Command): void {
     .option('--check-secrets', 'Run the secrets-store check.')
     .option('--check-encryption', 'Run the audit-encryption check.')
     .option('--check-systemd', 'Run the systemd-hardening check (Linux only).')
-    .option('--all', 'Run every check.')
+    .option('--all', 'Run every host check (does not imply --smoke-local).')
+    .option(
+      '--smoke-local',
+      'Run the local-first smoke: native SQLite stack, write/reopen/search, Ollama reachability + models, embedding dimension, and (with --ollama-model) a streamed tool-call round-trip.',
+    )
+    .option(
+      '--ollama-base-url <url>',
+      'Ollama base URL for --smoke-local (default http://127.0.0.1:11434).',
+    )
+    .option('--ollama-model <name>', 'Chat model --smoke-local exercises end to end.')
+    .option(
+      '--embed-model <name>',
+      'Embedding model for the --smoke-local dimension probe (default nomic-embed-text).',
+    )
     .option('--json', 'Emit a structured JSON report on stdout.')
     .action(
       async (opts: {
@@ -271,6 +284,10 @@ function registerDoctorCommand(program: Command): void {
         checkEncryption?: boolean;
         checkSystemd?: boolean;
         all?: boolean;
+        smokeLocal?: boolean;
+        ollamaBaseUrl?: string;
+        ollamaModel?: string;
+        embedModel?: string;
         json?: boolean;
       }) => {
         await runDoctor({
@@ -281,6 +298,10 @@ function registerDoctorCommand(program: Command): void {
           ...(opts.checkEncryption !== undefined ? { checkEncryption: opts.checkEncryption } : {}),
           ...(opts.checkSystemd !== undefined ? { checkSystemd: opts.checkSystemd } : {}),
           ...(opts.all !== undefined ? { all: opts.all } : {}),
+          ...(opts.smokeLocal !== undefined ? { smokeLocal: opts.smokeLocal } : {}),
+          ...(opts.ollamaBaseUrl !== undefined ? { ollamaBaseUrl: opts.ollamaBaseUrl } : {}),
+          ...(opts.ollamaModel !== undefined ? { ollamaModel: opts.ollamaModel } : {}),
+          ...(opts.embedModel !== undefined ? { embedModel: opts.embedModel } : {}),
           ...(opts.json !== undefined ? { json: opts.json } : {}),
         });
       },

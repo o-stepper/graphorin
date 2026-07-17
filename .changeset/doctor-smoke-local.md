@@ -1,0 +1,5 @@
+---
+"@graphorin/cli": minor
+---
+
+`graphorin doctor --smoke-local` - the local-first first-run smoke (external audit 2026-07-16, item 6). Exercises the exact stack a new local deployment depends on, through the same code paths the framework uses at runtime: the native SQLite stack (`better-sqlite3` binding + `sqlite-vec`, with the pnpm-10 skipped-build failure surfaced as the actionable `SqliteNativeBindingError` hint), a write / close / reopen / search round-trip against a throwaway store (FTS-only, no models needed), Ollama daemon reachability and model inventory (`--ollama-model` asserts presence), one real `/api/embed` probe reporting the embedding dimension (`--embed-model`, default `nomic-embed-text`), and - with `--ollama-model` - a streamed tool-call round-trip through the real `ollamaAdapter` (`think: false`) that reports the server's load / prompt-eval / generation timings. An unreachable daemon degrades to warn + skip so storage-only machines still get a verdict. `--smoke-local` alone runs only the smoke; it composes with `--check-*` / `--all` and is deliberately not implied by `--all` (CI hosts without a daemon keep `--all` unchanged).
