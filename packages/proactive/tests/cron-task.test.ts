@@ -360,3 +360,86 @@ describe('createProactiveCronTask - fires', () => {
     expect(scheduler.declarations.size).toBe(0);
   });
 });
+
+describe('createProactiveCronTask - scheduler wiring + fire error path (coverage leg)', () => {
+  it('start() registers the cron declaration and the trigger callback drives a real fire', async () => {
+    const provider = createMockProvider({
+      modelId: 'task-model',
+      scripts: [textScript('Sweep done - nothing stale.')],
+    });
+    const agent = createAgent({ name: 'wired-task', instructions: 'x', provider });
+    const scheduler = createStubScheduler();
+    const outcomes: ProactiveOutcome[] = [];
+    const task = createProactiveCronTask({
+      id: 'nightly-wired',
+      agent,
+      scheduler,
+      schedule: { cron: '0 3 * * *' },
+      prompt: 'sweep',
+      provider,
+      onOutcome: (o) => {
+        outcomes.push(o);
+      },
+      warn: silentWarn,
+    });
+    await task.start();
+    const declaration = scheduler.declarations.get('nightly-wired');
+    expect(declaration?.kind).toBe('cron');
+    declaration?.callback();
+    await vi.waitFor(() => {
+      expect(outcomes.length).toBe(1);
+    });
+    expect(provider.scriptsConsumed()).toBe(1);
+  });
+
+  it('a throwing onOutcome observer is warned by the deliver guard; the outcome still lands', async () => {
+    const provider = createMockProvider({
+      modelId: 'task-model',
+      scripts: [textScript('Report ready.')],
+    });
+    const agent = createAgent({ name: 'exploding-sink', instructions: 'x', provider });
+    const warn = vi.fn();
+    const task = createProactiveCronTask({
+      id: 'nightly-exploding',
+      agent,
+      scheduler: createStubScheduler(),
+      schedule: { cron: '0 3 * * *' },
+      prompt: 'sweep',
+      provider,
+      onOutcome: () => {
+        throw new Error('sink exploded');
+      },
+      warn,
+    });
+    const result = await task.fire();
+    expect(result.outcome?.kind).toBe('notify');
+    expect(result.runError).toBeUndefined();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('onOutcome observer threw'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('sink exploded'));
+  });
+
+  it('an agent that rejects mid-fire lands in the fire catch: runError + warn', async () => {
+    const provider = createMockProvider({ modelId: 'task-model', scripts: [] });
+    const agent = createAgent({ name: 'rejecting-task', instructions: 'x', provider });
+    // A run() rejection (not a failed result) is the catch's territory -
+    // simulate the pinned-provider agent throwing synchronously.
+    const throwingAgent = Object.create(agent) as typeof agent;
+    throwingAgent.run = () => Promise.reject(new Error('provider melted'));
+    const warn = vi.fn();
+    const task = createProactiveCronTask({
+      id: 'nightly-melting',
+      agent: throwingAgent,
+      scheduler: createStubScheduler(),
+      schedule: { cron: '0 3 * * *' },
+      prompt: 'sweep',
+      provider,
+      warn,
+    });
+    const result = await task.fire();
+    expect(result.outcome).toBeUndefined();
+    expect(result.runError?.code).toBe('fire-threw');
+    expect(result.runError?.message).toContain('provider melted');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('fire threw'));
+    expect(task.status().failures).toBe(1);
+  });
+});
