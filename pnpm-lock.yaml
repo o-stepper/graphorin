@@ -71,6 +71,30 @@ importers:
         specifier: ^3.2.6
         version: 3.2.6(@types/debug@4.1.13)(@types/node@22.19.17)(tsx@4.21.0)(yaml@2.9.0)
 
+  benchmarks/conformance:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/pricing':
+        specifier: workspace:*
+        version: link:../../packages/pricing
+      '@graphorin/security':
+        specifier: workspace:*
+        version: link:../../packages/security
+      '@graphorin/server':
+        specifier: workspace:*
+        version: link:../../packages/server
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+
   benchmarks/cost:
     dependencies:
       '@graphorin/agent':
