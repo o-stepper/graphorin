@@ -137,9 +137,9 @@ Graphorin is built as a stack of focused packages. Each layer depends only on th
 
 ```
 Tier 6  Standalone server + DX     @graphorin/server · cli · protocol · client
-Tier 5  Runtime                    @graphorin/agent · workflow
+Tier 5  Runtime                    @graphorin/agent · workflow · proactive
 Tier 4  Memory & Sessions          @graphorin/memory · sessions
-Tier 3  External surface           @graphorin/tools · skills · mcp
+Tier 3  External surface           @graphorin/tools · skills · mcp · channels
 Tier 2  Persistence + Provider     @graphorin/store-sqlite · embedder-* · triggers · provider
 Tier 1  Cross-cutting              @graphorin/security · observability · pricing
 Tier 0  Foundation                 @graphorin/core (types · contracts · utilities · ESM-only)
@@ -166,10 +166,12 @@ The framework is published as a set of focused packages on the npm registry unde
 | `@graphorin/tools` | Typed tool definitions and execution. |
 | `@graphorin/skills` | `SKILL.md` packaging-format-compatible loader with three-tier progressive disclosure. |
 | `@graphorin/mcp` | Model Context Protocol client (stdio + Streamable HTTP). |
+| `@graphorin/channels` | Channel SPI + gateway runtime for messenger front doors - identity routing, pairing, trust boundary. |
 | `@graphorin/memory` | Six-tier memory system with consolidation pipeline. |
 | `@graphorin/sessions` | Hybrid session facade, agent registry, handoffs, JSONL export, replay. |
 | `@graphorin/agent` | Agent runtime. |
 | `@graphorin/workflow` | Durable workflow engine. |
+| `@graphorin/proactive` | Proactivity layer - heartbeat runner and cron-leg tasks emitting the typed escalation ladder. |
 | `@graphorin/server` | Optional standalone server with REST + WebSocket + SSE fallback. |
 | `@graphorin/cli` | Operator CLI. |
 | `@graphorin/protocol` | WebSocket protocol contract - `graphorin.protocol.v1`. |
