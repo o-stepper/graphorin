@@ -3,8 +3,8 @@
  *
  * Surface (per Phase 15 § Memory):
  *
- *  - `graphorin memory status` - counts + active embedder + migration
- *    state. Pure read-only inspection of the SQLite store.
+ *  - `graphorin memory status` - counts + registered embedders. Pure
+ *    read-only inspection of the SQLite store.
  *  - `graphorin memory migrate --from <embedder> --to <embedder>
  *    --strategy <lock-on-first|auto-migrate|multi-active>` - embedder
  *    swap. The runner itself lives in `@graphorin/memory`
