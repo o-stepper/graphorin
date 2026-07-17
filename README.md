@@ -67,7 +67,7 @@ Graphorin is currently on the **`v0.12.0`** pre-release line, **published on the
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.12.0** (2026-07-17) - the local-first first-run release: `graphorin doctor --smoke-local` verifies the whole local stack (native SQLite bindings, a write/reopen/search round-trip, Ollama reachability, embedding dimension, and a streamed tool-call through the real adapter) before you write any code; Ollama server timings surface in events and traces (`providerMetadata.ollama`), so a cold model load no longer looks like slow generation; and the providers guide gains a measured `qwen3:8b-q4_K_M` profile for Apple Silicon. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-10-x-0-11-0) for upgrade notes.
+Latest release: **0.12.0** (2026-07-17) - the durable-approvals release: a run parked on human approval now **survives a server restart** (the new `suspended_runs` sidecar + the `Agent.serializeState`/`deserializeState` codec mean the approve button keeps working after a redeploy); `/v1/metrics` is authenticated by default (`admin:metrics:read`); the server states its plaintext-HTTP posture and takes a `server.tlsTerminatedUpstream` acknowledgement for reverse-proxy deployments; and `graphorin token revoke` prints the verifier-cache propagation window. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-11-0-0-12-0) for upgrade notes.
 
 ## Use cases
 
