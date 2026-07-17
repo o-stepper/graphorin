@@ -152,6 +152,48 @@ jobs:
   # Runs on ubuntu only by design: the examples exercise the framework's
   # public API surface, which the 3-OS matrix above already covers; the
   # smoke adds API-regression signal, not platform signal.
+  # Coverage-threshold enforcement (prod-readiness item 3): every package
+  # declares vitest coverage thresholds, but a threshold only bites when
+  # `--coverage` actually runs - without this job coverage could regress
+  # green forever. One ubuntu leg is the signal; the OS matrix legs stay
+  # instrumentation-free. GRAPHORIN_COVERAGE=1 skips the p95 latency
+  # canaries (security), which measure nothing under V8 instrumentation.
+  coverage:
+    name: Coverage thresholds
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      # Own cache stream: the --coverage args change every task hash, so
+      # sharing the matrix legs' cache would only thrash their entries.
+      - name: Turbo cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-coverage-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-coverage-turbo-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Test with coverage thresholds
+        shell: bash
+        env:
+          GRAPHORIN_COVERAGE: '1'
+        run: pnpm exec turbo run test -- --coverage --testTimeout=30000
+
   examples-smoke:
     name: Examples smoke (stub recipe)
     runs-on: ubuntu-latest

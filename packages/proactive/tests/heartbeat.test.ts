@@ -369,3 +369,69 @@ describe('createHeartbeat - beat behaviour', () => {
     expect(scheduler.declarations.size).toBe(0);
   });
 });
+
+describe('createHeartbeat - scheduler wiring + observer resilience (coverage leg)', () => {
+  it('start() registers the schedule and the trigger callback drives a real beat (interval + cron)', async () => {
+    const { provider, agent } = makeAgent([textScript('Fridge is empty - buy milk.')]);
+    const scheduler = createStubScheduler();
+    const outcomes: ProactiveOutcome[] = [];
+    const heartbeat = createHeartbeat({
+      agent,
+      scheduler,
+      schedule: { every: 60_000 },
+      checklist: () => 'check the fridge',
+      onOutcome: (o) => {
+        outcomes.push(o);
+      },
+      warn: silentWarn,
+    });
+    await heartbeat.start();
+    const declaration = scheduler.declarations.get(heartbeat.id);
+    expect(declaration?.kind).toBe('interval');
+    // The scheduler firing the trigger must run the SAME beat path as
+    // heartbeat.beat() - invoke the registered callback directly.
+    declaration?.callback();
+    await waitFor(() => outcomes.length === 1);
+    expect(provider.scriptsConsumed()).toBe(1);
+
+    // The cron-schedule variant registers a cron declaration wired the
+    // same way.
+    const cronSide = makeAgent([textScript('Nightly: nothing to report.')]);
+    const cronOutcomes: ProactiveOutcome[] = [];
+    const cronHeartbeat = createHeartbeat({
+      agent: cronSide.agent,
+      scheduler,
+      schedule: { cron: '0 3 * * *' },
+      checklist: () => 'nightly sweep',
+      onOutcome: (o) => {
+        cronOutcomes.push(o);
+      },
+      warn: silentWarn,
+    });
+    await cronHeartbeat.start();
+    const cronDeclaration = scheduler.declarations.get(cronHeartbeat.id);
+    expect(cronDeclaration?.kind).toBe('cron');
+    cronDeclaration?.callback();
+    await waitFor(() => cronOutcomes.length === 1);
+    expect(cronSide.provider.scriptsConsumed()).toBe(1);
+  });
+
+  it('a throwing onOutcome observer is warned and the beat still returns its outcome', async () => {
+    const { agent } = makeAgent([textScript('Milk is low.')]);
+    const warn = vi.fn();
+    const heartbeat = createHeartbeat({
+      agent,
+      scheduler: createStubScheduler(),
+      schedule: { every: 60_000 },
+      checklist: () => 'check the fridge',
+      onOutcome: () => {
+        throw new Error('observer exploded');
+      },
+      warn,
+    });
+    const result = await heartbeat.beat();
+    expect(result.outcome?.kind).toBe('notify');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('onOutcome observer threw'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('observer exploded'));
+  });
+});
