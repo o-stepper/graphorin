@@ -170,7 +170,7 @@ The `examples/github-actions/` folder ships CI/CD workflow **templates** for a d
 
 ## TLS termination
 
-Graphorin serves **plaintext HTTP only** - there is deliberately no in-process TLS. Front the server with a TLS-terminating reverse proxy (Caddy, nginx, an ingress controller); every template in this guide assumes one. A non-loopback bind logs a startup WARN until you acknowledge the proxy with `server.tlsTerminatedUpstream: true` in the config (the flag records intent and silences the warning - it changes no runtime behaviour). While you are wiring the proxy: `/v1/metrics` requires the `admin:metrics:read` scope by default (since 0.11.0), so give your Prometheus scrape job a token via `authorization.credentials_file` or explicitly opt out with `metrics.requireAuth: false` on trusted networks.
+Graphorin serves **plaintext HTTP only** - there is deliberately no in-process TLS. Front the server with a TLS-terminating reverse proxy (Caddy, nginx, an ingress controller); every template in this guide assumes one. A non-loopback bind logs a startup WARN until you acknowledge the proxy with `server.tlsTerminatedUpstream: true` in the config (the flag records intent and silences the warning - it changes no runtime behaviour). While you are wiring the proxy: `/v1/metrics` requires the `admin:metrics:read` scope by default (since 0.12.0), so give your Prometheus scrape job a token via `authorization.credentials_file` or explicitly opt out with `metrics.requireAuth: false` on trusted networks.
 
 ## Health checks
 

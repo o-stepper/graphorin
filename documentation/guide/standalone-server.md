@@ -312,7 +312,7 @@ windows.
 
 ## Prometheus metrics
 
-`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted. With `metrics.requireAuth = true` (the default since 0.11.0) the endpoint mounts behind the standard auth boundary and requires the `admin:metrics:read` scope (an `admin:*` grant matches) - point your scraper at the endpoint with an `Authorization: Bearer <token>` header (Prometheus: `authorization.credentials_file`). Setting `requireAuth = false` serves the exposition unauthenticated for trusted-network scrapes; on a non-loopback bind the server logs a WARN because the labels leak operational detail (trigger ids, consolidator budgets).
+`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted. With `metrics.requireAuth = true` (the default since 0.12.0) the endpoint mounts behind the standard auth boundary and requires the `admin:metrics:read` scope (an `admin:*` grant matches) - point your scraper at the endpoint with an `Authorization: Bearer <token>` header (Prometheus: `authorization.credentials_file`). Setting `requireAuth = false` serves the exposition unauthenticated for trusted-network scrapes; on a non-loopback bind the server logs a WARN because the labels leak operational detail (trigger ids, consolidator budgets).
 
 ## Configuration
 

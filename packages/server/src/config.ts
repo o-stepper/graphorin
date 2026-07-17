@@ -173,7 +173,7 @@ export interface ServerConfigSpec {
     readonly path: string;
     /**
      * Require a verified token with `admin:metrics:read` on the
-     * exposition endpoint. Default `true` since 0.11.0: the exposition
+     * exposition endpoint. Default `true` since 0.12.0: the exposition
      * leaks operational intel (trigger ids in labels, consolidator
      * budgets), so scraping is authenticated unless the operator
      * explicitly opts out for a trusted network.
@@ -410,7 +410,7 @@ const metricsSchema = z
   .object({
     enabled: z.boolean().default(true),
     path: z.string().default('/metrics'),
-    // IP-23 hardening: authenticated exposition by default since 0.11.0
+    // IP-23 hardening: authenticated exposition by default since 0.12.0
     // (the labels leak trigger ids + consolidator budgets). Opt out
     // explicitly for trusted-network scrapes.
     requireAuth: z.boolean().default(true),
