@@ -1,0 +1,1040 @@
+{
+  "results": [
+    {
+      "caseId": "0862e8bf_abs",
+      "input": {
+        "question": "What is the name of my hamster?",
+        "askedAt": "2023/05/30 (Tue) 21:39",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. While I have records of conversations about your cat Luna and various other topics, there is no mention of a hamster or its name in the available memory.",
+      "durationMs": 2082,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "15745da0_abs",
+      "input": {
+        "question": "How long have I been collecting vintage films?",
+        "askedAt": "2023/05/30 (Tue) 23:02",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on your memory, I can see that you've been collecting **vintage cameras** for three months (as of May 28, 2023), but there is no record of you collecting vintage films. You have attended film festivals and watched documentaries, but vintage film collection is not mentioned in your stored information.",
+      "durationMs": 1778,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "bc8a6e93_abs",
+      "input": {
+        "question": "What did I bake for my uncle's birthday party?",
+        "askedAt": "2023/05/30 (Tue) 15:26",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nAccording to my records, you mentioned baking a **lemon blueberry cake for your niece's birthday party** (on 2023/05/23), which was a huge hit. However, I don't have any information about what you baked for your uncle's birthday party.",
+      "durationMs": 1770,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "19b5f2b3_abs",
+      "input": {
+        "question": "How long was I in Korea for?",
+        "askedAt": "2023/05/30 (Tue) 17:14",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. While you mentioned thinking about visiting the Demilitarized Zone (DMZ) between North and South Korea and exploring Seoul, there is no record of you actually taking a trip to Korea or how long you stayed there.",
+      "durationMs": 1773,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "29f2956b_abs",
+      "input": {
+        "question": "How much time do I dedicate to practicing violin every day?",
+        "askedAt": "2023/05/30 (Tue) 20:28",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. There is no record of you discussing your violin practice routine or how much time you dedicate to it daily.",
+      "durationMs": 1511,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "f4f1d8a4_abs",
+      "input": {
+        "question": "What did my dad gave me as a birthday gift?",
+        "askedAt": "2023/05/30 (Tue) 21:51",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. While I can see that you mentioned it's your birthday and that you're planning to treat yourself to a special dress, there is no record of a birthday gift from your dad in the memories available to me.",
+      "durationMs": 1655,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "88432d0a_abs",
+      "input": {
+        "question": "How many times did I bake egg tarts in the past two weeks?",
+        "askedAt": "2023/05/30 (Tue) 23:40",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. There is no record of you baking egg tarts in the past two weeks.",
+      "durationMs": 1243,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "80ec1f4f_abs",
+      "input": {
+        "question": "How many different museums or galleries did I visit in December?",
+        "askedAt": "2023/03/03 (Fri) 23:44",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. The memory provided does not contain any records of you visiting museums or galleries in December. The conversations documented are from March 3, 2023, and mention a visit to the Modern Art Museum in January, but there is no information about December visits to museums or galleries.",
+      "durationMs": 1864,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "eeda8a6d_abs",
+      "input": {
+        "question": "How many fish are there in my 30-gallon tank?",
+        "askedAt": "2023/05/30 (Tue) 19:56",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. Based on the records I have, you've mentioned having:\n\n- A **10-gallon tank** with your betta fish, **Bubbles**\n- A **20-gallon tank** with **gouramis**, and you were planning to add schooling fish like lemon tetras or zebra danios\n\nHowever, I don't have any information about a 30-gallon tank or how many fish are in it. Could you tell me more about your 30-gallon tank setup?",
+      "durationMs": 2151,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "60bf93ed_abs",
+      "input": {
+        "question": "How many days did it take for my iPad case to arrive after I bought it?",
+        "askedAt": "2023/01/24 (Tue) 23:58",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. There is no record of you purchasing an iPad case or details about its delivery timeline.",
+      "durationMs": 1271,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "edced276_abs",
+      "input": {
+        "question": "How many days did I spend in total traveling in Hawaii and in Seattle?",
+        "askedAt": "2023/05/30 (Tue) 20:59",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nWhile I can see that you took an island-hopping trip to Hawaii with your family, there is no record of the specific number of days you spent there. Additionally, there is no mention of a trip to Seattle in your memory.\n\nIf you'd like to tell me about these trips, I'd be happy to remember that information for future reference!",
+      "durationMs": 2149,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "gpt4_372c3eed_abs",
+      "input": {
+        "question": "How many years in total did I spend in formal education from high school to the completion of my Master's degree?",
+        "askedAt": "2023/08/20 (Sun) 23:54",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on what I can recall from our conversations, I know that:\n- You attended Arcadia High School from 2010 to 2014 (4 years)\n- You graduated with a Bachelor's in Computer Science from UCLA in 2020, which took you 4 years to complete\n- You were considering pursuing a Master's degree in Computer Science\n\nHowever, I don't have information about whether you completed a Master's degree or how long it took. Without that information, I cannot calculate the total years you spent in formal education from high school through the completion of a Master's degree.",
+      "durationMs": 2314,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2311e44b_abs",
+      "input": {
+        "question": "How many pages do I have left to read in 'Sapiens'?",
+        "askedAt": "2023/05/30 (Tue) 18:25",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information. Based on my memory, I know that you've been reading \"Sapiens\" at a pace of 10-20 pages a week, but I don't have any record of how many pages you've completed or how many pages remain in the book. To find out how many pages you have left, you could check your current bookmark position or look up the total page count of your edition and subtract the pages you've already read.",
+      "durationMs": 2217,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "6456829e_abs",
+      "input": {
+        "question": "How many plants did I initially plant for tomatoes and chili peppers?",
+        "askedAt": "2023/05/30 (Tue) 14:24",
+        "ability": "abstention"
+      },
+      "output": "Based on my memory, I have information about your tomato plants, but not about chili peppers.\n\nYou initially planted **5 tomato plants**, and they've been producing abundantly with daily harvests that you've been using in salads, sandwiches, and cooking.\n\nHowever, I do not have any information in my memory about how many chili pepper plants you initially planted.",
+      "durationMs": 2189,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "e5ba910e_abs",
+      "input": {
+        "question": "What is the total cost of my recently purchased headphones and the iPad?",
+        "askedAt": "2023/05/30 (Tue) 17:19",
+        "ability": "abstention"
+      },
+      "output": "I do not have information about an iPad purchase in your memory. \n\nHowever, I can tell you about your headphones: You purchased Sony WH-1000XM4 headphones for **$378**.\n\nTo answer your question about the total cost of both items, I would need information about the iPad purchase, which is not present in your memory records.",
+      "durationMs": 1927,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "a96c20ee_abs",
+      "input": {
+        "question": "At which university did I present a poster for my undergrad course research project?",
+        "askedAt": "2023/05/30 (Tue) 12:03",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can see that you presented a poster on your thesis research at your first research conference over the summer (2023), and you visited Harvard University to attend a research conference where you saw interesting projects on AI in education. However, there is no information about presenting a poster for an undergrad course research project or which university that was at.",
+      "durationMs": 2025,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "ba358f49_abs",
+      "input": {
+        "question": "How old will Rachel be when I get married?",
+        "askedAt": "2023/05/30 (Tue) 22:29",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nWhile I can see that you mentioned your friend Rachel is getting married next year (from your May 22nd note), I don't have any information about:\n- Rachel's current age\n- When you plan to get married\n- Any other details about your future wedding plans\n\nTo answer your question, I would need information about both Rachel's age and your own wedding timeline.",
+      "durationMs": 2067,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "09ba9854_abs",
+      "input": {
+        "question": "How much will I save by taking the bus from the airport to my hotel instead of a taxi?",
+        "askedAt": "2023/05/30 (Tue) 22:56",
+        "ability": "abstention"
+      },
+      "output": "Based on the information in my memory, here's what I can tell you about the cost difference:\n\n**Taxi from the airport:**\n- From Haneda Airport: around ¥6,000 - ¥10,000 (around $55 - $90 USD) during daytime\n- From Narita Airport: around ¥15,000 - ¥20,000 (around $140 - $180 USD) during daytime\n\n**Airport Limousine Bus:**\n- From Haneda Airport: approximately ¥1,000 - ¥2,000 (around $10 - $20 USD)\n- From Narita Airport: approximately ¥3,200 (around $29 USD)\n\n**Savings:**\n- From Haneda: You would save approximately $35 - $80 USD by taking the bus instead of a taxi\n- From Narita: You would save approximately $110 - $150 USD by taking the bus instead of a taxi\n\nThe bus is significantly more affordable than a taxi, especially from Narita Airport. The Airport Limousine Bus is",
+      "durationMs": 3755,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "failed to abstain on an unanswerable question"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "gpt4_70e84552_abs",
+      "input": {
+        "question": "Which task did I complete first, fixing the fence or purchasing three cows from Peter?",
+        "askedAt": "2023/05/21 (Sun) 10:40",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information. According to my memory, you mentioned fixing a broken fence on the east side of your property about three weeks ago (around late April/early May 2023), where your goats like to graze. However, I have no record of you purchasing three cows from Peter in our conversation history.",
+      "durationMs": 1687,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "gpt4_93159ced_abs",
+      "input": {
+        "question": "How long have I been working before I started my current job at Google?",
+        "askedAt": "2023/05/30 (Tue) 18:54",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory.\n\nBased on the memory provided, I know that you are a software engineer with a degree in Computer Science from the University of California, Berkeley, and that you've been working at **NovaTech** for about 4 years and 3 months. However, there is no information about how long you worked before starting at NovaTech, nor is there any mention of you working at Google.",
+      "durationMs": 2164,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "982b5123_abs",
+      "input": {
+        "question": "When did I book the Airbnb in Sacramento?",
+        "askedAt": "2023/05/27 (Sat) 17:10",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can see that you stayed in Haight-Ashbury (in San Francisco, not Sacramento) for your best friend's wedding and had to book three months in advance, but there is no record of you booking an Airbnb in Sacramento.",
+      "durationMs": 1523,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "c8090214_abs",
+      "input": {
+        "question": "How many days before I bought my iPad did I attend the Holiday Market?",
+        "askedAt": "2023/05/30 (Tue) 05:17",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in your memory. While I can see that you attended the annual Holiday Market at the local mall a week before Black Friday, there is no record of when you purchased an iPad, so I cannot calculate how many days before that purchase you attended the Holiday Market.",
+      "durationMs": 1420,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "gpt4_c27434e8_abs",
+      "input": {
+        "question": "Which project did I start first, the Ferrari model or the Porsche 991 Turbo S model?",
+        "askedAt": "2023/05/23 (Tue) 11:26",
+        "ability": "abstention"
+      },
+      "output": "I do not have information about a Porsche 991 Turbo S model in your memory. Based on the memory provided, I can only confirm that you started your Ferrari 288 GTO model about three weeks ago (around early May 2023) on a Sunday afternoon. There is no mention of a Porsche 991 Turbo S project in your records.",
+      "durationMs": 1787,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "gpt4_fe651585_abs",
+      "input": {
+        "question": "Who became a parent first, Tom or Alex?",
+        "askedAt": "2023/03/17 (Fri) 03:09",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nWhile I have a record that your cousin Alex adopted a baby girl from China in January 2023, I don't have any information about Tom or when Tom became a parent. To answer your question about who became a parent first, I would need additional details about Tom that aren't present in my memory.",
+      "durationMs": 1479,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "6aeb4375_abs",
+      "input": {
+        "question": "How many Italian restaurants have I tried in my city?",
+        "askedAt": "2023/06/15 (Thu) 13:37",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can see that you've mentioned trying Korean restaurants in your city (you've tried four different ones as of May 26, 2023), but there is no record of you discussing Italian restaurants that you've tried in Denver or any other city.",
+      "durationMs": 1821,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "031748ae_abs",
+      "input": {
+        "question": "How many engineers do I lead when I just started my new role as Software Engineer Manager?",
+        "askedAt": "2023/06/06 (Tue) 08:19",
+        "ability": "abstention"
+      },
+      "output": "Based on the memory provided, I don't have information about you starting a new role as Software Engineer Manager.\n\nHowever, I do have information about your role as **Senior Software Engineer**. According to your memory from May 27, 2023, you mentioned that you lead a team of **five engineers** in your role as Senior Software Engineer, and you've been enjoying this role for a while.\n\nIf you've recently transitioned to a new role as Software Engineer Manager, I don't have that information in my memory yet. Could you clarify if this is a new position you're moving into, or if you're asking about your current Senior Software Engineer role?",
+      "durationMs": 2266,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2698e78f_abs",
+      "input": {
+        "question": "How often do I see Dr. Johnson?",
+        "askedAt": "2023/06/16 (Fri) 16:18",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nHowever, I do have information about **Dr. Smith**, whom you see **every week** for therapy sessions. You've mentioned working with her on setting healthy boundaries and prioritizing tasks.\n\nIs it possible you meant Dr. Smith, or would you like to tell me about Dr. Johnson?",
+      "durationMs": 4922,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2133c1b5_abs",
+      "input": {
+        "question": "How long have I been living in my current apartment in Shinjuku?",
+        "askedAt": "2023/10/15 (Sun) 10:21",
+        "ability": "abstention"
+      },
+      "output": "I don't have that information. According to my memory, you've been living in a studio apartment in **Harajuku** (not Shinjuku) for about a month as of April 11, 2023, and you mentioned being in Harajuku for 3 months as of October 3, 2023. However, I don't have any information about you living in Shinjuku.",
+      "durationMs": 2190,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "0ddfec37_abs",
+      "input": {
+        "question": "How many autographed football have I added to my collection in the first three months of collection?",
+        "askedAt": "2023/06/07 (Wed) 08:31",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nAccording to the memory I have, you've been collecting autographed **baseballs** (not footballs), and you mentioned adding 20 autographed baseballs to your collection in the past few months as of May 22, 2023. However, I don't have specific information about autographed footballs in your collection.",
+      "durationMs": 1706,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "f685340e_abs",
+      "input": {
+        "question": "How often do I play table tennis with my friends at the local park?",
+        "askedAt": "2023/06/19 (Mon) 04:29",
+        "ability": "abstention"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can see that you play **tennis** (not table tennis) with your friends at the local park. According to your notes, you mentioned playing tennis \"every other week\" at the local park on Sundays, but I don't have any information about table tennis sessions.",
+      "durationMs": 2037,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "reason": "correctly abstained"
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 30,
+    "passed": 28,
+    "failed": 2,
+    "avgDurationMs": 2024.7666666666667,
+    "byScorer": {
+      "llm-judge-j": {
+        "passed": 28,
+        "failed": 2,
+        "avgScore": 0.8933333333333333
+      },
+      "abstention": {
+        "passed": 29,
+        "failed": 1,
+        "avgScore": 0.9666666666666667
+      }
+    },
+    "passRateCi": {
+      "lo": 0.7867618227892791,
+      "hi": 0.9815233646723066
+    }
+  },
+  "benchConfig": {
+    "mode": "memory",
+    "retrieval": "default",
+    "embedder": "none",
+    "conflictPipeline": "off",
+    "topK": 12,
+    "consolidate": false,
+    "provider": "openai-compatible:claude-haiku-4-5",
+    "judge": "ollama:qwen3:8b-q4_K_M",
+    "selfJudged": false,
+    "iterations": 1,
+    "loader": "longmemeval",
+    "variant": "S",
+    "ability": "abstention",
+    "maxCostUsd": 5
+  },
+  "aggregates": {
+    "passRates": [0.9333333333333333],
+    "passRateMean": 0.9333333333333333,
+    "passRateStddev": 0,
+    "abstentionRate": 0.9666666666666667
+  }
+}

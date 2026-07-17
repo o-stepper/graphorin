@@ -51,11 +51,34 @@ multi-session | temporal | knowledge-update | abstention`.
    (evals-01/02) - every report stamps its `benchConfig`, so a hybrid run can
    never be confused with an FTS-only one.
 
-3. Review, then copy the emitted `reports/<loader>.<ability>.json` here as
-   `<loader>.<ability>.json` and commit it. Subsequent runs gate against it.
+3. **Strip the report before committing**: a real-provider report embeds
+   every case's full `haystackSessions` (~0.5 MB per case, 16-83 MB per
+   ability) - far past git sanity and biome's 1 MiB cap, and the
+   regression gate reads none of it (`detectRegressions` needs
+   `summary`, `results[].caseId`, `results[].scores`, durations).
+
+   ```bash
+   node benchmarks/longmemeval/scripts/strip-baseline.mjs \
+     benchmarks/longmemeval/baselines/<loader>.<ability>.json
+   ```
+
+4. Review, then copy the emitted `reports/<loader>.<ability>.json` here as
+   `<loader>.<ability>.json`, strip it, and commit it. Subsequent runs
+   gate against it.
 
 `reports/` holds ephemeral run output and is git-ignored; only the curated
-baselines in this directory are committed.
+(stripped) baselines in this directory are committed.
+
+## Committed live baselines (2026-07-17)
+
+The five `longmemeval.<ability>.json` files were seeded from a billed
+real-provider run: subject `openai-compatible:claude-haiku-4-5` (the
+Anthropic OpenAI-compat endpoint), judge `ollama:qwen3:8b-q4_K_M`
+(think-off), `mode=memory retrieval=default embedder=none topK=12` -
+each file's `benchConfig` records it. Headline pass rates:
+info-extraction 118/150, multi-session 61/121, temporal 75/127,
+knowledge-update 56/72, abstention 28/30 (abstention rate 96.7%);
+338/500 (67.6%) overall.
 
 ## Full-context baseline (SOTA-1)
 
