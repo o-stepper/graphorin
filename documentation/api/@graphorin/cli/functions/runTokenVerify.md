@@ -10,7 +10,7 @@
 function runTokenVerify(options): TokenVerifyResult;
 ```
 
-Defined in: [packages/cli/src/commands/token.ts:334](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L334)
+Defined in: [packages/cli/src/commands/token.ts:339](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L339)
 
 Offline checksum verification. Confirms the structural shape, the
 environment marker, and the CRC checksum but does NOT consult the
