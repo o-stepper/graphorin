@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-approval-workflow",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "description": "Workflow HITL durable-resume demo for the Graphorin framework. Demonstrates @graphorin/workflow pause()/Directive(resume) lifecycle on an expense-approval pipeline that survives simulated server restart mid-pause, with all stream modes and every WorkflowEvent variant exercised end-to-end. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

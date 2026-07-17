@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/evals",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Eval framework for the Graphorin framework. Ships scorer libraries (`code/` exact-match, regex, JSON path, predicates; `llm/` LLM-judge; `prebuilt/` toxicity / factuality / helpfulness), dataset loaders (JSONL, CSV, from-traces, generic iterable), reporters (terminal, markdown, JSON, JUnit XML), a parallel runner with `concurrency` config, and regression detection that compares the current run against a stored baseline. Builds on the eval primitives shipped from `@graphorin/observability` (RB-17 / DEC-152 - full orchestrator lives here, post-MVP, decoupled from the core observability bundle so consumers do not pay the dataset / reporter cost when only the inline runner is needed). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

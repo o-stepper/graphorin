@@ -20,14 +20,14 @@ pnpm --filter ./examples/approval-workflow dev
 Expected dev output:
 
 ```
-graphorin v0.12.0 approval-workflow auto - status=completed, approved=true, notifications=4.
-graphorin v0.12.0 approval-workflow manual - status=suspended, suspendedAtNode='auto-approve-or-pause'.
-graphorin v0.12.0 approval-workflow resume - status=completed, approved=true, processedAt='2026-…', notifications=4.
-graphorin v0.12.0 approval-workflow settle - parked on durable timer, status=suspended, node='hold-for-settlement', wakeAt=2026-07-04T12:00:00.080Z.
-graphorin v0.12.0 approval-workflow settle - durable timer fired via tick, fired=1, sweeps=5.
-graphorin v0.12.0 approval-workflow settle - parked on awakeable 'settlement-confirmed', status=suspended.
-graphorin v0.12.0 approval-workflow settle - awakeable resolved, status=completed, confirmedBy=finance-ops, reference=SET-2026-0117, log=2.
-graphorin v0.12.0 approval-workflow durable primitives: OK.
+graphorin v0.12.1 approval-workflow auto - status=completed, approved=true, notifications=4.
+graphorin v0.12.1 approval-workflow manual - status=suspended, suspendedAtNode='auto-approve-or-pause'.
+graphorin v0.12.1 approval-workflow resume - status=completed, approved=true, processedAt='2026-…', notifications=4.
+graphorin v0.12.1 approval-workflow settle - parked on durable timer, status=suspended, node='hold-for-settlement', wakeAt=2026-07-04T12:00:00.080Z.
+graphorin v0.12.1 approval-workflow settle - durable timer fired via tick, fired=1, sweeps=5.
+graphorin v0.12.1 approval-workflow settle - parked on awakeable 'settlement-confirmed', status=suspended.
+graphorin v0.12.1 approval-workflow settle - awakeable resolved, status=completed, confirmedBy=finance-ops, reference=SET-2026-0117, log=2.
+graphorin v0.12.1 approval-workflow durable primitives: OK.
 ```
 
 (Timestamps and the `sweeps=` count vary per run.)
@@ -301,4 +301,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.12.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.12.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

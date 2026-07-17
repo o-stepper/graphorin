@@ -18,7 +18,7 @@ pnpm --filter ./examples/structured-verifier dev
 Expected dev output:
 
 ```
-graphorin v0.12.0 structured-verifier - city='Tokyo', population=37400000, providerCalls=2, verifierRounds=1: OK
+graphorin v0.12.1 structured-verifier - city='Tokyo', population=37400000, providerCalls=2, verifierRounds=1: OK
 ```
 
 **What just happened?**
@@ -91,4 +91,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.12.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.12.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
