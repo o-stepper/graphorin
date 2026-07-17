@@ -14,6 +14,112 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.10.2 - 2026-07-17
+
+The documentation-reconciliation tail of the 2026-07 end-to-end
+campaign (PRs #188, #190, #191): small CLI contract fixes plus a sweep
+that reconciled every remaining doc-drift item against the shipped
+code.
+
+- **CLI** (`@graphorin/cli`): `triggers prune` requires an explicit
+  `--before` cutoff instead of silently no-opping (OPERATOR-01);
+  `memory review --json` for scripted triage (MEMORY-CL-02);
+  `secrets ref` threads `--secrets-source` / `--strict-secrets`
+  (SECRETS-S-03/04); `guard --help` names all five tiers.
+- **Provider** (`@graphorin/provider`): the OpenAI-compatible adapter
+  sends structured output as `json_schema` (LIVE-EVAL-01).
+- **Docs**: the agent-runtime filter table documents `bySensitivity` /
+  `stripSensitiveOutputs` as the coarse `[REDACTED:...]`-token
+  heuristics they are (AGENT-FIL-01/02/03); guide pages catch up with
+  the MEMORY-C-03 behavior shipped in 0.10.1; the channels guide shows
+  the real untrusted-content envelope attributes (`trust=` / `tool=` /
+  `origin=`); the imperative-scan budget is documented as 250 ms, not
+  5 ms (TOOLS-EX-02); the reconnect backoff and `ProtocolGuardConfig`
+  docstrings match the implementation (ORPHAN-SU-02, LATERAL-L-03).
+
+## 0.10.1 - 2026-07-16
+
+The **e2e-remediation release**: closes the 2026-07 end-to-end
+campaign over the released 0.9.0 / 0.10.0 line (PRs #184, #186, #187)
+with 37 fixes - three criticals, the P1 batches, and the P2 tail.
+Per-package details live in each package's `CHANGELOG.md`; observable
+behavior changes are in the migration guide.
+
+### Criticals
+
+- **STORE-SQ-02**: session erasure crashed (and rolled back) in the
+  default vec0 mode - the sidecar discovery scan matched vec0 SHADOW
+  tables, whose DELETE rejection aborted the whole cascade. The
+  GDPR-style erasure path works again, with a regression test on the
+  real vec0 path.
+- **MEMORY-C-01**: a working block written under a partial
+  (NULL session/agent) scope could never be mutated a second time (the
+  UNIQUE index treats NULLs as unequal); upserts now resolve rows
+  NULL-safely.
+- **WS-LIFECY-02**: graceful shutdown hung forever with a connected
+  WebSocket client; `dispatcher.shutdown()` now closes sockets with
+  the documented `4007` close code and `stop()` gains a drain-budget
+  force-close.
+
+### Agent, provider & cost
+
+- **R-01**: `RunBudget.maxCostUsd` enforces - `withCostTracking`
+  stamps the computed cost onto run usage (previously it only reached
+  the `onUsage` hook, leaving the ceiling inert).
+- **PROVIDER-CT-01**: tiktoken-backed counters no longer throw on
+  special-token sequences such as `<|endoftext|>`.
+- **PROVIDER-01**: cached reads bill at the input rate when the price
+  entry has no cached-read rate (was billed at $0).
+- **T3**: reasoning / local-adapter defect batch; **MODEL-FAL-01**:
+  the gpt-4o family classifies correctly.
+- **ORPHAN-SU-03**: concurrent OAuth `refresh()` calls share one
+  rotation (one audit row / lifecycle event / rotation hook);
+  **OAUTH-ADV-01/02**: DCR and device-authorization failures carry the
+  RFC `error` / `error_description`.
+- **LATERAL-L-01**: the default lateral-leak denial catalogue is no
+  longer inert.
+
+### Memory & sessions
+
+- **MEMORY-C-02**: exact dedup works without an embedder (FTS
+  fallback); **MEMORY-C-03**: the compaction default is gated on
+  `providerContextWindow` - a bare `createMemory()` is off and silent
+  instead of warning on every construction; **MEMORY-R-02**: a
+  malformed fusion weight is coerced instead of crashing search;
+  **BUFFER-N-01**: invalid consolidator trigger specs warn at
+  construction.
+- **SESSIONS-01**: session reads are scoped by `userId`.
+- **SESSION-R-01/02/03**: session replay reproduces the run
+  (routing-id sensitivity + internal minTier default), and a null
+  cassette body throws a typed error.
+
+### Server, workflow, security & tooling
+
+- **TOKENS-RE-01**: `DELETE /v1/tokens/:id` invalidates the verifier
+  LRU immediately (a warm token no longer authenticates for up to
+  60 s); **SERVER-C-01**: workflow endpoints return the documented
+  error envelope; **SERVER-CH-01**: a failed `start()` unwinds its
+  daemons and `stop()` is a no-op afterwards; **SERVER-DO-01**:
+  `/v1/health` surfaces the orphaned-trigger count.
+- **WORKFLOW-01**: the timer driver re-arms at the earliest future
+  wake; **TRIGGERS-01**: disabled triggers no longer fire via
+  `emit()` / manual `fire()`.
+- **SECRETS-S-01/S-02**: denied `ctx.secrets` access is audited, and
+  `GRAPHORIN_MASTER_PASSPHRASE` activates the encrypted-file store
+  from the CLI; **TOOL-AUDI-01**: the durable-HITL approval lifecycle
+  is audited; **TOOL-AUDI-02**: audit export enforces mode 0600 on a
+  pre-existing file; **TOOLS-EX-01/CHANNELS-01**: `bytesStripped` is
+  never negative.
+- **CORE-PRO-01**: RPC success frames require a `result` field;
+  **OBS-PRIC-01**: `toOtlpEnvelope` is `@stable` and barrel-exported;
+  **OBS-PRIC-02**: opt-in redaction patterns via `enabledPatterns`;
+  **ORPHAN-SU-01**: OpenInference spans cover the insight tier and
+  consolidate phases.
+- **CLI**: the T8 batch (migrate strategy validation, offline revoke,
+  read-only migrate guard); **CLI-01**: `token rotate` / `rekey` print
+  the raw token to stdout (parity with `create`); **EVALS-REP-01**:
+  the regression boundary is exclusive and float-robust.
+
 ## 0.10.0 - 2026-07-16
 
 The **external-audit remediation release**: an independent consumer

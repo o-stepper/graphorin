@@ -67,7 +67,7 @@ Graphorin is currently on the **`v0.10.2`** pre-release line, **published on the
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.10.2** (2026-07-16) - the external-audit remediation release: an independent consumer audit of 0.9.0 confirmed the framework end to end (cloud + local Ollama legs) and this release closes its P1 list. Highlights: Ollama adapter operational controls (`think`, `numCtx`, `keepAlive`, streamed thinking surfaced as `reasoning.delta`, and a forced `toolChoice` now refused honestly instead of silently degraded); a typed `SqliteNativeBindingError` that turns the pnpm-10 skipped-build trap into an actionable fix with a matching installation-guide recipe; a warning-free quickstart with a coherent context profile; and a weekly consumer-install smoke against the published packages. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-9-x-0-10-0) for upgrade notes.
+Latest release: **0.10.2** (2026-07-17) - together with 0.10.1, closes the 2026-07 end-to-end campaign: three criticals fixed (vec0 session erasure, NULL-scope working blocks, the WebSocket shutdown hang), `RunBudget.maxCostUsd` actually enforces, revoked server tokens die immediately, session replay reproduces runs, plus a CLI-contract batch and a full documentation reconciliation against the shipped code. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-10-0-0-10-1-0-10-2) for upgrade notes.
 
 ## Use cases
 

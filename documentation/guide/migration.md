@@ -52,6 +52,37 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.10.0 -> 0.10.1 / 0.10.2
+
+Two patch releases from the 2026-07 end-to-end campaign. Everything is
+a fix, but several defaults sharpen in ways you can observe:
+
+- **`RunBudget.maxCostUsd` now enforces.** With a `priceLookup`
+  configured, per-call cost lands on the run's accumulated usage and
+  the ceiling trips runs that previously overran silently (the ceiling
+  was inert). Raise the budget - or drop it - if you relied on the old
+  fail-open behavior.
+- **A bare `createMemory()` no longer warns: compaction is simply
+  off** until you pass `providerContextWindow` (MEMORY-C-03). An
+  explicit `compaction` config without a window still throws.
+- **`graphorin triggers prune` requires `--before <cutoff>`.** The
+  bare invocation was an epoch-0 no-op; it now errors instead of
+  pretending to prune (OPERATOR-01).
+- **Revoked server tokens stop authenticating immediately.**
+  `DELETE /v1/tokens/:id` invalidates the verifier cache; anything
+  that relied on the buggy up-to-60-second grace window sees denials
+  right away (TOKENS-RE-01).
+- **Graceful shutdown closes WebSockets** with close code `4007`
+  (`server.shutdown`); clients should treat it as a terminal close,
+  not a network drop to retry instantly (WS-LIFECY-02).
+- **tiktoken-backed counters treat special-token sequences as plain
+  text** - `<|endoftext|>` counts as its BPE pieces instead of
+  throwing, so token counts over such content shift slightly
+  (PROVIDER-CT-01).
+- **Session erasure works in the default vec0 mode again**
+  (STORE-SQ-02); if you scripted around the crash, remove the
+  workaround.
+
 ### 0.9.x -> 0.10.0
 
 0.10.0 is the external-audit remediation release (Ollama adapter
