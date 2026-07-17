@@ -1,5 +1,16 @@
 # @graphorin/proactive
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553), [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553)]:
+  - @graphorin/agent@0.10.2
+  - @graphorin/sessions@0.10.2
+  - @graphorin/core@0.10.2
+  - @graphorin/triggers@0.10.2
+  - @graphorin/workflow@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

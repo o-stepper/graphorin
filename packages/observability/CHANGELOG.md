@@ -1,5 +1,12 @@
 # @graphorin/observability
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

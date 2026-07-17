@@ -1,5 +1,21 @@
 # @graphorin/tools
 
+## 0.10.2
+
+### Patch Changes
+
+- [#188](https://github.com/o-stepper/graphorin/pull/188) [`42cff94`](https://github.com/o-stepper/graphorin/commit/42cff94a6a3636e3ebe80d22b2b83a428afc727f) Thanks [@o-stepper](https://github.com/o-stepper)! - docs(tools): TOOLS-EX-02 correct the imperative-scan budget default in docstrings
+
+  `SanitizationOptions.budgetMs` and `ExecutorOptions.imperativeBudgetMs` documented
+  a `5` ms default, but the effective default is `250` ms (a 5 ms budget is too
+  tight on cold/loaded runners and would skip the strip pass, letting injection
+  through). The docstrings now match the code; behaviour is unchanged.
+
+- Updated dependencies []:
+  - @graphorin/core@0.10.2
+  - @graphorin/observability@0.10.2
+  - @graphorin/security@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

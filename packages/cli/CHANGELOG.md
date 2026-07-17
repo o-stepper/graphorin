@@ -1,5 +1,52 @@
 # @graphorin/cli
 
+## 0.10.2
+
+### Patch Changes
+
+- [#191](https://github.com/o-stepper/graphorin/pull/191) [`072687d`](https://github.com/o-stepper/graphorin/commit/072687d3a80d312cec885b282b5fbf8a287aaa05) Thanks [@o-stepper](https://github.com/o-stepper)! - docs(cli): guard --help says five tiers; memory.ts header drops the stale migration-state claim
+
+  `graphorin guard status --help` still said "the four guard tiers" (the
+  `MemoryGuardTier` union has five members; the guide and `guard/types.ts` were
+  already corrected). Also the `memory.ts` module header still promised "counts +
+  active embedder + migration state" for `memory status`, which does not report
+  migration state. Help-string and comment changes only; no behaviour change.
+
+- [#190](https://github.com/o-stepper/graphorin/pull/190) [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(cli): MEMORY-CL-02 `memory review --promote` emits a JSON error on failure
+
+  `review --promote <bad-id> --json` exited 1 with empty stdout, so `--json`
+  consumers got no structured payload. The failure paths (not-quarantined and
+  injection-refused) now carry an `error { code, message }` on the result and emit
+  it through the JSON sink, matching the `secrets get` miss contract.
+
+- [#190](https://github.com/o-stepper/graphorin/pull/190) [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(cli): OPERATOR-01 `triggers prune` requires --before
+
+  The prune help promised a bare invocation would "drop every disabled row", but
+  the epoch-0 default cutoff made it a no-op for every dated row. `--before` is
+  now a required option (mirroring `audit prune` / `traces prune`) and the help
+  text describes the real behaviour.
+
+- [#190](https://github.com/o-stepper/graphorin/pull/190) [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553) Thanks [@o-stepper](https://github.com/o-stepper)! - fix(cli): SECRETS-S-03/04 honour ref flags and detect read-only writes
+
+  - SECRETS-S-03: `secrets ref` now threads `--secrets-source` / `--strict-secrets`
+    and activates the requested store before resolving, so `ref:` URIs resolve
+    through the chosen store instead of failing with "No active SecretsStore".
+  - SECRETS-S-04: `secrets set` reads the value back after writing and fails loudly
+    when the active store is read-only (e.g. the env resolver), instead of
+    reporting ok:true / exit 0 for a write that never persisted.
+
+- Updated dependencies []:
+  - @graphorin/server@0.10.2
+  - @graphorin/memory@0.10.2
+  - @graphorin/sessions@0.10.2
+  - @graphorin/core@0.10.2
+  - @graphorin/eslint-plugin@0.10.2
+  - @graphorin/pricing@0.10.2
+  - @graphorin/security@0.10.2
+  - @graphorin/skills@0.10.2
+  - @graphorin/store-sqlite@0.10.2
+  - @graphorin/workflow@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

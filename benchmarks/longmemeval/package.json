@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-longmemeval",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "private": true,
   "description": "LongMemEval (+ real LOCOMO / DMR) memory-quality benchmark runner for the Graphorin framework. Ingests each question's haystack sessions into a fresh in-memory @graphorin/memory instance, answers from recall via the selected Provider, and scores answers with the @graphorin/evals LLM-judge ('J') plus per-ability scorers. The default CLI run uses a deterministic offline stub (scores are plumbing-only); pass --provider ollama|llamacpp|openai-compatible (with --model) for real numbers. --mode full-context evaluates a baseline that inlines the whole haystack (no retrieval), and every run reports tokens/query beside accuracy/latency so the memory pipeline's cost/quality trade-off is honest. Per-category regression gates activate once a real-provider baseline is committed under baselines/. Real datasets download on demand via scripts/fetch-eval-datasets.mjs (dev-only); a tiny offline fixture ships for the smoke test. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
