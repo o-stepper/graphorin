@@ -1,0 +1,5 @@
+# assistant-bot
+
+## 0.1.0
+
+Initial release of the official whole-bot recipe (review item F6): one long-living personal assistant composed from every framework leg against a deterministic in-tree stub `Provider` (no LLM, no network). Wires `createAgent` with three typed `tool({...})` tools (one gated with `needsApproval: true`), `createMemory` over `createSqliteStore({ skipSqliteVec: true })` with `autoAssembleContext` + `factsAutoRecall` so a fact ingested early in the flow provably answers a later question, one `SessionManager` persisting the whole conversation with JSONL export, a `createServer({ skipListen: true })` REST surface in token-auth mode driven through `server.app.request(...)` for the run -> `awaiting_approval` -> resume HITL loop, a `createHeartbeat` proactivity beat on the durable `@graphorin/triggers` scheduler that produces a `notify` outcome, and the `@graphorin/channels` front door (pairing challenge on the durable SQLite `PairingStore`, inbound sanitization, taint seeding, identity routing, outbound scrubbing) on the loopback testkit adapter.

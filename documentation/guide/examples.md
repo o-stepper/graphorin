@@ -5,7 +5,7 @@ description: End-to-end example apps that exercise Graphorin against a determini
 
 # Examples
 
-Eleven end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
+Thirteen end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
 
 ::: tip Run any example
 From the repository root:
@@ -17,6 +17,13 @@ pnpm --filter ./examples/<name> test
 GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/<name> dev
 ```
 :::
+
+## `assistant-bot`
+
+The official whole-bot recipe: one long-living personal assistant composed from every framework leg. Facts ingested into memory answer a later question arriving through the channels front door (pairing challenge included), a REST run parks on a `needsApproval: true` tool and resumes through `POST /v1/runs/:runId/resume`, a heartbeat beat delivers a `notify` outcome, and one session exports the whole conversation as JSONL - all against the in-process hono app (`skipListen: true`), no sockets.
+
+- Demonstrates: the composition of `createAgent` + typed tools (HITL gate), `createMemory` auto-recall (`autoAssembleContext` + `factsAutoRecall`), sessions + JSONL export, the server HITL loop over REST with token auth, `createHeartbeat` proactivity, and the channels front door (pairing, sanitization, taint seed, identity routing).
+- Source: [`examples/assistant-bot/`](https://github.com/o-stepper/graphorin/tree/main/examples/assistant-bot).
 
 ## `personal-assistant-cli`
 
@@ -89,6 +96,13 @@ The security and replay showcase: the same scripted agent flow runs three times 
 - Demonstrates: `dataFlowPolicy` shadow -> enforce -> declassify, `cachePolicy` anchors, deterministic replay, read-only sub-agents.
 - Source: [`examples/secure-replay-agent/`](https://github.com/o-stepper/graphorin/tree/main/examples/secure-replay-agent).
 
+## `structured-verifier`
+
+The structured-output contract end-to-end (audit item 9): one extraction agent declares a CLOSED wire `jsonSchema` (mapped to strict `response_format: json_schema` by native adapters), a zod `schema` parse gate that fails a violating draft with the typed `output-validation-failed` error, and a deterministic C3 `ResponseVerifier` that bounces a placeholder draft back to the model for exactly one bounded continuation round - the smoke tests also pin that the schema is forwarded on EVERY provider call.
+
+- Demonstrates: `outputType: { kind: 'structured' }` (wire schema + local parse gate), `verifiers` + `maxVerifierRounds`, both typed failure modes.
+- Source: [`examples/structured-verifier/`](https://github.com/o-stepper/graphorin/tree/main/examples/structured-verifier).
+
 ## `local-stack-cli`
 
 A fully-local REPL assistant: an Ollama-served LLM, an Ollama-served embedder, and SQLite + sqlite-vec on disk - zero non-loopback packets, provable with `GRAPHORIN_OFFLINE=1`. Every turn is persisted through `memory.session.push(...)` and a consolidator turn trigger distills facts in the background, so a fact taught in one session is recalled in the next.
@@ -105,7 +119,7 @@ GRAPHORIN_TRACE=console GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
 ```
 
-The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the eleven apps.
+The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the thirteen apps.
 
 ## Production deployment templates
 
