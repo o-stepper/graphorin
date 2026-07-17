@@ -5,7 +5,7 @@ description: End-to-end example apps that exercise Graphorin against a determini
 
 # Examples
 
-Twelve end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
+Thirteen end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
 
 ::: tip Run any example
 From the repository root:
@@ -95,6 +95,13 @@ The security and replay showcase: the same scripted agent flow runs three times 
 
 - Demonstrates: `dataFlowPolicy` shadow -> enforce -> declassify, `cachePolicy` anchors, deterministic replay, read-only sub-agents.
 - Source: [`examples/secure-replay-agent/`](https://github.com/o-stepper/graphorin/tree/main/examples/secure-replay-agent).
+
+## `structured-verifier`
+
+The structured-output contract end-to-end (audit item 9): one extraction agent declares a CLOSED wire `jsonSchema` (mapped to strict `response_format: json_schema` by native adapters), a zod `schema` parse gate that fails a violating draft with the typed `output-validation-failed` error, and a deterministic C3 `ResponseVerifier` that bounces a placeholder draft back to the model for exactly one bounded continuation round - the smoke tests also pin that the schema is forwarded on EVERY provider call.
+
+- Demonstrates: `outputType: { kind: 'structured' }` (wire schema + local parse gate), `verifiers` + `maxVerifierRounds`, both typed failure modes.
+- Source: [`examples/structured-verifier/`](https://github.com/o-stepper/graphorin/tree/main/examples/structured-verifier).
 
 ## `local-stack-cli`
 
