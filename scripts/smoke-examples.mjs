@@ -53,6 +53,8 @@ const CASES = [
   { name: 'tools-harness-tour', expectOutput: 'tools-harness-tour: OK' },
   { name: 'memory-graph-recall', expectOutput: 'memory-graph-recall: OK' },
   { name: 'secure-replay-agent', expectOutput: 'sink blocked' },
+  // Audit item 9: structured output + response verifiers, end-to-end.
+  { name: 'structured-verifier', expectOutput: 'verifierRounds=1: OK' },
   // F-02: pin the case to a throwaway DB and a guaranteed-dead loopback
   // port so a live local Ollama daemon or a stale dev database in
   // examples/local-stack-cli/.graphorin cannot change its path.

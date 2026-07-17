@@ -144,6 +144,9 @@ importers:
       '@graphorin/memory':
         specifier: workspace:*
         version: link:../../packages/memory
+      '@graphorin/pricing':
+        specifier: workspace:*
+        version: link:../../packages/pricing
       '@graphorin/provider':
         specifier: workspace:*
         version: link:../../packages/provider
@@ -531,6 +534,21 @@ importers:
       '@graphorin/tools':
         specifier: workspace:*
         version: link:../../packages/tools
+
+  examples/structured-verifier:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/example-trace-helper':
+        specifier: workspace:*
+        version: link:../example-trace-helper
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
 
   examples/three-agent-harness:
     dependencies:

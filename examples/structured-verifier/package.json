@@ -1,0 +1,48 @@
+{
+  "name": "@graphorin/example-structured-verifier",
+  "version": "0.12.0",
+  "private": true,
+  "description": "Structured-output + response-verifier acceptance demo for the Graphorin framework. An extraction agent declares outputType { kind: 'structured' } with a closed JSON Schema and a zod parse gate, while a deterministic ResponseVerifier bounces a placeholder draft back to the model for one C3 continuation round - all against an in-tree stub provider. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/structured-verifier",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/structured-verifier"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/core": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "zod": "^3.25.0"
+  },
+  "bin": {
+    "graphorin-example-structured-verifier": "./dist/main.js"
+  }
+}
