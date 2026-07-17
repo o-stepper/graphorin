@@ -1,0 +1,5 @@
+---
+'@graphorin/agent': patch
+---
+
+Correct the handoff sensitivity-filter documentation to match the shipped contract (e2e 2026-07-16, AGENT-FIL-01 / AGENT-FIL-02 / AGENT-FIL-03, doc-drift). The API docs for `bySensitivity` and `stripSensitiveOutputs` described a per-part `MessageContent` sensitivity annotation (`inboundTrust` / `secret`) that does not exist on the public surface, implying a real tier gate that the filters do not perform. The docstrings (and the guide's Filter library table) now describe the actual behavior: `bySensitivity` is a coarse token heuristic that drops a message only when its content contains the literal `[REDACTED:secret]` token and `maxTier` is below `secret` (so untagged plaintext secrets are kept - use a custom predicate for a real per-part gate), and `stripSensitiveOutputs` strips `tool` messages carrying any `[REDACTED:...]` token. The table also notes that `lastN` / `lastUser` always retain system prompts in addition to the kept turns. Behavior is unchanged; a future release may add a real part-level annotation.

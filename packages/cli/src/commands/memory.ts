@@ -825,6 +825,12 @@ export interface MemoryReviewItem {
 export interface MemoryReviewResult {
   /** Set when `--promote <id>` succeeded. */
   readonly promoted?: { readonly id: string; readonly type: string };
+  /**
+   * Set when a `--promote <id>` request failed (MEMORY-CL-02). Carried on the
+   * payload so `--json` consumers receive a structured failure on stdout
+   * instead of an empty document; the process exit code is the machine signal.
+   */
+  readonly error?: { readonly code: string; readonly message: string };
   readonly facts: ReadonlyArray<MemoryReviewItem>;
   readonly episodes: ReadonlyArray<MemoryReviewItem>;
   readonly insights: ReadonlyArray<MemoryReviewItem>;
@@ -877,9 +883,21 @@ export async function runMemoryReview(
     if (options.promote !== undefined) {
       const located = locateQuarantined(conn, options.promote);
       if (located === null) {
-        print(`${statusMarker('warn')} '${options.promote}' is not a quarantined memory.`);
+        // MEMORY-CL-02: set the exit code before emitReport (W-002) and route
+        // the failure through emitReport so `--json` gets a structured error on
+        // stdout instead of nothing.
         process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
-        return EMPTY_REVIEW;
+        const out: MemoryReviewResult = Object.freeze({
+          ...EMPTY_REVIEW,
+          error: Object.freeze({
+            code: 'not-quarantined',
+            message: `'${options.promote}' is not a quarantined memory.`,
+          }),
+        });
+        emitReport(options, out, () => {
+          print(`${statusMarker('warn')} '${options.promote}' is not a quarantined memory.`);
+        });
+        return out;
       }
       const memory = createMemory({ store: ctx.store.memory, embeddings: ctx.store.embeddings });
       const scope = { userId: located.userId };
@@ -895,12 +913,22 @@ export async function runMemoryReview(
         );
       } catch (err) {
         if (err instanceof Error && err.name === 'QuarantinePromotionRefusedError') {
-          print(
-            `${statusMarker('warn')} refused: '${options.promote}' trips the injection heuristics.`,
-          );
-          print('  Review it, then re-run with --force from a trusted operator context.');
+          // MEMORY-CL-02: same structured-failure contract as the not-found path.
           process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
-          return EMPTY_REVIEW;
+          const out: MemoryReviewResult = Object.freeze({
+            ...EMPTY_REVIEW,
+            error: Object.freeze({
+              code: 'injection-refused',
+              message: `'${options.promote}' trips the injection heuristics; re-run with --force from a trusted operator context.`,
+            }),
+          });
+          emitReport(options, out, () => {
+            print(
+              `${statusMarker('warn')} refused: '${options.promote}' trips the injection heuristics.`,
+            );
+            print('  Review it, then re-run with --force from a trusted operator context.');
+          });
+          return out;
         }
         throw err;
       }

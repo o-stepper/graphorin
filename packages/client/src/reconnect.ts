@@ -5,7 +5,9 @@
  * RNG.
  *
  * Algorithm: exponential backoff with full-jitter
- * (`delay = random(0, min(maxMs, baseMs * 2^(attempt-1)))`). The
+ * (`delay = random(0, min(maxMs, baseMs * 2^(attempt-1)))`, with the
+ * exponent clamped at 30, and `attempt` 1-indexed so attempt 1 sleeps
+ * `random(0, baseMs)`). The
  * implementation matches the AWS Architecture Blog "exponential
  * backoff and jitter" reference but is otherwise an original
  * formulation.

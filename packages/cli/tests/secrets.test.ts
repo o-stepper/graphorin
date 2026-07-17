@@ -128,4 +128,39 @@ describe('graphorin secrets', () => {
       }),
     ).rejects.toThrow(/--value/);
   });
+
+  it('SECRETS-S-04: set fails loudly when the active store is read-only (env)', async () => {
+    // The env store is read-only by default: set() warns + no-ops but never
+    // throws. The CLI must read the value back and detect the write did not
+    // persist rather than report ok:true / exit 0.
+    delete process.env.GRAPHORIN_S04_UNSET;
+    await expect(
+      runSecretsSet({
+        key: 'GRAPHORIN_S04_UNSET',
+        value: 'hunter2',
+        secretsSource: 'env',
+        print: () => undefined,
+      }),
+    ).rejects.toThrow(/not persisted|read-only/);
+  });
+
+  it('SECRETS-S-03: ref honours --secrets-source so ref: URIs resolve through it', async () => {
+    // beforeEach activated a memory store that does NOT hold this key. Passing
+    // secretsSource:'env' must re-activate the env store and re-wire the ref
+    // lookup; before the fix the flag was ignored and the ref resolved against
+    // whatever store was active, yielding resolved:false / "No active store".
+    process.env.GRAPHORIN_S03_TEST = 'resolved-value';
+    try {
+      const out = await runSecretsRef({
+        uri: 'ref:GRAPHORIN_S03_TEST',
+        secretsSource: 'env',
+        reveal: true,
+        print: () => undefined,
+      });
+      expect(out.resolved).toBe(true);
+      expect(out.value).toBe('resolved-value');
+    } finally {
+      delete process.env.GRAPHORIN_S03_TEST;
+    }
+  });
 });

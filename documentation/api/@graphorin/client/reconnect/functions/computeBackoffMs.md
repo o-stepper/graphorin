@@ -10,7 +10,7 @@
 function computeBackoffMs(attempt, policy?): number | null;
 ```
 
-Defined in: [packages/client/src/reconnect.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/reconnect.ts#L44)
+Defined in: [packages/client/src/reconnect.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/reconnect.ts#L46)
 
 Compute the number of milliseconds to sleep before the
 `attempt`-th reconnect (1-indexed). Returns `null` when the policy

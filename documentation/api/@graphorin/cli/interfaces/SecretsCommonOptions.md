@@ -19,6 +19,7 @@ Defined in: [packages/cli/src/commands/secrets.ts:49](https://github.com/o-stepp
 - [`SecretsDeleteOptions`](/api/@graphorin/cli/interfaces/SecretsDeleteOptions.md)
 - [`SecretsGetOptions`](/api/@graphorin/cli/interfaces/SecretsGetOptions.md)
 - [`SecretsListOptions`](/api/@graphorin/cli/interfaces/SecretsListOptions.md)
+- [`SecretsRefOptions`](/api/@graphorin/cli/interfaces/SecretsRefOptions.md)
 - [`SecretsRotateOptions`](/api/@graphorin/cli/interfaces/SecretsRotateOptions.md)
 - [`SecretsSetOptions`](/api/@graphorin/cli/interfaces/SecretsSetOptions.md)
 

@@ -151,6 +151,18 @@ export async function runSecretsSet(options: SecretsSetOptions): Promise<{ reado
     options.key,
     SecretValue.fromString(raw, { source: { resolver: 'graphorin secrets set' } }),
   );
+  // SECRETS-S-04: a read-only store (e.g. the env resolver) silently no-ops on
+  // set() - it warns but never throws, so a naive `return { ok: true }` reports
+  // success (exit 0 / ok:true) for a write that never landed. Read the value
+  // back and fail loudly when it did not persist, so `--json` CI consumers see
+  // a non-zero exit instead of a false positive.
+  const persisted = await store.get(options.key);
+  if (persisted === null) {
+    throw new Error(
+      `[graphorin/cli] secret '${options.key}' was not persisted - the active secrets store is read-only. ` +
+        'Activate a writable store first (e.g. GRAPHORIN_MASTER_PASSPHRASE with --secrets-source encrypted-file, or --secrets-source keyring).',
+    );
+  }
   emitReport(options, { ok: true } as const, () => {
     const print = options.print ?? defaultPrintSink;
     print(brand(`secret '${options.key}' written.`));
@@ -177,7 +189,7 @@ export async function runSecretsDelete(
 }
 
 /** @stable */
-export interface SecretsRefOptions extends CommonOutputOptions {
+export interface SecretsRefOptions extends SecretsCommonOptions {
   readonly uri: string;
   readonly reveal?: boolean;
 }
@@ -200,6 +212,13 @@ export interface SecretsRefResult {
  */
 export async function runSecretsRef(options: SecretsRefOptions): Promise<SecretsRefResult> {
   const parsed = parseSecretRef(options.uri);
+  // SECRETS-S-03: honour --secrets-source / --strict-secrets. A `ref:KEY` URI
+  // resolves against the active store's ref-lookup, which is only wired once
+  // createSecretsStore(...) has run; activating the requested store here makes
+  // the flags take effect instead of resolving against whatever store (if any)
+  // happened to be active - previously `ref:` URIs failed with "No active
+  // SecretsStore" because the CLI never activated one.
+  await openStore(options);
   try {
     const value = await resolveSecret(options.uri);
     const length = await value.use((s) => s.length);

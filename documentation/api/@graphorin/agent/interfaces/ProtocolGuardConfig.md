@@ -8,10 +8,10 @@
 
 Defined in: [packages/agent/src/lateral-leak/protocol-guard.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/protocol-guard.ts#L47)
 
-Configurable per-boundary policy table. There is no agent-level
-config key for it in the current slice - the embedding surface
-(server route, channel adapter, custom harness) constructs the
-table and passes it to the escape helpers explicitly.
+Configurable per-boundary policy table. There is no `AgentConfig` knob
+for this; operators override specific boundaries by passing a
+`ProtocolGuardConfig` to `guardOutboundContent(...)` / `resolvePolicy(...)`
+when wiring server boundaries (SSE / session export).
 
 ## Stable
 
