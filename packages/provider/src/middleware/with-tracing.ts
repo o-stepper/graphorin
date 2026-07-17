@@ -64,6 +64,7 @@ export const withTracing = defineProviderMiddleware<WithTracingOptions>({
             span.setAttributes({
               'gen_ai.usage.input_tokens': response.usage.promptTokens,
               'gen_ai.usage.output_tokens': response.usage.completionTokens,
+              ...timingAttributes(response.providerMetadata),
             });
             return response;
           },
@@ -73,6 +74,33 @@ export const withTracing = defineProviderMiddleware<WithTracingOptions>({
     });
   },
 });
+
+/**
+ * Flatten numeric vendor diagnostics from a `providerMetadata` payload
+ * into span attributes: `{ ollama: { evalMs: 512 } }` becomes
+ * `graphorin.provider.ollama.evalMs = 512` (audit 2026-07-16, item 8 -
+ * the Ollama adapter reports load / prompt-eval / eval timings this
+ * way, so traces can attribute latency to model load vs generation).
+ * Numbers only, one vendor level deep, capped so a misbehaving adapter
+ * cannot bloat the span.
+ */
+function timingAttributes(
+  providerMetadata: Readonly<Record<string, unknown>> | undefined,
+): Record<string, number> {
+  if (providerMetadata === undefined) return {};
+  const attrs: Record<string, number> = {};
+  let count = 0;
+  for (const [vendor, payload] of Object.entries(providerMetadata)) {
+    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) continue;
+    for (const [key, value] of Object.entries(payload)) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) continue;
+      attrs[`graphorin.provider.${vendor}.${key}`] = value;
+      count += 1;
+      if (count >= 16) return attrs;
+    }
+  }
+  return attrs;
+}
 
 async function* tracedStream(
   tracer: Tracer,
@@ -98,6 +126,7 @@ async function* tracedStream(
         span.setAttributes({
           'gen_ai.usage.input_tokens': event.usage.promptTokens,
           'gen_ai.usage.output_tokens': event.usage.completionTokens,
+          ...timingAttributes(event.providerMetadata),
         });
       }
       yield event;

@@ -6,8 +6,8 @@
 
 export type { LlamaCppServerAdapterOptions } from './llamacpp-server.js';
 export { llamaCppServerAdapter } from './llamacpp-server.js';
-export type { OllamaAdapterOptions } from './ollama.js';
-export { ollamaAdapter } from './ollama.js';
+export type { OllamaAdapterOptions, OllamaTimings } from './ollama.js';
+export { DEFAULT_OLLAMA_BASE_URL, ollamaAdapter } from './ollama.js';
 export type { OpenAICompatibleAdapterOptions } from './openai-compatible.js';
 export { openAICompatibleAdapter } from './openai-compatible.js';
 export type { VercelAdapterOptions } from './vercel.js';

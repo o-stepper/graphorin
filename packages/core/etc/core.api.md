@@ -1552,10 +1552,20 @@ export type ProviderEvent = {
     readonly type: 'source';
     readonly uri: string;
     readonly title?: string;
-} | {
+}
+/**
+* Terminal event. `providerMetadata` mirrors
+* {@link ProviderResponse.providerMetadata} for the streaming path:
+* an optional vendor-namespaced diagnostic payload (e.g. the Ollama
+* adapter reports `{ ollama: { loadMs, promptEvalMs, evalMs,
+* totalMs } }` from the server's timing fields, so model load,
+* prompt processing and generation are distinguishable).
+* Adapters without such a payload simply omit the field.
+*/ | {
     readonly type: 'finish';
     readonly finishReason: FinishReason;
     readonly usage: Usage;
+    readonly providerMetadata?: Readonly<Record<string, unknown>>;
 } | {
     readonly type: 'error';
     readonly error: ProviderError;

@@ -149,3 +149,68 @@ describe('withTracing - counting tracer', () => {
     expect(calls.end).toBe(1);
   });
 });
+
+describe('withTracing - provider timing attributes (audit 2026-07-16, item 8)', () => {
+  function attributeCapturingTracer(): { tracer: Tracer; attrs: Record<string, unknown> } {
+    const attrs: Record<string, unknown> = {};
+    const base = countingTracer().tracer;
+    const tracer: Tracer = {
+      ...base,
+      startSpan(opts) {
+        const span = base.startSpan(opts);
+        return {
+          ...span,
+          setAttributes: (next: Record<string, unknown>) => {
+            Object.assign(attrs, next);
+          },
+        };
+      },
+      async span(opts, fn) {
+        const span = this.startSpan(opts);
+        try {
+          return await fn(span);
+        } finally {
+          span.end();
+        }
+      },
+    };
+    return { tracer, attrs };
+  }
+
+  it('stamps numeric providerMetadata timings from the streamed finish event', async () => {
+    const { tracer, attrs } = attributeCapturingTracer();
+    const inner = bareAdapter();
+    const wrapped = withTracing({ tracer })({
+      ...inner,
+      async *stream() {
+        yield {
+          type: 'finish' as const,
+          finishReason: 'stop' as const,
+          usage: { promptTokens: 3, completionTokens: 5, totalTokens: 8 },
+          providerMetadata: {
+            ollama: { loadMs: 40, promptEvalMs: 120, evalMs: 512, totalMs: 700, note: 'x' },
+          },
+        };
+      },
+    });
+    for await (const _ of wrapped.stream(REQ)) void _;
+    expect(attrs['graphorin.provider.ollama.evalMs']).toBe(512);
+    expect(attrs['graphorin.provider.ollama.loadMs']).toBe(40);
+    expect(attrs['graphorin.provider.ollama.note']).toBeUndefined();
+    expect(attrs['gen_ai.usage.output_tokens']).toBe(5);
+  });
+
+  it('stamps timings from generate() providerMetadata', async () => {
+    const { tracer, attrs } = attributeCapturingTracer();
+    const inner = bareAdapter();
+    const wrapped = withTracing({ tracer })({
+      ...inner,
+      async generate(req) {
+        const result = await inner.generate(req);
+        return { ...result, providerMetadata: { ollama: { totalMs: 900 } } };
+      },
+    });
+    await wrapped.generate(REQ);
+    expect(attrs['graphorin.provider.ollama.totalMs']).toBe(900);
+  });
+});

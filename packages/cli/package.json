@@ -66,6 +66,7 @@
     "@graphorin/eslint-plugin": "workspace:*",
     "@graphorin/memory": "workspace:*",
     "@graphorin/pricing": "workspace:*",
+    "@graphorin/provider": "workspace:*",
     "@graphorin/security": "workspace:*",
     "@graphorin/server": "workspace:*",
     "@graphorin/sessions": "workspace:*",
