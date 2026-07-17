@@ -1,5 +1,24 @@
 # @graphorin/cli
 
+## 0.12.0
+
+### Patch Changes
+
+- [#195](https://github.com/o-stepper/graphorin/pull/195) [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7) Thanks [@o-stepper](https://github.com/o-stepper)! - `graphorin token revoke` and `graphorin token rotate` now print a propagation note: the CLI writes the token store directly, so a running server may keep honoring the token for up to its verifier-cache TTL (default 60s); revoke via `DELETE /v1/tokens/:id` on the live server (which evicts the cache synchronously) or restart it for immediate effect.
+
+- Updated dependencies [[`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7), [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7), [`9bc93fe`](https://github.com/o-stepper/graphorin/commit/9bc93fe6135fdda421219fb5558bf8eb486437f7)]:
+  - @graphorin/server@0.12.0
+  - @graphorin/store-sqlite@0.12.0
+  - @graphorin/memory@0.12.0
+  - @graphorin/sessions@0.12.0
+  - @graphorin/workflow@0.12.0
+  - @graphorin/core@0.12.0
+  - @graphorin/eslint-plugin@0.12.0
+  - @graphorin/pricing@0.12.0
+  - @graphorin/provider@0.12.0
+  - @graphorin/security@0.12.0
+  - @graphorin/skills@0.12.0
+
 ## 0.11.0
 
 ### Minor Changes

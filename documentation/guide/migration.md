@@ -52,6 +52,36 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.11.0 -> 0.12.0
+
+0.12.0 is the durable-approvals release. One default flips; the rest
+is additive:
+
+- **`/v1/metrics` now requires auth by default.** `metrics.requireAuth`
+  flipped to `true`: give your Prometheus scrape job a bearer token
+  with the `admin:metrics:read` scope (`authorization.credentials_file`
+  in the scrape config), or restore the old behaviour explicitly with
+  `metrics: { requireAuth: false }` for trusted-network scrapes (the
+  non-loopback WARN still fires on the opt-out).
+- **Schema migration 038** (`suspended_runs`) applies on the first
+  server start (or a guarded `graphorin migrate` for CLI-first
+  workflows). Runs parked on durable HITL survive restarts from this
+  version on; nothing to do beyond the normal backup-before-upgrade.
+- **The `Agent` interface gains `serializeState` /
+  `deserializeState`.** Agents built by `createAgent(...)` get them
+  automatically; only hand-rolled implementations of the `Agent`
+  interface must add the two methods (delegate to `runStateToJSON` /
+  `runStateFromJSON`). Custom `ServerAgentLike` registry fixtures stay
+  optional-codec: without one, suspended runs keep the previous
+  in-memory-only behaviour.
+- **Non-loopback binds WARN about plaintext HTTP** until you set
+  `server.tlsTerminatedUpstream: true` to acknowledge the
+  TLS-terminating reverse proxy in front. The flag only silences the
+  warning.
+- `graphorin token revoke` / `rotate` now print the verifier-cache
+  propagation note (informational; scripts parsing stderr may see the
+  extra line).
+
 ### 0.10.x -> 0.11.0
 
 0.11.0 is the local-first first-run release. Everything is additive;

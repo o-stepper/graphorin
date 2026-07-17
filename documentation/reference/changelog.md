@@ -25,6 +25,68 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.12.0 - 2026-07-17
+
+The **durable-approvals release** (PR #195): the top follow-ups from
+the 2026-07-17 production-readiness review - a HITL park now outlives
+the process that created it, and the server's network defaults close
+the two soft spots the review flagged.
+
+### Durable suspended agent runs - migration 038
+(`@graphorin/agent`, `@graphorin/server`, `@graphorin/store-sqlite`)
+
+- A run parked on durable HITL (`awaiting_approval`) **survives a
+  server restart**: the `RunStateTracker` mirrors every park into the
+  new `suspended_runs` sidecar (`store.suspendedRuns`), boot hydration
+  re-registers persisted parks, and `POST /runs/:runId/resume`
+  rehydrates them - the messenger's approve button keeps working after
+  a redeploy.
+- The `Agent` interface gains the codec behind it:
+  `serializeState(state)` / `deserializeState(serialized)`
+  (version-stamped `graphorin-run-state/x.y`, binary payloads through
+  the wire projection, secret-named keys redacted at rest). Hand-rolled
+  `Agent` implementations must add both methods; hand-rolled
+  `ServerAgentLike` registry fixtures without them keep the previous
+  in-memory behaviour and the resume endpoint answers an actionable
+  `409 run-state-unavailable` (`500 run-state-invalid` for an
+  unreadable durable payload).
+- Rows drop when the run settles (resume completes or fails, or an
+  explicit `POST /runs/:runId/abort`); the graceful-shutdown
+  force-abort deliberately keeps them. `suspended_runs` is
+  session-scoped, so the session hard-delete erasure cascade covers it.
+
+### Server - secure network defaults (`@graphorin/server`)
+
+- **BREAKING**: `metrics.requireAuth` now defaults to `true` -
+  `GET /v1/metrics` requires the `admin:metrics:read` scope out of the
+  box (the exposition leaks trigger ids and consolidator budgets).
+  Give your Prometheus scrape job a bearer token or opt out explicitly
+  with `metrics: { requireAuth: false }` for trusted networks.
+- The server now states its TLS posture: it serves **plaintext HTTP
+  only** (no in-process TLS by design). A non-loopback bind logs a
+  startup WARN until the fronting reverse proxy is acknowledged with
+  the new `server.tlsTerminatedUpstream: true` flag (records intent;
+  changes no runtime behaviour).
+
+### CLI - revocation propagation note (`@graphorin/cli`)
+
+- `graphorin token revoke` / `token rotate` print the propagation
+  window: the CLI writes the token store directly, so a running server
+  may honor the old token for up to its verifier-cache TTL (default
+  60s). Revoke via `DELETE /v1/tokens/:id` on the live server (evicts
+  the cache synchronously) or restart it for immediate effect.
+
+### Docs
+
+- The README package table and architecture diagram catch up with the
+  0.9.0 first publications: `@graphorin/channels` (Tier 3) and
+  `@graphorin/proactive` (Tier 5) are listed, and the package count
+  reads 29 everywhere.
+- Deployment guide: a "TLS termination" section, the authenticated
+  Prometheus scrape, and a `suspended_runs` row in the
+  retention/growth table (self-clearing; deliberately no retention
+  window - a park waits on a human).
+
 ## 0.11.0 - 2026-07-17
 
 The **local-first first-run release** (PR #193): the remaining

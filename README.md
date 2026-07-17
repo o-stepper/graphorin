@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.11.0](https://img.shields.io/badge/version-v0.11.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.12.0](https://img.shields.io/badge/version-v0.12.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.11.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.12.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.11.0** (2026-07-17) - the local-first first-run release: `graphorin doctor --smoke-local` verifies the whole local stack (native SQLite bindings, a write/reopen/search round-trip, Ollama reachability, embedding dimension, and a streamed tool-call through the real adapter) before you write any code; Ollama server timings surface in events and traces (`providerMetadata.ollama`), so a cold model load no longer looks like slow generation; and the providers guide gains a measured `qwen3:8b-q4_K_M` profile for Apple Silicon. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-10-x-0-11-0) for upgrade notes.
+Latest release: **0.12.0** (2026-07-17) - the durable-approvals release: a run parked on human approval now **survives a server restart** (the new `suspended_runs` sidecar + the `Agent.serializeState`/`deserializeState` codec mean the approve button keeps working after a redeploy); `/v1/metrics` is authenticated by default (`admin:metrics:read`); the server states its plaintext-HTTP posture and takes a `server.tlsTerminatedUpstream` acknowledgement for reverse-proxy deployments; and `graphorin token revoke` prints the verifier-cache propagation window. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-11-0-0-12-0) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.11.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.12.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

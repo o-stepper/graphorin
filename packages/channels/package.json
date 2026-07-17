@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/channels",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Channel SPI for the Graphorin framework. Defines the vendor-neutral adapter contract for messenger front doors (inbound normalization, identity routing, pairing-based access policy, delivery), a gateway runtime that enforces the inbound trust boundary and outbound scaffolding sanitization, and a testkit with an in-memory loopback adapter plus a conformance suite. Ships no vendor adapters by design.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

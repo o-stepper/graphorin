@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/observability",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Observability primitives for the Graphorin framework: typed AISpan tracer over OpenTelemetry, mandatory withValidation wrapper for every exporter, sensitivity-aware RedactionValidator with built-in PII / secret patterns, GenAI Semantic Conventions conformance helpers, OpenInference span-kind emission, structured logger with span correlation, append-only JSONL exporter for replay, sanitized replay primitives, hierarchical CostTracker, and a minimal inline eval runner alongside a zero-default telemetry stub.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
