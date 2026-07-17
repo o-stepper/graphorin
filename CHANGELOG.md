@@ -14,6 +14,54 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.11.0 - 2026-07-17
+
+The **local-first first-run release** (PR #193): the remaining
+engineering items from the 2026-07-16 external-audit plan, shipped as
+one "will a local assistant run well on this machine?" story.
+
+### CLI - `graphorin doctor --smoke-local` (`@graphorin/cli`)
+
+- Six checks through the same code paths the framework uses at
+  runtime: `smoke:native` (the `better-sqlite3` binding +
+  `sqlite-vec`, with a pnpm-10 skipped-build install surfaced as the
+  actionable `SqliteNativeBindingError` fix), `smoke:sqlite-roundtrip`
+  (write / close / reopen / search, FTS-only - no models needed),
+  `smoke:ollama` (daemon reachability; degrades to warn + skip),
+  `smoke:ollama-models` (`--ollama-model` asserts presence),
+  `smoke:embedding` (a real `/api/embed` probe reporting the
+  dimension), and `smoke:chat` (a streamed tool-call round-trip
+  through the real `ollamaAdapter`, `think: false`, reporting the
+  server's load / prompt-eval / generation split).
+- `--smoke-local` alone runs only the smoke; it composes with
+  `--check-*` / `--all` and is deliberately not implied by `--all`.
+- `@graphorin/cli` now depends on `@graphorin/provider`.
+
+### Provider - Ollama server timings in events and traces
+(`@graphorin/core`, `@graphorin/provider`)
+
+- The `ProviderEvent` `finish` variant gains an optional
+  `providerMetadata` field, mirroring
+  `ProviderResponse.providerMetadata` for the streaming path.
+- The Ollama adapter normalizes the server's nanosecond timing fields
+  into the new `OllamaTimings` shape (`totalMs` / `loadMs` /
+  `promptEvalMs` / `evalMs`) under `providerMetadata.ollama` on both
+  the streamed `finish` event and `generate()` - a cold call dominated
+  by model load no longer looks like slow generation.
+- `withTracing` stamps numeric vendor diagnostics onto the provider
+  span as `graphorin.provider.<vendor>.<key>` attributes (bounded,
+  numbers only).
+- `DEFAULT_OLLAMA_BASE_URL` is exported from the package barrel.
+
+### Docs
+
+- The providers guide gains a measured `qwen3:8b-q4_K_M` profile on
+  Apple Silicon (M1 Max, 32 GB, Ollama 0.32.0): resident memory per
+  `num_ctx`, cold vs warm load, the `num_ctx`-change re-load cost,
+  generation speed, and the `think: true` wall-time impact - plus a
+  practical settings block.
+- The CLI guide documents the smoke with a real annotated run.
+
 ## 0.10.2 - 2026-07-17
 
 The documentation-reconciliation tail of the 2026-07 end-to-end
