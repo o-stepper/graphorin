@@ -398,27 +398,24 @@ function buildBody(
   // PS-24: structured output finally reaches the wire - gated on the
   // declared capability so a structuredOutput:false override keeps the
   // request clean for servers that reject response_format.
-  // LIVE-EVAL-01/02: always use the `json_schema` response_format, even when
-  // no explicit schema was supplied - the Anthropic OpenAI-compat endpoint
-  // rejects `json_object` ("response_format.type: Input should be
-  // 'json_schema'"), which silently broke structured memory extraction. A
-  // schema-less request gets a permissive object schema with `strict: false`
-  // (accepted by OpenAI's lenient json_schema and by the compat endpoints).
+  // LIVE-EVAL-01/02 (re-verified live against the Anthropic OpenAI-compat
+  // endpoint, 2026-07-17): an explicit schema maps to strict
+  // `json_schema`. A SCHEMA-LESS structured request sends NO
+  // response_format at all - that endpoint rejects every permissive
+  // spelling (`json_object`: "Input should be 'json_schema'";
+  // `strict: false`: "Input should be True"; `strict: true` with
+  // `additionalProperties: true`: "not supported"), so the only shape
+  // that works across OpenAI, the compat endpoints, and local servers is
+  // none: the AG-3 trailing JSON instruction the agent runtime already
+  // appends carries the contract, and the local `schema.parse` gate
+  // stays the enforcement point.
   if (structuredOutput && req.outputType?.kind === 'structured') {
-    body.response_format =
-      req.outputType.jsonSchema !== undefined
-        ? {
-            type: 'json_schema',
-            json_schema: { name: 'output', schema: req.outputType.jsonSchema, strict: true },
-          }
-        : {
-            type: 'json_schema',
-            json_schema: {
-              name: 'output',
-              schema: { type: 'object', additionalProperties: true },
-              strict: false,
-            },
-          };
+    if (req.outputType.jsonSchema !== undefined) {
+      body.response_format = {
+        type: 'json_schema',
+        json_schema: { name: 'output', schema: req.outputType.jsonSchema, strict: true },
+      };
+    }
   }
   if (req.providerOptions !== undefined) {
     Object.assign(body, req.providerOptions);
