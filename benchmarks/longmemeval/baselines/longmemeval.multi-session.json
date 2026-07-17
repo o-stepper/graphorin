@@ -1,0 +1,3982 @@
+{
+ "results": [
+  {
+   "caseId": "0a995998",
+   "input": {
+    "question": "How many items of clothing do I need to pick up or return from a store?",
+    "askedAt": "2023/02/15 (Wed) 23:50",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you have **1 item to pick up** from Zara:\n\n- **New boots** (exchanged on February 5th for a larger size) - You still need to pick up the new pair\n\nAdditionally, you mentioned needing to pick up **dry cleaning** for a navy blue blazer, but that's not clothing you need to return—just pick up.\n\nSo in terms of items you need to pick up or return from stores, you have the new boots from Zara as your main priority right now.",
+   "durationMs": 3267,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "6d550036",
+   "input": {
+    "question": "How many projects have I led or am currently leading?",
+    "askedAt": "2023/05/30 (Tue) 23:32",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following projects you are leading or have led:\n\n1. **Cloud Migration Project** (Current) - You mentioned on 2023/05/25 that you are currently leading a cloud migration effort for your company's applications, where you're applying your new skills in cloud computing to ensure a smooth transition and optimize cloud infrastructure.\n\n2. **Nigeria Rural Water Access Project** (Current/Planning) - You mentioned on 2023/05/21 that you are planning a project in Nigeria that connects 100 rural villages to running water.\n\n3. **Ethereum Mexico Community Event** (Current) - You are involved with the Ethereum México Community Team in creating a Web3 event, as referenced in the 2023/05/27 entry.\n\nSo based on the information in your memory, you are currently leading or actively involved in **at least 3 projects**.\n\nHowever, if you have additional projects not mentioned in these memory entries, I would not have that information. Feel free to share more details if you'd like me to provide a more complete picture.",
+   "durationMs": 3300,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_59c863d7",
+   "input": {
+    "question": "How many model kits have I worked on or bought?",
+    "askedAt": "2023/05/30 (Tue) 20:57",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following model kits you've worked on or bought:\n\n1. **Revell F-15 Eagle** - You finished this simple kit that you picked up in late April 2023\n2. **1/72 scale B-29 bomber** - You were planning to work on engine wiring and photo-etching details for this kit\n3. **1/24 scale '69 Camaro** - You were planning to add wire details and work on engine wiring and fuel lines for this kit\n\nSo you have worked on or bought **at least 3 model kits** that are mentioned in your memory.",
+   "durationMs": 2884,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.6,
+      "reason": "judge score 6 < threshold 7",
+      "metadata": {
+       "raw": 6,
+       "clamped": 6,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "b5ef892d",
+   "input": {
+    "question": "How many days did I spend on camping trips in the United States this year?",
+    "askedAt": "2023/04/29 (Sat) 23:45",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can only confirm that you took a **3-day solo camping trip to Big Sur in early April 2023**.\n\nI do not have information about other camping trips you may have taken in the United States this year, so I cannot give you a complete total of camping days. If you've taken additional camping trips beyond the Big Sur trip, please let me know and I can help you track that information.",
+   "durationMs": 2078,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "e831120c",
+   "input": {
+    "question": "How many weeks did it take me to watch all the Marvel Cinematic Universe movies and the main Star Wars films?",
+    "askedAt": "2023/05/30 (Tue) 18:41",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory, you watched:\n\n1. **All 22 Marvel Cinematic Universe movies in two weeks**\n2. **All the main Star Wars films in a week and a half**\n\nSo in total, it took you approximately **3.5 weeks** to watch both the MCU movies and the main Star Wars films combined.",
+   "durationMs": 1944,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "3a704032",
+   "input": {
+    "question": "How many plants did I acquire in the last month?",
+    "askedAt": "2023/05/30 (Tue) 21:51",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following plants you acquired in the last month:\n\n1. **Snake plant** - You mentioned on May 25th that you got this from your sister last month\n\nThat's the only plant acquisition I have clear information about from your memory. While there are discussions about other plants (basil, ferns, succulents) in the context, these appear to be plants you already had rather than recent acquisitions.\n\nSo based on the available information, you acquired **1 plant** (the snake plant) in the last month.",
+   "durationMs": 2099,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_d84a3211",
+   "input": {
+    "question": "How much total money have I spent on bike-related expenses since the start of the year?",
+    "askedAt": "2023/05/05 (Fri) 23:56",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the memory available, I can see that you've been tracking your bike mileage and have clocked 347 miles since the start of the year with a goal to reach 1000 miles by the end of summer. However, there are no records of your bike-related expenses or spending in the information I have access to.",
+   "durationMs": 2164,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "aae3761f",
+   "input": {
+    "question": "How many hours in total did I spend driving to my three road trip destinations combined?",
+    "askedAt": "2023/05/30 (Tue) 19:37",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can identify the following road trips you mentioned:\n\n1. **Outer Banks, North Carolina**: 4 hours\n2. **Washington D.C.**: 6 hours\n3. **Tennessee mountains**: 5 hours\n\n**Total driving time: 15 hours**\n\nThese are the three specific road trip destinations with driving times that you mentioned in our conversations.",
+   "durationMs": 1580,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_f2262a51",
+   "input": {
+    "question": "How many different doctors did I visit?",
+    "askedAt": "2023/05/30 (Tue) 21:43",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. The memory records show questions about a clinic appointment system, travel destinations, meal planning, and other topics, but there is no information about how many different doctors you have visited.",
+   "durationMs": 1369,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "dd2973ad",
+   "input": {
+    "question": "What time did I go to bed on the day before I had a doctor's appointment?",
+    "askedAt": "2023/05/30 (Tue) 21:28",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nFrom the memory provided, I can see that you had a doctor's appointment at 10 AM last Thursday (which would have been 2023/05/25), but there is no record of what time you went to bed the day before that appointment.",
+   "durationMs": 2031,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "c4a1ceb8",
+   "input": {
+    "question": "How many different types of citrus fruits have I used in my cocktail recipes?",
+    "askedAt": "2023/05/30 (Tue) 23:22",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following citrus fruits you've used in your cocktail recipes:\n\n1. **Lime** - mentioned multiple times (Cucumber Lime Refresher, lime juice in various cocktails)\n2. **Lemon** - used in several recipes (lemon juice, lemon slices, lemon-lime soda)\n3. **Orange** - featured prominently (orange bitters you made, orange juice, orange slices, orange liqueur)\n4. **Grapefruit** - mentioned in Gin & Tonic variations and as a garnish\n\nSo you've used **4 different types of citrus fruits** in your cocktail recipes and experiments.",
+   "durationMs": 2509,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_a56e767c",
+   "input": {
+    "question": "How many movie festivals that I attended?",
+    "askedAt": "2023/05/30 (Tue) 20:53",
+    "ability": "multi-session"
+   },
+   "output": "Based on my memory, I have information about **one film festival** that you attended:\n\n**AFI Fest** in Los Angeles, where you attended a screening of \"Joker\" and participated in a Q&A session with Todd Phillips and Joaquin Phoenix.\n\nI also have a mention of the **Portland Film Festival**, where you volunteered, though the memory indicates you were volunteering there rather than attending as a regular attendee.\n\nIf you've attended other film festivals, I don't have that information in my current memory. Would you like to tell me about other festivals you've attended?",
+   "durationMs": 2202,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "6cb6f249",
+   "input": {
+    "question": "How many days did I take social media breaks in total?",
+    "askedAt": "2023/03/14 (Tue) 23:56",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While the memory shows that you took a week-long break from social media at some point, there is no record of the total number of days you've taken social media breaks across all instances. To get this information, you would need to review your personal records or the tracking data from apps like Moment or Digital Wellbeing that you may have been using.",
+   "durationMs": 1899,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "46a3abf7",
+   "input": {
+    "question": "How many tanks do I currently have, including the one I set up for my friend's kid?",
+    "askedAt": "2023/05/30 (Tue) 21:36",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you currently have **3 tanks**:\n\n1. **20-gallon community tank** named \"Amazonia\" - your main freshwater tank that you set up\n2. **1-gallon tank** - the small tank you set up for a friend's kid with guppies and plants\n3. **Quarantine tank** - you mentioned you were thinking about setting up a separate quarantine tank for new fish before introducing them to your main tank\n\nHowever, if you're asking only about tanks you've already completed setting up (not ones you're planning), then you have **2 tanks** - the 20-gallon \"Amazonia\" tank and the 1-gallon tank for your friend's kid.",
+   "durationMs": 2562,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "36b9f61e",
+   "input": {
+    "question": "What is the total amount I spent on luxury items in the past few months?",
+    "askedAt": "2023/05/30 (Tue) 22:52",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I can see from our previous conversations that you mentioned buying a luxury evening gown for $800 for a wedding, I don't have a complete record of all your luxury purchases over the past few months.\n\nTo get an accurate total, I'd recommend:\n\n1. **Review your spreadsheet** - You mentioned you were planning to use a spreadsheet to track your expenses, which would give you a clear picture of all your luxury purchases\n2. **Check your bank or credit card statements** - These will show all your transactions from the past few months\n3. **Categorize your purchases** - Once you have your transactions, separate out the luxury items (designer clothing, accessories, high-end items, etc.) and add them up\n\nIf you'd like, you can share your recent luxury purchases with me, and I can help you categorize and total them up!",
+   "durationMs": 2972,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "28dc39ac",
+   "input": {
+    "question": "How many hours have I spent playing games in total?",
+    "askedAt": "2023/05/30 (Tue) 23:42",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can calculate the following gaming hours you've mentioned:\n\n- **Assassin's Creed Odyssey**: 70 hours\n- **The Last of Us Part II**: 30 hours\n- **Celeste**: 10 hours\n- **Hyper Light Drifter**: 5 hours\n\n**Total: 115 hours**\n\nHowever, this only includes the games you've specifically mentioned with playtime details. You may have played other games as well that aren't documented in my memory, so the actual total could be higher.",
+   "durationMs": 2115,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_2f8be40d",
+   "input": {
+    "question": "How many weddings have I attended in this year?",
+    "askedAt": "2023/10/15 (Sun) 23:47",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following weddings you attended in 2023:\n\n1. Your cousin's wedding at a vineyard in August\n2. Your sister's wedding (mentioned as \"just amazing\" and you were still on a high from it, though the specific date isn't provided)\n\nSo I can confirm at least **2 weddings** that you attended in 2023. However, the exact date of your sister's wedding isn't specified in the memory, so there may be additional details I'm not aware of.",
+   "durationMs": 2347,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2e6d26dc",
+   "input": {
+    "question": "How many babies were born to friends and family members in the last few months?",
+    "askedAt": "2023/05/13 (Sat) 23:55",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, here are the babies born to friends and family members in the last few months:\n\n1. **Max** - cousin Rachel's son, born in March\n2. **Charlotte** - Mike and Emma's daughter, born a few weeks after Rachel's baby shower (around the same time as Max)\n3. **Ava and Lily** - aunt's twins, born in April\n4. **Jasper** - friend David's baby boy, born a few weeks before the conversation on May 13\n\nSo in total, there are **5 babies** (or 4 births, counting the twins as one event) born to friends and family members in the last few months.",
+   "durationMs": 3202,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_15e38248",
+   "input": {
+    "question": "How many pieces of furniture did I buy, assemble, sell, or fix in the past few months?",
+    "askedAt": "2023/05/30 (Tue) 15:31",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, here's what I can tell you about furniture-related activities in the past few months:\n\n1. **Assembled**: You assembled an IKEA bookshelf for your home office about two months ago (around late March 2023)\n\n2. **Fixed**: You fixed the wobbly leg on your kitchen table last weekend (around late May 2023) by tightening a screw\n\n3. **Bought**: You bought a new wooden coffee table with metal legs (mentioned around late May 2023)\n\nSo in total, you **bought 1 piece of furniture, assembled 1 piece, and fixed 1 piece** in the past few months. There is no information in the memory about you selling any furniture.",
+   "durationMs": 2418,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 0.7,
+      "metadata": {
+       "raw": 7,
+       "clamped": 7,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "88432d0a",
+   "input": {
+    "question": "How many times did I bake something in the past two weeks?",
+    "askedAt": "2023/05/30 (Tue) 23:45",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following baking activities in the past two weeks:\n\n1. **Sourdough bread** - You were working on sourdough bread and discussing issues with overmixing and fermentation time\n2. **Chocolate cake** - You baked a chocolate cake that turned out amazing\n\nSo according to the information in your memory, you baked something **at least 2 times** in the past two weeks.\n\nHowever, I should note that there may be other baking activities not mentioned in our conversations, so this count is based only on what has been discussed in your long-term memory.",
+   "durationMs": 2426,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "80ec1f4f",
+   "input": {
+    "question": "How many different museums or galleries did I visit in the month of February?",
+    "askedAt": "2023/03/03 (Fri) 23:25",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the conversation history provided, I can only confirm that you attended a guided workshop at the Modern Art Museum in January 2023. However, there is no information about specific museums or galleries you visited during the month of February.\n\nTo answer your question accurately, I would need memory records that specifically document your visits to museums or galleries in February.",
+   "durationMs": 1565,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d23cf73b",
+   "input": {
+    "question": "How many different cuisines have I learned to cook or tried out in the past few months?",
+    "askedAt": "2023/05/30 (Tue) 16:04",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you have explored or learned about the following cuisines in the past few months:\n\n1. **Korean cuisine** - You tried a Korean bibimbap recipe from a cooking class's online recipe library (mentioned on 2023/05/29)\n2. **Ethiopian cuisine** - You tried out a new Ethiopian restaurant in town and loved it (mentioned on 2023/05/24)\n3. **Indian cuisine** - You learned how to make chicken tikka masala in a class on Indian cuisine (mentioned on 2023/05/26)\n4. **Vegan cuisine** - You attended a class on vegan cuisine where you learned to make vegan lasagna with cashew-based ricotta cheese substitute (mentioned on 2023/05/30)\n\nSo you have explored or learned about **4 different cuisines** in the past few months.",
+   "durationMs": 3146,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_7fce9456",
+   "input": {
+    "question": "How many properties did I view before making an offer on the townhouse in the Brookside neighborhood?",
+    "askedAt": "2023/03/08 (Wed) 23:58",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the records I have, I know that you viewed a 3-bedroom townhouse in the Brookside neighborhood on February 22nd and put in an offer on February 25th, but there is no information about how many other properties you may have viewed before this one.",
+   "durationMs": 3131,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d682f1a2",
+   "input": {
+    "question": "How many different types of food delivery services have I used recently?",
+    "askedAt": "2023/05/30 (Tue) 23:30",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you have used **2 different types of food delivery services** recently:\n\n1. **Domino's Pizza** - You mentioned having it three times in the week of May 22, 2023\n2. **Fresh Fusion** - You discovered this new service and mentioned they have great pre-made meals (as of May 30, 2023)",
+   "durationMs": 1978,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "7024f17c",
+   "input": {
+    "question": "How many hours of jogging and yoga did I do last week?",
+    "askedAt": "2023/05/30 (Tue) 21:24",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on our previous conversations, I know that you used to practice yoga three times a week for 2 hours each session, and you were planning to get back into yoga by scheduling sessions for Monday, Wednesday, and Friday mornings at 7:00 am starting from late May 2023. However, I don't have any records of your actual jogging or yoga activities from last week (May 23-29, 2023).\n\nIf you'd like to track your workouts going forward, I'd recommend using one of the apps we discussed earlier, such as Down Dog for yoga or Habitica for habit tracking, which can help you monitor your exercise hours.",
+   "durationMs": 2596,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_5501fe77",
+   "input": {
+    "question": "Which social media platform did I gain the most followers on over the past month?",
+    "askedAt": "2023/05/30 (Tue) 22:43",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can see that you gained followers on multiple platforms over the past month:\n\n1. **Twitter**: You gained 120 followers (from 420 to 540) over the past month\n2. **TikTok**: You gained around 200 followers over the past three weeks\n\nBased on this information, **TikTok** appears to be the platform where you gained the most followers, with approximately 200 new followers in just three weeks.",
+   "durationMs": 1776,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_2ba83207",
+   "input": {
+    "question": "Which grocery store did I spend the most money at in the past month?",
+    "askedAt": "2023/05/30 (Tue) 22:59",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can tell you that you spent around $120 at **Walmart** last Saturday (which would have been May 20, 2023, a week before May 26). You mentioned this was a bit higher than you expected, but you did get some good deals with a 10% off coupon on dairy products.\n\nHowever, I don't have information about other grocery stores you may have shopped at in the past month, so I cannot definitively say which store you spent the most money at overall. Walmart is the only specific grocery store purchase amount mentioned in your memory.",
+   "durationMs": 2569,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2318644b",
+   "input": {
+    "question": "How much more did I spend on accommodations per night in Hawaii compared to Tokyo?",
+    "askedAt": "2023/05/30 (Tue) 22:16",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, I can calculate this for you:\n\n**Tokyo accommodation:** You stayed in a hostel that cost around **$30 per night**\n\n**Hawaii (Maui) accommodation:** You booked a luxurious resort that costs over **$300 per night**\n\n**Difference:** $300 - $30 = **$270 more per night** in Hawaii compared to Tokyo\n\nSo you spent approximately $270 more per night on accommodations in Maui compared to your hostel stay in Tokyo.",
+   "durationMs": 1893,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2ce6a0f2",
+   "input": {
+    "question": "How many different art-related events did I attend in the past month?",
+    "askedAt": "2023/03/08 (Wed) 23:27",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the memory context provided, I can see that you've been interested in art and exploring local artists and galleries, but there are no specific records of art-related events you attended in the past month. To answer your question accurately, I would need information about the events you actually attended during that time period.",
+   "durationMs": 1839,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_d12ceb0e",
+   "input": {
+    "question": "What is the average age of me, my parents, and my grandparents?",
+    "askedAt": "2023/05/30 (Tue) 22:44",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, here are the ages:\n\n**You:** 32 years old (birthday: February 12th)\n\n**Your Parents:**\n- Mom: 55 years old\n- Dad: 58 years old\n\n**Your Grandparents:**\n- Grandma: 75 years old\n- Grandpa: 78 years old\n\n**Average age across all family members:** (32 + 55 + 58 + 75 + 78) ÷ 5 = **59.6 years old**\n\nIf you'd like to calculate the average for specific groups:\n- **Your parents' average age:** (55 + 58) ÷ 2 = **56.5 years old**\n- **Your grandparents' average age:** (75 + 78) ÷ 2 = **76.5 years old**",
+   "durationMs": 3340,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "00ca467f",
+   "input": {
+    "question": "How many doctor's appointments did I go to in March?",
+    "askedAt": "2023/03/27 (Mon) 23:35",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you went to **3 doctor's appointments in March**:\n\n1. **Dr. Smith** (your primary care physician) - March 3rd for a bronchitis diagnosis\n2. **Dr. Thompson** (your orthopedic surgeon) - March 20th for a follow-up appointment regarding your knee healing\n3. **Dr. Thompson** (your orthopedic surgeon) - March 25th when he cleared you to start physical therapy sessions twice a week for your torn ACL recovery",
+   "durationMs": 2501,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "b3c15d39",
+   "input": {
+    "question": "How many days did it take for me to receive the new remote shutter release after I ordered it?",
+    "askedAt": "2023/03/01 (Wed) 23:48",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you ordered a new remote shutter release online on February 5th, and it arrived on February 10th. That means it took **5 days** for you to receive it after ordering.",
+   "durationMs": 1431,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_31ff4165",
+   "input": {
+    "question": "How many health-related devices do I use in a day?",
+    "askedAt": "2023/05/30 (Tue) 23:38",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following health-related devices you use:\n\n1. **Fitbit Versa 3** - for tracking sleep, steps, and guided breathing sessions\n2. **Nebulizer** - for respiratory treatments\n3. **Hearing aids** (Phonak BTE) - with Size 13 Energizer batteries\n4. **Fitbit** - for tracking blood sugar levels and medication reminders (mentioned in the context of health organization)\n\nSo you use **at least 4 health-related devices** in your daily routine, though the Fitbit devices may be the same device (Fitbit Versa 3).\n\nHowever, I should note that I do not have information in your memory about recommendations for oral decongestants or expectorants. For medication recommendations, you should consult with your healthcare provider or pharmacist, as they can provide personalized advice based on your specific health condition and any potential interactions with your current treatments.",
+   "durationMs": 3132,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 0.7,
+      "metadata": {
+       "raw": 7,
+       "clamped": 7,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "eeda8a6d",
+   "input": {
+    "question": "How many fish are there in total in both of my aquariums?",
+    "askedAt": "2023/05/30 (Tue) 20:36",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I can see from your conversation history that you have:\n- A 10-gallon tank with your betta fish, Bubbles\n- A 20-gallon tank with Neon Tetras, Golden Honey Gouramis, and Pleco catfish\n\nYou haven't specified the exact number of each fish species you own, so I cannot calculate the total number of fish across both aquariums. If you'd like to tell me the specific quantities of each fish, I'd be happy to help you calculate the total!",
+   "durationMs": 4425,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2788b940",
+   "input": {
+    "question": "How many fitness classes do I attend in a typical week?",
+    "askedAt": "2023/05/30 (Tue) 20:00",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, I can identify the following fitness classes you attend in a typical week:\n\n1. **Hip Hop Abs** - Saturdays at 10:00 AM\n2. **BodyPump** - Mondays (you mentioned this class in relation to your weightlifting routine)\n3. **Yoga classes** - Sundays (you mentioned wanting to make a playlist for these)\n\nSo you attend **at least 3 fitness classes per week** based on what's documented in your memory. However, I don't have complete information about all the classes you may attend throughout the week, so there could be additional classes beyond these three that aren't mentioned in your memory.",
+   "durationMs": 2561,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "60bf93ed",
+   "input": {
+    "question": "How many days did it take for my laptop backpack to arrive after I bought it?",
+    "askedAt": "2023/01/24 (Tue) 23:56",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, you bought your laptop backpack from Amazon on 1/15, and it arrived on 1/20. That means it took **5 days** for your backpack to arrive after you purchased it.",
+   "durationMs": 1532,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "9d25d4e0",
+   "input": {
+    "question": "How many pieces of jewelry did I acquire in the last two months?",
+    "askedAt": "2023/05/30 (Tue) 15:43",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While I can see that you acquired a new pair of emerald earrings at a flea market last weekend (around May 21st) and a new silver necklace with a small pendant on the 15th of last month (around April 15th), I don't have a complete record of all jewelry pieces you've acquired over the last two months.\n\nTo get an accurate count, you might want to review your jewelry spreadsheet or inventory that we discussed, which would have all your pieces documented with acquisition dates.",
+   "durationMs": 2630,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "129d1232",
+   "input": {
+    "question": "How much money did I raise in total through all the charity events I participated in?",
+    "askedAt": "2023/05/01 (Mon) 23:45",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you participated in two charity events:\n\n1. **Charity Walk** (mentioned on 2023/05/01 at 10:42): You raised **$250** through sponsors\n\n2. **Bike-a-Thon for Cancer Research** (mentioned on 2023/05/01 at 22:24): Your team raised **$5,000**\n\n**Total amount raised: $5,250**\n\nThat's wonderful! You've made a significant impact through your charitable efforts.",
+   "durationMs": 1912,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.6,
+      "reason": "judge score 6 < threshold 7",
+      "metadata": {
+       "raw": 6,
+       "clamped": 6,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "60472f9c",
+   "input": {
+    "question": "How many projects have I been working on simultaneously, excluding my thesis?",
+    "askedAt": "2023/05/30 (Tue) 23:41",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory context, you have been working on **2 projects simultaneously**, excluding your Master's thesis in AI and healthcare:\n\n1. **Data Mining project** - You mentioned working on a Bike Sharing dataset for this course\n2. **Database Systems project** - You specifically noted this is a group project for your Database Systems course\n\nSo in total, you're juggling your thesis along with these 2 course projects, which you've mentioned keeps you quite busy.",
+   "durationMs": 2388,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_194be4b3",
+   "input": {
+    "question": "How many musical instruments do I currently own?",
+    "askedAt": "2023/05/30 (Tue) 23:29",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While I can see from our conversation history that you own a Korg B1 digital piano and a ukulele, I don't have a complete inventory of all the musical instruments you currently own. \n\nIf you'd like to tell me about all your instruments, I'd be happy to keep track of that information for future reference!",
+   "durationMs": 1951,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a9f6b44c",
+   "input": {
+    "question": "How many bikes did I service or plan to service in March?",
+    "askedAt": "2023/03/20 (Mon) 23:57",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can only see that you mentioned cleaning and lubricated the chain on your road bike on March 2nd, and you're planning a longer ride this weekend. However, there is no information about servicing or planning to service any specific number of bikes in March.",
+   "durationMs": 1957,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d851d5ba",
+   "input": {
+    "question": "How much money did I raise for charity in total?",
+    "askedAt": "2023/03/20 (Mon) 23:59",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, here's what I can tell you about your charity fundraising:\n\n1. **February 2023**: You completed a charity fitness challenge and raised **$500** for the American Cancer Society\n2. **January 20th, 2023**: You helped raise **$2,000** for a local animal shelter\n3. **Charity bake sale**: You raised **$1,000** for the local children's hospital\n\n**Total amount raised: $3,500**\n\nThis is a wonderful achievement! You've been very active with charity fundraising and have made a significant impact in your community.",
+   "durationMs": 2576,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.6,
+      "reason": "judge score 6 < threshold 7",
+      "metadata": {
+       "raw": 6,
+       "clamped": 6,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "5a7937c8",
+   "input": {
+    "question": "How many days did I spend participating in faith-related activities in December?",
+    "askedAt": "2024/01/10 (Wed) 23:41",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can only confirm one faith-related activity in December: a Bible study on **December 17th** at your church.\n\nHowever, I do not have enough information to determine the total number of days you spent participating in faith-related activities in December. The memory only mentions this one specific date and event. To answer your question accurately, I would need additional information about other faith-related activities you participated in during December.",
+   "durationMs": 1683,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.3,
+      "reason": "judge score 3 < threshold 7",
+      "metadata": {
+       "raw": 3,
+       "clamped": 3,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_ab202e7f",
+   "input": {
+    "question": "How many kitchen items did I replace or fix?",
+    "askedAt": "2023/05/30 (Tue) 22:20",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you replaced or fixed **2 kitchen items**:\n\n1. **Toaster oven** - You upgraded to a toaster oven to replace your traditional toaster\n2. **Kitchen shelves** - You fixed the kitchen shelves last weekend",
+   "durationMs": 2113,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_e05b82a6",
+   "input": {
+    "question": "How many times did I ride rollercoasters across all the events I attended from July to October?",
+    "askedAt": "2023/11/04 (Sat) 23:49",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can count the following rollercoaster rides you mentioned:\n\n1. **July at SeaWorld San Diego**: You rode the Mako, Kraken, and Manta rollercoasters all in one night = **3 rollercoasters**\n\n2. **October 15th at Universal Studios Hollywood**: You rode the Revenge of the Mummy rollercoaster **three times in a row** = **3 rides**\n\n**Total: 6 rollercoaster rides** across the events from July to October (though technically the Revenge of the Mummy counts as 3 rides of the same coaster, while the SeaWorld visit was 3 different coasters).\n\nIf you're asking about the total number of individual ride experiences, that would be **6 times total**.",
+   "durationMs": 2781,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.6,
+      "reason": "judge score 6 < threshold 7",
+      "metadata": {
+       "raw": 6,
+       "clamped": 6,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_731e37d7",
+   "input": {
+    "question": "How much total money did I spend on attending workshops in the last four months?",
+    "askedAt": "2023/02/26 (Sun) 23:35",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information. Based on the memory provided, I can see that you've been attending workshops regularly—five in the last three months, with a goal of attending at least one workshop per month. However, there is no information about the cost of these workshops or the total amount of money you've spent on them.\n\nIf you'd like to track this information, I'd be happy to help you keep record of it going forward!",
+   "durationMs": 1765,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "edced276",
+   "input": {
+    "question": "How many days did I spend in total traveling in Hawaii and in New York City?",
+    "askedAt": "2023/05/30 (Tue) 14:53",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I can see that you took a solo trip to New York City for **five days**, I don't have any record of you traveling to Hawaii in the memory provided. There is a mention of a family trip to Hawaii in one of the assistant's responses, but there's no information about how many days you actually spent there.\n\nIf you could clarify the details of your Hawaii trip, I'd be happy to help you calculate the total days spent traveling in both locations.",
+   "durationMs": 2200,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "10d9b85a",
+   "input": {
+    "question": "How many days did I spend attending workshops, lectures, and conferences in April?",
+    "askedAt": "2023/05/01 (Mon) 23:15",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I can see that you attended a lecture on sustainable development at the public library on April 10th, 2023, I don't have records of other workshops, lectures, or conferences you may have attended in April, nor do I have information about how many days in total you spent at such events.\n\nIf you'd like to track this information going forward, I'd be happy to help you keep a record of events you attend!",
+   "durationMs": 1831,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "e3038f8c",
+   "input": {
+    "question": "How many rare items do I have in total?",
+    "askedAt": "2023/05/30 (Tue) 20:48",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While our conversation history shows that you've mentioned having some lucky finds with rare items, including a rare 1967 pressing of The Beatles' Sgt Pepper's Lonely Hearts Club Band and a collection of rare coins and figurines, there is no specific total count of all your rare items documented in my memory.\n\nTo get an accurate inventory of your collection, you may want to refer to any inventory lists or tracking software you've been considering using to organize and track your collection, as mentioned in our previous conversations.",
+   "durationMs": 2518,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2b8f3739",
+   "input": {
+    "question": "What is the total amount of money I earned from selling my products at the markets?",
+    "askedAt": "2023/06/01 (Thu) 23:37",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, here's the total amount you've earned from selling your products at markets:\n\n1. **May 15th - Farmers' Market**: 12 bunches of fresh organic herbs = **$120**\n2. **May 29th - Homemade and Handmade Market**: 15 jars of homemade jam = **$225**\n3. **Summer Solstice Market**: 20 potted herb plants at $7.50 each = **$150**\n\n**Total earnings from market sales: $495**",
+   "durationMs": 2010,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "1a8a66a6",
+   "input": {
+    "question": "How many magazine subscriptions do I currently have?",
+    "askedAt": "2023/04/01 (Sat) 23:49",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you currently have **1 magazine subscription**.\n\nYou are subscribed to **The New Yorker**, which you subscribed to in early February 2023.\n\nYou previously had a subscription to **Forbes magazine**, but you canceled it in early March 2023 because you weren't finding the articles interesting.",
+   "durationMs": 1713,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "c2ac3c61",
+   "input": {
+    "question": "How many online courses have I completed in total?",
+    "askedAt": "2023/05/30 (Tue) 16:30",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, here's what I can tell you about the online courses you've completed:\n\n- **Coursera**: You've completed **three courses** on Coursera\n- **edX**: You've completed **two courses** on edX\n\n**Total: 5 online courses completed**\n\nYou mentioned having a good foundation from these courses and being familiar with the online learning format, which has been helpful in your current role as a software engineer.",
+   "durationMs": 2433,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "bf659f65",
+   "input": {
+    "question": "How many music albums or EPs have I purchased or downloaded?",
+    "askedAt": "2023/05/30 (Tue) 21:58",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can only confirm that you downloaded **one album** on Spotify:\n\n- **\"Happier Than Ever\"** by Billie Eilish (downloaded on 2023/05/20)\n\nThe memory also mentions **\"Midnight Sky\"** by The Whiskey Wanderers, but this appears to be a fictional reference that was discussed in the context of your blog writing plans.\n\nI do not have information about any other music albums or EPs you may have purchased or downloaded beyond what's mentioned above.",
+   "durationMs": 2326,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_372c3eed",
+   "input": {
+    "question": "How many years in total did I spend in formal education from high school to the completion of my Bachelor's degree?",
+    "askedAt": "2021/08/20 (Fri) 23:34",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, here's your formal education timeline:\n\n- **Arcadia High School**: 2010 to 2014 (4 years)\n- **Pasadena City College (Associate's degree in Computer Science)**: Completed in May 2016 (approximately 2 years)\n- **UCLA (Bachelor's degree in Computer Science)**: Completed in 2020 (4 years)\n\n**Total: 10 years** of formal education from high school through the completion of your Bachelor's degree.",
+   "durationMs": 2456,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "gpt4_2f91af09",
+   "input": {
+    "question": "How many total pieces of writing have I completed since I started writing again three weeks ago, including short stories, poems, and pieces for the writing challenge?",
+    "askedAt": "2023/05/30 (Tue) 17:14",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can tell you about some of your writing output, but I don't have a complete total for exactly three weeks ago.\n\nHere's what I know you've completed:\n\n- **5 short stories** (mentioned on 2023/05/28)\n- **17 poems in the past two weeks** (mentioned on 2023/05/21)\n- **At least 1 writing challenge submission**: \"The Smell of Old Books\" for the \"Forgotten Memories\" prompt (mentioned on 2023/05/30)\n\nHowever, I don't have enough information to give you a precise total for the exact three-week period you're asking about, since the dates of when you started writing again aren't clearly specified in my memory. If you'd like an accurate count, you may want to check your own records or file organization system.",
+   "durationMs": 2794,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "81507db6",
+   "input": {
+    "question": "How many graduation ceremonies have I attended in the past three months?",
+    "askedAt": "2023/07/21 (Fri) 23:33",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you have attended **3 graduation ceremonies** in the past three months:\n\n1. **Emma's preschool graduation** - about two months ago (your little cousin)\n2. **Rachel's master's degree graduation** - a couple of weeks ago (your best friend)\n3. **Alex's leadership development program graduation** - a few weeks ago (your colleague at work)",
+   "durationMs": 3788,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d3ab962e",
+   "input": {
+    "question": "What is the total distance of the hikes I did on two consecutive weekends?",
+    "askedAt": "2022/09/24 (Sat) 23:49",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you completed two hikes on consecutive weekends:\n\n1. **Red Rock Canyon** (two weekends ago from Sept 24): 5-mile hike\n2. **Valley of Fire State Park** (last weekend from Sept 24): 3-mile loop trail\n\n**Total distance: 8 miles**",
+   "durationMs": 2120,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "2311e44b",
+   "input": {
+    "question": "How many pages do I have left to read in 'The Nightingale'?",
+    "askedAt": "2023/05/30 (Tue) 22:55",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you are currently on page 250 of 'The Nightingale' by Kristin Hannah, which has 440 pages total.\n\nTherefore, you have **190 pages left to read** in 'The Nightingale' (440 - 250 = 190 pages).",
+   "durationMs": 1443,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "cc06de0d",
+   "input": {
+    "question": "For my daily commute, how much more expensive was the taxi ride compared to the train fare?",
+    "askedAt": "2023/05/30 (Tue) 23:25",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory:\n\n* **Taxi ride cost:** $12 (the taxi ride you took last Wednesday when you missed the train by 5 minutes)\n* **Daily train fare:** $6\n\nThe difference is:\n$12 - $6 = **$6**\n\nSo the taxi ride was **$6 more expensive** than your daily train fare. That's double the cost of a single train trip, which shows why missing the train by just 5 minutes can be such a setback to your budget!",
+   "durationMs": 2546,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a11281a2",
+   "input": {
+    "question": "What was the approximate increase in Instagram followers I experienced in two weeks?",
+    "askedAt": "2023/05/30 (Tue) 23:16",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you had approximately **350 followers on Instagram after two weeks of posting regularly** (as of May 23, 2023).\n\nHowever, I don't have information about your exact starting follower count from two weeks prior to that date, so I cannot calculate the precise increase. The memory only mentions that you reached 350 followers after two weeks of consistent posting, which was noted as \"a great start.\"",
+   "durationMs": 2008,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "4f54b7c9",
+   "input": {
+    "question": "How many antique items did I inherit or acquire from my family members?",
+    "askedAt": "2023/05/30 (Tue) 23:47",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you acquired or inherited **4 antique items** from your family members:\n\n1. **Antique tea set** - from your cousin Rachel\n2. **Vintage typewriter** - belonged to your dad\n3. **Vintage diamond necklace** - from your grandmother (inherited recently)\n4. **Antique music box** - from your great-aunt\n5. **Depression-era glassware** - from your mom\n\nActually, that's **5 items** total that you've mentioned acquiring from family members.",
+   "durationMs": 2003,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "85fa3a3f",
+   "input": {
+    "question": "What is the total cost of the new food bowl, measuring cup, dental chews, and flea and tick collar I got for Max?",
+    "askedAt": "2023/05/30 (Tue) 19:55",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, here are the costs of those items:\n\n- Stainless steel food bowl: $15\n- Measuring cup: $5\n- Dental chews: $10/month (you buy one pack per month)\n- Flea and tick collar: $20 (one-time expense)\n\nIf you're asking for a one-time total of these specific purchases, that would be:\n$15 + $5 + $20 = **$40** (for the bowl, measuring cup, and flea and tick collar)\n\nThe dental chews are a recurring monthly expense at $10/month, so they wouldn't be included in a one-time total unless you're asking about just one pack, which would be $10.\n\nCould you clarify if you'd like the total of just the one-time purchases, or if you'd like to include the dental chews as well?",
+   "durationMs": 3835,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "9aaed6a3",
+   "input": {
+    "question": "How much cashback did I earn at SaveMart last Thursday?",
+    "askedAt": "2023/05/30 (Tue) 23:17",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you spent $75 on groceries at SaveMart last Thursday (May 25th). With your 1% cashback membership, you earned:\n\n$75 × 0.01 = **$0.75 in cashback**",
+   "durationMs": 1658,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "1f2b8d4f",
+   "input": {
+    "question": "What is the difference in price between my luxury boots and the similar pair found at the budget store?",
+    "askedAt": "2023/05/30 (Tue) 21:36",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, the difference in price between your luxury boots and the similar pair found at the budget store is **$750**.\n\nYou purchased your black ankle boots with a heel from a luxury brand for **$800**, and you found a similar pair at a budget store for **$50**.\n\n$800 - $50 = $750\n\nThat's quite a significant price difference! This discovery seems to have prompted you to reflect on your spending habits and look for ways to be more budget-conscious with your fashion purchases going forward.",
+   "durationMs": 2594,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "e6041065",
+   "input": {
+    "question": "What percentage of packed shoes did I wear on my last trip?",
+    "askedAt": "2023/05/30 (Tue) 23:35",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you packed a lot of shoes on your last trip but only wore two of them - your sneakers and sandals. \n\nIf you packed multiple pairs of shoes but only wore 2, the exact percentage would depend on the total number of shoes you packed. However, from your later message on May 29th, you mentioned packing 5 pairs of shoes on another trip.\n\nIf we use that 5 pairs as reference: you wore 2 out of 5 shoes, which equals **40%** of the shoes you packed.",
+   "durationMs": 2210,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "51c32626",
+   "input": {
+    "question": "When did I submit my research paper on sentiment analysis?",
+    "askedAt": "2023/05/30 (Tue) 16:23",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I do not have specific information about when you submitted your research paper on sentiment analysis to ACL. \n\nThe memory only mentions that you \"submitted [a research paper on sentiment analysis] to ACL\" as part of your background, but no submission date is recorded. You may want to check your email records or ACL's submission system for the exact date.",
+   "durationMs": 2022,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d905b33f",
+   "input": {
+    "question": "What percentage discount did I get on the book from my favorite author?",
+    "askedAt": "2023/05/30 (Tue) 21:08",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you got the book from your favorite author for $24 after a discount, and the original price was $30.\n\nTo calculate the discount percentage:\n- Discount amount: $30 - $24 = $6\n- Discount percentage: ($6 / $30) × 100 = **20% discount**",
+   "durationMs": 1503,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "7405e8b1",
+   "input": {
+    "question": "Did I receive a higher percentage discount on my first order from HelloFresh, compared to my first UberEats order?",
+    "askedAt": "2023/05/30 (Tue) 21:33",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, yes, you received a higher percentage discount on your first HelloFresh order compared to your first UberEats order.\n\nAccording to your notes:\n- **HelloFresh**: You received a **40% discount** on your first order\n- **UberEats**: You received a **20% off discount** on your UberEats order last week\n\nSo the HelloFresh discount (40%) was double the UberEats discount (20%).",
+   "durationMs": 1625,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "f35224e0",
+   "input": {
+    "question": "What is the total number of episodes I've listened to from 'How I Built This' and 'My Favorite Murder'?",
+    "askedAt": "2023/05/30 (Tue) 23:58",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can tell you that:\n\n- **How I Built This**: You've finished around **15 episodes**\n- **My Favorite Murder**: You've finished **episode 12**\n\nSo the total number of episodes you've listened to from these two podcasts is approximately **27 episodes**.",
+   "durationMs": 1625,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "6456829e",
+   "input": {
+    "question": "How many plants did I initially plant for tomatoes and cucumbers?",
+    "askedAt": "2023/05/30 (Tue) 23:46",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you initially planted:\n\n- **5 tomato plants**\n- **3 cucumber plants**\n\nYou mentioned that the 5 tomato plants have been producing abundantly, with daily harvests, and your 3 cucumber plants are also producing a lot of cucumbers!",
+   "durationMs": 1773,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 0.8,
+      "metadata": {
+       "raw": 8,
+       "clamped": 8,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a4996e51",
+   "input": {
+    "question": "How many hours do I work in a typical week during peak campaign seasons?",
+    "askedAt": "2023/05/30 (Tue) 15:17",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, during peak campaign seasons, you work up to **50 hours per week**.\n\nAccording to the conversation from May 29, 2023, the suggested phrasing for your resume mentions working \"extended hours (up to 50 hours/week) during peak campaign seasons.\"\n\nHowever, I also see that in an earlier conversation from May 24, 2023, you mentioned that you typically work 40 hours a week, with some weeks going up to 45 hours. There appears to be a slight variation in how you've described your peak season hours in different contexts, but the most recent guidance suggests framing it as up to 50 hours per week for your application materials.",
+   "durationMs": 2910,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 0.7,
+      "metadata": {
+       "raw": 7,
+       "clamped": 7,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "3c1045c8",
+   "input": {
+    "question": "How much older am I than the average age of employees in my department?",
+    "askedAt": "2023/05/30 (Tue) 23:08",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, you are 32 years old, and the average age of employees in your department is 29.5 years old.\n\nTherefore, you are **2.5 years older** than the average age of employees in your department.",
+   "durationMs": 1404,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "60036106",
+   "input": {
+    "question": "What was the total number of people reached by my Facebook ad campaign and Instagram influencer collaboration?",
+    "askedAt": "2023/05/30 (Tue) 11:00",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, here are the numbers from your two campaigns:\n\n**Facebook Ad Campaign:**\n- Reached: 2,000 people\n\n**Instagram Influencer Collaboration:**\n- The influencer promoted your product to her 10,000 followers\n\n**Total combined reach: 12,000 people**\n\nHowever, I should note that these are different types of reach metrics. The Facebook campaign reached 2,000 people directly through your ads, while the influencer collaboration exposed your product to 10,000 of her followers. The actual overlap and engagement from the influencer promotion may differ from the direct ad reach.",
+   "durationMs": 2636,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "681a1674",
+   "input": {
+    "question": "How many Marvel movies did I re-watch?",
+    "askedAt": "2023/05/30 (Tue) 21:31",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you mentioned that you've watched **four Marvel movies** recently. You specifically stated: \"I've actually watched Doctor Strange already, it was one of the four Marvel movies I watched recently.\"",
+   "durationMs": 1843,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "e25c3b8d",
+   "input": {
+    "question": "How much did I save on the designer handbag at TK Maxx?",
+    "askedAt": "2023/05/30 (Tue) 15:02",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory, you mentioned that you got a fantastic deal on the designer handbag - it was originally $500, and you paid $200 for it at TK Maxx.\n\nSo you saved **$300** on that designer handbag!",
+   "durationMs": 1780,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "4adc0475",
+   "input": {
+    "question": "What is the total number of goals and assists I have in the recreational indoor soccer league?",
+    "askedAt": "2023/05/30 (Tue) 18:44",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, here's what I have about your indoor soccer performance:\n\n**Goals:** 3 goals (mentioned on 2023/05/26)\n\n**Assists:** 2 assists (mentioned on 2023/05/28)\n\n**Total goals and assists: 5**\n\nHowever, I should note that there's also a mention on 2023/05/28 of \"several goals in the league so far,\" which is less specific than the earlier count of 3 goals. If you've scored additional goals since the first mention, the total could be higher. Do you have a more current count of your goals?",
+   "durationMs": 2581,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 0.7,
+      "metadata": {
+       "raw": 7,
+       "clamped": 7,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "4bc144e2",
+   "input": {
+    "question": "How much did I spend on car wash and parking ticket?",
+    "askedAt": "2023/05/30 (Tue) 22:46",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory, here are your expenses:\n\n- **Car wash** (February 3rd): $15\n- **Parking ticket** (January 5th): $50\n\n**Total for both**: $65",
+   "durationMs": 1352,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "ef66a6e5",
+   "input": {
+    "question": "How many sports have I played competitively in the past?",
+    "askedAt": "2023/05/30 (Tue) 20:36",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can see that you have played **2 sports competitively in the past**:\n\n1. **Tennis** - You played competitively in high school\n2. **Swimming** - You swam competitively in college",
+   "durationMs": 1348,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "5025383b",
+   "input": {
+    "question": "What are the two hobbies that led me to join online communities?",
+    "askedAt": "2023/05/30 (Tue) 19:49",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, the two hobbies that led you to join online communities are:\n\n1. **Cooking** - You joined online communities related to cooking to engage in discussions about recipe techniques and share your thoughts on food-related posts. You expressed interest in learning more about cooking techniques from other food enthusiasts.\n\n2. **Photography** - You joined online communities related to photography, particularly for learning editing techniques in Lightroom and getting feedback on your work. You've been enjoying editing your photos and plan to share your knowledge about topics like editing processes, camera settings, and gear reviews with the community.",
+   "durationMs": 2180,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a1cc6108",
+   "input": {
+    "question": "How old was I when Alex was born?",
+    "askedAt": "2023/05/30 (Tue) 20:23",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. There is no record of Alex's birth date or your age at that time in the stored context.",
+   "durationMs": 1334,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "9ee3ecd6",
+   "input": {
+    "question": "How many points do I need to earn to redeem a free skincare product at Sephora?",
+    "askedAt": "2023/05/30 (Tue) 21:46",
+    "ability": "multi-session"
+   },
+   "output": "Based on my memory, you need **300 points** to redeem a free skincare product at Sephora.\n\nAccording to our previous conversation, you were close to reaching this goal with around 200 points, and purchasing the La Roche-Posay Toleriane Ultra Fluid Face Moisturizer SPF 50 (priced at around $30) would bring you even closer to redeeming your free skincare product!",
+   "durationMs": 1990,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "3fdac837",
+   "input": {
+    "question": "What is the total number of days I spent in Japan and Chicago?",
+    "askedAt": "2023/05/30 (Tue) 19:13",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I can see from your memory that you've been planning a trip to Chicago and have visited before, there are no specific dates or duration details about how long you spent in Chicago. Additionally, there is no information in your memory about any trips to Japan or how long you spent there.\n\nIf you'd like to share those details, I'd be happy to help you track that information going forward!",
+   "durationMs": 2070,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "91b15a6e",
+   "input": {
+    "question": "What is the minimum amount I could get if I sold the vintage diamond necklace and the antique vanity?",
+    "askedAt": "2023/05/30 (Tue) 20:17",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, here are the minimum amounts you could potentially get for each item:\n\n**Vintage Diamond Necklace:**\nYou mentioned this necklace is worth $5,000 (based on your appraisal), so that would be your baseline value.\n\n**Antique Vanity:**\nAccording to the restoration guidance I provided earlier, if you've made minor cosmetic improvements (such as cleaning and polishing), you might be able to sell it for a minimum of **$200-$300**. You originally purchased it for $150.\n\n**Combined Minimum:**\nIf you sold both items at their minimum estimated values, you could expect approximately **$5,200-$5,300** (assuming $5,000 for the necklace and $200-$300 for the vanity).\n\nHowever, keep in mind that:\n- The necklace's actual selling price may vary depending on the buyer and market conditions\n- The vanity's price depends on the quality and extent of your restoration work\n- Selling through different channels (online marketplaces, local dealers, auction houses) may yield different results\n\nTo maximize your returns, I'd",
+   "durationMs": 3999,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "27016adc",
+   "input": {
+    "question": "What percentage of the countryside property's price is the cost of the renovations I plan to do on my current house?",
+    "askedAt": "2023/05/30 (Tue) 18:29",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nWhile I have details about your planned renovations on your current house (a $20,000 deck and patio project), I don't have any information about a countryside property's price that would allow me to calculate what percentage the renovation costs represent.\n\nIf you'd like to provide the countryside property's price, I'd be happy to help you calculate that percentage.",
+   "durationMs": 2332,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "720133ac",
+   "input": {
+    "question": "What is the total cost of Lola's vet visit and flea medication?",
+    "askedAt": "2023/05/30 (Tue) 18:40",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can tell you that Lola's flea and tick prevention medication cost **$25 for a 3-month supply**.\n\nHowever, I do not have information about the total cost of Lola's vet visit itself. The memory mentions that you received a **$50 discounted consultation fee** as a regular customer at the vet, but this appears to be from a different vet visit (the one mentioned in the May 25th entry).\n\nTo give you the complete total cost, I would need information about any additional charges from Lola's vet visit on May 30th.",
+   "durationMs": 2390,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "77eafa52",
+   "input": {
+    "question": "How much more did I have to pay for the trip after the initial quote?",
+    "askedAt": "2023/05/30 (Tue) 20:07",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, the initial quote from Sakura Travel Agency was **$2,500** for the entire trip, and the corrected price for the entire trip was **$2,800**.\n\nTherefore, you had to pay **$300 more** after the initial quote.\n\nHowever, you mentioned that you're not sure how much of that is attributed to the hotel booking specifically, so you may want to review your booking details to get a clear breakdown of the costs.",
+   "durationMs": 2116,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "8979f9ec",
+   "input": {
+    "question": "What is the total number of lunch meals I got from the chicken fajitas and lentil soup?",
+    "askedAt": "2023/05/30 (Tue) 21:03",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can tell you:\n\n- **Chicken fajitas**: You got **3 meals** from this batch (you mentioned finishing off the last of your chicken fajitas as your third meal from that preparation)\n\n- **Lentil soup**: You got **5 lunches** from the big batch you made\n\n**Total: 8 lunch meals** from the chicken fajitas and lentil soup combined.",
+   "durationMs": 2070,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "0100672e",
+   "input": {
+    "question": "How much did I spend on each coffee mug for my coworkers?",
+    "askedAt": "2023/05/30 (Tue) 03:16",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you spent **$60 total** on coffee mugs for your coworkers (5 coffee mugs with funny quotes related to your profession, one for each of them).\n\nThis means each coffee mug cost approximately **$12 per mug** ($60 ÷ 5 = $12).",
+   "durationMs": 4228,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a96c20ee",
+   "input": {
+    "question": "At which university did I present a poster on my thesis research?",
+    "askedAt": "2023/05/30 (Tue) 21:47",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you presented your research at a conference over the summer, and you mentioned attending Harvard University to attend your first research conference where you saw some interesting projects on AI in education. However, the memory does not explicitly state that you presented your poster specifically at Harvard University.\n\nThe memory indicates you presented at \"your first research conference over the summer,\" but the specific university where you presented the poster is not clearly stated in the available information. I would need more specific details to confirm whether it was Harvard University or another institution.",
+   "durationMs": 2388,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "92a0aa75",
+   "input": {
+    "question": "How long have I been working in my current role?",
+    "askedAt": "2023/05/30 (Tue) 21:25",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While I can see references to you being a Senior Marketing Specialist working on product launches and collaborating with colleagues like Tom, I don't have a specific record of when you started in your current role or how long you've been in this position.",
+   "durationMs": 2248,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "3fe836c9",
+   "input": {
+    "question": "How much more was the pre-approval amount than the final sale price of the house?",
+    "askedAt": "2023/05/30 (Tue) 18:41",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, the pre-approval amount was $350,000 and the final sale price of your house was $325,000.\n\nThe difference is: $350,000 - $325,000 = **$25,000**\n\nSo you were pre-approved for $25,000 more than the final sale price of your house.",
+   "durationMs": 1395,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "1c549ce4",
+   "input": {
+    "question": "What is the total cost of the car cover and detailing spray I purchased?",
+    "askedAt": "2023/05/30 (Tue) 23:21",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, the total cost of the car cover and detailing spray you purchased is **$140**.\n\nHere's the breakdown:\n- **Waterproof car cover**: $120\n- **Detailing spray from Amazon**: $20\n\n**Total: $140**",
+   "durationMs": 1352,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "6c49646a",
+   "input": {
+    "question": "What is the total distance I covered in my four road trips?",
+    "askedAt": "2023/05/30 (Tue) 22:17",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can calculate your total distance across the road trips you've mentioned:\n\n1. **Yellowstone National Park trip** (4 days, last month): 1,200 miles\n2. **Three previous road trips combined** (solo trip to Durango, weekend trip to Breckenridge, and family trip to Santa Fe): 1,800 miles\n\n**Total distance covered: 3,000 miles**\n\nYou've done quite a bit of driving! With this experience, you're definitely comfortable with road trips and exploring new scenic spots, as you mentioned yourself.",
+   "durationMs": 2458,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "1192316e",
+   "input": {
+    "question": "What is the total time it takes I to get ready and commute to work?",
+    "askedAt": "2023/05/30 (Tue) 19:00",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, here's the breakdown of your morning routine and commute:\n\n**Morning routine:** 1 hour\n- 20-minute meditation session\n- 30-minute workout\n- Quick breakfast\n\n**Commute to work:** 30 minutes\n\n**Total time to get ready and commute to work: 1 hour and 30 minutes**\n\nThis assumes you wake up at 6:30 AM as you mentioned, so you would arrive at work around 8:00 AM.",
+   "durationMs": 2182,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "0ea62687",
+   "input": {
+    "question": "How much more miles per gallon was my car getting a few months ago compared to now?",
+    "askedAt": "2023/05/30 (Tue) 23:51",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, a few months ago (around May 2023) your car was getting **30 miles per gallon in the city**. Currently, you're getting **28 miles per gallon in the city**.\n\nSo your car is getting **2 miles per gallon less** now compared to a few months ago.",
+   "durationMs": 1810,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "67e0d0f2",
+   "input": {
+    "question": "What is the total number of online courses I've completed?",
+    "askedAt": "2023/05/30 (Tue) 23:23",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can tell you that you've completed **12 courses on Coursera**. However, you also mentioned that you've built a solid foundation in data analysis through online courses on **edX**, but the specific number of edX courses completed is not specified in the memory.\n\nSo the confirmed total is **at least 12 courses** (from Coursera), but the exact total number of all online courses completed is not fully documented in the available information.",
+   "durationMs": 1975,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "bb7c3b45",
+   "input": {
+    "question": "How much did I save on the Jimmy Choo heels?",
+    "askedAt": "2023/05/30 (Tue) 23:31",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, you mentioned that you purchased your Jimmy Choo heels at an outlet mall for $200, and you noted that they originally retailed for $500.\n\nThis means you saved **$300** on the Jimmy Choo heels!\n\nThat's a great deal – you got them for 60% off the original retail price!",
+   "durationMs": 1934,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "ba358f49",
+   "input": {
+    "question": "How many years will I be when my friend Rachel gets married?",
+    "askedAt": "2022/09/01 (Thu) 23:52",
+    "ability": "multi-session"
+   },
+   "output": "I don't have that information. While I can see from your memory that your friend Rachel is getting married next year (2023), I don't have your birth date or current age recorded, so I'm unable to calculate how old you'll be at that time.",
+   "durationMs": 1632,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "61f8c8f8",
+   "input": {
+    "question": "How much faster did I finish the 5K run compared to my previous year's time?",
+    "askedAt": "2023/10/01 (Sun) 23:53",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the memory available, I can see that you completed a 5K run last year in 45 minutes, but there is no record of a more recent 5K time to compare it against. To answer your question about how much faster you finished compared to your previous year's time, I would need information about a current or recent 5K run completion time.",
+   "durationMs": 1741,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "60159905",
+   "input": {
+    "question": "How many dinner parties have I attended in the past month?",
+    "askedAt": "2023/05/30 (Tue) 14:40",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, I can identify the following dinner parties you attended in the past month:\n\n1. **Sarah's place** - An Italian feast that inspired you to try Italian recipes\n2. **Alex's place** - A low-key potluck with different cuisines from around the world\n3. **Mike's place** - A BBQ where you watched a football game together\n\nSo you have attended **3 dinner parties** in the past month.",
+   "durationMs": 2007,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "ef9cf60a",
+   "input": {
+    "question": "How much did I spend on gifts for my sister?",
+    "askedAt": "2023/05/30 (Tue) 22:48",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you spent a total of **$300** on gifts for your sister:\n\n1. A silver necklace with a small pendant from Tiffany's: **$200**\n2. A gift set with multiple essential oils (with a personalized note): **~$100** (based on context, though the exact amount isn't specified)\n\nAdditionally, you mentioned previously giving her a **$100 gift card to her favorite spa**, which would bring the total to **$400** if you're counting all gifts mentioned.",
+   "durationMs": 2452,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.4,
+      "reason": "judge score 4 < threshold 7",
+      "metadata": {
+       "raw": 4,
+       "clamped": 4,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "73d42213",
+   "input": {
+    "question": "What time did I reach the clinic on Monday?",
+    "askedAt": "2023/05/30 (Tue) 22:10",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you mentioned that you left home at 7 AM on Monday for your doctor's appointment, and you got back to the office around 1:00 PM after taking a half-day off. However, the exact time you reached the clinic is not specified in the information I have.\n\nWhat I can tell you is that you arrived back at the office around 1:00 PM, but the specific arrival time at the clinic itself is not documented in your long-term memory.",
+   "durationMs": 1732,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.3,
+      "reason": "judge score 3 < threshold 7",
+      "metadata": {
+       "raw": 3,
+       "clamped": 3,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "bc149d6b",
+   "input": {
+    "question": "What is the total weight of the new feed I purchased in the past two months?",
+    "askedAt": "2023/05/30 (Tue) 22:02",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on our previous conversations, I can see that you purchased a 50-pound batch of layer feed (which cost $120 with a 10% discount, bringing the cost per pound to $2.16), but I don't have any record of additional feed purchases in the past two months or the total weight of all feed purchased during that period.\n\nIf you'd like to track this, you could provide me with details of all your feed purchases, and I can help you calculate the total weight.",
+   "durationMs": 2286,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "099778bb",
+   "input": {
+    "question": "What percentage of leadership positions do women hold in the my company?",
+    "askedAt": "2023/05/30 (Tue) 22:26",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you mentioned that **women occupy 20 of the leadership positions in your company**. Since you also noted that your company has a total of **100 leadership positions**, this means that **women hold 20% of the leadership positions** in your company.\n\nThis is the specific data you shared from your recent workshop on gender equality. To get more detailed information about how this compares to industry benchmarks and to understand if there are opportunities for improvement, I would recommend checking out the resources mentioned earlier, such as Catalyst's Pyramid Reports, McKinsey's Women in the Workplace Report, or Deloitte's Global Survey of Women in the Workplace.",
+   "durationMs": 2794,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "09ba9854",
+   "input": {
+    "question": "How much will I save by taking the train from the airport to my hotel instead of a taxi?",
+    "askedAt": "2023/05/30 (Tue) 11:49",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in your memory, you mentioned being told that a taxi from the airport to your hotel would cost around **$60**.\n\nRegarding the train cost, there has been some back-and-forth discussion about the price. The most reliable information from your memory indicates that train options from Narita Airport to Shinjuku range from approximately **$9-11 USD** (¥1,000-1,200) for the train fare itself, though you may need additional transportation (taxi or subway) from the station to your hotel.\n\nIf we use the $10 figure you mentioned for the train, you would save approximately **$50** by taking the train instead of a taxi.\n\nHowever, I should note that the actual savings may vary depending on:\n- Which airport you're arriving at (Narita or Haneda)\n- Your exact hotel location\n- Whether you need additional transportation from the train station to your hotel\n\nFor the most accurate comparison, I'd recommend confirming the exact train fare and any additional costs with your hotel or checking the official train operator websites.",
+   "durationMs": 3608,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "d6062bb9",
+   "input": {
+    "question": "What is the total number of views on my most popular videos on YouTube and TikTok?",
+    "askedAt": "2023/05/30 (Tue) 17:57",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, here are your most popular videos:\n\n- **YouTube**: Your social media analytics tutorial has **542 views**\n- **TikTok**: Your video of Luna chasing a laser pointer has **1,456 views**\n\n**Total combined views: 1,998 views**",
+   "durationMs": 1833,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "157a136e",
+   "input": {
+    "question": "How many years older is my grandma than me?",
+    "askedAt": "2024/02/05 (Mon) 23:49",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. While I can see that your grandma celebrated her 75th birthday and that you had your birthday a week after hers, I don't have your current age or birth date recorded, so I cannot calculate the age difference between you and your grandma.",
+   "durationMs": 1537,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "c18a7dc8",
+   "input": {
+    "question": "How many years older am I than when I graduated from college?",
+    "askedAt": "2023/05/30 (Tue) 23:37",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. To answer this question, I would need to know:\n\n1. When you graduated from college\n2. Your current age\n\nNeither of these details are present in the memory context provided. If you'd like me to help calculate the difference, please share those two pieces of information.",
+   "durationMs": 1524,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a3332713",
+   "input": {
+    "question": "What is the total amount I spent on gifts for my coworker and brother?",
+    "askedAt": "2023/05/30 (Tue) 21:10",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, here's what I can find about your gifts to your coworker and brother:\n\n* **Brother's graduation gift (May):** $100 gift card to an electronics store\n* **Coworker's baby shower gift:** $100 for baby clothes and toys from Buy Buy Baby\n\n**Total spent on gifts for your coworker and brother: $200**",
+   "durationMs": 1767,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "55241a1f",
+   "input": {
+    "question": "What is the total number of comments on my recent Facebook Live session and my most popular YouTube video?",
+    "askedAt": "2023/05/30 (Tue) 21:57",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, here's what I can tell you:\n\n- Your recent **Facebook Live session about vegan recipes** received **12 comments**\n- Your **most popular YouTube video on social media analytics** has **21 comments**\n\nSo the total number of comments across these two videos is **33 comments**.",
+   "durationMs": 1736,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a08a253f",
+   "input": {
+    "question": "How many days a week do I attend fitness classes?",
+    "askedAt": "2023/05/30 (Tue) 23:16",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, you attend fitness classes **3 days a week**:\n\n- **Tuesdays** at 6:30 pm - Zumba class\n- **Thursdays** at 6:30 pm - Zumba class\n- **Saturdays** at 10:00 am - Weightlifting class",
+   "durationMs": 9141,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.3,
+      "reason": "judge score 3 < threshold 7",
+      "metadata": {
+       "raw": 3,
+       "clamped": 3,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "f0e564bc",
+   "input": {
+    "question": "What is the total amount I spent on the designer handbag and high-end skincare products?",
+    "askedAt": "2023/05/30 (Tue) 22:07",
+    "ability": "multi-session"
+   },
+   "output": "Based on the information in my memory, I can tell you about your spending on these items:\n\n- **Coach handbag**: $800\n- **High-end skincare products from Nordstrom anniversary sale**: $500\n\n**Total amount spent**: $1,300\n\nThis includes your Coach handbag and the high-end skincare products (La Mer Moisturizing Cream, Sunday Riley Power Couple, and Dr Dennis Gross Skincare Alpha Beta Peel) that you purchased during the Nordstrom anniversary sale.",
+   "durationMs": 2084,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "078150f1",
+   "input": {
+    "question": "How much more money did I raise than my initial goal in the charity cycling event?",
+    "askedAt": "2023/05/30 (Tue) 23:36",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you initially aimed to raise $200 in donations for the local children's hospital during the charity cycling event. You ended up raising $250 in donations.\n\nTherefore, you raised **$50 more** than your initial goal - that's a 25% increase! That's a great achievement and shows your dedication to the cause.",
+   "durationMs": 1714,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "8cf4d046",
+   "input": {
+    "question": "What is the average GPA of my undergraduate and graduate studies?",
+    "askedAt": "2023/05/30 (Tue) 18:42",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, here are your GPAs:\n\n- **Undergraduate (Computer Science, University of Mumbai)**: 3.86 out of 4.0 (equivalent to an overall percentage of 83%, First-Class distinction)\n- **Graduate (Master's in Data Science, University of Illinois at Urbana-Champaign)**: 3.8 out of 4.0\n\nTo calculate the average of your undergraduate and graduate GPAs:\n(3.86 + 3.8) / 2 = **3.83 out of 4.0**",
+   "durationMs": 2003,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "a346bb18",
+   "input": {
+    "question": "How many minutes did I exceed my target time by in the marathon?",
+    "askedAt": "2023/05/30 (Tue) 22:30",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you mentioned that your target time for the marathon was 4 hours and 10 minutes, and you completed your first full marathon in 4 hours and 22 minutes.\n\nTherefore, you exceeded your target time by **12 minutes** (4:22 - 4:10 = 0:12).",
+   "durationMs": 1488,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "37f165cf",
+   "input": {
+    "question": "What was the page count of the two novels I finished in January and March?",
+    "askedAt": "2023/05/30 (Tue) 19:21",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nBased on the memory provided, I can see that you read \"The Power\" by Naomi Alderman in December (341 pages) and a 416-page novel before your May 27th message, but I don't have specific records of novels you finished in January and March with their exact page counts.",
+   "durationMs": 1963,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "8e91e7d9",
+   "input": {
+    "question": "What is the total number of siblings I have?",
+    "askedAt": "2023/05/30 (Tue) 09:50",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. There is no record of you telling me about how many siblings you have.",
+   "durationMs": 1096,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "87f22b4a",
+   "input": {
+    "question": "How much have I made from selling eggs this month?",
+    "askedAt": "2023/05/30 (Tue) 09:50",
+    "ability": "multi-session"
+   },
+   "output": "I do not have that information in my memory. \n\nThe most recent information I have about your egg sales is from May 22nd, when you mentioned you had sold a total of 40 dozen eggs so far that month at $3 a dozen. However, I don't have any updates about your egg sales for the rest of May or a total for the current month.",
+   "durationMs": 2337,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0,
+      "reason": "judge score 0 < threshold 7",
+      "metadata": {
+       "raw": 0,
+       "clamped": 0,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "e56a43b9",
+   "input": {
+    "question": "How much discount will I get on my next purchase at FreshMart?",
+    "askedAt": "2023/05/30 (Tue) 18:15",
+    "ability": "multi-session"
+   },
+   "output": "Based on your memory, you have 500 points at FreshMart, and every 100 points translates to a $1 discount on your next purchase.\n\nWith 500 points, you would get a **$5 discount** on your next purchase at FreshMart.",
+   "durationMs": 1442,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "efc3f7c2",
+   "input": {
+    "question": "How much earlier do I wake up on Fridays compared to other weekdays?",
+    "askedAt": "2023/05/30 (Tue) 16:24",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you wake up at **6:00 AM on Fridays** and **6:30 AM on other weekdays (Monday to Thursday)**.\n\nThis means you wake up **30 minutes earlier on Fridays** compared to other weekdays. You mentioned that on Fridays, you like to get a head start, which is why you wake up earlier.",
+   "durationMs": 1522,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": true,
+      "score": 1,
+      "metadata": {
+       "raw": 10,
+       "clamped": 10,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  },
+  {
+   "caseId": "21d02d0d",
+   "input": {
+    "question": "How many fun runs did I miss in March due to work commitments?",
+    "askedAt": "2023/04/26 (Wed) 23:58",
+    "ability": "multi-session"
+   },
+   "output": "Based on the memory provided, you missed **one** 5K fun run in March due to work commitments. Specifically, you missed the run on **March 5th** due to work commitments.\n\n(Note: There is a discrepancy in the memory where another entry mentions missing a run on March 26th, but March 26th would actually be in the future relative to the earlier conversation date, so the March 5th date appears to be the accurate one.)",
+   "durationMs": 2045,
+   "scores": [
+    {
+     "scorer": "llm-judge-j",
+     "result": {
+      "pass": false,
+      "score": 0.5,
+      "reason": "judge score 5 < threshold 7",
+      "metadata": {
+       "raw": 5,
+       "clamped": 5,
+       "passThreshold": 7,
+       "maxScore": 10
+      }
+     }
+    },
+    {
+     "scorer": "abstention",
+     "result": {
+      "pass": true,
+      "reason": "n/a (not an abstention case)"
+     }
+    }
+   ]
+  }
+ ],
+ "summary": {
+  "total": 121,
+  "passed": 61,
+  "failed": 60,
+  "avgDurationMs": 2259.190082644628,
+  "byScorer": {
+   "llm-judge-j": {
+    "passed": 61,
+    "failed": 60,
+    "avgScore": 0.6231404958677685
+   },
+   "abstention": {
+    "passed": 121,
+    "failed": 0,
+    "avgScore": null
+   }
+  },
+  "passRateCi": {
+   "lo": 0.4162985233990828,
+   "hi": 0.5917116270635835
+  }
+ },
+ "benchConfig": {
+  "mode": "memory",
+  "retrieval": "default",
+  "embedder": "none",
+  "conflictPipeline": "off",
+  "topK": 12,
+  "consolidate": false,
+  "provider": "openai-compatible:claude-haiku-4-5",
+  "judge": "ollama:qwen3:8b-q4_K_M",
+  "selfJudged": false,
+  "iterations": 1,
+  "loader": "longmemeval",
+  "variant": "S",
+  "ability": "multi-session",
+  "maxCostUsd": 5
+ },
+ "aggregates": {
+  "passRates": [
+   0.5041322314049587
+  ],
+  "passRateMean": 0.5041322314049587,
+  "passRateStddev": 0,
+  "abstentionRate": null
+ }
+}
