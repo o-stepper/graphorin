@@ -1,5 +1,13 @@
 # @graphorin/secret-1password
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.10.2
+  - @graphorin/security@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

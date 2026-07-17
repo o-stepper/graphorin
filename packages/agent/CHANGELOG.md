@@ -1,5 +1,34 @@
 # @graphorin/agent
 
+## 0.10.2
+
+### Patch Changes
+
+- [#190](https://github.com/o-stepper/graphorin/pull/190) [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553) Thanks [@o-stepper](https://github.com/o-stepper)! - docs: reconcile the last P3 doc drift from the 2026-07 e2e campaign
+
+  - ORPHAN-SU-02: the reconnect backoff docstring matches the implementation
+    (`baseMs * 2^(attempt-1)`, exponent clamped at 30, `attempt` 1-indexed).
+  - LATERAL-L-03: the `ProtocolGuardConfig` docstring no longer claims a
+    non-existent `Agent.protocolGuard` knob; it is passed to `guardOutboundContent`
+    / `resolvePolicy` when wiring server boundaries.
+  - SCAFFOLD-D1: the channels guide clarifies that only the `<<<commentary>>>`
+    envelope is stripped outbound; `<<<untrusted_content ...>>>` markers are an
+    inbound-only wrapper and are not removed on echo.
+  - Guide pages catch up with the MEMORY-C-03 behavior that shipped in 0.10.1:
+    a bare `createMemory()` documents compaction as off-and-silent until a
+    `providerContextWindow` is supplied (memory-system table + agent-runtime
+    context-management section), and the channels guide shows the real
+    untrusted-content envelope attributes (`trust=` / `tool=` / `origin=`).
+
+- [#190](https://github.com/o-stepper/graphorin/pull/190) [`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553) Thanks [@o-stepper](https://github.com/o-stepper)! - Correct the handoff sensitivity-filter documentation to match the shipped contract (e2e 2026-07-16, AGENT-FIL-01 / AGENT-FIL-02 / AGENT-FIL-03, doc-drift). The API docs for `bySensitivity` and `stripSensitiveOutputs` described a per-part `MessageContent` sensitivity annotation (`inboundTrust` / `secret`) that does not exist on the public surface, implying a real tier gate that the filters do not perform. The docstrings (and the guide's Filter library table) now describe the actual behavior: `bySensitivity` is a coarse token heuristic that drops a message only when its content contains the literal `[REDACTED:secret]` token and `maxTier` is below `secret` (so untagged plaintext secrets are kept - use a custom predicate for a real per-part gate), and `stripSensitiveOutputs` strips `tool` messages carrying any `[REDACTED:...]` token. The table also notes that `lastN` / `lastUser` always retain system prompts in addition to the kept turns. Behavior is unchanged; a future release may add a real part-level annotation.
+
+- Updated dependencies [[`42cff94`](https://github.com/o-stepper/graphorin/commit/42cff94a6a3636e3ebe80d22b2b83a428afc727f)]:
+  - @graphorin/tools@0.10.2
+  - @graphorin/memory@0.10.2
+  - @graphorin/core@0.10.2
+  - @graphorin/security@0.10.2
+  - @graphorin/skills@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

@@ -68,4 +68,4 @@ Implementation details and rationale are published in the [security guide](https
 
 ---
 
-**Graphorin** · v0.10.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.10.2 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

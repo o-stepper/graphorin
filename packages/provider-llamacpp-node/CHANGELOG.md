@@ -1,5 +1,13 @@
 # @graphorin/provider-llamacpp-node
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [[`fd159e0`](https://github.com/o-stepper/graphorin/commit/fd159e08448580d94daa3f0ac5ef1e23e4f7a553)]:
+  - @graphorin/provider@0.10.2
+  - @graphorin/core@0.10.2
+
 ## 0.10.1
 
 ### Patch Changes

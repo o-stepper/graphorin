@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/memory",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Six-tier memory system for the Graphorin framework: createMemory() facade with working / session / episodic / semantic / procedural / shared sub-modules, eleven memory tools wired into @graphorin/tools, hybrid vector + FTS5 search composed through Reciprocal Rank Fusion (k=60 default) with a pluggable reranker hook, a multi-stage conflict resolution pipeline (exact dedup → embedding three-zone → heuristic regex → subject/predicate → defer-to-deep) with an English locale pack default + plug-in locales, an embedder migration runner with three coexistence policies (lock-on-first / multi-active / auto-migrate), per-record embedder_id enforcement, multi-agent attribution, append-only writes with soft-delete + supersede semantics, default-on bi-temporal storage, provenance + quarantine safety gate for synthesized memory, AISpan emission for every operation, and tier-aware memory-modification guard wiring.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

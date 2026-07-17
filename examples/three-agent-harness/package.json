@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-three-agent-harness",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "private": true,
   "description": "Three-agent orchestration harness demo for the Graphorin framework. Demonstrates the Planner / Generator / Evaluator pattern with structured-handoff artifacts (agent.progress.write/read), evaluatorOptimizer({...}) self-revision loop, and an optional Agent.fanOut({...}) research-and-decide variant with createCitationAgent post-processing. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
