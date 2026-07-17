@@ -52,6 +52,26 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.10.x -> 0.11.0
+
+0.11.0 is the local-first first-run release. Everything is additive;
+nothing requires action:
+
+- **`ProviderEvent` `finish` gains an optional `providerMetadata`
+  field.** Exhaustive switches over the event union are unaffected (no
+  new variant); consumers that serialize provider events verbatim will
+  see the extra field on Ollama-backed streams.
+- **`withTracing` stamps additional span attributes**
+  (`graphorin.provider.<vendor>.<key>`) when an adapter reports vendor
+  diagnostics. Dashboards keyed on an exact attribute allowlist may
+  want to add them.
+- **`graphorin doctor` gains `--smoke-local`** (plus
+  `--ollama-base-url` / `--ollama-model` / `--embed-model`). Behavior
+  of existing flags is unchanged; the doctor still opens no network
+  connection unless `--smoke-local` is passed.
+- `@graphorin/cli` now depends on `@graphorin/provider` (installed
+  automatically with the lockstep bump).
+
 ### 0.10.0 -> 0.10.1 / 0.10.2
 
 Two patch releases from the 2026-07 end-to-end campaign. Everything is

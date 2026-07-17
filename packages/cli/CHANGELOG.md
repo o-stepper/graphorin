@@ -1,5 +1,26 @@
 # @graphorin/cli
 
+## 0.11.0
+
+### Minor Changes
+
+- [#193](https://github.com/o-stepper/graphorin/pull/193) [`47b6034`](https://github.com/o-stepper/graphorin/commit/47b60342dc8a345d1299a22a2fc4fe2aac50bb31) Thanks [@o-stepper](https://github.com/o-stepper)! - `graphorin doctor --smoke-local` - the local-first first-run smoke (external audit 2026-07-16, item 6). Exercises the exact stack a new local deployment depends on, through the same code paths the framework uses at runtime: the native SQLite stack (`better-sqlite3` binding + `sqlite-vec`, with the pnpm-10 skipped-build failure surfaced as the actionable `SqliteNativeBindingError` hint), a write / close / reopen / search round-trip against a throwaway store (FTS-only, no models needed), Ollama daemon reachability and model inventory (`--ollama-model` asserts presence), one real `/api/embed` probe reporting the embedding dimension (`--embed-model`, default `nomic-embed-text`), and - with `--ollama-model` - a streamed tool-call round-trip through the real `ollamaAdapter` (`think: false`) that reports the server's load / prompt-eval / generation timings. An unreachable daemon degrades to warn + skip so storage-only machines still get a verdict. `--smoke-local` alone runs only the smoke; it composes with `--check-*` / `--all` and is deliberately not implied by `--all` (CI hosts without a daemon keep `--all` unchanged).
+
+### Patch Changes
+
+- Updated dependencies [[`47b6034`](https://github.com/o-stepper/graphorin/commit/47b60342dc8a345d1299a22a2fc4fe2aac50bb31)]:
+  - @graphorin/core@0.11.0
+  - @graphorin/provider@0.11.0
+  - @graphorin/memory@0.11.0
+  - @graphorin/pricing@0.11.0
+  - @graphorin/security@0.11.0
+  - @graphorin/server@0.11.0
+  - @graphorin/sessions@0.11.0
+  - @graphorin/skills@0.11.0
+  - @graphorin/store-sqlite@0.11.0
+  - @graphorin/workflow@0.11.0
+  - @graphorin/eslint-plugin@0.11.0
+
 ## 0.10.2
 
 ### Patch Changes

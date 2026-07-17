@@ -1,5 +1,14 @@
 # @graphorin/sessions
 
+## 0.11.0
+
+### Patch Changes
+
+- Updated dependencies [[`47b6034`](https://github.com/o-stepper/graphorin/commit/47b60342dc8a345d1299a22a2fc4fe2aac50bb31)]:
+  - @graphorin/core@0.11.0
+  - @graphorin/observability@0.11.0
+  - @graphorin/tools@0.11.0
+
 ## 0.10.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-background-consolidator",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "private": true,
   "description": "Long-lived agent + cron triggers demo for the Graphorin framework. Server-mode example that wires @graphorin/triggers with the consolidator daemon to drive light + standard memory consolidation phases on a tier:cheap budget, observable via the consolidator status endpoint. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

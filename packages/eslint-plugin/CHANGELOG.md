@@ -1,5 +1,7 @@
 # @graphorin/eslint-plugin
 
+## 0.11.0
+
 ## 0.10.2
 
 ## 0.10.1

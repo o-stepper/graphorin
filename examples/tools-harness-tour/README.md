@@ -42,7 +42,7 @@ Expected output (one line per stage, then the summary line):
 [4/6] tool_search: 'convert kilometers to meters' -> 1 deferred hit(s): unit_convert
 [5/6] code-mode: sandboxed script bridged 2 tool calls -> chars=28, meters=28000
 [6/6] spill: handle graphorin-spill:tour-run/call-5-render_atlas.txt (123047 bytes spilled); read_result paged it back in 4 page(s), first page 32768 bytes
-graphorin v0.10.2 tools-harness-tour: OK - tools=10 deferred=1 searchHits=1 spillBytes=123047 pagesRead=4
+graphorin v0.11.0 tools-harness-tour: OK - tools=10 deferred=1 searchHits=1 spillBytes=123047 pagesRead=4
 ```
 
 ---
@@ -178,4 +178,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.10.2 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.11.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
