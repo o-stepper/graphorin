@@ -484,6 +484,9 @@ export const SESSION_SCOPED_PURGES: ReadonlyArray<SessionScopedPurge> = Object.f
       { table: 'rules', sessionColumn: 'scope_session_id', fts: 'rules_fts' },
       { table: 'working_blocks', sessionColumn: 'scope_session_id' },
       { table: 'spans', sessionColumn: 'session_id' },
+      // Migration 038: a parked run's serialized RunState embeds the
+      // session's messages - erasing the session must erase the park.
+      { table: 'suspended_runs', sessionColumn: 'session_id' },
       { table: 'consolidator_state', sessionColumn: 'scope_session_id' },
       { table: 'consolidator_runs', sessionColumn: 'scope_session_id' },
     ] satisfies ReadonlyArray<SessionScopedPurge>

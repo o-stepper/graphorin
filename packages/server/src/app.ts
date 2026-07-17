@@ -46,6 +46,7 @@ import { AgentRegistry, WorkflowRegistry } from './registry/index.js';
 import type { ReplayApi } from './replay/index.js';
 import type { AuditApi, McpApi, MemoryApi, SessionApi, SkillsApi } from './routes/index.js';
 import { RunStateTracker } from './runtime/run-state.js';
+import { createSuspendedRunPersistence } from './runtime/suspended-run-persistence.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
@@ -277,6 +278,15 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     });
   const agents = options.agents ?? new AgentRegistry();
   const workflows = options.workflows ?? new WorkflowRegistry();
+
+  // Migration 038: mirror `awaiting_approval` parks into the durable
+  // sidecar so `POST /runs/:runId/resume` survives a process restart.
+  // Guarded for structurally-custom stores that predate the surface.
+  if (store.suspendedRuns !== undefined) {
+    runs.setSuspendedRunPersistence(
+      createSuspendedRunPersistence({ agents, store: store.suspendedRuns, now }),
+    );
+  }
 
   const app = new Hono<{ Variables: ServerVariables }>();
 

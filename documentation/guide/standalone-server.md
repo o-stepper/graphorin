@@ -51,7 +51,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/agents/:id/stream` | **Starts the run** and returns `202` with `runId` + the WS subject (`agent:<id>/runs/<runId>/events`) the events are emitted on (IP-2). Subscribe over WebSocket; workflow runs use `workflow:<id>/runs/<runId>/events`. |
 | `GET` | `/v1/runs/:runId/state` | Read the current `RunState`. |
 | `POST` | `/v1/runs/:runId/abort` | Abort a run. |
-| `POST` | `/v1/runs/:runId/resume` | Resume an in-process suspended agent run (C3/W-119): body `{ "approvals": [{ "toolCallId", "granted", "reason"?, "subRunToolCallId"? }] }`, scope `agents:invoke:<agentId>`. The tracker retains the resumable `RunState` when a run parks (`POST /agents/:id/run` suspension branch, or `runs.registerSuspended(...)` for proactive fires executed outside REST); a partially-resolved directive re-suspends and retains the fresh state. `409 run-not-suspended` for a run that is not awaiting approval, `409 run-state-unavailable` when this process retains no state (resume those library-side via `agent.run(savedState, { directive })`), `409 agent-busy` when the instance has another run in flight. Suspended records are exempt from retention pruning - settle them via resume or abort. |
+| `POST` | `/v1/runs/:runId/resume` | Resume a suspended agent run (C3/W-119): body `{ "approvals": [{ "toolCallId", "granted", "reason"?, "subRunToolCallId"? }] }`, scope `agents:invoke:<agentId>`. The tracker retains the resumable `RunState` when a run parks (`POST /agents/:id/run` suspension branch, or `runs.registerSuspended(...)` for proactive fires executed outside REST) and mirrors it into the durable `suspended_runs` sidecar (migration 038), so a park **survives a server restart**: boot hydration re-registers each row and this endpoint rehydrates it through the owning agent's `deserializeState` codec. A partially-resolved directive re-suspends and retains (and re-persists) the fresh state. `409 run-not-suspended` for a run that is not awaiting approval, `409 run-state-unavailable` when no state is retained or the registered agent ships no codec (resume those library-side via `agent.run(savedState, { directive })`), `409 agent-busy` when the instance has another run in flight, `500 run-state-invalid` for an unreadable durable payload. Suspended records are exempt from retention pruning and their rows are dropped when the run settles - settle them via resume or abort. |
 | `POST` | `/v1/runs/:runId/replay` | Replay a recorded run from the audit / cassette artefacts. |
 | `GET` | `/v1/sessions` | List sessions. |
 | `POST` | `/v1/sessions` | Create a session. |
@@ -107,7 +107,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 
 | `auth.kind` | Behaviour |
 | --- | --- |
-| `'token'` (default) | Every endpoint except `/v1/health` (and, when `metrics.requireAuth = false`, `/v1/metrics`) requires a bearer token signed with HMAC-SHA256 against the deployment pepper. Scopes are enforced per route; the WebSocket upgrade authenticates by bearer header or a single-use ticket. |
+| `'token'` (default) | Every endpoint except `/v1/health` (and `/v1/metrics` only if you opt out via `metrics.requireAuth = false`) requires a bearer token signed with HMAC-SHA256 against the deployment pepper. Scopes are enforced per route; the WebSocket upgrade authenticates by bearer header or a single-use ticket. |
 | `'none'` | **Authentication is disabled.** Every endpoint - REST, the WebSocket upgrade, SSE and replay - is served to an anonymous, fully-authorized (`admin:*`) principal with no token. Intended only for **trusted loopback / single-operator** deployments. |
 
 The `'none'` contract is explicit and total: there is no half-open state. Either you run with tokens, or every route (including run invocation and the live stream) is open to anyone who can reach the socket. `ws.enabled: true` is honoured under `'none'` - the upgrade mounts and accepts clients that present only the `graphorin.protocol.v1` subprotocol (no ticket needed). Because this removes all access control, the server prints a startup **warning** when `auth.kind='none'` is combined with a non-loopback `server.host` (e.g. `0.0.0.0`); bind a loopback host or switch to `auth.kind='token'` for any exposed deployment.
@@ -312,7 +312,7 @@ windows.
 
 ## Prometheus metrics
 
-`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted. With `metrics.requireAuth = true` the endpoint mounts behind the standard auth boundary and requires the `admin:metrics:read` scope (an `admin:*` grant matches); with `requireAuth = false` (the default) it is served unauthenticated.
+`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted. With `metrics.requireAuth = true` (the default since 0.12.0) the endpoint mounts behind the standard auth boundary and requires the `admin:metrics:read` scope (an `admin:*` grant matches) - point your scraper at the endpoint with an `Authorization: Bearer <token>` header (Prometheus: `authorization.credentials_file`). Setting `requireAuth = false` serves the exposition unauthenticated for trusted-network scrapes; on a non-loopback bind the server logs a WARN because the labels leak operational detail (trigger ids, consolidator budgets).
 
 ## Configuration
 
@@ -357,6 +357,8 @@ Recommended deployment patterns:
 - **Kubernetes**: ship the manifests under `examples/k8s/`.
 
 All three templates run Graphorin as a **non-root** user with the audit log on its own mountpoint and the secrets store unreadable by the application's main filesystem path.
+
+**TLS**: the server speaks plaintext HTTP only - there is deliberately no in-process TLS. Terminate TLS at a reverse proxy (Caddy, nginx, an ingress controller); every shipped template assumes one in front. Binding a non-loopback host logs a startup WARN until you acknowledge the proxy with `server.tlsTerminatedUpstream: true` (the flag changes no runtime behaviour - it records the operator's intent and silences the warning).
 
 ## Next steps
 

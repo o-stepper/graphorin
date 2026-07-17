@@ -10,7 +10,7 @@
 function runTokenRotate(options): Promise<TokenCreateResult>;
 ```
 
-Defined in: [packages/cli/src/commands/token.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L218)
+Defined in: [packages/cli/src/commands/token.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L222)
 
 Revoke an existing token and immediately mint a fresh one with the
 same scopes. Returns the new raw token bytes once.

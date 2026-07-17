@@ -79,6 +79,9 @@ describe('Phase 14c - daemon survival under load', () => {
         auth: { kind: 'token', pepperRef: `env:${PEPPER_ENV}` },
         storage: { path: ':memory:', mode: 'lib' },
         server: { rateLimit: { enabled: false }, csrf: { enabled: false } },
+        // The unauthenticated scrape below measures exposition under
+        // load, not the (default-on since 0.11.0) auth gate.
+        metrics: { requireAuth: false },
       },
     });
 

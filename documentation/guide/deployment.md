@@ -83,6 +83,7 @@ Growth surfaces:
 | `session_audit`                          | Session audit trail                      | `store.sessions.pruneAuditEntries`           | `auditDays`                       | opt-in     |
 | `memory_history`                         | Fact supersede / change history          | `store.memory.pruneHistory`                  | `memoryHistoryDays`               | opt-in     |
 | `workflow_checkpoints` + `workflow_pending_writes` | Terminal workflow threads      | `store.checkpoints.pruneThreads`             | `workflowThreadsDays` (always terminal-only) | opt-in |
+| `suspended_runs`                         | Durable `awaiting_approval` agent parks  | dropped automatically when the run settles (resume/abort) | deliberately none - a park waits on a human | self-clearing |
 | Replay JSONL directory (filesystem)      | Replay trace files                       | `pruneTraces` from `@graphorin/observability` | not covered - schedule via cron  | manual     |
 
 The replay-JSONL directory is a **filesystem** surface, not a SQLite one: the server sweep deliberately does not touch it. Schedule `pruneTraces` (honouring its `retentionDays`) from cron or a maintenance job.
@@ -166,6 +167,10 @@ Two objects are prerequisites you create out-of-band (the manifest's header comm
 ## GitHub Actions
 
 The `examples/github-actions/` folder ships CI/CD workflow **templates** for a downstream app that embeds Graphorin: a Changesets-based release pipeline (`release.yml`), a security job with dependency audit + Sigstore verification (`security.yml`), and a `renovate.json`. They are starting points to copy into your own repository, not runnable example apps.
+
+## TLS termination
+
+Graphorin serves **plaintext HTTP only** - there is deliberately no in-process TLS. Front the server with a TLS-terminating reverse proxy (Caddy, nginx, an ingress controller); every template in this guide assumes one. A non-loopback bind logs a startup WARN until you acknowledge the proxy with `server.tlsTerminatedUpstream: true` in the config (the flag records intent and silences the warning - it changes no runtime behaviour). While you are wiring the proxy: `/v1/metrics` requires the `admin:metrics:read` scope by default (since 0.12.0), so give your Prometheus scrape job a token via `authorization.credentials_file` or explicitly opt out with `metrics.requireAuth: false` on trusted networks.
 
 ## Health checks
 

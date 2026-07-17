@@ -16,7 +16,7 @@ type RunStatus =
   | "aborted";
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L28)
+Defined in: [packages/server/src/runtime/run-state.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L32)
 
 Stable status discriminator for a run snapshot. Mirrors the values
 exposed on the public REST surface. `'awaiting_approval'` (C3 /

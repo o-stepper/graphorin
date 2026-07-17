@@ -121,6 +121,11 @@ import {
   SPAN_SESSION_ATTRIBUTE,
   traceSourceForSession,
 } from './span-store.js';
+import {
+  SqliteSuspendedRunStore,
+  type SuspendedRunRecord,
+  type SuspendedRunStore,
+} from './suspended-run-store.js';
 import { SqliteTriggerStore } from './trigger-store.js';
 import { VectorTableManager } from './vector-table-mgr.js';
 
@@ -214,6 +219,12 @@ export interface GraphorinSqliteStore {
   readonly authTokens: AuthTokenStore;
   readonly oauthServers: OAuthServerStore;
   readonly idempotency: IdempotencyStore;
+  /**
+   * Durable suspended agent runs (migration 038): the server's
+   * `RunStateTracker` persists `awaiting_approval` runs here so the
+   * REST resume endpoint survives a process restart.
+   */
+  readonly suspendedRuns: SuspendedRunStore;
   readonly embeddings: EmbeddingMetaRepository;
   readonly connection: SqliteConnection;
   readonly appliedMigrations: readonly AppliedMigration[];
@@ -310,6 +321,7 @@ export async function createSqliteStore(
   const authTokenStore = new SqliteAuthTokenStore(conn);
   const oauthServerStore = new SqliteOAuthServerStore(conn);
   const idempotencyStore = new SqliteIdempotencyStore(conn);
+  const suspendedRunStore = new SqliteSuspendedRunStore(conn);
 
   return {
     get memory() {
@@ -335,6 +347,9 @@ export async function createSqliteStore(
     },
     get idempotency() {
       return idempotencyStore;
+    },
+    get suspendedRuns() {
+      return suspendedRunStore;
     },
     get embeddings() {
       return embeddings;
@@ -435,11 +450,14 @@ export {
   SqliteOAuthServerStore,
   SqlitePairingStore,
   SqliteSessionStore,
+  SqliteSuspendedRunStore,
   SqliteTriggerStore,
   // STORE-SQ-01: value-export the class so the documented `instanceof
   // SqliteVecMissingError` works against the root barrel, not just the
   // `/connection` subpath.
   SqliteVecMissingError,
+  type SuspendedRunRecord,
+  type SuspendedRunStore,
   slugifyEmbedderId,
   traceSourceForSession,
   UnknownEmbedderIdError,

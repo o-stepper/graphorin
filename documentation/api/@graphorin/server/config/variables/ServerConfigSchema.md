@@ -251,6 +251,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
            ttlSeconds?: ...;
         };
      }>>;
+     tlsTerminatedUpstream: ZodDefault<ZodBoolean>;
      trustProxy: ZodDefault<ZodBoolean>;
      ws: ZodDefault<ZodObject<{
         commentarySanitization: ZodDefault<ZodObject<..., ..., ..., ..., ...>>;
@@ -321,6 +322,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
            ttlSeconds: number;
         };
      };
+     tlsTerminatedUpstream: boolean;
      trustProxy: boolean;
      ws: {
         commentarySanitization: {
@@ -378,6 +380,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
            ttlSeconds?: ... | ...;
         };
      };
+     tlsTerminatedUpstream?: boolean;
      trustProxy?: boolean;
      ws?: {
         commentarySanitization?: {
@@ -521,6 +524,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
            ttlSeconds: number;
         };
      };
+     tlsTerminatedUpstream: boolean;
      trustProxy: boolean;
      ws: {
         commentarySanitization: {
@@ -638,6 +642,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
            ttlSeconds?: number;
         };
      };
+     tlsTerminatedUpstream?: boolean;
      trustProxy?: boolean;
      ws?: {
         commentarySanitization?: {
@@ -662,7 +667,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
 }>>;
 ```
 
-Defined in: [packages/server/src/config.ts:419](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L419)
+Defined in: [packages/server/src/config.ts:439](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L439)
 
 Zod schema for the resolved [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md). Exposed for
 advanced users that want to validate other config sources (env-only

@@ -22,6 +22,26 @@ structurally so we avoid the peer dependency.
 
 ## Methods
 
+### deserializeState()?
+
+```ts
+optional deserializeState(serialized): unknown;
+```
+
+Defined in: [packages/server/src/registry/index.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L72)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `serialized` | `string` |
+
+#### Returns
+
+`unknown`
+
+***
+
 ### run()
 
 ```ts
@@ -45,6 +65,31 @@ Defined in: [packages/server/src/registry/index.ts:30](https://github.com/o-step
 #### Returns
 
 `Promise`\&lt;`unknown`\&gt;
+
+***
+
+### serializeState()?
+
+```ts
+optional serializeState(state): string;
+```
+
+Defined in: [packages/server/src/registry/index.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L71)
+
+Durable-suspension codec (migration 038). `@graphorin/agent`
+agents always carry both; optional here so plain run-only fixtures
+keep working - without them a suspended run stays in-memory only
+(no restart survival) and a hydrated string state cannot resume.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `state` | `unknown` |
+
+#### Returns
+
+`string`
 
 ***
 

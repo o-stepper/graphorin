@@ -70,6 +70,32 @@ Defined in: [packages/agent/src/types.ts:847](https://github.com/o-stepper/graph
 
 ***
 
+### deserializeState()
+
+```ts
+deserializeState(serialized): RunState;
+```
+
+Defined in: [packages/agent/src/types.ts:888](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L888)
+
+Rehydrate a `RunState` previously produced by
+[Agent.serializeState](/api/@graphorin/agent/interfaces/Agent.md#serializestate) (or the exported `runStateToJSON`).
+Throws `RunStateMalformedError` / `RunStateVersionUnsupportedError`
+on an unreadable payload. The result feeds straight back into
+`agent.run(state, { directive })`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `serialized` | `string` |
+
+#### Returns
+
+[`RunState`](/api/@graphorin/core/interfaces/RunState.md)
+
+***
+
 ### fanOut()
 
 ```ts
@@ -159,6 +185,33 @@ Defined in: [packages/agent/src/types.ts:832](https://github.com/o-stepper/graph
 #### Returns
 
 `Promise`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;\>
+
+***
+
+### serializeState()
+
+```ts
+serializeState(state): string;
+```
+
+Defined in: [packages/agent/src/types.ts:880](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L880)
+
+Render the canonical durable JSON form of a (typically suspended)
+`RunState`: version-stamped (`graphorin-run-state/x.y`), binary
+payloads projected to their wire envelopes, secret-named keys
+redacted. The `@graphorin/server` run tracker persists
+`awaiting_approval` runs through this codec so a resume survives a
+process restart; pairs with [Agent.deserializeState](/api/@graphorin/agent/interfaces/Agent.md#deserializestate).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `state` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) |
+
+#### Returns
+
+`string`
 
 ***
 

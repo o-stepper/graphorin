@@ -62,6 +62,14 @@ export interface ServerAgentLike {
       readonly userId?: string;
     },
   ): AsyncIterable<unknown>;
+  /**
+   * Durable-suspension codec (migration 038). `@graphorin/agent`
+   * agents always carry both; optional here so plain run-only fixtures
+   * keep working - without them a suspended run stays in-memory only
+   * (no restart survival) and a hydrated string state cannot resume.
+   */
+  serializeState?(state: unknown): string;
+  deserializeState?(serialized: string): unknown;
 }
 
 /**

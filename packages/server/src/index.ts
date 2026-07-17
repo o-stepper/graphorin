@@ -202,7 +202,13 @@ export {
   type RunStateSnapshot,
   RunStateTracker,
   type RunStatus,
+  type SuspendedRunPersistenceHooks,
 } from './runtime/run-state.js';
+export {
+  createSuspendedRunPersistence,
+  type SuspendedRunPersistenceOptions,
+  type SuspendedRunPersistenceStore,
+} from './runtime/suspended-run-persistence.js';
 export { createSseRoutes, type SseRoutesDeps } from './sse/index.js';
 export {
   bridgeToolAuditToAudit,

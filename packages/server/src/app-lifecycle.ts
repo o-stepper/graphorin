@@ -287,6 +287,41 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           ...(channelsDaemon !== undefined ? { channelsDaemon } : {}),
         });
 
+        // Migration 038: re-register durable `awaiting_approval` parks
+        // so the REST state/resume/abort surface keeps serving them
+        // after a restart. The raw serialized-state STRING is retained
+        // as-is; the resume handler rehydrates it through the owning
+        // agent's codec. Best-effort - an unreadable sidecar must not
+        // block startup.
+        if (store.suspendedRuns !== undefined) {
+          try {
+            const parked = await store.suspendedRuns.list();
+            for (const row of parked) {
+              runs.registerSuspended(
+                row.runId,
+                {
+                  kind: 'agent',
+                  agentId: row.agentId,
+                  ...(row.sessionId !== undefined ? { sessionId: row.sessionId } : {}),
+                  ...(row.userId !== undefined ? { userId: row.userId } : {}),
+                },
+                row.stateJson,
+              );
+            }
+            if (parked.length > 0) {
+              process.stderr.write(
+                `[graphorin/server] restored ${parked.length} suspended run(s) awaiting approval from durable storage.\n`,
+              );
+            }
+          } catch (err) {
+            process.stderr.write(
+              `[graphorin/server] failed to hydrate suspended runs from durable storage: ${
+                err instanceof Error ? err.message : String(err)
+              }\n`,
+            );
+          }
+        }
+
         // Start the consolidator first so it is ready to handle fired
         // triggers, bridge its cron / idle triggers onto the scheduler
         // (MCON-4 - without this nothing pipes triggers into the

@@ -129,5 +129,5 @@ Pair the runners with [`scaffold: 'minimal'`](/guide/minimal-profile) on the ded
 ## Limitations
 
 - **Single-process** - the SQLite trigger store supports one scheduler process; run one proactive host per store.
-- **In-process resume** - `POST /v1/runs/:runId/resume` resumes suspensions retained by the current server process (including bridged proactive fires). After a restart, resume library-side from the agent's own `CheckpointStore` (`agent.run(savedState, { directive })`).
+- **Durable resume** - `POST /v1/runs/:runId/resume` resumes suspensions retained by the server tracker (including bridged proactive fires). Since migration 038 an agent park survives a server restart: the tracker mirrors it into the `suspended_runs` sidecar and boot hydration re-registers it, so the messenger's approve button keeps working after a redeploy. The library-side path (`agent.run(savedState, { directive })` over the agent's own `CheckpointStore`) remains for custom agents that ship no `serializeState`/`deserializeState` codec.
 - **One run per instance** - dedicate agent instances to the heartbeat and to each task; `Agent.isBusy()` and the busy gate exist precisely because instances are single-run.

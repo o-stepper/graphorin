@@ -82,6 +82,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '035': '@graphorin/memory (session-message security verdict)',
   '036': '@graphorin/memory (recall ledger - distinct-query counter)',
   '037': '@graphorin/store-sqlite (FTS tokenizer trailing-punctuation fix)',
+  '038': '@graphorin/server (durable suspended agent runs)',
 };
 
 /**

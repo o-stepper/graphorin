@@ -12,7 +12,7 @@ function createAgentRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/agents.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/agents.ts#L60)
+Defined in: [packages/server/src/routes/agents.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/agents.ts#L68)
 
 ## Parameters
 

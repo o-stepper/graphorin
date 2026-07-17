@@ -249,3 +249,52 @@ describe('W-005 - checkpointPolicy: thread hygiene on terminal runs', () => {
     expect(deleted).toEqual([]);
   });
 });
+
+describe('migration 038 - the Agent durable-suspension codec', () => {
+  it('serializeState emits the version-stamped, secret-redacted JSON string', () => {
+    const agent = createAgent({
+      name: 'codec',
+      instructions: 'work',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('unused')] }),
+    });
+    const json = agent.serializeState(baseState());
+    expect(typeof json).toBe('string');
+    const parsed = JSON.parse(json) as { version: string };
+    expect(parsed.version).toBe('graphorin-run-state/1.2');
+    // Server-side persistence goes to durable storage - the AG-23
+    // redaction pass is always on for this codec.
+    expect(json).not.toContain('sk-secret-123');
+    expect(json).toContain('[redacted]');
+  });
+
+  it('deserializeState round-trips serializeState back into a resumable RunState', () => {
+    const agent = createAgent({
+      name: 'codec',
+      instructions: 'work',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('unused')] }),
+    });
+    const state = baseState();
+    state.pendingApprovals.push({
+      toolCallId: 'tc-9',
+      toolName: 'send_email',
+      args: { to: 'a@b.c' },
+      requestedAt: new Date(3).toISOString(),
+    } as never);
+    const rehydrated = agent.deserializeState(agent.serializeState(state));
+    expect(rehydrated.id).toBe('run-1');
+    expect(rehydrated.agentId).toBe('a-1');
+    expect(rehydrated.sessionId).toBe('s-1');
+    expect(rehydrated.steps).toHaveLength(1);
+    expect(rehydrated.pendingApprovals.map((a) => a.toolCallId)).toEqual(['tc-9']);
+  });
+
+  it('deserializeState rejects malformed payloads with a typed error', () => {
+    const agent = createAgent({
+      name: 'codec',
+      instructions: 'work',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('unused')] }),
+    });
+    expect(() => agent.deserializeState('{not json')).toThrowError(/invalid JSON/);
+    expect(() => agent.deserializeState('{"no":"version"}')).toThrowError(/version/);
+  });
+});
