@@ -104,7 +104,11 @@ export function applyInboundSanitization(opts: {
   readonly contentOrigin?: string;
   readonly failClosed?: boolean;
   readonly patterns?: ReadonlyArray<ImperativePattern>;
-  /** Best-effort scan budget in milliseconds. Default `5`. */
+  /**
+   * Best-effort scan budget in milliseconds. Default `250` (TOOLS-EX-02 - the
+   * effective default; see the inline note on why 5 ms was too tight). On a
+   * timeout the strip pass is skipped and the body returned unredacted.
+   */
   readonly budgetMs?: number;
 }): SanitizationOutcome {
   if (opts.policy === 'pass-through') {

@@ -6,7 +6,7 @@
 
 # Interface: DataFlowInspectInput
 
-Defined in: [packages/tools/src/executor/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L221)
+Defined in: [packages/tools/src/executor/types.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L220)
 
 Input to [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.md#inspect).
 
@@ -14,10 +14,10 @@ Input to [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | Raw-shaped POST-REPAIR arguments (stringified by the guard for probing): what the approval gate saw and what the validate phase derives the executed input from (W-118). Bytes-equal to the model's `call.args` when no repair hook ran. Residual limitation: probed before schema coercion, so spans introduced purely by Zod `transform`/`default` are not visible to the verbatim probe. | [packages/tools/src/executor/types.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L235) |
-| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | [packages/tools/src/executor/types.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L236) |
-| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | [packages/tools/src/executor/types.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L225) |
-| <a id="property-sideeffectclass"></a> `sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - | [packages/tools/src/executor/types.ts:223](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L223) |
-| <a id="property-source"></a> `source?` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | [packages/tools/src/executor/types.ts:226](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L226) |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | - | [packages/tools/src/executor/types.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L222) |
-| <a id="property-trustclass"></a> `trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | [packages/tools/src/executor/types.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L224) |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | Raw-shaped POST-REPAIR arguments (stringified by the guard for probing): what the approval gate saw and what the validate phase derives the executed input from (W-118). Bytes-equal to the model's `call.args` when no repair hook ran. Residual limitation: probed before schema coercion, so spans introduced purely by Zod `transform`/`default` are not visible to the verbatim probe. | [packages/tools/src/executor/types.ts:234](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L234) |
+| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | [packages/tools/src/executor/types.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L235) |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | [packages/tools/src/executor/types.ts:224](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L224) |
+| <a id="property-sideeffectclass"></a> `sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - | [packages/tools/src/executor/types.ts:222](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L222) |
+| <a id="property-source"></a> `source?` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | [packages/tools/src/executor/types.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L225) |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | - | [packages/tools/src/executor/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L221) |
+| <a id="property-trustclass"></a> `trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | [packages/tools/src/executor/types.ts:223](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L223) |

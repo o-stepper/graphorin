@@ -12,7 +12,7 @@ type PermissionHook = (input) =>
 | Promise<PermissionHookResult>;
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:426](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L426)
+Defined in: [packages/tools/src/executor/types.ts:425](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L425)
 
 E1 pre-tool permission hook: one caller-supplied decision point over
 every tool call, evaluated after schema validation and BEFORE the
