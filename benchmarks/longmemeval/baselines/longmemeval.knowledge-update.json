@@ -1,2370 +1,2368 @@
 {
- "results": [
-  {
-   "caseId": "6a1eabeb",
-   "input": {
-    "question": "What was my personal best time in the charity 5K run?",
-    "askedAt": "2023/06/25 (Sun) 13:22",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, your personal best time in the charity 5K run was **25:50**.\n\nYou mentioned this as the time you were hoping to beat in your upcoming charity 5K run training. However, I also have a record from May 23rd where you mentioned setting a personal best time of **27:12** in a charity 5K run. \n\nSo it appears your most recent personal best is **25:50**, which represents an improvement from your previous time of 27:12.",
-   "durationMs": 3129,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "6aeb4375",
-   "input": {
-    "question": "How many Korean restaurants have I tried in my city?",
-    "askedAt": "2023/10/22 (Sun) 15:38",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have tried **four different Korean restaurants** in your city. You mentioned this most recently on September 30, 2023, when you said you've \"tried four different ones so far, and I'm always looking for new recommendations.\"",
-   "durationMs": 1567,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "830ce83f",
-   "input": {
-    "question": "Where did Rachel move to after her recent relocation?",
-    "askedAt": "2023/06/13 (Tue) 15:15",
-    "ability": "knowledge-update"
-   },
-   "output": "I do not have that information in my memory. \n\nBased on the memory context provided, I know that you have a friend named Rachel who lives in Chicago, and you were planning to visit her there. However, there is no information about Rachel relocating or moving to a different location after that.\n\nIf Rachel has recently moved, you may want to ask her directly about her new location.",
-   "durationMs": 1694,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0,
-      "reason": "judge score 0 < threshold 7",
-      "metadata": {
-       "raw": 0,
-       "clamped": 0,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "852ce960",
-   "input": {
-    "question": "What was the amount I was pre-approved for when I got my mortgage from Wells Fargo?",
-    "askedAt": "2023/12/18 (Mon) 04:17",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, there are two different amounts mentioned:\n\n1. **$350,000** - This was stated in your first message on 2023/08/11, where you said you got pre-approved for $350,000 from Wells Fargo for a $325,000 house purchase.\n\n2. **$400,000** - This amount was mentioned in your message on 2023/11/30, where you referenced being pre-approved for $400,000 from Wells Fargo.\n\nThe most recent and reliable information from your initial mortgage inquiry is the **$350,000 pre-approval** from Wells Fargo.",
-   "durationMs": 2103,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "945e3d21",
-   "input": {
-    "question": "How often do I attend yoga classes to help with my anxiety?",
-    "askedAt": "2023/12/14 (Thu) 06:32",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you attend yoga classes **three times a week**. You've mentioned that you notice you're more focused on days when you attend yoga classes, and that your yoga practice has been helping you feel more grounded and centered, especially on days when you're feeling anxious.",
-   "durationMs": 1793,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "d7c942c3",
-   "input": {
-    "question": "Is my mom using the same grocery list method as me?",
-    "askedAt": "2023/05/14 (Sun) 09:58",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, yes, your mom is now using the same grocery list app as you. \n\nAccording to your note from April 30, 2023, you mentioned: \"my mom is actually using the same grocery list app as me now, so we can easily share lists and keep track of what we need.\"\n\nThis is an update from March 11, 2023, when you mentioned you were trying to get your mom to use the app, but she was still using her old paper list at that time.",
-   "durationMs": 2439,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "71315a70",
-   "input": {
-    "question": "How many hours have I spent on my abstract ocean sculpture?",
-    "askedAt": "2023/06/18 (Sun) 19:47",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you've spent **10-12 hours** on your abstract ocean sculpture so far. You mentioned this on June 17th, and noted that it's still a work in progress.",
-   "durationMs": 1722,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "89941a93",
-   "input": {
-    "question": "How many bikes do I currently own?",
-    "askedAt": "2023/10/27 (Fri) 13:00",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you currently own **four bikes**:\n\n1. Road bike (which you're planning to use for the century ride)\n2. Mountain bike (for trail rides)\n3. Commuter bike (for daily commutes)\n4. Hybrid bike (a new one you purchased recently)\n\nYou mentioned this most recently on 2023/10/10 when discussing your upcoming trip.",
-   "durationMs": 1808,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "ce6d2d27",
-   "input": {
-    "question": "What day of the week do I take a cocktail-making class?",
-    "askedAt": "2023/07/15 (Sat) 22:19",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you mentioned having a cocktail-making class on **Fridays**. You've referenced this a couple of times when discussing tequila-based cocktail recipes you wanted to experiment with during those classes.",
-   "durationMs": 1660,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "9ea5eabc",
-   "input": {
-    "question": "Where did I go on my most recent family trip?",
-    "askedAt": "2023/06/08 (Thu) 10:33",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, your most recent family trip was to **Hawaii**. You mentioned going on a family trip to Hawaii where you had a great time snorkeling together, though you also felt a bit stuck to a schedule during that trip.",
-   "durationMs": 1825,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "07741c44",
-   "input": {
-    "question": "Where do I initially keep my old sneakers?",
-    "askedAt": "2023/11/30 (Thu) 23:52",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you initially kept your old sneakers **under your bed for storage**. You mentioned this on August 11, 2023, noting that they were starting to smell from being stored in that location.\n\nHowever, more recently (November 30, 2023), you've been planning to organize your closet and store them in a shoe rack instead, as they were taking up space.",
-   "durationMs": 2231,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "a1eacc2a",
-   "input": {
-    "question": "How many short stories have I written since I started writing regularly?",
-    "askedAt": "2023/06/20 (Tue) 17:03",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have written **7 short stories** since you started writing regularly. You mentioned this on May 30th, 2023, noting that you've been writing regularly for three months at that point and have managed to complete 7 short stories since you started.",
-   "durationMs": 1726,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "184da446",
-   "input": {
-    "question": "How many pages of 'A Short History of Nearly Everything' have I read so far?",
-    "askedAt": "2023/06/17 (Sat) 04:02",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory I have, you've read up to **page 220** of \"A Short History of Nearly Everything.\"\n\nThis is mentioned in your entries from May 29th, where you noted that you're on page 220 and had just finished reading about the discovery of DNA structure. You also mentioned earlier on May 20th that you were on page 200, so you've made good progress through the book!",
-   "durationMs": 2144,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "031748ae",
-   "input": {
-    "question": "How many engineers do I lead when I just started my new role as Senior Software Engineer? How many engineers do I lead now?",
-    "askedAt": "2023/11/10 (Fri) 04:20",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, when you first started your new role as Senior Software Engineer, you led a team of **4 engineers**.\n\nHowever, as of October 24, 2023, you mentioned that you now lead a team of **5 engineers**. You noted at that time: \"I've been enjoying my role as Senior Software Engineer for a while, especially the part where I now lead a team of five engineers.\"\n\nSo to summarize:\n- **Initially**: 4 engineers\n- **Currently (as of October 24, 2023)**: 5 engineers",
-   "durationMs": 2003,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "4d6b87c8",
-   "input": {
-    "question": "How many titles are currently on my to-watch list?",
-    "askedAt": "2023/06/03 (Sat) 15:47",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you currently have **25 titles** on your to-watch list.\n\nThis was mentioned in your message from 2023/05/22 (Mon) 03:27, where you asked for help organizing your to-watch list and noted that you had 25 titles on it at that time.",
-   "durationMs": 1983,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "0f05491a",
-   "input": {
-    "question": "How many stars do I need to reach the gold level on my Starbucks Rewards app?",
-    "askedAt": "2023/08/01 (Tue) 22:29",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, there has been some confusion about this number. You initially corrected me stating that you need **120 stars** to reach the Gold level on your Starbucks Rewards app (not 300 as I had previously mentioned).\n\nSo according to your most recent correction, you need **120 stars** to reach Gold level.",
-   "durationMs": 1721,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "08e075c7",
-   "input": {
-    "question": "How long have I been using my Fitbit Charge 3?",
-    "askedAt": "2023/09/04 (Mon) 17:07",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you've been using your Fitbit Charge 3 for approximately 9 months. You mentioned this on September 2, 2023, noting that it's \"crazy how time flies!\" \n\nYou initially started using it around June 2023 (about 6 months at that time), and by early September 2023, you had been using it for 9 months.",
-   "durationMs": 2098,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "f9e8c073",
-   "input": {
-    "question": "How many sessions of the bereavement support group did I attend?",
-    "askedAt": "2023/11/07 (Tue) 04:54",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, there is a discrepancy in the records. You mentioned attending **three sessions** of the bereavement support group in your initial entry from May 11, 2023. However, in a later reflection from October 30, 2023, you stated that you **attended five sessions** and found it really helpful in processing your emotions.\n\nThe most recent account indicates **five sessions**, which you found particularly valuable for the sense of community, the kind and understanding facilitator, and the safe space to share your story and listen to others without judgment.",
-   "durationMs": 2877,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "41698283",
-   "input": {
-    "question": "What type of camera lens did I purchase most recently?",
-    "askedAt": "2023/09/21 (Thu) 08:41",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, the most recent lens you purchased was a **50mm prime lens**, which you mentioned on 2023/03/11. You noted that it has been working out great for your portrait and low-light photography.\n\nLater, on 2023/08/30, you also mentioned taking great shots with a **70-200mm zoom lens** at a local park, but this appears to be a lens you were using rather than a recent purchase announcement.",
-   "durationMs": 2990,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "2698e78f",
-   "input": {
-    "question": "How often do I see my therapist, Dr. Smith?",
-    "askedAt": "2023/11/10 (Fri) 00:38",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory, you see Dr. Smith on different schedules at different times:\n\n- As of April 2023, you mentioned having therapy sessions with Dr. Smith **every two weeks**\n- By November 2023, you mentioned seeing Dr. Smith **every week**\n\nSo it appears your therapy frequency increased from every two weeks to weekly sessions by November 2023.",
-   "durationMs": 1828,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "b6019101",
-   "input": {
-    "question": "How many MCU films did I watch in the last 3 months?",
-    "askedAt": "2023/06/17 (Sat) 16:20",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you watched **5 MCU films in the last 3 months** (as of May 29, 2023).\n\nYou mentioned this when discussing your movie marathon plans, noting that you've been on a roll with movies lately - you watched 12 films total in the last 3 months, with 5 of those being MCU films.",
-   "durationMs": 3621,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "45dc21b6",
-   "input": {
-    "question": "How many of Emma's recipes have I tried out?",
-    "askedAt": "2023/06/16 (Fri) 17:33",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have tried out **3 of Emma's recipes** so far. You mentioned this on 2023/05/30 (Tue) 06:32, saying \"I've tried out 3 of Emma's recipes so far, and they're all amazing!\"",
-   "durationMs": 2340,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "5a4f22c0",
-   "input": {
-    "question": "What company is Rachel, an old colleague from my previous company, currently working at?",
-    "askedAt": "2023/06/21 (Wed) 13:02",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, Rachel is currently working at **TechCorp**.\n\nYou mentioned this on May 26th when you were thinking about catching up with her.",
-   "durationMs": 1382,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "6071bd76",
-   "input": {
-    "question": "For the coffee-to-water ratio in my French press, did I switch to more water per tablespoon of coffee, or less?",
-    "askedAt": "2023/07/30 (Sun) 05:53",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you actually switched to **less water per tablespoon of coffee**.\n\nIn February 2023, you mentioned your ratio was **1 tablespoon of coffee for every 6 ounces of water**.\n\nBy June 2023, you updated it to **1 tablespoon of coffee for every 5 ounces of water**.\n\nSo you decreased the amount of water per tablespoon of coffee, making your brew stronger.",
-   "durationMs": 1726,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "e493bb7c",
-   "input": {
-    "question": "Where is the painting 'Ethereal Dreams' by Emma Taylor currently hanging?",
-    "askedAt": "2023/11/18 (Sat) 19:24",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, the \"Ethereal Dreams\" painting by Emma Taylor is currently hanging **above your bed in your bedroom**.\n\nYou mentioned moving it there on October 30, 2023, and it was previously above your living room sofa (as noted in your July 11 entry), but you relocated it to your bedroom where it adds a nice touch to the space.",
-   "durationMs": 2014,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "618f13b2",
-   "input": {
-    "question": "How many times have I worn my new black Converse Chuck Taylor All Star sneakers?",
-    "askedAt": "2023/06/18 (Sun) 22:29",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you've worn your new black Converse Chuck Taylor All Star sneakers **six times**. \n\nYou mentioned wearing them four times initially (including to your friend's birthday party last Saturday on 2023/05/30), and then you wore them again to run some errands, bringing the total to six times as of 2023/05/30.",
-   "durationMs": 2171,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "72e3ee87",
-   "input": {
-    "question": "How many episodes of the Science series have I completed on Crash Course?",
-    "askedAt": "2023/06/27 (Tue) 19:26",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you have completed **50 episodes** of Crash Course's Science series. You mentioned this on May 29, 2023, when you said \"I just completed 50 episodes - it's been really helpful in understanding the basics of science.\"",
-   "durationMs": 1616,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "c4ea545c",
-   "input": {
-    "question": "Do I go to the gym more frequently than I did previously?",
-    "askedAt": "2023/09/01 (Fri) 19:15",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory context, you mentioned on 2023/08/15 that you've been consistent with your gym routine \"four times a week, actually.\" However, earlier on 2023/06/01, your gym schedule was set for Tuesdays, Thursdays, and Saturdays (three days a week).\n\nSo yes, it appears you are going to the gym more frequently now - you've increased from three times a week to four times a week.",
-   "durationMs": 1896,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "01493427",
-   "input": {
-    "question": "How many new postcards have I added to my collection since I started collecting again?",
-    "askedAt": "2023/12/21 (Thu) 21:31",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you've added a total of **50 new postcards** to your collection since you started collecting again.\n\nHere's the breakdown:\n- **17 new postcards** added by August 11, 2023\n- **25 new postcards** added by November 30, 2023\n- **8 more postcards** acquired from a local antique shop visit by November 30, 2023\n\n(17 + 25 + 8 = 50 postcards)",
-   "durationMs": 1798,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0,
-      "reason": "judge score 0 < threshold 7",
-      "metadata": {
-       "raw": 0,
-       "clamped": 0,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "6a27ffc2",
-   "input": {
-    "question": "How many videos of Corey Schafer's Python programming series have I completed so far?",
-    "askedAt": "2023/06/09 (Fri) 01:44",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you have completed **30 videos** of Corey Schafer's Python programming series so far.\n\nYou mentioned this on May 26th, 2023, when you were excited about applying your Python skills to NLP tasks like sentiment analysis.",
-   "durationMs": 1495,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "2133c1b5",
-   "input": {
-    "question": "How long have I been living in my current apartment in Harajuku?",
-    "askedAt": "2023/10/15 (Sun) 08:39",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you've been living in your studio apartment in Harajuku for approximately 3 months as of October 15, 2023. You mentioned on that date that you've been living there for 3 months and are still discovering new hidden gems in the neighborhood.",
-   "durationMs": 1462,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "18bc8abd",
-   "input": {
-    "question": "What brand of BBQ sauce am I currently obsessed with?",
-    "askedAt": "2023/07/15 (Sat) 07:37",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your long-term memory, you are currently obsessed with **Kansas City Masterpiece BBQ sauce**. \n\nYou mentioned loving it on your ribs and have referenced it multiple times as your favorite BBQ sauce option for various dishes like pulled pork sandwiches and smoked brisket.",
-   "durationMs": 1817,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "db467c8c",
-   "input": {
-    "question": "How long have my parents been staying with me in the US?",
-    "askedAt": "2023/10/22 (Sun) 09:15",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, your parents have been staying with you in the US for **nine months**. \n\nThis is mentioned in your notes from October 20, 2023, where you reference that \"they've been staying with me for nine months now.\" This is also consistent with an earlier note from July 16, 2023, where you mentioned they had been with you for \"the past six months,\" which would align with the nine-month timeline by October.",
-   "durationMs": 2702,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "7a87bd0c",
-   "input": {
-    "question": "How long have I been sticking to my daily tidying routine?",
-    "askedAt": "2023/09/30 (Sat) 23:15",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have been sticking to your daily tidying routine for **4 weeks** as of September 30, 2023. \n\nYou previously mentioned maintaining this routine for 3 weeks back in June, and you've continued to be consistent with it. You've also noted that it's made a significant difference in your apartment!",
-   "durationMs": 1776,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "e61a7584",
-   "input": {
-    "question": "How long have I had my cat, Luna?",
-    "askedAt": "2023/11/30 (Thu) 12:46",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory context provided, you have had your cat Luna for approximately **9 months** as of November 30, 2023.\n\nThis is mentioned in your entry from November 30, 2023, where you stated: \"I've had my cat, Luna, for about 9 months now, and I've been trying to keep her active and engaged.\"",
-   "durationMs": 1508,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "1cea1afa",
-   "input": {
-    "question": "How many Instagram followers do I currently have?",
-    "askedAt": "2023/06/14 (Wed) 13:43",
-    "ability": "knowledge-update"
-   },
-   "output": "I don't have that information in my memory. The most recent reference I have is from May 28, 2023, when you mentioned reaching 600 followers as a milestone, but I don't have your current follower count as of June 14, 2023.\n\nTo find your current follower count, you can:\n1. Check your Instagram profile directly\n2. Look at your Instagram Insights (if you have a business or creator account)\n3. Use third-party analytics tools that track your Instagram growth",
-   "durationMs": 2274,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "ed4ddc30",
-   "input": {
-    "question": "How many dozen eggs do we currently have stocked up in our refrigerator?",
-    "askedAt": "2023/03/16 (Thu) 14:24",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, the most recent information I have about your egg inventory is from March 15, 2023, when you mentioned having **20 dozen eggs** stocked up in the fridge.\n\nHowever, I should note that you previously had 30 dozen eggs as of January 11, 2023, so your inventory has changed since then. The current count of 20 dozen from March 15th is the most recent information I have.",
-   "durationMs": 2250,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "8fb83627",
-   "input": {
-    "question": "How many issues of National Geographic have I finished reading?",
-    "askedAt": "2023/08/14 (Mon) 23:19",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you have finished reading **five issues** of National Geographic.\n\nThis is mentioned in your message from 2023/07/15 where you stated: \"I've finished five issues so far and they've all had great articles on the region\" (referring to Amazon rainforest articles).\n\nNote: There's a slight discrepancy in the earlier conversation from 2023/04/20 where you mentioned finishing three issues and being on your fourth, but the more recent update from July 15th indicates you've completed five issues total.",
-   "durationMs": 4815,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "b01defab",
-   "input": {
-    "question": "Did I finish reading 'The Nightingale' by Kristin Hannah?",
-    "askedAt": "2023/04/12 (Wed) 06:37",
-    "ability": "knowledge-update"
-   },
-   "output": "Yes, according to my memory, you did finish reading \"The Nightingale\" by Kristin Hannah! \n\nYou mentioned on March 30, 2023 that you had recently finished reading it, and you described it as \"such a powerful and emotional read.\" You also discussed how much you appreciated the novel, particularly the sisterly bond between Vianne and Isabelle, and how the book highlighted the experiences of women during World War II.\n\nThis is quite a journey from when you first put the book down in January 2023 because it was getting too emotional, but you were determined to finish it in time for your book club discussion. It sounds like you successfully completed it!",
-   "durationMs": 2806,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "22d2cb42",
-   "input": {
-    "question": "Where did I get my guitar serviced?",
-    "askedAt": "2023/06/24 (Sat) 09:01",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you mentioned a music shop on Main St where you got your guitar serviced. You noted that they're really good with guitar maintenance. However, the specific name of the shop is not clearly stated in the memory - it was referenced as \"that music shop on Main St\" where you had your guitar serviced.",
-   "durationMs": 1457,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "0e4e4c46",
-   "input": {
-    "question": "What is my current highest score in Ticket to Ride?",
-    "askedAt": "2023/06/10 (Sat) 16:46",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, your current highest score in Ticket to Ride is **132 points**, which you achieved on May 25, 2023. You mentioned this was an improvement from your previous high score of 124 points!",
-   "durationMs": 1355,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "4b24c848",
-   "input": {
-    "question": "How many tops have I bought from H&M so far?",
-    "askedAt": "2023/10/20 (Fri) 08:09",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have bought **five tops from H&M so far**. You mentioned this most recently on September 30, 2023, when you were planning to go to the mall and thinking of getting a few more tops. Prior to that, on August 11, 2023, you had mentioned buying three tops from H&M and loving their summer collection.",
-   "durationMs": 2246,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "7e974930",
-   "input": {
-    "question": "How much did I earn at the Downtown Farmers Market on my most recent visit?",
-    "askedAt": "2023/10/26 (Thu) 11:44",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you earned **$420** at the Downtown Farmers Market on your most recent visit (2023/09/30).",
-   "durationMs": 1059,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "603deb26",
-   "input": {
-    "question": "How many times have I tried making a Negroni at home since my friend Emma showed me how to make it?",
-    "askedAt": "2023/12/05 (Tue) 02:37",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you've tried making a Negroni at home **10 times** since your friend Emma showed you how to make it.",
-   "durationMs": 1034,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "59524333",
-   "input": {
-    "question": "What time do I usually go to the gym?",
-    "askedAt": "2023/06/06 (Tue) 16:35",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you usually go to the gym at **7:00 pm on Mondays, Wednesdays, and Fridays**.",
-   "durationMs": 1175,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "5831f84d",
-   "input": {
-    "question": "How many Crash Course videos have I watched in the past few weeks?",
-    "askedAt": "2023/10/05 (Thu) 05:19",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you've watched **15 Crash Course videos** in the past few weeks as of September 30, 2023.\n\nThis represents an increase from earlier in August when you had completed 12 Crash Course videos on computer science. You've been on quite an impressive learning streak!",
-   "durationMs": 1970,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "eace081b",
-   "input": {
-    "question": "Where am I planning to stay for my birthday trip to Hawaii?",
-    "askedAt": "2023/06/06 (Tue) 04:18",
-    "ability": "knowledge-update"
-   },
-   "output": "I do not have that information in my memory. \n\nWhile I can see that you're planning a birthday trip to Hawaii in October and have received recommendations for hiking trails on Kauai and snorkeling spots across various Hawaiian islands, there is no record of where specifically you've decided to stay for your trip.",
-   "durationMs": 1753,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "affe2881",
-   "input": {
-    "question": "How many different species of birds have I seen in my local park?",
-    "askedAt": "2023/06/07 (Wed) 02:42",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you've seen **32 different bird species** in your local park. You started with 27 species, and then spotted a Northern Flicker last weekend, which brought your total count to 32.",
-   "durationMs": 1892,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "50635ada",
-   "input": {
-    "question": "What was my previous frequent flyer status on United Airlines before I got the current status?",
-    "askedAt": "2023/06/29 (Thu) 04:09",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, your previous frequent flyer status on United Airlines was **Premier Silver**. \n\nYou reached Premier Silver status after accumulating 20,000 miles. Your current status is **Premier Gold**, which you mentioned you had just reached as of May 30, 2023.",
-   "durationMs": 5194,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "e66b632c",
-   "input": {
-    "question": "What was my previous personal best time for the charity 5K run?",
-    "askedAt": "2023/08/25 (Fri) 05:19",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you have mentioned two different personal best times for the charity 5K run:\n\n1. **26 minutes and 30 seconds** - mentioned on 2023/07/30\n2. **27 minutes and 45 seconds** - mentioned on 2023/04/11\n\nThe more recent entry from July 30th indicates your personal best time is **26 minutes and 30 seconds**, which represents a personal best you achieved by shaving off about a minute and a half from your previous record.",
-   "durationMs": 1980,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.4,
-      "reason": "judge score 4 < threshold 7",
-      "metadata": {
-       "raw": 4,
-       "clamped": 4,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "0ddfec37",
-   "input": {
-    "question": "How many autographed baseballs have I added to my collection in the first three months of collection?",
-    "askedAt": "2024/01/08 (Mon) 09:27",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you added **15 autographed baseballs** to your collection in the first three months of collecting.\n\nThis was mentioned in your entry from 2023/07/11, where you noted that you had just acquired a signed Mike Trout baseball and that it was \"a great addition to my collection - that's 15 autographed baseballs since I started collecting three months ago!\"",
-   "durationMs": 2060,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "f685340e",
-   "input": {
-    "question": "How often do I play tennis with my friends at the local park previously? How often do I play now?",
-    "askedAt": "2023/07/31 (Mon) 11:43",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, here's what I know about your tennis schedule:\n\n**Previously:** You mentioned playing tennis with your friends at the local park on a regular basis, and you referred to it as your \"weekly tennis sessions with friends.\"\n\n**Now:** As of your most recent message on July 30, 2023, you stated that you play tennis with your friends at the local park \"every other week\" on Sundays.\n\nSo it appears your tennis schedule has changed from weekly sessions to every other week.",
-   "durationMs": 3491,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "cc5ded98",
-   "input": {
-    "question": "How much time do I dedicate to coding exercises each day?",
-    "askedAt": "2023/06/13 (Tue) 01:30",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you currently dedicate **two hours each day** to coding exercises.\n\nYou mentioned this commitment on May 29, 2023, noting that you were excited to see progress in your skills over the next few weeks with this level of dedication.",
-   "durationMs": 1902,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "dfde3500",
-   "input": {
-    "question": "What day of the week did I meet with my previous language exchange tutor Juan?",
-    "askedAt": "2023/06/20 (Tue) 14:46",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you met with your language exchange tutor Juan on **Wednesday evening**. \n\nAccording to your notes from May 20th, you stated: \"We meet every Wednesday evening, and he helps me with my Spanish pronunciation and grammar while I assist him with his English vocabulary.\"",
-   "durationMs": 1634,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "69fee5aa",
-   "input": {
-    "question": "How many pre-1920 American coins do I have in my collection?",
-    "askedAt": "2023/06/09 (Fri) 11:14",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on my memory, you have a total of 37 pre-1920 American coins in your collection. You mentioned this when you were thinking about organizing them by denomination and mint mark back in May 2023.",
-   "durationMs": 1508,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.6,
-      "reason": "judge score 6 < threshold 7",
-      "metadata": {
-       "raw": 6,
-       "clamped": 6,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "7401057b",
-   "input": {
-    "question": "How many free night's stays can I redeem at any Hilton property with my accumulated points?",
-    "askedAt": "2023/06/16 (Fri) 09:50",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have accumulated enough points for **two free night's stays** at any Hilton property.\n\nYou mentioned this on May 30th when you said: \"I've accumulated enough points for two free night's stays at any Hilton property, so I might use that for a separate trip to Las Vegas.\"\n\nThis is an update from your earlier statement on May 29th when you indicated you had enough points for a single free night's stay. So your accumulated points have increased to cover two free nights.",
-   "durationMs": 2288,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "cf22b7bf",
-   "input": {
-    "question": "How much weight have I lost since I started going to the gym consistently?",
-    "askedAt": "2023/06/23 (Fri) 03:15",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you have lost **10 pounds** since you started going consistently to the gym 3 months ago (as of June 21, 2023).\n\nYou also mentioned earlier progress of losing 5 pounds in a month (as of May 21, 2023), so you've continued to make steady progress toward your goal weight by the end of summer!",
-   "durationMs": 2442,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "a2f3aa27",
-   "input": {
-    "question": "How many followers do I have on Instagram now?",
-    "askedAt": "2023/06/15 (Thu) 23:26",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, the most recent information about your Instagram follower count is from May 25, 2023, when you mentioned you were close to 1300 followers. However, since today's date is June 15, 2023 (about 3 weeks later), your current follower count may have changed.\n\nThe last specific follower count I have on record is **1250 followers** (from May 25, 2023), and you mentioned you were close to reaching 1300 at that time.\n\nTo get your exact current follower count, I'd recommend checking your Instagram profile directly or viewing your Instagram Insights, which will show you your most up-to-date follower count and growth trends.",
-   "durationMs": 2453,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "c7dc5443",
-   "input": {
-    "question": "What is my current record in the recreational volleyball league?",
-    "askedAt": "2023/07/21 (Fri) 20:30",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, I have two different records for your volleyball league:\n\n1. **3-2 record** (mentioned on 2023/06/16)\n2. **5-2 record** (mentioned on 2023/06/30)\n\nThe most recent update from 2023/06/30 indicates your volleyball team, the **Net Ninjas**, has a **5-2 record**. This suggests your team has been performing well and improving throughout the season!",
-   "durationMs": 2174,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "06db6396",
-   "input": {
-    "question": "How many projects have I completed since starting painting classes?",
-    "askedAt": "2023/11/08 (Wed) 09:08",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you have completed **5 projects** since starting painting classes.\n\nYou mentioned completing 4 projects as of August 16, 2023, and then by October 9, 2023, you had finished your 5th project and were feeling pretty accomplished about it!",
-   "durationMs": 4423,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "3ba21379",
-   "input": {
-    "question": "What type of vehicle model am I currently working on?",
-    "askedAt": "2023/06/01 (Thu) 05:09",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory context, you are currently working on a **Ford Mustang Shelby GT350R model**. \n\nYou mentioned that you're using Vallejo paints on this project and are impressed with the color range and quality. You've also been thinking about adding extra details like seatbelts and a dashboard to enhance the realism of the model.",
-   "durationMs": 2496,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.3,
-      "reason": "judge score 3 < threshold 7",
-      "metadata": {
-       "raw": 3,
-       "clamped": 3,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "9bbe84a2",
-   "input": {
-    "question": "What was my previous goal for my Apex Legends level before I updated my goal?",
-    "askedAt": "2023/10/08 (Sun) 15:29",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, your previous goal for your Apex Legends level was to reach **level 100 before the end of the year**. \n\nYou mentioned this goal on 2023/06/16, stating: \"I've been playing a lot of Apex lately and I'm determined to reach level 100 before the end of the year.\"\n\nLater, on 2023/09/30, you updated your goal to reach **level 150** instead.",
-   "durationMs": 2702,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 0.7,
-      "metadata": {
-       "raw": 7,
-       "clamped": 7,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "10e09553",
-   "input": {
-    "question": "How many largemouth bass did I catch with Alex on the earlier fishing trip to Lake Michigan before the 7/22 trip?",
-    "askedAt": "2023/12/06 (Wed) 11:18",
-    "ability": "knowledge-update"
-   },
-   "output": "I do not have that information in my memory.\n\nBased on the memory provided, I can see that you mentioned catching largemouth bass with Alex on a trip to Lake Michigan on 7/10 (where you caught 7 bass), but I don't have a record of an earlier fishing trip with Alex before the 7/22 trip you referenced.",
-   "durationMs": 1473,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.4,
-      "reason": "judge score 4 < threshold 7",
-      "metadata": {
-       "raw": 4,
-       "clamped": 4,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "dad224aa",
-   "input": {
-    "question": "What time do I wake up on Saturday mornings?",
-    "askedAt": "2023/06/24 (Sat) 03:58",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the information in your memory, your desired wake-up time on Saturday mornings is **8:00 am**. However, your actual wake-up times have varied:\n\n- Previous Saturday: 7:30 am\n- Last Saturday: 9:30 am\n\nYou mentioned wanting to wake up at 8:00 am on weekends as part of establishing a consistent sleep schedule, and you also mentioned liking to wake up at 7:30 am on Saturdays to fit in a cup of coffee before going for a jog.\n\nSo while your goal is 8:00 am, your actual Saturday wake-up times have been inconsistent, ranging from 7:30 am to 9:30 am.",
-   "durationMs": 2866,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.4,
-      "reason": "judge score 4 < threshold 7",
-      "metadata": {
-       "raw": 4,
-       "clamped": 4,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "ba61f0b9",
-   "input": {
-    "question": "How many women are on the team led by my former manager Rachel?",
-    "askedAt": "2023/08/03 (Thu) 06:02",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, your former manager Rachel leads a team of 10 people, and **6 women are on her team**.\n\nYou mentioned this in July 2023 when discussing companies that promote gender diversity in the workplace, noting that Rachel's team is \"a great example of a diverse team, with 6 women out of 10 people.\"\n\nThis represents 60% female representation on her team, which is notably higher than the 25% of executive positions held by women in your industry that you learned about at a seminar.",
-   "durationMs": 3336,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "42ec0761",
-   "input": {
-    "question": "Do I have a spare screwdriver for opening up my laptop?",
-    "askedAt": "2023/08/31 (Thu) 00:39",
-    "ability": "knowledge-update"
-   },
-   "output": "Yes, according to your memory, you do have a spare screwdriver! On August 15th, you mentioned that you picked up a spare screwdriver when you organized your computer desk a while back, so you're all set for cleaning those laptop fans.",
-   "durationMs": 1704,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "5c40ec5b",
-   "input": {
-    "question": "How many times have I met up with Alex from Germany?",
-    "askedAt": "2023/10/30 (Mon) 13:39",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory context, you have met up with Alex from Germany **twice** before.\n\nThis is mentioned in your notes from 2023/09/30, where you stated: \"we've met up twice already\" and \"we've met up twice before.\"",
-   "durationMs": 2721,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "c6853660",
-   "input": {
-    "question": "Did I mostly recently increase or decrease the limit on the number of cups of coffee in the morning?",
-    "askedAt": "2023/06/11 (Sun) 21:37",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you most recently **increased** your morning coffee limit to **two cups**.\n\nAccording to the conversation from 2023/05/26, you mentioned: \"I have increased the limit to two cups, and I'm thinking of experimenting with different sweeteners, like stevia or honey.\"\n\nThis was an increase from your previous limit of one cup, which you had mentioned earlier in the conversation history.",
-   "durationMs": 3520,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "26bdc477",
-   "input": {
-    "question": "How many trips have I taken my Canon EOS 80D camera on?",
-    "askedAt": "2023/06/06 (Tue) 18:27",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, you've taken your Canon EOS 80D camera on **five trips** so far.\n\nYou mentioned this in your message from May 30, 2023, when you said: \"By the way, I've had my Canon EOS 80D with me on five trips now, and it's been a beast!\"\n\nEarlier, in March 2023, you had mentioned taking your camera on three trips to Yellowstone, Yosemite, and the Grand Canyon, so you've added two more adventures since then.",
-   "durationMs": 2795,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": true,
-      "score": 1,
-      "metadata": {
-       "raw": 10,
-       "clamped": 10,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "0977f2af",
-   "input": {
-    "question": "What new kitchen gadget did I invest in before getting the Air Fryer?",
-    "askedAt": "2023/05/31 (Wed) 07:54",
-    "ability": "knowledge-update"
-   },
-   "output": "I do not have that information in my memory. While I can see that you got an Air Fryer yesterday (as of May 21, 2023), there is no record of what kitchen gadget you may have invested in before that purchase.",
-   "durationMs": 1283,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0,
-      "reason": "judge score 0 < threshold 7",
-      "metadata": {
-       "raw": 0,
-       "clamped": 0,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "89941a94",
-   "input": {
-    "question": "Before I purchased the gravel bike, do I have other bikes in addition to my mountain bike and my commuter bike?",
-    "askedAt": "2023/06/21 (Wed) 02:24",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on the memory provided, before you purchased the gravel bike, you had **four bikes**:\n\n1. Road bike\n2. Mountain bike\n3. Commuter bike\n4. Hybrid bike (new purchase as of 2023/05/28)\n\nHowever, I don't have any information about you purchasing a gravel bike. The most recent bike purchase mentioned in your memory is the hybrid bike that you acquired before your San Francisco to New York City road trip.",
-   "durationMs": 2219,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.3,
-      "reason": "judge score 3 < threshold 7",
-      "metadata": {
-       "raw": 3,
-       "clamped": 3,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  },
-  {
-   "caseId": "07741c45",
-   "input": {
-    "question": "Where do I currently keep my old sneakers?",
-    "askedAt": "2023/06/23 (Fri) 07:31",
-    "ability": "knowledge-update"
-   },
-   "output": "Based on your memory, you currently keep your old sneakers **under your bed for storage**. However, you mentioned that keeping them there has caused them to start to smell, which is why you were looking into better storage solutions like a shoe rack to organize your closet.",
-   "durationMs": 1603,
-   "scores": [
-    {
-     "scorer": "llm-judge-j",
-     "result": {
-      "pass": false,
-      "score": 0.5,
-      "reason": "judge score 5 < threshold 7",
-      "metadata": {
-       "raw": 5,
-       "clamped": 5,
-       "passThreshold": 7,
-       "maxScore": 10
-      }
-     }
-    },
-    {
-     "scorer": "abstention",
-     "result": {
-      "pass": true,
-      "reason": "n/a (not an abstention case)"
-     }
-    }
-   ]
-  }
- ],
- "summary": {
-  "total": 72,
-  "passed": 56,
-  "failed": 16,
-  "avgDurationMs": 2180.8055555555557,
-  "byScorer": {
-   "llm-judge-j": {
+  "results": [
+    {
+      "caseId": "6a1eabeb",
+      "input": {
+        "question": "What was my personal best time in the charity 5K run?",
+        "askedAt": "2023/06/25 (Sun) 13:22",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, your personal best time in the charity 5K run was **25:50**.\n\nYou mentioned this as the time you were hoping to beat in your upcoming charity 5K run training. However, I also have a record from May 23rd where you mentioned setting a personal best time of **27:12** in a charity 5K run. \n\nSo it appears your most recent personal best is **25:50**, which represents an improvement from your previous time of 27:12.",
+      "durationMs": 3129,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "6aeb4375",
+      "input": {
+        "question": "How many Korean restaurants have I tried in my city?",
+        "askedAt": "2023/10/22 (Sun) 15:38",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have tried **four different Korean restaurants** in your city. You mentioned this most recently on September 30, 2023, when you said you've \"tried four different ones so far, and I'm always looking for new recommendations.\"",
+      "durationMs": 1567,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "830ce83f",
+      "input": {
+        "question": "Where did Rachel move to after her recent relocation?",
+        "askedAt": "2023/06/13 (Tue) 15:15",
+        "ability": "knowledge-update"
+      },
+      "output": "I do not have that information in my memory. \n\nBased on the memory context provided, I know that you have a friend named Rachel who lives in Chicago, and you were planning to visit her there. However, there is no information about Rachel relocating or moving to a different location after that.\n\nIf Rachel has recently moved, you may want to ask her directly about her new location.",
+      "durationMs": 1694,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "judge score 0 < threshold 7",
+            "metadata": {
+              "raw": 0,
+              "clamped": 0,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "852ce960",
+      "input": {
+        "question": "What was the amount I was pre-approved for when I got my mortgage from Wells Fargo?",
+        "askedAt": "2023/12/18 (Mon) 04:17",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, there are two different amounts mentioned:\n\n1. **$350,000** - This was stated in your first message on 2023/08/11, where you said you got pre-approved for $350,000 from Wells Fargo for a $325,000 house purchase.\n\n2. **$400,000** - This amount was mentioned in your message on 2023/11/30, where you referenced being pre-approved for $400,000 from Wells Fargo.\n\nThe most recent and reliable information from your initial mortgage inquiry is the **$350,000 pre-approval** from Wells Fargo.",
+      "durationMs": 2103,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "945e3d21",
+      "input": {
+        "question": "How often do I attend yoga classes to help with my anxiety?",
+        "askedAt": "2023/12/14 (Thu) 06:32",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you attend yoga classes **three times a week**. You've mentioned that you notice you're more focused on days when you attend yoga classes, and that your yoga practice has been helping you feel more grounded and centered, especially on days when you're feeling anxious.",
+      "durationMs": 1793,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "d7c942c3",
+      "input": {
+        "question": "Is my mom using the same grocery list method as me?",
+        "askedAt": "2023/05/14 (Sun) 09:58",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, yes, your mom is now using the same grocery list app as you. \n\nAccording to your note from April 30, 2023, you mentioned: \"my mom is actually using the same grocery list app as me now, so we can easily share lists and keep track of what we need.\"\n\nThis is an update from March 11, 2023, when you mentioned you were trying to get your mom to use the app, but she was still using her old paper list at that time.",
+      "durationMs": 2439,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "71315a70",
+      "input": {
+        "question": "How many hours have I spent on my abstract ocean sculpture?",
+        "askedAt": "2023/06/18 (Sun) 19:47",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you've spent **10-12 hours** on your abstract ocean sculpture so far. You mentioned this on June 17th, and noted that it's still a work in progress.",
+      "durationMs": 1722,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "89941a93",
+      "input": {
+        "question": "How many bikes do I currently own?",
+        "askedAt": "2023/10/27 (Fri) 13:00",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you currently own **four bikes**:\n\n1. Road bike (which you're planning to use for the century ride)\n2. Mountain bike (for trail rides)\n3. Commuter bike (for daily commutes)\n4. Hybrid bike (a new one you purchased recently)\n\nYou mentioned this most recently on 2023/10/10 when discussing your upcoming trip.",
+      "durationMs": 1808,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "ce6d2d27",
+      "input": {
+        "question": "What day of the week do I take a cocktail-making class?",
+        "askedAt": "2023/07/15 (Sat) 22:19",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you mentioned having a cocktail-making class on **Fridays**. You've referenced this a couple of times when discussing tequila-based cocktail recipes you wanted to experiment with during those classes.",
+      "durationMs": 1660,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "9ea5eabc",
+      "input": {
+        "question": "Where did I go on my most recent family trip?",
+        "askedAt": "2023/06/08 (Thu) 10:33",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, your most recent family trip was to **Hawaii**. You mentioned going on a family trip to Hawaii where you had a great time snorkeling together, though you also felt a bit stuck to a schedule during that trip.",
+      "durationMs": 1825,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "07741c44",
+      "input": {
+        "question": "Where do I initially keep my old sneakers?",
+        "askedAt": "2023/11/30 (Thu) 23:52",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you initially kept your old sneakers **under your bed for storage**. You mentioned this on August 11, 2023, noting that they were starting to smell from being stored in that location.\n\nHowever, more recently (November 30, 2023), you've been planning to organize your closet and store them in a shoe rack instead, as they were taking up space.",
+      "durationMs": 2231,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "a1eacc2a",
+      "input": {
+        "question": "How many short stories have I written since I started writing regularly?",
+        "askedAt": "2023/06/20 (Tue) 17:03",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have written **7 short stories** since you started writing regularly. You mentioned this on May 30th, 2023, noting that you've been writing regularly for three months at that point and have managed to complete 7 short stories since you started.",
+      "durationMs": 1726,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "184da446",
+      "input": {
+        "question": "How many pages of 'A Short History of Nearly Everything' have I read so far?",
+        "askedAt": "2023/06/17 (Sat) 04:02",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory I have, you've read up to **page 220** of \"A Short History of Nearly Everything.\"\n\nThis is mentioned in your entries from May 29th, where you noted that you're on page 220 and had just finished reading about the discovery of DNA structure. You also mentioned earlier on May 20th that you were on page 200, so you've made good progress through the book!",
+      "durationMs": 2144,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "031748ae",
+      "input": {
+        "question": "How many engineers do I lead when I just started my new role as Senior Software Engineer? How many engineers do I lead now?",
+        "askedAt": "2023/11/10 (Fri) 04:20",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, when you first started your new role as Senior Software Engineer, you led a team of **4 engineers**.\n\nHowever, as of October 24, 2023, you mentioned that you now lead a team of **5 engineers**. You noted at that time: \"I've been enjoying my role as Senior Software Engineer for a while, especially the part where I now lead a team of five engineers.\"\n\nSo to summarize:\n- **Initially**: 4 engineers\n- **Currently (as of October 24, 2023)**: 5 engineers",
+      "durationMs": 2003,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "4d6b87c8",
+      "input": {
+        "question": "How many titles are currently on my to-watch list?",
+        "askedAt": "2023/06/03 (Sat) 15:47",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you currently have **25 titles** on your to-watch list.\n\nThis was mentioned in your message from 2023/05/22 (Mon) 03:27, where you asked for help organizing your to-watch list and noted that you had 25 titles on it at that time.",
+      "durationMs": 1983,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "0f05491a",
+      "input": {
+        "question": "How many stars do I need to reach the gold level on my Starbucks Rewards app?",
+        "askedAt": "2023/08/01 (Tue) 22:29",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, there has been some confusion about this number. You initially corrected me stating that you need **120 stars** to reach the Gold level on your Starbucks Rewards app (not 300 as I had previously mentioned).\n\nSo according to your most recent correction, you need **120 stars** to reach Gold level.",
+      "durationMs": 1721,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "08e075c7",
+      "input": {
+        "question": "How long have I been using my Fitbit Charge 3?",
+        "askedAt": "2023/09/04 (Mon) 17:07",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you've been using your Fitbit Charge 3 for approximately 9 months. You mentioned this on September 2, 2023, noting that it's \"crazy how time flies!\" \n\nYou initially started using it around June 2023 (about 6 months at that time), and by early September 2023, you had been using it for 9 months.",
+      "durationMs": 2098,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "f9e8c073",
+      "input": {
+        "question": "How many sessions of the bereavement support group did I attend?",
+        "askedAt": "2023/11/07 (Tue) 04:54",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, there is a discrepancy in the records. You mentioned attending **three sessions** of the bereavement support group in your initial entry from May 11, 2023. However, in a later reflection from October 30, 2023, you stated that you **attended five sessions** and found it really helpful in processing your emotions.\n\nThe most recent account indicates **five sessions**, which you found particularly valuable for the sense of community, the kind and understanding facilitator, and the safe space to share your story and listen to others without judgment.",
+      "durationMs": 2877,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "41698283",
+      "input": {
+        "question": "What type of camera lens did I purchase most recently?",
+        "askedAt": "2023/09/21 (Thu) 08:41",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, the most recent lens you purchased was a **50mm prime lens**, which you mentioned on 2023/03/11. You noted that it has been working out great for your portrait and low-light photography.\n\nLater, on 2023/08/30, you also mentioned taking great shots with a **70-200mm zoom lens** at a local park, but this appears to be a lens you were using rather than a recent purchase announcement.",
+      "durationMs": 2990,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2698e78f",
+      "input": {
+        "question": "How often do I see my therapist, Dr. Smith?",
+        "askedAt": "2023/11/10 (Fri) 00:38",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory, you see Dr. Smith on different schedules at different times:\n\n- As of April 2023, you mentioned having therapy sessions with Dr. Smith **every two weeks**\n- By November 2023, you mentioned seeing Dr. Smith **every week**\n\nSo it appears your therapy frequency increased from every two weeks to weekly sessions by November 2023.",
+      "durationMs": 1828,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "b6019101",
+      "input": {
+        "question": "How many MCU films did I watch in the last 3 months?",
+        "askedAt": "2023/06/17 (Sat) 16:20",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you watched **5 MCU films in the last 3 months** (as of May 29, 2023).\n\nYou mentioned this when discussing your movie marathon plans, noting that you've been on a roll with movies lately - you watched 12 films total in the last 3 months, with 5 of those being MCU films.",
+      "durationMs": 3621,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "45dc21b6",
+      "input": {
+        "question": "How many of Emma's recipes have I tried out?",
+        "askedAt": "2023/06/16 (Fri) 17:33",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have tried out **3 of Emma's recipes** so far. You mentioned this on 2023/05/30 (Tue) 06:32, saying \"I've tried out 3 of Emma's recipes so far, and they're all amazing!\"",
+      "durationMs": 2340,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "5a4f22c0",
+      "input": {
+        "question": "What company is Rachel, an old colleague from my previous company, currently working at?",
+        "askedAt": "2023/06/21 (Wed) 13:02",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, Rachel is currently working at **TechCorp**.\n\nYou mentioned this on May 26th when you were thinking about catching up with her.",
+      "durationMs": 1382,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "6071bd76",
+      "input": {
+        "question": "For the coffee-to-water ratio in my French press, did I switch to more water per tablespoon of coffee, or less?",
+        "askedAt": "2023/07/30 (Sun) 05:53",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you actually switched to **less water per tablespoon of coffee**.\n\nIn February 2023, you mentioned your ratio was **1 tablespoon of coffee for every 6 ounces of water**.\n\nBy June 2023, you updated it to **1 tablespoon of coffee for every 5 ounces of water**.\n\nSo you decreased the amount of water per tablespoon of coffee, making your brew stronger.",
+      "durationMs": 1726,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "e493bb7c",
+      "input": {
+        "question": "Where is the painting 'Ethereal Dreams' by Emma Taylor currently hanging?",
+        "askedAt": "2023/11/18 (Sat) 19:24",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, the \"Ethereal Dreams\" painting by Emma Taylor is currently hanging **above your bed in your bedroom**.\n\nYou mentioned moving it there on October 30, 2023, and it was previously above your living room sofa (as noted in your July 11 entry), but you relocated it to your bedroom where it adds a nice touch to the space.",
+      "durationMs": 2014,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "618f13b2",
+      "input": {
+        "question": "How many times have I worn my new black Converse Chuck Taylor All Star sneakers?",
+        "askedAt": "2023/06/18 (Sun) 22:29",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you've worn your new black Converse Chuck Taylor All Star sneakers **six times**. \n\nYou mentioned wearing them four times initially (including to your friend's birthday party last Saturday on 2023/05/30), and then you wore them again to run some errands, bringing the total to six times as of 2023/05/30.",
+      "durationMs": 2171,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "72e3ee87",
+      "input": {
+        "question": "How many episodes of the Science series have I completed on Crash Course?",
+        "askedAt": "2023/06/27 (Tue) 19:26",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you have completed **50 episodes** of Crash Course's Science series. You mentioned this on May 29, 2023, when you said \"I just completed 50 episodes - it's been really helpful in understanding the basics of science.\"",
+      "durationMs": 1616,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "c4ea545c",
+      "input": {
+        "question": "Do I go to the gym more frequently than I did previously?",
+        "askedAt": "2023/09/01 (Fri) 19:15",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory context, you mentioned on 2023/08/15 that you've been consistent with your gym routine \"four times a week, actually.\" However, earlier on 2023/06/01, your gym schedule was set for Tuesdays, Thursdays, and Saturdays (three days a week).\n\nSo yes, it appears you are going to the gym more frequently now - you've increased from three times a week to four times a week.",
+      "durationMs": 1896,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "01493427",
+      "input": {
+        "question": "How many new postcards have I added to my collection since I started collecting again?",
+        "askedAt": "2023/12/21 (Thu) 21:31",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you've added a total of **50 new postcards** to your collection since you started collecting again.\n\nHere's the breakdown:\n- **17 new postcards** added by August 11, 2023\n- **25 new postcards** added by November 30, 2023\n- **8 more postcards** acquired from a local antique shop visit by November 30, 2023\n\n(17 + 25 + 8 = 50 postcards)",
+      "durationMs": 1798,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "judge score 0 < threshold 7",
+            "metadata": {
+              "raw": 0,
+              "clamped": 0,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "6a27ffc2",
+      "input": {
+        "question": "How many videos of Corey Schafer's Python programming series have I completed so far?",
+        "askedAt": "2023/06/09 (Fri) 01:44",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you have completed **30 videos** of Corey Schafer's Python programming series so far.\n\nYou mentioned this on May 26th, 2023, when you were excited about applying your Python skills to NLP tasks like sentiment analysis.",
+      "durationMs": 1495,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "2133c1b5",
+      "input": {
+        "question": "How long have I been living in my current apartment in Harajuku?",
+        "askedAt": "2023/10/15 (Sun) 08:39",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you've been living in your studio apartment in Harajuku for approximately 3 months as of October 15, 2023. You mentioned on that date that you've been living there for 3 months and are still discovering new hidden gems in the neighborhood.",
+      "durationMs": 1462,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "18bc8abd",
+      "input": {
+        "question": "What brand of BBQ sauce am I currently obsessed with?",
+        "askedAt": "2023/07/15 (Sat) 07:37",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your long-term memory, you are currently obsessed with **Kansas City Masterpiece BBQ sauce**. \n\nYou mentioned loving it on your ribs and have referenced it multiple times as your favorite BBQ sauce option for various dishes like pulled pork sandwiches and smoked brisket.",
+      "durationMs": 1817,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "db467c8c",
+      "input": {
+        "question": "How long have my parents been staying with me in the US?",
+        "askedAt": "2023/10/22 (Sun) 09:15",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, your parents have been staying with you in the US for **nine months**. \n\nThis is mentioned in your notes from October 20, 2023, where you reference that \"they've been staying with me for nine months now.\" This is also consistent with an earlier note from July 16, 2023, where you mentioned they had been with you for \"the past six months,\" which would align with the nine-month timeline by October.",
+      "durationMs": 2702,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "7a87bd0c",
+      "input": {
+        "question": "How long have I been sticking to my daily tidying routine?",
+        "askedAt": "2023/09/30 (Sat) 23:15",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have been sticking to your daily tidying routine for **4 weeks** as of September 30, 2023. \n\nYou previously mentioned maintaining this routine for 3 weeks back in June, and you've continued to be consistent with it. You've also noted that it's made a significant difference in your apartment!",
+      "durationMs": 1776,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "e61a7584",
+      "input": {
+        "question": "How long have I had my cat, Luna?",
+        "askedAt": "2023/11/30 (Thu) 12:46",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory context provided, you have had your cat Luna for approximately **9 months** as of November 30, 2023.\n\nThis is mentioned in your entry from November 30, 2023, where you stated: \"I've had my cat, Luna, for about 9 months now, and I've been trying to keep her active and engaged.\"",
+      "durationMs": 1508,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "1cea1afa",
+      "input": {
+        "question": "How many Instagram followers do I currently have?",
+        "askedAt": "2023/06/14 (Wed) 13:43",
+        "ability": "knowledge-update"
+      },
+      "output": "I don't have that information in my memory. The most recent reference I have is from May 28, 2023, when you mentioned reaching 600 followers as a milestone, but I don't have your current follower count as of June 14, 2023.\n\nTo find your current follower count, you can:\n1. Check your Instagram profile directly\n2. Look at your Instagram Insights (if you have a business or creator account)\n3. Use third-party analytics tools that track your Instagram growth",
+      "durationMs": 2274,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "ed4ddc30",
+      "input": {
+        "question": "How many dozen eggs do we currently have stocked up in our refrigerator?",
+        "askedAt": "2023/03/16 (Thu) 14:24",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, the most recent information I have about your egg inventory is from March 15, 2023, when you mentioned having **20 dozen eggs** stocked up in the fridge.\n\nHowever, I should note that you previously had 30 dozen eggs as of January 11, 2023, so your inventory has changed since then. The current count of 20 dozen from March 15th is the most recent information I have.",
+      "durationMs": 2250,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "8fb83627",
+      "input": {
+        "question": "How many issues of National Geographic have I finished reading?",
+        "askedAt": "2023/08/14 (Mon) 23:19",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you have finished reading **five issues** of National Geographic.\n\nThis is mentioned in your message from 2023/07/15 where you stated: \"I've finished five issues so far and they've all had great articles on the region\" (referring to Amazon rainforest articles).\n\nNote: There's a slight discrepancy in the earlier conversation from 2023/04/20 where you mentioned finishing three issues and being on your fourth, but the more recent update from July 15th indicates you've completed five issues total.",
+      "durationMs": 4815,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "b01defab",
+      "input": {
+        "question": "Did I finish reading 'The Nightingale' by Kristin Hannah?",
+        "askedAt": "2023/04/12 (Wed) 06:37",
+        "ability": "knowledge-update"
+      },
+      "output": "Yes, according to my memory, you did finish reading \"The Nightingale\" by Kristin Hannah! \n\nYou mentioned on March 30, 2023 that you had recently finished reading it, and you described it as \"such a powerful and emotional read.\" You also discussed how much you appreciated the novel, particularly the sisterly bond between Vianne and Isabelle, and how the book highlighted the experiences of women during World War II.\n\nThis is quite a journey from when you first put the book down in January 2023 because it was getting too emotional, but you were determined to finish it in time for your book club discussion. It sounds like you successfully completed it!",
+      "durationMs": 2806,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "22d2cb42",
+      "input": {
+        "question": "Where did I get my guitar serviced?",
+        "askedAt": "2023/06/24 (Sat) 09:01",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you mentioned a music shop on Main St where you got your guitar serviced. You noted that they're really good with guitar maintenance. However, the specific name of the shop is not clearly stated in the memory - it was referenced as \"that music shop on Main St\" where you had your guitar serviced.",
+      "durationMs": 1457,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "0e4e4c46",
+      "input": {
+        "question": "What is my current highest score in Ticket to Ride?",
+        "askedAt": "2023/06/10 (Sat) 16:46",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, your current highest score in Ticket to Ride is **132 points**, which you achieved on May 25, 2023. You mentioned this was an improvement from your previous high score of 124 points!",
+      "durationMs": 1355,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "4b24c848",
+      "input": {
+        "question": "How many tops have I bought from H&M so far?",
+        "askedAt": "2023/10/20 (Fri) 08:09",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have bought **five tops from H&M so far**. You mentioned this most recently on September 30, 2023, when you were planning to go to the mall and thinking of getting a few more tops. Prior to that, on August 11, 2023, you had mentioned buying three tops from H&M and loving their summer collection.",
+      "durationMs": 2246,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "7e974930",
+      "input": {
+        "question": "How much did I earn at the Downtown Farmers Market on my most recent visit?",
+        "askedAt": "2023/10/26 (Thu) 11:44",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you earned **$420** at the Downtown Farmers Market on your most recent visit (2023/09/30).",
+      "durationMs": 1059,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "603deb26",
+      "input": {
+        "question": "How many times have I tried making a Negroni at home since my friend Emma showed me how to make it?",
+        "askedAt": "2023/12/05 (Tue) 02:37",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you've tried making a Negroni at home **10 times** since your friend Emma showed you how to make it.",
+      "durationMs": 1034,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "59524333",
+      "input": {
+        "question": "What time do I usually go to the gym?",
+        "askedAt": "2023/06/06 (Tue) 16:35",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you usually go to the gym at **7:00 pm on Mondays, Wednesdays, and Fridays**.",
+      "durationMs": 1175,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "5831f84d",
+      "input": {
+        "question": "How many Crash Course videos have I watched in the past few weeks?",
+        "askedAt": "2023/10/05 (Thu) 05:19",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you've watched **15 Crash Course videos** in the past few weeks as of September 30, 2023.\n\nThis represents an increase from earlier in August when you had completed 12 Crash Course videos on computer science. You've been on quite an impressive learning streak!",
+      "durationMs": 1970,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "eace081b",
+      "input": {
+        "question": "Where am I planning to stay for my birthday trip to Hawaii?",
+        "askedAt": "2023/06/06 (Tue) 04:18",
+        "ability": "knowledge-update"
+      },
+      "output": "I do not have that information in my memory. \n\nWhile I can see that you're planning a birthday trip to Hawaii in October and have received recommendations for hiking trails on Kauai and snorkeling spots across various Hawaiian islands, there is no record of where specifically you've decided to stay for your trip.",
+      "durationMs": 1753,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "affe2881",
+      "input": {
+        "question": "How many different species of birds have I seen in my local park?",
+        "askedAt": "2023/06/07 (Wed) 02:42",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you've seen **32 different bird species** in your local park. You started with 27 species, and then spotted a Northern Flicker last weekend, which brought your total count to 32.",
+      "durationMs": 1892,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "50635ada",
+      "input": {
+        "question": "What was my previous frequent flyer status on United Airlines before I got the current status?",
+        "askedAt": "2023/06/29 (Thu) 04:09",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, your previous frequent flyer status on United Airlines was **Premier Silver**. \n\nYou reached Premier Silver status after accumulating 20,000 miles. Your current status is **Premier Gold**, which you mentioned you had just reached as of May 30, 2023.",
+      "durationMs": 5194,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "e66b632c",
+      "input": {
+        "question": "What was my previous personal best time for the charity 5K run?",
+        "askedAt": "2023/08/25 (Fri) 05:19",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you have mentioned two different personal best times for the charity 5K run:\n\n1. **26 minutes and 30 seconds** - mentioned on 2023/07/30\n2. **27 minutes and 45 seconds** - mentioned on 2023/04/11\n\nThe more recent entry from July 30th indicates your personal best time is **26 minutes and 30 seconds**, which represents a personal best you achieved by shaving off about a minute and a half from your previous record.",
+      "durationMs": 1980,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.4,
+            "reason": "judge score 4 < threshold 7",
+            "metadata": {
+              "raw": 4,
+              "clamped": 4,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "0ddfec37",
+      "input": {
+        "question": "How many autographed baseballs have I added to my collection in the first three months of collection?",
+        "askedAt": "2024/01/08 (Mon) 09:27",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you added **15 autographed baseballs** to your collection in the first three months of collecting.\n\nThis was mentioned in your entry from 2023/07/11, where you noted that you had just acquired a signed Mike Trout baseball and that it was \"a great addition to my collection - that's 15 autographed baseballs since I started collecting three months ago!\"",
+      "durationMs": 2060,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "f685340e",
+      "input": {
+        "question": "How often do I play tennis with my friends at the local park previously? How often do I play now?",
+        "askedAt": "2023/07/31 (Mon) 11:43",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, here's what I know about your tennis schedule:\n\n**Previously:** You mentioned playing tennis with your friends at the local park on a regular basis, and you referred to it as your \"weekly tennis sessions with friends.\"\n\n**Now:** As of your most recent message on July 30, 2023, you stated that you play tennis with your friends at the local park \"every other week\" on Sundays.\n\nSo it appears your tennis schedule has changed from weekly sessions to every other week.",
+      "durationMs": 3491,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "cc5ded98",
+      "input": {
+        "question": "How much time do I dedicate to coding exercises each day?",
+        "askedAt": "2023/06/13 (Tue) 01:30",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you currently dedicate **two hours each day** to coding exercises.\n\nYou mentioned this commitment on May 29, 2023, noting that you were excited to see progress in your skills over the next few weeks with this level of dedication.",
+      "durationMs": 1902,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "dfde3500",
+      "input": {
+        "question": "What day of the week did I meet with my previous language exchange tutor Juan?",
+        "askedAt": "2023/06/20 (Tue) 14:46",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you met with your language exchange tutor Juan on **Wednesday evening**. \n\nAccording to your notes from May 20th, you stated: \"We meet every Wednesday evening, and he helps me with my Spanish pronunciation and grammar while I assist him with his English vocabulary.\"",
+      "durationMs": 1634,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "69fee5aa",
+      "input": {
+        "question": "How many pre-1920 American coins do I have in my collection?",
+        "askedAt": "2023/06/09 (Fri) 11:14",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on my memory, you have a total of 37 pre-1920 American coins in your collection. You mentioned this when you were thinking about organizing them by denomination and mint mark back in May 2023.",
+      "durationMs": 1508,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.6,
+            "reason": "judge score 6 < threshold 7",
+            "metadata": {
+              "raw": 6,
+              "clamped": 6,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "7401057b",
+      "input": {
+        "question": "How many free night's stays can I redeem at any Hilton property with my accumulated points?",
+        "askedAt": "2023/06/16 (Fri) 09:50",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have accumulated enough points for **two free night's stays** at any Hilton property.\n\nYou mentioned this on May 30th when you said: \"I've accumulated enough points for two free night's stays at any Hilton property, so I might use that for a separate trip to Las Vegas.\"\n\nThis is an update from your earlier statement on May 29th when you indicated you had enough points for a single free night's stay. So your accumulated points have increased to cover two free nights.",
+      "durationMs": 2288,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "cf22b7bf",
+      "input": {
+        "question": "How much weight have I lost since I started going to the gym consistently?",
+        "askedAt": "2023/06/23 (Fri) 03:15",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you have lost **10 pounds** since you started going consistently to the gym 3 months ago (as of June 21, 2023).\n\nYou also mentioned earlier progress of losing 5 pounds in a month (as of May 21, 2023), so you've continued to make steady progress toward your goal weight by the end of summer!",
+      "durationMs": 2442,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "a2f3aa27",
+      "input": {
+        "question": "How many followers do I have on Instagram now?",
+        "askedAt": "2023/06/15 (Thu) 23:26",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, the most recent information about your Instagram follower count is from May 25, 2023, when you mentioned you were close to 1300 followers. However, since today's date is June 15, 2023 (about 3 weeks later), your current follower count may have changed.\n\nThe last specific follower count I have on record is **1250 followers** (from May 25, 2023), and you mentioned you were close to reaching 1300 at that time.\n\nTo get your exact current follower count, I'd recommend checking your Instagram profile directly or viewing your Instagram Insights, which will show you your most up-to-date follower count and growth trends.",
+      "durationMs": 2453,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "c7dc5443",
+      "input": {
+        "question": "What is my current record in the recreational volleyball league?",
+        "askedAt": "2023/07/21 (Fri) 20:30",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, I have two different records for your volleyball league:\n\n1. **3-2 record** (mentioned on 2023/06/16)\n2. **5-2 record** (mentioned on 2023/06/30)\n\nThe most recent update from 2023/06/30 indicates your volleyball team, the **Net Ninjas**, has a **5-2 record**. This suggests your team has been performing well and improving throughout the season!",
+      "durationMs": 2174,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "06db6396",
+      "input": {
+        "question": "How many projects have I completed since starting painting classes?",
+        "askedAt": "2023/11/08 (Wed) 09:08",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you have completed **5 projects** since starting painting classes.\n\nYou mentioned completing 4 projects as of August 16, 2023, and then by October 9, 2023, you had finished your 5th project and were feeling pretty accomplished about it!",
+      "durationMs": 4423,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "3ba21379",
+      "input": {
+        "question": "What type of vehicle model am I currently working on?",
+        "askedAt": "2023/06/01 (Thu) 05:09",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory context, you are currently working on a **Ford Mustang Shelby GT350R model**. \n\nYou mentioned that you're using Vallejo paints on this project and are impressed with the color range and quality. You've also been thinking about adding extra details like seatbelts and a dashboard to enhance the realism of the model.",
+      "durationMs": 2496,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.3,
+            "reason": "judge score 3 < threshold 7",
+            "metadata": {
+              "raw": 3,
+              "clamped": 3,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "9bbe84a2",
+      "input": {
+        "question": "What was my previous goal for my Apex Legends level before I updated my goal?",
+        "askedAt": "2023/10/08 (Sun) 15:29",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, your previous goal for your Apex Legends level was to reach **level 100 before the end of the year**. \n\nYou mentioned this goal on 2023/06/16, stating: \"I've been playing a lot of Apex lately and I'm determined to reach level 100 before the end of the year.\"\n\nLater, on 2023/09/30, you updated your goal to reach **level 150** instead.",
+      "durationMs": 2702,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.7,
+            "metadata": {
+              "raw": 7,
+              "clamped": 7,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "10e09553",
+      "input": {
+        "question": "How many largemouth bass did I catch with Alex on the earlier fishing trip to Lake Michigan before the 7/22 trip?",
+        "askedAt": "2023/12/06 (Wed) 11:18",
+        "ability": "knowledge-update"
+      },
+      "output": "I do not have that information in my memory.\n\nBased on the memory provided, I can see that you mentioned catching largemouth bass with Alex on a trip to Lake Michigan on 7/10 (where you caught 7 bass), but I don't have a record of an earlier fishing trip with Alex before the 7/22 trip you referenced.",
+      "durationMs": 1473,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.4,
+            "reason": "judge score 4 < threshold 7",
+            "metadata": {
+              "raw": 4,
+              "clamped": 4,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "dad224aa",
+      "input": {
+        "question": "What time do I wake up on Saturday mornings?",
+        "askedAt": "2023/06/24 (Sat) 03:58",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the information in your memory, your desired wake-up time on Saturday mornings is **8:00 am**. However, your actual wake-up times have varied:\n\n- Previous Saturday: 7:30 am\n- Last Saturday: 9:30 am\n\nYou mentioned wanting to wake up at 8:00 am on weekends as part of establishing a consistent sleep schedule, and you also mentioned liking to wake up at 7:30 am on Saturdays to fit in a cup of coffee before going for a jog.\n\nSo while your goal is 8:00 am, your actual Saturday wake-up times have been inconsistent, ranging from 7:30 am to 9:30 am.",
+      "durationMs": 2866,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.4,
+            "reason": "judge score 4 < threshold 7",
+            "metadata": {
+              "raw": 4,
+              "clamped": 4,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "ba61f0b9",
+      "input": {
+        "question": "How many women are on the team led by my former manager Rachel?",
+        "askedAt": "2023/08/03 (Thu) 06:02",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, your former manager Rachel leads a team of 10 people, and **6 women are on her team**.\n\nYou mentioned this in July 2023 when discussing companies that promote gender diversity in the workplace, noting that Rachel's team is \"a great example of a diverse team, with 6 women out of 10 people.\"\n\nThis represents 60% female representation on her team, which is notably higher than the 25% of executive positions held by women in your industry that you learned about at a seminar.",
+      "durationMs": 3336,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "42ec0761",
+      "input": {
+        "question": "Do I have a spare screwdriver for opening up my laptop?",
+        "askedAt": "2023/08/31 (Thu) 00:39",
+        "ability": "knowledge-update"
+      },
+      "output": "Yes, according to your memory, you do have a spare screwdriver! On August 15th, you mentioned that you picked up a spare screwdriver when you organized your computer desk a while back, so you're all set for cleaning those laptop fans.",
+      "durationMs": 1704,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "5c40ec5b",
+      "input": {
+        "question": "How many times have I met up with Alex from Germany?",
+        "askedAt": "2023/10/30 (Mon) 13:39",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory context, you have met up with Alex from Germany **twice** before.\n\nThis is mentioned in your notes from 2023/09/30, where you stated: \"we've met up twice already\" and \"we've met up twice before.\"",
+      "durationMs": 2721,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "c6853660",
+      "input": {
+        "question": "Did I mostly recently increase or decrease the limit on the number of cups of coffee in the morning?",
+        "askedAt": "2023/06/11 (Sun) 21:37",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you most recently **increased** your morning coffee limit to **two cups**.\n\nAccording to the conversation from 2023/05/26, you mentioned: \"I have increased the limit to two cups, and I'm thinking of experimenting with different sweeteners, like stevia or honey.\"\n\nThis was an increase from your previous limit of one cup, which you had mentioned earlier in the conversation history.",
+      "durationMs": 3520,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "26bdc477",
+      "input": {
+        "question": "How many trips have I taken my Canon EOS 80D camera on?",
+        "askedAt": "2023/06/06 (Tue) 18:27",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, you've taken your Canon EOS 80D camera on **five trips** so far.\n\nYou mentioned this in your message from May 30, 2023, when you said: \"By the way, I've had my Canon EOS 80D with me on five trips now, and it's been a beast!\"\n\nEarlier, in March 2023, you had mentioned taking your camera on three trips to Yellowstone, Yosemite, and the Grand Canyon, so you've added two more adventures since then.",
+      "durationMs": 2795,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "raw": 10,
+              "clamped": 10,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "0977f2af",
+      "input": {
+        "question": "What new kitchen gadget did I invest in before getting the Air Fryer?",
+        "askedAt": "2023/05/31 (Wed) 07:54",
+        "ability": "knowledge-update"
+      },
+      "output": "I do not have that information in my memory. While I can see that you got an Air Fryer yesterday (as of May 21, 2023), there is no record of what kitchen gadget you may have invested in before that purchase.",
+      "durationMs": 1283,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "judge score 0 < threshold 7",
+            "metadata": {
+              "raw": 0,
+              "clamped": 0,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "89941a94",
+      "input": {
+        "question": "Before I purchased the gravel bike, do I have other bikes in addition to my mountain bike and my commuter bike?",
+        "askedAt": "2023/06/21 (Wed) 02:24",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on the memory provided, before you purchased the gravel bike, you had **four bikes**:\n\n1. Road bike\n2. Mountain bike\n3. Commuter bike\n4. Hybrid bike (new purchase as of 2023/05/28)\n\nHowever, I don't have any information about you purchasing a gravel bike. The most recent bike purchase mentioned in your memory is the hybrid bike that you acquired before your San Francisco to New York City road trip.",
+      "durationMs": 2219,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.3,
+            "reason": "judge score 3 < threshold 7",
+            "metadata": {
+              "raw": 3,
+              "clamped": 3,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "07741c45",
+      "input": {
+        "question": "Where do I currently keep my old sneakers?",
+        "askedAt": "2023/06/23 (Fri) 07:31",
+        "ability": "knowledge-update"
+      },
+      "output": "Based on your memory, you currently keep your old sneakers **under your bed for storage**. However, you mentioned that keeping them there has caused them to start to smell, which is why you were looking into better storage solutions like a shoe rack to organize your closet.",
+      "durationMs": 1603,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": false,
+            "score": 0.5,
+            "reason": "judge score 5 < threshold 7",
+            "metadata": {
+              "raw": 5,
+              "clamped": 5,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 72,
     "passed": 56,
     "failed": 16,
-    "avgScore": 0.8013888888888889
-   },
-   "abstention": {
-    "passed": 72,
-    "failed": 0,
-    "avgScore": null
-   }
+    "avgDurationMs": 2180.8055555555557,
+    "byScorer": {
+      "llm-judge-j": {
+        "passed": 56,
+        "failed": 16,
+        "avgScore": 0.8013888888888889
+      },
+      "abstention": {
+        "passed": 72,
+        "failed": 0,
+        "avgScore": null
+      }
+    },
+    "passRateCi": {
+      "lo": 0.6690882726433144,
+      "hi": 0.8583267607947987
+    }
   },
-  "passRateCi": {
-   "lo": 0.6690882726433144,
-   "hi": 0.8583267607947987
+  "benchConfig": {
+    "mode": "memory",
+    "retrieval": "default",
+    "embedder": "none",
+    "conflictPipeline": "off",
+    "topK": 12,
+    "consolidate": false,
+    "provider": "openai-compatible:claude-haiku-4-5",
+    "judge": "ollama:qwen3:8b-q4_K_M",
+    "selfJudged": false,
+    "iterations": 1,
+    "loader": "longmemeval",
+    "variant": "S",
+    "ability": "knowledge-update",
+    "maxCostUsd": 5
+  },
+  "aggregates": {
+    "passRates": [0.7777777777777778],
+    "passRateMean": 0.7777777777777778,
+    "passRateStddev": 0,
+    "abstentionRate": null
   }
- },
- "benchConfig": {
-  "mode": "memory",
-  "retrieval": "default",
-  "embedder": "none",
-  "conflictPipeline": "off",
-  "topK": 12,
-  "consolidate": false,
-  "provider": "openai-compatible:claude-haiku-4-5",
-  "judge": "ollama:qwen3:8b-q4_K_M",
-  "selfJudged": false,
-  "iterations": 1,
-  "loader": "longmemeval",
-  "variant": "S",
-  "ability": "knowledge-update",
-  "maxCostUsd": 5
- },
- "aggregates": {
-  "passRates": [
-   0.7777777777777778
-  ],
-  "passRateMean": 0.7777777777777778,
-  "passRateStddev": 0,
-  "abstentionRate": null
- }
 }
