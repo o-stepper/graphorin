@@ -523,3 +523,60 @@ describe('audit 2026-07-16 - providerOptions options-block merge', () => {
     expect(body.options.top_k).toBe(20);
   });
 });
+
+describe('audit 2026-07-16 item 8 - server timings surfaced as providerMetadata', () => {
+  const DONE = {
+    done: true,
+    done_reason: 'stop',
+    prompt_eval_count: 10,
+    eval_count: 20,
+    total_duration: 700_000_000,
+    load_duration: 40_000_000,
+    prompt_eval_duration: 120_400_000,
+    eval_duration: 512_000_000,
+  };
+
+  it('stream: the finish event carries millisecond timings under providerMetadata.ollama', async () => {
+    const provider = ollamaAdapter({
+      model: 'qwen3:8b',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ message: { content: 'hi' } }, DONE]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.providerMetadata).toEqual({
+      ollama: { totalMs: 700, loadMs: 40, promptEvalMs: 120, evalMs: 512 },
+    });
+  });
+
+  it('generate: the response carries the same timings', async () => {
+    const provider = ollamaAdapter({
+      model: 'qwen3:8b',
+      fetchImpl: makeFetchImpl({
+        jsonOnce: { message: { role: 'assistant', content: 'hi' }, ...DONE },
+      }),
+      logger: () => {},
+    });
+    const result = await provider.generate({ messages: [{ role: 'user', content: 'hi' }] });
+    expect(result.providerMetadata).toEqual({
+      ollama: { totalMs: 700, loadMs: 40, promptEvalMs: 120, evalMs: 512 },
+    });
+  });
+
+  it('omits providerMetadata entirely when the server reports no timings', async () => {
+    const provider = ollamaAdapter({
+      model: 'qwen3:8b',
+      fetchImpl: makeFetchImpl({
+        body: makeNdJsonStream([{ done: true, done_reason: 'stop' }]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect('providerMetadata' in finish).toBe(false);
+  });
+});

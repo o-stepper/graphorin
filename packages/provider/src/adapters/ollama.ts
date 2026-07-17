@@ -189,6 +189,7 @@ async function* streamOllama(
   yield makeStreamStartEvent({ providerName, modelId: options.model });
   let usage: Usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
   let finishReason: FinishReason = 'stop';
+  let timings: OllamaTimings | undefined;
   let sawToolCall = false;
   let finishedNaturally = false;
   for await (const line of parseNdJsonStream(
@@ -237,6 +238,7 @@ async function* streamOllama(
     if (chunk.done === true) {
       finishReason = mapFinishReason(chunk.done_reason);
       usage = mapUsage(chunk);
+      timings = mapTimings(chunk);
       finishedNaturally = true;
       break;
     }
@@ -249,7 +251,12 @@ async function* streamOllama(
   // emitted tool_calls; surface the actionable 'tool-calls' outcome (the
   // OpenAI-compatible path against the same backend already does).
   if (sawToolCall && finishReason === 'stop') finishReason = 'tool-calls';
-  yield { type: 'finish', finishReason, usage };
+  yield {
+    type: 'finish',
+    finishReason,
+    usage,
+    ...(timings !== undefined ? { providerMetadata: { ollama: timings } } : {}),
+  };
 }
 
 async function generateOllama(
@@ -280,9 +287,11 @@ async function generateOllama(
   // OLLAMA-AD-01: report 'tool-calls' when the turn ended requesting tools,
   // even though Ollama reports done_reason 'stop' alongside them.
   if (hasToolCalls && finishReason === 'stop') finishReason = 'tool-calls';
+  const timings = mapTimings(json);
   return {
     usage: mapUsage(json),
     finishReason,
+    ...(timings !== undefined ? { providerMetadata: { ollama: timings } } : {}),
     ...(typeof json.message?.content === 'string' && json.message.content.length > 0
       ? { text: json.message.content }
       : {}),
@@ -405,6 +414,50 @@ function mapUsage(chunk: OllamaChatChunk): Usage {
   };
 }
 
+/**
+ * Ollama server timings for one call, in milliseconds (audit
+ * 2026-07-16, item 8). The server reports them in nanoseconds on the
+ * terminal chunk; normalized here so model load, prompt processing and
+ * generation are distinguishable in events and traces. Surfaced under
+ * `providerMetadata.ollama` on the `finish` event / `generate()`
+ * response, and stamped onto the provider span by `withTracing`.
+ *
+ * @stable
+ */
+export interface OllamaTimings {
+  /** Wall clock for the whole call. */
+  readonly totalMs?: number;
+  /** Time spent loading the model (0 when already resident). */
+  readonly loadMs?: number;
+  /** Prompt-processing time. */
+  readonly promptEvalMs?: number;
+  /** Token-generation time. */
+  readonly evalMs?: number;
+}
+
+function mapTimings(chunk: OllamaChatChunk): OllamaTimings | undefined {
+  const ms = (ns: number | undefined): number | undefined =>
+    typeof ns === 'number' && Number.isFinite(ns) ? Math.round(ns / 1e6) : undefined;
+  const totalMs = ms(chunk.total_duration);
+  const loadMs = ms(chunk.load_duration);
+  const promptEvalMs = ms(chunk.prompt_eval_duration);
+  const evalMs = ms(chunk.eval_duration);
+  if (
+    totalMs === undefined &&
+    loadMs === undefined &&
+    promptEvalMs === undefined &&
+    evalMs === undefined
+  ) {
+    return undefined;
+  }
+  return {
+    ...(totalMs !== undefined ? { totalMs } : {}),
+    ...(loadMs !== undefined ? { loadMs } : {}),
+    ...(promptEvalMs !== undefined ? { promptEvalMs } : {}),
+    ...(evalMs !== undefined ? { evalMs } : {}),
+  };
+}
+
 function emitTrustWarning(
   log: (level: 'warn' | 'info', message: string, meta?: object) => void,
   classification: LocalProviderClassification,
@@ -463,4 +516,9 @@ interface OllamaChatChunk {
   readonly done_reason?: string;
   readonly prompt_eval_count?: number;
   readonly eval_count?: number;
+  /** Server-side timings, nanoseconds; present on the terminal chunk. */
+  readonly total_duration?: number;
+  readonly load_duration?: number;
+  readonly prompt_eval_duration?: number;
+  readonly eval_duration?: number;
 }
