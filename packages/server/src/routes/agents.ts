@@ -43,6 +43,14 @@ export interface AgentRoutesDeps {
    * `agent:<id>/runs/<runId>/events` subject.
    */
   readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
+  /**
+   * Durable suspended-run sidecar (migration 038). Writes flow through
+   * the tracker's persistence hooks; the route layer only needs the
+   * explicit DELETE on `POST /runs/:runId/abort` - the tracker's
+   * `abort()` deliberately keeps rows so a graceful-shutdown
+   * force-abort cannot erase parked approvals.
+   */
+  readonly suspendedRuns?: { delete(runId: string): Promise<void> };
 }
 
 const RunBodySchema = z
@@ -288,7 +296,7 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     return c.json(state);
   });
 
-  app.post('/:runId/abort', createAuthenticatedMiddleware(), (c) => {
+  app.post('/:runId/abort', createAuthenticatedMiddleware(), async (c) => {
     const runId = c.req.param('runId');
     const state = deps.runs.snapshot(runId);
     if (state === undefined) {
@@ -305,16 +313,24 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     if (!aborted) {
       return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
     }
+    if (state.status === 'awaiting_approval' && deps.suspendedRuns !== undefined) {
+      // An explicit user abort settles the park for good - drop the
+      // durable row (the tracker's abort() keeps rows by design so the
+      // shutdown force-abort cannot erase restart-surviving parks).
+      await deps.suspendedRuns.delete(runId).catch(() => {});
+    }
     return c.json({ runId, status: 'aborted' });
   });
 
-  // C3/W-119: the formerly-501 endpoint. Resumes an in-process
-  // suspended agent run: the tracker retained the resumable RunState
-  // when the run parked (POST /agents/:id/run suspension branch, or
+  // C3/W-119: the formerly-501 endpoint. Resumes a suspended agent
+  // run: the tracker retained the resumable RunState when the run
+  // parked (POST /agents/:id/run suspension branch, or
   // `runs.registerSuspended(...)` for proactive fires executed outside
   // the REST surface), and the directive's approval decisions re-enter
-  // the agent loop via `agent.run(state, { directive })`. Cross-process
-  // resume stays library-side over the agent's own CheckpointStore.
+  // the agent loop via `agent.run(state, { directive })`. Since
+  // migration 038 a park also survives a process RESTART: boot
+  // hydration re-registers each durable row with its serialized-state
+  // string, which this handler rehydrates through the agent's codec.
   app.post('/:runId/resume', createAuthenticatedMiddleware(), async (c) => {
     const runId = c.req.param('runId');
     const state = deps.runs.snapshot(runId);
@@ -339,7 +355,7 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
         409,
       );
     }
-    const suspended = deps.runs.suspendedStateOf(runId);
+    let suspended = deps.runs.suspendedStateOf(runId);
     if (suspended === undefined) {
       return c.json(
         {
@@ -363,6 +379,39 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
         },
         404,
       );
+    }
+    // Migration 038: a string state is a boot-hydrated durable row -
+    // rehydrate it through the owning agent's codec before re-entering
+    // the loop (the codec restores binary payloads the wire form
+    // envelopes; a naive JSON.parse would smuggle them through).
+    if (typeof suspended === 'string') {
+      if (typeof agent.deserializeState !== 'function') {
+        return c.json(
+          {
+            error: 'run-state-unavailable',
+            runId,
+            message:
+              `Run '${runId}' was restored from durable storage but agent '${agentId}' ` +
+              'exposes no deserializeState codec - resume library-side: ' +
+              'agent.run(savedState, { directive }).',
+          },
+          409,
+        );
+      }
+      try {
+        suspended = agent.deserializeState(suspended);
+      } catch (err) {
+        return c.json(
+          {
+            error: 'run-state-invalid',
+            runId,
+            message:
+              `Run '${runId}' has a durable suspended state this build cannot rehydrate: ` +
+              `${err instanceof Error ? err.message : String(err)}`,
+          },
+          500,
+        );
+      }
     }
     const parsed = ResumeRunBodySchema.safeParse(await safelyParseJson(c));
     if (!parsed.success) {

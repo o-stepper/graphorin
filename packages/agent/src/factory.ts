@@ -45,7 +45,12 @@ import { newId } from './internal/ids.js';
 import { InMemoryUsageAccumulator } from './internal/usage-accumulator.js';
 import { CausalityMonitor } from './lateral-leak/causality-monitor.js';
 import { createProgressIO, type ProgressIO } from './progress/index.js';
-import { addModelUsage, serializeRunState } from './run-state/index.js';
+import {
+  addModelUsage,
+  runStateFromJSON,
+  runStateToJSON,
+  serializeRunState,
+} from './run-state/index.js';
 import {
   createCompactMethod,
   createFanOutMethod,
@@ -1070,6 +1075,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     fanOut,
     progress,
     registry: toolRegistry,
+    // Durable-suspension codec: the server's RunStateTracker persists a
+    // parked run through these instead of a naive JSON.stringify, so
+    // binary payloads survive (W-004 wire projection) and secret-named
+    // keys are redacted at rest (AG-23 parity with the checkpoint
+    // store). `deserializeState` throws RunStateMalformedError /
+    // RunStateVersionUnsupportedError on an unreadable payload.
+    serializeState: (state) => runStateToJSON(state, { stripTracingApiKey: true }),
+    deserializeState: (serialized) => runStateFromJSON(serialized),
   };
 
   return agent;

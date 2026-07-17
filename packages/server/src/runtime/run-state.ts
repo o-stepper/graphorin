@@ -2,14 +2,18 @@
  * In-memory bookkeeping for in-flight agent / workflow runs. Exposes
  * a tiny CRUD surface route handlers consume to honour the
  * `GET /runs/:runId/state` and `POST /runs/:runId/abort` endpoints
- * declared in the runtime architecture.
- *
- * The full durable resume / replay path lives in Phase 14b/c on top
- * of the WebSocket layer + the consolidator daemon. Phase 14a only
- * needs enough state to:
+ * declared in the runtime architecture:
  *   - mint a runId on every `POST /run` / `POST /stream`,
  *   - track its lifecycle (`pending` → `running` → `completed` / `failed` / `aborted`),
  *   - propagate `AbortController.signal` so handlers can cancel.
+ *
+ * Suspended (`awaiting_approval`) runs additionally flow through the
+ * optional {@link SuspendedRunPersistenceHooks} delegate: the server
+ * wires a SQLite-backed sidecar (`store.suspendedRuns`, migration 038)
+ * so a parked approval survives a process restart - boot hydration
+ * re-registers each persisted row with its raw serialized-state STRING
+ * as the retained state, and `POST /runs/:runId/resume` rehydrates it
+ * through the owning agent's `deserializeState` codec.
  *
  * @packageDocumentation
  */
@@ -153,9 +157,41 @@ interface RunRecord {
 }
 
 /**
- * Pluggable tracker. The default in-memory implementation is the only
- * one shipped in Phase 14a; future phases plug in a SQLite-backed
- * variant so durable resume survives process restarts.
+ * Persistence delegate for suspended (`awaiting_approval`) runs. The
+ * tracker itself stays in-memory and synchronous; the delegate mirrors
+ * every suspension into a durable sidecar and drops it when the run
+ * settles, so `POST /runs/:runId/resume` survives a process restart.
+ *
+ * Both hooks are fire-and-forget from the tracker's point of view:
+ * implementations must never throw (the tracker additionally guards)
+ * and own their async error handling.
+ *
+ * @stable
+ */
+export interface SuspendedRunPersistenceHooks {
+  /**
+   * A run parked (or re-parked) on durable HITL. `state` is either the
+   * live resumable RunState (in-process suspension) or the raw
+   * serialized-state STRING (boot re-registration of a persisted row -
+   * persist it verbatim).
+   */
+  suspended(runId: string, descriptor: RunDescriptor, state: unknown): void;
+  /**
+   * A previously-suspended run settled through resume (completed,
+   * failed, or aborted mid-resume) - drop the durable row. NOT invoked
+   * from {@link RunStateTracker.abort}: the graceful-shutdown path
+   * force-aborts every run, and erasing parked approvals there would
+   * defeat restart survival. The REST abort route deletes its row
+   * explicitly.
+   */
+  settled(runId: string): void;
+}
+
+/**
+ * Pluggable tracker. Bookkeeping is in-memory; wire
+ * {@link RunStateTracker.setSuspendedRunPersistence} to make suspended
+ * runs durable across process restarts (the standalone server does, on
+ * top of `store.suspendedRuns`).
  *
  * @stable
  */
@@ -164,6 +200,7 @@ export class RunStateTracker {
   readonly #now: () => number;
   readonly #onTerminal: ((info: TerminalRunInfo) => void) | undefined;
   #onActivity: ((event: RunActivityEvent) => void) | undefined;
+  #persistence: SuspendedRunPersistenceHooks | undefined;
 
   constructor(
     options: {
@@ -198,6 +235,31 @@ export class RunStateTracker {
       this.#onActivity?.(event);
     } catch {
       // The bridge must never break run tracking.
+    }
+  }
+
+  /**
+   * Register the suspended-run persistence delegate (one slot -
+   * `createServer` owns it). Exceptions are swallowed so a durability
+   * bridge failure can never break run tracking.
+   */
+  setSuspendedRunPersistence(hooks: SuspendedRunPersistenceHooks | undefined): void {
+    this.#persistence = hooks;
+  }
+
+  #persistSuspended(record: RunRecord, state: unknown): void {
+    try {
+      this.#persistence?.suspended(record.runId, record.descriptor, state);
+    } catch {
+      // Durability is best-effort - never break the in-memory tracker.
+    }
+  }
+
+  #persistSettled(runId: string): void {
+    try {
+      this.#persistence?.settled(runId);
+    } catch {
+      // Durability is best-effort - never break the in-memory tracker.
     }
   }
 
@@ -264,10 +326,15 @@ export class RunStateTracker {
     // IP-15: only the FIRST terminal transition counts toward the metrics -
     // a run aborted then re-completed must not double-increment.
     const wasTerminal = isTerminalStatus(record.status);
+    // A retained suspension that settles (the resume flow re-`start`s the
+    // run, so the status alone does not identify it) drops its durable row.
+    const wasSuspended =
+      record.status === 'awaiting_approval' || record.suspendedState !== undefined;
     record.status = status;
     record.completedAt = this.#now();
     // C3: a settled run keeps no suspended state.
     record.suspendedState = undefined;
+    if (wasSuspended) this.#persistSettled(runId);
     if (err !== undefined) {
       // W-052: keep the machine-readable code next to the message so
       // the GET run-status surface reports it too.
@@ -291,6 +358,7 @@ export class RunStateTracker {
     if (record === undefined) return;
     record.status = 'awaiting_approval';
     record.suspendedState = state;
+    this.#persistSuspended(record, state);
     this.#emitActivity({ kind: 'run-end', runKind: record.kind });
   }
 
@@ -313,6 +381,7 @@ export class RunStateTracker {
     record.status = 'awaiting_approval';
     record.suspendedState = state;
     this.#records.set(runId, record);
+    this.#persistSuspended(record, state);
   }
 
   /** Peek the retained suspended state (C3). `undefined` when none. */

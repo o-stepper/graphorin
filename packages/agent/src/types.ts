@@ -869,6 +869,23 @@ export interface Agent<TDeps = unknown, TOutput = string> {
    * present on agents built by `createAgent(...)`.
    */
   readonly registry?: ToolRegistry;
+  /**
+   * Render the canonical durable JSON form of a (typically suspended)
+   * `RunState`: version-stamped (`graphorin-run-state/x.y`), binary
+   * payloads projected to their wire envelopes, secret-named keys
+   * redacted. The `@graphorin/server` run tracker persists
+   * `awaiting_approval` runs through this codec so a resume survives a
+   * process restart; pairs with {@link Agent.deserializeState}.
+   */
+  serializeState(state: RunState): string;
+  /**
+   * Rehydrate a `RunState` previously produced by
+   * {@link Agent.serializeState} (or the exported `runStateToJSON`).
+   * Throws `RunStateMalformedError` / `RunStateVersionUnsupportedError`
+   * on an unreadable payload. The result feeds straight back into
+   * `agent.run(state, { directive })`.
+   */
+  deserializeState(serialized: string): RunState;
 }
 
 export type {
