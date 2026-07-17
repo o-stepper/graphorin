@@ -1339,7 +1339,7 @@ function registerGuardCommands(program: Command): void {
     .command('guard')
     .description('[Diagnostics] Inspect the memory-modification guard.');
   g.command('status')
-    .description('Print the four guard tiers and their variants.')
+    .description('Print the five guard tiers and their variants.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action((opts: { json?: boolean }) => {
       runGuardStatus({ ...(opts.json !== undefined ? { json: opts.json } : {}) });

@@ -4,7 +4,7 @@
  *
  * Surface (per Phase 15 § Guard):
  *
- *  - `graphorin guard status` - print the four tiers + their guard
+ *  - `graphorin guard status` - print the five tiers + their guard
  *    variants (per DEC-153).
  *  - `graphorin guard explain <toolName>` - derive the tier the
  *    classifier would assign to a tool with the supplied trust class
