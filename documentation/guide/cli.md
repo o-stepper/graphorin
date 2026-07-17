@@ -127,6 +127,8 @@ Tokens are HMAC-SHA256 over a deployment-wide pepper. The pepper is a `SecretRef
 
 `token rotate` revokes one token and reissues it with the same scopes; `token rekey` does that for **every** active token and is the post-compromise lever. Both accept `--env live|test` (default `live`). `token verify` is fully offline: it confirms the structural shape, the environment marker, and the CRC checksum without touching the store - a malformed token exits with code `1`. Verifying that a token is *active* (not revoked, not expired) still requires the server or `token list`.
 
+**Revocation propagation**: `token revoke` / `token rotate` write the token STORE directly - they cannot reach a running server's in-memory verifier cache, so a live server may keep honoring the old token for up to the cache TTL (default 60s; the command prints this note). For immediate effect revoke through the live server (`DELETE /v1/tokens/<id>`, scope `tokens:revoke` - the REST path evicts the cache entry synchronously) or restart the daemon.
+
 ## `graphorin secrets`
 
 ```bash

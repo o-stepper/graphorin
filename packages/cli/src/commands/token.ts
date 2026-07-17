@@ -194,6 +194,10 @@ export async function runTokenRevoke(
         return;
       }
       print(brand(`token '${result.id}' revoked at ${result.revokedAt ?? '<now>'}`));
+      // The CLI writes the store directly - it cannot reach a running
+      // server's in-memory verifier cache, so a live server may honor
+      // the token for up to its cache TTL (default 60s).
+      print(brand(cacheLagNote(result.id)));
     });
     // W-002: exit code independent of --json (see runAuditVerify).
     if (result === undefined) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
@@ -244,6 +248,7 @@ export async function runTokenRotate(options: TokenRotateOptions): Promise<Token
     emitReport(options, out, () => {
       const print = options.print ?? defaultPrintSink;
       print(brand(`token '${result.old.id}' revoked + replaced by '${out.id}'`));
+      print(brand(cacheLagNote(result.old.id)));
       print(brand('raw token (shown ONCE, printed to stdout):'));
       // S-14b parity (e2e 2026-07-13, CLI-01): like `token create`, the
       // raw value is the machine-consumable output - stdout, capture-
@@ -380,4 +385,19 @@ export function parseDuration(input: string): number {
     default:
       throw new Error(`[graphorin/cli] invalid --expires-in unit '${unit}'.`);
   }
+}
+
+/**
+ * TOKENS-RE-02: the CLI mutates the token STORE directly - it cannot
+ * reach a running server's in-memory verifier cache, so an
+ * out-of-process revoke propagates only when the cache entry expires
+ * (`cacheTtlMaxMs`, default 60s). Printed after every revoke-shaped
+ * command so operators know the immediate-effect alternative.
+ */
+function cacheLagNote(id: string): string {
+  return (
+    `note: a running server may keep honoring token '${id}' for up to 60s ` +
+    `(verifier cache TTL). For immediate effect revoke via the live server ` +
+    `(DELETE /v1/tokens/${id}, scope 'tokens:revoke') or restart it.`
+  );
 }
