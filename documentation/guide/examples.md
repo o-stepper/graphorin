@@ -5,7 +5,7 @@ description: End-to-end example apps that exercise Graphorin against a determini
 
 # Examples
 
-Eleven end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
+Twelve end-to-end example apps live in [`examples/`](https://github.com/o-stepper/graphorin/tree/main/examples) inside the repository. Every example builds, tests, and runs against a deterministic in-tree **stub provider** so CI never depends on a live LLM.
 
 ::: tip Run any example
 From the repository root:
@@ -17,6 +17,13 @@ pnpm --filter ./examples/<name> test
 GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/<name> dev
 ```
 :::
+
+## `assistant-bot`
+
+The official whole-bot recipe: one long-living personal assistant composed from every framework leg. Facts ingested into memory answer a later question arriving through the channels front door (pairing challenge included), a REST run parks on a `needsApproval: true` tool and resumes through `POST /v1/runs/:runId/resume`, a heartbeat beat delivers a `notify` outcome, and one session exports the whole conversation as JSONL - all against the in-process hono app (`skipListen: true`), no sockets.
+
+- Demonstrates: the composition of `createAgent` + typed tools (HITL gate), `createMemory` auto-recall (`autoAssembleContext` + `factsAutoRecall`), sessions + JSONL export, the server HITL loop over REST with token auth, `createHeartbeat` proactivity, and the channels front door (pairing, sanitization, taint seed, identity routing).
+- Source: [`examples/assistant-bot/`](https://github.com/o-stepper/graphorin/tree/main/examples/assistant-bot).
 
 ## `personal-assistant-cli`
 
@@ -105,7 +112,7 @@ GRAPHORIN_TRACE=console GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
 ```
 
-The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the eleven apps.
+The shared helper `examples/example-trace-helper/` wires the console exporter consistently across the twelve apps.
 
 ## Production deployment templates
 

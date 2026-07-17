@@ -30,6 +30,9 @@ const TIMEOUT_MS = 90_000;
 /** @type {Case[]} */
 const CASES = [
   { name: 'approval-workflow', expectOutput: 'durable primitives: OK' },
+  // F6: the official whole-bot recipe (agent + memory + sessions +
+  // server HITL + heartbeat + channels front door).
+  { name: 'assistant-bot', expectOutput: 'assistant-bot: OK' },
   { name: 'document-pipeline' },
   { name: 'background-consolidator' },
   { name: 'multi-agent-crew' },

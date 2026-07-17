@@ -286,6 +286,48 @@ importers:
         specifier: workspace:*
         version: link:../../packages/workflow
 
+  examples/assistant-bot:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@graphorin/channels':
+        specifier: workspace:*
+        version: link:../../packages/channels
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/example-trace-helper':
+        specifier: workspace:*
+        version: link:../example-trace-helper
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/proactive':
+        specifier: workspace:*
+        version: link:../../packages/proactive
+      '@graphorin/security':
+        specifier: workspace:*
+        version: link:../../packages/security
+      '@graphorin/server':
+        specifier: workspace:*
+        version: link:../../packages/server
+      '@graphorin/sessions':
+        specifier: workspace:*
+        version: link:../../packages/sessions
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+      '@graphorin/tools':
+        specifier: workspace:*
+        version: link:../../packages/tools
+      '@graphorin/triggers':
+        specifier: workspace:*
+        version: link:../../packages/triggers
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
+
   examples/background-consolidator:
     dependencies:
       '@graphorin/agent':
