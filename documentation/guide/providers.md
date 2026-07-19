@@ -42,7 +42,7 @@ A `MiddlewareOrderingError` is thrown the moment the array argument violates the
 | `withCostLimit` | Refuses requests that would breach the configured budget. |
 | `withCostTracking` | Records per-call cost for auditing. |
 | `withFallback` | Composes a chain of fallback providers. |
-| `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), and the streaming scan keeps a bounded tail buffer so a secret split across two `text-delta` chunks is still caught. |
+| `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), per-pattern `verify` predicates are honoured (the built-in `creditcard` check requires a Luhn-valid number with a major-network leading digit, so serialized floats and epoch timestamps are never corrupted), and the streaming scan keeps a bounded tail buffer so a secret split across two `text-delta` chunks is still caught. |
 
 Token counting, model-tier classification, and reasoning-retention policy are **separate APIs** (`createDefaultCounter(...)`, `classifyModelTier(...)`, `resolveReasoningRetention(...)`) - not middleware. Reasoning retention is consulted by the runtime per step; `classifyModelTier(...)` is an operator-side helper for building and sanity-checking a `modelTierMap` - the agent's tier resolution walks its own precedence ladder and does NOT invoke the classifier at runtime, so an inconsistent tier-map is not auto-validated.
 

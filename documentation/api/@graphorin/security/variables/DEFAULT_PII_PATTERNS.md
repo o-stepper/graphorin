@@ -10,7 +10,7 @@
 const DEFAULT_PII_PATTERNS: ReadonlyArray<PiiPattern>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:45
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:46
 
 **`Stable`**
 

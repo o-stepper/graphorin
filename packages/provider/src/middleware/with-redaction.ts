@@ -464,33 +464,43 @@ function scrubText(
 ): string {
   let scrubbed = text;
   for (const pattern of policy.patterns) {
+    // Single pass per pattern: mask every match the per-pattern `verify`
+    // predicate accepts (no predicate = accept all). Rejected look-alikes
+    // (e.g. Luhn-invalid digit runs hitting the `creditcard` regex) stay
+    // byte-identical, mirroring the OTLP validator's RP-21 semantics.
+    const mask = pattern.mask ?? `[REDACTED ${pattern.name}]`;
+    const verify = pattern.verify;
+    let matchLength = 0;
+    let accepted = 0;
     pattern.regex.lastIndex = 0;
-    if (pattern.regex.test(scrubbed)) {
-      const matches = scrubbed.match(pattern.regex) ?? [];
-      const matchLength = matches.reduce((sum, m) => sum + m.length, 0);
-      ctx.hits++;
-      reportViolation(
-        policy,
-        {
-          patternName: pattern.name,
-          fieldPath,
-          role,
-          matchLength,
-          ...(trustClass !== undefined ? { trustClass } : {}),
-          action: policy.action,
-        },
-        logger,
-      );
-      if (policy.action === 'throw' || policy.failClosed) {
-        throw new PromptRedactionError({
-          patternName: pattern.name,
-          fieldPath,
-          ...(role !== undefined ? { role } : {}),
-        });
-      }
-      pattern.regex.lastIndex = 0;
-      scrubbed = scrubbed.replace(pattern.regex, pattern.mask ?? `[REDACTED ${pattern.name}]`);
+    const rewritten = scrubbed.replace(pattern.regex, (m) => {
+      if (verify !== undefined && !verify(m)) return m;
+      accepted += 1;
+      matchLength += m.length;
+      return mask;
+    });
+    if (accepted === 0) continue;
+    ctx.hits++;
+    reportViolation(
+      policy,
+      {
+        patternName: pattern.name,
+        fieldPath,
+        role,
+        matchLength,
+        ...(trustClass !== undefined ? { trustClass } : {}),
+        action: policy.action,
+      },
+      logger,
+    );
+    if (policy.action === 'throw' || policy.failClosed) {
+      throw new PromptRedactionError({
+        patternName: pattern.name,
+        fieldPath,
+        ...(role !== undefined ? { role } : {}),
+      });
     }
+    scrubbed = rewritten;
   }
   return scrubbed;
 }
@@ -633,7 +643,13 @@ async function* scanStreamingResponse(
         while (match !== null) {
           const endIndex = match.index + match[0].length;
           // A match wholly inside `tail` was reported on the prior delta.
-          if (match[0].length > 0 && endIndex > tail.length) {
+          // Per-pattern `verify` applies here too, so a rejected look-alike
+          // (Luhn-invalid digit run, …) does not emit a violation row.
+          if (
+            match[0].length > 0 &&
+            endIndex > tail.length &&
+            (pattern.verify === undefined || pattern.verify(match[0]))
+          ) {
             newMatchLength += match[0].length;
           }
           if (!pattern.regex.global) break;

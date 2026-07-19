@@ -43,6 +43,19 @@ describe('@graphorin/observability/redaction - validator', () => {
     expect(ts?.value).toBe('ts=1718000000000');
   });
 
+  it('leaves serialized numbers intact (decimal boundary + network prefix)', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    // A float's fractional digits are never a PAN, even when Luhn-valid.
+    const score = v.validate({ value: '{"score":0.01639344262295082}', tier: 'public' });
+    expect(score?.value).toBe('{"score":0.01639344262295082}');
+    const luhnValidFraction = v.validate({ value: '{"p":0.4111111111111111}', tier: 'public' });
+    expect(luhnValidFraction?.value).toBe('{"p":0.4111111111111111}');
+    // Luhn-valid snowflake-style id: leading digit 1 is outside the
+    // major-network prefixes, so it is not treated as a card.
+    const id = v.validate({ value: 'id=1240000000000000001', tier: 'public' });
+    expect(id?.value).toBe('id=1240000000000000001');
+  });
+
   it('throws when failOnUnredactedSensitive is true and a tier exceeds the floor', () => {
     const v = createRedactionValidator({ minTier: 'public', failOnUnredactedSensitive: true });
     expect(() => v.validate({ value: 'x', tier: 'secret' })).toThrow(RedactionValidationError);

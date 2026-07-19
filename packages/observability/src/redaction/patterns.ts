@@ -65,9 +65,13 @@ export interface RedactionPattern {
   /**
    * Optional per-match predicate. When present, a regex hit is only
    * treated as a real match - and masked - when this returns `true` for the
-   * matched substring. Used by the `creditcard` pattern to require a valid
-   * Luhn checksum so look-alike digit runs (epoch-ms timestamps, order ids)
-   * are not corrupted.
+   * matched substring. Every catalogue consumer honours it: the OTLP
+   * `RedactionValidator`, the `withRedaction` provider middleware (both the
+   * request scrub and the streaming response scan), and user-supplied
+   * patterns may carry their own predicate. Used by the `creditcard`
+   * pattern to require a valid Luhn checksum plus a major-network leading
+   * digit so look-alike digit runs (epoch-ms timestamps, order ids,
+   * serialized floats) are not corrupted.
    */
   readonly verify?: (match: string) => boolean;
   /**
@@ -166,12 +170,17 @@ const PATTERNS: readonly RedactionPattern[] = [
   {
     name: 'creditcard',
     category: 'pii',
-    description: 'Credit card number (13-19 digits, optional spaces / dashes; Luhn-checked).',
-    regex: /\b(?:\d[\s-]*?){13,19}\b/g,
+    description:
+      'Credit card number (13-19 digits, optional spaces / dashes; Luhn-checked, major-network leading digit 2-6; decimal-adjacent digit runs are skipped).',
+    // The lookarounds keep serialized decimals intact: `(?<!\.)` refuses a
+    // run that continues a fractional part (`0.01639344262295082`) and
+    // `(?!\.\d)` refuses the integer part of a decimal (`4111111111119.75`).
+    regex: /\b(?<!\.)(?:\d[\s-]*?){13,19}\b(?!\.\d)/g,
     mask: '[REDACTED creditcard]',
-    // RP-21: require a valid Luhn checksum so a 13-19 digit run that is not a
-    // real PAN (millisecond epoch timestamps, order numbers, …) is left alone.
-    verify: isLuhnValid,
+    // RP-21: require a valid Luhn checksum + plausible network prefix so a
+    // 13-19 digit run that is not a real PAN (millisecond epoch timestamps,
+    // order numbers, …) is left alone.
+    verify: isLikelyPan,
   },
   {
     name: 'us-ssn',
@@ -239,6 +248,22 @@ export const OPT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS.filter(
  * @stable
  */
 export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
+
+/**
+ * Verifier for the `creditcard` pattern: Luhn checksum + leading digit of a
+ * major card network (2 = Mir / Mastercard 2-series, 3 = JCB / Amex /
+ * Diners, 4 = Visa, 5 = Mastercard / Maestro, 6 = Discover / UnionPay /
+ * RuPay). Runs leading with 0 / 1 / 7 / 8 / 9 are never consumer PANs in
+ * practice (epoch timestamps and snowflake ids start with 1) - the rare
+ * exceptions (UATP `1...`, petroleum `7...`, RuPay `81/82`, Troy `9792`)
+ * are deliberately outside the built-in catalogue; register a custom
+ * pattern to cover them.
+ */
+function isLikelyPan(value: string): boolean {
+  const lead = value.charCodeAt(0) - 48; // matches always start with a digit
+  if (lead < 2 || lead > 6) return false;
+  return isLuhnValid(value);
+}
 
 /**
  * Luhn (mod-10) checksum validator used by the `creditcard` pattern.

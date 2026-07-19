@@ -10,7 +10,7 @@
 const BUILT_IN_PATTERNS: readonly RedactionPattern[];
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:221
+Defined in: packages/observability/src/redaction/patterns.ts:230
 
 **`Stable`**
 
