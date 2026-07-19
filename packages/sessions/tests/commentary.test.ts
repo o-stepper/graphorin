@@ -164,27 +164,33 @@ describe('Commentary sanitizer', () => {
     expect(JSON.stringify(c)).toBe(JSON.stringify(d));
   });
 
-  it('per-part sanitization is well under 2 ms p95 on a 100-part fixture', () => {
-    const sanitizer = createCommentarySanitizer();
-    const samples: Message[] = [];
-    for (let i = 0; i < 100; i += 1) {
-      samples.push({
-        role: 'assistant',
-        content: [
-          { type: 'text', text: `Hello part ${i}` },
-          { type: 'text', text: COMMENTARY_LEAK },
-        ],
-      });
-    }
-    const timings: number[] = [];
-    for (const m of samples) {
-      const start = process.hrtime.bigint();
-      sanitizer.sanitizeMessage(m, 'session-push');
-      timings.push(Number(process.hrtime.bigint() - start) / 1e6);
-    }
-    timings.sort((a, b) => a - b);
-    const p95 = timings[Math.floor(timings.length * 0.95)] ?? 0;
-    // Generous bound: 5 ms for CI noise tolerance - the spec target is 2 ms p95.
-    expect(p95).toBeLessThan(5);
-  });
+  // V8 coverage instrumentation inflates the timing 5-8x, so the latency
+  // canary is meaningless there - the CI coverage leg sets
+  // GRAPHORIN_COVERAGE=1 and skips it (the plain matrix legs still run it).
+  it.skipIf(process.env.GRAPHORIN_COVERAGE === '1')(
+    'per-part sanitization is well under 2 ms p95 on a 100-part fixture',
+    () => {
+      const sanitizer = createCommentarySanitizer();
+      const samples: Message[] = [];
+      for (let i = 0; i < 100; i += 1) {
+        samples.push({
+          role: 'assistant',
+          content: [
+            { type: 'text', text: `Hello part ${i}` },
+            { type: 'text', text: COMMENTARY_LEAK },
+          ],
+        });
+      }
+      const timings: number[] = [];
+      for (const m of samples) {
+        const start = process.hrtime.bigint();
+        sanitizer.sanitizeMessage(m, 'session-push');
+        timings.push(Number(process.hrtime.bigint() - start) / 1e6);
+      }
+      timings.sort((a, b) => a - b);
+      const p95 = timings[Math.floor(timings.length * 0.95)] ?? 0;
+      // Generous bound: 5 ms for CI noise tolerance - the spec target is 2 ms p95.
+      expect(p95).toBeLessThan(5);
+    },
+  );
 });
