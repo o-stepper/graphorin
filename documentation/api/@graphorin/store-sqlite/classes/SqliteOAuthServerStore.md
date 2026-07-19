@@ -6,14 +6,14 @@
 
 # Class: SqliteOAuthServerStore
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L12)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:12
+
+**`Stable`**
 
 Default `OAuthServerStore` implementation. Persists OAuth
 registration metadata + `SecretRef` URI strings; the actual token
 material lives in `@graphorin/security`'s secret store and is
 resolved by the URI at use time (DEC-139 / ADR-033).
-
-## Stable
 
 ## Implements
 
@@ -27,7 +27,7 @@ resolved by the URI at use time (DEC-139 / ADR-033).
 new SqliteOAuthServerStore(conn): SqliteOAuthServerStore;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L14)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:14
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: [packages/store-sqlite/src/oauth-server-store.ts:14](https://github.
 delete(id): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L78)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:78
 
 Remove the record for `id`.
 
@@ -75,7 +75,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L53)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:53
 
 Read the record for `id`, returning `null` when absent.
 
@@ -103,7 +103,7 @@ Read the record for `id`, returning `null` when absent.
 list(): Promise<readonly OAuthServerRecord[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L58)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:58
 
 Snapshot of all stored records, ordered by `id`.
 
@@ -123,7 +123,7 @@ Snapshot of all stored records, ordered by `id`.
 put(record): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L18)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:18
 
 Insert or replace the record for `id`.
 
@@ -149,7 +149,7 @@ Insert or replace the record for `id`.
 update(id, patch): Promise<OAuthServerRecord>;
 ```
 
-Defined in: [packages/store-sqlite/src/oauth-server-store.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/oauth-server-store.ts#L63)
+Defined in: packages/store-sqlite/src/oauth-server-store.ts:63
 
 Apply a partial update to the record at `id`.
 

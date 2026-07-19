@@ -10,7 +10,9 @@
 function languageWhitelist<TValue>(opts): InputGuardrail<TValue>;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/language-whitelist.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/language-whitelist.ts#L69)
+Defined in: packages/security/src/guardrails/builtins/language-whitelist.ts:69
+
+**`Stable`**
 
 Construct the language-whitelist guardrail.
 
@@ -29,5 +31,3 @@ Construct the language-whitelist guardrail.
 ## Returns
 
 [`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\&lt;`TValue`\&gt;
-
-## Stable

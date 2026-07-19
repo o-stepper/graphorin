@@ -12,7 +12,9 @@ function createSseRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/sse/events.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/sse/events.ts#L69)
+Defined in: packages/server/src/sse/events.ts:69
+
+**`Stable`**
 
 Build the SSE event-stream router. Mounts
 `GET /sessions/:id/events` (the canonical path documented in the
@@ -30,5 +32,3 @@ the router under a custom prefix.
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

@@ -10,7 +10,9 @@
 function reviserConsolidatorPreset(options): ReviserConsolidatorConfig;
 ```
 
-Defined in: [packages/memory/src/consolidator/presets.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/presets.ts#L77)
+Defined in: packages/memory/src/consolidator/presets.ts:77
+
+**`Stable`**
 
 Build the reviser consolidator configuration - pass the result as
 `createMemory({ consolidator: reviserConsolidatorPreset({...}) })`.
@@ -24,5 +26,3 @@ Build the reviser consolidator configuration - pass the result as
 ## Returns
 
 [`ReviserConsolidatorConfig`](/api/@graphorin/memory/interfaces/ReviserConsolidatorConfig.md)
-
-## Stable

@@ -18,7 +18,9 @@ type FusionStrategy =
 };
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L121)
+Defined in: packages/memory/src/tiers/semantic-memory.ts:121
+
+**`Stable`**
 
 Score-fusion strategy for [SemanticMemory.search](/api/@graphorin/memory/classes/SemanticMemory.md#search) (X-2).
 
@@ -54,8 +56,6 @@ Score-fusion strategy for [SemanticMemory.search](/api/@graphorin/memory/classes
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `k?` | `number` | Override the RRF constant for the weighted fuse. Default `60`. | [packages/memory/src/tiers/semantic-memory.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L127) |
-| `strategy` | `"weighted"` | - | [packages/memory/src/tiers/semantic-memory.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L124) |
-| `weights` | [`FusionWeights`](/api/@graphorin/memory/interfaces/FusionWeights.md) | - | [packages/memory/src/tiers/semantic-memory.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L125) |
-
-## Stable
+| `k?` | `number` | Override the RRF constant for the weighted fuse. Default `60`. | packages/memory/src/tiers/semantic-memory.ts:127 |
+| `strategy` | `"weighted"` | - | packages/memory/src/tiers/semantic-memory.ts:124 |
+| `weights` | [`FusionWeights`](/api/@graphorin/memory/interfaces/FusionWeights.md) | - | packages/memory/src/tiers/semantic-memory.ts:125 |

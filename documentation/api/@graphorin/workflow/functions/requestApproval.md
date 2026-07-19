@@ -13,7 +13,9 @@ function requestApproval<TDecision>(
    options?): TDecision;
 ```
 
-Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
+Defined in: packages/core/dist/channels/durable.d.ts:196
+
+**`Stable`**
 
 Suspend on a named persisted approval. Resolved by
 `workflow.approve(threadId, name, decision)`; the decision is returned
@@ -39,5 +41,3 @@ see [RequestApprovalOptions](/api/@graphorin/core/interfaces/RequestApprovalOpti
 ## Returns
 
 `TDecision`
-
-## Stable

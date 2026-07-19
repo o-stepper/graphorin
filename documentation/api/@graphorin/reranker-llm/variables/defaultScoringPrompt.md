@@ -10,11 +10,11 @@
 const defaultScoringPrompt: ScoringPromptBuilder;
 ```
 
-Defined in: [packages/reranker-llm/src/scoring-prompt.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/scoring-prompt.ts#L69)
+Defined in: src/scoring-prompt.ts:69
+
+**`Stable`**
 
 Default English scoring prompt. Asks the model to emit a single integer in
 `[0, maxScore]` and to omit any other text. The passage is wrapped in
 explicit delimiters and framed as untrusted DATA - never instructions - so a
 poisoned memory can't steer its own relevance score (PS-14).
-
-## Stable

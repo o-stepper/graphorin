@@ -10,7 +10,9 @@
 function getSpecSnapshot(): SpecSnapshot;
 ```
 
-Defined in: [packages/skills/src/spec/index.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L81)
+Defined in: packages/skills/src/spec/index.ts:81
+
+**`Stable`**
 
 Return the currently active snapshot. Loads the bundled JSON file
 on first call, then caches the parsed object.
@@ -18,5 +20,3 @@ on first call, then caches the parsed object.
 ## Returns
 
 [`SpecSnapshot`](/api/@graphorin/skills/spec/interfaces/SpecSnapshot.md)
-
-## Stable

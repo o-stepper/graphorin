@@ -6,12 +6,12 @@
 
 # Interface: SessionRoutesDeps
 
-Defined in: [packages/server/src/routes/sessions.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L99)
+Defined in: packages/server/src/routes/sessions.ts:99
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | [packages/server/src/routes/sessions.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L100) |
+| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | packages/server/src/routes/sessions.ts:100 |

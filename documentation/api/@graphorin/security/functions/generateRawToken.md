@@ -13,7 +13,9 @@ function generateRawToken(opts): {
 };
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L254)
+Defined in: packages/security/src/auth/token-format.ts:254
+
+**`Stable`**
 
 Generate a brand-new raw token. The result is the only place the
 plaintext value exists; callers MUST hand it to the user immediately
@@ -36,7 +38,5 @@ and persist only the HMAC hash via the `AuthTokenStore` contract.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `entropyBytes` | `Buffer` | [packages/security/src/auth/token-format.ts:256](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L256) |
-| `raw` | `string` | [packages/security/src/auth/token-format.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L255) |
-
-## Stable
+| `entropyBytes` | `Buffer` | packages/security/src/auth/token-format.ts:256 |
+| `raw` | `string` | packages/security/src/auth/token-format.ts:255 |

@@ -47,7 +47,9 @@ type AgentEvent<TOutput> =
   | AgentErrorEvent;
 ```
 
-Defined in: [packages/core/src/types/agent-event.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L32)
+Defined in: packages/core/src/types/agent-event.ts:32
+
+**`Stable`**
 
 Discriminated union of every event produced by `Agent.stream(...)`.
 
@@ -78,5 +80,3 @@ key is `toolCallId`; `toolName` is duplicated onto the
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `string` |
-
-## Stable

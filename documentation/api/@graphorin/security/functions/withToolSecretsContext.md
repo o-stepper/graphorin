@@ -10,7 +10,9 @@
 function withToolSecretsContext<T>(ctx, fn): T;
 ```
 
-Defined in: [packages/security/src/secrets/acl.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L42)
+Defined in: packages/security/src/secrets/acl.ts:42
+
+**`Stable`**
 
 Run `fn` with `ctx` set as the active per-tool secrets context. Used
 by `@graphorin/tools` and `@graphorin/agent` to wrap tool/agent
@@ -32,5 +34,3 @@ execution.
 ## Returns
 
 `T`
-
-## Stable

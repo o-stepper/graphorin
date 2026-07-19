@@ -10,6 +10,6 @@
 type HealthRollup = "ok" | "degraded" | "failing";
 ```
 
-Defined in: [packages/server/src/health/checks.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L33)
+Defined in: packages/server/src/health/checks.ts:33
 
-## Stable
+**`Stable`**

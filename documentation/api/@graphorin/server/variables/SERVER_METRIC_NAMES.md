@@ -24,6 +24,6 @@ const SERVER_METRIC_NAMES: Readonly<{
 }>;
 ```
 
-Defined in: [packages/server/src/metrics/catalog.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/catalog.ts#L32)
+Defined in: packages/server/src/metrics/catalog.ts:32
 
-## Stable
+**`Stable`**

@@ -10,7 +10,9 @@
 function runTracesStatus(options?): Promise<TracesStatusResult>;
 ```
 
-Defined in: [packages/cli/src/commands/traces.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/traces.ts#L51)
+Defined in: packages/cli/src/commands/traces.ts:51
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/traces.ts:51](https://github.com/o-steppe
 ## Returns
 
 `Promise`\&lt;[`TracesStatusResult`](/api/@graphorin/cli/interfaces/TracesStatusResult.md)\&gt;
-
-## Stable

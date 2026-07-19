@@ -18,8 +18,8 @@ type WireContentChunk =
 };
 ```
 
-Defined in: [packages/core/src/types/agent-event-wire.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L38)
+Defined in: packages/core/src/types/agent-event-wire.ts:38
+
+**`Stable`**
 
 Wire twin of the binary [ContentChunk](/api/@graphorin/core/type-aliases/ContentChunk.md) variant.
-
-## Stable

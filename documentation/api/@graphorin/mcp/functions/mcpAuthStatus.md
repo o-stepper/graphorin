@@ -10,7 +10,7 @@
 function mcpAuthStatus(storage, options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: [packages/mcp/src/oauth/library.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L69)
+Defined in: packages/mcp/src/oauth/library.ts:69
 
 Drive `graphorin auth status --mcp`.
 

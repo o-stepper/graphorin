@@ -24,8 +24,8 @@ type SupplyChainSkillSource =
 };
 ```
 
-Defined in: [packages/security/dist/supply-chain/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/supply-chain/types.d.ts)
+Defined in: packages/security/dist/supply-chain/types.d.ts:30
+
+**`Stable`**
 
 Source descriptor for a skill installation request.
-
-## Stable

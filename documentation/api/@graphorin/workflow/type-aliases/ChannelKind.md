@@ -17,7 +17,9 @@ type ChannelKind =
   | "ephemeral";
 ```
 
-Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
+Defined in: packages/core/dist/channels/channels.d.ts:14
+
+**`Stable`**
 
 Workflow channel kinds. Every state field declared on a workflow's
 `stateSchema` is bound to a channel that decides the merge strategy
@@ -27,5 +29,3 @@ execution step.
 The names are **Graphorin's own design** and must not be aliased to
 terms from other workflow libraries. A dedicated lint rule lands later
 in the release line to enforce this.
-
-## Stable

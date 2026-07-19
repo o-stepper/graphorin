@@ -6,7 +6,7 @@
 
 # Interface: MCPPromptDefinition
 
-Defined in: [packages/mcp/src/client/types.ts:287](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L287)
+Defined in: packages/mcp/src/client/types.ts:287
 
 Prompt descriptor returned by `listPrompts()`.
 
@@ -14,6 +14,6 @@ Prompt descriptor returned by `listPrompts()`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-arguments"></a> `arguments?` | `readonly` | readonly \{ `description?`: `string`; `name`: `string`; `required?`: `boolean`; \}[] | [packages/mcp/src/client/types.ts:290](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L290) |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | [packages/mcp/src/client/types.ts:289](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L289) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/mcp/src/client/types.ts:288](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L288) |
+| <a id="property-arguments"></a> `arguments?` | `readonly` | readonly \{ `description?`: `string`; `name`: `string`; `required?`: `boolean`; \}[] | packages/mcp/src/client/types.ts:290 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/mcp/src/client/types.ts:289 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/mcp/src/client/types.ts:288 |

@@ -19,10 +19,10 @@ type VerifyResult =
 };
 ```
 
-Defined in: [packages/security/src/auth/verify.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L60)
+Defined in: packages/security/src/auth/verify.ts:60
+
+**`Stable`**
 
 Discriminated result of a verify call. The pipeline never throws
 on the unhappy path so callers can map `reason` directly to an
 HTTP status code without try/catch in their hot path.
-
-## Stable

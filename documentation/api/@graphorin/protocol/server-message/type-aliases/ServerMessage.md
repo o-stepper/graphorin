@@ -10,8 +10,8 @@
 type ServerMessage = z.infer<typeof ServerMessageSchema>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L177)
+Defined in: src/server-message.ts:177
+
+**`Stable`**
 
 Inferred TypeScript union for the `ServerMessage` discriminator.
-
-## Stable

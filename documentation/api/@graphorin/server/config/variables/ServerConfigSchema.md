@@ -667,10 +667,10 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
 }>>;
 ```
 
-Defined in: [packages/server/src/config.ts:439](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L439)
+Defined in: packages/server/src/config.ts:439
+
+**`Stable`**
 
 Zod schema for the resolved [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md). Exposed for
 advanced users that want to validate other config sources (env-only
 launch, CLI overrides, etc.).
-
-## Stable

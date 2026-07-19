@@ -10,7 +10,9 @@
 function compose(...filters): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:286](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L286)
+Defined in: packages/agent/src/filters/index.ts:286
+
+**`Stable`**
 
 Compose multiple filters left-to-right. The composer **always**
 appends `stripReasoning()` at the end so reasoning content never
@@ -25,5 +27,3 @@ crosses a handoff boundary regardless of caller intent.
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

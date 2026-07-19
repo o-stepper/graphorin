@@ -25,9 +25,9 @@ type GenAISystem =
 };
 ```
 
-Defined in: [packages/observability/src/gen-ai/types.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L16)
+Defined in: packages/observability/src/gen-ai/types.ts:16
+
+**`Stable`**
 
 Canonical OpenTelemetry semantic-conventions vendor enum used as the
 value of the `gen_ai.system` attribute.
-
-## Stable

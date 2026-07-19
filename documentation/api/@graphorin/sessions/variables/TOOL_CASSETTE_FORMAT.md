@@ -10,8 +10,8 @@
 const TOOL_CASSETTE_FORMAT: "graphorin-tool-cassette" = 'graphorin-tool-cassette';
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L26)
+Defined in: packages/sessions/src/cassette/types.ts:26
+
+**`Stable`**
 
 Stable canonical format identifier surfaced in every header.
-
-## Stable

@@ -6,12 +6,12 @@
 
 # Interface: ContextEngine
 
-Defined in: [packages/memory/src/memory-interface.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L56)
+Defined in: packages/memory/src/memory-interface.ts:56
+
+**`Stable`**
 
 Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextEngine.md) instance returned by
 [createContextEngine](/api/@graphorin/memory/functions/createContextEngine.md).
-
-## Stable
 
 ## Methods
 
@@ -21,7 +21,7 @@ Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextE
 assemble(memory, input): Promise<AssembledPrompt>;
 ```
 
-Defined in: [packages/memory/src/memory-interface.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L58)
+Defined in: packages/memory/src/memory-interface.ts:58
 
 Assemble the layered system prompt for a single step.
 
@@ -51,7 +51,7 @@ compactNow(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/memory-interface.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L89)
+Defined in: packages/memory/src/memory-interface.ts:89
 
 Run a compaction call. Phase 12 calls this when the trigger
 fires (`source: 'auto-trigger'`) or the operator invokes
@@ -96,7 +96,7 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 config(): ResolvedContextEngineConfig;
 ```
 
-Defined in: [packages/memory/src/memory-interface.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L119)
+Defined in: packages/memory/src/memory-interface.ts:119
 
 Resolved configuration snapshot.
 
@@ -112,7 +112,7 @@ Resolved configuration snapshot.
 shouldCompact(messages, options?): Promise<boolean>;
 ```
 
-Defined in: [packages/memory/src/memory-interface.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L69)
+Defined in: packages/memory/src/memory-interface.ts:69
 
 Trigger evaluation primitive used by Phase 12 (agent runtime)
 at the top of every step. Returns `true` when the in-flight

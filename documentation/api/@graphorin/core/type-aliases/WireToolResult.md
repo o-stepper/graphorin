@@ -12,7 +12,9 @@ type WireToolResult<TOutput> = Omit<ToolResult<TOutput>, "contentParts"> & {
 };
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L116)
+Defined in: packages/core/src/utils/binary-json.ts:116
+
+**`Stable`**
 
 Wire twin of [ToolResult](/api/@graphorin/core/interfaces/ToolResult.md): `contentParts` are encoded.
 
@@ -20,12 +22,10 @@ Wire twin of [ToolResult](/api/@graphorin/core/interfaces/ToolResult.md): `conte
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `contentParts?` | readonly [`WireMessageContent`](/api/@graphorin/core/type-aliases/WireMessageContent.md)[] | [packages/core/src/utils/binary-json.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L117) |
+| `contentParts?` | readonly [`WireMessageContent`](/api/@graphorin/core/type-aliases/WireMessageContent.md)[] | packages/core/src/utils/binary-json.ts:117 |
 
 ## Type Parameters
 
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `unknown` |
-
-## Stable

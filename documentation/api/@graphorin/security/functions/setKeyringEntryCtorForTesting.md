@@ -10,7 +10,7 @@
 function _setKeyringEntryCtorForTesting(ctor): void;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/keyring.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/keyring.ts#L73)
+Defined in: packages/security/src/secrets/resolvers/keyring.ts:73
 
 **`Experimental`**
 

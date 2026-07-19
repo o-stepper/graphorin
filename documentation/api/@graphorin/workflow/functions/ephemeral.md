@@ -10,7 +10,9 @@
 function ephemeral<T>(opts?): Ephemeral<T>;
 ```
 
-Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
+Defined in: packages/core/dist/channels/channels.d.ts:151
+
+**`Stable`**
 
 Construct an `Ephemeral` channel.
 
@@ -30,5 +32,3 @@ Construct an `Ephemeral` channel.
 ## Returns
 
 [`Ephemeral`](/api/@graphorin/workflow/interfaces/Ephemeral.md)\&lt;`T`\&gt;
-
-## Stable

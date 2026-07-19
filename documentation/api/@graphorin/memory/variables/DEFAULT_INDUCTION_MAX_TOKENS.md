@@ -10,6 +10,6 @@
 const DEFAULT_INDUCTION_MAX_TOKENS: 512 = 512;
 ```
 
-Defined in: [packages/memory/src/consolidator/phases/induce.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L35)
+Defined in: packages/memory/src/consolidator/phases/induce.ts:35
 
 Output-token ceiling for one induction call.

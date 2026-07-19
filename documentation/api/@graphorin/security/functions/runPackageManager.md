@@ -10,7 +10,9 @@
 function runPackageManager(args): Promise<PackageManagerResult>;
 ```
 
-Defined in: [packages/security/src/supply-chain/package-manager.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L138)
+Defined in: packages/security/src/supply-chain/package-manager.ts:138
+
+**`Stable`**
 
 Run a package-manager invocation. Returns the buffered stdout +
 stderr; a non-zero exit code is reported to the caller via the
@@ -30,5 +32,3 @@ stderr; a non-zero exit code is reported to the caller via the
 ## Returns
 
 `Promise`\&lt;[`PackageManagerResult`](/api/@graphorin/security/interfaces/PackageManagerResult.md)\&gt;
-
-## Stable

@@ -13,7 +13,9 @@ function privacyDecide(recordSensitivity, context): {
 };
 ```
 
-Defined in: [packages/memory/src/context-engine/privacy-filter.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L114)
+Defined in: packages/memory/src/context-engine/privacy-filter.ts:114
+
+**`Stable`**
 
 Decide whether a single record is safe to send to the active
 provider. The decision logic mirrors the DoD spec:
@@ -43,7 +45,5 @@ provider. The decision logic mirrors the DoD spec:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `decision` | [`PrivacyDecision`](/api/@graphorin/memory/type-aliases/PrivacyDecision.md) | [packages/memory/src/context-engine/privacy-filter.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L117) |
-| `reason` | [`PrivacyDecisionReason`](/api/@graphorin/memory/type-aliases/PrivacyDecisionReason.md) | [packages/memory/src/context-engine/privacy-filter.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L117) |
-
-## Stable
+| `decision` | [`PrivacyDecision`](/api/@graphorin/memory/type-aliases/PrivacyDecision.md) | packages/memory/src/context-engine/privacy-filter.ts:117 |
+| `reason` | [`PrivacyDecisionReason`](/api/@graphorin/memory/type-aliases/PrivacyDecisionReason.md) | packages/memory/src/context-engine/privacy-filter.ts:117 |

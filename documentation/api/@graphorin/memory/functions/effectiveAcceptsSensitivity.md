@@ -10,7 +10,9 @@
 function effectiveAcceptsSensitivity(context): readonly Sensitivity[];
 ```
 
-Defined in: [packages/memory/src/context-engine/privacy-filter.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L82)
+Defined in: packages/memory/src/context-engine/privacy-filter.ts:82
+
+**`Stable`**
 
 Resolve the effective `acceptsSensitivity` set for a provider.
 The function is pure: callers can supply a custom matrix to
@@ -34,5 +36,3 @@ Per-provider overrides always win over the defaults - pass
 ## Returns
 
 readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[]
-
-## Stable

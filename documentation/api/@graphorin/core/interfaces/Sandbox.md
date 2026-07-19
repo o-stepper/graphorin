@@ -6,13 +6,13 @@
 
 # Interface: Sandbox
 
-Defined in: [packages/core/src/contracts/sandbox.ts:8](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/sandbox.ts#L8)
+Defined in: packages/core/src/contracts/sandbox.ts:8
+
+**`Stable`**
 
 Pluggable sandbox interface for tool / skill execution. Concrete
 implementations live in `@graphorin/security` (worker-threads,
 isolated-vm, docker, none).
-
-## Stable
 
 ## Extended by
 
@@ -22,7 +22,7 @@ isolated-vm, docker, none).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the sandbox flavor (`'worker-threads'`, `'isolated-vm'`, …). | [packages/core/src/contracts/sandbox.ts:10](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/sandbox.ts#L10) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the sandbox flavor (`'worker-threads'`, `'isolated-vm'`, …). | packages/core/src/contracts/sandbox.ts:10 |
 
 ## Methods
 
@@ -32,7 +32,7 @@ isolated-vm, docker, none).
 run<TInput, TOutput>(code, opts): Promise<SandboxResult<TOutput>>;
 ```
 
-Defined in: [packages/core/src/contracts/sandbox.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/sandbox.ts#L11)
+Defined in: packages/core/src/contracts/sandbox.ts:11
 
 #### Type Parameters
 

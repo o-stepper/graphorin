@@ -6,9 +6,9 @@
 
 # Interface: RunEvalOptions\&lt;I, O\&gt;
 
-Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
+Defined in: packages/observability/dist/eval/types.d.ts:115
 
-## Stable
+**`Stable`**
 
 ## Type Parameters
 
@@ -21,9 +21,9 @@ Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-s
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agent"></a> `agent` | `readonly` | \{ `run`: (`input`) => `Promise`\&lt;`O`\&gt;; \} | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
-| `agent.run` | `readonly` | (`input`) => `Promise`\&lt;`O`\&gt; | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
-| <a id="property-dataset"></a> `dataset` | `readonly` | [`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\&lt;`I`, `O`\&gt; | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
-| <a id="property-iterations"></a> `iterations?` | `readonly` | `number` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
-| <a id="property-scorers"></a> `scorers` | `readonly` | readonly [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;[] | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-agent"></a> `agent` | `readonly` | \{ `run`: (`input`) => `Promise`\&lt;`O`\&gt;; \} | packages/observability/dist/eval/types.d.ts:116 |
+| `agent.run` | `readonly` | (`input`) => `Promise`\&lt;`O`\&gt; | packages/observability/dist/eval/types.d.ts:117 |
+| <a id="property-dataset"></a> `dataset` | `readonly` | [`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\&lt;`I`, `O`\&gt; | packages/observability/dist/eval/types.d.ts:119 |
+| <a id="property-iterations"></a> `iterations?` | `readonly` | `number` | packages/observability/dist/eval/types.d.ts:121 |
+| <a id="property-scorers"></a> `scorers` | `readonly` | readonly [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;[] | packages/observability/dist/eval/types.d.ts:120 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/observability/dist/eval/types.d.ts:122 |

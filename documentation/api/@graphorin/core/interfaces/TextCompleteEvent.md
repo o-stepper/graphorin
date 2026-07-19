@@ -6,13 +6,13 @@
 
 # Interface: TextCompleteEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L109)
+Defined in: packages/core/src/types/agent-event.ts:109
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L111) |
-| <a id="property-type"></a> `type` | `readonly` | `"text.complete"` | [packages/core/src/types/agent-event.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L110) |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/core/src/types/agent-event.ts:111 |
+| <a id="property-type"></a> `type` | `readonly` | `"text.complete"` | packages/core/src/types/agent-event.ts:110 |

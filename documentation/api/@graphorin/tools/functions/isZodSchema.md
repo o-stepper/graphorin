@@ -10,7 +10,7 @@
 function isZodSchema(value): boolean;
 ```
 
-Defined in: [packages/tools/src/schema/to-json-schema.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L101)
+Defined in: packages/tools/src/schema/to-json-schema.ts:101
 
 `true` when `value` is a Zod schema instance of either major line.
 

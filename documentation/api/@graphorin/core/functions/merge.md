@@ -10,7 +10,9 @@
 function merge<T>(sources, signal?): AsyncIterable<T>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L109)
+Defined in: packages/core/src/utils/streams.ts:109
+
+**`Stable`**
 
 Merge multiple async iterables into a single output iterable. Items
 are yielded in the order they arrive (interleaved), not in source
@@ -32,5 +34,3 @@ order. Cancellation propagates to every upstream iterator.
 ## Returns
 
 `AsyncIterable`\&lt;`T`\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 type EmbedderMigrationStrategy = "lock-on-first" | "multi-active" | "auto-migrate";
 ```
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L23)
+Defined in: packages/memory/src/migration/embedder-migration.ts:23
+
+**`Stable`**
 
 Coexistence policy for embedder swaps.
 
@@ -21,5 +23,3 @@ Coexistence policy for embedder swaps.
    to active); used while a long migration is in flight.
  - `'auto-migrate'` - re-embeds existing rows in resumable batches
    until the source embedder has zero rows, then retires it.
-
-## Stable

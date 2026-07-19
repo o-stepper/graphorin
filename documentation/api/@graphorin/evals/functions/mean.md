@@ -10,7 +10,9 @@
 function mean(values): number;
 ```
 
-Defined in: [packages/evals/src/stats.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L30)
+Defined in: packages/evals/src/stats.ts:30
+
+**`Stable`**
 
 Arithmetic mean; `0` for an empty list.
 
@@ -23,5 +25,3 @@ Arithmetic mean; `0` for an empty list.
 ## Returns
 
 `number`
-
-## Stable

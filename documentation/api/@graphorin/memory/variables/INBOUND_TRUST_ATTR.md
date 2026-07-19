@@ -10,8 +10,8 @@
 const INBOUND_TRUST_ATTR: "graphorin.content.inbound.trust";
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L37)
+Defined in: packages/memory/src/context-engine/annotations.ts:37
+
+**`Stable`**
 
 Span-attribute key for the inbound-trust axis.
-
-## Stable

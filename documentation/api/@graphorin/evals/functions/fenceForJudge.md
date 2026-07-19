@@ -10,7 +10,9 @@
 function fenceForJudge(label, value): string;
 ```
 
-Defined in: [packages/evals/src/scorers/llm/judge.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/llm/judge.ts#L124)
+Defined in: packages/evals/src/scorers/llm/judge.ts:124
+
+**`Stable`**
 
 EB-7: wrap untrusted content in unambiguous sentinel fences so the judge can
 tell data from instructions. Exported so caller-supplied `buildPrompt`
@@ -27,5 +29,3 @@ way the default builder does.
 ## Returns
 
 `string`
-
-## Stable

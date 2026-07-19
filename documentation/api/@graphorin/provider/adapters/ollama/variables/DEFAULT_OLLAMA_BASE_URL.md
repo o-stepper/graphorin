@@ -10,8 +10,8 @@
 const DEFAULT_OLLAMA_BASE_URL: "http://127.0.0.1:11434" = 'http://127.0.0.1:11434';
 ```
 
-Defined in: [packages/provider/src/adapters/ollama.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/ollama.ts#L51)
+Defined in: packages/provider/src/adapters/ollama.ts:51
+
+**`Stable`**
 
 Default Ollama base URL.
-
-## Stable

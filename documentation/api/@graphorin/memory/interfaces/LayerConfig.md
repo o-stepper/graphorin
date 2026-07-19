@@ -6,16 +6,16 @@
 
 # Interface: LayerConfig
 
-Defined in: [packages/memory/src/context-engine/engine.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/engine.ts#L101)
+Defined in: packages/memory/src/context-engine/engine.ts:101
+
+**`Stable`**
 
 Per-layer cap configuration. Mirrors the documented
 `ContextEngineConfig.layers.*` fields.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cap"></a> `cap?` | `readonly` | `number` | [packages/memory/src/context-engine/engine.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/engine.ts#L103) |
-| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | [packages/memory/src/context-engine/engine.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/engine.ts#L102) |
+| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/engine.ts:103 |
+| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:102 |

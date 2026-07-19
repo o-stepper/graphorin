@@ -13,7 +13,9 @@ function decryptBundle(bundle, passphrase): Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/encrypted-file.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/encrypted-file.ts#L132)
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:132
+
+**`Stable`**
 
 Decrypt a raw bundle into the values map. Used by the resolver and by
 the `EncryptedFileSecretsStore` so the wire format stays in one place.
@@ -31,5 +33,3 @@ the `EncryptedFileSecretsStore` so the wire format stays in one place.
   `meta`: `Record`\&lt;`string`, `unknown`\&gt;;
   `values`: `Record`\&lt;`string`, `unknown`\&gt;;
 \}\>
-
-## Stable

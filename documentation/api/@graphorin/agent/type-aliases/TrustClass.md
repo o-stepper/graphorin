@@ -10,10 +10,10 @@
 type TrustClass = "loopback" | "public-tls" | "public-mtls" | "untrusted-skill";
 ```
 
-Defined in: [packages/agent/src/lateral-leak/merge-guard.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/merge-guard.ts#L18)
+Defined in: packages/agent/src/lateral-leak/merge-guard.ts:18
+
+**`Stable`**
 
 Trust-class baseline used by the guard's `sourceTrust`
 computation. Mirrors the DEC-149 trust-class taxonomy from
 `@graphorin/provider`.
-
-## Stable

@@ -6,7 +6,9 @@
 
 # Interface: RetrievalGrader
 
-Defined in: [packages/memory/src/search/iterative.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L210)
+Defined in: packages/memory/src/search/iterative.ts:210
+
+**`Stable`**
 
 Pluggable retrieval-grader seam consumed by the iterative loop. The
 built-in provider-backed implementation lives in
@@ -15,8 +17,6 @@ bespoke grader (e.g. a deterministic heuristic).
 
 Implementations MUST degrade gracefully - return a "stop" grade rather
 than throw - so a grader failure never breaks recall.
-
-## Stable
 
 ## Methods
 
@@ -29,7 +29,7 @@ grade(
 options?): Promise<RetrievalGrade>;
 ```
 
-Defined in: [packages/memory/src/search/iterative.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L211)
+Defined in: packages/memory/src/search/iterative.ts:211
 
 #### Parameters
 

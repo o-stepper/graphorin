@@ -6,16 +6,16 @@
 
 # Interface: AutoRecallTriggers
 
-Defined in: [packages/memory/src/context-engine/locale-packs/types.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/types.ts#L22)
+Defined in: packages/memory/src/context-engine/locale-packs/types.ts:22
+
+**`Stable`**
 
 Trigger mode used by the auto-recall heuristic. The framework ships
 regex patterns for the bundled locale; consumers may extend or
 replace them via [defineContextLocalePack](/api/@graphorin/memory/functions/defineContextLocalePack.md).
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-facttriggers"></a> `factTriggers` | `readonly` | readonly `RegExp`[] | Case-insensitive regex set evaluated against the last user message. A match indicates the model would benefit from the top-K facts being injected into Layer 6. | [packages/memory/src/context-engine/locale-packs/types.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/types.ts#L28) |
+| <a id="property-facttriggers"></a> `factTriggers` | `readonly` | readonly `RegExp`[] | Case-insensitive regex set evaluated against the last user message. A match indicates the model would benefit from the top-K facts being injected into Layer 6. | packages/memory/src/context-engine/locale-packs/types.ts:28 |

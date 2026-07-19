@@ -10,7 +10,9 @@
 function toOtlpEnvelope(record, serviceName): unknown;
 ```
 
-Defined in: [packages/observability/src/exporters/otlp-http.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/otlp-http.ts#L111)
+Defined in: packages/observability/src/exporters/otlp-http.ts:111
+
+**`Stable`**
 
 Convert a finished [SpanRecord](/api/@graphorin/observability/interfaces/SpanRecord.md) into an OTLP-HTTP `resourceSpans`
 envelope. Exposed (OBS-PRIC-01) so an upstream OTel SDK pipeline can adapt
@@ -27,5 +29,3 @@ guides document.
 ## Returns
 
 `unknown`
-
-## Stable

@@ -10,7 +10,9 @@
 function evaluatePermissionDecision(policy, facts): PermissionDecision;
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L150)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:150
+
+**`Stable`**
 
 Evaluate a policy against one tool call under the four-value
 vocabulary (E1). Every matching rule contributes its (normalised)
@@ -30,5 +32,3 @@ else is allowed. Pure + deterministic.
 ## Returns
 
 [`PermissionDecision`](/api/@graphorin/security/type-aliases/PermissionDecision.md)
-
-## Stable

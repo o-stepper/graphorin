@@ -6,14 +6,14 @@
 
 # Interface: IdentityRouterOptions
 
-Defined in: [packages/channels/src/router.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L53)
+Defined in: packages/channels/src/router.ts:53
+
+**`Stable`**
 
 Options for [createIdentityRouter](/api/@graphorin/channels/functions/createIdentityRouter.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-routes"></a> `routes` | `readonly` | readonly [`ChannelRoute`](/api/@graphorin/channels/interfaces/ChannelRoute.md)[] | Ordered route table; first match wins. Must contain a catch-all default route. | [packages/channels/src/router.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L55) |
+| <a id="property-routes"></a> `routes` | `readonly` | readonly [`ChannelRoute`](/api/@graphorin/channels/interfaces/ChannelRoute.md)[] | Ordered route table; first match wins. Must contain a catch-all default route. | packages/channels/src/router.ts:55 |

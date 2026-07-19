@@ -10,7 +10,9 @@
 function renderMarkdownReport<I, O>(report): string;
 ```
 
-Defined in: [packages/evals/src/reporters/markdown.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/markdown.ts#L12)
+Defined in: packages/evals/src/reporters/markdown.ts:12
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/evals/src/reporters/markdown.ts:12](https://github.com/o-s
 ## Returns
 
 `string`
-
-## Stable

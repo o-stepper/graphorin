@@ -10,7 +10,9 @@
 function runInit(options?): Promise<InitCommandResult>;
 ```
 
-Defined in: [packages/cli/src/commands/init.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/init.ts#L71)
+Defined in: packages/cli/src/commands/init.ts:71
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/init.ts:71](https://github.com/o-stepper/
 ## Returns
 
 `Promise`\&lt;[`InitCommandResult`](/api/@graphorin/cli/interfaces/InitCommandResult.md)\&gt;
-
-## Stable

@@ -12,7 +12,9 @@ function runWorkflowInspect(options): Promise<
 | null>;
 ```
 
-Defined in: [packages/cli/src/commands/workflow.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/workflow.ts#L54)
+Defined in: packages/cli/src/commands/workflow.ts:54
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/workflow.ts:54](https://github.com/o-step
 `Promise`\<
   \| [`ThreadInspection`](/api/@graphorin/workflow/interfaces/ThreadInspection.md)
   \| `null`\>
-
-## Stable

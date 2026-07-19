@@ -6,13 +6,13 @@
 
 # Class: SqlitePairingStore
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L52)
+Defined in: packages/store-sqlite/src/pairing-store.ts:52
+
+**`Stable`**
 
 Default `PairingStore` implementation (migration 034). Expiry
 policy lives in the access controller of `@graphorin/channels`;
 this store only filters by the timestamps it is handed.
-
-## Stable
 
 ## Implements
 
@@ -26,7 +26,7 @@ this store only filters by the timestamps it is handed.
 new SqlitePairingStore(conn): SqlitePairingStore;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L54)
+Defined in: packages/store-sqlite/src/pairing-store.ts:54
 
 #### Parameters
 
@@ -46,7 +46,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:54](https://github.com/o
 addPairedPeer(peer): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L117)
+Defined in: packages/store-sqlite/src/pairing-store.ts:117
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:117](https://github.com/
 countPendingRequests(channelId, nowIso): Promise<number>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L98)
+Defined in: packages/store-sqlite/src/pairing-store.ts:98
 
 Count pending requests on a channel whose `expiresAt` is after `nowIso`.
 
@@ -97,7 +97,7 @@ Count pending requests on a channel whose `expiresAt` is after `nowIso`.
 deleteRequest(channelId, code): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L91)
+Defined in: packages/store-sqlite/src/pairing-store.ts:91
 
 #### Parameters
 
@@ -124,7 +124,7 @@ findRequestByCode(channelId, code): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L83)
+Defined in: packages/store-sqlite/src/pairing-store.ts:83
 
 #### Parameters
 
@@ -153,7 +153,7 @@ findRequestByPeer(peer): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L74)
+Defined in: packages/store-sqlite/src/pairing-store.ts:74
 
 #### Parameters
 
@@ -179,7 +179,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:74](https://github.com/o
 isPaired(peer): Promise<boolean>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L126)
+Defined in: packages/store-sqlite/src/pairing-store.ts:126
 
 #### Parameters
 
@@ -203,7 +203,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:126](https://github.com/
 listPairedPeers(channelId?): Promise<readonly PairedPeerRecord[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:143](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L143)
+Defined in: packages/store-sqlite/src/pairing-store.ts:143
 
 #### Parameters
 
@@ -227,7 +227,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:143](https://github.com/
 pruneExpiredRequests(nowIso): Promise<number>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L106)
+Defined in: packages/store-sqlite/src/pairing-store.ts:106
 
 Delete requests whose `expiresAt` is at or before `nowIso`; returns the number removed.
 
@@ -253,7 +253,7 @@ Delete requests whose `expiresAt` is at or before `nowIso`; returns the number r
 removePairedPeer(peer): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L135)
+Defined in: packages/store-sqlite/src/pairing-store.ts:135
 
 #### Parameters
 
@@ -277,7 +277,7 @@ Defined in: [packages/store-sqlite/src/pairing-store.ts:135](https://github.com/
 upsertRequest(request): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/pairing-store.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/pairing-store.ts#L58)
+Defined in: packages/store-sqlite/src/pairing-store.ts:58
 
 Insert or replace the (single) pending request for the peer.
 

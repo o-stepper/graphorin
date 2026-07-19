@@ -6,13 +6,13 @@
 
 # Interface: GraphorinTracer
 
-Defined in: [packages/observability/src/tracer/tracer.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L88)
+Defined in: packages/observability/src/tracer/tracer.ts:88
+
+**`Stable`**
 
 The [createTracer](/api/@graphorin/observability/functions/createTracer.md) return value extends the standard
 [Tracer](/api/@graphorin/core/interfaces/Tracer.md) contract from `@graphorin/core` with introspection
 helpers (counter snapshots, validator handle).
-
-## Stable
 
 ## Extends
 
@@ -22,8 +22,8 @@ helpers (counter snapshots, validator handle).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-servicename"></a> `serviceName` | `readonly` | `string` | Service name embedded in the OTLP resource. | [packages/observability/src/tracer/tracer.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L90) |
-| <a id="property-validator"></a> `validator` | `readonly` | \| [`RedactionValidatorInstance`](/api/@graphorin/observability/interfaces/RedactionValidatorInstance.md) \| `null` | The tracer-managed validator. `null` when `validation: 'off'`. | [packages/observability/src/tracer/tracer.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L98) |
+| <a id="property-servicename"></a> `serviceName` | `readonly` | `string` | Service name embedded in the OTLP resource. | packages/observability/src/tracer/tracer.ts:90 |
+| <a id="property-validator"></a> `validator` | `readonly` | \| [`RedactionValidatorInstance`](/api/@graphorin/observability/interfaces/RedactionValidatorInstance.md) \| `null` | The tracer-managed validator. `null` when `validation: 'off'`. | packages/observability/src/tracer/tracer.ts:98 |
 
 ## Methods
 
@@ -33,7 +33,7 @@ helpers (counter snapshots, validator handle).
 flush(): Promise<void>;
 ```
 
-Defined in: [packages/observability/src/tracer/tracer.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L100)
+Defined in: packages/observability/src/tracer/tracer.ts:100
 
 Force-flush every registered exporter.
 
@@ -49,7 +49,7 @@ Force-flush every registered exporter.
 getMetrics(): RedactionCounters;
 ```
 
-Defined in: [packages/observability/src/tracer/tracer.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L96)
+Defined in: packages/observability/src/tracer/tracer.ts:96
 
 Snapshot of the redaction counters (`droppedTotal`,
 `droppedByReason`, `matchesByPattern`) maintained by the
@@ -67,7 +67,7 @@ tracer-managed validator.
 shutdown(): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
+Defined in: packages/core/dist/contracts/tracer.d.ts:121
 
 Force-flush any pending spans.
 
@@ -87,7 +87,7 @@ Force-flush any pending spans.
 span<T, R>(opts, fn): Promise<R>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
+Defined in: packages/core/dist/contracts/tracer.d.ts:119
 
 Convenience wrapper: start a span, run `fn` inside, and call
 `setStatus('ok' | 'error')` + `end()` based on the outcome.
@@ -122,7 +122,7 @@ Convenience wrapper: start a span, run `fn` inside, and call
 startSpan<T>(opts): AISpan<T>;
 ```
 
-Defined in: [packages/core/dist/contracts/tracer.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/tracer.d.ts)
+Defined in: packages/core/dist/contracts/tracer.d.ts:114
 
 #### Type Parameters
 

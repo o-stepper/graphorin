@@ -10,7 +10,9 @@
 function piiDetection<TValue>(opts?): GuardrailDefinition<TValue>;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L144)
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:144
+
+**`Stable`**
 
 Construct the PII detection guardrail.
 
@@ -37,5 +39,3 @@ is not worth the complexity for a best-effort redactor.
 ## Returns
 
 [`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\&lt;`TValue`\&gt;
-
-## Stable

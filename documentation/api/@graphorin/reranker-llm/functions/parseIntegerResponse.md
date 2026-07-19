@@ -10,7 +10,9 @@
 function parseIntegerResponse(text): number | null;
 ```
 
-Defined in: [packages/reranker-llm/src/reranker.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L315)
+Defined in: src/reranker.ts:315
+
+**`Stable`**
 
 Parse the model's reply into a non-negative integer score.
 
@@ -32,5 +34,3 @@ extraction. Negative integers also return `null`.
 ## Returns
 
 `number` \| `null`
-
-## Stable

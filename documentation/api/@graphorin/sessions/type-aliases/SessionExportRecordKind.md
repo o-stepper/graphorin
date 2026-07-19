@@ -10,9 +10,9 @@
 type SessionExportRecordKind = "meta" | "session" | "agent" | "message" | "handoff" | "audit" | "footer";
 ```
 
-Defined in: [packages/sessions/src/export/types.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L50)
+Defined in: packages/sessions/src/export/types.ts:50
+
+**`Stable`**
 
 Discriminator on every stream record. `'meta'` is always line 1;
 `'footer'` is always the last line.
-
-## Stable

@@ -30,10 +30,10 @@ type ToolSource =
 };
 ```
 
-Defined in: [packages/core/src/types/tool.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L127)
+Defined in: packages/core/src/types/tool.ts:127
+
+**`Stable`**
 
 Source descriptor attached to a `Tool` registration. Mirrors the
 registration-time provenance the dispatcher uses to derive the
 trust class and to compute the four collision audit row kinds.
-
-## Stable

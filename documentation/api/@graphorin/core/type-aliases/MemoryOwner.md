@@ -10,7 +10,9 @@
 type MemoryOwner = "user" | "agent" | "shared";
 ```
 
-Defined in: [packages/core/src/types/memory.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L68)
+Defined in: packages/core/src/types/memory.ts:68
+
+**`Stable`**
 
 Principal a memory belongs to (D3) - the *who-owns-this* dimension,
 orthogonal to [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md) (*where-it-came-from*):
@@ -21,5 +23,3 @@ shared tier. Absent (rows written before the feature, or writers
 that do not care) is treated as `user` at filter time; default
 reads apply **no owner filter**, so behaviour is unchanged until a
 caller opts into a retrieval-time scope filter.
-
-## Stable

@@ -12,7 +12,9 @@ type ToolOutcome<TOutput> =
   | ToolError;
 ```
 
-Defined in: [packages/core/src/types/tool.ts:288](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L288)
+Defined in: packages/core/src/types/tool.ts:288
+
+**`Stable`**
 
 Either a `ToolResult` or a `ToolError`. The runtime always returns one
 of the two - there is no implicit "tool fell through" outcome.
@@ -22,5 +24,3 @@ of the two - there is no implicit "tool fell through" outcome.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `unknown` |
-
-## Stable

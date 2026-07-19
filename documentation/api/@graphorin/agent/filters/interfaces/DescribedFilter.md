@@ -6,13 +6,13 @@
 
 # Interface: DescribedFilter()
 
-Defined in: [packages/agent/src/filters/index.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L53)
+Defined in: packages/agent/src/filters/index.ts:53
+
+**`Stable`**
 
 A `HandoffFilter` paired with the serializable descriptor that
 round-trips through the JSONL session export. Authors of custom
 filters return one of these via `filters.custom({...})`.
-
-## Stable
 
 ## Extends
 
@@ -22,7 +22,9 @@ filters return one of these via `filters.custom({...})`.
 DescribedFilter(history): readonly Message[];
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L53)
+Defined in: packages/agent/src/filters/index.ts:53
+
+**`Stable`**
 
 A `HandoffFilter` paired with the serializable descriptor that
 round-trips through the JSONL session export. Authors of custom
@@ -38,10 +40,8 @@ filters return one of these via `filters.custom({...})`.
 
 readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-descriptor"></a> `descriptor` | `readonly` | [`HandoffInputFilterDescriptor`](/api/@graphorin/core/interfaces/HandoffInputFilterDescriptor.md) | [packages/agent/src/filters/index.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L54) |
+| <a id="property-descriptor"></a> `descriptor` | `readonly` | [`HandoffInputFilterDescriptor`](/api/@graphorin/core/interfaces/HandoffInputFilterDescriptor.md) | packages/agent/src/filters/index.ts:54 |

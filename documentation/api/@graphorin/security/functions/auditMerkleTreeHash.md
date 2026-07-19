@@ -10,7 +10,7 @@
 function auditMerkleTreeHash(leaves): Buffer;
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L60)
+Defined in: packages/security/src/audit/merkle.ts:60
 
 RFC 6962 §2.1 Merkle Tree Hash over ordered leaf hashes. The empty
 tree hashes to `SHA-256()` per the RFC.

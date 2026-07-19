@@ -10,7 +10,9 @@
 function composeLayer1(pack, mode): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/templates/composer.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L26)
+Defined in: packages/memory/src/context-engine/templates/composer.ts:26
+
+**`Stable`**
 
 Compose Layer 1 from the resolved locale pack.
 
@@ -24,5 +26,3 @@ Compose Layer 1 from the resolved locale pack.
 ## Returns
 
 `string`
-
-## Stable

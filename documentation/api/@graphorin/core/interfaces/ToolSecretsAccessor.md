@@ -6,7 +6,9 @@
 
 # Interface: ToolSecretsAccessor
 
-Defined in: [packages/core/src/contracts/tool.ts:382](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L382)
+Defined in: packages/core/src/contracts/tool.ts:382
+
+**`Stable`**
 
 Per-call secrets accessor surface. Implemented by the executor; the
 tool author calls `require(...)` to obtain a `SecretValue` wrapper.
@@ -14,8 +16,6 @@ tool author calls `require(...)` to obtain a `SecretValue` wrapper.
 The accessor is intentionally narrow - the ACL enforcement happens
 inside `require(...)`, so the tool author never accidentally
 unwraps a secret outside the tool's permitted set.
-
-## Stable
 
 ## Methods
 
@@ -27,7 +27,7 @@ unwraps a secret outside the tool's permitted set.
 require(key, options?): Promise<SecretValue>;
 ```
 
-Defined in: [packages/core/src/contracts/tool.ts:389](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L389)
+Defined in: packages/core/src/contracts/tool.ts:389
 
 Resolve a secret by key. Throws `SecretAccessDeniedError` if the
 key is not in the tool's `secretsAllowed` allowlist; throws
@@ -52,7 +52,7 @@ if the key resolves to no value.
 require(key, options): Promise<SecretValue | null>;
 ```
 
-Defined in: [packages/core/src/contracts/tool.ts:393](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L393)
+Defined in: packages/core/src/contracts/tool.ts:393
 
 ##### Parameters
 

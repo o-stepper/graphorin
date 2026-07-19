@@ -36,7 +36,9 @@ type ConflictDecision =
 };
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L83)
+Defined in: packages/memory/src/conflict/types.ts:83
+
+**`Stable`**
 
 Final pipeline outcome - discriminated union returned by
 [runConflictPipeline](/api/@graphorin/memory/functions/runConflictPipeline.md). Mirrors RB-02 §8.1 / DEC-117 - every
@@ -99,11 +101,9 @@ can pattern-match without inspecting the message.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `candidateId` | `string` | The candidate id that was admitted as `pending`. | [packages/memory/src/conflict/types.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L106) |
-| `conflictingIds` | `ReadonlyArray`\&lt;`string`\&gt; | Top-K conflicting existing fact ids from Stage 2's vector search. | [packages/memory/src/conflict/types.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L108) |
-| `kind` | `"pending"` | - | [packages/memory/src/conflict/types.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L103) |
-| `reason?` | `string` | - | [packages/memory/src/conflict/types.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L110) |
-| `similarity?` | `number` | - | [packages/memory/src/conflict/types.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L109) |
-| `stage` | [`ConflictStage`](/api/@graphorin/memory/type-aliases/ConflictStage.md) | - | [packages/memory/src/conflict/types.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L104) |
-
-## Stable
+| `candidateId` | `string` | The candidate id that was admitted as `pending`. | packages/memory/src/conflict/types.ts:106 |
+| `conflictingIds` | `ReadonlyArray`\&lt;`string`\&gt; | Top-K conflicting existing fact ids from Stage 2's vector search. | packages/memory/src/conflict/types.ts:108 |
+| `kind` | `"pending"` | - | packages/memory/src/conflict/types.ts:103 |
+| `reason?` | `string` | - | packages/memory/src/conflict/types.ts:110 |
+| `similarity?` | `number` | - | packages/memory/src/conflict/types.ts:109 |
+| `stage` | [`ConflictStage`](/api/@graphorin/memory/type-aliases/ConflictStage.md) | - | packages/memory/src/conflict/types.ts:104 |

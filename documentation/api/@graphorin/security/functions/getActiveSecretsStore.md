@@ -12,7 +12,9 @@ function getActiveSecretsStore():
   | undefined;
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L121)
+Defined in: packages/security/src/secrets/factory.ts:121
+
+**`Stable`**
 
 Read the currently-active store. Returns `undefined` if
 `createSecretsStore(...)` has not been called yet.
@@ -21,5 +23,3 @@ Read the currently-active store. Returns `undefined` if
 
   \| [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md)
   \| `undefined`
-
-## Stable

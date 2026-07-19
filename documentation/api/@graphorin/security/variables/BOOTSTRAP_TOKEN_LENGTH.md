@@ -10,12 +10,12 @@
 const BOOTSTRAP_TOKEN_LENGTH: 43 = 43;
 ```
 
-Defined in: [packages/security/src/hardening/crypto.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/crypto.ts#L28)
+Defined in: packages/security/src/hardening/crypto.ts:28
+
+**`Stable`**
 
 Canonical base62-url encoded width for the 32-byte (256-bit)
 bootstrap token. `ceil(256 / log2(62)) = 43`; the encoder pads to
 this width so every emitted token is the same length, regardless
 of how many leading bytes happen to be small. Stable downstream
 verifiers can reject tokens whose width drifts.
-
-## Stable

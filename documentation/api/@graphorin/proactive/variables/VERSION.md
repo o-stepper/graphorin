@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/proactive/src/index.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/index.ts#L17)
+Defined in: packages/proactive/src/index.ts:17

@@ -10,7 +10,9 @@
 function sortKeysAnthropicFirst(frontmatter): Record<string, unknown>;
 ```
 
-Defined in: [packages/skills/src/migration/index.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L171)
+Defined in: packages/skills/src/migration/index.ts:171
+
+**`Stable`**
 
 Stable key ordering: Anthropic-base fields first (in their snapshot
 insertion order), then the `metadata` bucket, then the
@@ -27,5 +29,3 @@ identical bytes (idempotence).
 ## Returns
 
 `Record`\&lt;`string`, `unknown`\&gt;
-
-## Stable

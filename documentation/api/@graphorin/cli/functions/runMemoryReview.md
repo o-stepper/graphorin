@@ -10,7 +10,9 @@
 function runMemoryReview(options?): Promise<MemoryReviewResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:868](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L868)
+Defined in: packages/cli/src/commands/memory.ts:868
+
+**`Stable`**
 
 `graphorin memory review` - list the facts / episodes / insights / induced
 procedures the consolidator left in quarantine (read-only), or promote a
@@ -27,5 +29,3 @@ unless `--force` is supplied after review (MCON-2).
 ## Returns
 
 `Promise`\&lt;[`MemoryReviewResult`](/api/@graphorin/cli/interfaces/MemoryReviewResult.md)\&gt;
-
-## Stable

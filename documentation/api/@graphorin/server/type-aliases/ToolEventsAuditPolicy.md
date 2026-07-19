@@ -10,8 +10,8 @@
 type ToolEventsAuditPolicy = "security" | "all" | "off";
 ```
 
-Defined in: [packages/server/src/tools-audit-bridge.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L30)
+Defined in: packages/server/src/tools-audit-bridge.ts:30
+
+**`Stable`**
 
 Volume policy for the tool-audit bridge.
-
-## Stable

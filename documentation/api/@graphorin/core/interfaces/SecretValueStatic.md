@@ -6,11 +6,11 @@
 
 # Interface: SecretValueStatic
 
-Defined in: [packages/core/src/contracts/secret-value.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L98)
+Defined in: packages/core/src/contracts/secret-value.ts:98
+
+**`Stable`**
 
 Static helpers expected on every concrete `SecretValue` constructor.
-
-## Stable
 
 ## Methods
 
@@ -20,7 +20,7 @@ Static helpers expected on every concrete `SecretValue` constructor.
 fromBuffer(buf, opts?): SecretValue;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L106)
+Defined in: packages/core/src/contracts/secret-value.ts:106
 
 Construct from a Node.js `Buffer`.
 
@@ -43,7 +43,7 @@ Construct from a Node.js `Buffer`.
 fromString(raw, opts?): SecretValue;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L104)
+Defined in: packages/core/src/contracts/secret-value.ts:104
 
 Construct from a plain string.
 
@@ -66,7 +66,7 @@ Construct from a plain string.
 isSecretValue(value): value is SecretValue;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L100)
+Defined in: packages/core/src/contracts/secret-value.ts:100
 
 Cross-realm safe type guard.
 
@@ -88,7 +88,7 @@ Cross-realm safe type guard.
 timingSafeEquals(a, b): boolean;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L102)
+Defined in: packages/core/src/contracts/secret-value.ts:102
 
 Constant-time equality.
 

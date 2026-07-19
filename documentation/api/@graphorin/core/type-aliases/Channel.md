@@ -17,7 +17,9 @@ type Channel<T> =
 | Ephemeral<T>;
 ```
 
-Defined in: [packages/core/src/channels/channels.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L31)
+Defined in: packages/core/src/channels/channels.ts:31
+
+**`Stable`**
 
 Discriminated union of every channel descriptor.
 
@@ -30,5 +32,3 @@ fields (`reduce`, `from`, `unique`) to decide how to combine writes.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `T` | `unknown` |
-
-## Stable

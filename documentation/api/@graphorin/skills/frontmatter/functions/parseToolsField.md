@@ -12,7 +12,9 @@ function parseToolsField(value):
   | null;
 ```
 
-Defined in: [packages/skills/src/frontmatter/index.ts:530](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L530)
+Defined in: packages/skills/src/frontmatter/index.ts:530
+
+**`Stable`**
 
 Parse the `tools` field. Accepts either an array of strings (tool
 names - the loader resolves modules through naming convention) or
@@ -29,5 +31,3 @@ Returns `null` for unsupported shapes.
 
   \| readonly [`SkillToolDeclaration`](/api/@graphorin/skills/interfaces/SkillToolDeclaration.md)[]
   \| `null`
-
-## Stable

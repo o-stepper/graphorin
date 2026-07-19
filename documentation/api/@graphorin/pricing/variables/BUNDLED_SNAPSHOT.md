@@ -10,10 +10,10 @@
 const BUNDLED_SNAPSHOT: PricingSnapshot;
 ```
 
-Defined in: [packages/pricing/src/snapshot/bundled.ts:298](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/snapshot/bundled.ts#L298)
+Defined in: pricing/src/snapshot/bundled.ts:321
+
+**`Stable`**
 
 The bundled snapshot. The `sha256` digest is computed over the
 canonical JSON form of `entries` at module load time so consumers
 can verify integrity without trusting the package metadata.
-
-## Stable

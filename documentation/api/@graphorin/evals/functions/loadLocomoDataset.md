@@ -10,7 +10,9 @@
 function loadLocomoDataset(options): Promise<Dataset<MemoryEvalInput, string, Readonly<Record<string, unknown>>>>;
 ```
 
-Defined in: [packages/evals/src/loaders/locomo.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/locomo.ts#L72)
+Defined in: packages/evals/src/loaders/locomo.ts:72
+
+**`Stable`**
 
 Read a LOCOMO JSON file and return a fully-materialised
 [Dataset](/api/@graphorin/evals/interfaces/Dataset.md) - one case per QA pair, scored against the reference
@@ -25,5 +27,3 @@ answer string (LLM-judge "J").
 ## Returns
 
 `Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<[`MemoryEvalInput`](/api/@graphorin/evals/interfaces/MemoryEvalInput.md), `string`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>\>
-
-## Stable

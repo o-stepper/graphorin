@@ -10,7 +10,9 @@
 function refreshPricing(opts): Promise<PricingSnapshot>;
 ```
 
-Defined in: [packages/pricing/src/refresh.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/refresh.ts#L63)
+Defined in: pricing/src/refresh.ts:63
+
+**`Stable`**
 
 Pull a fresh snapshot from the supplied URL and return it. Network
 failures and shape mismatches surface as thrown errors so the CLI
@@ -25,5 +27,3 @@ can surface them to the operator.
 ## Returns
 
 `Promise`\&lt;[`PricingSnapshot`](/api/@graphorin/pricing/interfaces/PricingSnapshot.md)\&gt;
-
-## Stable

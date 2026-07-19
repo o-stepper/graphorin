@@ -6,7 +6,7 @@
 
 # Interface: ToolSearchToolOptions
 
-Defined in: [packages/tools/src/built-in/tool-search.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L24)
+Defined in: packages/tools/src/built-in/tool-search.ts:24
 
 Configuration for [createToolSearchTool](/api/@graphorin/tools/functions/createToolSearchTool.md).
 
@@ -14,8 +14,8 @@ Configuration for [createToolSearchTool](/api/@graphorin/tools/functions/createT
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-availability"></a> `availability?` | `readonly` | `"next-step"` \| `"next-run"` | When matched tools become callable, reflected in the model-facing description so the model is never promised availability the harness does not deliver. `'next-step'` (default) matches the agent's immediate promotion mode; `'next-run'` matches `toolPromotion: 'run-boundary'` (C1), where the catalogue is frozen for the current run. | [packages/tools/src/built-in/tool-search.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L38) |
-| <a id="property-defaultk"></a> `defaultK?` | `readonly` | `number` | Default `k` when the model does not pass one. Default `5`. | [packages/tools/src/built-in/tool-search.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L27) |
-| <a id="property-excludetool"></a> `excludeTool?` | `readonly` | (`toolName`) => `boolean` | E1 deny-by-name: matches returning `true` are dropped from the results BEFORE the model sees them, so a name-denied deferred tool is neither discoverable nor promoted into the advertised set (its name and schema would otherwise leak while execution stays blocked). The agent wires the permission policy's name-level deny here; absent ⇒ no exclusion. | [packages/tools/src/built-in/tool-search.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L47) |
-| <a id="property-maxk"></a> `maxK?` | `readonly` | `number` | Hard cap on `k` (model-supplied). Default `15`. | [packages/tools/src/built-in/tool-search.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L29) |
-| <a id="property-registry"></a> `registry` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | - | [packages/tools/src/built-in/tool-search.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/tool-search.ts#L25) |
+| <a id="property-availability"></a> `availability?` | `readonly` | `"next-step"` \| `"next-run"` | When matched tools become callable, reflected in the model-facing description so the model is never promised availability the harness does not deliver. `'next-step'` (default) matches the agent's immediate promotion mode; `'next-run'` matches `toolPromotion: 'run-boundary'` (C1), where the catalogue is frozen for the current run. | packages/tools/src/built-in/tool-search.ts:38 |
+| <a id="property-defaultk"></a> `defaultK?` | `readonly` | `number` | Default `k` when the model does not pass one. Default `5`. | packages/tools/src/built-in/tool-search.ts:27 |
+| <a id="property-excludetool"></a> `excludeTool?` | `readonly` | (`toolName`) => `boolean` | E1 deny-by-name: matches returning `true` are dropped from the results BEFORE the model sees them, so a name-denied deferred tool is neither discoverable nor promoted into the advertised set (its name and schema would otherwise leak while execution stays blocked). The agent wires the permission policy's name-level deny here; absent ⇒ no exclusion. | packages/tools/src/built-in/tool-search.ts:47 |
+| <a id="property-maxk"></a> `maxK?` | `readonly` | `number` | Hard cap on `k` (model-supplied). Default `15`. | packages/tools/src/built-in/tool-search.ts:29 |
+| <a id="property-registry"></a> `registry` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | - | packages/tools/src/built-in/tool-search.ts:25 |

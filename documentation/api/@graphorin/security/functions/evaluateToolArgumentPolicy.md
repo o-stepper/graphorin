@@ -10,7 +10,9 @@
 function evaluateToolArgumentPolicy(policy, facts): ToolPolicyDecision;
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L200)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:200
+
+**`Stable`**
 
 Evaluate a policy against one tool call, projected onto the binary
 pre-E1 vocabulary. Delegates to [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
@@ -29,5 +31,3 @@ is byte-identical to the original forbid-before-allow semantics.
 ## Returns
 
 [`ToolPolicyDecision`](/api/@graphorin/security/type-aliases/ToolPolicyDecision.md)
-
-## Stable

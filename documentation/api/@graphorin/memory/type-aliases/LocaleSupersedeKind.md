@@ -10,10 +10,10 @@
 type LocaleSupersedeKind = "location" | "job" | "preference" | "relationship" | "health" | "generic";
 ```
 
-Defined in: [packages/memory/src/conflict/locale-packs/types.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/locale-packs/types.ts#L16)
+Defined in: packages/memory/src/conflict/locale-packs/types.ts:16
+
+**`Stable`**
 
 Categorisation of a supersede marker. Surfaced on the audit row so
 downstream tooling can group conflicts by lifecycle event
 (relocation / job / preference / relationship / health / generic).
-
-## Stable

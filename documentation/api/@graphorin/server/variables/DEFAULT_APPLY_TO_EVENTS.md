@@ -10,10 +10,10 @@
 const DEFAULT_APPLY_TO_EVENTS: ReadonlyArray<string>;
 ```
 
-Defined in: [packages/server/src/commentary/built-in-patterns.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/built-in-patterns.ts#L43)
+Defined in: packages/server/src/commentary/built-in-patterns.ts:43
+
+**`Stable`**
 
 Default whitelist of `event.type` strings the dispatcher walks
 through the sanitizer. Extension is opt-in via
 `DeliveryCommentaryConfig.applyToEvents`.
-
-## Stable

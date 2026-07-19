@@ -13,7 +13,9 @@ function runIterativeRetrieval<H>(
 options?): Promise<IterativeRetrievalResult<H>>;
 ```
 
-Defined in: [packages/memory/src/search/iterative.ts:426](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L426)
+Defined in: packages/memory/src/search/iterative.ts:426
+
+**`Stable`**
 
 Run the gated grade-then-reformulate loop.
 
@@ -39,5 +41,3 @@ again (widened) and re-grade; otherwise **abstain**.
 ## Returns
 
 `Promise`\<[`IterativeRetrievalResult`](/api/@graphorin/memory/interfaces/IterativeRetrievalResult.md)\&lt;`H`\&gt;\>
-
-## Stable

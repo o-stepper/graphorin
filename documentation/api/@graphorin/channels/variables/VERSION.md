@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/channels/src/index.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/index.ts#L19)
+Defined in: packages/channels/src/index.ts:19

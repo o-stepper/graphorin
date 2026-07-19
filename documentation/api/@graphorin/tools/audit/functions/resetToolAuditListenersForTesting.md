@@ -10,7 +10,7 @@
 function _resetToolAuditListenersForTesting(): void;
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L141)
+Defined in: packages/tools/src/audit/index.ts:141
 
 **`Experimental`**
 

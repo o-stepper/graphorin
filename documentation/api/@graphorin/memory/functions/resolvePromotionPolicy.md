@@ -10,7 +10,7 @@
 function resolvePromotionPolicy(config): ResolvedPromotionPolicy;
 ```
 
-Defined in: [packages/memory/src/consolidator/promotion.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L66)
+Defined in: packages/memory/src/consolidator/promotion.ts:66
 
 Apply defaults.
 

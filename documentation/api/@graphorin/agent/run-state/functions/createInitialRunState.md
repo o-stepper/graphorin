@@ -10,7 +10,9 @@
 function createInitialRunState(args): RunState;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:511](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L511)
+Defined in: packages/agent/src/run-state/index.ts:511
+
+**`Stable`**
 
 Build a fresh, minimal [RunState](/api/@graphorin/core/interfaces/RunState.md) for a new run. Helper used
 by `createAgent({...})` so consumers can construct deterministic
@@ -30,5 +32,3 @@ run state in tests.
 ## Returns
 
 [`RunState`](/api/@graphorin/core/interfaces/RunState.md)
-
-## Stable

@@ -10,7 +10,9 @@
 function llmJudge<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: [packages/evals/src/scorers/llm/judge.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/llm/judge.ts#L49)
+Defined in: packages/evals/src/scorers/llm/judge.ts:49
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/evals/src/scorers/llm/judge.ts:49](https://github.com/o-st
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function scheduleReplayBufferPruning(buffer, opts?): () => void;
 ```
 
-Defined in: [packages/server/src/ws/replay-buffer.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L197)
+Defined in: packages/server/src/ws/replay-buffer.ts:197
+
+**`Stable`**
 
 W-028: schedule a periodic [ReplayBuffer.prune](/api/@graphorin/server/interfaces/ReplayBuffer.md#prune) sweep. Without
 it TTL expiry only ran lazily inside `push`/`replay`/`size` FOR THE
@@ -33,5 +35,3 @@ short-disconnect resume of terminal events).
 ## Returns
 
 () => `void`
-
-## Stable

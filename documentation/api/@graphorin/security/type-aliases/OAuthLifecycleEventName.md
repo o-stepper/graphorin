@@ -15,8 +15,8 @@ type OAuthLifecycleEventName =
   | "mcp.auth.expired";
 ```
 
-Defined in: [packages/security/src/oauth/events.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/events.ts#L15)
+Defined in: packages/security/src/oauth/events.ts:15
+
+**`Stable`**
 
 Discriminator for `OAuthLifecycleEvent`.
-
-## Stable

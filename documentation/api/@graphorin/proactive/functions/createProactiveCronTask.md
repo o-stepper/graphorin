@@ -10,7 +10,9 @@
 function createProactiveCronTask<TDeps>(options): ProactiveCronTask;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L235)
+Defined in: packages/proactive/src/cron-task.ts:235
+
+**`Stable`**
 
 Build a [ProactiveCronTask](/api/@graphorin/proactive/interfaces/ProactiveCronTask.md).
 
@@ -29,5 +31,3 @@ Build a [ProactiveCronTask](/api/@graphorin/proactive/interfaces/ProactiveCronTa
 ## Returns
 
 [`ProactiveCronTask`](/api/@graphorin/proactive/interfaces/ProactiveCronTask.md)
-
-## Stable

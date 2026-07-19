@@ -31,7 +31,8 @@ export type AgentRuntimeErrorCode =
   | 'run-state-version-unsupported'
   | 'run-state-malformed'
   | 'concurrent-run'
-  | 'budget-exceeded';
+  | 'budget-exceeded'
+  | 'budget-unpriced';
 
 /**
  * Base class for every error thrown from `@graphorin/agent`.
@@ -332,6 +333,32 @@ export class AgentBudgetExceededError extends AgentRuntimeError {
     this.resource = args.resource;
     this.observed = args.observed;
     this.limit = args.limit;
+  }
+}
+
+/**
+ * Deep retest 2026-07-19 (P1-3): `RunBudget.maxCostUsd` is set but the
+ * accumulated usage carries no USD cost data, so the ceiling cannot
+ * observe spend. Under the fail-closed default
+ * (`RunBudget.onUnpriced: 'fail'`) the run stops at the first
+ * between-step check: `onExceed: 'throw'` rejects with this error, the
+ * `'stop'` shape fails the run with `error.code: 'budget-unpriced'`.
+ * Wire `withCostTracking` (@graphorin/provider) with a
+ * `@graphorin/pricing` snapshot, use `RunBudget.maxTokens`, or opt back
+ * into the old warn-once behaviour with `onUnpriced: 'warn'`.
+ *
+ * @stable
+ */
+export class AgentBudgetUnpricedError extends AgentRuntimeError {
+  constructor() {
+    super(
+      'budget-unpriced',
+      'RunBudget.maxCostUsd is set but the accumulated usage carries no USD cost data - ' +
+        'the cost ceiling cannot observe spend. Wire withCostTracking (@graphorin/provider) ' +
+        "with a @graphorin/pricing snapshot, use RunBudget.maxTokens, or set RunBudget.onUnpriced: 'warn' " +
+        'to accept an unenforced ceiling.',
+      'AgentBudgetUnpricedError',
+    );
   }
 }
 

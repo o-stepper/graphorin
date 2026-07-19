@@ -6,14 +6,14 @@
 
 # Interface: InjectionClassifierGuardrailOptions
 
-Defined in: [packages/security/src/inspect/injection-classifier.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/inspect/injection-classifier.ts#L77)
+Defined in: packages/security/src/inspect/injection-classifier.ts:77
+
+**`Stable`**
 
 Options for [injectionClassifierOutputGuardrail](/api/@graphorin/security/functions/injectionClassifierOutputGuardrail.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-action"></a> `action?` | `readonly` | `"block"` \| `"warn"` | What a flagged output does to the run: `'warn'` (default) logs and continues, `'block'` fails the run. | [packages/security/src/inspect/injection-classifier.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/inspect/injection-classifier.ts#L82) |
+| <a id="property-action"></a> `action?` | `readonly` | `"block"` \| `"warn"` | What a flagged output does to the run: `'warn'` (default) logs and continues, `'block'` fails the run. | packages/security/src/inspect/injection-classifier.ts:82 |

@@ -10,7 +10,9 @@
 function runMigrateExport(options): Promise<MigrateExportResult>;
 ```
 
-Defined in: [packages/cli/src/commands/migrate-export.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L61)
+Defined in: packages/cli/src/commands/migrate-export.ts:61
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/migrate-export.ts:61](https://github.com/
 ## Returns
 
 `Promise`\&lt;[`MigrateExportResult`](/api/@graphorin/cli/interfaces/MigrateExportResult.md)\&gt;
-
-## Stable

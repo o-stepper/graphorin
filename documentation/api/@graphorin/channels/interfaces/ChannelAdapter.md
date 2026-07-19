@@ -6,7 +6,9 @@
 
 # Interface: ChannelAdapter
 
-Defined in: [packages/channels/src/spi.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L213)
+Defined in: packages/channels/src/spi.ts:213
+
+**`Stable`**
 
 The adapter contract. One instance per channel account; the
 gateway drives the lifecycle (`start` on gateway start, `stop` on
@@ -14,8 +16,6 @@ gateway stop) and calls `deliver` for outbound traffic.
 
 Implementations live in application repositories and are validated
 against the conformance suite in `@graphorin/channels/testkit`.
-
-## Stable
 
 ## Extended by
 
@@ -25,8 +25,8 @@ against the conformance suite in `@graphorin/channels/testkit`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ChannelCapabilities`](/api/@graphorin/channels/interfaces/ChannelCapabilities.md) | - | [packages/channels/src/spi.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L216) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable channel id; becomes `ChannelIdentity.channelId` on inbound. | [packages/channels/src/spi.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L215) |
+| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ChannelCapabilities`](/api/@graphorin/channels/interfaces/ChannelCapabilities.md) | - | packages/channels/src/spi.ts:216 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable channel id; becomes `ChannelIdentity.channelId` on inbound. | packages/channels/src/spi.ts:215 |
 
 ## Methods
 
@@ -36,7 +36,7 @@ against the conformance suite in `@graphorin/channels/testkit`.
 deliver(payload): Promise<DeliveryReceipt>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L225)
+Defined in: packages/channels/src/spi.ts:225
 
 Deliver one outbound payload. Throws [ChannelDeliveryError](/api/@graphorin/channels/classes/ChannelDeliveryError.md)
 after in-call retries are exhausted (D-14: no durable outbox).
@@ -59,7 +59,7 @@ after in-call retries are exhausted (D-14: no durable outbox).
 start(ctx): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L218)
+Defined in: packages/channels/src/spi.ts:218
 
 Subscribe / start polling. Resolves once the adapter is receiving.
 
@@ -81,7 +81,7 @@ Subscribe / start polling. Resolves once the adapter is receiving.
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L220)
+Defined in: packages/channels/src/spi.ts:220
 
 Stop receiving; idempotent.
 

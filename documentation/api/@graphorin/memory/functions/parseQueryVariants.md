@@ -10,7 +10,9 @@
 function parseQueryVariants(text, max): readonly string[];
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L157)
+Defined in: packages/memory/src/search/query-transform.ts:157
+
+**`Stable`**
 
 Parse the variant-generation model output into a deduped, capped list
 of reworded queries. Tolerates a JSON array, a `{ "variants": [...] }`
@@ -29,5 +31,3 @@ the result is capped at `max`.
 ## Returns
 
 readonly `string`[]
-
-## Stable

@@ -10,7 +10,9 @@
 function runAuditVerify(options?): Promise<AuditVerifyResult>;
 ```
 
-Defined in: [packages/cli/src/commands/audit.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L73)
+Defined in: packages/cli/src/commands/audit.ts:73
+
+**`Stable`**
 
 `graphorin audit verify` - replay the chain and report the first
 broken link (if any).
@@ -24,5 +26,3 @@ broken link (if any).
 ## Returns
 
 `Promise`\&lt;[`AuditVerifyResult`](/api/@graphorin/cli/interfaces/AuditVerifyResult.md)\&gt;
-
-## Stable

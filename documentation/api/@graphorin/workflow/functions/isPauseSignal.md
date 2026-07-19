@@ -10,7 +10,9 @@
 function isPauseSignal(err): err is PauseSignal<unknown>;
 ```
 
-Defined in: [packages/core/dist/channels/pause.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/pause.d.ts)
+Defined in: packages/core/dist/channels/pause.d.ts:126
+
+**`Stable`**
 
 Cross-realm safe type guard for `PauseSignal`.
 
@@ -23,5 +25,3 @@ Cross-realm safe type guard for `PauseSignal`.
 ## Returns
 
 `err is PauseSignal<unknown>`
-
-## Stable

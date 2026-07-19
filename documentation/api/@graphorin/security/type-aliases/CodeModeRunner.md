@@ -10,7 +10,9 @@
 type CodeModeRunner = (options) => Promise<BridgedSourceResult>;
 ```
 
-Defined in: [packages/security/src/sandbox/bridged-source.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/bridged-source.ts#L128)
+Defined in: packages/security/src/sandbox/bridged-source.ts:128
+
+**`Stable`**
 
 E3 (item 13, step 1): the code-mode RUNTIME contract - the seam
 through which a harness substitutes WHERE model-written code
@@ -37,5 +39,3 @@ material or run internals.
 ## Returns
 
 `Promise`\&lt;[`BridgedSourceResult`](/api/@graphorin/security/type-aliases/BridgedSourceResult.md)\&gt;
-
-## Stable

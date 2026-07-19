@@ -6,12 +6,12 @@
 
 # Interface: CheckpointStore
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:137
+
+**`Stable`**
 
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
-
-## Stable
 
 ## Methods
 
@@ -21,7 +21,7 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:148
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -51,7 +51,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:140
 
 #### Parameters
 
@@ -78,7 +78,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:141
 
 #### Parameters
 
@@ -103,7 +103,7 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:158
 
 W-032: enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
@@ -142,7 +142,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:138
 
 #### Parameters
 
@@ -171,7 +171,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:139
 
 #### Parameters
 

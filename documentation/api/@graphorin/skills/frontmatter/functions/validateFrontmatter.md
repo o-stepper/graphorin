@@ -10,7 +10,9 @@
 function validateFrontmatter(frontmatter, options?): ValidatedFrontmatter;
 ```
 
-Defined in: [packages/skills/src/frontmatter/index.ts:207](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L207)
+Defined in: packages/skills/src/frontmatter/index.ts:207
+
+**`Stable`**
 
 Validate a parsed frontmatter against the bundled spec snapshot and
 the `graphorin-*` extension catalogue.
@@ -25,5 +27,3 @@ the `graphorin-*` extension catalogue.
 ## Returns
 
 [`ValidatedFrontmatter`](/api/@graphorin/skills/frontmatter/interfaces/ValidatedFrontmatter.md)
-
-## Stable

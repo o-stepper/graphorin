@@ -22,9 +22,9 @@ type ToolErrorKind =
   | "rate_limited";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L225)
+Defined in: packages/core/src/types/tool.ts:225
+
+**`Stable`**
 
 Discriminator used by `ToolError.kind`. The list is exhaustive: any new
 kind must extend the union here and every `assertNever` switch.
-
-## Stable

@@ -10,7 +10,7 @@
 function areBuiltinsInstalled(): boolean;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/registry.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L125)
+Defined in: packages/security/src/secrets/resolvers/registry.ts:125
 
 **`Internal`**
 

@@ -10,7 +10,9 @@
 function capInsightsBelowFacts(factHits, insightHits): readonly MemoryHit<Insight>[];
 ```
 
-Defined in: [packages/memory/src/tiers/insight-memory.ts:183](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L183)
+Defined in: packages/memory/src/tiers/insight-memory.ts:183
+
+**`Stable`**
 
 Enforce the P1-1 rank ceiling: an insight may never outrank a primary
 fact **it cites**. For each insight hit, if any fact it cites is
@@ -34,5 +36,3 @@ Pure + deterministic - does not mutate its inputs.
 ## Returns
 
 readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]
-
-## Stable

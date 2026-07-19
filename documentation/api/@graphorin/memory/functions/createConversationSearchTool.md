@@ -10,7 +10,9 @@
 function createConversationSearchTool(deps): Tool<ConversationSearchInput, ConversationSearchOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/recall-tools.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/recall-tools.ts#L208)
+Defined in: packages/memory/src/tools/recall-tools.ts:208
+
+**`Stable`**
 
 `conversation_search` - FTS5 search over the active session
 messages.
@@ -24,5 +26,3 @@ messages.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ConversationSearchInput`, `ConversationSearchOutput`\&gt;
-
-## Stable

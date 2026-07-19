@@ -10,7 +10,9 @@
 function recoveryAfterError<I>(options?): Scorer<I, Trajectory>;
 ```
 
-Defined in: [packages/evals/src/scorers/trajectory/recovery-after-error.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/recovery-after-error.ts#L22)
+Defined in: packages/evals/src/scorers/trajectory/recovery-after-error.ts:22
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/evals/src/scorers/trajectory/recovery-after-error.ts:22](h
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\&gt;
-
-## Stable

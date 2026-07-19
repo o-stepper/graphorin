@@ -13,7 +13,9 @@ function validateOrThrow<T>(
    what?): T;
 ```
 
-Defined in: [packages/core/src/utils/validation.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L73)
+Defined in: packages/core/src/utils/validation.ts:73
+
+**`Stable`**
 
 Throwing variant of `validate(...)` that surfaces a `TypeError` carrying
 a stable, parser-style message. Useful at module-boundary entry points
@@ -36,5 +38,3 @@ where a thrown error is the natural failure mode.
 ## Returns
 
 `T`
-
-## Stable

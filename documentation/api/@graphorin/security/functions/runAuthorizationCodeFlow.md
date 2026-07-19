@@ -10,7 +10,9 @@
 function runAuthorizationCodeFlow(args): Promise<OAuthSession>;
 ```
 
-Defined in: [packages/security/src/oauth/authorize-code-flow.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/authorize-code-flow.ts#L50)
+Defined in: packages/security/src/oauth/authorize-code-flow.ts:50
+
+**`Stable`**
 
 Drive the Authorization Code + PKCE flow. The function is exposed
 for tests and for higher-level orchestration in `client.ts`.
@@ -24,5 +26,3 @@ for tests and for higher-level orchestration in `client.ts`.
 ## Returns
 
 `Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
-
-## Stable

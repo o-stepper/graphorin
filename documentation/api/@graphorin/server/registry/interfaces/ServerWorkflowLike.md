@@ -6,18 +6,18 @@
 
 # Interface: ServerWorkflowLike
 
-Defined in: [packages/server/src/registry/index.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L81)
+Defined in: packages/server/src/registry/index.ts:81
+
+**`Stable`**
 
 Minimal shape the server needs from a `Workflow`. Mirrors the
 `Workflow` surface from `@graphorin/workflow`.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/server/src/registry/index.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L82) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/server/src/registry/index.ts:82 |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 optional deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L122)
+Defined in: packages/server/src/registry/index.ts:122
 
 W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
@@ -49,7 +49,7 @@ W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 execute(input, options?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L83)
+Defined in: packages/server/src/registry/index.ts:83
 
 #### Parameters
 
@@ -77,7 +77,7 @@ optional fork(
 }>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L114)
+Defined in: packages/server/src/registry/index.ts:114
 
 W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
 `opts.patch` merges channel-level state into the forked root (the
@@ -106,7 +106,7 @@ W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
 optional getState(threadId): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L119)
+Defined in: packages/server/src/registry/index.ts:119
 
 #### Parameters
 
@@ -126,7 +126,7 @@ Defined in: [packages/server/src/registry/index.ts:119](https://github.com/o-ste
 optional listCheckpoints(threadId): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L120)
+Defined in: packages/server/src/registry/index.ts:120
 
 #### Parameters
 
@@ -150,7 +150,7 @@ optional resolveAwakeable(
 opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L103)
+Defined in: packages/server/src/registry/index.ts:103
 
 W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
 `name`) - `approve` is the same primitive under the hood.
@@ -180,7 +180,7 @@ optional resume(
 opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L87)
+Defined in: packages/server/src/registry/index.ts:87
 
 #### Parameters
 
@@ -204,7 +204,7 @@ Defined in: [packages/server/src/registry/index.ts:87](https://github.com/o-step
 optional retry(threadId, opts?): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L93)
+Defined in: packages/server/src/registry/index.ts:93
 
 W-119: replay a failed/aborted thread (`POST /:id/retry`).
 
@@ -231,7 +231,7 @@ optional tick(threadId, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/registry/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L95)
+Defined in: packages/server/src/registry/index.ts:95
 
 W-119: fire a due durable timer (`POST /:id/tick`).
 

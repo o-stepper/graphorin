@@ -10,9 +10,9 @@
 const COMMENTARY_WRAP_CLOSE: "<<</commentary>>>" = '<<</commentary>>>';
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L85)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:85
+
+**`Stable`**
 
 Default wrap-envelope close delimiter. See
 [COMMENTARY\_WRAP\_OPEN](/api/@graphorin/tools/outbound/variables/COMMENTARY_WRAP_OPEN.md).
-
-## Stable

@@ -1,3 +1,4 @@
+import { realpathSync } from 'node:fs';
 import pkg from '../package.json' with { type: 'json' };
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
@@ -533,10 +534,22 @@ export async function main(): Promise<void> {
         'so the ceiling could not observe spend (PS-8) - it was effectively UNENFORCED.',
     );
   }
-  console.log(
-    `[benchmark-halumem] stage=${args.stage} conflictPipeline=${conflictPipeline} ` +
-      `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed}`,
-  );
+  // P2-3 (deep retest 2026-07-19): a stub run's pass/fail counts are
+  // plumbing-only noise, and `passed=0` reads like a failed quality
+  // gate to anyone skimming CI logs. Stub summaries say `not-scored`;
+  // real-provider runs keep the honest counts (and gate on them).
+  if (label.startsWith('stub')) {
+    console.log(
+      `[benchmark-halumem] stage=${args.stage} conflictPipeline=${conflictPipeline} ` +
+        `cases=${report.summary.total} scored=not-scored (stub run is plumbing-only; ` +
+        'real-provider runs gate on scores)',
+    );
+  } else {
+    console.log(
+      `[benchmark-halumem] stage=${args.stage} conflictPipeline=${conflictPipeline} ` +
+        `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed}`,
+    );
+  }
   const benchConfig = {
     stage: args.stage,
     conflictPipeline,
@@ -563,6 +576,16 @@ export async function main(): Promise<void> {
   if (!label.startsWith('stub')) exitOnFailures(report);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) ===
+    (() => {
+      try {
+        return realpathSync(process.argv[1]);
+      } catch {
+        return process.argv[1];
+      }
+    })()
+) {
   await main();
 }

@@ -13,7 +13,9 @@ function ensureFileMode(
 opts?): Promise<void>;
 ```
 
-Defined in: [packages/security/src/hardening/file-modes.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/file-modes.ts#L45)
+Defined in: packages/security/src/hardening/file-modes.ts:45
+
+**`Stable`**
 
 Ensure a file is at the supplied POSIX mode. The function:
 
@@ -35,5 +37,3 @@ Ensure a file is at the supplied POSIX mode. The function:
 ## Returns
 
 `Promise`\&lt;`void`\&gt;
-
-## Stable

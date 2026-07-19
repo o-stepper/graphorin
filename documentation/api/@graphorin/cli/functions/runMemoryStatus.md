@@ -10,7 +10,9 @@
 function runMemoryStatus(options?): Promise<MemoryStatusResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L66)
+Defined in: packages/cli/src/commands/memory.ts:66
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/memory.ts:66](https://github.com/o-steppe
 ## Returns
 
 `Promise`\&lt;[`MemoryStatusResult`](/api/@graphorin/cli/interfaces/MemoryStatusResult.md)\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function isRuntimeCompatSatisfied(range, version): boolean;
 ```
 
-Defined in: [packages/skills/src/frontmatter/index.ts:567](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L567)
+Defined in: packages/skills/src/frontmatter/index.ts:567
+
+**`Stable`**
 
 Best-effort semver-range satisfaction check. Supports the patterns
 the framework actually emits (`^x.y.z`, `~x.y.z`, `>=x.y.z`,
@@ -29,5 +31,3 @@ diagnostic.
 ## Returns
 
 `boolean`
-
-## Stable

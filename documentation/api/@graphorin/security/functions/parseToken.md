@@ -10,7 +10,9 @@
 function parseToken(input, opts?): ParsedToken;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L276)
+Defined in: packages/security/src/auth/token-format.ts:276
+
+**`Stable`**
 
 Strict structural parser. Returns a discriminated union so callers
 can branch on `ok` without throwing on the hot path. The function
@@ -27,5 +29,3 @@ length.
 ## Returns
 
 [`ParsedToken`](/api/@graphorin/security/type-aliases/ParsedToken.md)
-
-## Stable

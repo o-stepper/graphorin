@@ -10,7 +10,7 @@
 type OllamaTrust = LocalProviderTrust;
 ```
 
-Defined in: [packages/core/src/contracts/local-provider-trust.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/local-provider-trust.ts#L33)
+Defined in: packages/core/src/contracts/local-provider-trust.ts:33
 
 Legacy alias preserved for downstream packages that still import the
 Ollama-specific name. Removed in v0.2 per the legacy-sugar

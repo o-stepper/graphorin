@@ -10,12 +10,12 @@
 const TICKET_SUBPROTOCOL_PREFIX: "ticket." = 'ticket.';
 ```
 
-Defined in: [packages/protocol/src/subprotocol.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/subprotocol.ts#L42)
+Defined in: src/subprotocol.ts:42
+
+**`Stable`**
 
 Prefix for the single-use ticket that browser clients attach to
 the `Sec-WebSocket-Protocol` header. The server's upgrade handler
 splits the comma-separated list, finds the first
 `ticket.<value>` token, and validates the value against the
 in-memory ticket store before granting the connection.
-
-## Stable

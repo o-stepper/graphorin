@@ -10,7 +10,9 @@
 const withFallback: (opts) => ProviderMiddleware;
 ```
 
-Defined in: [packages/provider/src/middleware/with-fallback.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-fallback.ts#L34)
+Defined in: packages/provider/src/middleware/with-fallback.ts:34
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/provider/src/middleware/with-fallback.ts:34](https://githu
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

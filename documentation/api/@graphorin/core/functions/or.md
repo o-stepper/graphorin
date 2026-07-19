@@ -10,7 +10,9 @@
 function or(...conditions): StopCondition;
 ```
 
-Defined in: [packages/core/src/types/stop-condition.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L79)
+Defined in: packages/core/src/types/stop-condition.ts:79
+
+**`Stable`**
 
 Stop when **any** of the supplied conditions is satisfied.
 
@@ -23,5 +25,3 @@ Stop when **any** of the supplied conditions is satisfied.
 ## Returns
 
 [`StopCondition`](/api/@graphorin/core/interfaces/StopCondition.md)
-
-## Stable

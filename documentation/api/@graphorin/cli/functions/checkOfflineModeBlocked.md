@@ -10,7 +10,9 @@
 function checkOfflineModeBlocked(operation, options?): boolean;
 ```
 
-Defined in: [packages/cli/src/internal/offline.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/offline.ts#L51)
+Defined in: packages/cli/src/internal/offline.ts:51
+
+**`Stable`**
 
 Phase 15 helper for subcommands that informationally **may** make
 network calls (e.g. `graphorin auth login`, `graphorin pricing
@@ -32,5 +34,3 @@ letting the caller short-circuit cleanly without throwing. Returns
 ## Returns
 
 `boolean`
-
-## Stable

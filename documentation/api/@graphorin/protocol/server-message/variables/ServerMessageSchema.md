@@ -124,12 +124,12 @@ const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodEffects<ZodObject<{
 }>]>]>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L170)
+Defined in: src/server-message.ts:170
+
+**`Stable`**
 
 Zod schema for every legal server → client frame. Validation runs
 twice in the server pipeline: first when a route handler enqueues
 the frame onto the dispatcher's send queue (so a malformed frame
 never escapes the process), then again on the client side to
 defend against protocol drift.
-
-## Stable

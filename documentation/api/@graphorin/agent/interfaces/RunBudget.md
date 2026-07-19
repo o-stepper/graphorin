@@ -6,7 +6,9 @@
 
 # Interface: RunBudget
 
-Defined in: [packages/agent/src/types.ts:590](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L590)
+Defined in: packages/agent/src/types.ts:592
+
+**`Stable`**
 
 Run-level budget (C5 / W-084 residual, decision D-8). Enforced as a
 between-step precheck against the run's accumulated usage - the step
@@ -19,15 +21,16 @@ usage into the parent run's accounting (W-033).
 The cost leg reads `Usage.cost`, which only exists when the provider
 chain reports it (wire `withCostTracking` from `@graphorin/provider`
 with a `@graphorin/pricing` snapshot). A cost ceiling without USD
-cost data is UNENFORCED and WARNs once per run - use `maxTokens` for
-a provider-independent ceiling.
-
-## Stable
+cost data is fail-closed by default: the run stops at the first
+between-step check (`onUnpriced: 'fail'`) instead of spending
+unmetered - see [RunBudget.onUnpriced](/api/@graphorin/agent/interfaces/RunBudget.md#property-onunpriced) for the opt-out and
+`maxTokens` for a provider-independent ceiling.
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | [packages/agent/src/types.ts:592](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L592) |
-| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | [packages/agent/src/types.ts:598](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L598) |
-| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | [packages/agent/src/types.ts:608](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L608) |
+| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | packages/agent/src/types.ts:594 |
+| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | packages/agent/src/types.ts:600 |
+| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | packages/agent/src/types.ts:610 |
+| <a id="property-onunpriced"></a> `onUnpriced?` | `readonly` | `"warn"` \| `"fail"` | What to do when `maxCostUsd` is set but the accumulated usage carries no USD cost data, so the ceiling cannot observe spend (deep retest 2026-07-19, P1-3). `'fail'` (default) is fail-closed: the run stops at the first between-step check in the `onExceed` shape (`'stop'` fails the run with `error.code: 'budget-unpriced'`; `'throw'` rejects with `AgentBudgetUnpricedError`) - a caller who set a cost cap must never keep spending unmetered. `'warn'` restores the pre-0.13 behaviour: one console WARN, ceiling unenforced. Wire `withCostTracking` with a pricing snapshot, or use `maxTokens` for a provider-independent ceiling. | packages/agent/src/types.ts:623 |

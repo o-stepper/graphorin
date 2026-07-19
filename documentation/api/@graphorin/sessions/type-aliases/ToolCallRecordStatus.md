@@ -10,8 +10,8 @@
 type ToolCallRecordStatus = "completed" | "failed" | "cancelled" | "budget-exceeded";
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L73)
+Defined in: packages/sessions/src/cassette/types.ts:73
+
+**`Stable`**
 
 Status of a recorded tool execution.
-
-## Stable

@@ -10,7 +10,9 @@
 function createBlockReplaceTool(deps): Tool<BlockReplaceInput, BlockReplaceOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/block-tools.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/block-tools.ts#L125)
+Defined in: packages/memory/src/tools/block-tools.ts:125
+
+**`Stable`**
 
 `block_replace` - replace a unique substring inside a working
 memory block. Throws when the substring is missing or appears more
@@ -25,5 +27,3 @@ than once.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockReplaceInput`, `BlockReplaceOutput`\&gt;
-
-## Stable

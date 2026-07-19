@@ -6,13 +6,13 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L253)
+Defined in: packages/memory/src/internal/storage-adapter.ts:253
+
+**`Stable`**
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
 storage adapters may expose.
-
-## Stable
 
 ## Extends
 
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:282](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L282)
+Defined in: packages/memory/src/internal/storage-adapter.ts:282
 
 Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -50,7 +50,7 @@ counts instead of `list(...)`-materialising up to 1000 rows.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
+Defined in: packages/core/dist/contracts/memory-store.d.ts:122
 
 #### Parameters
 
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:272](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L272)
+Defined in: packages/memory/src/internal/storage-adapter.ts:272
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -105,7 +105,7 @@ idempotency cursor without rereading already-processed turns.
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
+Defined in: packages/core/dist/contracts/memory-store.d.ts:127
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -136,7 +136,7 @@ push(
 options?): Promise<MessageRef>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
+Defined in: packages/core/dist/contracts/memory-store.d.ts:121
 
 #### Parameters
 
@@ -165,7 +165,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
+Defined in: packages/core/dist/contracts/memory-store.d.ts:139
 
 Full-text search over the scoped session messages.
 
@@ -205,7 +205,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L254)
+Defined in: packages/memory/src/internal/storage-adapter.ts:254
 
 #### Parameters
 
@@ -228,7 +228,7 @@ Defined in: [packages/memory/src/internal/storage-adapter.ts:254](https://github
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:265](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L265)
+Defined in: packages/memory/src/internal/storage-adapter.ts:265
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

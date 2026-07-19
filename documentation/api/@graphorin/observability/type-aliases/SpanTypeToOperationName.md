@@ -12,7 +12,9 @@ type SpanTypeToOperationName = (type) =>
   | undefined;
 ```
 
-Defined in: [packages/observability/src/gen-ai/types.ts:143](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L143)
+Defined in: packages/observability/src/gen-ai/types.ts:143
+
+**`Stable`**
 
 Mapping from a Graphorin `SpanType` to the canonical
 `gen_ai.operation.name` value. Returns `undefined` for span types
@@ -29,5 +31,3 @@ as `'replay.run'` / `'replay.skipped'` per the doc table).
 
   \| [`GenAIOperationName`](/api/@graphorin/observability/type-aliases/GenAIOperationName.md)
   \| `undefined`
-
-## Stable

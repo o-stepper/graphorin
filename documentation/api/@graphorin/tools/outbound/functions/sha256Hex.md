@@ -10,7 +10,9 @@
 function sha256Hex(value): string;
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L193)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:193
+
+**`Stable`**
 
 Hex-encoded SHA-256 of a UTF-8 string. Used for the before/after
 digests on sanitization audit rows (raw payloads never reach the
@@ -25,5 +27,3 @@ audit log).
 ## Returns
 
 `string`
-
-## Stable

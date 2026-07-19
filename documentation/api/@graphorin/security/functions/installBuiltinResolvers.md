@@ -10,7 +10,9 @@
 function installBuiltinResolvers(opts?): void;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/index.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/index.ts#L26)
+Defined in: packages/security/src/secrets/resolvers/index.ts:26
+
+**`Stable`**
 
 Idempotently install the seven built-in resolvers. Safe to call
 multiple times - replays no-op if the registry already has them.
@@ -25,5 +27,3 @@ multiple times - replays no-op if the registry already has them.
 ## Returns
 
 `void`
-
-## Stable

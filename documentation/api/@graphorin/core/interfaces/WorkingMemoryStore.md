@@ -6,9 +6,9 @@
 
 # Interface: WorkingMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L76)
+Defined in: packages/core/src/contracts/memory-store.ts:76
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -21,7 +21,7 @@ delete(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L80)
+Defined in: packages/core/src/contracts/memory-store.ts:80
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:80](https://github.com/
 get(scope, label): Promise<Block | null>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L78)
+Defined in: packages/core/src/contracts/memory-store.ts:78
 
 #### Parameters
 
@@ -64,7 +64,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:78](https://github.com/
 list(scope): Promise<readonly Block[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L77)
+Defined in: packages/core/src/contracts/memory-store.ts:77
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:77](https://github.com/
 optional purge(scope, label): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L89)
+Defined in: packages/core/src/contracts/memory-store.ts:89
 
 Hard-delete a block row - no tombstone left behind (wave-D D2).
 `delete` stays the soft tombstone; `purge` is the GDPR path for
@@ -112,7 +112,7 @@ Optional-additive: adapters that do not implement it make
 upsert(scope, block): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L79)
+Defined in: packages/core/src/contracts/memory-store.ts:79
 
 #### Parameters
 

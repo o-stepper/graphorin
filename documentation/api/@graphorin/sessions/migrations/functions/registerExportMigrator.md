@@ -10,7 +10,9 @@
 function registerExportMigrator(migrator): void;
 ```
 
-Defined in: [packages/sessions/src/migrations/index.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L37)
+Defined in: packages/sessions/src/migrations/index.ts:37
+
+**`Stable`**
 
 Register a migrator. Idempotent on the `(fromVersion, toVersion)`
 pair - re-registering replaces the prior entry.
@@ -24,5 +26,3 @@ pair - re-registering replaces the prior entry.
 ## Returns
 
 `void`
-
-## Stable

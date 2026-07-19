@@ -10,7 +10,9 @@
 function isPingRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "ping"; params?: { nonce?: string }; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/client-message.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L191)
+Defined in: src/client-message.ts:191
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/client-message.ts:191](https://github.com/o-s
 ## Returns
 
 message is \{ id: string \| number; jsonrpc: "2.0"; method: "ping"; params?: \{ nonce?: string \}; v: "1" \}
-
-## Stable

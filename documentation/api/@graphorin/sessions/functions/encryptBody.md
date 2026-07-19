@@ -10,7 +10,9 @@
 function encryptBody(body, key): Uint8Array;
 ```
 
-Defined in: [packages/sessions/src/export/writer.ts:270](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L270)
+Defined in: packages/sessions/src/export/writer.ts:270
+
+**`Stable`**
 
 Convenience: AES-256-GCM encrypt a body buffer. The IV is generated
 fresh and prepended; the auth tag is appended. Output layout:
@@ -26,5 +28,3 @@ fresh and prepended; the auth tag is appended. Output layout:
 ## Returns
 
 `Uint8Array`
-
-## Stable

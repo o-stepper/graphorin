@@ -10,7 +10,7 @@
 function _getSupplyChainAuditListenerCountForTesting(): number;
 ```
 
-Defined in: [packages/security/src/supply-chain/audit-emitter.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L105)
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:105
 
 **`Experimental`**
 

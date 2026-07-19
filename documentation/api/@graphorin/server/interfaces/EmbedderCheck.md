@@ -6,9 +6,9 @@
 
 # Interface: EmbedderCheck
 
-Defined in: [packages/server/src/health/checks.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L55)
+Defined in: packages/server/src/health/checks.ts:55
 
-## Stable
+**`Stable`**
 
 ## Extends
 
@@ -18,7 +18,7 @@ Defined in: [packages/server/src/health/checks.ts:55](https://github.com/o-stepp
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-message"></a> `message?` | `readonly` | `string` | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`message`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-message) | [packages/server/src/health/checks.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L44) |
-| <a id="property-model"></a> `model?` | `readonly` | `string` | - | [packages/server/src/health/checks.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L57) |
-| <a id="property-modelloaded"></a> `modelLoaded` | `readonly` | `boolean` | - | [packages/server/src/health/checks.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L56) |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`status`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-status) | [packages/server/src/health/checks.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L43) |
+| <a id="property-message"></a> `message?` | `readonly` | `string` | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`message`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-message) | packages/server/src/health/checks.ts:44 |
+| <a id="property-model"></a> `model?` | `readonly` | `string` | - | packages/server/src/health/checks.ts:57 |
+| <a id="property-modelloaded"></a> `modelLoaded` | `readonly` | `boolean` | - | packages/server/src/health/checks.ts:56 |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`status`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-status) | packages/server/src/health/checks.ts:43 |

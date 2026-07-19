@@ -12,7 +12,9 @@ function createIdempotencyMiddleware(options): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: [packages/server/src/middleware/idempotency.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/idempotency.ts#L72)
+Defined in: packages/server/src/middleware/idempotency.ts:72
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/middleware/idempotency.ts:72](https://github.co
 `MiddlewareHandler`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

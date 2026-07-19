@@ -10,7 +10,9 @@
 function runStorageBackup(options): Promise<StorageBackupResult>;
 ```
 
-Defined in: [packages/cli/src/commands/storage.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L157)
+Defined in: packages/cli/src/commands/storage.ts:157
+
+**`Stable`**
 
 store-02: online backup via the driver's page-level `backup()` API -
 consistent under a live writer (the daemon can keep running),
@@ -28,5 +30,3 @@ renumbers rowids and corrupts the FTS mapping on restore.
 ## Returns
 
 `Promise`\&lt;[`StorageBackupResult`](/api/@graphorin/cli/interfaces/StorageBackupResult.md)\&gt;
-
-## Stable

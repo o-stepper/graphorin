@@ -17,9 +17,9 @@ type OutboundCommentaryReason =
   | "agent.model.fellback-event-signature";
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L49)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:49
+
+**`Stable`**
 
 Stable label for each detection pattern. Surfaced in audit rows;
 the counter label cardinality is bounded.
-
-## Stable

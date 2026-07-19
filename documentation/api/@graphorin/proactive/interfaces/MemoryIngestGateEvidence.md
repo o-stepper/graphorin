@@ -6,7 +6,7 @@
 
 # Interface: MemoryIngestGateEvidence
 
-Defined in: [packages/proactive/src/cron-task.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L70)
+Defined in: packages/proactive/src/cron-task.ts:70
 
 Structural evidence slice of `@graphorin/memory`'s facade.
 
@@ -14,4 +14,4 @@ Structural evidence slice of `@graphorin/memory`'s facade.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-ingestgate"></a> `ingestGate` | `readonly` | `unknown` | [packages/proactive/src/cron-task.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L71) |
+| <a id="property-ingestgate"></a> `ingestGate` | `readonly` | `unknown` | packages/proactive/src/cron-task.ts:71 |

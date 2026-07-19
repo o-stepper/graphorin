@@ -10,7 +10,9 @@
 function containsPii(text, patterns?): boolean;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L103)
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:103
+
+**`Stable`**
 
 SDF-8 / FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
 phone, Luhn-valid card, …)? A pure, allocation-light predicate that returns on
@@ -28,5 +30,3 @@ PII exfiltration trips the lethal-trifecta gate even without a `'secret'` tag.
 ## Returns
 
 `boolean`
-
-## Stable

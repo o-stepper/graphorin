@@ -39,10 +39,10 @@ type ParsedSubject =
 };
 ```
 
-Defined in: [packages/server/src/ws/subjects.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/subjects.ts#L25)
+Defined in: packages/server/src/ws/subjects.ts:25
+
+**`Stable`**
 
 Discriminated union of every recognised subject form. Surfaced on
 audit log entries + diagnostics; the wire still carries the raw
 string.
-
-## Stable

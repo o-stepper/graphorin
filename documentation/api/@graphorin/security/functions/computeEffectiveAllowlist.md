@@ -10,7 +10,9 @@
 function computeEffectiveAllowlist(parent, declared): readonly string[];
 ```
 
-Defined in: [packages/security/src/secrets/acl.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L95)
+Defined in: packages/security/src/secrets/acl.ts:95
+
+**`Stable`**
 
 Compute the **effective** allowlist for a child scope: intersection
 of the parent's allowlist and the child's declared list. The
@@ -28,5 +30,3 @@ works when the parent already permits it.
 ## Returns
 
 readonly `string`[]
-
-## Stable

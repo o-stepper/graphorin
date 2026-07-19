@@ -6,11 +6,11 @@
 
 # Interface: DirectiveOptions\&lt;TUpdate, TResume\&gt;
 
-Defined in: [packages/core/src/channels/directive.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L37)
+Defined in: packages/core/src/channels/directive.ts:37
+
+**`Stable`**
 
 Constructor parameters for `Directive`.
-
-## Stable
 
 ## Type Parameters
 
@@ -23,6 +23,6 @@ Constructor parameters for `Directive`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-goto"></a> `goto?` | `readonly` | `string` | [packages/core/src/channels/directive.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L38) |
-| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | [packages/core/src/channels/directive.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L39) |
-| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | [packages/core/src/channels/directive.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L40) |
+| <a id="property-goto"></a> `goto?` | `readonly` | `string` | packages/core/src/channels/directive.ts:38 |
+| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | packages/core/src/channels/directive.ts:39 |
+| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | packages/core/src/channels/directive.ts:40 |

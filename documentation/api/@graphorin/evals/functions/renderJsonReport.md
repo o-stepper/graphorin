@@ -10,7 +10,9 @@
 function renderJsonReport<I, O>(report, options?): string;
 ```
 
-Defined in: [packages/evals/src/reporters/json.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/json.ts#L12)
+Defined in: packages/evals/src/reporters/json.ts:12
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -30,5 +32,3 @@ Defined in: [packages/evals/src/reporters/json.ts:12](https://github.com/o-stepp
 ## Returns
 
 `string`
-
-## Stable

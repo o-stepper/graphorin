@@ -10,7 +10,9 @@
 function onMemoryGuardAudit(listener): () => void;
 ```
 
-Defined in: [packages/security/src/guard/audit-emitter.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L95)
+Defined in: packages/security/src/guard/audit-emitter.ts:95
+
+**`Stable`**
 
 Subscribe to guard audit events. Returns an unsubscribe function.
 
@@ -23,5 +25,3 @@ Subscribe to guard audit events. Returns an unsubscribe function.
 ## Returns
 
 () => `void`
-
-## Stable

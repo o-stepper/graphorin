@@ -10,7 +10,9 @@
 function xxhash(input, seed?): string;
 ```
 
-Defined in: [packages/core/src/utils/hash.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/hash.ts#L39)
+Defined in: packages/core/src/utils/hash.ts:39
+
+**`Stable`**
 
 Pure-JS XXH32 implementation. Used by the memory-modification guard
 - fast, non-cryptographic content fingerprinting (`xxhash(content)`
@@ -31,5 +33,3 @@ untrusted attacker; for that the audit log uses SHA-256 (in
 ## Returns
 
 `string`
-
-## Stable

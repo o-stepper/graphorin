@@ -13,7 +13,9 @@ const DEFAULT_APPROVAL_TIMEOUT_DECISION: {
 };
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L84)
+Defined in: packages/core/src/channels/durable.ts:84
+
+**`Stable`**
 
 The decision a deadline-carrying approval resolves with when its
 timeout fires and no explicit `timeoutDecision` was supplied: a
@@ -23,7 +25,5 @@ deny, so an unattended deferred permission fails closed.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-granted"></a> `granted` | `false` | [packages/core/src/channels/durable.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L85) |
-| <a id="property-reason"></a> `reason` | `string` | [packages/core/src/channels/durable.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L86) |
-
-## Stable
+| <a id="property-granted"></a> `granted` | `false` | packages/core/src/channels/durable.ts:85 |
+| <a id="property-reason"></a> `reason` | `string` | packages/core/src/channels/durable.ts:86 |

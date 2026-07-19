@@ -10,9 +10,9 @@
 const NOOP_LOGGER: Logger;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L52)
+Defined in: packages/core/src/contracts/logger.ts:52
+
+**`Stable`**
 
 Minimal no-op logger. Useful as a typed default when downstream code
 needs a non-null `Logger` without taking the observability dependency.
-
-## Stable

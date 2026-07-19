@@ -6,13 +6,13 @@
 
 # Interface: ArgumentValidityOptions
 
-Defined in: [packages/evals/src/scorers/trajectory/argument-validity.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/argument-validity.ts#L19)
+Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:19
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | [packages/evals/src/scorers/trajectory/argument-validity.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/argument-validity.ts#L23) |
-| <a id="property-tools"></a> `tools` | `readonly` | readonly \{ `inputSchema`: `SchemaLike`; `name`: `string`; \}[] | The tools whose `inputSchema` is used to validate matching calls. | [packages/evals/src/scorers/trajectory/argument-validity.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/argument-validity.ts#L21) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | packages/evals/src/scorers/trajectory/argument-validity.ts:23 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly \{ `inputSchema`: `SchemaLike`; `name`: `string`; \}[] | The tools whose `inputSchema` is used to validate matching calls. | packages/evals/src/scorers/trajectory/argument-validity.ts:21 |

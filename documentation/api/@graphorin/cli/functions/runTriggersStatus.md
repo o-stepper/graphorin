@@ -12,7 +12,9 @@ function runTriggersStatus(options): Promise<
 | null>;
 ```
 
-Defined in: [packages/cli/src/commands/triggers.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L77)
+Defined in: packages/cli/src/commands/triggers.ts:77
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/triggers.ts:77](https://github.com/o-step
 `Promise`\<
   \| [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)
   \| `null`\>
-
-## Stable

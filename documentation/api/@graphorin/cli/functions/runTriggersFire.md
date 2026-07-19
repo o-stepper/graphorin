@@ -13,7 +13,9 @@ function runTriggersFire(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/triggers.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L116)
+Defined in: packages/cli/src/commands/triggers.ts:116
+
+**`Stable`**
 
 ## Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/cli/src/commands/triggers.ts:116](https://github.com/o-ste
   `fired`: `false`;
   `unsupported`: `true`;
 \}\>
-
-## Stable

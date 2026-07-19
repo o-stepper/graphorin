@@ -10,6 +10,6 @@
 const MEMORY_TOOL_PROFILES: ReadonlyArray<MemoryToolProfile>;
 ```
 
-Defined in: [packages/memory/src/tools/index.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L72)
+Defined in: packages/memory/src/tools/index.ts:72
 
 The valid profile values (runtime validation source).

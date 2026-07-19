@@ -6,7 +6,9 @@
 
 # Class: WorkingMemory
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L105)
+Defined in: packages/memory/src/tiers/working-memory.ts:105
+
+**`Stable`**
 
 `WorkingMemory` - labeled, character-bounded blocks rendered into
 every system prompt. Operations:
@@ -24,8 +26,6 @@ every system prompt. Operations:
  - `compile(scope)`: render the active blocks for the context
    engine (used by Phase 10d).
 
-## Stable
-
 ## Constructors
 
 ### Constructor
@@ -34,7 +34,7 @@ every system prompt. Operations:
 new WorkingMemory(args): WorkingMemory;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L110)
+Defined in: packages/memory/src/tiers/working-memory.ts:110
 
 #### Parameters
 
@@ -59,7 +59,7 @@ append(
 content): Promise<Block>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:167](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L167)
+Defined in: packages/memory/src/tiers/working-memory.ts:167
 
 Append `content` to a block (with a newline separator).
 
@@ -86,7 +86,7 @@ attach(
 agentId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L251)
+Defined in: packages/memory/src/tiers/working-memory.ts:251
 
 Attach a working block to an additional agent. Backed by the
 adapter's `shared.attach(...)` join table so multi-agent crews
@@ -112,7 +112,7 @@ can share the same block without duplicating storage.
 compile(scope, agentId?): Promise<string>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:294](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L294)
+Defined in: packages/memory/src/tiers/working-memory.ts:294
 
 Render a deterministic `<memory_blocks>` XML fragment for the
 supplied scope. The full layered system prompt (six layers) is
@@ -142,7 +142,7 @@ accepted but ignored - the rendering is scope-wide.
 define(definition): BlockDefinition;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L117)
+Defined in: packages/memory/src/tiers/working-memory.ts:117
 
 Register a block definition. Returns the same definition object.
 
@@ -166,7 +166,7 @@ definitionFor(label):
   | undefined;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L128)
+Defined in: packages/memory/src/tiers/working-memory.ts:128
 
 Lookup a definition by label.
 
@@ -189,7 +189,7 @@ Lookup a definition by label.
 definitions(): readonly BlockDefinition[];
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L123)
+Defined in: packages/memory/src/tiers/working-memory.ts:123
 
 Snapshot of every registered definition.
 
@@ -208,7 +208,7 @@ detach(
 agentId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L268)
+Defined in: packages/memory/src/tiers/working-memory.ts:268
 
 Detach a working block from an agent.
 
@@ -235,7 +235,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L205)
+Defined in: packages/memory/src/tiers/working-memory.ts:205
 
 Soft-delete a block.
 
@@ -259,7 +259,7 @@ Soft-delete a block.
 list(scope): Promise<readonly Block[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L133)
+Defined in: packages/memory/src/tiers/working-memory.ts:133
 
 List active (non-deleted) blocks for the supplied scope.
 
@@ -281,7 +281,7 @@ List active (non-deleted) blocks for the supplied scope.
 purge(scope, label): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L227)
+Defined in: packages/memory/src/tiers/working-memory.ts:227
 
 Hard-delete a block (wave-D D2, GDPR path). Unlike [forget](/api/@graphorin/memory/classes/WorkingMemory.md#forget)
 (soft tombstone), the stored value is gone. This is the erasure
@@ -311,7 +311,7 @@ misreport erasure.
 read(scope, label): Promise<string | null>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L142)
+Defined in: packages/memory/src/tiers/working-memory.ts:142
 
 Read a single block's value (or `null` when absent).
 
@@ -338,7 +338,7 @@ replace(
 newText): Promise<Block>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L179)
+Defined in: packages/memory/src/tiers/working-memory.ts:179
 
 Replace the unique substring `oldUnique` inside the block's value
 with `newText`. Throws `WorkingBlockReplaceMismatchError` when
@@ -368,7 +368,7 @@ rethink(
 mutator): Promise<Block>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L196)
+Defined in: packages/memory/src/tiers/working-memory.ts:196
 
 Run `mutator(current) => next` and persist the result.
 
@@ -395,7 +395,7 @@ write(
 value): Promise<Block>;
 ```
 
-Defined in: [packages/memory/src/tiers/working-memory.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/working-memory.ts#L162)
+Defined in: packages/memory/src/tiers/working-memory.ts:162
 
 Replace a block's value entirely. Honours overflow policy.
 

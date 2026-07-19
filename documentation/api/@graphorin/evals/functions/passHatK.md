@@ -14,7 +14,9 @@ function passHatK(outcomes): {
 };
 ```
 
-Defined in: [packages/evals/src/stats.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L99)
+Defined in: packages/evals/src/stats.ts:99
+
+**`Stable`**
 
 pass^k over per-iteration case outcomes: group by base case id and
 report the fraction of base cases whose EVERY iteration passed.
@@ -40,8 +42,6 @@ report the fraction of base cases whose EVERY iteration passed.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `baseCases` | `number` | [packages/evals/src/stats.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L101) |
-| `k` | `number` | [packages/evals/src/stats.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L101) |
-| `value` | `number` | [packages/evals/src/stats.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L101) |
-
-## Stable
+| `baseCases` | `number` | packages/evals/src/stats.ts:101 |
+| `k` | `number` | packages/evals/src/stats.ts:101 |
+| `value` | `number` | packages/evals/src/stats.ts:101 |

@@ -12,7 +12,7 @@ function normalizeInducedProcedure(raw):
   | null;
 ```
 
-Defined in: [packages/memory/src/consolidator/phases/induce.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L198)
+Defined in: packages/memory/src/consolidator/phases/induce.ts:198
 
 **`Internal`**
 

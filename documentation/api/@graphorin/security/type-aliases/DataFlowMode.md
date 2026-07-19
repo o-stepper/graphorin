@@ -10,7 +10,9 @@
 type DataFlowMode = "off" | "shadow" | "enforce";
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L38)
+Defined in: packages/security/src/dataflow/types.ts:38
+
+**`Stable`**
 
 Operating mode for [DataFlowPolicy](/api/@graphorin/security/interfaces/DataFlowPolicy.md).
 
@@ -22,5 +24,3 @@ Operating mode for [DataFlowPolicy](/api/@graphorin/security/interfaces/DataFlow
   positives against real traffic before enforcing.
 - `'enforce'` - tainted flows are *blocked* (the sink does not run)
   unless the sink is operator-declassified.
-
-## Stable

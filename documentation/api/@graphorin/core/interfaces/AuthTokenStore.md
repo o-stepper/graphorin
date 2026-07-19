@@ -6,13 +6,13 @@
 
 # Interface: AuthTokenStore
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L30)
+Defined in: packages/core/src/contracts/auth-token-store.ts:30
+
+**`Stable`**
 
 Pluggable storage for server auth tokens. The default implementation
 lives in `@graphorin/store-sqlite` (`auth_tokens` table). The server
 package implements `verifyToken(...)` on top of this contract.
-
-## Stable
 
 ## Methods
 
@@ -24,7 +24,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L32)
+Defined in: packages/core/src/contracts/auth-token-store.ts:32
 
 #### Parameters
 
@@ -48,7 +48,7 @@ optional getByHash(hashHex): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L41)
+Defined in: packages/core/src/contracts/auth-token-store.ts:41
 
 Indexed lookup by HMAC hash (SPL-19). When present, the verifier
 uses it on cache-miss instead of walking `list()` - O(1) instead of
@@ -74,7 +74,7 @@ an O(n) full-table scan per verification.
 list(): Promise<readonly AuthTokenRecord[]>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L33)
+Defined in: packages/core/src/contracts/auth-token-store.ts:33
 
 #### Returns
 
@@ -88,7 +88,7 @@ Defined in: [packages/core/src/contracts/auth-token-store.ts:33](https://github.
 put(record): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L31)
+Defined in: packages/core/src/contracts/auth-token-store.ts:31
 
 #### Parameters
 
@@ -108,7 +108,7 @@ Defined in: [packages/core/src/contracts/auth-token-store.ts:31](https://github.
 recordUse(id, usedAt): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L35)
+Defined in: packages/core/src/contracts/auth-token-store.ts:35
 
 #### Parameters
 
@@ -129,7 +129,7 @@ Defined in: [packages/core/src/contracts/auth-token-store.ts:35](https://github.
 revoke(id, revokedAt): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/auth-token-store.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/auth-token-store.ts#L34)
+Defined in: packages/core/src/contracts/auth-token-store.ts:34
 
 #### Parameters
 

@@ -10,7 +10,9 @@
 function defaultRerankerDtype(device): RerankerDtype;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L36)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:36
+
+**`Stable`**
 
 Device-aware default precision. The fp16 ONNX exports of the default
 BGE rerankers fail session initialisation on the onnxruntime-node CPU
@@ -27,5 +29,3 @@ so the CPU default is the q8 quantization; non-CPU devices
 ## Returns
 
 [`RerankerDtype`](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md)
-
-## Stable

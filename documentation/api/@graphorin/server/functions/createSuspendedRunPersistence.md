@@ -10,7 +10,9 @@
 function createSuspendedRunPersistence(options): SuspendedRunPersistenceHooks;
 ```
 
-Defined in: [packages/server/src/runtime/suspended-run-persistence.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/suspended-run-persistence.ts#L58)
+Defined in: packages/server/src/runtime/suspended-run-persistence.ts:58
+
+**`Stable`**
 
 Build the [SuspendedRunPersistenceHooks](/api/@graphorin/server/interfaces/SuspendedRunPersistenceHooks.md) delegate the server
 installs via `runs.setSuspendedRunPersistence(...)`.
@@ -24,5 +26,3 @@ installs via `runs.setSuspendedRunPersistence(...)`.
 ## Returns
 
 [`SuspendedRunPersistenceHooks`](/api/@graphorin/server/interfaces/SuspendedRunPersistenceHooks.md)
-
-## Stable

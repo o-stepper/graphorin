@@ -10,7 +10,9 @@
 function isAwakeablePauseValue(value): value is AwakeablePauseValue;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L100)
+Defined in: packages/core/src/channels/durable.ts:100
+
+**`Stable`**
 
 Type guard for [AwakeablePauseValue](/api/@graphorin/core/interfaces/AwakeablePauseValue.md).
 
@@ -23,5 +25,3 @@ Type guard for [AwakeablePauseValue](/api/@graphorin/core/interfaces/AwakeablePa
 ## Returns
 
 `value is AwakeablePauseValue`
-
-## Stable

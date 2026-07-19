@@ -6,18 +6,18 @@
 
 # Interface: MigrationRow
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L152)
+Defined in: packages/memory/src/migration/embedder-migration.ts:152
+
+**`Stable`**
 
 Single row exposed to the migration runner. The runner re-embeds
 `text` with the target embedder; the storage adapter is responsible
 for committing the new vector + updating `embedder_id`.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/memory/src/migration/embedder-migration.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L153) |
-| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/memory/src/migration/embedder-migration.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L154) |
-| <a id="property-write"></a> `write` | `readonly` | (`vector`) => `Promise`\&lt;`void`\&gt; | [packages/memory/src/migration/embedder-migration.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L155) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/migration/embedder-migration.ts:153 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/memory/src/migration/embedder-migration.ts:154 |
+| <a id="property-write"></a> `write` | `readonly` | (`vector`) => `Promise`\&lt;`void`\&gt; | packages/memory/src/migration/embedder-migration.ts:155 |

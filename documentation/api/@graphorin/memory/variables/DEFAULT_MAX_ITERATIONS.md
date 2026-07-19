@@ -10,6 +10,6 @@
 const DEFAULT_MAX_ITERATIONS: 3 = 3;
 ```
 
-Defined in: [packages/memory/src/search/iterative.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L39)
+Defined in: packages/memory/src/search/iterative.ts:39
 
 Default hard ceiling on total retrieval passes (gate + cap mandatory).

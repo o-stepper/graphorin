@@ -10,7 +10,7 @@
 function _resetMemoryGuardAuditListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/guard/audit-emitter.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L107)
+Defined in: packages/security/src/guard/audit-emitter.ts:107
 
 **`Experimental`**
 

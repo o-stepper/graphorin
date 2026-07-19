@@ -10,7 +10,9 @@
 function announceTelemetryPosture(opts?): readonly string[];
 ```
 
-Defined in: [packages/observability/src/telemetry/index.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/telemetry/index.ts#L74)
+Defined in: packages/observability/src/telemetry/index.ts:74
+
+**`Stable`**
 
 Detect the reserved env vars and emit one informational line per
 process. Returns the lines as an array so callers can route them to
@@ -27,5 +29,3 @@ any sink they like (defaults to `console.info`).
 ## Returns
 
 readonly `string`[]
-
-## Stable

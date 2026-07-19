@@ -12,7 +12,9 @@ function runPricingLookup(options):
   | null;
 ```
 
-Defined in: [packages/cli/src/commands/pricing.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L208)
+Defined in: packages/cli/src/commands/pricing.ts:208
+
+**`Stable`**
 
 ## Parameters
 
@@ -24,5 +26,3 @@ Defined in: [packages/cli/src/commands/pricing.ts:208](https://github.com/o-step
 
   \| [`LookupPriceResult`](/api/@graphorin/pricing/interfaces/LookupPriceResult.md)
   \| `null`
-
-## Stable

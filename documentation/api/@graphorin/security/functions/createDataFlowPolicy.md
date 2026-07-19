@@ -10,7 +10,9 @@
 function createDataFlowPolicy(config): DataFlowPolicy;
 ```
 
-Defined in: [packages/security/src/dataflow/policy.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/policy.ts#L58)
+Defined in: packages/security/src/dataflow/policy.ts:58
+
+**`Stable`**
 
 Build a [DataFlowPolicy](/api/@graphorin/security/interfaces/DataFlowPolicy.md) from config.
 
@@ -35,5 +37,3 @@ Decision procedure for a sink call:
 ## Returns
 
 [`DataFlowPolicy`](/api/@graphorin/security/interfaces/DataFlowPolicy.md)
-
-## Stable

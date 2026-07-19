@@ -10,8 +10,8 @@
 type PromptRedactionScanScope = "all" | "untrusted" | "secret-value-only";
 ```
 
-Defined in: [packages/provider/src/middleware/with-redaction.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-redaction.ts#L52)
+Defined in: packages/provider/src/middleware/with-redaction.ts:52
+
+**`Stable`**
 
 Range of fields scanned by the middleware.
-
-## Stable

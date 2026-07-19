@@ -6,17 +6,17 @@
 
 # Interface: InjectionClassifier
 
-Defined in: [packages/security/dist/inspect/injection-classifier.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/inspect/injection-classifier.d.ts)
+Defined in: packages/security/dist/inspect/injection-classifier.d.ts:27
+
+**`Stable`**
 
 The pluggable classifier contract.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable engine id for audit rows, e.g. `'deberta-injection-v2'`. | [packages/security/dist/inspect/injection-classifier.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/inspect/injection-classifier.d.ts) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable engine id for audit rows, e.g. `'deberta-injection-v2'`. | packages/security/dist/inspect/injection-classifier.d.ts:29 |
 
 ## Methods
 
@@ -26,7 +26,7 @@ The pluggable classifier contract.
 classify(input): Promise<InjectionClassification>;
 ```
 
-Defined in: [packages/security/dist/inspect/injection-classifier.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/inspect/injection-classifier.d.ts)
+Defined in: packages/security/dist/inspect/injection-classifier.d.ts:30
 
 #### Parameters
 

@@ -10,7 +10,7 @@
 function tokenise(text, stopwords?): string[];
 ```
 
-Defined in: [packages/tools/src/registry/bm25.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/bm25.ts#L46)
+Defined in: packages/tools/src/registry/bm25.ts:46
 
 Tokenise a body - lowercase, alphanumeric runs only, drop stopwords.
 

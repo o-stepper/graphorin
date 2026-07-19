@@ -6,16 +6,16 @@
 
 # Interface: CipherIntegrityCheckResult
 
-Defined in: [packages/store-sqlite-encrypted/src/integrity-check.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/integrity-check.ts#L20)
+Defined in: packages/store-sqlite-encrypted/src/integrity-check.ts:20
+
+**`Stable`**
 
 Result of [cipherIntegrityCheck](/api/@graphorin/store-sqlite-encrypted/functions/cipherIntegrityCheck.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | Wall-clock duration of the pragma call in milliseconds. | [packages/store-sqlite-encrypted/src/integrity-check.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/integrity-check.ts#L26) |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | `true` when SQLite reported a single `'ok'` row. | [packages/store-sqlite-encrypted/src/integrity-check.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/integrity-check.ts#L22) |
-| <a id="property-rows"></a> `rows` | `readonly` | readonly `string`[] | Raw rows returned by `PRAGMA integrity_check`. | [packages/store-sqlite-encrypted/src/integrity-check.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/integrity-check.ts#L24) |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | Wall-clock duration of the pragma call in milliseconds. | packages/store-sqlite-encrypted/src/integrity-check.ts:26 |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | `true` when SQLite reported a single `'ok'` row. | packages/store-sqlite-encrypted/src/integrity-check.ts:22 |
+| <a id="property-rows"></a> `rows` | `readonly` | readonly `string`[] | Raw rows returned by `PRAGMA integrity_check`. | packages/store-sqlite-encrypted/src/integrity-check.ts:24 |

@@ -10,7 +10,9 @@
 function createSqliteSpanExporter(conn, options?): TraceExporter;
 ```
 
-Defined in: [packages/store-sqlite/src/span-store.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/span-store.ts#L53)
+Defined in: packages/store-sqlite/src/span-store.ts:53
+
+**`Stable`**
 
 Build a `TraceExporter` that persists finished spans into the `spans` table.
 Each row records the `graphorin.session.id` attribute (when present) so a
@@ -27,5 +29,3 @@ session's spans can be read back in order.
 ## Returns
 
 [`TraceExporter`](/api/@graphorin/observability/interfaces/TraceExporter.md)
-
-## Stable

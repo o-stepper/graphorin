@@ -10,7 +10,9 @@
 function isUnbrandedToolReturn(value): boolean;
 ```
 
-Defined in: [packages/core/src/contracts/tool.ts:329](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L329)
+Defined in: packages/core/src/contracts/tool.ts:329
+
+**`Stable`**
 
 W-115: `true` when [isToolReturnEnvelope](/api/@graphorin/core/functions/isToolReturnEnvelope.md) matched WITHOUT the
 brand - observability for the future deprecation of the structural
@@ -25,5 +27,3 @@ sniff.
 ## Returns
 
 `boolean`
-
-## Stable

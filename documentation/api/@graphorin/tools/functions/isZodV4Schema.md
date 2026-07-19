@@ -10,7 +10,7 @@
 function isZodV4Schema(value): value is ZodV4Like;
 ```
 
-Defined in: [packages/tools/src/schema/to-json-schema.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L76)
+Defined in: packages/tools/src/schema/to-json-schema.ts:76
 
 `true` when `value` is a Zod **v4** schema instance. v4 instances carry a
 versioned `_zod` internals bag (they also carry `_def`, so this check

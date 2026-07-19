@@ -10,7 +10,9 @@
 function runAuthList(options?): Promise<readonly OAuthSessionMetadata[]>;
 ```
 
-Defined in: [packages/cli/src/commands/auth.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L114)
+Defined in: packages/cli/src/commands/auth.ts:114
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/auth.ts:114](https://github.com/o-stepper
 ## Returns
 
 `Promise`\&lt;readonly [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md)[]\&gt;
-
-## Stable

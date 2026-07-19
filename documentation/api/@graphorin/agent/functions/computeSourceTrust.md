@@ -10,7 +10,9 @@
 function computeSourceTrust(input, overrides?): number;
 ```
 
-Defined in: [packages/agent/src/lateral-leak/merge-guard.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/merge-guard.ts#L84)
+Defined in: packages/agent/src/lateral-leak/merge-guard.ts:84
+
+**`Stable`**
 
 Compose `baseline * provenance * historyAdjustment` and clamp.
 
@@ -24,5 +26,3 @@ Compose `baseline * provenance * historyAdjustment` and clamp.
 ## Returns
 
 `number`
-
-## Stable

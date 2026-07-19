@@ -6,14 +6,14 @@
 
 # Interface: ToolApprovalDeniedEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L232)
+Defined in: packages/core/src/types/agent-event.ts:232
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L235) |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:234](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L234) |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.denied"` | [packages/core/src/types/agent-event.ts:233](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L233) |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:235 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:234 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.denied"` | packages/core/src/types/agent-event.ts:233 |

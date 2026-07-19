@@ -10,7 +10,9 @@
 function llamaCppNodeAdapter(options): Provider;
 ```
 
-Defined in: [packages/provider-llamacpp-node/src/adapter.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/adapter.ts#L118)
+Defined in: src/adapter.ts:118
+
+**`Stable`**
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by an in-process GGUF
 model. The first call lazily loads the `node-llama-cpp` peer + the
@@ -25,5 +27,3 @@ model file; subsequent calls reuse the cached instances.
 ## Returns
 
 [`Provider`](/api/@graphorin/core/interfaces/Provider.md)
-
-## Stable

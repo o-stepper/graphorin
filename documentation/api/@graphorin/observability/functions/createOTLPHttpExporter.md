@@ -10,7 +10,9 @@
 function createOTLPHttpExporter(opts): TraceExporter;
 ```
 
-Defined in: [packages/observability/src/exporters/otlp-http.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/otlp-http.ts#L56)
+Defined in: packages/observability/src/exporters/otlp-http.ts:56
+
+**`Stable`**
 
 Build a minimal OTLP-over-HTTP trace exporter. Call
 `withValidation(exporter)` before passing the result to
@@ -29,5 +31,3 @@ with their own queue or use a sidecar collector.
 ## Returns
 
 [`TraceExporter`](/api/@graphorin/observability/interfaces/TraceExporter.md)
-
-## Stable

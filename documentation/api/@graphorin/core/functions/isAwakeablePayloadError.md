@@ -10,7 +10,9 @@
 function isAwakeablePayloadError(err): err is AwakeablePayloadError;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L196)
+Defined in: packages/core/src/channels/durable.ts:196
+
+**`Stable`**
 
 Structural guard for [AwakeablePayloadError](/api/@graphorin/core/classes/AwakeablePayloadError.md) - matches by
 `name` so the check survives duplicated module instances.
@@ -24,5 +26,3 @@ Structural guard for [AwakeablePayloadError](/api/@graphorin/core/classes/Awakea
 ## Returns
 
 `err is AwakeablePayloadError`
-
-## Stable

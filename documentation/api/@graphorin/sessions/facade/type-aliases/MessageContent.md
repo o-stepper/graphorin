@@ -15,7 +15,9 @@ type MessageContent =
   | ReasoningContent;
 ```
 
-Defined in: [packages/core/dist/types/message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts)
+Defined in: packages/core/dist/types/message.d.ts:15
+
+**`Stable`**
 
 A single multimodal content part attached to a chat-style message.
 
@@ -23,5 +25,3 @@ The discriminated union is exhaustive: every variant carries a literal
 `type` field used by both the runtime and the type system to pick the
 branch. New variants must be added to all three of: this union, every
 `assertNever` switch in the codebase, and the wire-stable adapters.
-
-## Stable

@@ -12,8 +12,8 @@ type ToolCassetteParsedRecord =
   | ToolCassetteUnknownRecord;
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L220)
+Defined in: packages/sessions/src/cassette/types.ts:220
+
+**`Stable`**
 
 Either a typed record or the unknown wrapper.
-
-## Stable

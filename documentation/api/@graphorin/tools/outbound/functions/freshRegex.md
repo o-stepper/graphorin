@@ -10,7 +10,9 @@
 function freshRegex(re): RegExp;
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:145](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L145)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:145
+
+**`Stable`**
 
 Clone a regex before every scan. RegExp instances with the `g`
 flag carry a mutable `lastIndex`; cloning keeps sanitizers built
@@ -25,5 +27,3 @@ over the shared catalogue stateless.
 ## Returns
 
 `RegExp`
-
-## Stable

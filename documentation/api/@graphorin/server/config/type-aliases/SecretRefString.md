@@ -10,12 +10,12 @@
 type SecretRefString = string;
 ```
 
-Defined in: [packages/server/src/config.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L29)
+Defined in: packages/server/src/config.ts:29
+
+**`Stable`**
 
 String literal that flags a value as a `SecretRef` URI. The
 server's pre-bind step resolves every `*Ref` field through the
 `@graphorin/security` resolver registry before binding the
 listener; an unresolvable ref fails fast with
 `PrebindSecretUnresolvableError`.
-
-## Stable

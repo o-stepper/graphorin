@@ -6,13 +6,13 @@
 
 # Class: EmbedderMigrationStateRepository
 
-Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedder-migration-support.ts#L49)
+Defined in: packages/store-sqlite/src/embedder-migration-support.ts:49
+
+**`Stable`**
 
 Persisted cursor store over `migration_state`. Structurally matches
 the runner's `MigrationStateStoreLike` contract in
 `@graphorin/memory` (the memory package never imports this class).
-
-## Stable
 
 ## Constructors
 
@@ -22,7 +22,7 @@ the runner's `MigrationStateStoreLike` contract in
 new EmbedderMigrationStateRepository(conn): EmbedderMigrationStateRepository;
 ```
 
-Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedder-migration-support.ts#L52)
+Defined in: packages/store-sqlite/src/embedder-migration-support.ts:52
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:52](https:/
 create(state): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedder-migration-support.ts#L96)
+Defined in: packages/store-sqlite/src/embedder-migration-support.ts:96
 
 Insert a fresh `running` row.
 
@@ -71,7 +71,7 @@ findResumable(sourceEmbedder, targetEmbedder): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedder-migration-support.ts#L57)
+Defined in: packages/store-sqlite/src/embedder-migration-support.ts:57
 
 The most recent RESUMABLE row (running/aborted) for the pair, or null.
 
@@ -96,7 +96,7 @@ The most recent RESUMABLE row (running/aborted) for the pair, or null.
 update(id, patch): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/embedder-migration-support.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedder-migration-support.ts#L120)
+Defined in: packages/store-sqlite/src/embedder-migration-support.ts:120
 
 Advance / settle the row.
 

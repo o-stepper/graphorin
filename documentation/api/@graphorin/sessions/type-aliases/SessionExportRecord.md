@@ -17,8 +17,8 @@ type SessionExportRecord =
   | SessionExportFooterRecord;
 ```
 
-Defined in: [packages/sessions/src/export/types.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L204)
+Defined in: packages/sessions/src/export/types.ts:204
+
+**`Stable`**
 
 Union of every record kind. Used by the writer + parser.
-
-## Stable

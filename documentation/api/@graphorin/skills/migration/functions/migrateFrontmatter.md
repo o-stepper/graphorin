@@ -10,7 +10,9 @@
 function migrateFrontmatter(skillMd, options?): MigrationResult;
 ```
 
-Defined in: [packages/skills/src/migration/index.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L58)
+Defined in: packages/skills/src/migration/index.ts:58
+
+**`Stable`**
 
 Migrate the bundled `deprecate-graphorin-prefix` mappings on a
 single SKILL.md. The function is idempotent: re-running it on an
@@ -27,5 +29,3 @@ already-migrated SKILL.md returns `changed: false` and an empty
 ## Returns
 
 [`MigrationResult`](/api/@graphorin/skills/migration/interfaces/MigrationResult.md)
-
-## Stable

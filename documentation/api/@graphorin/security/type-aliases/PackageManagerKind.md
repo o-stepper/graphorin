@@ -10,8 +10,8 @@
 type PackageManagerKind = "pnpm" | "npm" | "yarn";
 ```
 
-Defined in: [packages/security/src/supply-chain/package-manager.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L20)
+Defined in: packages/security/src/supply-chain/package-manager.ts:20
+
+**`Stable`**
 
 Discriminator for the resolved package manager.
-
-## Stable

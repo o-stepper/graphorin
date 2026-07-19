@@ -10,7 +10,9 @@
 function runAuthLogin(options): Promise<LoginInteractiveResult>;
 ```
 
-Defined in: [packages/cli/src/commands/auth.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L75)
+Defined in: packages/cli/src/commands/auth.ts:75
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/auth.ts:75](https://github.com/o-stepper/
 ## Returns
 
 `Promise`\&lt;[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\&gt;
-
-## Stable

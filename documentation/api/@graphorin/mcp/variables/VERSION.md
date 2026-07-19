@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/mcp/src/index.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/index.ts#L43)
+Defined in: packages/mcp/src/index.ts:43

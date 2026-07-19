@@ -10,7 +10,9 @@
 function runEval<I, O>(opts): Promise<EvalReport<I, O>>;
 ```
 
-Defined in: [packages/observability/src/eval/runner.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/eval/runner.ts#L25)
+Defined in: packages/observability/src/eval/runner.ts:25
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/observability/src/eval/runner.ts:25](https://github.com/o-
 ## Returns
 
 `Promise`\<[`EvalReport`](/api/@graphorin/observability/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
-
-## Stable

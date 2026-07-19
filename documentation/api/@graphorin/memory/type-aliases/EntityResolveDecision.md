@@ -24,10 +24,10 @@ type EntityResolveDecision =
 };
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L47)
+Defined in: packages/memory/src/graph/entity-resolver.ts:47
+
+**`Stable`**
 
 Outcome of the pure resolution policy. `match` reuses an existing
 entity; `ambiguous` flags a middle-similarity candidate for the caller
 to adjudicate (or conservatively reject); `new` mints a fresh entity.
-
-## Stable

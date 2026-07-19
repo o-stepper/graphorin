@@ -10,11 +10,11 @@
 const AMBIGUOUS_PARAMETER_NAMES: ReadonlyArray<string>;
 ```
 
-Defined in: [packages/eslint-plugin/src/tool-discovery.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L156)
+Defined in: src/tool-discovery.ts:156
+
+**`Stable`**
 
 Generic identifiers the parameter-naming rule flags as ambiguous.
 Tools whose `inputSchema` references only specific identifiers
 (e.g. `userId`, `recipientEmail`, `apiKey`) get full credit on
 the naming axis.
-
-## Stable

@@ -12,7 +12,9 @@ type WorkflowNodeRun<TState> = (state, ctx) =>
 | NodeRunResult<TState>;
 ```
 
-Defined in: [packages/workflow/src/types.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L204)
+Defined in: packages/workflow/src/types.ts:204
+
+**`Stable`**
 
 Per-node run callback.
 
@@ -33,5 +35,3 @@ Per-node run callback.
 
   \| `Promise`\<[`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;\>
   \| [`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;
-
-## Stable

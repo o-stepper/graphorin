@@ -10,6 +10,6 @@
 const AWAKEABLE_PAUSE_KIND: "graphorin.awakeable";
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L33)
+Defined in: packages/core/src/channels/durable.ts:33
 
 Reserved pause-value kind for awakeables / durable promises (D1).

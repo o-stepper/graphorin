@@ -10,6 +10,6 @@
 const TOKEN_ENVIRONMENTS: ReadonlyArray<TokenEnvironment>;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L67)
+Defined in: packages/security/src/auth/token-format.ts:67
 
 Canonical accepted environments. Frozen so callers cannot mutate it.

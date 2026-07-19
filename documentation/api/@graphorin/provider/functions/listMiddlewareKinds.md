@@ -10,7 +10,9 @@
 function listMiddlewareKinds(provider): readonly string[];
 ```
 
-Defined in: [packages/provider/src/middleware/compose.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L100)
+Defined in: packages/provider/src/middleware/compose.ts:100
+
+**`Stable`**
 
 Walk the middleware chain inside `provider` and return the array of
 declared kinds (outer → inner).
@@ -24,5 +26,3 @@ declared kinds (outer → inner).
 ## Returns
 
 readonly `string`[]
-
-## Stable

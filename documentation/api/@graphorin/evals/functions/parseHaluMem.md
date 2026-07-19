@@ -10,7 +10,9 @@
 function parseHaluMem(text, stage): readonly Case<MemoryOperationsEvalInput, MemoryOperationsObservation, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: [packages/evals/src/loaders/halumem.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/halumem.ts#L101)
+Defined in: packages/evals/src/loaders/halumem.ts:101
+
+**`Stable`**
 
 Pure parser. Exported so tests can exercise the mapping without
 touching the filesystem.
@@ -25,5 +27,3 @@ touching the filesystem.
 ## Returns
 
 readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<[`MemoryOperationsEvalInput`](/api/@graphorin/evals/interfaces/MemoryOperationsEvalInput.md), [`MemoryOperationsObservation`](/api/@graphorin/evals/interfaces/MemoryOperationsObservation.md), `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
-
-## Stable

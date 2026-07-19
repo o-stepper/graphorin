@@ -10,7 +10,9 @@
 function base64ToBytes(data): Uint8Array;
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L191)
+Defined in: packages/core/src/utils/binary-json.ts:191
+
+**`Stable`**
 
 Decode standard base64 (padding optional). Throws on characters
 outside the base64 alphabet.
@@ -24,5 +26,3 @@ outside the base64 alphabet.
 ## Returns
 
 `Uint8Array`
-
-## Stable

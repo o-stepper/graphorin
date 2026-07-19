@@ -10,7 +10,9 @@
 function runMigrate(options?): Promise<MigrateCommandResult>;
 ```
 
-Defined in: [packages/cli/src/commands/migrate.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L37)
+Defined in: packages/cli/src/commands/migrate.ts:37
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/migrate.ts:37](https://github.com/o-stepp
 ## Returns
 
 `Promise`\&lt;[`MigrateCommandResult`](/api/@graphorin/cli/interfaces/MigrateCommandResult.md)\&gt;
-
-## Stable

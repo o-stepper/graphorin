@@ -6,7 +6,9 @@
 
 # Interface: Logger
 
-Defined in: [packages/core/src/contracts/logger.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L32)
+Defined in: packages/core/src/contracts/logger.ts:32
+
+**`Stable`**
 
 Pluggable logger contract consumed by every `@graphorin/*` runtime
 package. The concrete implementation lives in `@graphorin/observability`
@@ -18,8 +20,6 @@ type contract: the `info(msg, fields?)` signature is a hint, not a
 mandate to actually emit anything. Implementations may sample, drop, or
 batch.
 
-## Stable
-
 ## Methods
 
 ### child()
@@ -28,7 +28,7 @@ batch.
 child(fields): Logger;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L43)
+Defined in: packages/core/src/contracts/logger.ts:43
 
 Return a child logger with `fields` merged into every record's
 structured payload. Useful for binding `runId` / `sessionId` /
@@ -52,7 +52,7 @@ structured payload. Useful for binding `runId` / `sessionId` /
 debug(message, fields?): void;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L34)
+Defined in: packages/core/src/contracts/logger.ts:34
 
 #### Parameters
 
@@ -73,7 +73,7 @@ Defined in: [packages/core/src/contracts/logger.ts:34](https://github.com/o-step
 error(message, fields?): void;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L37)
+Defined in: packages/core/src/contracts/logger.ts:37
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: [packages/core/src/contracts/logger.ts:37](https://github.com/o-step
 info(message, fields?): void;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L35)
+Defined in: packages/core/src/contracts/logger.ts:35
 
 #### Parameters
 
@@ -115,7 +115,7 @@ Defined in: [packages/core/src/contracts/logger.ts:35](https://github.com/o-step
 trace(message, fields?): void;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L33)
+Defined in: packages/core/src/contracts/logger.ts:33
 
 #### Parameters
 
@@ -136,7 +136,7 @@ Defined in: [packages/core/src/contracts/logger.ts:33](https://github.com/o-step
 warn(message, fields?): void;
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L36)
+Defined in: packages/core/src/contracts/logger.ts:36
 
 #### Parameters
 

@@ -10,7 +10,9 @@
 function installSkillFromNpm(options): Promise<SkillInstallationStatus>;
 ```
 
-Defined in: [packages/security/src/supply-chain/installer.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/installer.ts#L78)
+Defined in: packages/security/src/supply-chain/installer.ts:78
+
+**`Stable`**
 
 Install a skill from the npm registry.
 
@@ -23,5 +25,3 @@ Install a skill from the npm registry.
 ## Returns
 
 `Promise`\&lt;[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\&gt;
-
-## Stable

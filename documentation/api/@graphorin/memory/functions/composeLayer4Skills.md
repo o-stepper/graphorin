@@ -10,7 +10,7 @@
 function composeLayer4Skills(cards): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/templates/composer.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L58)
+Defined in: packages/memory/src/context-engine/templates/composer.ts:58
 
 ## Parameters
 

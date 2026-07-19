@@ -6,9 +6,9 @@
 
 # Interface: Scorer\&lt;I, O\&gt;
 
-Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
+Defined in: packages/observability/dist/eval/types.d.ts:46
 
-## Stable
+**`Stable`**
 
 ## Type Parameters
 
@@ -21,7 +21,7 @@ Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-s
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/observability/dist/eval/types.d.ts:47 |
 
 ## Methods
 
@@ -31,7 +31,7 @@ Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-s
 score(args): Promise<ScoreResult>;
 ```
 
-Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
+Defined in: packages/observability/dist/eval/types.d.ts:48
 
 #### Parameters
 

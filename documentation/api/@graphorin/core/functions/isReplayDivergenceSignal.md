@@ -10,7 +10,9 @@
 function isReplayDivergenceSignal(err): err is ReplayDivergenceSignal;
 ```
 
-Defined in: [packages/core/src/channels/pause.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/pause.ts#L86)
+Defined in: packages/core/src/channels/pause.ts:86
+
+**`Stable`**
 
 Cross-realm safe type guard for [ReplayDivergenceSignal](/api/@graphorin/core/classes/ReplayDivergenceSignal.md).
 
@@ -23,5 +25,3 @@ Cross-realm safe type guard for [ReplayDivergenceSignal](/api/@graphorin/core/cl
 ## Returns
 
 `err is ReplayDivergenceSignal`
-
-## Stable

@@ -6,7 +6,9 @@
 
 # Interface: PairingPeerRef
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L14)
+Defined in: packages/core/src/contracts/pairing-store.ts:14
+
+**`Stable`**
 
 Channel pairing persistence. Backs the default `'pairing'` access
 policy of the channel gateway (`@graphorin/channels`): an unknown
@@ -18,8 +20,6 @@ The peer reference triple mirrors `ChannelIdentity` from
 `@graphorin/channels` structurally (core takes no dependency on
 the channels package).
 
-## Stable
-
 ## Extended by
 
 - [`PairedPeerRecord`](/api/@graphorin/core/interfaces/PairedPeerRecord.md)
@@ -29,6 +29,6 @@ the channels package).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-accountid"></a> `accountId` | `readonly` | `string` | [packages/core/src/contracts/pairing-store.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L16) |
-| <a id="property-channelid"></a> `channelId` | `readonly` | `string` | [packages/core/src/contracts/pairing-store.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L15) |
-| <a id="property-peerid"></a> `peerId` | `readonly` | `string` | [packages/core/src/contracts/pairing-store.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L17) |
+| <a id="property-accountid"></a> `accountId` | `readonly` | `string` | packages/core/src/contracts/pairing-store.ts:16 |
+| <a id="property-channelid"></a> `channelId` | `readonly` | `string` | packages/core/src/contracts/pairing-store.ts:15 |
+| <a id="property-peerid"></a> `peerId` | `readonly` | `string` | packages/core/src/contracts/pairing-store.ts:17 |

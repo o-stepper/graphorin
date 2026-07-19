@@ -10,6 +10,6 @@
 type ReplayMode = "sanitized" | "raw";
 ```
 
-Defined in: [packages/server/src/replay/routes.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/replay/routes.ts#L32)
+Defined in: packages/server/src/replay/routes.ts:32
 
-## Stable
+**`Stable`**

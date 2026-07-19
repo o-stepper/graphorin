@@ -10,6 +10,6 @@
 const SPILL_HANDLE_SCHEME: "graphorin-spill:" = 'graphorin-spill:';
 ```
 
-Defined in: [packages/tools/src/result/reader.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/result/reader.ts#L24)
+Defined in: packages/tools/src/result/reader.ts:24
 
 The only handle scheme this reader resolves.

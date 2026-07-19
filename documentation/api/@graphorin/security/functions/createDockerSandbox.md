@@ -10,7 +10,9 @@
 function createDockerSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: [packages/security/src/sandbox/docker.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/docker.ts#L105)
+Defined in: packages/security/src/sandbox/docker.ts:105
+
+**`Stable`**
 
 Construct a `DockerSandbox` instance. The adapter resolves the
 peer dependency lazily on the first `run(...)` call.
@@ -24,5 +26,3 @@ peer dependency lazily on the first `run(...)` call.
 ## Returns
 
 [`SandboxImpl`](/api/@graphorin/security/interfaces/SandboxImpl.md)
-
-## Stable

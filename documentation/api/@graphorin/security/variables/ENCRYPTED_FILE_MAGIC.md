@@ -10,7 +10,9 @@
 const ENCRYPTED_FILE_MAGIC: 16777216 = 0x01_00_00_00;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/encrypted-file.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/encrypted-file.ts#L34)
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:34
+
+**`Stable`**
 
 On-disk format of an encrypted bundle:
 
@@ -29,5 +31,3 @@ The bundle is read end-to-end, decrypted with the passphrase derived
 via Argon2id, and the requested fragment (`#field`) is selected from
 the values map. JSON-pointer style fragments (`#/path/to/field`) are
 supported for nested objects (post-MVP).
-
-## Stable

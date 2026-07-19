@@ -10,7 +10,7 @@
 function enforceSecretAcl(key): void;
 ```
 
-Defined in: [packages/security/src/secrets/acl.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L78)
+Defined in: packages/security/src/secrets/acl.ts:78
 
 ## Parameters
 

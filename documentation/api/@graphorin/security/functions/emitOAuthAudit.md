@@ -10,7 +10,9 @@
 function emitOAuthAudit(event): void;
 ```
 
-Defined in: [packages/security/src/oauth/audit-emitter.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/audit-emitter.ts#L86)
+Defined in: packages/security/src/oauth/audit-emitter.ts:86
+
+**`Stable`**
 
 Emit an event to every subscriber. Listeners that throw are
 isolated - a faulty listener never tears down the OAuth fast
@@ -25,5 +27,3 @@ path.
 ## Returns
 
 `void`
-
-## Stable

@@ -10,7 +10,9 @@
 function registerMigration(migration): void;
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/registry.ts:185](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/registry.ts#L185)
+Defined in: packages/store-sqlite/src/migrations/registry.ts:185
+
+**`Stable`**
 
 Register a runtime-supplied migration. Used by downstream packages
 that want to ship their schema alongside the bundled set without
@@ -25,5 +27,3 @@ forking this package.
 ## Returns
 
 `void`
-
-## Stable

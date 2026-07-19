@@ -29,12 +29,12 @@ type ReconcileDecision =
 };
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L243)
+Defined in: packages/memory/src/conflict/types.ts:243
+
+**`Stable`**
 
 Outcome of `reconcileCandidate`. `add` is independent / unsure
 (a fresh fact); `noop` is a duplicate that adds nothing; `update` is
 a newer version of `targetId`; `conflict` contradicts `targetId` and
 closes it. The three neighbour-referencing variants carry the
 `targetId` of the existing fact they resolve against.
-
-## Stable

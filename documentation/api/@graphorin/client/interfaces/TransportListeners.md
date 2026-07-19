@@ -6,13 +6,13 @@
 
 # Interface: TransportListeners
 
-Defined in: [packages/client/src/transport/types.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L64)
+Defined in: packages/client/src/transport/types.ts:64
+
+**`Stable`**
 
 Minimal listener surface the transport invokes in lifecycle order:
 `onOpen` ⇒ `onFrame*` (zero or more) ⇒ `onClose`. `onError` may
 fire at any time before `onClose`.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ fire at any time before `onClose`.
 onClose(reason): void;
 ```
 
-Defined in: [packages/client/src/transport/types.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L68)
+Defined in: packages/client/src/transport/types.ts:68
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/client/src/transport/types.ts:68](https://github.com/o-ste
 onError(error): void;
 ```
 
-Defined in: [packages/client/src/transport/types.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L67)
+Defined in: packages/client/src/transport/types.ts:67
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: [packages/client/src/transport/types.ts:67](https://github.com/o-ste
 onFrame(frame): void;
 ```
 
-Defined in: [packages/client/src/transport/types.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L66)
+Defined in: packages/client/src/transport/types.ts:66
 
 #### Parameters
 
@@ -82,7 +82,7 @@ Defined in: [packages/client/src/transport/types.ts:66](https://github.com/o-ste
 onOpen(): void;
 ```
 
-Defined in: [packages/client/src/transport/types.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L65)
+Defined in: packages/client/src/transport/types.ts:65
 
 #### Returns
 

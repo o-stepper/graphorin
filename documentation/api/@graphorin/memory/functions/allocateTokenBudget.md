@@ -14,7 +14,9 @@ function allocateTokenBudget(
 options?): Promise<AllocationResult>;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-budget.ts:214](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-budget.ts#L214)
+Defined in: packages/memory/src/context-engine/token-budget.ts:214
+
+**`Stable`**
 
 Run the allocator. Layers are sorted by priority ascending (the
 first layer is the highest priority); when the running total
@@ -36,5 +38,3 @@ whatever fits.
 ## Returns
 
 `Promise`\&lt;[`AllocationResult`](/api/@graphorin/memory/interfaces/AllocationResult.md)\&gt;
-
-## Stable

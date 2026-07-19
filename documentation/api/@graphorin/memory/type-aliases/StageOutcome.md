@@ -34,10 +34,10 @@ type StageOutcome =
 };
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L161)
+Defined in: packages/memory/src/conflict/types.ts:161
+
+**`Stable`**
 
 Per-stage outcome surfaced to the orchestrator. `'admit'` means the
 stage decided not to short-circuit - the pipeline continues to the
 next stage. Every other variant terminates the pipeline.
-
-## Stable

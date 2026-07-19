@@ -15,7 +15,9 @@ type MemoryGuardTier =
   | "untrusted";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L34)
+Defined in: packages/core/src/types/tool.ts:34
+
+**`Stable`**
 
 Memory-modification guard tier requested for a tool's `execute` method.
 
@@ -33,5 +35,3 @@ security package.
   the audit-only baseline.
 - `'untrusted'`                - third-party / untrusted skill code;
   the runtime forces the strictest snapshot policy.
-
-## Stable

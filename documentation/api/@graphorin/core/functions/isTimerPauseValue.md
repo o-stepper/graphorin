@@ -10,7 +10,9 @@
 function isTimerPauseValue(value): value is TimerPauseValue;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L90)
+Defined in: packages/core/src/channels/durable.ts:90
+
+**`Stable`**
 
 Type guard for [TimerPauseValue](/api/@graphorin/core/interfaces/TimerPauseValue.md).
 
@@ -23,5 +25,3 @@ Type guard for [TimerPauseValue](/api/@graphorin/core/interfaces/TimerPauseValue
 ## Returns
 
 `value is TimerPauseValue`
-
-## Stable

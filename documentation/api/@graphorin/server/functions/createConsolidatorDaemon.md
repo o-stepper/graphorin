@@ -10,7 +10,9 @@
 function createConsolidatorDaemon(options): ConsolidatorDaemon;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L94)
+Defined in: packages/server/src/consolidator/daemon.ts:94
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/server/src/consolidator/daemon.ts:94](https://github.com/o
 ## Returns
 
 [`ConsolidatorDaemon`](/api/@graphorin/server/interfaces/ConsolidatorDaemon.md)
-
-## Stable

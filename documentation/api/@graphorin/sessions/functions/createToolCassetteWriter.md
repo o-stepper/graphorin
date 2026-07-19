@@ -10,7 +10,9 @@
 function createToolCassetteWriter(sink, options): ToolCassetteWriter;
 ```
 
-Defined in: [packages/sessions/src/cassette/writer.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/writer.ts#L63)
+Defined in: packages/sessions/src/cassette/writer.ts:63
+
+**`Stable`**
 
 Build a streaming writer.
 
@@ -24,5 +26,3 @@ Build a streaming writer.
 ## Returns
 
 [`ToolCassetteWriter`](/api/@graphorin/sessions/interfaces/ToolCassetteWriter.md)
-
-## Stable

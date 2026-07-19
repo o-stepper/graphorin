@@ -6,16 +6,16 @@
 
 # Interface: AgentSteeredEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:338](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L338)
+Defined in: packages/core/src/types/agent-event.ts:338
+
+**`Stable`**
 
 Emitted when `agent.steer(...)` queues an intervention to flow into
 the next provider call within the current run.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L340) |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | [packages/core/src/types/agent-event.ts:339](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L339) |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:340 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | packages/core/src/types/agent-event.ts:339 |

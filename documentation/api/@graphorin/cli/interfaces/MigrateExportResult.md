@@ -6,16 +6,16 @@
 
 # Interface: MigrateExportResult
 
-Defined in: [packages/cli/src/commands/migrate-export.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L52)
+Defined in: packages/cli/src/commands/migrate-export.ts:52
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-input"></a> `input` | `readonly` | `string` | [packages/cli/src/commands/migrate-export.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L53) |
-| <a id="property-output"></a> `output` | `readonly` | `string` | [packages/cli/src/commands/migrate-export.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L54) |
-| <a id="property-records"></a> `records` | `readonly` | `number` | [packages/cli/src/commands/migrate-export.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L57) |
-| <a id="property-schemain"></a> `schemaIn` | `readonly` | `string` | [packages/cli/src/commands/migrate-export.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L55) |
-| <a id="property-schemaout"></a> `schemaOut` | `readonly` | `string` | [packages/cli/src/commands/migrate-export.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate-export.ts#L56) |
+| <a id="property-input"></a> `input` | `readonly` | `string` | packages/cli/src/commands/migrate-export.ts:53 |
+| <a id="property-output"></a> `output` | `readonly` | `string` | packages/cli/src/commands/migrate-export.ts:54 |
+| <a id="property-records"></a> `records` | `readonly` | `number` | packages/cli/src/commands/migrate-export.ts:57 |
+| <a id="property-schemain"></a> `schemaIn` | `readonly` | `string` | packages/cli/src/commands/migrate-export.ts:55 |
+| <a id="property-schemaout"></a> `schemaOut` | `readonly` | `string` | packages/cli/src/commands/migrate-export.ts:56 |

@@ -10,7 +10,9 @@
 function defaultLocaleHeuristicStrategy(pack): AutoRecallStrategy;
 ```
 
-Defined in: [packages/memory/src/context-engine/auto-recall.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/auto-recall.ts#L51)
+Defined in: packages/memory/src/context-engine/auto-recall.ts:51
+
+**`Stable`**
 
 Build a locale-driven heuristic strategy. The default for every
 configured locale.
@@ -24,5 +26,3 @@ configured locale.
 ## Returns
 
 [`AutoRecallStrategy`](/api/@graphorin/memory/type-aliases/AutoRecallStrategy.md)
-
-## Stable

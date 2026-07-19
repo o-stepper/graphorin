@@ -10,9 +10,9 @@
 const DEFAULT_LAYER_PRIORITY: ReadonlyArray<LayerId>;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-budget.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-budget.ts#L48)
+Defined in: packages/memory/src/context-engine/token-budget.ts:48
+
+**`Stable`**
 
 Default priority ladder. Higher priority means the layer is
 preserved longer when the budget is tight.
-
-## Stable

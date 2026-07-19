@@ -6,13 +6,13 @@
 
 # Interface: Tracer
 
-Defined in: [packages/core/src/contracts/tracer.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L176)
+Defined in: packages/core/src/contracts/tracer.ts:176
+
+**`Stable`**
 
 Pluggable tracer. Implementations live in `@graphorin/observability`.
 The interface intentionally mirrors a subset of the OTel API so that
 adapter code is a thin pass-through.
-
-## Stable
 
 ## Extended by
 
@@ -26,7 +26,7 @@ adapter code is a thin pass-through.
 shutdown(): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L187)
+Defined in: packages/core/src/contracts/tracer.ts:187
 
 Force-flush any pending spans.
 
@@ -42,7 +42,7 @@ Force-flush any pending spans.
 span<T, R>(opts, fn): Promise<R>;
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L182)
+Defined in: packages/core/src/contracts/tracer.ts:182
 
 Convenience wrapper: start a span, run `fn` inside, and call
 `setStatus('ok' | 'error')` + `end()` based on the outcome.
@@ -73,7 +73,7 @@ Convenience wrapper: start a span, run `fn` inside, and call
 startSpan<T>(opts): AISpan<T>;
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L177)
+Defined in: packages/core/src/contracts/tracer.ts:177
 
 #### Type Parameters
 

@@ -10,8 +10,8 @@
 type ProactiveTaskSkipReason = "inactive-hours" | "fire-in-flight";
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L75)
+Defined in: packages/proactive/src/cron-task.ts:75
+
+**`Stable`**
 
 Why a fire produced no outcome.
-
-## Stable

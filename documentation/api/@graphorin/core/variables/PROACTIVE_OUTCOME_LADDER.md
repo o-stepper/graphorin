@@ -10,10 +10,10 @@
 const PROACTIVE_OUTCOME_LADDER: ReadonlyArray<ProactiveOutcomeKind>;
 ```
 
-Defined in: [packages/core/src/types/proactive.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/proactive.ts#L36)
+Defined in: packages/core/src/types/proactive.ts:36
+
+**`Stable`**
 
 The ladder in escalation order - the single source for rung
 comparisons (`indexOf` semantics; see
 [proactiveOutcomeWithinGrant](/api/@graphorin/core/functions/proactiveOutcomeWithinGrant.md)).
-
-## Stable

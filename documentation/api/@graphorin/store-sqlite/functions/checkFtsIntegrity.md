@@ -10,7 +10,9 @@
 function checkFtsIntegrity(conn): FtsIntegrityReport[];
 ```
 
-Defined in: [packages/store-sqlite/src/fts-integrity.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L76)
+Defined in: packages/store-sqlite/src/fts-integrity.ts:76
+
+**`Stable`**
 
 Count orphaned FTS rows (rowids with no matching base row) for every FTS
 table that exists. An empty array means every FTS index is consistent with
@@ -29,5 +31,3 @@ skipped rather than reported.
 ## Returns
 
 [`FtsIntegrityReport`](/api/@graphorin/store-sqlite/interfaces/FtsIntegrityReport.md)[]
-
-## Stable

@@ -10,7 +10,9 @@
 function requireHandoffInputFilter(metadata): HandoffInputFilterDeclaration;
 ```
 
-Defined in: [packages/skills/src/loader/index.ts:789](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/loader/index.ts#L789)
+Defined in: packages/skills/src/loader/index.ts:789
+
+**`Stable`**
 
 Required handoff-filter declaration helper. Returns the typed
 declaration the loader parsed from frontmatter; throws
@@ -27,5 +29,3 @@ before instantiating an untrusted skill's sub-agent.
 ## Returns
 
 [`HandoffInputFilterDeclaration`](/api/@graphorin/skills/type-aliases/HandoffInputFilterDeclaration.md)
-
-## Stable

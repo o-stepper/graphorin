@@ -10,7 +10,9 @@
 function computeAuditTreeHead(db, opts?): Promise<AuditTreeHead>;
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L142)
+Defined in: packages/security/src/audit/merkle.ts:142
+
+**`Stable`**
 
 Compute the current (or historical, via `toSeq`) Merkle tree head of
 the audit log.
@@ -26,5 +28,3 @@ the audit log.
 ## Returns
 
 `Promise`\&lt;[`AuditTreeHead`](/api/@graphorin/security/interfaces/AuditTreeHead.md)\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function verifySkillSignature(options): Promise<SkillSignatureVerificationResult>;
 ```
 
-Defined in: [packages/security/src/supply-chain/signature.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/signature.ts#L107)
+Defined in: packages/security/src/supply-chain/signature.ts:107
+
+**`Stable`**
 
 Verify the ed25519 signature embedded in `skillMd`. Returns a
 structured result instead of throwing for the validation outcome -
@@ -27,5 +29,3 @@ hierarchy.
 ## Returns
 
 `Promise`\&lt;[`SkillSignatureVerificationResult`](/api/@graphorin/security/interfaces/SkillSignatureVerificationResult.md)\&gt;
-
-## Stable

@@ -134,10 +134,18 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   const home = options.home ?? join(homedir(), '.graphorin');
   let expected: Readonly<Record<string, number>>;
   let configPath: string | undefined;
+  // P2-1 (deep retest 2026-07-19): a config-driven doctor must respect
+  // what the config turned OFF - `--all` on a fresh unencrypted init
+  // used to fail on the audit-encryption binding the disabled audit log
+  // never needs. Undefined (no config supplied) keeps the strict
+  // default-layout behaviour.
+  let auditEnabled: boolean | undefined;
   if (options.config !== undefined) {
     const loaded = await loadConfig(options.config);
     configPath = loaded.path;
-    expected = expectedFileModesForConfig(loaded.path, parseServerConfig(loaded.config));
+    const parsed = parseServerConfig(loaded.config);
+    auditEnabled = parsed.audit.enabled;
+    expected = expectedFileModesForConfig(loaded.path, parsed);
   } else {
     expected = expectedFileModes(home);
   }
@@ -183,7 +191,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   }
 
   if (enable.encryption) {
-    checks.push(...checkEncryption());
+    checks.push(...checkEncryption(auditEnabled !== undefined ? { auditEnabled } : {}));
   }
 
   if (enable.systemd) {

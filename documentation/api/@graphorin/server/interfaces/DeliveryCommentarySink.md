@@ -6,14 +6,14 @@
 
 # Interface: DeliveryCommentarySink
 
-Defined in: [packages/server/src/commentary/types.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L100)
+Defined in: packages/server/src/commentary/types.ts:100
+
+**`Stable`**
 
 Single audit + counter sink consumed by the sanitizer when a
 decision fires. Wiring is optional - operators that do not need
 audit telemetry can skip the sink and the sanitizer becomes a
 pure transform.
-
-## Stable
 
 ## Extended by
 
@@ -28,7 +28,7 @@ pure transform.
 onDecision(decision): void;
 ```
 
-Defined in: [packages/server/src/commentary/types.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L106)
+Defined in: packages/server/src/commentary/types.ts:106
 
 Called once per applied decision. Implementations should be
 non-throwing; the sanitizer wraps the call in `try/catch` so a

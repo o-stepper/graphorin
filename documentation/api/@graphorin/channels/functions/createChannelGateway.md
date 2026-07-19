@@ -10,7 +10,9 @@
 function createChannelGateway(options): ChannelGateway;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L176)
+Defined in: packages/channels/src/gateway.ts:176
+
+**`Stable`**
 
 Build the gateway. Throws [ChannelGatewayConfigError](/api/@graphorin/channels/classes/ChannelGatewayConfigError.md) on an
 empty adapter list or duplicate adapter ids - fail-closed at
@@ -25,5 +27,3 @@ construction.
 ## Returns
 
 [`ChannelGateway`](/api/@graphorin/channels/interfaces/ChannelGateway.md)
-
-## Stable

@@ -6,16 +6,16 @@
 
 # Interface: ReplayBufferSlice
 
-Defined in: [packages/server/src/ws/replay-buffer.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L32)
+Defined in: packages/server/src/ws/replay-buffer.ts:32
+
+**`Stable`**
 
 Snapshot returned by [ReplayBuffer.replay](/api/@graphorin/server/interfaces/ReplayBuffer.md#replay).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-droppedcount"></a> `droppedCount` | `readonly` | `number` | [packages/server/src/ws/replay-buffer.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L34) |
-| <a id="property-events"></a> `events` | `readonly` | readonly \{ `eventId`: `string`; `kind`: `"event"`; `payload?`: `unknown`; `subject`: `string`; `subscriptionId`: `string`; `type`: `string`; `v`: `"1"`; \}[] | [packages/server/src/ws/replay-buffer.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L33) |
-| <a id="property-nexteventidhint"></a> `nextEventIdHint` | `readonly` | `string` \| `undefined` | [packages/server/src/ws/replay-buffer.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/replay-buffer.ts#L35) |
+| <a id="property-droppedcount"></a> `droppedCount` | `readonly` | `number` | packages/server/src/ws/replay-buffer.ts:34 |
+| <a id="property-events"></a> `events` | `readonly` | readonly \{ `eventId`: `string`; `kind`: `"event"`; `payload?`: `unknown`; `subject`: `string`; `subscriptionId`: `string`; `type`: `string`; `v`: `"1"`; \}[] | packages/server/src/ws/replay-buffer.ts:33 |
+| <a id="property-nexteventidhint"></a> `nextEventIdHint` | `readonly` | `string` \| `undefined` | packages/server/src/ws/replay-buffer.ts:35 |

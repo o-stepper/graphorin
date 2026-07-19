@@ -6,7 +6,7 @@
 
 # Interface: BetterSqlite3Database
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L21)
+Defined in: packages/store-sqlite/src/driver-types.ts:21
 
 **`Internal`**
 
@@ -18,8 +18,8 @@ load to runtime and keep the module load free of side effects.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | [packages/store-sqlite/src/driver-types.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L42) |
-| <a id="property-open"></a> `open` | `readonly` | `boolean` | [packages/store-sqlite/src/driver-types.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L41) |
+| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:42 |
+| <a id="property-open"></a> `open` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:41 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ load to runtime and keep the module load free of side effects.
 backup(destinationPath): Promise<unknown>;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L38)
+Defined in: packages/store-sqlite/src/driver-types.ts:38
 
 Online page-level backup (store-02/05). Consistent under a live
 writer and preserves rowids (so FTS5 external-content mappings
@@ -53,7 +53,7 @@ survive - unlike `VACUUM INTO`).
 close(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L39)
+Defined in: packages/store-sqlite/src/driver-types.ts:39
 
 #### Returns
 
@@ -67,7 +67,7 @@ Defined in: [packages/store-sqlite/src/driver-types.ts:39](https://github.com/o-
 exec(query): void;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L23)
+Defined in: packages/store-sqlite/src/driver-types.ts:23
 
 #### Parameters
 
@@ -87,7 +87,7 @@ Defined in: [packages/store-sqlite/src/driver-types.ts:23](https://github.com/o-
 loadExtension(path): void;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L40)
+Defined in: packages/store-sqlite/src/driver-types.ts:40
 
 #### Parameters
 
@@ -107,7 +107,7 @@ Defined in: [packages/store-sqlite/src/driver-types.ts:40](https://github.com/o-
 pragma(query, options?): unknown;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L22)
+Defined in: packages/store-sqlite/src/driver-types.ts:22
 
 #### Parameters
 
@@ -129,7 +129,7 @@ Defined in: [packages/store-sqlite/src/driver-types.ts:22](https://github.com/o-
 prepare(query): BetterSqlite3Statement;
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L24)
+Defined in: packages/store-sqlite/src/driver-types.ts:24
 
 #### Parameters
 
@@ -153,7 +153,7 @@ transaction<T>(fn): T & {
 };
 ```
 
-Defined in: [packages/store-sqlite/src/driver-types.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L30)
+Defined in: packages/store-sqlite/src/driver-types.ts:30
 
 The returned wrapper also carries the `.deferred` / `.immediate` /
 `.exclusive` variants (store-06 uses `.immediate` for every write

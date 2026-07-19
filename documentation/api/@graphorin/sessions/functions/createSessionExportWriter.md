@@ -10,7 +10,9 @@
 function createSessionExportWriter(sink, options): SessionExportWriter;
 ```
 
-Defined in: [packages/sessions/src/export/writer.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L112)
+Defined in: packages/sessions/src/export/writer.ts:112
+
+**`Stable`**
 
 Build a writer that emits to the supplied sink.
 
@@ -24,5 +26,3 @@ Build a writer that emits to the supplied sink.
 ## Returns
 
 [`SessionExportWriter`](/api/@graphorin/sessions/interfaces/SessionExportWriter.md)
-
-## Stable

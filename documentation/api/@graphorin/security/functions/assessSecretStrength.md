@@ -10,7 +10,9 @@
 function assessSecretStrength(bytes, options?): SecretStrength;
 ```
 
-Defined in: [packages/security/src/hardening/weak-secret.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/weak-secret.ts#L51)
+Defined in: packages/security/src/hardening/weak-secret.ts:51
+
+**`Stable`**
 
 Assess the strength of a raw secret buffer. Pure: callers decide
 whether to throw or WARN on `ok === false`.
@@ -25,5 +27,3 @@ whether to throw or WARN on `ok === false`.
 ## Returns
 
 [`SecretStrength`](/api/@graphorin/security/interfaces/SecretStrength.md)
-
-## Stable

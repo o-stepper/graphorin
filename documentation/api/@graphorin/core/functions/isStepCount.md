@@ -10,7 +10,9 @@
 function isStepCount(n): StopCondition;
 ```
 
-Defined in: [packages/core/src/types/stop-condition.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L27)
+Defined in: packages/core/src/types/stop-condition.ts:27
+
+**`Stable`**
 
 Stop after `n` total steps (`stepNumber >= n`). The default condition
 for the agent runtime is `isStepCount(50)`.
@@ -24,5 +26,3 @@ for the agent runtime is `isStepCount(50)`.
 ## Returns
 
 [`StopCondition`](/api/@graphorin/core/interfaces/StopCondition.md)
-
-## Stable

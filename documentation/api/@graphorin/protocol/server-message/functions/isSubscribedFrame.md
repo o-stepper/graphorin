@@ -10,7 +10,9 @@
 function isSubscribedFrame(message): message is { kind: "subscribed"; snapshotEventId?: string; subject: string; subscriptionId: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L225)
+Defined in: src/server-message.ts:225
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:225](https://github.com/o-s
 ## Returns
 
 `message is { kind: "subscribed"; snapshotEventId?: string; subject: string; subscriptionId: string; v: "1" }`
-
-## Stable

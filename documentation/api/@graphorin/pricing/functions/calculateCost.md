@@ -15,7 +15,9 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: [packages/pricing/src/lookup.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L135)
+Defined in: pricing/src/lookup.ts:135
+
+**`Stable`**
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost
@@ -53,5 +55,3 @@ tokens at `inputUsdPerToken = 3e-6` cost `3` (three dollars).
   `currency`: `"USD"`;
 \}
   \| `null`
-
-## Stable

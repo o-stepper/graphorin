@@ -10,7 +10,7 @@
 function _resetSupplyChainAuditListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/supply-chain/audit-emitter.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L96)
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:96
 
 **`Experimental`**
 

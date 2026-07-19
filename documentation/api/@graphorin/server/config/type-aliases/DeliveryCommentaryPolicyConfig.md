@@ -10,6 +10,6 @@
 type DeliveryCommentaryPolicyConfig = "wrap" | "strip" | "pass-through";
 ```
 
-Defined in: [packages/server/src/config.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L43)
+Defined in: packages/server/src/config.ts:43
 
-## Stable
+**`Stable`**

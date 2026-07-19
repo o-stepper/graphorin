@@ -10,7 +10,9 @@
 function createDefaultOpCli(): OpCli;
 ```
 
-Defined in: [packages/secret-1password/src/op-cli.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/op-cli.ts#L109)
+Defined in: packages/secret-1password/src/op-cli.ts:109
+
+**`Stable`**
 
 Default [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) implementation. Spawns `op read --no-color
 --reveal '&lt;uri&gt;'` with the configured timeout and inherits the
@@ -19,5 +21,3 @@ parent environment.
 ## Returns
 
 [`OpCli`](/api/@graphorin/secret-1password/interfaces/OpCli.md)
-
-## Stable

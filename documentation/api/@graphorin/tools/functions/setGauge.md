@@ -13,7 +13,9 @@ function setGauge(
    labels?): void;
 ```
 
-Defined in: [packages/tools/src/audit/counters.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L75)
+Defined in: packages/tools/src/audit/counters.ts:75
+
+**`Stable`**
 
 Set a gauge value. Used for one-shot signals like the
 `tool.result.truncation.first-overrun{toolName}` per-tool flag.
@@ -29,5 +31,3 @@ Set a gauge value. Used for one-shot signals like the
 ## Returns
 
 `void`
-
-## Stable

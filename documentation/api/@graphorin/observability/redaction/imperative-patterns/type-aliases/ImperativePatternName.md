@@ -20,10 +20,10 @@ type ImperativePatternName =
   | "untrusted-content-delimiter-injection";
 ```
 
-Defined in: [packages/observability/src/redaction/imperative-patterns.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/imperative-patterns.ts#L30)
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:30
+
+**`Stable`**
 
 Stable name of an imperative pattern. The catalogue is curated;
 user-supplied patterns can use any identifier they want and will be
 passed through the sanitization layer alongside the built-ins.
-
-## Stable

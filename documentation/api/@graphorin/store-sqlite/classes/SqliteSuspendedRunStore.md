@@ -6,11 +6,11 @@
 
 # Class: SqliteSuspendedRunStore
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L47)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:47
+
+**`Stable`**
 
 Default `SuspendedRunStore` implementation.
-
-## Stable
 
 ## Implements
 
@@ -24,7 +24,7 @@ Default `SuspendedRunStore` implementation.
 new SqliteSuspendedRunStore(conn): SqliteSuspendedRunStore;
 ```
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L49)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:49
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: [packages/store-sqlite/src/suspended-run-store.ts:49](https://github
 delete(runId): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L80)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:80
 
 #### Parameters
 
@@ -70,7 +70,7 @@ get(runId): Promise<
 | undefined>;
 ```
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L73)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:73
 
 #### Parameters
 
@@ -96,7 +96,7 @@ Defined in: [packages/store-sqlite/src/suspended-run-store.ts:73](https://github
 list(): Promise<readonly SuspendedRunRecord[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L84)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:84
 
 Every parked run, oldest suspension first - boot hydration.
 
@@ -116,7 +116,7 @@ Every parked run, oldest suspension first - boot hydration.
 put(record): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/suspended-run-store.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/suspended-run-store.ts#L53)
+Defined in: packages/store-sqlite/src/suspended-run-store.ts:53
 
 Insert or refresh a suspension. A re-put for the same `runId`
 replaces the state but keeps the original `suspendedAt`, so the

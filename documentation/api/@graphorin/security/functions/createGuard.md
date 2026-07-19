@@ -10,7 +10,9 @@
 function createGuard(opts): MemoryModificationGuard;
 ```
 
-Defined in: [packages/security/src/guard/factory.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/factory.ts#L32)
+Defined in: packages/security/src/guard/factory.ts:32
+
+**`Stable`**
 
 Construct a guard for the supplied tier.
 
@@ -23,5 +25,3 @@ Construct a guard for the supplied tier.
 ## Returns
 
 [`MemoryModificationGuard`](/api/@graphorin/security/interfaces/MemoryModificationGuard.md)
-
-## Stable

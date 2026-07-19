@@ -6,12 +6,12 @@
 
 # Class: MemorySecretsStore
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L22)
+Defined in: packages/security/src/secrets/stores/memory.ts:22
+
+**`Stable`**
 
 In-memory `SecretsStore` for tests. Refuses to start in `production`
 mode unless explicitly opted in.
-
-## Stable
 
 ## Implements
 
@@ -25,7 +25,7 @@ mode unless explicitly opted in.
 new MemorySecretsStore(opts?): MemorySecretsStore;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L27)
+Defined in: packages/security/src/secrets/stores/memory.ts:27
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/security/src/secrets/stores/memory.ts:27](https://github.c
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"memory"` | Stable identifier - surfaced in `getSecretsStoreStatus()`. | [packages/security/src/secrets/stores/memory.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L24) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"memory"` | Stable identifier - surfaced in `getSecretsStoreStatus()`. | packages/security/src/secrets/stores/memory.ts:24 |
 
 ## Accessors
 
@@ -54,7 +54,7 @@ Defined in: [packages/security/src/secrets/stores/memory.ts:27](https://github.c
 get size(): number;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L34)
+Defined in: packages/security/src/secrets/stores/memory.ts:34
 
 Whether this store has any keys at all.
 
@@ -70,7 +70,7 @@ Whether this store has any keys at all.
 delete(key, scope?): Promise<void>;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L85)
+Defined in: packages/security/src/secrets/stores/memory.ts:85
 
 #### Parameters
 
@@ -95,7 +95,7 @@ Defined in: [packages/security/src/secrets/stores/memory.ts:85](https://github.c
 get(key, scope?): Promise<SecretValue | null>;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L38)
+Defined in: packages/security/src/secrets/stores/memory.ts:38
 
 Returns the secret if it exists, `null` otherwise.
 
@@ -122,7 +122,7 @@ Returns the secret if it exists, `null` otherwise.
 list(scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L91)
+Defined in: packages/security/src/secrets/stores/memory.ts:91
 
 Returns metadata about every key - never the values themselves.
 
@@ -148,7 +148,7 @@ Returns metadata about every key - never the values themselves.
 require(key, scope?): Promise<SecretValue>;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L53)
+Defined in: packages/security/src/secrets/stores/memory.ts:53
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -180,7 +180,7 @@ set(
 opts?): Promise<void>;
 ```
 
-Defined in: [packages/security/src/secrets/stores/memory.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/memory.ts#L61)
+Defined in: packages/security/src/secrets/stores/memory.ts:61
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

@@ -13,7 +13,9 @@ function verifyAuditConsistency(
    proof): boolean;
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L277)
+Defined in: packages/security/src/audit/merkle.ts:277
+
+**`Stable`**
 
 Verify a consistency proof between two heads (RFC 6962 §2.1.2). A
 `true` result means `newer` is an append-only extension of `older` -
@@ -30,5 +32,3 @@ nothing covered by `older` was rewritten, reordered, or truncated.
 ## Returns
 
 `boolean`
-
-## Stable

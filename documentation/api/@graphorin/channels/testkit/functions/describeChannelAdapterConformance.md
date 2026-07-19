@@ -10,7 +10,9 @@
 function describeChannelAdapterConformance(api, harness): void;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L72)
+Defined in: packages/channels/src/testkit/conformance.ts:72
+
+**`Stable`**
 
 Register the conformance suite against a harness.
 
@@ -24,5 +26,3 @@ Register the conformance suite against a harness.
 ## Returns
 
 `void`
-
-## Stable

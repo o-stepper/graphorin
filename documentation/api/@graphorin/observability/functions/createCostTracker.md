@@ -10,7 +10,9 @@
 function createCostTracker(opts?): CostTracker;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L151)
+Defined in: packages/observability/src/cost/cost-tracker.ts:151
+
+**`Stable`**
 
 Build a [CostTracker](/api/@graphorin/observability/interfaces/CostTracker.md) configured with the supplied budgets.
 
@@ -23,5 +25,3 @@ Build a [CostTracker](/api/@graphorin/observability/interfaces/CostTracker.md) c
 ## Returns
 
 [`CostTracker`](/api/@graphorin/observability/interfaces/CostTracker.md)
-
-## Stable

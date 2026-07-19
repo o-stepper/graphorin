@@ -6,7 +6,9 @@
 
 # Class: EntityResolver
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L227)
+Defined in: packages/memory/src/graph/entity-resolver.ts:227
+
+**`Stable`**
 
 Resolves a fact's subject / object strings to canonical entity ids and
 links them, applying [resolveEntityDecision](/api/@graphorin/memory/functions/resolveEntityDecision.md) backed by an
@@ -14,8 +16,6 @@ injected store + embedder (+ optional provider for adjudication).
 Constructed only when entity resolution is opted in
 (`createMemory({ graph: { entityResolution: true } })`); otherwise the
 write path skips it and behaviour is unchanged + offline.
-
-## Stable
 
 ## Constructors
 
@@ -25,7 +25,7 @@ write path skips it and behaviour is unchanged + offline.
 new EntityResolver(deps): EntityResolver;
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L236)
+Defined in: packages/memory/src/graph/entity-resolver.ts:236
 
 #### Parameters
 
@@ -48,7 +48,7 @@ linkFact(
 opts?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:295](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L295)
+Defined in: packages/memory/src/graph/entity-resolver.ts:295
 
 Resolve + link a fact's subject and object (the predicate is a
 relation label, never an entity). Idempotent on re-link.
@@ -77,7 +77,7 @@ resolve(
 opts?): Promise<string | null>;
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L251)
+Defined in: packages/memory/src/graph/entity-resolver.ts:251
 
 Resolve a single name to a canonical entity id (find-or-create),
 deduping via lexical + embedding similarity. Returns `null` for a

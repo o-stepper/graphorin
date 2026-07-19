@@ -6,15 +6,15 @@
 
 # Interface: AnnotatedPart
 
-Defined in: [packages/memory/src/context-engine/io-types.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/io-types.ts#L62)
+Defined in: packages/memory/src/context-engine/io-types.ts:62
+
+**`Stable`**
 
 Single annotated `MessageContent` part assembled by the engine.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-annotation"></a> `annotation` | `readonly` | [`ContentAnnotation`](/api/@graphorin/memory/interfaces/ContentAnnotation.md) | [packages/memory/src/context-engine/io-types.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/io-types.ts#L64) |
-| <a id="property-content"></a> `content` | `readonly` | [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md) | [packages/memory/src/context-engine/io-types.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/io-types.ts#L63) |
+| <a id="property-annotation"></a> `annotation` | `readonly` | [`ContentAnnotation`](/api/@graphorin/memory/interfaces/ContentAnnotation.md) | packages/memory/src/context-engine/io-types.ts:64 |
+| <a id="property-content"></a> `content` | `readonly` | [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md) | packages/memory/src/context-engine/io-types.ts:63 |

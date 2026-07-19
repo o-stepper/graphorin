@@ -6,9 +6,9 @@
 
 # Interface: ProceduralMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L204)
+Defined in: packages/core/src/contracts/memory-store.ts:204
 
-## Stable
+**`Stable`**
 
 ## Extended by
 
@@ -22,7 +22,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:204](https://github.com
 add(rule): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L205)
+Defined in: packages/core/src/contracts/memory-store.ts:205
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:205](https://github.com
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L206)
+Defined in: packages/core/src/contracts/memory-store.ts:206
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:206](https://github.com
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:207](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L207)
+Defined in: packages/core/src/contracts/memory-store.ts:207
 
 #### Parameters
 

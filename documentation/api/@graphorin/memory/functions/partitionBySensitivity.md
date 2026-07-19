@@ -10,7 +10,9 @@
 function partitionBySensitivity<TRecord>(records, context): PartitionResult<TRecord>;
 ```
 
-Defined in: [packages/memory/src/context-engine/privacy-filter.ts:164](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L164)
+Defined in: packages/memory/src/context-engine/privacy-filter.ts:164
+
+**`Stable`**
 
 Partition a record list against the supplied filter context.
 
@@ -30,5 +32,3 @@ Partition a record list against the supplied filter context.
 ## Returns
 
 [`PartitionResult`](/api/@graphorin/memory/interfaces/PartitionResult.md)\&lt;`TRecord`\&gt;
-
-## Stable

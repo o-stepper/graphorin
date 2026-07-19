@@ -10,7 +10,9 @@
 function bridgeAuthToAudit(options): AuthBridgeTeardown;
 ```
 
-Defined in: [packages/security/src/audit/auth-bridge.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L38)
+Defined in: packages/security/src/audit/auth-bridge.ts:38
+
+**`Stable`**
 
 Subscribe the audit-log subsystem to the auth-layer audit emitter
 (SPL-5). Token mint / revoke / rotate / rekey and every verification
@@ -28,5 +30,3 @@ and logged (never swallowed) when no `onWriteError` is supplied.
 ## Returns
 
 [`AuthBridgeTeardown`](/api/@graphorin/security/interfaces/AuthBridgeTeardown.md)
-
-## Stable

@@ -18,7 +18,9 @@ type TransportAuth =
 };
 ```
 
-Defined in: [packages/client/src/transport/types.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L53)
+Defined in: packages/client/src/transport/types.ts:53
+
+**`Stable`**
 
 Authentication strategy passed to a transport. The bearer-token
 shape is consumed by both transports (WS via the
@@ -27,5 +29,3 @@ shape is consumed by both transports (WS via the
 is only used by the WS browser path (the WebSocket browser API
 does not allow custom headers, so the ticket rides the
 `Sec-WebSocket-Protocol` header).
-
-## Stable

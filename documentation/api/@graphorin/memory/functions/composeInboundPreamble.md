@@ -10,7 +10,9 @@
 function composeInboundPreamble(pack): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/templates/composer.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L81)
+Defined in: packages/memory/src/context-engine/templates/composer.ts:81
+
+**`Stable`**
 
 Render the inbound-sanitization preamble fragment. Emitted
 AFTER the cache breakpoint so the Layer 1-4 cache prefix is
@@ -27,5 +29,3 @@ caller does not need to know the cache-breakpoint policy.
 ## Returns
 
 `string`
-
-## Stable

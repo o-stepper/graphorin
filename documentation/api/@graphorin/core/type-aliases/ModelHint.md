@@ -10,7 +10,9 @@
 type ModelHint = "fast" | "balanced" | "smart";
 ```
 
-Defined in: [packages/core/src/contracts/preferred-model.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L23)
+Defined in: packages/core/src/contracts/preferred-model.ts:23
+
+**`Stable`**
 
 Cost-tier vocabulary for declaring a preferred model on a tool or
 agent. Provider-agnostic at the tool-author level; the operator-side
@@ -30,5 +32,3 @@ envelopes circa 2026:
 The vocabulary is Graphorin's own design - no third-party routing-
 guide attribution leaks into the public surface. Per-provider
 dispatch lives in `@graphorin/provider/model-tier/classify.ts`.
-
-## Stable

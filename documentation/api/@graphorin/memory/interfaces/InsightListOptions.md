@@ -6,7 +6,7 @@
 
 # Interface: InsightListOptions
 
-Defined in: [packages/memory/src/tiers/insight-memory.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L36)
+Defined in: packages/memory/src/tiers/insight-memory.ts:36
 
 Per-call options accepted by [InsightMemory.list](/api/@graphorin/memory/classes/InsightMemory.md#list).
 
@@ -14,5 +14,5 @@ Per-call options accepted by [InsightMemory.list](/api/@graphorin/memory/classes
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | [packages/memory/src/tiers/insight-memory.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L39) |
-| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | [packages/memory/src/tiers/insight-memory.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L37) |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/tiers/insight-memory.ts:39 |
+| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/tiers/insight-memory.ts:37 |

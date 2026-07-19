@@ -10,7 +10,9 @@
 function createCommentarySanitizer(options?): CommentarySanitizer;
 ```
 
-Defined in: [packages/sessions/src/commentary/sanitizer.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L103)
+Defined in: packages/sessions/src/commentary/sanitizer.ts:103
+
+**`Stable`**
 
 Build a stateless commentary-phase sanitizer.
 
@@ -23,5 +25,3 @@ Build a stateless commentary-phase sanitizer.
 ## Returns
 
 [`CommentarySanitizer`](/api/@graphorin/sessions/interfaces/CommentarySanitizer.md)
-
-## Stable

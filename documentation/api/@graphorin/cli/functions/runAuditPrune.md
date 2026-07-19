@@ -10,7 +10,9 @@
 function runAuditPrune(options): Promise<PruneAuditResult>;
 ```
 
-Defined in: [packages/cli/src/commands/audit.ts:136](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L136)
+Defined in: packages/cli/src/commands/audit.ts:136
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/audit.ts:136](https://github.com/o-steppe
 ## Returns
 
 `Promise`\&lt;[`PruneAuditResult`](/api/@graphorin/security/interfaces/PruneAuditResult.md)\&gt;
-
-## Stable

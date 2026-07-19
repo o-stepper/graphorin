@@ -33,9 +33,9 @@ type WorkflowErrorCode =
   | "awakeable-payload-invalid";
 ```
 
-Defined in: [packages/workflow/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/errors/index.ts#L16)
+Defined in: packages/workflow/src/errors/index.ts:16
+
+**`Stable`**
 
 Stable `code` discriminator on every [WorkflowError](/api/@graphorin/workflow/errors/classes/WorkflowError.md) subclass.
 Treat as a string literal union for `switch (err.code)` style code.
-
-## Stable

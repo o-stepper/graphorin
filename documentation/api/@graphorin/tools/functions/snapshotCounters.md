@@ -10,12 +10,12 @@
 function snapshotCounters(): CounterSnapshot;
 ```
 
-Defined in: [packages/tools/src/audit/counters.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L127)
+Defined in: packages/tools/src/audit/counters.ts:127
+
+**`Stable`**
 
 Snapshot the current state of the counter / histogram registry.
 
 ## Returns
 
 [`CounterSnapshot`](/api/@graphorin/tools/interfaces/CounterSnapshot.md)
-
-## Stable

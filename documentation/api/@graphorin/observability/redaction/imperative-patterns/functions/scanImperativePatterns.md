@@ -15,7 +15,9 @@ function scanImperativePatterns(
   | null;
 ```
 
-Defined in: [packages/observability/src/redaction/imperative-patterns.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/imperative-patterns.ts#L199)
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:199
+
+**`Stable`**
 
 Run the imperative-pattern scan against `body`. Patterns are
 iterated in catalogue order; the prefilter shortcut returns early
@@ -33,5 +35,3 @@ for bodies that do not contain any imperative-family substring.
 
   \| [`ScanResult`](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ScanResult.md)
   \| `null`
-
-## Stable

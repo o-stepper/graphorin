@@ -18,10 +18,10 @@ type AgentRegistryLookup =
 };
 ```
 
-Defined in: [packages/sessions/src/agent-registry.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L26)
+Defined in: packages/sessions/src/agent-registry.ts:26
+
+**`Stable`**
 
 Result of [AgentRegistry.resolveOrPlaceholder](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#resolveorplaceholder). Either the
 stored agent metadata, or a placeholder discriminated by
 `kind: 'unknown'` so callers can render "(deleted) Worker Agent".
-
-## Stable

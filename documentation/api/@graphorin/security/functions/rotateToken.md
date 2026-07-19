@@ -13,7 +13,9 @@ function rotateToken(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/auth/crud.ts:169](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L169)
+Defined in: packages/security/src/auth/crud.ts:169
+
+**`Stable`**
 
 Revoke a token and immediately mint a fresh one with the same
 scopes. Useful for grace-period rotations.
@@ -30,5 +32,3 @@ scopes. Useful for grace-period rotations.
   `next`: [`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md);
   `old`: [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md);
 \}\>
-
-## Stable

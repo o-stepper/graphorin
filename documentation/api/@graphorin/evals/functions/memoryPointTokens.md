@@ -10,7 +10,9 @@
 function memoryPointTokens(text): readonly string[];
 ```
 
-Defined in: [packages/evals/src/scorers/memory/util.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/util.ts#L25)
+Defined in: packages/evals/src/scorers/memory/util.ts:25
+
+**`Stable`**
 
 Lowercase, strip punctuation to spaces, collapse whitespace and
 split into tokens.
@@ -24,5 +26,3 @@ split into tokens.
 ## Returns
 
 readonly `string`[]
-
-## Stable

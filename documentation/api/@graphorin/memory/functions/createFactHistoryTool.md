@@ -10,7 +10,9 @@
 function createFactHistoryTool(deps): Tool<FactHistoryInput, FactHistoryOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/fact-tools.ts:393](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L393)
+Defined in: packages/memory/src/tools/fact-tools.ts:393
+
+**`Stable`**
 
 `fact_history` - trace how a fact changed over time. Returns the
 full bi-temporal supersede chain the given fact belongs to, oldest →
@@ -26,5 +28,3 @@ did the user say before" / "how did this change". Read-only. P0-2.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactHistoryInput`, `FactHistoryOutput`\&gt;
-
-## Stable

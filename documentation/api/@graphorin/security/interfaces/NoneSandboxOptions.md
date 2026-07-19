@@ -6,7 +6,9 @@
 
 # Interface: NoneSandboxOptions
 
-Defined in: [packages/security/src/sandbox/none.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/none.ts#L48)
+Defined in: packages/security/src/sandbox/none.ts:48
+
+**`Stable`**
 
 Options for `NoneSandbox`. Hosting code passes a registry of
 handlers; lookups are by `module + export` for `'handler'` codes
@@ -14,10 +16,8 @@ and by `'inline'` key for `'source'` / `'file'` codes (which the
 adapter rejects - directly executing JS source bypasses the trust
 tier the user explicitly opted out of).
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-resolvehandler"></a> `resolveHandler` | `readonly` | (`code`) => \| [`NoneSandboxHandler`](/api/@graphorin/security/type-aliases/NoneSandboxHandler.md)\&lt;`unknown`, `unknown`\&gt; \| `undefined` | Resolver for `code.kind === 'handler'` invocations. The framework default registers built-in trusted tool handlers at startup. | [packages/security/src/sandbox/none.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/none.ts#L53) |
+| <a id="property-resolvehandler"></a> `resolveHandler` | `readonly` | (`code`) => \| [`NoneSandboxHandler`](/api/@graphorin/security/type-aliases/NoneSandboxHandler.md)\&lt;`unknown`, `unknown`\&gt; \| `undefined` | Resolver for `code.kind === 'handler'` invocations. The framework default registers built-in trusted tool handlers at startup. | packages/security/src/sandbox/none.ts:53 |

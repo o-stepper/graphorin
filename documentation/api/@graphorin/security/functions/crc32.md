@@ -10,7 +10,9 @@
 function crc32(input): number;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L130)
+Defined in: packages/security/src/auth/token-format.ts:130
+
+**`Stable`**
 
 CRC32/IEEE 802.3 implementation. Pure JS, branchless inner loop -
 matches the polynomial used by GZIP / PNG / Ethernet (`0xEDB88320`).
@@ -26,5 +28,3 @@ without further bit-fiddling.
 ## Returns
 
 `number`
-
-## Stable

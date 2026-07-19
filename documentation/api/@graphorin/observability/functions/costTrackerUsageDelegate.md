@@ -10,7 +10,9 @@
 function costTrackerUsageDelegate(tracker, ids): (info) => void;
 ```
 
-Defined in: [packages/observability/src/cost/delegate.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/delegate.ts#L63)
+Defined in: packages/observability/src/cost/delegate.ts:63
+
+**`Stable`**
 
 Build an `onUsage` callback that records into `tracker`. Pass either
 static ids (a provider instance bound to one session) or a resolver
@@ -28,5 +30,3 @@ middleware does not fabricate a $0 USD cost entry.
 ## Returns
 
 (`info`) => `void`
-
-## Stable

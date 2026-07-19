@@ -6,13 +6,13 @@
 
 # Interface: Reducer\&lt;T\&gt;
 
-Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
+Defined in: packages/core/dist/channels/channels.d.ts:52
+
+**`Stable`**
 
 Fold writes via a user-provided `reduce` function. The reducer is
 invoked left-to-right over the writes collected within an execution
 step.
-
-## Stable
 
 ## Type Parameters
 
@@ -24,6 +24,6 @@ step.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | `T` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
-| <a id="property-kind"></a> `kind` | `readonly` | `"reducer"` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
-| <a id="property-reduce"></a> `reduce` | `readonly` | (`prev`, `next`) => `T` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
+| <a id="property-default"></a> `default?` | `readonly` | `T` | packages/core/dist/channels/channels.d.ts:54 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"reducer"` | packages/core/dist/channels/channels.d.ts:53 |
+| <a id="property-reduce"></a> `reduce` | `readonly` | (`prev`, `next`) => `T` | packages/core/dist/channels/channels.d.ts:55 |

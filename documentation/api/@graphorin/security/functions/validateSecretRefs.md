@@ -10,7 +10,9 @@
 function validateSecretRefs(config, opts?): SecretRefValidationResult;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:584](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L584)
+Defined in: packages/security/src/secrets/secret-ref.ts:584
+
+**`Stable`**
 
 Walks an arbitrary configuration object and validates every `*Ref`
 field. Returns a structured result rather than throwing, so callers
@@ -26,5 +28,3 @@ can collect every issue before deciding to bail out.
 ## Returns
 
 [`SecretRefValidationResult`](/api/@graphorin/security/interfaces/SecretRefValidationResult.md)
-
-## Stable

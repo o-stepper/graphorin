@@ -10,7 +10,9 @@
 function loadCipherDriver(): Promise<BetterSqlite3Constructor>;
 ```
 
-Defined in: [packages/store-sqlite/src/encryption/index.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L105)
+Defined in: packages/store-sqlite/src/encryption/index.ts:105
+
+**`Stable`**
 
 Loads the cipher peer (`better-sqlite3-multiple-ciphers`). Lazy by
 design - the import only fires when encryption-at-rest is enabled.
@@ -18,5 +20,3 @@ design - the import only fires when encryption-at-rest is enabled.
 ## Returns
 
 `Promise`\&lt;[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)\&gt;
-
-## Stable

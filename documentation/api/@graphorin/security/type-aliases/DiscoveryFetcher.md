@@ -14,7 +14,7 @@ type DiscoveryFetcher = (url, init) => Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/oauth/discovery.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/discovery.ts#L22)
+Defined in: packages/security/src/oauth/discovery.ts:22
 
 Strategy hook used by tests so the unit suite never hits the network.
 

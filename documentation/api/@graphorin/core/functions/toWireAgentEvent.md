@@ -10,7 +10,9 @@
 function toWireAgentEvent<TOutput>(ev): WireAgentEvent<TOutput>;
 ```
 
-Defined in: [packages/core/src/types/agent-event-wire.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L132)
+Defined in: packages/core/src/types/agent-event-wire.ts:132
+
+**`Stable`**
 
 Project an [AgentEvent](/api/@graphorin/core/type-aliases/AgentEvent.md) into its JSON-safe [WireAgentEvent](/api/@graphorin/core/type-aliases/WireAgentEvent.md)
 twin. Idempotent: projecting an already-wire event returns an
@@ -31,5 +33,3 @@ equivalent value. Events of unknown `type` pass through untouched.
 ## Returns
 
 [`WireAgentEvent`](/api/@graphorin/core/type-aliases/WireAgentEvent.md)\&lt;`TOutput`\&gt;
-
-## Stable

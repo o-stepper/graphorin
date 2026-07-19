@@ -10,7 +10,7 @@
 function _resetPipelineFactoryCacheForTesting(): void;
 ```
 
-Defined in: [packages/embedder-transformersjs/src/index.ts:289](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L289)
+Defined in: packages/embedder-transformersjs/src/index.ts:289
 
 Test-only cache reset.
 

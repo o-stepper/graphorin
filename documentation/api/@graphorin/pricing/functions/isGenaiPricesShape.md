@@ -10,7 +10,9 @@
 function isGenaiPricesShape(body): boolean;
 ```
 
-Defined in: [packages/pricing/src/convert-genai-prices.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/convert-genai-prices.ts#L76)
+Defined in: pricing/src/convert-genai-prices.ts:76
+
+**`Stable`**
 
 Cheap structural detector: does this body look like the
 genai-prices dataset (a `providers` array of objects carrying
@@ -26,5 +28,3 @@ provider objects)?
 ## Returns
 
 `boolean`
-
-## Stable

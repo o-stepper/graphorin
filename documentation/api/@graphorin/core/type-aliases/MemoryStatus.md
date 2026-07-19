@@ -10,11 +10,11 @@
 type MemoryStatus = "active" | "quarantined";
 ```
 
-Defined in: [packages/core/src/types/memory.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L53)
+Defined in: packages/core/src/types/memory.ts:53
+
+**`Stable`**
 
 Retrieval-trust state of a memory. `active` rows are eligible for
 default recall; `quarantined` rows are persisted and auditable but
 excluded from action-driving recall until explicitly validated (P1-4).
 Quarantine is a *retrieval gate*, never a delete.
-
-## Stable

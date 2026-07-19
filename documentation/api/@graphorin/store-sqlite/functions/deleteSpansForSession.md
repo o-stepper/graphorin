@@ -10,7 +10,9 @@
 function deleteSpansForSession(conn, sessionId): number;
 ```
 
-Defined in: [packages/store-sqlite/src/span-store.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/span-store.ts#L120)
+Defined in: packages/store-sqlite/src/span-store.ts:120
+
+**`Stable`**
 
 Delete every persisted span of one session (W-006). Called by the
 session hard-delete cascade (the `spans` entry of
@@ -27,5 +29,3 @@ of band. Returns the number of rows deleted.
 ## Returns
 
 `number`
-
-## Stable

@@ -10,7 +10,9 @@
 function runMemoryMigrate(options): Promise<MemoryMigrateResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L160)
+Defined in: packages/cli/src/commands/memory.ts:160
+
+**`Stable`**
 
 `graphorin memory migrate` - embedder swap (wave-D D5, real
 implementation). Loads the operator's `--embedders` factory module,
@@ -29,5 +31,3 @@ additionally drops retired vector tables and compacts free pages.
 ## Returns
 
 `Promise`\&lt;`MemoryMigrateResult`\&gt;
-
-## Stable

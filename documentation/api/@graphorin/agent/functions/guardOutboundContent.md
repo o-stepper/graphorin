@@ -13,7 +13,9 @@ function guardOutboundContent(
    cfg?): GuardOutcome;
 ```
 
-Defined in: [packages/agent/src/lateral-leak/protocol-guard.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/protocol-guard.ts#L171)
+Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:171
+
+**`Stable`**
 
 Apply the configured escape policy to a single string body. Pure
 - never mutates inputs.
@@ -29,5 +31,3 @@ Apply the configured escape policy to a single string body. Pure
 ## Returns
 
 [`GuardOutcome`](/api/@graphorin/agent/interfaces/GuardOutcome.md)
-
-## Stable

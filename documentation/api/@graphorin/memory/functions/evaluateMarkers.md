@@ -10,7 +10,9 @@
 function evaluateMarkers(text, patterns): LocaleMatch;
 ```
 
-Defined in: [packages/memory/src/conflict/locale-packs/types.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/locale-packs/types.ts#L119)
+Defined in: packages/memory/src/conflict/locale-packs/types.ts:119
+
+**`Stable`**
 
 Apply a list of patterns to the supplied text and return the
 highest-confidence match (first match wins on ties). Surfaced for
@@ -26,5 +28,3 @@ unit tests; the pipeline calls this internally.
 ## Returns
 
 [`LocaleMatch`](/api/@graphorin/memory/interfaces/LocaleMatch.md)
-
-## Stable

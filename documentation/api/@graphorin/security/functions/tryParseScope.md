@@ -12,7 +12,9 @@ function tryParseScope(input):
   | undefined;
 ```
 
-Defined in: [packages/security/src/auth/scope.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L83)
+Defined in: packages/security/src/auth/scope.ts:83
+
+**`Stable`**
 
 Try-parse helper. Returns `undefined` on failure rather than
 throwing; useful when iterating over a granted set that may include
@@ -28,5 +30,3 @@ legacy strings.
 
   \| [`ParsedScope`](/api/@graphorin/security/type-aliases/ParsedScope.md)
   \| `undefined`
-
-## Stable

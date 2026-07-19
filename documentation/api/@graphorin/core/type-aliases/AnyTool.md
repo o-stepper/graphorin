@@ -10,7 +10,9 @@
 type AnyTool<TDeps> = Tool<any, any, TDeps>;
 ```
 
-Defined in: [packages/core/src/contracts/tool.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L200)
+Defined in: packages/core/src/contracts/tool.ts:200
+
+**`Stable`**
 
 Existentially-typed [Tool](/api/@graphorin/core/interfaces/Tool.md) for collection seams (W-100).
 
@@ -31,5 +33,3 @@ the `tool({...})` factory.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TDeps` | `unknown` |
-
-## Stable

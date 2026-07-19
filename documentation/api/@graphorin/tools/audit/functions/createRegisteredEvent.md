@@ -10,7 +10,9 @@
 function createRegisteredEvent(opts): ToolAuditEvent;
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:180](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L180)
+Defined in: packages/tools/src/audit/index.ts:180
+
+**`Stable`**
 
 Convenience factory for the `tool:registered` audit row. Carries
 the resolved trust class + side-effect class + per-tool fields the
@@ -36,5 +38,3 @@ downstream cassette / replay layers care about.
 ## Returns
 
 [`ToolAuditEvent`](/api/@graphorin/tools/audit/interfaces/ToolAuditEvent.md)
-
-## Stable

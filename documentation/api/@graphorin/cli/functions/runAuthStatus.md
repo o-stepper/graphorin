@@ -10,7 +10,9 @@
 function runAuthStatus(options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: [packages/cli/src/commands/auth.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L215)
+Defined in: packages/cli/src/commands/auth.ts:215
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/auth.ts:215](https://github.com/o-stepper
 ## Returns
 
 `Promise`\&lt;[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\&gt;
-
-## Stable

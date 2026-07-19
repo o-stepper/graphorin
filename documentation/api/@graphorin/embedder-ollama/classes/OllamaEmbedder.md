@@ -6,11 +6,11 @@
 
 # Class: OllamaEmbedder
 
-Defined in: [packages/embedder-ollama/src/index.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L134)
+Defined in: packages/embedder-ollama/src/index.ts:134
+
+**`Stable`**
 
 `EmbedderProvider` implementation that talks to the Ollama HTTP API.
-
-## Stable
 
 ## Implements
 
@@ -24,7 +24,7 @@ Defined in: [packages/embedder-ollama/src/index.ts:134](https://github.com/o-ste
 new OllamaEmbedder(options): OllamaEmbedder;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L148)
+Defined in: packages/embedder-ollama/src/index.ts:148
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: [packages/embedder-ollama/src/index.ts:148](https://github.com/o-ste
 configHash(): string;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:209](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L209)
+Defined in: packages/embedder-ollama/src/index.ts:209
 
 Deterministic hash over the embedder's full configuration -
 including the discovered digest. A model upgrade in the same
@@ -68,7 +68,7 @@ silently reusing the same `embedder_id`.
 dim(): number;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L191)
+Defined in: packages/embedder-ollama/src/index.ts:191
 
 Output dimension - the explicit `dim` option, the resolved width from the
 first `embed()`, or a known-family default. PS-11: throws for an unknown
@@ -92,7 +92,7 @@ vector search). Pass `dim` for any model not in [KNOWN\_OLLAMA\_MODEL\_DIMS](/ap
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L219)
+Defined in: packages/embedder-ollama/src/index.ts:219
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -119,7 +119,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L177)
+Defined in: packages/embedder-ollama/src/index.ts:177
 
 The canonical embedder id - `'ollama:<model>@<dim-or-digest>'`.
 

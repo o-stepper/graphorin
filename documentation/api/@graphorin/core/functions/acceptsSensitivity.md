@@ -10,7 +10,9 @@
 function acceptsSensitivity(accepts, record): boolean;
 ```
 
-Defined in: [packages/core/src/types/sensitivity.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/sensitivity.ts#L33)
+Defined in: packages/core/src/types/sensitivity.ts:33
+
+**`Stable`**
 
 Return `true` iff `record` is allowed to flow to a sink declaring `accepts`.
 
@@ -29,5 +31,3 @@ Graphorin trust matrix.
 ## Returns
 
 `boolean`
-
-## Stable

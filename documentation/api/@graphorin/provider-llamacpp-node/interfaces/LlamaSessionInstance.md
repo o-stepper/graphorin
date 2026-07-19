@@ -6,7 +6,7 @@
 
 # Interface: LlamaSessionInstance
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L49)
+Defined in: src/runtime.ts:49
 
 **`Internal`**
 
@@ -20,7 +20,7 @@ Loaded chat session capable of streaming responses.
 optional dispose(): void;
 ```
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L73)
+Defined in: src/runtime.ts:73
 
 Release the per-request context / sequence backing this session.
 node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
@@ -39,7 +39,7 @@ every stream so long-running agents do not leak until OOM.
 promptStreamingResponse(prompt, options?): AsyncIterable<string>;
 ```
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L50)
+Defined in: src/runtime.ts:50
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Defined in: [packages/provider-llamacpp-node/src/runtime.ts:50](https://github.c
 optional setChatHistory(history): void;
 ```
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L66)
+Defined in: src/runtime.ts:66
 
 W-096: replace the session's chat history (node-llama-cpp v3
 `setChatHistory`). When present, the adapter feeds multi-turn

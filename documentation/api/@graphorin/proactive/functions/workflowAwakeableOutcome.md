@@ -12,7 +12,9 @@ function workflowAwakeableOutcome(args):
   | ProactiveReviewOutcome;
 ```
 
-Defined in: [packages/proactive/src/ladder.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/ladder.ts#L88)
+Defined in: packages/proactive/src/ladder.ts:88
+
+**`Stable`**
 
 Build a `question` / `review` outcome for a task parked inside a
 durable WORKFLOW (`awaitExternal` / `requestApproval`): the resolve
@@ -41,5 +43,3 @@ re-hosts it (D-9).
 
   \| [`ProactiveQuestionOutcome`](/api/@graphorin/core/interfaces/ProactiveQuestionOutcome.md)
   \| [`ProactiveReviewOutcome`](/api/@graphorin/core/interfaces/ProactiveReviewOutcome.md)
-
-## Stable

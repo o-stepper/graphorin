@@ -10,10 +10,10 @@
 type OverflowMode = "truncate" | "drop";
 ```
 
-Defined in: [packages/memory/src/context-engine/token-budget.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-budget.ts#L79)
+Defined in: packages/memory/src/context-engine/token-budget.ts:79
+
+**`Stable`**
 
 Per-layer truncation mode used when the layer overflows its cap
 or the global budget. `truncate` is the default; `drop` removes
 the layer entirely when it would otherwise overflow.
-
-## Stable

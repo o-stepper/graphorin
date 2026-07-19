@@ -10,8 +10,8 @@
 const enLocalePack: LocalePack;
 ```
 
-Defined in: [packages/memory/src/conflict/locale-packs/en.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/locale-packs/en.ts#L22)
+Defined in: packages/memory/src/conflict/locale-packs/en.ts:22
+
+**`Stable`**
 
 The default English `LocalePack`. Frozen - share the singleton.
-
-## Stable

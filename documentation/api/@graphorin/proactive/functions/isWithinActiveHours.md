@@ -10,7 +10,9 @@
 function isWithinActiveHours(hours, now): boolean;
 ```
 
-Defined in: [packages/proactive/src/active-hours.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/active-hours.ts#L51)
+Defined in: packages/proactive/src/active-hours.ts:51
+
+**`Stable`**
 
 `true` when `now` (epoch ms) falls inside the window's wall clock.
 Pure and deterministic for a given clock value.
@@ -25,5 +27,3 @@ Pure and deterministic for a given clock value.
 ## Returns
 
 `boolean`
-
-## Stable

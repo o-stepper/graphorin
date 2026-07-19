@@ -10,7 +10,9 @@
 function readPragma(conn, name): unknown;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:388](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L388)
+Defined in: packages/store-sqlite/src/connection.ts:388
+
+**`Stable`**
 
 Pragma helper that surfaces the runtime value of a single setting as
 a typed scalar. Used by the integration tests to verify the WAL
@@ -26,5 +28,3 @@ hardening defaults landed correctly.
 ## Returns
 
 `unknown`
-
-## Stable

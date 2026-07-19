@@ -6,14 +6,14 @@
 
 # Interface: ReplayBufferProbe
 
-Defined in: [packages/server/src/health/checks.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L22)
+Defined in: packages/server/src/health/checks.ts:22
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-eventsbuffered"></a> `eventsBuffered` | `readonly` | `number` | Total events buffered across all subjects. Aggregated by the caller. | [packages/server/src/health/checks.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L24) |
-| <a id="property-subscribers"></a> `subscribers?` | `readonly` | `number` | - | [packages/server/src/health/checks.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L25) |
-| <a id="property-subscriptions"></a> `subscriptions?` | `readonly` | `number` | - | [packages/server/src/health/checks.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L26) |
+| <a id="property-eventsbuffered"></a> `eventsBuffered` | `readonly` | `number` | Total events buffered across all subjects. Aggregated by the caller. | packages/server/src/health/checks.ts:24 |
+| <a id="property-subscribers"></a> `subscribers?` | `readonly` | `number` | - | packages/server/src/health/checks.ts:25 |
+| <a id="property-subscriptions"></a> `subscriptions?` | `readonly` | `number` | - | packages/server/src/health/checks.ts:26 |

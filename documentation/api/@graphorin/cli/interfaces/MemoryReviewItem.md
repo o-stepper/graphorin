@@ -6,7 +6,7 @@
 
 # Interface: MemoryReviewItem
 
-Defined in: [packages/cli/src/commands/memory.ts:818](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L818)
+Defined in: packages/cli/src/commands/memory.ts:818
 
 A single quarantined memory row surfaced by `graphorin memory review`.
 
@@ -14,6 +14,6 @@ A single quarantined memory row surfaced by `graphorin memory review`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:819](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L819) |
-| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | [packages/cli/src/commands/memory.ts:821](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L821) |
-| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:820](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L820) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:819 |
+| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:821 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:820 |

@@ -110,6 +110,13 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
     '  3. Mint your admin token: graphorin token create --label bootstrap --scopes <scopes> (the raw token is shown ONCE).',
   );
   print(`  4. Run \`graphorin start --config ${target}\` to launch the server.`);
+  // P1-4 (deep retest 2026-07-19): the consent tier is a MEMORY-side
+  // setting - the server config cannot enforce it, so hand the operator
+  // the exact code instead of a decorative option.
+  print(`  5. Enforce your cloud-consent tier ('${cloudConsent}') where you compose memory:`);
+  for (const line of consentSnippet(cloudConsent)) {
+    print(`       ${line}`);
+  }
 
   return Object.freeze({
     configPath: target,
@@ -228,18 +235,68 @@ export default defineConfig({
   },
   // IP-5: no top-level 'defaults' block - the strict server-config
   // parser rejects unknown keys, so the old render made a fresh
-  // 'graphorin init' fail on the very next migrate/start. The tier you
-  // chose at init is recorded below; enforce it via the memory
-  // package (createMemory contextEngine privacy options):
-  // cloudUploadConsent: ${JSON.stringify(input.cloudConsent)}
+  // 'graphorin init' fail on the very next migrate/start. Memory is
+  // composed in CODE, not by this server config - the cloud-consent
+  // tier you chose at init ('${input.cloudConsent}') is enforced where
+  // you call createMemory(...):
+  //
+${consentSnippet(input.cloudConsent)
+  .map((line) => (line.length > 0 ? `  //   ${line}` : '  //'))
+  .join('\n')}
 });
 `;
 }
 
+/**
+ * Deep retest 2026-07-19 (P1-4): the exact `createMemory` privacy
+ * snippet that ENFORCES the chosen cloud-consent tier. `init` cannot
+ * wire it itself (memory composition is programmatic by design - the
+ * server config carries no adapters), so the honest contract is: record
+ * the choice, and hand the operator the precise code in both the
+ * `next steps` output and the .ts config comment.
+ */
+export function consentSnippet(
+  tier: 'public-only' | 'public-and-internal' | 'all-with-warnings',
+): ReadonlyArray<string> {
+  switch (tier) {
+    case 'public-only':
+      return [
+        "// 'public-only' is the fail-closed default: cloud providers",
+        "// receive only 'public'-sensitivity context. Nothing to add:",
+        'const memory = createMemory({ store });',
+      ];
+    case 'public-and-internal':
+      return [
+        'const memory = createMemory({',
+        '  store,',
+        '  contextEngine: {',
+        '    privacy: { cloudUploadConsent: true },',
+        '  },',
+        '});',
+        "// The provider must also accept 'internal' payloads, e.g.:",
+        "//   acceptsSensitivity: ['public', 'internal']",
+      ];
+    case 'all-with-warnings':
+      return [
+        'const memory = createMemory({',
+        '  store,',
+        '  contextEngine: {',
+        '    privacy: { cloudUploadConsent: true },',
+        '  },',
+        '});',
+        '// ...and the provider must accept every tier it should see:',
+        "//   acceptsSensitivity: ['public', 'internal', 'secret']",
+        '// Trace redaction still validates exported spans; review the',
+        '// security guide before shipping secret-tier context to a cloud.',
+      ];
+  }
+}
+
 // F-05: the defineConfig-free flavour (same shape as the docker
-// template). JSON cannot carry the cloudUploadConsent comment the .ts
-// render embeds; the chosen tier still lands in the command's return
-// payload + stderr next-steps.
+// template). JSON cannot carry comments, so the enforcement snippet the
+// .ts render embeds is delivered through the stderr next-steps (step 5)
+// and the command's return payload instead - both flavours hand the
+// operator the same createMemory privacy code (P1-4).
 function renderConfigJson(input: {
   readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly storageEncrypted: boolean;

@@ -10,7 +10,9 @@
 function readWalSize(conn): number;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:398](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L398)
+Defined in: packages/store-sqlite/src/connection.ts:398
+
+**`Stable`**
 
 Returns the byte size of the WAL file, or `0` when the file is
 absent / empty. Surfaced as `graphorin.storage.wal.size_bytes`.
@@ -24,5 +26,3 @@ absent / empty. Surfaced as `graphorin.storage.wal.size_bytes`.
 ## Returns
 
 `number`
-
-## Stable

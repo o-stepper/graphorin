@@ -6,9 +6,9 @@
 
 # Interface: MemoryApi
 
-Defined in: [packages/server/src/routes/memory.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L58)
+Defined in: packages/server/src/routes/memory.ts:58
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -18,7 +18,7 @@ Defined in: [packages/server/src/routes/memory.ts:58](https://github.com/o-stepp
 deleteBlock(scope, label): Promise<boolean>;
 ```
 
-Defined in: [packages/server/src/routes/memory.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L63)
+Defined in: packages/server/src/routes/memory.ts:63
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: [packages/server/src/routes/memory.ts:63](https://github.com/o-stepp
 forget(scope, factId): Promise<boolean>;
 ```
 
-Defined in: [packages/server/src/routes/memory.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L61)
+Defined in: packages/server/src/routes/memory.ts:61
 
 #### Parameters
 
@@ -64,7 +64,7 @@ remember(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/memory.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L60)
+Defined in: packages/server/src/routes/memory.ts:60
 
 #### Parameters
 
@@ -93,7 +93,7 @@ Defined in: [packages/server/src/routes/memory.ts:60](https://github.com/o-stepp
 search(input): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/memory.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L59)
+Defined in: packages/server/src/routes/memory.ts:59
 
 #### Parameters
 
@@ -121,7 +121,7 @@ upsertBlock(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/memory.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/memory.ts#L62)
+Defined in: packages/server/src/routes/memory.ts:62
 
 #### Parameters
 

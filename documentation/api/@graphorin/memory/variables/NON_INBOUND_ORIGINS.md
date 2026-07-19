@@ -10,10 +10,10 @@
 const NON_INBOUND_ORIGINS: ReadonlySet<ContentOrigin>;
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L96)
+Defined in: packages/memory/src/context-engine/annotations.ts:96
+
+**`Stable`**
 
 Origins for which the inbound-trust axis is meaningless and is
 always set to `'n/a'`. Surfaced as a frozen constant so consumers
 can introspect the contract without re-implementing the rule.
-
-## Stable

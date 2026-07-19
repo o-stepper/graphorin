@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/workflow/src/index.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/index.ts#L33)
+Defined in: packages/workflow/src/index.ts:33

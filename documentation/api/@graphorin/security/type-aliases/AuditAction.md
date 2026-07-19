@@ -51,11 +51,11 @@ type AuditAction =
 };
 ```
 
-Defined in: [packages/security/src/audit/types.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/types.ts#L34)
+Defined in: packages/security/src/audit/types.ts:34
+
+**`Stable`**
 
 Canonical action discriminator. Listed here as an open string union
 so deployments can extend with their own actions without forking
 the framework - but the well-known set is documented for tooling
 (filter dropdowns, tests, etc.).
-
-## Stable

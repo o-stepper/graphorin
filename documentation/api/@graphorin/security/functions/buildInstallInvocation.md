@@ -13,7 +13,9 @@ function buildInstallInvocation(args): {
 };
 ```
 
-Defined in: [packages/security/src/supply-chain/package-manager.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L100)
+Defined in: packages/security/src/supply-chain/package-manager.ts:100
+
+**`Stable`**
 
 Build the CLI invocation for an install request. Encapsulates the
 subtle differences between the supported package managers.
@@ -39,7 +41,5 @@ subtle differences between the supported package managers.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `args` | readonly `string`[] | [packages/security/src/supply-chain/package-manager.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L105) |
-| `command` | `string` | [packages/security/src/supply-chain/package-manager.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L105) |
-
-## Stable
+| `args` | readonly `string`[] | packages/security/src/supply-chain/package-manager.ts:105 |
+| `command` | `string` | packages/security/src/supply-chain/package-manager.ts:105 |

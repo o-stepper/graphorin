@@ -6,11 +6,11 @@
 
 # Interface: TimerDriver
 
-Defined in: [packages/workflow/src/timer-driver.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L90)
+Defined in: packages/workflow/src/timer-driver.ts:90
+
+**`Stable`**
 
 Handle returned by [createTimerDriver](/api/@graphorin/workflow/functions/createTimerDriver.md).
-
-## Stable
 
 ## Methods
 
@@ -20,7 +20,7 @@ Handle returned by [createTimerDriver](/api/@graphorin/workflow/functions/create
 start(): void;
 ```
 
-Defined in: [packages/workflow/src/timer-driver.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L91)
+Defined in: packages/workflow/src/timer-driver.ts:91
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: [packages/workflow/src/timer-driver.ts:91](https://github.com/o-step
 status(): TimerDriverStatus;
 ```
 
-Defined in: [packages/workflow/src/timer-driver.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L93)
+Defined in: packages/workflow/src/timer-driver.ts:93
 
 #### Returns
 
@@ -48,7 +48,7 @@ Defined in: [packages/workflow/src/timer-driver.ts:93](https://github.com/o-step
 stop(): void;
 ```
 
-Defined in: [packages/workflow/src/timer-driver.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L92)
+Defined in: packages/workflow/src/timer-driver.ts:92
 
 #### Returns
 
@@ -62,7 +62,7 @@ Defined in: [packages/workflow/src/timer-driver.ts:92](https://github.com/o-step
 sweep(): Promise<number>;
 ```
 
-Defined in: [packages/workflow/src/timer-driver.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L95)
+Defined in: packages/workflow/src/timer-driver.ts:95
 
 Run one poll pass immediately; resolves with the fired count.
 

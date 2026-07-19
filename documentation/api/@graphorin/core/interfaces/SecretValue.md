@@ -6,7 +6,9 @@
 
 # Interface: SecretValue
 
-Defined in: [packages/core/src/contracts/secret-value.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L46)
+Defined in: packages/core/src/contracts/secret-value.ts:46
+
+**`Stable`**
 
 Runtime-safe wrapper around an opaque secret (API key, token, password).
 
@@ -29,14 +31,12 @@ Any conforming implementation must ensure that:
 - The underlying value is only reachable through `.use(fn)`,
   `.useBuffer(fn)` or the audited `.reveal()` escape hatch.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-secret_value_brand"></a> `[SECRET_VALUE_BRAND]` | `readonly` | `true` | Cross-realm brand. Implementations set this to `SECRET_VALUE_BRAND`. | [packages/core/src/contracts/secret-value.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L77) |
-| <a id="property-length"></a> `length` | `readonly` | `number` | Number of bytes in the wrapped value. Safe to log. | [packages/core/src/contracts/secret-value.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L48) |
+| <a id="property-secret_value_brand"></a> `[SECRET_VALUE_BRAND]` | `readonly` | `true` | Cross-realm brand. Implementations set this to `SECRET_VALUE_BRAND`. | packages/core/src/contracts/secret-value.ts:77 |
+| <a id="property-length"></a> `length` | `readonly` | `number` | Number of bytes in the wrapped value. Safe to log. | packages/core/src/contracts/secret-value.ts:48 |
 
 ## Methods
 
@@ -46,7 +46,7 @@ Any conforming implementation must ensure that:
 [NODEJS_INSPECT_CUSTOM](%0A%20%20%20depth?,%20%0A%20%20%20opts?,%20%0A%20%20%20inspect?): string;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L90)
+Defined in: packages/core/src/contracts/secret-value.ts:90
 
 Leakage barrier for `node:util.inspect(...)`. Returns the placeholder
 (`'SecretValue([REDACTED])'`) so that REPL / `console.log` /
@@ -72,7 +72,7 @@ structured-logger output never reveals the underlying value.
 toPrimitive: string | number;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L80)
+Defined in: packages/core/src/contracts/secret-value.ts:80
 
 Leakage barrier for ToPrimitive coercion. Returns the placeholder.
 
@@ -94,7 +94,7 @@ Leakage barrier for ToPrimitive coercion. Returns the placeholder.
 dispose(): void;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L74)
+Defined in: packages/core/src/contracts/secret-value.ts:74
 
 Best-effort zeroization of the underlying buffer. Does not affect
 derived V8 strings already created via `.use(fn)` / `.reveal()`.
@@ -111,7 +111,7 @@ derived V8 strings already created via `.use(fn)` / `.reveal()`.
 reveal(): string;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L68)
+Defined in: packages/core/src/contracts/secret-value.ts:68
 
 One-shot reveal as a string. Audited by the implementation. Prefer
 `.use(fn)` whenever possible.
@@ -128,7 +128,7 @@ One-shot reveal as a string. Audited by the implementation. Prefer
 toJSON(): string;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L83)
+Defined in: packages/core/src/contracts/secret-value.ts:83
 
 Leakage barrier for `JSON.stringify(...)`. Returns the placeholder.
 
@@ -144,7 +144,7 @@ Leakage barrier for `JSON.stringify(...)`. Returns the placeholder.
 use<T>(fn): Promise<T>;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L55)
+Defined in: packages/core/src/contracts/secret-value.ts:55
 
 Run `fn` with the unwrapped string and return its result. Preferred
 over `.reveal()` because it scopes the unwrapped value to a single
@@ -174,7 +174,7 @@ synchronous / asynchronous turn.
 useBuffer<T>(fn): Promise<T>;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L62)
+Defined in: packages/core/src/contracts/secret-value.ts:62
 
 Run `fn` with the unwrapped value as a `Buffer`. Useful for binary
 secrets (encryption keys, HMAC keys) where round-tripping through a

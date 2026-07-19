@@ -10,7 +10,9 @@
 function stripImperativePatterns(body, patterns?): string;
 ```
 
-Defined in: [packages/observability/src/redaction/imperative-patterns.ts:259](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/imperative-patterns.ts#L259)
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:259
+
+**`Stable`**
 
 Apply `pattern.mask` to every match of every pattern in `body`. Used
 by the `'detect-and-strip*'` policies. The mask is calibrated to NOT
@@ -27,5 +29,3 @@ trigger another scan hit on round trips.
 ## Returns
 
 `string`
-
-## Stable

@@ -10,7 +10,9 @@
 type PassageExtractor<TRecord> = (record) => string;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/text-extraction.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/text-extraction.ts#L47)
+Defined in: packages/reranker-transformersjs/src/text-extraction.ts:47
+
+**`Stable`**
 
 Caller-supplied passage extractor. Receives the record + the
 surrounding metadata (kind, sensitivity, tags) and returns the
@@ -31,5 +33,3 @@ passage to feed into the cross-encoder.
 ## Returns
 
 `string`
-
-## Stable

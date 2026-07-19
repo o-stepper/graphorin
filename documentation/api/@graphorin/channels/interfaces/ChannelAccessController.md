@@ -6,19 +6,19 @@
 
 # Interface: ChannelAccessController
 
-Defined in: [packages/channels/src/access.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L107)
+Defined in: packages/channels/src/access.ts:107
+
+**`Stable`**
 
 The access controller consumed by the gateway. `approve` and
 `revoke` are the operator surface (CLI / REST wiring is
 application-side).
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-policy"></a> `policy` | `readonly` | [`ChannelAccessPolicyKind`](/api/@graphorin/channels/type-aliases/ChannelAccessPolicyKind.md) | [packages/channels/src/access.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L108) |
+| <a id="property-policy"></a> `policy` | `readonly` | [`ChannelAccessPolicyKind`](/api/@graphorin/channels/type-aliases/ChannelAccessPolicyKind.md) | packages/channels/src/access.ts:108 |
 
 ## Methods
 
@@ -30,7 +30,7 @@ approve(channelId, code): Promise<
 | null>;
 ```
 
-Defined in: [packages/channels/src/access.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L116)
+Defined in: packages/channels/src/access.ts:116
 
 Operator approval of a pairing code. One-time: consumes the
 request and durably pairs the peer. Returns `null` when the code
@@ -57,7 +57,7 @@ is unknown or expired (an expired code is also deleted).
 check(identity): Promise<ChannelAccessDecision>;
 ```
 
-Defined in: [packages/channels/src/access.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L110)
+Defined in: packages/channels/src/access.ts:110
 
 Evaluate one inbound identity. Deterministic given store state + clock.
 
@@ -79,7 +79,7 @@ Evaluate one inbound identity. Deterministic given store state + clock.
 listPaired(channelId?): Promise<readonly PairedPeerRecord[]>;
 ```
 
-Defined in: [packages/channels/src/access.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L120)
+Defined in: packages/channels/src/access.ts:120
 
 List durably paired peers (operator surface).
 
@@ -101,7 +101,7 @@ List durably paired peers (operator surface).
 revoke(peer): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/access.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L118)
+Defined in: packages/channels/src/access.ts:118
 
 Remove a durably paired peer.
 

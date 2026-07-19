@@ -1,6 +1,6 @@
 import type { Tool } from '@graphorin/core';
 import { describe, expect, it, vi } from 'vitest';
-import { createAgent } from '../src/index.js';
+import { AgentBudgetUnpricedError, createAgent } from '../src/index.js';
 import {
   createMockProvider,
   type MockProviderScript,
@@ -194,7 +194,7 @@ describe('C5: run-level budget', () => {
     expect(parentProvider.scriptsConsumed()).toBe(1);
   });
 
-  it('WARNs once when maxCostUsd is set but the usage carries no USD cost', async () => {
+  it("onUnpriced: 'warn' keeps the pre-0.13 warn-once behaviour", async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const provider = createMockProvider({
@@ -215,7 +215,9 @@ describe('C5: run-level budget', () => {
         provider,
         tools: [noopTool],
       });
-      const result = await agent.run('go', { budget: { maxCostUsd: 0.01 } });
+      const result = await agent.run('go', {
+        budget: { maxCostUsd: 0.01, onUnpriced: 'warn' },
+      });
       expect(result.status).toBe('completed');
       const budgetWarns = warnSpy.mock.calls.filter(
         (c) => typeof c[0] === 'string' && c[0].includes('cost ceiling is UNENFORCED'),
@@ -224,6 +226,57 @@ describe('C5: run-level budget', () => {
     } finally {
       warnSpy.mockRestore();
     }
+  });
+
+  it('an unpriced cost ceiling FAILS the run by default (deep retest 2026-07-19, P1-3)', async () => {
+    const provider = createMockProvider({
+      modelId: 'mock-unpriced-fail',
+      scripts: [
+        toolCallScript({
+          toolCallId: 'tc-1',
+          toolName: 'noop',
+          args: { value: 'a' },
+          totalTokens: 10,
+        }),
+        textOnlyScript('never reached', 10),
+      ],
+    });
+    const agent = createAgent({
+      name: 'unpriced-fail',
+      instructions: 'work',
+      provider,
+      tools: [noopTool],
+    });
+    const result = await agent.run('go', { budget: { maxCostUsd: 0.01 } });
+    expect(result.status).toBe('failed');
+    expect(result.state.error?.code).toBe('budget-unpriced');
+    // The run stopped at the FIRST between-step check: exactly one
+    // provider call happened, no unmetered second step.
+    expect(provider.scriptsConsumed()).toBe(1);
+  });
+
+  it("onExceed: 'throw' rejects an unpriced ceiling with AgentBudgetUnpricedError", async () => {
+    const provider = createMockProvider({
+      modelId: 'mock-unpriced-throw',
+      scripts: [
+        toolCallScript({
+          toolCallId: 'tc-1',
+          toolName: 'noop',
+          args: { value: 'a' },
+          totalTokens: 10,
+        }),
+        textOnlyScript('never reached', 10),
+      ],
+    });
+    const agent = createAgent({
+      name: 'unpriced-throw',
+      instructions: 'work',
+      provider,
+      tools: [noopTool],
+    });
+    await expect(
+      agent.run('go', { budget: { maxCostUsd: 0.01, onExceed: 'throw' } }),
+    ).rejects.toThrow(AgentBudgetUnpricedError);
   });
 
   it('rejects a malformed budget synchronously', async () => {

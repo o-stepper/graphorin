@@ -10,7 +10,9 @@
 type ChannelUnauthorizedHandler = (message, decision, io) => Promise<void>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L80)
+Defined in: packages/channels/src/gateway.ts:80
+
+**`Stable`**
 
 Callback for denied / unpaired peers. The FRAMEWORK never texts a
 peer on its own - the challenge/denial wording is application
@@ -28,5 +30,3 @@ policy; use `io.deliver` to render one.
 ## Returns
 
 `Promise`\&lt;`void`\&gt;
-
-## Stable

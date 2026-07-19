@@ -6,9 +6,9 @@
 
 # Interface: AuditApi
 
-Defined in: [packages/server/src/routes/audit.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/audit.ts#L23)
+Defined in: packages/server/src/routes/audit.ts:23
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -21,7 +21,7 @@ export(opts): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/audit.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/audit.ts#L34)
+Defined in: packages/server/src/routes/audit.ts:34
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: [packages/server/src/routes/audit.ts:34](https://github.com/o-steppe
 list(opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/audit.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/audit.ts#L24)
+Defined in: packages/server/src/routes/audit.ts:24
 
 #### Parameters
 
@@ -76,7 +76,7 @@ optional verify(opts): Promise<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/audit.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/audit.ts#L45)
+Defined in: packages/server/src/routes/audit.ts:45
 
 Verify the chain integrity of every audit row in the inclusive
 range. Phase 14c surfaces this through `POST /v1/audit/verify`.

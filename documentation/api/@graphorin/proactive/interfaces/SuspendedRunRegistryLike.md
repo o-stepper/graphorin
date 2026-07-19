@@ -6,12 +6,12 @@
 
 # Interface: SuspendedRunRegistryLike
 
-Defined in: [packages/proactive/src/cron-task.ts:194](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L194)
+Defined in: packages/proactive/src/cron-task.ts:194
+
+**`Stable`**
 
 Structural slice of the server's `RunStateTracker` the C3 bridge
 needs - no dependency on `@graphorin/server`.
-
-## Stable
 
 ## Methods
 
@@ -24,7 +24,7 @@ registerSuspended(
    state): void;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L195)
+Defined in: packages/proactive/src/cron-task.ts:195
 
 #### Parameters
 

@@ -6,12 +6,12 @@
 
 # Interface: ConformanceTestApi
 
-Defined in: [packages/channels/src/testkit/conformance.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L30)
+Defined in: packages/channels/src/testkit/conformance.ts:30
+
+**`Stable`**
 
 The subset of the vitest/jest API the conformance suite needs -
 injected so this module has no test-framework dependency.
-
-## Stable
 
 ## Methods
 
@@ -21,7 +21,7 @@ injected so this module has no test-framework dependency.
 describe(name, body): void;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L31)
+Defined in: packages/channels/src/testkit/conformance.ts:31
 
 #### Parameters
 
@@ -48,7 +48,7 @@ expect(value): {
 };
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L33)
+Defined in: packages/channels/src/testkit/conformance.ts:33
 
 #### Parameters
 
@@ -70,11 +70,11 @@ Defined in: [packages/channels/src/testkit/conformance.ts:33](https://github.com
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `toBe()` | (`expected`) => `void` | [packages/channels/src/testkit/conformance.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L34) |
-| `toBeDefined()` | () => `void` | [packages/channels/src/testkit/conformance.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L35) |
-| `toBeGreaterThan()` | (`expected`) => `void` | [packages/channels/src/testkit/conformance.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L36) |
-| `toBeTruthy()` | () => `void` | [packages/channels/src/testkit/conformance.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L38) |
-| `toEqual()` | (`expected`) => `void` | [packages/channels/src/testkit/conformance.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L37) |
+| `toBe()` | (`expected`) => `void` | packages/channels/src/testkit/conformance.ts:34 |
+| `toBeDefined()` | () => `void` | packages/channels/src/testkit/conformance.ts:35 |
+| `toBeGreaterThan()` | (`expected`) => `void` | packages/channels/src/testkit/conformance.ts:36 |
+| `toBeTruthy()` | () => `void` | packages/channels/src/testkit/conformance.ts:38 |
+| `toEqual()` | (`expected`) => `void` | packages/channels/src/testkit/conformance.ts:37 |
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: [packages/channels/src/testkit/conformance.ts:33](https://github.com
 it(name, body): void;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L32)
+Defined in: packages/channels/src/testkit/conformance.ts:32
 
 #### Parameters
 

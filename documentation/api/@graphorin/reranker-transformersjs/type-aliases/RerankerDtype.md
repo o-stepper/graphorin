@@ -10,9 +10,9 @@
 type RerankerDtype = "fp32" | "fp16" | "q8" | "q4";
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L25)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:25
+
+**`Stable`**
 
 Numeric dtype hint. Default: `'q8'` on the CPU device, `'fp16'` on
 accelerated devices - see [defaultRerankerDtype](/api/@graphorin/reranker-transformersjs/functions/defaultRerankerDtype.md).
-
-## Stable

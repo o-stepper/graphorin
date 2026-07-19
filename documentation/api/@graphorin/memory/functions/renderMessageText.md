@@ -10,7 +10,9 @@
 function renderMessageText(message): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-counter.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L124)
+Defined in: packages/memory/src/context-engine/token-counter.ts:124
+
+**`Stable`**
 
 Render a `Message` into a single textual approximation suitable
 for token counting. Multimodal parts other than `'text'` /
@@ -31,5 +33,3 @@ engine's arithmetic must too (mirrors the provider-side
 ## Returns
 
 `string`
-
-## Stable

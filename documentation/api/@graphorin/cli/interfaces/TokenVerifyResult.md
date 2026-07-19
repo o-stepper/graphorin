@@ -6,13 +6,13 @@
 
 # Interface: TokenVerifyResult
 
-Defined in: [packages/cli/src/commands/token.ts:326](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L326)
+Defined in: packages/cli/src/commands/token.ts:326
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | [packages/cli/src/commands/token.ts:327](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L327) |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | [packages/cli/src/commands/token.ts:328](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L328) |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/cli/src/commands/token.ts:327 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/cli/src/commands/token.ts:328 |

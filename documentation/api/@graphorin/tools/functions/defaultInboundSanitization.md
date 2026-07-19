@@ -10,7 +10,9 @@
 function defaultInboundSanitization(trustClass): InboundSanitizationPolicy;
 ```
 
-Defined in: [packages/tools/src/builder/trust-class.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L66)
+Defined in: packages/tools/src/builder/trust-class.ts:66
+
+**`Stable`**
 
 Default inbound-sanitization policy per trust class. Operator
 overrides via `tool({ inboundSanitization: ... })` always win.
@@ -35,5 +37,3 @@ overrides via `tool({ inboundSanitization: ... })` always win.
 ## Returns
 
 [`InboundSanitizationPolicy`](/api/@graphorin/core/type-aliases/InboundSanitizationPolicy.md)
-
-## Stable

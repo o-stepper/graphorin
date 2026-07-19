@@ -10,7 +10,9 @@
 function buildRuleOfTwoPolicy(profile): RuleOfTwoCompilation;
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:284](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L284)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:284
+
+**`Stable`**
 
 Compile a Rule-of-Two profile into an enforceable policy. When the
 profile denies external side effects, the compilation yields a
@@ -28,5 +30,3 @@ can refuse or warn - the preset never silently permits the trifecta.
 ## Returns
 
 [`RuleOfTwoCompilation`](/api/@graphorin/security/interfaces/RuleOfTwoCompilation.md)
-
-## Stable

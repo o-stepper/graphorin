@@ -10,7 +10,7 @@
 function resetCountersForTesting(): void;
 ```
 
-Defined in: [packages/tools/src/audit/counters.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L146)
+Defined in: packages/tools/src/audit/counters.ts:146
 
 **`Experimental`**
 

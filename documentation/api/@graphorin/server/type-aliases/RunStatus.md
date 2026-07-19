@@ -16,12 +16,12 @@ type RunStatus =
   | "aborted";
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L32)
+Defined in: packages/server/src/runtime/run-state.ts:32
+
+**`Stable`**
 
 Stable status discriminator for a run snapshot. Mirrors the values
 exposed on the public REST surface. `'awaiting_approval'` (C3 /
 W-119): the run suspended on durable HITL and its resumable
 `RunState` is retained by the tracker until
 `POST /runs/:runId/resume` (or an abort) settles it.
-
-## Stable

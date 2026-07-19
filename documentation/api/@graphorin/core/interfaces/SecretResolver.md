@@ -6,20 +6,20 @@
 
 # Interface: SecretResolver
 
-Defined in: [packages/core/src/contracts/secrets-store.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secrets-store.ts#L13)
+Defined in: packages/core/src/contracts/secrets-store.ts:13
+
+**`Stable`**
 
 Pluggable secret resolver - turns a parsed `SecretRef` into a live
 `SecretValue`. Concrete resolvers live in `@graphorin/security` (env,
 keyring, file, encrypted-file, literal, ref, vault) and in optional
 adapter packages (`@graphorin/secret-1password`, …).
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-scheme"></a> `scheme` | `readonly` | `string` | Lowercased URI scheme handled by this resolver (`'env'`, `'op'`, …). | [packages/core/src/contracts/secrets-store.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secrets-store.ts#L15) |
+| <a id="property-scheme"></a> `scheme` | `readonly` | `string` | Lowercased URI scheme handled by this resolver (`'env'`, `'op'`, …). | packages/core/src/contracts/secrets-store.ts:15 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ adapter packages (`@graphorin/secret-1password`, …).
 resolve(ref, ctx?): Promise<SecretValue>;
 ```
 
-Defined in: [packages/core/src/contracts/secrets-store.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secrets-store.ts#L16)
+Defined in: packages/core/src/contracts/secrets-store.ts:16
 
 #### Parameters
 

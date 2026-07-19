@@ -10,7 +10,9 @@
 function openAuditDatabase(options): Promise<AuditDatabase>;
 ```
 
-Defined in: [packages/store-sqlite/src/audit-db.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/audit-db.ts#L55)
+Defined in: packages/store-sqlite/src/audit-db.ts:55
+
+**`Stable`**
 
 Opens the encrypted `audit.db` file.
 
@@ -23,5 +25,3 @@ Opens the encrypted `audit.db` file.
 ## Returns
 
 `Promise`\&lt;[`AuditDatabase`](/api/@graphorin/store-sqlite/interfaces/AuditDatabase.md)\&gt;
-
-## Stable

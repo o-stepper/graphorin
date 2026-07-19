@@ -10,7 +10,9 @@
 function reducer<T>(reduce, opts?): Reducer<T>;
 ```
 
-Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
+Defined in: packages/core/dist/channels/channels.d.ts:118
+
+**`Stable`**
 
 Construct a `Reducer` channel.
 
@@ -31,5 +33,3 @@ Construct a `Reducer` channel.
 ## Returns
 
 [`Reducer`](/api/@graphorin/workflow/interfaces/Reducer.md)\&lt;`T`\&gt;
-
-## Stable

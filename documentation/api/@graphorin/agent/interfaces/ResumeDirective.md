@@ -6,7 +6,9 @@
 
 # Interface: ResumeDirective
 
-Defined in: [packages/agent/src/types.ts:542](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L542)
+Defined in: packages/agent/src/types.ts:542
+
+**`Stable`**
 
 Resume directive accepted by `agent.run(input | RunState, { directive })`.
 
@@ -16,10 +18,8 @@ waits for the user / cron / webhook to resolve the pending
 approval, and re-invokes `agent.run(savedState, { directive: {
 approvals: [...] } })` to resume.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | [packages/agent/src/types.ts:543](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L543) |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:543 |

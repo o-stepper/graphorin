@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/store-sqlite/src/index.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/index.ts#L132)
+Defined in: packages/store-sqlite/src/index.ts:132

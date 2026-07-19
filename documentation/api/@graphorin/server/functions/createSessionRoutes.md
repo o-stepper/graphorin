@@ -12,7 +12,9 @@ function createSessionRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L106)
+Defined in: packages/server/src/routes/sessions.ts:106
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/routes/sessions.ts:106](https://github.com/o-st
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

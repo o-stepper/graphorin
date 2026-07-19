@@ -6,13 +6,13 @@
 
 # Class: SessionMemory
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L51)
+Defined in: packages/memory/src/tiers/session-memory.ts:51
+
+**`Stable`**
 
 `SessionMemory` - append-only message log per session. Owns the
 `session_messages` storage by single-source-of-truth (DEC-147); the
 `@graphorin/sessions` package wraps this surface in Phase 11.
-
-## Stable
 
 ## Constructors
 
@@ -22,7 +22,7 @@ Defined in: [packages/memory/src/tiers/session-memory.ts:51](https://github.com/
 new SessionMemory(args): SessionMemory;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L56)
+Defined in: packages/memory/src/tiers/session-memory.ts:56
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: [packages/memory/src/tiers/session-memory.ts:56](https://github.com/
 attributedFor(scope): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:268](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L268)
+Defined in: packages/memory/src/tiers/session-memory.ts:268
 
 NOT IMPLEMENTED (MRET-12) - always resolves `[]`. The agent
 registry lives in `@graphorin/sessions` and has never been
@@ -71,7 +71,7 @@ the sessions facade for participant attribution.
 compact(scope, opts?): Promise<SessionCompactionResult>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L200)
+Defined in: packages/memory/src/tiers/session-memory.ts:200
 
 NOT IMPLEMENTED (MRET-12) - always resolves
 `{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
@@ -105,7 +105,7 @@ flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L175)
+Defined in: packages/memory/src/tiers/session-memory.ts:175
 
 NOT IMPLEMENTED (MRET-12) - always resolves `{ flushed: 0 }` and
 performs no work. The consolidator pipeline (extraction → facts /
@@ -142,7 +142,7 @@ summarized away.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L98)
+Defined in: packages/memory/src/tiers/session-memory.ts:98
 
 List messages for the supplied scope.
 
@@ -165,7 +165,7 @@ List messages for the supplied scope.
 listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L121)
+Defined in: packages/memory/src/tiers/session-memory.ts:121
 
 RP-5: list messages with their persisted identity (stored id / sequence /
 `createdAt`) so an exporter preserves message identity + chronology.
@@ -193,7 +193,7 @@ push(
 options?): Promise<MessageRef>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L71)
+Defined in: packages/memory/src/tiers/session-memory.ts:71
 
 Persist a message. Returns the storage reference. B3:
 `options.verdict` threads the run loop's per-turn security
@@ -222,7 +222,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L141)
+Defined in: packages/memory/src/tiers/session-memory.ts:141
 
 Hybrid (FTS5) search over the session messages.
 
@@ -248,7 +248,9 @@ Hybrid (FTS5) search over the session messages.
 shouldCompact(scope, contextWindowOrOptions?): Promise<boolean>;
 ```
 
-Defined in: [packages/memory/src/tiers/session-memory.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/session-memory.ts#L236)
+Defined in: packages/memory/src/tiers/session-memory.ts:236
+
+**`Stable`**
 
 Returns `true` when the cached message tokens exceed
 `compactAtRatio * contextWindow` (default `0.9` per DEC-104). The
@@ -273,5 +275,3 @@ second argument can be either:
 #### Returns
 
 `Promise`\&lt;`boolean`\&gt;
-
-#### Stable

@@ -10,7 +10,9 @@
 function runMigrations(conn, options?): readonly AppliedMigration[];
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/runner.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/runner.ts#L44)
+Defined in: packages/store-sqlite/src/migrations/runner.ts:44
+
+**`Stable`**
 
 Apply every pending migration in version order. Each migration runs
 inside its own transaction so a failure mid-sequence leaves the
@@ -27,5 +29,3 @@ fully-migrated DB is a no-op.
 ## Returns
 
 readonly [`AppliedMigration`](/api/@graphorin/store-sqlite/interfaces/AppliedMigration.md)[]
-
-## Stable

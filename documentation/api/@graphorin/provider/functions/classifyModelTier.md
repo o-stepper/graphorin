@@ -12,7 +12,9 @@ function classifyModelTier(provider):
   | undefined;
 ```
 
-Defined in: [packages/provider/src/model-tier/classify.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/model-tier/classify.ts#L87)
+Defined in: packages/provider/src/model-tier/classify.ts:87
+
+**`Stable`**
 
 Classify a `Provider`'s `modelId` into one of `'fast' | 'balanced' |
 'smart'`. Returns `undefined` when the model id matches none of the
@@ -28,5 +30,3 @@ canonical 2026 mappings (Ollama / OpenAI-compatible / unknown).
 
   \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md)
   \| `undefined`
-
-## Stable

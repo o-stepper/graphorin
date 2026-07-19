@@ -10,7 +10,9 @@
 function composeLayer2(instructions): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/templates/composer.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L37)
+Defined in: packages/memory/src/context-engine/templates/composer.ts:37
+
+**`Stable`**
 
 Render the optional Layer 2 (`agent_instructions`) wrapper.
 Returns the empty string when `instructions` is empty so the
@@ -25,5 +27,3 @@ layer is dropped from the assembled prompt.
 ## Returns
 
 `string`
-
-## Stable

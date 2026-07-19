@@ -10,7 +10,9 @@
 function parseSlashCommand(raw): SlashCommandActivation;
 ```
 
-Defined in: [packages/skills/src/activation/index.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/activation/index.ts#L39)
+Defined in: packages/skills/src/activation/index.ts:39
+
+**`Stable`**
 
 Parse a single message body for a `/skill:<name>` invocation. The
 grammar accepts:
@@ -33,5 +35,3 @@ other prefix triggers a [SlashCommandParseError](/api/@graphorin/skills/errors/c
 ## Returns
 
 [`SlashCommandActivation`](/api/@graphorin/skills/interfaces/SlashCommandActivation.md)
-
-## Stable

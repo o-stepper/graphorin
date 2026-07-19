@@ -6,9 +6,9 @@
 
 # Interface: WorkflowStepStartEvent\&lt;TState\&gt;
 
-Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
+Defined in: packages/core/dist/types/workflow-event.d.ts:19
 
-## Stable
+**`Stable`**
 
 ## Type Parameters
 
@@ -20,6 +20,6 @@ Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.step.start"` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:22 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:21 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.step.start"` | packages/core/dist/types/workflow-event.d.ts:20 |

@@ -10,7 +10,9 @@
 function createFactSupersedeTool(deps): Tool<FactSupersedeInput, FactSupersedeOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/fact-tools.ts:330](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L330)
+Defined in: packages/memory/src/tools/fact-tools.ts:330
+
+**`Stable`**
 
 `fact_supersede` - soft-supersede an old fact by storing a new one
 that replaces it. The old fact is kept for replay but no longer
@@ -26,5 +28,3 @@ reachable via `asOf` / inspector paths.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactSupersedeInput`, `FactSupersedeOutput`\&gt;
-
-## Stable

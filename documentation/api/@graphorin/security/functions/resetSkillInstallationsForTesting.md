@@ -10,7 +10,7 @@
 function _resetSkillInstallationsForTesting(): void;
 ```
 
-Defined in: [packages/security/src/supply-chain/audit.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit.ts#L39)
+Defined in: packages/security/src/supply-chain/audit.ts:39
 
 **`Experimental`**
 

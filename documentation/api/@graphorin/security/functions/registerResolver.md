@@ -12,7 +12,9 @@ function registerResolver(resolver, opts?):
   | undefined;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/registry.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L43)
+Defined in: packages/security/src/secrets/resolvers/registry.ts:43
+
+**`Stable`**
 
 Register a resolver for a single scheme. Last registration wins by
 default, matching the documented "pluggable resolver" contract; pass
@@ -29,5 +31,3 @@ default, matching the documented "pluggable resolver" contract; pass
 
   \| [`SecretResolver`](/api/@graphorin/core/interfaces/SecretResolver.md)
   \| `undefined`
-
-## Stable

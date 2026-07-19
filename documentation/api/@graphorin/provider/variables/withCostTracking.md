@@ -10,7 +10,9 @@
 const withCostTracking: (opts) => ProviderMiddleware;
 ```
 
-Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-tracking.ts#L134)
+Defined in: packages/provider/src/middleware/with-cost-tracking.ts:134
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/provider/src/middleware/with-cost-tracking.ts:134](https:/
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

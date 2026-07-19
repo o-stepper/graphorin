@@ -10,7 +10,9 @@
 function defineLocalePack(input): LocalePack;
 ```
 
-Defined in: [packages/memory/src/conflict/locale-packs/types.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/locale-packs/types.ts#L102)
+Defined in: packages/memory/src/conflict/locale-packs/types.ts:102
+
+**`Stable`**
 
 Builder used by application code that wants to ship a custom pack:
 
@@ -36,5 +38,3 @@ across multiple `Memory` instances without accidental mutation.
 ## Returns
 
 [`LocalePack`](/api/@graphorin/memory/interfaces/LocalePack.md)
-
-## Stable

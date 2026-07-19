@@ -10,7 +10,9 @@
 function runDeviceAuthorizationFlow(args): Promise<OAuthSession>;
 ```
 
-Defined in: [packages/security/src/oauth/authorize-device-flow.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/authorize-device-flow.ts#L65)
+Defined in: packages/security/src/oauth/authorize-device-flow.ts:65
+
+**`Stable`**
 
 Drive the Device Authorization Grant flow.
 
@@ -23,5 +25,3 @@ Drive the Device Authorization Grant flow.
 ## Returns
 
 `Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
-
-## Stable

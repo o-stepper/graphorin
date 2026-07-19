@@ -10,7 +10,7 @@
 const TASKS_CHANNEL: "__graphorin_tasks__";
 ```
 
-Defined in: [packages/workflow/src/types.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L43)
+Defined in: packages/workflow/src/types.ts:43
 
 **`Internal`**
 

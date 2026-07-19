@@ -25,11 +25,12 @@ type AgentRuntimeErrorCode =
   | "run-state-version-unsupported"
   | "run-state-malformed"
   | "concurrent-run"
-  | "budget-exceeded";
+  | "budget-exceeded"
+  | "budget-unpriced";
 ```
 
-Defined in: [packages/agent/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L16)
+Defined in: packages/agent/src/errors/index.ts:16
+
+**`Stable`**
 
 Stable code discriminator surfaced on every [AgentRuntimeError](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).
-
-## Stable

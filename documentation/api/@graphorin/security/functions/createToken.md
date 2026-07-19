@@ -10,7 +10,9 @@
 function createToken(options): Promise<CreatedToken>;
 ```
 
-Defined in: [packages/security/src/auth/crud.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L65)
+Defined in: packages/security/src/auth/crud.ts:65
+
+**`Stable`**
 
 Mint a new token, persist its HMAC hash through the injected store,
 and return the raw token wrapped in a `SecretValue`. The plaintext
@@ -26,5 +28,3 @@ function.
 ## Returns
 
 `Promise`\&lt;[`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\&gt;
-
-## Stable

@@ -6,15 +6,15 @@
 
 # Interface: SessionExportWriter
 
-Defined in: [packages/sessions/src/export/writer.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L88)
+Defined in: packages/sessions/src/export/writer.ts:88
+
+**`Stable`**
 
 Streaming writer. Call `writeRecord(...)` per body record (in any
 order, but `kind: 'meta'` and `kind: 'footer'` are owned by the
 writer) and `close()` to emit the footer. The writer itself does
 not own the destination - every emission is delivered via the
 caller-supplied `sink`.
-
-## Stable
 
 ## Methods
 
@@ -24,7 +24,7 @@ caller-supplied `sink`.
 close(): Promise<SessionExportFooterRecord>;
 ```
 
-Defined in: [packages/sessions/src/export/writer.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L92)
+Defined in: packages/sessions/src/export/writer.ts:92
 
 Emit the footer + any opt-in `--hash` body checksum. Idempotent.
 
@@ -40,7 +40,7 @@ Emit the footer + any opt-in `--hash` body checksum. Idempotent.
 writeRecord(record): Promise<void>;
 ```
 
-Defined in: [packages/sessions/src/export/writer.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L90)
+Defined in: packages/sessions/src/export/writer.ts:90
 
 Write a single body record. The header is emitted lazily.
 

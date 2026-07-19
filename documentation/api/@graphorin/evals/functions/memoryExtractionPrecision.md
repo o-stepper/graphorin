@@ -10,7 +10,9 @@
 function memoryExtractionPrecision(options?): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/extraction.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/extraction.ts#L81)
+Defined in: packages/evals/src/scorers/memory/extraction.ts:81
+
+**`Stable`**
 
 Extraction precision: `observed points grounded in some gold point /
 observed points`. The grounded set includes every gold `content`
@@ -26,5 +28,3 @@ plus `update.previous` values (a not-yet-updated old value is
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;[`MemoryOperationsEvalInput`](/api/@graphorin/evals/interfaces/MemoryOperationsEvalInput.md), [`MemoryOperationsObservation`](/api/@graphorin/evals/interfaces/MemoryOperationsObservation.md)\&gt;
-
-## Stable

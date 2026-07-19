@@ -10,6 +10,6 @@
 const DEFAULT_MAX_CHAIN_DEPTH: 32 = 32;
 ```
 
-Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L59)
+Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:59
 
 Default chain depth when not specified.

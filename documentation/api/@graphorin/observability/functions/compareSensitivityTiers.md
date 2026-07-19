@@ -10,7 +10,9 @@
 function compareSensitivityTiers(a, b): number;
 ```
 
-Defined in: [packages/observability/src/redaction/validator.ts:305](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/validator.ts#L305)
+Defined in: packages/observability/src/redaction/validator.ts:305
+
+**`Stable`**
 
 Quickly compute the relative ordering of two sensitivity tiers.
 Exposed because the tracer + replay layers need it without taking a
@@ -26,5 +28,3 @@ full dependency on the validator implementation.
 ## Returns
 
 `number`
-
-## Stable

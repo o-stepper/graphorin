@@ -10,7 +10,9 @@
 function parseJsonl(text, mapper?): readonly Case<unknown, unknown, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: [packages/evals/src/loaders/jsonl.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/jsonl.ts#L52)
+Defined in: packages/evals/src/loaders/jsonl.ts:52
+
+**`Stable`**
 
 Pure parser. Exported separately so tests can exercise the line-by-
 line behaviour without touching the filesystem.
@@ -25,5 +27,3 @@ line behaviour without touching the filesystem.
 ## Returns
 
 readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
-
-## Stable

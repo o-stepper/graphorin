@@ -10,7 +10,9 @@
 type Sensitivity = "public" | "internal" | "secret";
 ```
 
-Defined in: [packages/core/src/types/sensitivity.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/sensitivity.ts#L13)
+Defined in: packages/core/src/types/sensitivity.ts:13
+
+**`Stable`**
 
 Sensitivity tier for any piece of data flowing through Graphorin.
 
@@ -20,5 +22,3 @@ Sensitivity tier for any piece of data flowing through Graphorin.
   exporters and replay consumers.
 - `'secret'`   - credentials, tokens, encryption keys; only ever stays
   in-process and is never serialized to the wire by default.
-
-## Stable

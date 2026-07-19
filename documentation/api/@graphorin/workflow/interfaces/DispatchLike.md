@@ -6,7 +6,7 @@
 
 # Interface: DispatchLike
 
-Defined in: [packages/workflow/src/types.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L236)
+Defined in: packages/workflow/src/types.ts:236
 
 **`Internal`**
 
@@ -20,6 +20,6 @@ dispatches via `dispatch(nodeName, args)` / `new Dispatch(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-__graphorindispatch"></a> `__graphorinDispatch` | `readonly` | `true` | [packages/workflow/src/types.ts:237](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L237) |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | [packages/workflow/src/types.ts:239](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L239) |
-| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | [packages/workflow/src/types.ts:238](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L238) |
+| <a id="property-__graphorindispatch"></a> `__graphorinDispatch` | `readonly` | `true` | packages/workflow/src/types.ts:237 |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/workflow/src/types.ts:239 |
+| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | packages/workflow/src/types.ts:238 |

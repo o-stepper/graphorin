@@ -6,17 +6,17 @@
 
 # Interface: ProactiveCronTask
 
-Defined in: [packages/proactive/src/cron-task.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L212)
+Defined in: packages/proactive/src/cron-task.ts:212
+
+**`Stable`**
 
 The cron-leg task handle.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/proactive/src/cron-task.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L213) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/proactive/src/cron-task.ts:213 |
 
 ## Methods
 
@@ -26,7 +26,7 @@ The cron-leg task handle.
 fire(): Promise<ProactiveTaskFireResult>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:219](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L219)
+Defined in: packages/proactive/src/cron-task.ts:219
 
 Fire once now (also the trigger callback).
 
@@ -42,7 +42,7 @@ Fire once now (also the trigger callback).
 start(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L215)
+Defined in: packages/proactive/src/cron-task.ts:215
 
 Register the schedule on the scheduler. Idempotent.
 
@@ -58,7 +58,7 @@ Register the schedule on the scheduler. Idempotent.
 status(): ProactiveCronTaskStatus;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L220)
+Defined in: packages/proactive/src/cron-task.ts:220
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: [packages/proactive/src/cron-task.ts:220](https://github.com/o-stepp
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/cron-task.ts:217](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/cron-task.ts#L217)
+Defined in: packages/proactive/src/cron-task.ts:217
 
 Unregister the schedule.
 

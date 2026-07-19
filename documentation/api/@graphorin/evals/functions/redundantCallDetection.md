@@ -10,7 +10,9 @@
 function redundantCallDetection<I>(options?): Scorer<I, Trajectory>;
 ```
 
-Defined in: [packages/evals/src/scorers/trajectory/redundant-call-detection.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/redundant-call-detection.ts#L26)
+Defined in: packages/evals/src/scorers/trajectory/redundant-call-detection.ts:26
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/evals/src/scorers/trajectory/redundant-call-detection.ts:2
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\&gt;
-
-## Stable

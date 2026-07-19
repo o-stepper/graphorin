@@ -10,7 +10,9 @@
 function collect<T>(source, signal?): Promise<T[]>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L25)
+Defined in: packages/core/src/utils/streams.ts:25
+
+**`Stable`**
 
 Drain an `AsyncIterable` into an array.
 
@@ -30,5 +32,3 @@ Drain an `AsyncIterable` into an array.
 ## Returns
 
 `Promise`\&lt;`T`[]\&gt;
-
-## Stable

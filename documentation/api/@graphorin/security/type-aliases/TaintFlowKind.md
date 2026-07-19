@@ -10,7 +10,9 @@
 type TaintFlowKind = "untrusted-to-sink" | "lethal-trifecta" | "derived-untrusted-to-sink";
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L60)
+Defined in: packages/security/src/dataflow/types.ts:60
+
+**`Stable`**
 
 The kind of tainted data flow the policy detected at a sink.
 
@@ -28,5 +30,3 @@ The kind of tainted data flow the policy detected at a sink.
   as derived from it - paraphrase-robust by construction, deliberately
   coarse. Fires only when the verbatim probe did not already match
   (verbatim keeps the precise label).
-
-## Stable

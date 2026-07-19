@@ -16,7 +16,9 @@ function wilsonInterval(
 };
 ```
 
-Defined in: [packages/evals/src/stats.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L60)
+Defined in: packages/evals/src/stats.ts:60
+
+**`Stable`**
 
 Wilson score interval for a binomial proportion.
 
@@ -41,7 +43,5 @@ Wilson score interval for a binomial proportion.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `hi` | `number` | [packages/evals/src/stats.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L64) |
-| `lo` | `number` | [packages/evals/src/stats.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L64) |
-
-## Stable
+| `hi` | `number` | packages/evals/src/stats.ts:64 |
+| `lo` | `number` | packages/evals/src/stats.ts:64 |

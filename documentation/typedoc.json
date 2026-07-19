@@ -95,9 +95,36 @@
   "disableGit": true,
   "basePath": "..",
   "packageOptions": {
-    "disableGit": true,
-    "basePath": "../..",
-    "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
+    "blockTags": [
+      "@alpha",
+      "@beta",
+      "@default",
+      "@defaultValue",
+      "@deprecated",
+      "@example",
+      "@experimental",
+      "@inheritDoc",
+      "@internal",
+      "@param",
+      "@privateRemarks",
+      "@public",
+      "@readonly",
+      "@remarks",
+      "@returns",
+      "@sealed",
+      "@see",
+      "@stable",
+      "@throws",
+      "@typeParam"
+    ],
+    "modifierTags": [
+      "@experimental",
+      "@hidden",
+      "@internal",
+      "@override",
+      "@packageDocumentation",
+      "@stable"
+    ]
   },
   "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
 }

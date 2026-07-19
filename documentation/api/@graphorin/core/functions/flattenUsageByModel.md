@@ -10,7 +10,9 @@
 function flattenUsageByModel(byModel): readonly ModelUsage[];
 ```
 
-Defined in: [packages/core/src/types/run.ts:289](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L289)
+Defined in: packages/core/src/types/run.ts:289
+
+**`Stable`**
 
 Snapshot helper used by `@graphorin/observability` aggregators to
 convert the on-disk `usageByModel` shape into the canonical
@@ -27,5 +29,3 @@ run-state breakdown.
 ## Returns
 
 readonly [`ModelUsage`](/api/@graphorin/core/interfaces/ModelUsage.md)[]
-
-## Stable

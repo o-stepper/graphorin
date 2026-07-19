@@ -10,7 +10,9 @@
 function createStrictFullGuard(opts?): MemoryModificationGuard;
 ```
 
-Defined in: [packages/security/src/guard/strict-full-guard.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/strict-full-guard.ts#L46)
+Defined in: packages/security/src/guard/strict-full-guard.ts:46
+
+**`Stable`**
 
 Construct a `STRICT_FULL_GUARD`.
 
@@ -23,5 +25,3 @@ Construct a `STRICT_FULL_GUARD`.
 ## Returns
 
 [`MemoryModificationGuard`](/api/@graphorin/security/interfaces/MemoryModificationGuard.md)
-
-## Stable

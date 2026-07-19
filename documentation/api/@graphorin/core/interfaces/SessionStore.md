@@ -6,12 +6,12 @@
 
 # Interface: SessionStore
 
-Defined in: [packages/core/src/contracts/session-store.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L84)
+Defined in: packages/core/src/contracts/session-store.ts:84
+
+**`Stable`**
 
 Pluggable session-metadata storage. Implementations live in the
 storage adapter packages.
-
-## Stable
 
 ## Extended by
 
@@ -25,7 +25,7 @@ storage adapter packages.
 appendHandoff(sessionId, record): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L97)
+Defined in: packages/core/src/contracts/session-store.ts:97
 
 #### Parameters
 
@@ -46,7 +46,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:97](https://github.com
 attachWorkflowRun(run): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L100)
+Defined in: packages/core/src/contracts/session-store.ts:100
 
 #### Parameters
 
@@ -66,7 +66,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:100](https://github.co
 closeSession(sessionId, closedAt): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L91)
+Defined in: packages/core/src/contracts/session-store.ts:91
 
 #### Parameters
 
@@ -87,7 +87,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:91](https://github.com
 createSession(metadata): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L85)
+Defined in: packages/core/src/contracts/session-store.ts:85
 
 #### Parameters
 
@@ -109,7 +109,7 @@ getSession(sessionId): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L86)
+Defined in: packages/core/src/contracts/session-store.ts:86
 
 #### Parameters
 
@@ -131,7 +131,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:86](https://github.com
 listHandoffs(sessionId): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L98)
+Defined in: packages/core/src/contracts/session-store.ts:98
 
 #### Parameters
 
@@ -151,7 +151,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:98](https://github.com
 listSessions(scope): Promise<readonly SessionMetadata[]>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L87)
+Defined in: packages/core/src/contracts/session-store.ts:87
 
 #### Parameters
 
@@ -171,7 +171,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:87](https://github.com
 listWorkflowRuns(sessionId): Promise<readonly SessionWorkflowRun[]>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L101)
+Defined in: packages/core/src/contracts/session-store.ts:101
 
 #### Parameters
 
@@ -191,7 +191,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:101](https://github.co
 registerAgent(entry): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L93)
+Defined in: packages/core/src/contracts/session-store.ts:93
 
 #### Parameters
 
@@ -213,7 +213,7 @@ resolveAgent(agentId): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L95)
+Defined in: packages/core/src/contracts/session-store.ts:95
 
 #### Parameters
 
@@ -235,7 +235,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:95](https://github.com
 retireAgent(agentId, retiredAt): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L94)
+Defined in: packages/core/src/contracts/session-store.ts:94
 
 #### Parameters
 
@@ -256,7 +256,7 @@ Defined in: [packages/core/src/contracts/session-store.ts:94](https://github.com
 updateSession(sessionId, patch): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/session-store.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L90)
+Defined in: packages/core/src/contracts/session-store.ts:90
 
 #### Parameters
 

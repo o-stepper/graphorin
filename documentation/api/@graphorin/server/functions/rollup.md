@@ -10,7 +10,9 @@
 function rollup(checks): HealthRollup;
 ```
 
-Defined in: [packages/server/src/health/checks.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L362)
+Defined in: packages/server/src/health/checks.ts:362
+
+**`Stable`**
 
 Promote the worst per-check status to the rollup label.
 
@@ -23,5 +25,3 @@ Promote the worst per-check status to the rollup label.
 ## Returns
 
 [`HealthRollup`](/api/@graphorin/server/type-aliases/HealthRollup.md)
-
-## Stable

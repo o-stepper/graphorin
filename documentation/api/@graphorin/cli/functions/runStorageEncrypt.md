@@ -10,7 +10,9 @@
 function runStorageEncrypt(options): Promise<StorageEncryptResult>;
 ```
 
-Defined in: [packages/cli/src/commands/storage.ts:354](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L354)
+Defined in: packages/cli/src/commands/storage.ts:354
+
+**`Stable`**
 
 `graphorin storage encrypt --passphrase-from <ref>` - encrypt a
 previously unencrypted SQLite store. Delegates to the optional Phase
@@ -27,5 +29,3 @@ actionable hint.
 ## Returns
 
 `Promise`\&lt;`StorageEncryptResult`\&gt;
-
-## Stable

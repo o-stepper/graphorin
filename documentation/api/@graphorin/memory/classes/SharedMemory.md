@@ -6,14 +6,14 @@
 
 # Class: SharedMemory
 
-Defined in: [packages/memory/src/tiers/shared-memory.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/shared-memory.ts#L13)
+Defined in: packages/memory/src/tiers/shared-memory.ts:13
+
+**`Stable`**
 
 `SharedMemory` - many-to-many attach mode for blocks / facts /
 rules across multiple agents. Storage adapters represent
 attachments as a join table (`shared_attachments` in
 `@graphorin/store-sqlite`).
-
-## Stable
 
 ## Constructors
 
@@ -23,7 +23,7 @@ attachments as a join table (`shared_attachments` in
 new SharedMemory(args): SharedMemory;
 ```
 
-Defined in: [packages/memory/src/tiers/shared-memory.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/shared-memory.ts#L17)
+Defined in: packages/memory/src/tiers/shared-memory.ts:17
 
 #### Parameters
 
@@ -48,7 +48,7 @@ attach(
 userId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/shared-memory.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/shared-memory.ts#L23)
+Defined in: packages/memory/src/tiers/shared-memory.ts:23
 
 Attach `recordId` to `agentId`. Idempotent.
 
@@ -75,7 +75,7 @@ detach(
 userId): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/shared-memory.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/shared-memory.ts#L36)
+Defined in: packages/memory/src/tiers/shared-memory.ts:36
 
 Detach `recordId` from `agentId`. Idempotent.
 
@@ -99,7 +99,7 @@ Detach `recordId` from `agentId`. Idempotent.
 listFor(agentId, userId): Promise<readonly MemoryRecord[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/shared-memory.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/shared-memory.ts#L49)
+Defined in: packages/memory/src/tiers/shared-memory.ts:49
 
 List every attachment for `agentId`.
 

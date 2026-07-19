@@ -10,7 +10,7 @@
 type PackageManagerRunner = (args) => Promise<PackageManagerResult>;
 ```
 
-Defined in: [packages/security/src/supply-chain/package-manager.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L32)
+Defined in: packages/security/src/supply-chain/package-manager.ts:32
 
 **`Experimental`**
 

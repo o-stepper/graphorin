@@ -10,7 +10,9 @@
 function traceSourceForSession(conn, sessionId): AsyncIterable<SpanRecord<SpanType>>;
 ```
 
-Defined in: [packages/store-sqlite/src/span-store.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/span-store.ts#L100)
+Defined in: packages/store-sqlite/src/span-store.ts:100
+
+**`Stable`**
 
 Read a session's persisted spans back as an ordered
 `AsyncIterable<SpanRecord>` - the `traceSource` shape `Session.replay()` and
@@ -27,5 +29,3 @@ the `graphorin memory why` CLI consume. Spans are ordered by start time
 ## Returns
 
 `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;\>
-
-## Stable

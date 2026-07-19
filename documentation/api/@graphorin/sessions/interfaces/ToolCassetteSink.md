@@ -6,13 +6,13 @@
 
 # Interface: ToolCassetteSink
 
-Defined in: [packages/sessions/src/cassette/writer.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/writer.ts#L27)
+Defined in: packages/sessions/src/cassette/writer.ts:27
+
+**`Stable`**
 
 Sink that consumes already-serialized JSONL lines (each carrying
 its trailing newline). Mirrors the export sink shape so callers
 can plug a streaming `node:stream` writer in.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ can plug a streaming `node:stream` writer in.
 write(line): Promise<void>;
 ```
 
-Defined in: [packages/sessions/src/cassette/writer.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/writer.ts#L28)
+Defined in: packages/sessions/src/cassette/writer.ts:28
 
 #### Parameters
 

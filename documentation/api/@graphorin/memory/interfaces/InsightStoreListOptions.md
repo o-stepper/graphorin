@@ -6,7 +6,7 @@
 
 # Interface: InsightStoreListOptions
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:704](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L704)
+Defined in: packages/memory/src/internal/storage-adapter.ts:704
 
 Options accepted by [InsightMemoryStoreExt.list](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md#list).
 
@@ -14,5 +14,5 @@ Options accepted by [InsightMemoryStoreExt.list](/api/@graphorin/memory/interfac
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | [packages/memory/src/internal/storage-adapter.ts:707](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L707) |
-| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | [packages/memory/src/internal/storage-adapter.ts:705](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L705) |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/internal/storage-adapter.ts:707 |
+| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:705 |

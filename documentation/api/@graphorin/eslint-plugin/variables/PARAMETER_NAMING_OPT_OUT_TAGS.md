@@ -10,12 +10,12 @@
 const PARAMETER_NAMING_OPT_OUT_TAGS: ReadonlyArray<string>;
 ```
 
-Defined in: [packages/eslint-plugin/src/tool-discovery.ts:180](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L180)
+Defined in: src/tool-discovery.ts:180
+
+**`Stable`**
 
 Tag values that, when present in a tool's `tags: [...]` literal,
 suppress the parameter-naming rule for that tool. The opt-out
 exists so operators can defer the rename for a long tail of
 pre-RB-49 tools while the framework migrates without breaking
 calling code.
-
-## Stable

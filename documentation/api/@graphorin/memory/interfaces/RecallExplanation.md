@@ -6,7 +6,9 @@
 
 # Interface: RecallExplanation
 
-Defined in: [packages/memory/src/search/explain.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L57)
+Defined in: packages/memory/src/search/explain.ts:57
+
+**`Stable`**
 
 Structured "why was this recalled?" explanation for one
 [SemanticMemory.search](/api/@graphorin/memory/classes/SemanticMemory.md#search) call: the query, the reranker that
@@ -14,13 +16,11 @@ fused the candidate lists, and the per-memory signal breakdown in
 final-rank order. Pure data - safe to attach to a span, log, or
 render. X-3.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-count"></a> `count` | `readonly` | `number` | Number of recalled memories explained. | [packages/memory/src/search/explain.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L63) |
-| <a id="property-query"></a> `query` | `readonly` | `string` | The query the recall ran for. | [packages/memory/src/search/explain.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L59) |
-| <a id="property-rerankerid"></a> `rerankerId` | `readonly` | `string` | Stable id of the reranker that fused the candidate lists. | [packages/memory/src/search/explain.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L61) |
-| <a id="property-results"></a> `results` | `readonly` | readonly [`RecalledMemoryExplanation`](/api/@graphorin/memory/interfaces/RecalledMemoryExplanation.md)[] | Per-memory breakdown, in final-rank order (rank 1 first). | [packages/memory/src/search/explain.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L65) |
+| <a id="property-count"></a> `count` | `readonly` | `number` | Number of recalled memories explained. | packages/memory/src/search/explain.ts:63 |
+| <a id="property-query"></a> `query` | `readonly` | `string` | The query the recall ran for. | packages/memory/src/search/explain.ts:59 |
+| <a id="property-rerankerid"></a> `rerankerId` | `readonly` | `string` | Stable id of the reranker that fused the candidate lists. | packages/memory/src/search/explain.ts:61 |
+| <a id="property-results"></a> `results` | `readonly` | readonly [`RecalledMemoryExplanation`](/api/@graphorin/memory/interfaces/RecalledMemoryExplanation.md)[] | Per-memory breakdown, in final-rank order (rank 1 first). | packages/memory/src/search/explain.ts:65 |

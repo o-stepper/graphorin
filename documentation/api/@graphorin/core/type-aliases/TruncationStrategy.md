@@ -10,7 +10,9 @@
 type TruncationStrategy = "middle" | "tail" | "spill-to-file" | "summarize";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L101)
+Defined in: packages/core/src/types/tool.ts:101
+
+**`Stable`**
 
 Result-envelope truncation strategy applied to a tool's assembled
 output before it reaches the conversation history.
@@ -24,5 +26,3 @@ output before it reaches the conversation history.
   path.
 - `'summarize'`      - invoke the agent's configured summarizer
   and replace the body with the summary.
-
-## Stable

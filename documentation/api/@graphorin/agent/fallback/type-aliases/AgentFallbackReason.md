@@ -10,9 +10,9 @@
 type AgentFallbackReason = "rate-limit" | "capacity" | "context-length" | "transient";
 ```
 
-Defined in: [packages/agent/src/fallback/index.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L46)
+Defined in: packages/agent/src/fallback/index.ts:46
+
+**`Stable`**
 
 Stable taxonomy returned by [isAgentFallbackEligible](/api/@graphorin/agent/fallback/functions/isAgentFallbackEligible.md) on
 eligible errors.
-
-## Stable

@@ -10,7 +10,9 @@
 type PostCompactionHook = (ctx) => Promise<ReadonlyArray<MessageContent>>;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L216)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:216
+
+**`Stable`**
 
 Post-compaction hook signature. Each hook returns the
 `MessageContent[]` parts the harness should append to the
@@ -25,5 +27,3 @@ trimmed message buffer (re-injected Context Essentials).
 ## Returns
 
 `Promise`\<`ReadonlyArray`\&lt;[`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)\&gt;\>
-
-## Stable

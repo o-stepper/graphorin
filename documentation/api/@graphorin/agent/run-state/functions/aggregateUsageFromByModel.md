@@ -10,7 +10,9 @@
 function aggregateUsageFromByModel(byModel): Usage;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:593](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L593)
+Defined in: packages/agent/src/run-state/index.ts:593
+
+**`Stable`**
 
 Recompute the aggregate usage from `usageByModel`. Returns the
 sum that callers can compare against `state.usage` to verify the
@@ -25,5 +27,3 @@ per-step retry loop maintained the documented invariant.
 ## Returns
 
 [`Usage`](/api/@graphorin/core/interfaces/Usage.md)
-
-## Stable

@@ -10,7 +10,7 @@
 function _resetOAuthLifecycleListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/oauth/events.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/events.ts#L75)
+Defined in: packages/security/src/oauth/events.ts:75
 
 **`Experimental`**
 

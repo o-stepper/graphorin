@@ -10,7 +10,9 @@
 function emitOpenInferenceKind<T>(span): void;
 ```
 
-Defined in: [packages/observability/src/openinference/index.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/openinference/index.ts#L126)
+Defined in: packages/observability/src/openinference/index.ts:126
+
+**`Stable`**
 
 Attach the `openinference.span.kind` attribute to a span. No-op for
 span types that lack a clean OpenInference equivalent. The attribute
@@ -32,5 +34,3 @@ no PII.
 ## Returns
 
 `void`
-
-## Stable

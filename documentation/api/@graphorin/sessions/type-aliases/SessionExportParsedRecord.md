@@ -12,8 +12,8 @@ type SessionExportParsedRecord =
   | SessionExportUnknownRecord;
 ```
 
-Defined in: [packages/sessions/src/export/types.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L229)
+Defined in: packages/sessions/src/export/types.ts:229
+
+**`Stable`**
 
 Either a typed record or the unknown wrapper.
-
-## Stable

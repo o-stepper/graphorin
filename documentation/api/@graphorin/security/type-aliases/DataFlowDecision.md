@@ -16,7 +16,9 @@ type DataFlowDecision =
 } & DataFlowFinding;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:310](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L310)
+Defined in: packages/security/src/dataflow/types.ts:310
+
+**`Stable`**
 
 The verdict [DataFlowPolicy.evaluate](/api/@graphorin/security/interfaces/DataFlowPolicy.md#evaluate) returns for a sink call.
 
@@ -28,5 +30,3 @@ The verdict [DataFlowPolicy.evaluate](/api/@graphorin/security/interfaces/DataFl
   audit and proceed (the audited escape hatch).
 - `'block'`       - tainted flow in `'enforce'` mode: do not run the
   sink; surface a `dataflow_policy_blocked` error.
-
-## Stable

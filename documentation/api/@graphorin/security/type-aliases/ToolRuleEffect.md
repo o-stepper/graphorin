@@ -12,10 +12,10 @@ type ToolRuleEffect =
   | "forbid";
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L79)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:79
+
+**`Stable`**
 
 Effect accepted on a [ToolArgumentRule](/api/@graphorin/security/interfaces/ToolArgumentRule.md): the four-value
 vocabulary plus `'forbid'`, the pre-E1 spelling kept as a back-compat
 alias of `'deny'` (existing policies keep working byte-for-byte).
-
-## Stable

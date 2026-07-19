@@ -10,7 +10,9 @@
 function isChannelDeliveryError(err): err is ChannelDeliveryError;
 ```
 
-Defined in: [packages/channels/src/spi.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L235)
+Defined in: packages/channels/src/spi.ts:235
+
+**`Stable`**
 
 Structural check for [ChannelDeliveryError](/api/@graphorin/channels/classes/ChannelDeliveryError.md) that survives
 package-boundary `instanceof` failures (matched by `name`, the
@@ -25,5 +27,3 @@ same convention as `EmbedderLockOnFirstError`).
 ## Returns
 
 `err is ChannelDeliveryError`
-
-## Stable

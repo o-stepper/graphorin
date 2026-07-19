@@ -14,7 +14,9 @@ type Message =
   | ToolMessage;
 ```
 
-Defined in: [packages/core/src/types/message.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L141)
+Defined in: packages/core/src/types/message.ts:141
+
+**`Stable`**
 
 Chat message. The shape is provider-agnostic: adapters convert it to /
 from the wire format.
@@ -24,5 +26,3 @@ from the wire format.
 - Assistant messages may carry `toolCalls` alongside their content.
 - Tool messages carry the originating `toolCallId` so the model can
   correlate the response to its previous request.
-
-## Stable

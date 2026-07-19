@@ -33,6 +33,7 @@ import type { Memory } from '@graphorin/memory';
 
 import {
   AgentBudgetExceededError,
+  AgentBudgetUnpricedError,
   AgentRuntimeError,
   ConcurrentRunError,
   InvalidAgentConfigError,
@@ -689,10 +690,29 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         if (runBudget !== undefined) {
           if (!budgetUnpricedWarned && isCostCeilingUnpriced(runBudget, state.usage)) {
             budgetUnpricedWarned = true;
+            // Deep retest 2026-07-19 (P1-3): an unpriced cost ceiling is
+            // fail-closed by default - a caller who set maxCostUsd
+            // believes a cap is active, and silently unmetered spend is
+            // the dangerous outcome. `onUnpriced: 'warn'` restores the
+            // pre-0.13 warn-once behaviour.
+            if ((runBudget.onUnpriced ?? 'fail') === 'fail') {
+              const unpriced = new AgentBudgetUnpricedError();
+              if (runBudget.onExceed === 'throw') {
+                throw unpriced;
+              }
+              yield {
+                type: 'agent.error',
+                error: { message: unpriced.message, code: 'budget-unpriced' },
+              };
+              state.status = 'failed';
+              state.error = { message: unpriced.message, code: 'budget-unpriced' };
+              return yield* finishRun(state, finalSnapshot);
+            }
             console.warn(
               '[graphorin/agent] RunBudget.maxCostUsd is set but the accumulated usage ' +
-                'carries no USD cost data, so the cost ceiling is UNENFORCED. Wire ' +
-                'withCostTracking (@graphorin/provider) with a @graphorin/pricing snapshot, ' +
+                'carries no USD cost data, so the cost ceiling is UNENFORCED ' +
+                "(RunBudget.onUnpriced: 'warn'). Wire withCostTracking " +
+                '(@graphorin/provider) with a @graphorin/pricing snapshot, ' +
                 'or use RunBudget.maxTokens.',
             );
           }
@@ -961,10 +981,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       yield { type: 'agent.error', error: { message, code } };
       state.status = 'failed';
       state.error = { message, code };
-      if (cause instanceof AgentBudgetExceededError) {
+      if (cause instanceof AgentBudgetExceededError || cause instanceof AgentBudgetUnpricedError) {
         // C5: `onExceed: 'throw'` REJECTS the run - the caller opted
         // out of graceful finalization (no final checkpoint, no
         // `agent.end`). The `finally` below still closes the trace.
+        // The unpriced-ceiling rejection (P1-3) takes the same path.
         throw cause;
       }
       return yield* finishRun(state, finalSnapshot);

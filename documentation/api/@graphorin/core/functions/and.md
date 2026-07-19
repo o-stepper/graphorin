@@ -10,7 +10,9 @@
 function and(...conditions): StopCondition;
 ```
 
-Defined in: [packages/core/src/types/stop-condition.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L91)
+Defined in: packages/core/src/types/stop-condition.ts:91
+
+**`Stable`**
 
 Stop only when **all** of the supplied conditions are satisfied.
 
@@ -23,5 +25,3 @@ Stop only when **all** of the supplied conditions are satisfied.
 ## Returns
 
 [`StopCondition`](/api/@graphorin/core/interfaces/StopCondition.md)
-
-## Stable

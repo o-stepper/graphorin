@@ -6,7 +6,9 @@
 
 # Class: Directive\&lt;TUpdate, TResume\&gt;
 
-Defined in: [packages/core/src/channels/directive.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L20)
+Defined in: packages/core/src/channels/directive.ts:20
+
+**`Stable`**
 
 Workflow control-flow primitive: a single value handed to
 `Workflow.resume(threadId, directive?)` (or returned from a node's
@@ -24,8 +26,6 @@ Workflow control-flow primitive: a single value handed to
 The shape is **Graphorin's own design** (the name `Directive` is part
 of the public API).
 
-## Stable
-
 ## Type Parameters
 
 | Type Parameter | Default type |
@@ -41,7 +41,7 @@ of the public API).
 new Directive<TUpdate, TResume>(opts): Directive<TUpdate, TResume>;
 ```
 
-Defined in: [packages/core/src/channels/directive.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L25)
+Defined in: packages/core/src/channels/directive.ts:25
 
 #### Parameters
 
@@ -57,6 +57,6 @@ Defined in: [packages/core/src/channels/directive.ts:25](https://github.com/o-st
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-goto"></a> `goto?` | `readonly` | `string` | [packages/core/src/channels/directive.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L21) |
-| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | [packages/core/src/channels/directive.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L22) |
-| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | [packages/core/src/channels/directive.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/directive.ts#L23) |
+| <a id="property-goto"></a> `goto?` | `readonly` | `string` | packages/core/src/channels/directive.ts:21 |
+| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | packages/core/src/channels/directive.ts:22 |
+| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | packages/core/src/channels/directive.ts:23 |

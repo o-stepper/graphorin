@@ -12,7 +12,9 @@ type SkillsTrustLevel =
   | "unknown";
 ```
 
-Defined in: [packages/skills/src/types/index.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L31)
+Defined in: packages/skills/src/types/index.ts:31
+
+**`Stable`**
 
 Trust level recognised by the skills loader. Extends the
 supply-chain trust ladder with a third `'unknown'` value the
@@ -22,5 +24,3 @@ sandbox tier resolver treats `'unknown'` like `'untrusted'`
 installer treats it as untrusted EXCEPT that the signature
 requirement is downgraded from mandatory to optional - signature
 is a trust upgrade, not a gate (Phase 08 § Risks & mitigations).
-
-## Stable

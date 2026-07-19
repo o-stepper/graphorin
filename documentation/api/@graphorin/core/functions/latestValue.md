@@ -10,7 +10,9 @@
 function latestValue<T>(opts?): LatestValue<T>;
 ```
 
-Defined in: [packages/core/src/channels/channels.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L124)
+Defined in: packages/core/src/channels/channels.ts:124
+
+**`Stable`**
 
 Construct a `LatestValue` channel.
 
@@ -30,5 +32,3 @@ Construct a `LatestValue` channel.
 ## Returns
 
 [`LatestValue`](/api/@graphorin/core/interfaces/LatestValue.md)\&lt;`T`\&gt;
-
-## Stable

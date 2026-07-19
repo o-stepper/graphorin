@@ -14,7 +14,9 @@ function fuseWeighted<TRecord>(
    labels?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: [packages/memory/src/search/rrf.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L148)
+Defined in: packages/memory/src/search/rrf.ts:148
+
+**`Stable`**
 
 Weighted / convex generalization of [fuseRrf](/api/@graphorin/memory/functions/fuseRrf.md) (X-2). Each input
 list `i` contributes `weights[i] · 1 / (k + rank)` to a record's fused
@@ -52,5 +54,3 @@ position.
 ## Returns
 
 readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
-
-## Stable

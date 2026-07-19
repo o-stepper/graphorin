@@ -6,9 +6,9 @@
 
 # Interface: WorkflowResumedEvent\&lt;TState\&gt;
 
-Defined in: [packages/core/src/types/workflow-event.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L101)
+Defined in: packages/core/src/types/workflow-event.ts:101
 
-## Stable
+**`Stable`**
 
 ## Type Parameters
 
@@ -20,7 +20,7 @@ Defined in: [packages/core/src/types/workflow-event.ts:101](https://github.com/o
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | [packages/core/src/types/workflow-event.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L105) |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | [packages/core/src/types/workflow-event.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L104) |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | [packages/core/src/types/workflow-event.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L103) |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.resumed"` | [packages/core/src/types/workflow-event.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/workflow-event.ts#L102) |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/src/types/workflow-event.ts:105 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/workflow-event.ts:104 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:103 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.resumed"` | packages/core/src/types/workflow-event.ts:102 |

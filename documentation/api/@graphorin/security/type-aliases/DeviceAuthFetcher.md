@@ -15,7 +15,7 @@ type DeviceAuthFetcher = (url, init) => Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/oauth/authorize-device-flow.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/authorize-device-flow.ts#L31)
+Defined in: packages/security/src/oauth/authorize-device-flow.ts:31
 
 Strategy hook used by tests to stub the device-authorization request.
 

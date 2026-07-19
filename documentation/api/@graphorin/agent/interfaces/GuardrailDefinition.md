@@ -6,13 +6,13 @@
 
 # Interface: GuardrailDefinition\&lt;TValue\&gt;
 
-Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
+Defined in: packages/security/dist/guardrails/types.d.ts:75
+
+**`Stable`**
 
 Definition of a single guardrail. The `kind` discriminator lets
 downstream code tell input from output guardrails without juggling
 separate registries.
-
-## Stable
 
 ## Type Parameters
 
@@ -24,6 +24,6 @@ separate registries.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\<[`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\> | [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts) |
-| <a id="property-kind"></a> `kind` | `readonly` | `"output"` \| `"input"` | [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts) |
+| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\<[`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\> | packages/security/dist/guardrails/types.d.ts:78 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"output"` \| `"input"` | packages/security/dist/guardrails/types.d.ts:76 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/security/dist/guardrails/types.d.ts:77 |

@@ -10,7 +10,9 @@
 function loadSkills(sources, options?): Promise<readonly Skill[]>;
 ```
 
-Defined in: [packages/skills/src/loader/index.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/loader/index.ts#L195)
+Defined in: packages/skills/src/loader/index.ts:195
+
+**`Stable`**
 
 Load multiple skills concurrently. The sources are loaded in parallel and
 the returned array preserves input order. When `throwOnSourceError === false`
@@ -27,5 +29,3 @@ rejection propagates out unchanged.
 ## Returns
 
 `Promise`\&lt;readonly [`Skill`](/api/@graphorin/skills/interfaces/Skill.md)[]\&gt;
-
-## Stable

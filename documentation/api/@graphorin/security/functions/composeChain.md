@@ -10,7 +10,9 @@
 function composeChain(stores): SecretsStore;
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L173)
+Defined in: packages/security/src/secrets/factory.ts:173
+
+**`Stable`**
 
 Compose multiple stores into a try-in-order chain. The first non-null
 value wins; writes go to the first writable store.
@@ -24,5 +26,3 @@ value wins; writes go to the first writable store.
 ## Returns
 
 [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md)
-
-## Stable

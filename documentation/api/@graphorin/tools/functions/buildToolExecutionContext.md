@@ -10,7 +10,9 @@
 function buildToolExecutionContext<TDeps>(opts): ToolExecutionContext<TDeps>;
 ```
 
-Defined in: [packages/tools/src/executor/tool-context.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/tool-context.ts#L76)
+Defined in: packages/tools/src/executor/tool-context.ts:76
+
+**`Stable`**
 
 Build a [ToolExecutionContext](/api/@graphorin/core/interfaces/ToolExecutionContext.md) for one invocation. The
 returned context honours the tool's `secretsAllowed` ACL - calls to
@@ -36,5 +38,3 @@ is `false`.
 ## Returns
 
 [`ToolExecutionContext`](/api/@graphorin/core/interfaces/ToolExecutionContext.md)\&lt;`TDeps`\&gt;
-
-## Stable

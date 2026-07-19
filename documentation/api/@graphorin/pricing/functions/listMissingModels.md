@@ -10,7 +10,9 @@
 function listMissingModels(spans, snapshot?): readonly MissingModelEntry[];
 ```
 
-Defined in: [packages/pricing/src/missing.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/missing.ts#L35)
+Defined in: pricing/src/missing.ts:35
+
+**`Stable`**
 
 Return one entry per (provider, model) pair that the snapshot does
 not recognise, sorted by descending occurrence count.
@@ -25,5 +27,3 @@ not recognise, sorted by descending occurrence count.
 ## Returns
 
 readonly [`MissingModelEntry`](/api/@graphorin/pricing/interfaces/MissingModelEntry.md)[]
-
-## Stable

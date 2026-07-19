@@ -10,7 +10,9 @@
 function composeProviderMiddleware(middlewares): ProviderMiddleware;
 ```
 
-Defined in: [packages/provider/src/middleware/compose.ts:136](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L136)
+Defined in: packages/provider/src/middleware/compose.ts:136
+
+**`Stable`**
 
 Wrap an adapter in a middleware chain whose order is validated
 against [CANONICAL\_MIDDLEWARE\_ORDER](/api/@graphorin/provider/variables/CANONICAL_MIDDLEWARE_ORDER.md). The argument array MUST
@@ -33,5 +35,3 @@ responsibility of placing them sensibly.
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

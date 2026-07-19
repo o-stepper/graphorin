@@ -10,7 +10,9 @@
 function onOAuthLifecycle(listener): () => void;
 ```
 
-Defined in: [packages/security/src/oauth/events.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/events.ts#L46)
+Defined in: packages/security/src/oauth/events.ts:46
+
+**`Stable`**
 
 Subscribe to OAuth lifecycle events. Returns an unsubscribe
 function.
@@ -24,5 +26,3 @@ function.
 ## Returns
 
 () => `void`
-
-## Stable

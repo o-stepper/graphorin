@@ -10,7 +10,9 @@
 type SideEffectClass = "pure" | "read-only" | "side-effecting" | "external-stateful";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L59)
+Defined in: packages/core/src/types/tool.ts:59
+
+**`Stable`**
 
 Side-effect classification declared by a tool author.
 
@@ -26,5 +28,3 @@ cassette layers, retry middleware, and approval-policy derivations.
 - `'external-stateful'` - mutates state outside the agent's
   boundary that other systems can observe (e.g. issue creation,
   message dispatch, payment).
-
-## Stable

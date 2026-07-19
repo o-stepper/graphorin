@@ -6,23 +6,23 @@
 
 # Interface: CostSnapshot
 
-Defined in: [packages/observability/src/cost/types.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L49)
+Defined in: packages/observability/src/cost/types.ts:49
+
+**`Stable`**
 
 Snapshot returned by [CostTracker.usage](/api/@graphorin/observability/interfaces/CostTracker.md#usage).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly \{ `cachedReadTokens`: `number`; `cacheWriteTokens`: `number`; `callCount`: `number`; `completionTokens`: `number`; `cost`: [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null`; `mixedCurrency`: `boolean`; `model`: `string`; `promptTokens`: `number`; `reasoningTokens`: `number`; \}[] | - | [packages/observability/src/cost/types.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L71) |
-| <a id="property-cachedreadtokens"></a> `cachedReadTokens` | `readonly` | `number` | W-092: aggregated prompt-cache READ tokens (0 when never recorded). | [packages/observability/src/cost/types.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L55) |
-| <a id="property-cachewritetokens"></a> `cacheWriteTokens` | `readonly` | `number` | W-092: aggregated prompt-cache WRITE tokens (0 when never recorded). | [packages/observability/src/cost/types.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L57) |
-| <a id="property-callcount"></a> `callCount` | `readonly` | `number` | - | [packages/observability/src/cost/types.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L58) |
-| <a id="property-completiontokens"></a> `completionTokens` | `readonly` | `number` | - | [packages/observability/src/cost/types.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L52) |
-| <a id="property-cost"></a> `cost` | `readonly` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null` | Aggregated cost in WHOLE currency units (W-045; for USD - dollars, fractional values expected). Same convention as core `Cost.amount` and `@graphorin/pricing.calculateCost` - never minor units. | [packages/observability/src/cost/types.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L64) |
-| <a id="property-mixedcurrency"></a> `mixedCurrency` | `readonly` | `boolean` | RP-22: `true` when records carrying differing currencies were aggregated into this snapshot. `cost.amount` is then a sum across currencies and must not be treated as a single clean figure. | [packages/observability/src/cost/types.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L70) |
-| <a id="property-prompttokens"></a> `promptTokens` | `readonly` | `number` | - | [packages/observability/src/cost/types.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L51) |
-| <a id="property-reasoningtokens"></a> `reasoningTokens` | `readonly` | `number` | - | [packages/observability/src/cost/types.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L53) |
-| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | - | [packages/observability/src/cost/types.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L50) |
+| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly \{ `cachedReadTokens`: `number`; `cacheWriteTokens`: `number`; `callCount`: `number`; `completionTokens`: `number`; `cost`: [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null`; `mixedCurrency`: `boolean`; `model`: `string`; `promptTokens`: `number`; `reasoningTokens`: `number`; \}[] | - | packages/observability/src/cost/types.ts:71 |
+| <a id="property-cachedreadtokens"></a> `cachedReadTokens` | `readonly` | `number` | W-092: aggregated prompt-cache READ tokens (0 when never recorded). | packages/observability/src/cost/types.ts:55 |
+| <a id="property-cachewritetokens"></a> `cacheWriteTokens` | `readonly` | `number` | W-092: aggregated prompt-cache WRITE tokens (0 when never recorded). | packages/observability/src/cost/types.ts:57 |
+| <a id="property-callcount"></a> `callCount` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:58 |
+| <a id="property-completiontokens"></a> `completionTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:52 |
+| <a id="property-cost"></a> `cost` | `readonly` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null` | Aggregated cost in WHOLE currency units (W-045; for USD - dollars, fractional values expected). Same convention as core `Cost.amount` and `@graphorin/pricing.calculateCost` - never minor units. | packages/observability/src/cost/types.ts:64 |
+| <a id="property-mixedcurrency"></a> `mixedCurrency` | `readonly` | `boolean` | RP-22: `true` when records carrying differing currencies were aggregated into this snapshot. `cost.amount` is then a sum across currencies and must not be treated as a single clean figure. | packages/observability/src/cost/types.ts:70 |
+| <a id="property-prompttokens"></a> `promptTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:51 |
+| <a id="property-reasoningtokens"></a> `reasoningTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:53 |
+| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:50 |

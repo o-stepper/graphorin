@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutor
 
-Defined in: [packages/tools/src/executor/types.ts:430](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L430)
+Defined in: packages/tools/src/executor/types.ts:430
 
 Public executor surface.
 
@@ -18,7 +18,7 @@ Public executor surface.
 executeBatch(opts): Promise<readonly CompletedToolCall<unknown>[]>;
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:432](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L432)
+Defined in: packages/tools/src/executor/types.ts:432
 
 Run a batch of tool calls.
 
@@ -40,7 +40,7 @@ Run a batch of tool calls.
 executeOne(opts): Promise<CompletedToolCall<unknown>>;
 ```
 
-Defined in: [packages/tools/src/executor/types.ts:434](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L434)
+Defined in: packages/tools/src/executor/types.ts:434
 
 Run a single tool call.
 

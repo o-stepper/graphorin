@@ -17,7 +17,9 @@ function truncateToTokens(
 }>;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-budget.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-budget.ts#L155)
+Defined in: packages/memory/src/context-engine/token-budget.ts:155
+
+**`Stable`**
 
 Truncate `text` to fit `maxTokens`, preserving the leading
 portion and replacing the trailing portion with the literal
@@ -45,5 +47,3 @@ well-formed in the assembled prompt. Plain strings are unaffected.
   `tokens`: `number`;
   `truncated`: `boolean`;
 \}\>
-
-## Stable

@@ -32,8 +32,8 @@ type ReplayEvent =
 };
 ```
 
-Defined in: [packages/observability/src/replay/types.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/types.ts#L59)
+Defined in: packages/observability/src/replay/types.ts:59
+
+**`Stable`**
 
 Single record yielded by the replay iterator.
-
-## Stable

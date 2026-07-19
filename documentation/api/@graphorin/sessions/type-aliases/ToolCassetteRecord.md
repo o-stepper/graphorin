@@ -18,8 +18,8 @@ type ToolCassetteRecord =
   | ToolCassetteFooterRecord;
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:194](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L194)
+Defined in: packages/sessions/src/cassette/types.ts:194
+
+**`Stable`**
 
 Union of every record kind. Consumed by the writer + parser.
-
-## Stable

@@ -10,7 +10,9 @@
 function runConsolidatorStatus(options?): Promise<ConsolidatorStatusResult>;
 ```
 
-Defined in: [packages/cli/src/commands/consolidator.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L64)
+Defined in: packages/cli/src/commands/consolidator.ts:64
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/consolidator.ts:64](https://github.com/o-
 ## Returns
 
 `Promise`\&lt;[`ConsolidatorStatusResult`](/api/@graphorin/cli/interfaces/ConsolidatorStatusResult.md)\&gt;
-
-## Stable

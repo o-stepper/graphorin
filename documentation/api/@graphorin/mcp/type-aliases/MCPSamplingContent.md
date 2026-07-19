@@ -24,6 +24,6 @@ type MCPSamplingContent =
 };
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L141)
+Defined in: packages/mcp/src/client/types.ts:141
 
 A single content block carried by a sampling message or result.

@@ -10,7 +10,9 @@
 function parseFrontmatter(frontmatter): Record<string, unknown>;
 ```
 
-Defined in: [packages/security/src/supply-chain/frontmatter.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L52)
+Defined in: packages/security/src/supply-chain/frontmatter.ts:52
+
+**`Stable`**
 
 Parse the YAML frontmatter into a plain object. Returns `{}` for an
 empty block.
@@ -24,5 +26,3 @@ empty block.
 ## Returns
 
 `Record`\&lt;`string`, `unknown`\&gt;
-
-## Stable

@@ -6,7 +6,9 @@
 
 # Interface: SamplingRule
 
-Defined in: [packages/observability/src/tracer/sampling.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L28)
+Defined in: packages/observability/src/tracer/sampling.ts:28
+
+**`Stable`**
 
 Per-span-type rate override. Applies on the probabilistic root path
 AND (W-090) to children of a sampled parent under `'parent-based'` -
@@ -15,11 +17,9 @@ inside every sampled `agent.run` trace. A child dropped by its rule
 breaks the tree below it: its own descendants inherit
 `parentSampled=false`.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-rate"></a> `rate` | `readonly` | `number` | [packages/observability/src/tracer/sampling.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L30) |
-| <a id="property-type"></a> `type` | `readonly` | `string` | [packages/observability/src/tracer/sampling.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L29) |
+| <a id="property-rate"></a> `rate` | `readonly` | `number` | packages/observability/src/tracer/sampling.ts:30 |
+| <a id="property-type"></a> `type` | `readonly` | `string` | packages/observability/src/tracer/sampling.ts:29 |

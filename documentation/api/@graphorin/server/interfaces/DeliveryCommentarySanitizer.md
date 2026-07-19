@@ -6,19 +6,19 @@
 
 # Interface: DeliveryCommentarySanitizer
 
-Defined in: [packages/server/src/commentary/sanitizer.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L49)
+Defined in: packages/server/src/commentary/sanitizer.ts:49
+
+**`Stable`**
 
 Public surface returned by [createDeliveryCommentarySanitizer](/api/@graphorin/server/functions/createDeliveryCommentarySanitizer.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | [packages/server/src/commentary/sanitizer.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L51) |
-| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | [packages/server/src/commentary/sanitizer.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L52) |
-| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | [packages/server/src/commentary/sanitizer.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L50) |
+| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | packages/server/src/commentary/sanitizer.ts:51 |
+| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | packages/server/src/commentary/sanitizer.ts:52 |
+| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | packages/server/src/commentary/sanitizer.ts:50 |
 
 ## Methods
 
@@ -36,7 +36,7 @@ sanitize(frame, transport): {
 };
 ```
 
-Defined in: [packages/server/src/commentary/sanitizer.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L63)
+Defined in: packages/server/src/commentary/sanitizer.ts:63
 
 Sanitize the payload of a single `event` frame. Returns the
 (possibly-replaced) frame; emits an audit decision via the
@@ -77,10 +77,10 @@ The frame is returned unchanged when:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `eventId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `kind` | `"event"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `payload?` | `unknown` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `subject` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `subscriptionId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `type` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
-| `v` | `"1"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `eventId` | `string` | packages/protocol/dist/server-message.d.ts:113 |
+| `kind` | `"event"` | packages/protocol/dist/server-message.d.ts:110 |
+| `payload?` | `unknown` | packages/protocol/dist/server-message.d.ts:114 |
+| `subject` | `string` | packages/protocol/dist/server-message.d.ts:112 |
+| `subscriptionId` | `string` | packages/protocol/dist/server-message.d.ts:111 |
+| `type` | `string` | packages/protocol/dist/server-message.d.ts:109 |
+| `v` | `"1"` | packages/protocol/dist/server-message.d.ts:108 |

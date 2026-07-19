@@ -10,7 +10,9 @@
 function buildHydeRequest(query, options?): ProviderRequest;
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L134)
+Defined in: packages/memory/src/search/query-transform.ts:134
+
+**`Stable`**
 
 Build the HyDE pseudo-document request. Pure - no I/O.
 
@@ -26,5 +28,3 @@ Build the HyDE pseudo-document request. Pure - no I/O.
 ## Returns
 
 [`ProviderRequest`](/api/@graphorin/core/interfaces/ProviderRequest.md)
-
-## Stable

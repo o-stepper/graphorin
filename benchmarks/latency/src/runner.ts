@@ -1,3 +1,4 @@
+import { realpathSync } from 'node:fs';
 import pkg from '../package.json' with { type: 'json' };
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
@@ -121,6 +122,16 @@ export async function main(): Promise<void> {
   if (!pass) process.exitCode = 1;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) ===
+    (() => {
+      try {
+        return realpathSync(process.argv[1]);
+      } catch {
+        return process.argv[1];
+      }
+    })()
+) {
   await main();
 }

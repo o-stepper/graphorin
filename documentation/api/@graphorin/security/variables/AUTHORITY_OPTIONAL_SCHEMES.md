@@ -10,12 +10,12 @@
 const AUTHORITY_OPTIONAL_SCHEMES: ReadonlySet<string>;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L43)
+Defined in: packages/security/src/secrets/secret-ref.ts:43
+
+**`Stable`**
 
 Schemes whose authority component is optional. `file:` and
 `encrypted-file:` accept either `file:///abs/path` (authority empty)
 or `file:relative/path` (opaque). `vault://` accepts both an explicit
 server (`vault://host:port/...`) and an opaque form that defers to
 the `VAULT_ADDR` environment variable.
-
-## Stable

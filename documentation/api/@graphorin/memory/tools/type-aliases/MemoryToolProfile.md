@@ -10,9 +10,9 @@
 type MemoryToolProfile = "interactive" | "reviser" | "full";
 ```
 
-Defined in: [packages/memory/src/tools/index.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L69)
+Defined in: packages/memory/src/tools/index.ts:69
+
+**`Stable`**
 
 Memory tool profile (wave-D D3): which slice of the canonical set an
 agent receives. `'interactive'` is read-only by construction.
-
-## Stable

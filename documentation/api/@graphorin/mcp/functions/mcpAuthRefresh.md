@@ -13,7 +13,7 @@ function mcpAuthRefresh(
 options?): Promise<OAuthSession>;
 ```
 
-Defined in: [packages/mcp/src/oauth/library.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L42)
+Defined in: packages/mcp/src/oauth/library.ts:42
 
 Drive `graphorin auth refresh --mcp <id>`.
 

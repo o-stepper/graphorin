@@ -10,7 +10,7 @@
 function isZodV3Schema(value): value is ZodV3Like;
 ```
 
-Defined in: [packages/tools/src/schema/to-json-schema.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L87)
+Defined in: packages/tools/src/schema/to-json-schema.ts:87
 
 `true` when `value` is a Zod **v3 classic** schema instance.
 

@@ -6,7 +6,9 @@
 
 # Interface: TaintLedger
 
-Defined in: [packages/security/src/dataflow/types.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L123)
+Defined in: packages/security/src/dataflow/types.ts:123
+
+**`Stable`**
 
 Per-run taint state. Records the provenance of each tool output and
 answers two questions a sink check needs: *has untrusted/sensitive
@@ -15,15 +17,13 @@ untrusted content verbatim?*
 
 Implementations are stateful and run-scoped; create one per run.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` once any secret-tier output has entered the run. | [packages/security/src/dataflow/types.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L150) |
-| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` once any untrusted-source output has entered the run. | [packages/security/src/dataflow/types.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L148) |
-| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | Distinct untrusted source kinds observed so far. | [packages/security/src/dataflow/types.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L152) |
+| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` once any secret-tier output has entered the run. | packages/security/src/dataflow/types.ts:150 |
+| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` once any untrusted-source output has entered the run. | packages/security/src/dataflow/types.ts:148 |
+| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | Distinct untrusted source kinds observed so far. | packages/security/src/dataflow/types.ts:152 |
 
 ## Methods
 
@@ -33,7 +33,7 @@ Implementations are stateful and run-scoped; create one per run.
 inspectArgs(argsText): ArgsTaintProbe;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L146)
+Defined in: packages/security/src/dataflow/types.ts:146
 
 Probe a sink's serialized arguments for verbatim untrusted carry.
 
@@ -55,7 +55,7 @@ Probe a sink's serialized arguments for verbatim untrusted carry.
 optional recordAssistantOutput(text): void;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L134)
+Defined in: packages/security/src/dataflow/types.ts:134
 
 C6: record the MODEL's own output as derived-untrusted once untrusted
 content has entered the run. Tracks the text as untrusted spans (source
@@ -82,7 +82,7 @@ compiling; the built-in ledger implements it.
 optional recordInboundMessage(label, text): void;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L144)
+Defined in: packages/security/src/dataflow/types.ts:144
 
 B1.5: record message-borne input (channel inbound) with the same
 widening semantics as [TaintLedger.recordOutput](/api/@graphorin/security/interfaces/TaintLedger.md#recordoutput). A dedicated
@@ -111,7 +111,7 @@ ledger implements it.
 recordOutput(label, outputText): void;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L125)
+Defined in: packages/security/src/dataflow/types.ts:125
 
 Record one tool output's provenance (and its text, if untrusted).
 
@@ -134,7 +134,7 @@ Record one tool output's provenance (and its text, if untrusted).
 snapshot(): TaintLedgerSnapshot;
 ```
 
-Defined in: [packages/security/src/dataflow/types.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/types.ts#L160)
+Defined in: packages/security/src/dataflow/types.ts:160
 
 Coarse, serializable summary of the load-bearing trifecta-gate signal -
 the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked

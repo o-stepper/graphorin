@@ -10,7 +10,9 @@
 function appendAudit(db, input): Promise<StoredAuditEntry>;
 ```
 
-Defined in: [packages/security/src/audit/append.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/append.ts#L82)
+Defined in: packages/security/src/audit/append.ts:82
+
+**`Stable`**
 
 Append a single audit entry. The function is `async` so it can run
 the canonical-JSON serializer + SHA-256 in a worker pool in a
@@ -29,5 +31,3 @@ Concurrent calls against the same `AuditDb` are serialised so the
 ## Returns
 
 `Promise`\&lt;[`StoredAuditEntry`](/api/@graphorin/security/interfaces/StoredAuditEntry.md)\&gt;
-
-## Stable

@@ -18,7 +18,9 @@ function authorize(result, required):
 };
 ```
 
-Defined in: [packages/security/src/auth/verify.ts:454](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L454)
+Defined in: packages/security/src/auth/verify.ts:454
+
+**`Stable`**
 
 Helper that authorises a parsed verify result against a required
 scope. Keeps the scope plumbing close to the rest of the auth
@@ -41,5 +43,3 @@ surface so callers do not have to import from two places.
   `ok`: `false`;
   `reason`: `"unauthenticated"` \| `"insufficient-scope"`;
 \}
-
-## Stable

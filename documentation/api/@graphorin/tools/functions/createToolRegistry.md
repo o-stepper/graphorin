@@ -10,7 +10,9 @@
 function createToolRegistry(opts?): ToolRegistry;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L133)
+Defined in: packages/tools/src/registry/registry.ts:133
+
+**`Stable`**
 
 Build a [ToolRegistry](/api/@graphorin/tools/interfaces/ToolRegistry.md) instance.
 
@@ -23,5 +25,3 @@ Build a [ToolRegistry](/api/@graphorin/tools/interfaces/ToolRegistry.md) instanc
 ## Returns
 
 [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md)
-
-## Stable

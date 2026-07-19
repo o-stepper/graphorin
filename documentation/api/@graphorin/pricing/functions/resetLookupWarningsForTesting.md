@@ -10,7 +10,7 @@
 function _resetLookupWarningsForTesting(): void;
 ```
 
-Defined in: [packages/pricing/src/lookup.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L30)
+Defined in: pricing/src/lookup.ts:30
 
 **`Internal`**
 

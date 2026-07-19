@@ -6,15 +6,15 @@
 
 # Interface: PruneAuditResult
 
-Defined in: [packages/security/src/audit/prune.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/prune.ts#L88)
+Defined in: packages/security/src/audit/prune.ts:88
+
+**`Stable`**
 
 Result of `pruneAudit(...)`.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | [packages/security/src/audit/prune.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/prune.ts#L89) |
-| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | Sequence number of the first surviving entry, or `undefined` if empty. | [packages/security/src/audit/prune.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/prune.ts#L91) |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | packages/security/src/audit/prune.ts:89 |
+| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | Sequence number of the first surviving entry, or `undefined` if empty. | packages/security/src/audit/prune.ts:91 |

@@ -10,7 +10,9 @@
 function serializeAwakeableRef(ref): string;
 ```
 
-Defined in: [packages/workflow/src/awakeable-ref.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/awakeable-ref.ts#L38)
+Defined in: packages/workflow/src/awakeable-ref.ts:38
+
+**`Stable`**
 
 Serialize an [AwakeableRef](/api/@graphorin/workflow/interfaces/AwakeableRef.md) into `wf:<workflowId>:<threadId>:<name>`
 with URI-encoded segments. Throws `TypeError` when any segment is
@@ -25,5 +27,3 @@ empty - a partial address is unresolvable by construction.
 ## Returns
 
 `string`
-
-## Stable

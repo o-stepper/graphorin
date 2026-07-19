@@ -10,7 +10,7 @@
 function createTracer(opts): GraphorinTracer;
 ```
 
-Defined in: [packages/observability/src/tracer/tracer.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L128)
+Defined in: packages/observability/src/tracer/tracer.ts:128
 
 ## Parameters
 

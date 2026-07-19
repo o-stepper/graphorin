@@ -18,7 +18,9 @@ type ContentOrigin =
   | "tool-call:args";
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L49)
+Defined in: packages/memory/src/context-engine/annotations.ts:49
+
+**`Stable`**
 
 Origin discriminator for an assembled message-content part. The
 non-ContextEngine origins (`'user:input'`, `'tool:result'`,
@@ -26,5 +28,3 @@ non-ContextEngine origins (`'user:input'`, `'tool:result'`,
 (agent runtime) when the corresponding payload enters
 `session_messages`; the ContextEngine then propagates the tag
 through the assembled message list.
-
-## Stable

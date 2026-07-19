@@ -10,7 +10,9 @@
 type CommentaryPolicy = "wrap" | "strip" | "pass-through";
 ```
 
-Defined in: [packages/sessions/src/commentary/types.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/types.ts#L22)
+Defined in: packages/sessions/src/commentary/types.ts:22
+
+**`Stable`**
 
 Operator-facing policy for handling detected commentary fragments.
 
@@ -20,5 +22,3 @@ Operator-facing policy for handling detected commentary fragments.
  - `'strip'` removes the detected fragment entirely.
  - `'pass-through'` disables the sanitization (operator opt-in for
    deployments that handle commentary at a different layer).
-
-## Stable

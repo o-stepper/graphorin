@@ -18,8 +18,8 @@ type SupplyChainDecision =
 };
 ```
 
-Defined in: [packages/security/src/supply-chain/types.ts:149](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/types.ts#L149)
+Defined in: packages/security/src/supply-chain/types.ts:149
+
+**`Stable`**
 
 Decision returned by [evaluateSupplyChainPolicy](/api/@graphorin/security/functions/evaluateSupplyChainPolicy.md).
-
-## Stable

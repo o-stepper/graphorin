@@ -10,7 +10,9 @@
 function pause<TValue, TResume>(value): TResume;
 ```
 
-Defined in: [packages/core/dist/channels/pause.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/pause.d.ts)
+Defined in: packages/core/dist/channels/pause.d.ts:120
+
+**`Stable`**
 
 Programmatically suspend the current workflow node. The `value` is
 surfaced to callers via the `WorkflowSuspendedEvent.value` field; the
@@ -40,5 +42,3 @@ return the operator-supplied resume value instead of throwing.
 ## Returns
 
 `TResume`
-
-## Stable

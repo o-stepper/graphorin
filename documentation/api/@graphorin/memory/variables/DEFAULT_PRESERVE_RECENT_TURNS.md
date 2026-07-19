@@ -10,9 +10,9 @@
 const DEFAULT_PRESERVE_RECENT_TURNS: 6 = 6;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/compactor.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/compactor.ts#L54)
+Defined in: packages/memory/src/context-engine/compaction/compactor.ts:54
+
+**`Stable`**
 
 Default count of recent turns preserved verbatim by the
 `summarize-old-preserve-recent` strategy.
-
-## Stable

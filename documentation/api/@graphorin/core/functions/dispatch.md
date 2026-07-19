@@ -10,7 +10,9 @@
 function dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: [packages/core/src/channels/dispatch.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/dispatch.ts#L35)
+Defined in: packages/core/src/channels/dispatch.ts:35
+
+**`Stable`**
 
 Convenience factory equivalent to `new Dispatch(nodeName, args)`.
 
@@ -30,5 +32,3 @@ Convenience factory equivalent to `new Dispatch(nodeName, args)`.
 ## Returns
 
 [`Dispatch`](/api/@graphorin/core/classes/Dispatch.md)\&lt;`TArgs`\&gt;
-
-## Stable

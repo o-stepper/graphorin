@@ -22,9 +22,9 @@ type Rubric =
 };
 ```
 
-Defined in: [packages/agent/src/evaluator-optimizer/index.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L24)
+Defined in: packages/agent/src/evaluator-optimizer/index.ts:24
+
+**`Stable`**
 
 Rubric discriminator. Pick the variant that matches your
 Evaluator's contract.
-
-## Stable

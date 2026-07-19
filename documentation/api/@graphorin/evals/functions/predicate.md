@@ -10,7 +10,9 @@
 function predicate<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: [packages/evals/src/scorers/code/predicate.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/predicate.ts#L21)
+Defined in: packages/evals/src/scorers/code/predicate.ts:21
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/evals/src/scorers/code/predicate.ts:21](https://github.com
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function classifyHttpStatus(status, bodyText?): ProviderErrorKind;
 ```
 
-Defined in: [packages/provider/src/errors/errors.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L229)
+Defined in: packages/provider/src/errors/errors.ts:229
+
+**`Stable`**
 
 Map an HTTP status (plus optional error-body text) onto the
 canonical `ProviderErrorKind`. One
@@ -35,5 +37,3 @@ adapter:
 ## Returns
 
 [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md)
-
-## Stable

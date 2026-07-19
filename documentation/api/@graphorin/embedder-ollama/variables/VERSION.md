@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L14)
+Defined in: packages/embedder-ollama/src/index.ts:14

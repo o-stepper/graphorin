@@ -10,9 +10,9 @@
 type Pooling = "mean" | "cls" | "first_token" | "eos" | "last_token" | "none";
 ```
 
-Defined in: [packages/embedder-transformersjs/src/index.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L26)
+Defined in: packages/embedder-transformersjs/src/index.ts:26
+
+**`Stable`**
 
 Pooling strategy. Defaults to `'mean'` per the multilingual-e5 model
 card.
-
-## Stable

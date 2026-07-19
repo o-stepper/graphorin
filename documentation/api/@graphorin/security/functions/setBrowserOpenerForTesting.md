@@ -12,7 +12,7 @@ function _setBrowserOpenerForTesting(opener):
   | null;
 ```
 
-Defined in: [packages/security/src/oauth/browser.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/browser.ts#L34)
+Defined in: packages/security/src/oauth/browser.ts:34
 
 **`Experimental`**
 

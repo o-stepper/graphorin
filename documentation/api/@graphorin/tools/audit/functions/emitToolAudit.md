@@ -10,7 +10,9 @@
 function emitToolAudit(event): void;
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L161)
+Defined in: packages/tools/src/audit/index.ts:161
+
+**`Stable`**
 
 Emit an audit event. Never throws across listener boundaries -
 a listener that throws is isolated so it cannot tear down the
@@ -25,5 +27,3 @@ tool execution path.
 ## Returns
 
 `void`
-
-## Stable

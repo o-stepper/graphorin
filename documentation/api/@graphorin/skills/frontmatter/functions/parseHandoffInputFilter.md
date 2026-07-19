@@ -12,7 +12,9 @@ function parseHandoffInputFilter(value):
   | null;
 ```
 
-Defined in: [packages/skills/src/frontmatter/index.ts:463](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L463)
+Defined in: packages/skills/src/frontmatter/index.ts:463
+
+**`Stable`**
 
 Parse the `handoff-input-filter` field into a structured
 declaration. Returns `null` for unsupported shapes; callers should
@@ -29,5 +31,3 @@ value was non-undefined.
 
   \| [`HandoffInputFilterDeclaration`](/api/@graphorin/skills/type-aliases/HandoffInputFilterDeclaration.md)
   \| `null`
-
-## Stable

@@ -6,17 +6,17 @@
 
 # Interface: CheckpointTuple
 
-Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:72
+
+**`Stable`**
 
 A checkpoint paired with its sidecar metadata. Returned by
 `CheckpointStore.getTuple(...)` and the `list(...)` iterator.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-checkpoint"></a> `checkpoint` | `readonly` | [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md) | [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts) |
-| <a id="property-metadata"></a> `metadata` | `readonly` | [`CheckpointMetadata`](/api/@graphorin/workflow/interfaces/CheckpointMetadata.md) | [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts) |
-| <a id="property-pendingwrites"></a> `pendingWrites?` | `readonly` | readonly [`PendingWrite`](/api/@graphorin/workflow/interfaces/PendingWrite.md)[] | [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts) |
+| <a id="property-checkpoint"></a> `checkpoint` | `readonly` | [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md) | packages/core/dist/contracts/checkpoint-store.d.ts:73 |
+| <a id="property-metadata"></a> `metadata` | `readonly` | [`CheckpointMetadata`](/api/@graphorin/workflow/interfaces/CheckpointMetadata.md) | packages/core/dist/contracts/checkpoint-store.d.ts:74 |
+| <a id="property-pendingwrites"></a> `pendingWrites?` | `readonly` | readonly [`PendingWrite`](/api/@graphorin/workflow/interfaces/PendingWrite.md)[] | packages/core/dist/contracts/checkpoint-store.d.ts:75 |

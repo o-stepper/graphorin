@@ -6,18 +6,18 @@
 
 # Interface: ProviderRequestMetadata
 
-Defined in: [packages/core/src/contracts/provider.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L127)
+Defined in: packages/core/src/contracts/provider.ts:127
+
+**`Stable`**
 
 Per-request metadata used by tracing and auditing layers.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | [packages/core/src/contracts/provider.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L129) |
-| <a id="property-runid"></a> `runId?` | `readonly` | `string` | [packages/core/src/contracts/provider.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L131) |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | [packages/core/src/contracts/provider.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L128) |
-| <a id="property-stepnumber"></a> `stepNumber?` | `readonly` | `number` | [packages/core/src/contracts/provider.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L132) |
-| <a id="property-userid"></a> `userId?` | `readonly` | `string` | [packages/core/src/contracts/provider.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L130) |
+| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:129 |
+| <a id="property-runid"></a> `runId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:131 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:128 |
+| <a id="property-stepnumber"></a> `stepNumber?` | `readonly` | `number` | packages/core/src/contracts/provider.ts:132 |
+| <a id="property-userid"></a> `userId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:130 |

@@ -14,7 +14,9 @@ function listAuditDbBindings(): readonly {
 }[];
 ```
 
-Defined in: [packages/security/src/audit/audit-db.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L159)
+Defined in: packages/security/src/audit/audit-db.ts:159
+
+**`Stable`**
 
 Snapshot of the binding registry. Used by `graphorin doctor` once
 the CLI ships.
@@ -26,5 +28,3 @@ readonly \{
   `id`: [`AuditDbBindingId`](/api/@graphorin/security/type-aliases/AuditDbBindingId.md);
   `isDefault`: `boolean`;
 \}[]
-
-## Stable

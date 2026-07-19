@@ -13,7 +13,9 @@ function buildOAuthSession(
    override?): OAuthSession;
 ```
 
-Defined in: [packages/security/src/oauth/authorize-code-flow.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/authorize-code-flow.ts#L187)
+Defined in: packages/security/src/oauth/authorize-code-flow.ts:187
+
+**`Stable`**
 
 Construct an [OAuthSession](/api/@graphorin/security/interfaces/OAuthSession.md) from a successful token-endpoint
 payload. Exported for the device + refresh flows so they share a
@@ -31,5 +33,3 @@ single mapping path.
 ## Returns
 
 [`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)
-
-## Stable

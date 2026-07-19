@@ -12,7 +12,9 @@ function runSkillsInspect(options): Promise<
 | null>;
 ```
 
-Defined in: [packages/cli/src/commands/skills.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L117)
+Defined in: packages/cli/src/commands/skills.ts:117
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/skills.ts:117](https://github.com/o-stepp
 `Promise`\<
   \| [`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)
   \| `null`\>
-
-## Stable

@@ -10,6 +10,6 @@
 const TOKEN_ENTROPY_LENGTH: 43 = 43;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L48)
+Defined in: packages/security/src/auth/token-format.ts:48
 
 Canonical entropy block length in characters when base62-encoded.

@@ -10,7 +10,9 @@
 function getMiddlewareKind(provider): string | undefined;
 ```
 
-Defined in: [packages/provider/src/middleware/compose.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L90)
+Defined in: packages/provider/src/middleware/compose.ts:90
+
+**`Stable`**
 
 Read the discriminant kind attached to a middleware-produced
 provider. Returns `undefined` if the provider is the bare adapter
@@ -25,5 +27,3 @@ or a custom wrapper that does not declare a kind.
 ## Returns
 
 `string` \| `undefined`
-
-## Stable

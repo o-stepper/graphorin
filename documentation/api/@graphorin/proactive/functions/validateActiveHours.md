@@ -10,7 +10,7 @@
 function validateActiveHours(hours): void;
 ```
 
-Defined in: [packages/proactive/src/active-hours.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/active-hours.ts#L37)
+Defined in: packages/proactive/src/active-hours.ts:37
 
 Validate an [ActiveHours](/api/@graphorin/proactive/interfaces/ActiveHours.md) declaration eagerly. Throws
 `TypeError` on a malformed time or an unknown timezone - at

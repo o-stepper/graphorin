@@ -19,9 +19,9 @@ const CLOSE_CODE_VALUES: Readonly<{
 }>;
 ```
 
-Defined in: [packages/protocol/src/close-codes.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/close-codes.ts#L31)
+Defined in: src/close-codes.ts:31
+
+**`Stable`**
 
 Numeric close-code constants. The pair `(value, reason)` round-trips
 via [closeCodeReason](/api/@graphorin/protocol/close-codes/functions/closeCodeReason.md) / [closeCodeFor](/api/@graphorin/protocol/close-codes/functions/closeCodeFor.md).
-
-## Stable

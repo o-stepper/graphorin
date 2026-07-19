@@ -15,7 +15,9 @@ type InboundSanitizationPolicy =
   | "detect-and-strip-and-wrap";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L78)
+Defined in: packages/core/src/types/tool.ts:78
+
+**`Stable`**
 
 Inbound prompt-injection sanitization policy applied to a tool's
 result body before it reaches the conversation history.
@@ -30,5 +32,3 @@ result body before it reaches the conversation history.
   `<<<untrusted_content>>>` envelope without stripping matches.
 - `'detect-and-strip-and-wrap'` - both strip matches and wrap the
   resulting body (the untrusted-source default).
-
-## Stable

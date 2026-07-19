@@ -6,14 +6,14 @@
 
 # Interface: ConsolidatorLike
 
-Defined in: [packages/server/src/consolidator/daemon.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L21)
+Defined in: packages/server/src/consolidator/daemon.ts:21
+
+**`Stable`**
 
 Structurally-typed view of the `@graphorin/memory` Consolidator
 surface. Importing the full type would force a hard dependency on
 `@graphorin/memory`; the structural subset captured here is enough
 for the lifecycle integration + the `/v1/health` aggregator.
-
-## Stable
 
 ## Methods
 
@@ -23,7 +23,7 @@ for the lifecycle integration + the `/v1/health` aggregator.
 optional drainDlq(): Promise<number>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L28)
+Defined in: packages/server/src/consolidator/daemon.ts:28
 
 #### Returns
 
@@ -37,7 +37,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:28](https://github.com/o
 optional notifyActivity(): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L44)
+Defined in: packages/server/src/consolidator/daemon.ts:44
 
 A2 (item 7): activity signal - a tracked run settled, the
 transcript may have grown. The server's run tracker calls this so
@@ -57,7 +57,7 @@ opt out.
 optional pause(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L26)
+Defined in: packages/server/src/consolidator/daemon.ts:26
 
 #### Returns
 
@@ -71,7 +71,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:26](https://github.com/o
 optional registerWithScheduler(scheduler): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L36)
+Defined in: packages/server/src/consolidator/daemon.ts:36
 
 Register the consolidator's cron / idle triggers with the server's
 triggers scheduler so background consolidation actually fires (MCON-4).
@@ -97,7 +97,7 @@ custom surface) simply opts out.
 optional resume(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L27)
+Defined in: packages/server/src/consolidator/daemon.ts:27
 
 #### Returns
 
@@ -111,7 +111,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:27](https://github.com/o
 optional setTier(tier): Promise<void>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L25)
+Defined in: packages/server/src/consolidator/daemon.ts:25
 
 #### Parameters
 
@@ -131,7 +131,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:25](https://github.com/o
 start(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L22)
+Defined in: packages/server/src/consolidator/daemon.ts:22
 
 #### Returns
 
@@ -145,7 +145,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:22](https://github.com/o
 status(): Promise<ConsolidatorStatusLike>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L24)
+Defined in: packages/server/src/consolidator/daemon.ts:24
 
 #### Returns
 
@@ -159,7 +159,7 @@ Defined in: [packages/server/src/consolidator/daemon.ts:24](https://github.com/o
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/consolidator/daemon.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L23)
+Defined in: packages/server/src/consolidator/daemon.ts:23
 
 #### Returns
 

@@ -18,8 +18,8 @@ type OpenInferenceSpanKind =
   | "RERANKER";
 ```
 
-Defined in: [packages/observability/src/openinference/index.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/openinference/index.ts#L25)
+Defined in: packages/observability/src/openinference/index.ts:25
+
+**`Stable`**
 
 Canonical OpenInference span-kind enum.
-
-## Stable

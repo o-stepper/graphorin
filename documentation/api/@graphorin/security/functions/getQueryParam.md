@@ -10,7 +10,9 @@
 function getQueryParam(ref, key): string | undefined;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:526](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L526)
+Defined in: packages/security/src/secrets/secret-ref.ts:526
+
+**`Stable`**
 
 Read a single query parameter from a parsed ref. Returns `undefined`
 if the parameter is not present.
@@ -25,5 +27,3 @@ if the parameter is not present.
 ## Returns
 
 `string` \| `undefined`
-
-## Stable

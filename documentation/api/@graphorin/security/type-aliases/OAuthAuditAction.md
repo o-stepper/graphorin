@@ -15,9 +15,9 @@ type OAuthAuditAction =
   | "oauth:expired";
 ```
 
-Defined in: [packages/security/src/oauth/audit-emitter.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/audit-emitter.ts#L16)
+Defined in: packages/security/src/oauth/audit-emitter.ts:16
+
+**`Stable`**
 
 Discriminator for `OAuthAuditEvent`. Variants follow the
 `<resource>:<action>` convention used throughout the audit log.
-
-## Stable

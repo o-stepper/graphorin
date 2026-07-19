@@ -6,18 +6,18 @@
 
 # Interface: SessionManager
 
-Defined in: [packages/sessions/src/facade.ts:301](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L301)
+Defined in: packages/sessions/src/facade.ts:301
+
+**`Stable`**
 
 Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/functions/createSessionManager.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-agents"></a> `agents` | `readonly` | [`AgentRegistry`](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md) | The underlying agent registry. | [packages/sessions/src/facade.ts:303](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L303) |
-| <a id="property-commentary"></a> `commentary` | `readonly` | [`CommentarySanitizer`](/api/@graphorin/sessions/interfaces/CommentarySanitizer.md) | Default sanitizer instance (test seam). | [packages/sessions/src/facade.ts:305](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L305) |
+| <a id="property-agents"></a> `agents` | `readonly` | [`AgentRegistry`](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md) | The underlying agent registry. | packages/sessions/src/facade.ts:303 |
+| <a id="property-commentary"></a> `commentary` | `readonly` | [`CommentarySanitizer`](/api/@graphorin/sessions/interfaces/CommentarySanitizer.md) | Default sanitizer instance (test seam). | packages/sessions/src/facade.ts:305 |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/funct
 create(args): Promise<Session>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:313](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L313)
+Defined in: packages/sessions/src/facade.ts:313
 
 Create a fresh session. The optional `commentaryPolicy` overrides
 the manager-level default just for this session - useful for
@@ -59,7 +59,7 @@ uses the `'wrap'` default).
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:341](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L341)
+Defined in: packages/sessions/src/facade.ts:341
 
 Hard-delete a session (RP-6). The cascade removes the session's
 bookkeeping (handoffs, workflow-run attachments, audit rows), the
@@ -92,7 +92,7 @@ find(sessionId): Promise<
 | null>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:324](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L324)
+Defined in: packages/sessions/src/facade.ts:324
 
 Best-effort lookup. Returns `null` when the id is unknown.
 
@@ -116,7 +116,7 @@ Best-effort lookup. Returns `null` when the id is unknown.
 get(sessionId): Promise<Session>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:322](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L322)
+Defined in: packages/sessions/src/facade.ts:322
 
 Hydrate an existing session by id.
 
@@ -142,7 +142,7 @@ importFromString(body, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:351](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L351)
+Defined in: packages/sessions/src/facade.ts:351
 
 Import a JSONL stream into a fresh session.
 
@@ -169,7 +169,7 @@ Import a JSONL stream into a fresh session.
 listSessions(scope): Promise<readonly SessionMetadata[]>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:326](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L326)
+Defined in: packages/sessions/src/facade.ts:326
 
 List sessions for a scope (newest-first by `createdAt`).
 
@@ -191,7 +191,7 @@ List sessions for a scope (newest-first by `createdAt`).
 pruneAudit(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:358](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L358)
+Defined in: packages/sessions/src/facade.ts:358
 
 Prune audit rows older than the supplied epoch ms.
 
@@ -213,7 +213,7 @@ Prune audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:346](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L346)
+Defined in: packages/sessions/src/facade.ts:346
 
 Retention sweep (RP-6): delete every session matching the policy. Returns
 the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/interfaces/SessionStoreExt.md#prunesessions).
@@ -238,7 +238,7 @@ the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/inte
 replayer(): SessionReplayer;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:356](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L356)
+Defined in: packages/sessions/src/facade.ts:356
 
 Build the underlying replay engine for advanced consumers.
 

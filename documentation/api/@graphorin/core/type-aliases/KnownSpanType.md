@@ -59,7 +59,9 @@ type KnownSpanType =
   | "mcp.list-tools";
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L11)
+Defined in: packages/core/src/contracts/tracer.ts:11
+
+**`Stable`**
 
 Framework-known discriminators for typed observability spans.
 
@@ -67,5 +69,3 @@ The list mirrors the span taxonomy documented for the observability
 layer; concrete implementations live in `@graphorin/observability`.
 Promoting a frequently-used custom span kind (see
 [CustomSpanType](/api/@graphorin/core/type-aliases/CustomSpanType.md)) into this union is an additive minor change.
-
-## Stable

@@ -6,11 +6,11 @@
 
 # Interface: StartSpanOptions\&lt;T\&gt;
 
-Defined in: [packages/core/src/contracts/tracer.ts:163](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L163)
+Defined in: packages/core/src/contracts/tracer.ts:163
+
+**`Stable`**
 
 Span constructor parameters.
-
-## Stable
 
 ## Type Parameters
 
@@ -22,6 +22,6 @@ Span constructor parameters.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-attrs"></a> `attrs?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> | [packages/core/src/contracts/tracer.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L165) |
-| <a id="property-parent"></a> `parent?` | `readonly` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; | [packages/core/src/contracts/tracer.ts:166](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L166) |
-| <a id="property-type"></a> `type` | `readonly` | `T` | [packages/core/src/contracts/tracer.ts:164](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L164) |
+| <a id="property-attrs"></a> `attrs?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> | packages/core/src/contracts/tracer.ts:165 |
+| <a id="property-parent"></a> `parent?` | `readonly` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; | packages/core/src/contracts/tracer.ts:166 |
+| <a id="property-type"></a> `type` | `readonly` | `T` | packages/core/src/contracts/tracer.ts:164 |

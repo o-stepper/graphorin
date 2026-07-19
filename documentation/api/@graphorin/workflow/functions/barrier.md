@@ -10,7 +10,9 @@
 function barrier<T>(from, opts?): Barrier<T>;
 ```
 
-Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
+Defined in: packages/core/dist/channels/channels.d.ts:143
+
+**`Stable`**
 
 Construct a `Barrier` channel.
 
@@ -31,5 +33,3 @@ Construct a `Barrier` channel.
 ## Returns
 
 [`Barrier`](/api/@graphorin/workflow/interfaces/Barrier.md)\&lt;`T`\&gt;
-
-## Stable

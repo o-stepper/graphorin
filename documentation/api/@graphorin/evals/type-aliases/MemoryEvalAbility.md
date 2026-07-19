@@ -15,10 +15,10 @@ type MemoryEvalAbility =
   | "abstention";
 ```
 
-Defined in: [packages/evals/src/loaders/memory-eval.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/memory-eval.ts#L56)
+Defined in: packages/evals/src/loaders/memory-eval.ts:56
+
+**`Stable`**
 
 The five LongMemEval abilities. Every loader maps its dataset-native
 category onto one of these so per-ability scoring is comparable
 across datasets; the raw category is preserved in `Case.metadata`.
-
-## Stable

@@ -10,9 +10,9 @@
 const DEFAULT_DENIAL_PATTERNS: ReadonlyArray<RegExp>;
 ```
 
-Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L51)
+Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:51
+
+**`Stable`**
 
 Default denial-pattern catalogue. The agent runtime extends this
 list when the operator supplies their own patterns.
-
-## Stable

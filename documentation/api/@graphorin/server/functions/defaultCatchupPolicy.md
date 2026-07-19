@@ -10,7 +10,9 @@
 function defaultCatchupPolicy(): CatchupPolicy;
 ```
 
-Defined in: [packages/server/src/triggers/daemon.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L197)
+Defined in: packages/server/src/triggers/daemon.ts:197
+
+**`Stable`**
 
 Resolve the catch-up policy default for triggers that did not
 declare one explicitly. Returns `'none'` per DEC-150 (personal-
@@ -19,5 +21,3 @@ assistant friendly).
 ## Returns
 
 [`CatchupPolicy`](/api/@graphorin/triggers/type-aliases/CatchupPolicy.md)
-
-## Stable

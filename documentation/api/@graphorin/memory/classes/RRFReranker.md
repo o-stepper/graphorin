@@ -6,7 +6,9 @@
 
 # Class: RRFReranker
 
-Defined in: [packages/memory/src/search/rrf.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L30)
+Defined in: packages/memory/src/search/rrf.ts:30
+
+**`Stable`**
 
 Built-in Reciprocal Rank Fusion reranker. Combines multiple ranked
 lists (vector hits, FTS5 hits, optional entity boost) into a single
@@ -21,8 +23,6 @@ Properties (verified by the property-based test suite):
  - **Tie-broken by stable record id.** Records with equal RRF
    scores keep their first-seen order.
 
-## Stable
-
 ## Implements
 
 - [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md)
@@ -35,7 +35,7 @@ Properties (verified by the property-based test suite):
 new RRFReranker(k?): RRFReranker;
 ```
 
-Defined in: [packages/memory/src/search/rrf.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L34)
+Defined in: packages/memory/src/search/rrf.ts:34
 
 #### Parameters
 
@@ -51,8 +51,8 @@ Defined in: [packages/memory/src/search/rrf.ts:34](https://github.com/o-stepper/
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `"rrf"` | Stable lowercase identifier surfaced on every span. | [packages/memory/src/search/rrf.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L31) |
-| <a id="property-k"></a> `k` | `readonly` | `number` | - | [packages/memory/src/search/rrf.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L32) |
+| <a id="property-id"></a> `id` | `readonly` | `"rrf"` | Stable lowercase identifier surfaced on every span. | packages/memory/src/search/rrf.ts:31 |
+| <a id="property-k"></a> `k` | `readonly` | `number` | - | packages/memory/src/search/rrf.ts:32 |
 
 ## Methods
 
@@ -65,7 +65,7 @@ rerank<TRecord>(
 options?): Promise<readonly MemoryHit<TRecord>[]>;
 ```
 
-Defined in: [packages/memory/src/search/rrf.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L43)
+Defined in: packages/memory/src/search/rrf.ts:43
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be

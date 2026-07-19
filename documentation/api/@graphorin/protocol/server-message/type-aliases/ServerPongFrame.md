@@ -10,6 +10,6 @@
 type ServerPongFrame = z.infer<typeof PongFrame>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L195)
+Defined in: src/server-message.ts:195
 
-## Stable
+**`Stable`**

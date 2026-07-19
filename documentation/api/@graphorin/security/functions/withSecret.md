@@ -13,7 +13,9 @@ function withSecret<T>(
 opts?): Promise<T>;
 ```
 
-Defined in: [packages/security/src/secrets/acl.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L195)
+Defined in: packages/security/src/secrets/acl.ts:195
+
+**`Stable`**
 
 Run `fn` with the unwrapped value. Auto-wraps raw strings into a
 `SecretValue` so callers migrating from raw-string APIs do not have
@@ -37,5 +39,3 @@ to wrap manually. Records a single audit event per scope.
 ## Returns
 
 `Promise`\&lt;`T`\&gt;
-
-## Stable

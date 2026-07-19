@@ -6,12 +6,12 @@
 
 # Interface: SuspendedRunPersistenceStore
 
-Defined in: [packages/server/src/runtime/suspended-run-persistence.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/suspended-run-persistence.ts#L27)
+Defined in: packages/server/src/runtime/suspended-run-persistence.ts:27
+
+**`Stable`**
 
 Structural slice of `@graphorin/store-sqlite`'s `SuspendedRunStore`
 the delegate needs (kept local so tests wire plain objects).
-
-## Stable
 
 ## Methods
 
@@ -21,7 +21,7 @@ the delegate needs (kept local so tests wire plain objects).
 delete(runId): Promise<void>;
 ```
 
-Defined in: [packages/server/src/runtime/suspended-run-persistence.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/suspended-run-persistence.ts#L36)
+Defined in: packages/server/src/runtime/suspended-run-persistence.ts:36
 
 #### Parameters
 
@@ -41,7 +41,7 @@ Defined in: [packages/server/src/runtime/suspended-run-persistence.ts:36](https:
 put(record): Promise<void>;
 ```
 
-Defined in: [packages/server/src/runtime/suspended-run-persistence.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/suspended-run-persistence.ts#L28)
+Defined in: packages/server/src/runtime/suspended-run-persistence.ts:28
 
 #### Parameters
 

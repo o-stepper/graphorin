@@ -10,7 +10,9 @@
 function createOllamaEmbedder(options?): OllamaEmbedder;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L125)
+Defined in: packages/embedder-ollama/src/index.ts:125
+
+**`Stable`**
 
 Build an Ollama-backed embedder. The first `embed()` call issues a
 `POST /api/show` to capture the model digest; subsequent calls hit
@@ -25,5 +27,3 @@ the embedding endpoint directly.
 ## Returns
 
 [`OllamaEmbedder`](/api/@graphorin/embedder-ollama/classes/OllamaEmbedder.md)
-
-## Stable

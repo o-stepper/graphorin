@@ -6,19 +6,19 @@
 
 # Interface: NamedPostCompactionHook
 
-Defined in: [packages/memory/src/context-engine/compaction/hooks/types.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/types.ts#L56)
+Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:56
+
+**`Stable`**
 
 Tagged hook returned by every factory below. The `id` field is
 surfaced on the `context.compaction.hook.executed.total{hookName}`
 counter family.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/memory/src/context-engine/compaction/hooks/types.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/types.ts#L57) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/compaction/hooks/types.ts:57 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ counter family.
 resolveContent(deps, ctx?): Promise<readonly MessageContent[]>;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/hooks/types.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/types.ts#L64)
+Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:64
 
 `ctx` carries the REAL compaction outcome (CE-6) - result, scope,
 runId, sessionId, agentId, source - built by `compactNow` after the

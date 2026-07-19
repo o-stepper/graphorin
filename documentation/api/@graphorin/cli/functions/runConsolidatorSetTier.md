@@ -14,7 +14,9 @@ function runConsolidatorSetTier(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/consolidator.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L134)
+Defined in: packages/cli/src/commands/consolidator.ts:134
+
+**`Stable`**
 
 ## Parameters
 
@@ -29,5 +31,3 @@ Defined in: [packages/cli/src/commands/consolidator.ts:134](https://github.com/o
   `tier`: [`ConsolidatorTier`](/api/@graphorin/memory/type-aliases/ConsolidatorTier.md);
   `unsupported`: `true`;
 \}\>
-
-## Stable

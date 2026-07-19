@@ -10,9 +10,9 @@
 type ClientMessageId = z.infer<typeof RpcId>;
 ```
 
-Defined in: [packages/protocol/src/client-message.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L154)
+Defined in: src/client-message.ts:154
+
+**`Stable`**
 
 Convenience type for the JSON-RPC `id` slot. Matches the Graphorin
 subset (string + integer; no `null`, no float).
-
-## Stable

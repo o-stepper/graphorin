@@ -10,7 +10,9 @@
 function onSecretsAudit(listener): () => void;
 ```
 
-Defined in: [packages/security/src/secrets/audit-emitter.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L86)
+Defined in: packages/security/src/secrets/audit-emitter.ts:86
+
+**`Stable`**
 
 Subscribe to secrets-layer audit events. The audit-log subsystem
 registers exactly one listener that forwards each event into the
@@ -25,5 +27,3 @@ dedicated audit database.
 ## Returns
 
 () => `void`
-
-## Stable

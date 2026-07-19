@@ -10,7 +10,9 @@
 function createAuditOnlyGuard(opts?): MemoryModificationGuard;
 ```
 
-Defined in: [packages/security/src/guard/audit-only-guard.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-only-guard.ts#L37)
+Defined in: packages/security/src/guard/audit-only-guard.ts:37
+
+**`Stable`**
 
 Construct an `AUDIT_ONLY_GUARD`.
 
@@ -23,5 +25,3 @@ Construct an `AUDIT_ONLY_GUARD`.
 ## Returns
 
 [`MemoryModificationGuard`](/api/@graphorin/security/interfaces/MemoryModificationGuard.md)
-
-## Stable

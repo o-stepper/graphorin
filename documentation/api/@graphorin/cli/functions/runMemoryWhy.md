@@ -10,7 +10,9 @@
 function runMemoryWhy(options): Promise<MemoryWhyResult>;
 ```
 
-Defined in: [packages/cli/src/commands/memory.ts:741](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L741)
+Defined in: packages/cli/src/commands/memory.ts:741
+
+**`Stable`**
 
 `graphorin memory why` - explain why facts were recalled, by decoding the
 `memory.search.semantic.explain` attribute off the persisted recall spans.
@@ -26,5 +28,3 @@ spans (RP-17). Empty when nothing was recorded.
 ## Returns
 
 `Promise`\&lt;[`MemoryWhyResult`](/api/@graphorin/cli/interfaces/MemoryWhyResult.md)\&gt;
-
-## Stable

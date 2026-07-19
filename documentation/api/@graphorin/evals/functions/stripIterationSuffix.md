@@ -10,7 +10,9 @@
 function stripIterationSuffix(caseId): string;
 ```
 
-Defined in: [packages/evals/src/stats.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L85)
+Defined in: packages/evals/src/stats.ts:85
+
+**`Stable`**
 
 Strip the `-iter-N` disambiguation suffix the runner appends under
 `iterations > 1` (EB-6), recovering the base case id.
@@ -24,5 +26,3 @@ Strip the `-iter-N` disambiguation suffix the runner appends under
 ## Returns
 
 `string`
-
-## Stable

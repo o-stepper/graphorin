@@ -32,7 +32,7 @@
  * Exit codes: 0 ok · 1 violations · 2 invocation error.
  */
 
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -268,7 +268,17 @@ function selfTest() {
   process.exit(bad > 0 ? 1 : 0);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) ===
+    (() => {
+      try {
+        return realpathSync(process.argv[1]);
+      } catch {
+        return process.argv[1];
+      }
+    })()
+) {
   if (process.argv.includes('--self-test')) selfTest();
   else await run();
 }

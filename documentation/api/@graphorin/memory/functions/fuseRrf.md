@@ -13,7 +13,9 @@ function fuseRrf<TRecord>(
    labels?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: [packages/memory/src/search/rrf.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L119)
+Defined in: packages/memory/src/search/rrf.ts:119
+
+**`Stable`**
 
 Pure functional core of the RRF reranker - the equal-weight case of
 [fuseWeighted](/api/@graphorin/memory/functions/fuseWeighted.md). Exported separately so the test suite (and the
@@ -37,5 +39,3 @@ wrapping of the public surface.
 ## Returns
 
 readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
-
-## Stable

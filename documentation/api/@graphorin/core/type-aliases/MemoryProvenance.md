@@ -10,7 +10,9 @@
 type MemoryProvenance = "user" | "tool" | "extraction" | "reflection" | "induction" | "imported";
 ```
 
-Defined in: [packages/core/src/types/memory.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L37)
+Defined in: packages/core/src/types/memory.ts:37
+
+**`Stable`**
 
 Where a memory came from - the trust-provenance tag carried by every
 fact / episode / induced procedure. `user` (the human said it) and
@@ -23,5 +25,3 @@ default; `imported` is bulk-loaded from an external store. Used by
 P1-4 to gate action-driving recall against memory-poisoning (MINJA /
 MemoryGraft) - induced procedures drive *actions*, so the quarantine
 gate matters most for them.
-
-## Stable

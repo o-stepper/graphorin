@@ -10,7 +10,9 @@
 const SESSION_SCOPED_PURGES: ReadonlyArray<SessionScopedPurge>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:450](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L450)
+Defined in: packages/store-sqlite/src/session-store.ts:450
+
+**`Stable`**
 
 Declarative registry of every session-scoped CONTENT surface the
 session hard-delete cascade purges (W-029/W-060). The gate test in
@@ -18,5 +20,3 @@ session hard-delete cascade purges (W-029/W-060). The gate test in
 [SESSION\_TABLE\_EXEMPTIONS](/api/@graphorin/store-sqlite/variables/SESSION_TABLE_EXEMPTIONS.md)) against the live schema: a new
 table with a session column fails the suite until its author decides
 how erasure covers it.
-
-## Stable

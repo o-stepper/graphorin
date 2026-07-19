@@ -54,7 +54,9 @@ type SchedulerEvent =
 };
 ```
 
-Defined in: [packages/triggers/src/index.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L250)
+Defined in: packages/triggers/src/index.ts:250
+
+**`Stable`**
 
 Lifecycle event emitted by [Scheduler.events](/api/@graphorin/triggers/interfaces/Scheduler.md#events). Useful for
 tests and for piping into observability without monkey-patching.
@@ -182,5 +184,3 @@ auto-paused it (C4): the persistent `disabled` flag is set instead
 of firing the callback. Renew with a later `expiresAt` +
 `setDisabled(id, false)`, or prune it
 (`POST /v1/triggers/prune { "disabled": true }`).
-
-## Stable

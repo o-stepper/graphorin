@@ -10,9 +10,9 @@
 const SENSITIVITY_ORDER: readonly Sensitivity[];
 ```
 
-Defined in: [packages/core/src/types/sensitivity.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/sensitivity.ts#L21)
+Defined in: packages/core/src/types/sensitivity.ts:21
+
+**`Stable`**
 
 Strict ordering used by sensitivity-aware filters
 (`record.sensitivity ⊆ provider.acceptsSensitivity`).
-
-## Stable
