@@ -43,7 +43,7 @@ const KEY_RE = /^[A-Za-z0-9_\-:]{8,255}$/;
  */
 export interface IdempotencyMiddlewareOptions {
   /**
-   * Paths whose responses are NEVER cached or replayed (IP-6) - the
+   * Paths whose responses are NEVER cached or replayed - the
    * middleware passes straight through. Used for secret-bearing
    * endpoints (`POST /v1/tokens` returns a raw token; caching it would
    * persist the secret plaintext in durable SQLite for the TTL).
@@ -54,7 +54,7 @@ export interface IdempotencyMiddlewareOptions {
   /** Wall-clock provider; tests inject a deterministic generator. */
   readonly now?: () => number;
   /**
-   * IP-15: when supplied, the middleware publishes a live
+   * When supplied, the middleware publishes a live
    * `graphorin_idempotency_cache_hit_ratio` gauge (replays / replays+executes)
    * instead of leaving the registered metric a permanently-empty series.
    */

@@ -68,7 +68,7 @@ The framework never texts a peer on its own: when a check ends in a pairing chal
 
 Channel peers are authenticated by the pairing policy, but their CONTENT is still attacker-influenceable (forwarded posts, quoted articles, pasted text). The gateway therefore treats every inbound body as untrusted:
 
-1. **Inbound sanitisation** - `sanitizeChannelInbound` pins `applyInboundSanitization` from `@graphorin/tools/inbound` to the `'channel-inbound'` trust class: imperative injection patterns are stripped, chat-template tokens are neutralized, and the remainder is wrapped in the untrusted-content envelope. The handler receives `sanitizedText`; the original stays on `message.text` for audit and taint seeding only. Note `sanitizedText` is **not** tidy plain text - it is the cleaned body still inside the boundary envelope (OPERATOR-02):
+1. **Inbound sanitisation** - `sanitizeChannelInbound` pins `applyInboundSanitization` from `@graphorin/tools/inbound` to the `'channel-inbound'` trust class: imperative injection patterns are stripped, chat-template tokens are neutralized, and the remainder is wrapped in the untrusted-content envelope. The handler receives `sanitizedText`; the original stays on `message.text` for audit and taint seeding only. Note `sanitizedText` is **not** tidy plain text - it is the cleaned body still inside the boundary envelope:
 
    ```text
    <<<untrusted_content trust="channel-inbound" tool="channel:<id>" origin="channel:<id>">>>
@@ -191,7 +191,7 @@ Notes on the preset:
 
 - `'channel-inbound'` is untrusted by construction - you do not configure that; passing `ctx.inboundTaint` into every run is what arms it.
 - In `enforce` mode the final assistant reply is itself a sink (stable id `'assistant-output'`): on a lethal-trifecta run the reply is withheld and replaced by a notice unless you explicitly declassify the reply surface. See [Security](/guide/security).
-- `treatPiiAsSensitive` stays opt-in framework-wide (W-103 / D-13): the recommendation here is preset policy, not a framework default.
+- `treatPiiAsSensitive` stays opt-in framework-wide: the recommendation here is preset policy, not a framework default.
 - Memory hygiene: pair the gateway with `ingestGate: verdictIngestGate` so blocked turns cannot become long-term memories - the write path is gated by persisted verdicts, not by trust in the conversation loop.
 
 ## Composing the full bot

@@ -78,7 +78,7 @@ export const withTracing = defineProviderMiddleware<WithTracingOptions>({
 /**
  * Flatten numeric vendor diagnostics from a `providerMetadata` payload
  * into span attributes: `{ ollama: { evalMs: 512 } }` becomes
- * `graphorin.provider.ollama.evalMs = 512` (audit 2026-07-16, item 8 -
+ * `graphorin.provider.ollama.evalMs = 512` (item 8 -
  * the Ollama adapter reports load / prompt-eval / eval timings this
  * way, so traces can attribute latency to model load vs generation).
  * Numbers only, one vendor level deep, capped so a misbehaving adapter

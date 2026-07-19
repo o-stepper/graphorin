@@ -1,5 +1,5 @@
 /**
- * Typed in-process event emitter for server-token auth events (SPL-5).
+ * Typed in-process event emitter for server-token auth events.
  * The audit-log subsystem subscribes via {@link bridgeAuthToAudit} to
  * write these into the dedicated audit database - the auth layer never
  * reaches across the package boundary to write rows itself, mirroring

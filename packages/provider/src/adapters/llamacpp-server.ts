@@ -40,7 +40,7 @@ export interface LlamaCppServerAdapterOptions {
   /** Custom `fetch` implementation; useful for tests. */
   readonly fetchImpl?: typeof fetch;
   /**
-   * Time-to-response budget per request (PS-24). Default
+   * Time-to-response budget per request. Default
    * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
    */
   readonly timeoutMs?: number;

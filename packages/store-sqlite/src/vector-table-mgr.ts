@@ -6,7 +6,7 @@ import type { EmbeddingMetaRow } from './embedding-meta-repo.js';
  * for `(entity, embedder_id)` creates the corresponding `*_vec_<slug>`
  * virtual table; subsequent writes hit the cached existence check.
  *
- * Wave-D D5: in `'linear-fallback'` mode (sqlite-vec unavailable +
+ * In `'linear-fallback'` mode (sqlite-vec unavailable +
  * `onMissingSqliteVec: 'linear-fallback'`) the same table names are
  * created as PLAIN tables (`<id> TEXT PRIMARY KEY, embedding BLOB`)
  * and KNN is served by {@link VectorTableManager.linearKnn} - a
@@ -92,13 +92,13 @@ export class VectorTableManager {
     return tableName;
   }
 
-  /** Active vector-serving mode (wave-D D5). */
+  /** Active vector-serving mode. */
   get mode(): 'vec0' | 'linear-fallback' | 'disabled' {
     return this.#mode;
   }
 
   /**
-   * In-process cosine KNN over a plain fallback sidecar (wave-D D5):
+   * In-process cosine KNN over a plain fallback sidecar:
    * scans the table in batches of `batchSize` rows, yielding to the
    * event loop between batches (`setImmediate`) so a large scan cannot
    * monopolise it, and keeps the `k` nearest by cosine distance
@@ -180,8 +180,8 @@ function vecMetric(metric: 'cosine' | 'dot' | 'euclidean'): 'cosine' | 'L2' {
 }
 
 /**
- * Map a sqlite-vec KNN distance to a `[0, 1]` similarity score by metric
- * (CS-3). Cosine distance ∈ [0, 2] (`1 - cos`) ⇒ `1 - d/2` ∈ [0, 1];
+ * Map a sqlite-vec KNN distance to a `[0, 1]` similarity score by
+ * metric. Cosine distance ∈ [0, 2] (`1 - cos`) ⇒ `1 - d/2` ∈ [0, 1];
  * L2 distance ∈ [0, ∞) ⇒ `1 / (1 + d)` ∈ (0, 1].
  *
  * @stable
@@ -206,7 +206,7 @@ function pickTableName(kind: 'facts' | 'episodes' | 'messages', meta: EmbeddingM
   }
 }
 
-/** @internal - id column for a vector sidecar kind (wave-D D5 reuse). */
+/** @internal - id column for a vector sidecar kind (shared helper). */
 export function pickIdColumn(kind: 'facts' | 'episodes' | 'messages'): string {
   switch (kind) {
     case 'facts':

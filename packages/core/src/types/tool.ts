@@ -187,7 +187,7 @@ export interface ToolResult<TOutput = unknown> {
  * inlines {@link preview} (plus a retrieval hint) and registers the
  * built-in `read_result` tool so the model can page through the full
  * artifact behind {@link uri} on demand - keeping large results out of the
- * context window (P1-4).
+ * context window.
  *
  * @stable
  */
@@ -199,7 +199,7 @@ export interface ResultHandle {
    * read arbitrary files.
    */
   readonly uri: string;
-  /** Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP (WI-13). */
+  /** Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP. */
   readonly kind: 'spill-file' | 'resource-link';
   /** A bounded preview of the full body (already inlined alongside the handle). */
   readonly preview: string;
@@ -208,7 +208,7 @@ export interface ResultHandle {
   /** MIME type of the stored artifact, when known. */
   readonly mediaType?: string;
   /**
-   * Trust class of the tool that PRODUCED the stored body (TL-6).
+   * Trust class of the tool that PRODUCED the stored body.
    * `read_result` re-applies inbound sanitization and dataflow
    * provenance by this class, so an untrusted spill cannot launder to
    * trusted through the built-in reader.
@@ -237,7 +237,7 @@ export type ToolErrorKind =
   | 'rate_limited';
 
 /**
- * Model-facing recovery guidance attached to a {@link ToolError} (C3).
+ * Model-facing recovery guidance attached to a {@link ToolError}.
  * Practitioner evidence converges on these two fields being what changes
  * model behaviour after a failure:
  *
@@ -270,12 +270,12 @@ export interface ToolError {
   /** Optional remediation hint for human readers. */
   readonly hint?: string;
   /**
-   * Whether retrying the SAME call can plausibly succeed (C3). Stamped
+   * Whether retrying the SAME call can plausibly succeed. Stamped
    * from the error kind by the executor; the harness-side transparent
    * retry consults it together with the tool's side-effect safety.
    */
   readonly recoverable?: boolean;
-  /** Model-facing recovery guidance derived from the error kind (C3). */
+  /** Model-facing recovery guidance derived from the error kind. */
   readonly recoveryHint?: RecoveryHint;
 }
 
@@ -301,7 +301,7 @@ export interface ToolApproval {
   readonly reason?: string;
   readonly requestedAt: string;
   /**
-   * E1: which permission verdict parked this approval. `'ask'` wants an
+   * Which permission verdict parked this approval. `'ask'` wants an
    * interactive human decision now; `'defer'` is parked for
    * asynchronous resolution (e.g. a workflow awakeable with a
    * durable-timer auto-deny) - the harness routes the two differently.
@@ -310,7 +310,7 @@ export interface ToolApproval {
    */
   readonly mode?: 'ask' | 'defer';
   /**
-   * W-001: set when this approval belongs to a PARKED sub-agent run.
+   * Set when this approval belongs to a PARKED sub-agent run.
    * It is the PARENT's toolCallId of the parked handoff / sub-agent
    * call (the `RunState.pendingSubRuns` key), never a child-local id.
    * Operators echo it back on the matching `ApprovalDecision` so

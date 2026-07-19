@@ -8,7 +8,7 @@
  * - Does **not** inherit the host `process.env`: the worker is
  *   constructed with `env: {}` and the runtime scrubs the environment
  *   before the handler runs, so only the explicit
- *   `SandboxRunOptions.env` allowlist is visible (TL-9).
+ *   `SandboxRunOptions.env` allowlist is visible.
  * - Enforces a hard wall-clock timeout via `worker.terminate()`.
  * - Honours `AbortSignal` cancellation; on abort the worker is
  *   terminated after a configurable grace period.

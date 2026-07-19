@@ -4,7 +4,7 @@
  * {@link RateLimitExceededError} on overflow; `'queue'` waits for the
  * next available slot.
  *
- * W-145: an optional second dimension, `tokensPerMinute`, budgets
+ * An optional second dimension, `tokensPerMinute`, budgets
  * MODEL tokens alongside requests. For agentic workloads the binding
  * provider limit is TPM, not RPM - a 150k-token compacted transcript
  * used to occupy the same single slot as a 200-token reranker call,
@@ -30,7 +30,7 @@ export interface WithRateLimitOptions {
   /** Burst size - defaults to `requestsPerMinute / 4` (rounded up to >= 1). */
   readonly burst?: number;
   /**
-   * Optional token budget per minute (W-145). When set, each request
+   * Optional token budget per minute. When set, each request
    * additionally reserves its estimated token weight from a second
    * bucket whose capacity is the full minute budget; a request whose
    * weight exceeds the remaining budget waits (queue mode) or throws
@@ -69,10 +69,10 @@ interface Waiter {
 interface BucketState {
   tokens: number;
   lastRefill: number;
-  /** W-145: remaining TPM budget (only meaningful when TPM is set). */
+  /** Remaining TPM budget (only meaningful when TPM is set). */
   tpmTokens: number;
   tpmLastRefill: number;
-  /** FIFO waiters in `'queue'` mode (PS-18). */
+  /** FIFO waiters in `'queue'` mode. */
   queue: Waiter[];
   /** Whether the single drain loop for this bucket is running. */
   draining: boolean;

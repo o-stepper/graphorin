@@ -44,7 +44,7 @@ export interface BudgetTrackerOptions {
   readonly resetSemantics: 'utc' | 'local' | 'sliding-24h';
   readonly now?: () => number;
   /**
-   * Sink for the `onExceed: 'log'` WARN (memory-consolidation-02).
+   * Sink for the `onExceed: 'log'` WARN.
    * Defaults to `process.stderr`. One WARN per resource per budget
    * window - the shipped standard/full presets use `'log'`, so without
    * it a breached ceiling was completely silent.
@@ -71,13 +71,13 @@ export class BudgetTracker {
   #cost = 0;
   #paused = false;
   #pausedReason: 'tokens-exceeded' | 'cost-exceeded' | null = null;
-  /** Resources already WARNed this window under `onExceed: 'log'` (memory-consolidation-02). */
+  /** Resources already WARNed this window under `onExceed: 'log'`. */
   #warnedThisWindow = new Set<'tokens' | 'cost'>();
   /**
    * Timestamped spend ledger for `sliding-24h` only. `#maybeReset` trims it to
    * the trailing 24h window and recomputes `#tokens` / `#cost` from it, so the
    * counters reflect a true rolling window instead of being zeroed on every
-   * check (MCON-3). Unused - and never appended to - under `utc` / `local`.
+   * check. Unused - and never appended to - under `utc` / `local`.
    */
   #ledger: Array<{ at: number; tokens: number; cost: number }> = [];
 

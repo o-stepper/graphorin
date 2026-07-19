@@ -21,7 +21,7 @@ const MIN_TRUSTWORTHY_WINDOW = 8;
  * away case, whitespace, punctuation (whether inserted mid-word or swapped in
  * for the spaces), and control / zero-width characters in a single pass.
  *
- * SDF-11: the previous lowercase + collapse-whitespace fold was defeated by
+ * The previous lowercase + collapse-whitespace fold was defeated by
  * trivial obfuscation - a single inserted punctuation or zero-width character
  * every `<window` chars broke every shingle. This fold is still best-effort
  * verbatim detection: it does NOT defeat aggressive paraphrase or cross-script
@@ -59,7 +59,7 @@ interface TrackedSpan {
   readonly sourceKind: string;
 }
 
-/** Cap on persisted span-tile hashes (C6). */
+/** Cap on persisted span-tile hashes. */
 const MAX_PERSISTED_TILE_HASHES = 8192;
 
 /** FNV-1a 32-bit over a string, hex-encoded - one-way, cheap, stable. */
@@ -78,8 +78,8 @@ function fnv1a32(text: string): string {
  * Verbatim detection is a bounded shingle intersection: an output is
  * tracked only when its normalized length is ≥ `minSpanLength`, and the
  * total tracked text is FIFO-capped at `maxTrackedChars` (oldest spans
- * evicted first). Comparison runs over an NFKC + alphanumeric-only fold
- * (SDF-11), so case, whitespace, inserted punctuation, zero-width and
+ * evicted first). Comparison runs over an NFKC + alphanumeric-only fold,
+ * so case, whitespace, inserted punctuation, zero-width and
  * fullwidth-homoglyph obfuscation do not defeat it. Detection is therefore
  * **best-effort** - it catches verbatim / near-verbatim forwarding of
  * untrusted content, not aggressive paraphrase or cross-script confusables,
@@ -93,7 +93,7 @@ export function createTaintLedger(opts?: {
   readonly minSpanLength?: number;
   readonly maxTrackedChars?: number;
   /**
-   * AG-19: rehydrate the coarse trifecta-gate flags from a prior
+   * Rehydrate the coarse trifecta-gate flags from a prior
    * {@link TaintLedger.snapshot}, so a resumed run does not start with an empty
    * ledger that silently un-gates sinks exposed before the suspend. Spans are
    * not restored (they are untrusted text and are not persisted), so the
@@ -101,7 +101,7 @@ export function createTaintLedger(opts?: {
    */
   readonly initial?: TaintLedgerSnapshot;
   /**
-   * SDF-8 / FIDES-lattice: optional predicate run over each tool output. When it
+   * FIDES-lattice: optional predicate run over each tool output. When it
    * returns `true`, the read counts toward `sensitiveSeen` even if the tool's
    * declared `sensitivity` is not `'secret'` - so PII/user-content exfiltration
    * trips the lethal-trifecta leg. Wire `containsPii` here to opt in; omit for

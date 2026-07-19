@@ -1,5 +1,5 @@
 /**
- * Bridge between the server-token auth audit emitter (SPL-5) and the
+ * Bridge between the server-token auth audit emitter and the
  * audit-log subsystem. A single `onAuthAudit(...)` listener translates
  * each emitted event into an `appendAudit(...)` call on the supplied
  * `AuditDb` - the auth layer never writes audit rows across the package
@@ -26,10 +26,10 @@ export interface AuthBridgeTeardown {
 }
 
 /**
- * Subscribe the audit-log subsystem to the auth-layer audit emitter
- * (SPL-5). Token mint / revoke / rotate / rekey and every verification
+ * Subscribe the audit-log subsystem to the auth-layer audit emitter.
+ * Token mint / revoke / rotate / rekey and every verification
  * outcome (granted, unauth, scope-denied, lockout) land in the chain.
- * Writes serialise through `appendAudit` (SPL-4) so concurrent events
+ * Writes serialise through `appendAudit` so concurrent events
  * never race on `seq`; a failed write is isolated from the auth path
  * and logged (never swallowed) when no `onWriteError` is supplied.
  *

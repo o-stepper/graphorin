@@ -45,7 +45,7 @@ export interface OpenStoreContextOptions {
    */
   readonly skipInit?: boolean;
   /**
-   * W-068: what to do about pending schema migrations.
+   * What to do about pending schema migrations.
    *
    * - `'apply'` (default, the historical behaviour): run `store.init()`,
    *   which applies every pending migration.

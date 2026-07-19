@@ -44,22 +44,22 @@ const RECONCILE_TOP_K = 10;
 export interface StandardPhaseDeps {
   readonly semantic: SemanticMemory;
   /**
-   * Episodic tier used for auto-episode-formation (P1-2). Omitted /
+   * Episodic tier used for auto-episode-formation. Omitted /
    * `null` ⇒ episode formation is skipped regardless of `formEpisodes`.
    */
   readonly episodic?: EpisodicMemory | null;
-  /** Auto-form a quarantined episode per processed slice (P1-2). */
+  /** Auto-form a quarantined episode per processed slice. */
   readonly formEpisodes: boolean;
-  /** Ask the episode summary call for a `[1, 10]` importance score (P1-2). */
+  /** Ask the episode summary call for a `[1, 10]` importance score. */
   readonly importanceScoring: boolean;
   /**
-   * Auto-promotion policy (MCON-2). When `true`, an injection-clean extraction
+   * Auto-promotion policy. When `true`, an injection-clean extraction
    * fact is admitted `active` instead of quarantined. Injection-flagged facts
    * always stay quarantined. Off by default.
    */
   readonly autoPromoteExtraction: boolean;
   /**
-   * Contextual-retrieval mode for additive fact writes (P1-3). `'llm'`
+   * Contextual-retrieval mode for additive fact writes. `'llm'`
    * spends one budgeted cheap-model call per `add` to author a situating
    * prefix; `'late-chunk'` / `'off'` defer to the shared
    * {@link SemanticMemory} instance (no extra call here).
@@ -72,11 +72,11 @@ export interface StandardPhaseDeps {
   readonly scope: SessionScope;
   readonly cheapModel: string | null;
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
-  /** B3: deterministic pre-extraction admission gate (see MemoryIngestGate). */
+  /** Deterministic pre-extraction admission gate (see MemoryIngestGate). */
   readonly ingestGate?: MemoryIngestGate | null;
   readonly maxBatchSize: number;
   /**
-   * W-081: input transcript budget in characters (chars/4 token proxy).
+   * Input transcript budget in characters (chars/4 token proxy).
    * A multi-message slice whose rendered transcript exceeds it is
    * half-split BEFORE the provider call; a single message that alone
    * exceeds it is tail-truncated (recorded on the phase span).
@@ -104,11 +104,11 @@ interface ExtractedFact {
   readonly predicate?: string;
   readonly object?: string;
   readonly confidence?: number;
-  /** Raw `[1, 10]` importance as returned by the model, pre-normalization (MCON-12). */
+  /** Raw `[1, 10]` importance as returned by the model, pre-normalization. */
   readonly importance?: number;
 }
 
-/** Parsed episode-summary payload (P1-2). */
+/** Parsed episode-summary payload. */
 interface ExtractedEpisode {
   readonly summary: string;
   /** Raw `[1, 10]` importance as returned by the model, pre-normalization. */
@@ -128,7 +128,7 @@ const EXTRACTION_SYSTEM_PROMPT = [
 ].join(' ');
 
 /**
- * Per-call output-token ceilings (MCON-14). `BudgetTracker.record()`
+ * Per-call output-token ceilings. `BudgetTracker.record()`
  * only runs AFTER `provider.generate` returns, so without a request cap
  * a degenerate model response could blow through the daily ceiling in a
  * single call before `pause` can take effect. All consolidator output
@@ -151,7 +151,7 @@ const EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT = [
 ].join(' ');
 
 /**
- * W-083 guard (wave-D D4, optional leg): with `autoPromoteExtraction`
+ * Guard for the optional auto-promote leg: with `autoPromoteExtraction`
  * enabled, an update/conflict decision against a QUARANTINED or
  * USER-provenance target must NOT close the old interval immediately -
  * the pending-supersede path is forced instead, so a MINJA-style
@@ -568,14 +568,14 @@ interface SliceExtraction {
   readonly lengthSplits: number;
   /** Number of single-message slices salvaged from a truncated output. */
   readonly truncatedSalvages: number;
-  /** W-081: number of batches half-split on the INPUT transcript budget. */
+  /** Number of batches half-split on the INPUT transcript budget. */
   readonly budgetSplits: number;
-  /** W-081: number of lone over-budget messages that were tail-truncated. */
+  /** Number of lone over-budget messages that were tail-truncated. */
   readonly inputTruncations: number;
 }
 
 /**
- * W-020: run 'render transcript -> generate -> record budget -> parse'
+ * Run 'render transcript -> generate -> record budget -> parse'
  * for one slice, handling `finishReason: 'length'`:
  *
  * - multi-message slice: split in half (message order preserved) and
@@ -585,7 +585,7 @@ interface SliceExtraction {
  *   the DLQ WITHOUT advancing the cursor - the established failure
  *   semantics). A DLQ route on truncation itself was rejected: replay
  *   re-reads the same slice with the same output cap and deterministically
- *   truncates again (the W-081 wedge shape); half-splitting converges.
+ *   truncates again (the cursor-wedge shape); half-splitting converges.
  * - single message: salvage the complete prefix of the truncated JSON
  *   ({@link salvageTruncatedExtraction}) - a lone message that overflows
  *   the cap cannot be split further, and losing its parseable facts is
@@ -594,7 +594,7 @@ interface SliceExtraction {
  * Facts are only RETURNED here; the caller writes them after every
  * sub-slice extracted successfully, so a mid-split failure leaves no
  * partially-committed slice (replay is additionally guarded by the
- * exact-text dedup, memory-consolidation-07).
+ * exact-text dedup).
  */
 async function extractFactsFromSlice(
   deps: StandardPhaseDeps,
@@ -682,8 +682,8 @@ async function extractFactsFromSlice(
 /**
  * Split `messages` in half (order preserved) and extract each half
  * recursively, folding counters into `seed`. Shared by the two split
- * triggers: output truncation (W-020, `finishReason: 'length'`) and the
- * W-081 input budget (transcript over `maxTranscriptChars`). Depth is
+ * triggers: output truncation (`finishReason: 'length'`) and the
+ * input budget (transcript over `maxTranscriptChars`). Depth is
  * bounded by log2(maxStandardBatchSize); a paused budget THROWS so the
  * runtime lands the batch in the DLQ WITHOUT advancing the cursor (the
  * established failure semantics - see the {@link extractFactsFromSlice}
@@ -723,7 +723,7 @@ async function extractHalves(
 }
 
 /**
- * W-020: recover the complete prefix of a length-truncated extraction.
+ * Recover the complete prefix of a length-truncated extraction.
  * Walks the `facts` array with string/escape-aware bracket tracking,
  * cuts the trailing incomplete object, closes the array, and delegates
  * field validation to {@link parseExtraction}. A salvaged half-formed
@@ -809,7 +809,7 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
 }
 
 /**
- * Build the episode-summarization request (P1-2). Uses the same
+ * Build the episode-summarization request. Uses the same
  * transcript + structured-output seam as {@link buildRequest}; the
  * system prompt switches on `withImportance` so a poignancy score is
  * only requested when importance scoring is enabled.
@@ -843,7 +843,7 @@ function buildEpisodeRequest(
 /**
  * Render a message batch into the exact transcript text the extraction
  * prompt consumes. Exported for the runtime's `buffer:N` tail
- * measurement (item 7, A2) so the trigger threshold and the W-081
+ * measurement so the trigger threshold and the `maxTranscriptChars`
  * transcript budget speak identical chars/4 units.
  *
  * @internal
@@ -910,8 +910,8 @@ export function parseExtraction(text: string | undefined): ReadonlyArray<Extract
 }
 
 /**
- * Parse the episode-summary model output into `{ summary, importance? }`
- * (P1-2). Tolerates fenced blocks + an optional `{ episode: {...} }`
+ * Parse the episode-summary model output into `{ summary, importance? }`.
+ * Tolerates fenced blocks + an optional `{ episode: {...} }`
  * wrapper; returns `null` when no usable `summary` string is present
  * (so an extraction-shaped `{ facts: [...] }` payload is rejected, not
  * mistaken for an episode).
@@ -952,7 +952,7 @@ export function parseEpisode(text: string | undefined): ExtractedEpisode | null 
 
 /**
  * Normalize a raw `[1, 10]` poignancy score into the episodic
- * `importance` field's `[0, 1]` range (P1-2). Out-of-range values are
+ * `importance` field's `[0, 1]` range. Out-of-range values are
  * clamped to `[1, 10]` first (so `15 → 1.0`, `0 → 0.1`); non-finite /
  * missing scores return `undefined` so the episode is recorded without
  * an importance signal rather than a bogus one.
@@ -966,14 +966,14 @@ export function normalizeImportance(raw: number | undefined): number | undefined
 }
 
 /**
- * Build the {@link FactInput} for an extracted candidate. P1-4:
+ * Build the {@link FactInput} for an extracted candidate:
  * distilled-from-transcript facts are synthesized memory - tagged
  * `extraction` so they land quarantined (excluded from action-driving
  * recall until validated).
  */
 /**
- * Embedder-independent exact-duplicate lookup
- * (memory-consolidation-07): FTS top hits + strict string equality.
+ * Embedder-independent exact-duplicate lookup: FTS top hits + strict
+ * string equality.
  * Returns the existing fact's id or `null`. Failures are swallowed -
  * the guard is an optimization, never a reason to fail the slice.
  */
@@ -1013,7 +1013,7 @@ function buildFactInput(fact: ExtractedFact): FactInput {
 
 /**
  * Record a reconcile / pre-filter decision into `fact_conflicts` so every
- * write-path decision stays auditable (P0-3). Best-effort: a storage
+ * write-path decision stays auditable. Best-effort: a storage
  * adapter without the conflict surface simply skips it.
  */
 async function recordConflictDecision(

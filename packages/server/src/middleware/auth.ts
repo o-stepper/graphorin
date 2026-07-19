@@ -18,7 +18,7 @@ import type { Context, MiddlewareHandler, Next } from 'hono';
 import type { ServerVariables } from '../internal/context.js';
 
 /**
- * IP-13: the scope set granted to every request when `auth.kind = 'none'`.
+ * The scope set granted to every request when `auth.kind = 'none'`.
  * `admin:*` matches every required scope (see `@graphorin/security/auth`
  * `scopeMatches`), so the trusted-loopback operator is uniformly authorized
  * without special-casing each route.

@@ -80,7 +80,7 @@ export interface VerifySkillSignatureOptions {
    */
   readonly publicKeySource?: { readonly publicKeyPem: string; readonly publisher?: string };
   /**
-   * Operator trust root (D4 / security-01). When supplied, the RESOLVED
+   * Operator trust root. When supplied, the RESOLVED
    * signing key must match the trust root or verification fails
    * `valid: false` with `reason: 'untrusted-key'` - a self-signed skill
    * whose inline key is not in the root can no longer verify green. The
@@ -228,12 +228,12 @@ export async function verifySkillSignature(
 }
 
 /**
- * Operator trust root for skill signatures (D4 / security-01). At least
+ * Operator trust root for skill signatures. At least
  * one leg must be non-empty to trust anything. `allowSigstore` (default
  * `true`) exempts sigstore-resolved keys (their identity/issuer were
  * already checked by the verifier).
  *
- * W-026: the `publishers` leg counts ONLY for keys resolved through the
+ * The `publishers` leg counts ONLY for keys resolved through the
  * `well-known` channel, whose URL host is verified to be the publisher's
  * domain (or a subdomain). The frontmatter `publisher` string is NOT
  * covered by the signature - anyone can claim any publisher - so an
@@ -250,7 +250,7 @@ export interface SkillTrustRoot {
    * Trusted publisher DNS names. Satisfied only by `well-known`-resolved
    * keys whose URL host equals the publisher (or is its subdomain) -
    * control of the HTTPS endpoint on the publisher's domain is the one
-   * channel that can vouch for the unsigned `publisher` string (W-026).
+   * channel that can vouch for the unsigned `publisher` string.
    */
   readonly publishers?: ReadonlyArray<string>;
   /** Trust sigstore-resolved keys without a fingerprint/publisher entry. Default `true`. */

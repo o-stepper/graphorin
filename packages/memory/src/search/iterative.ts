@@ -1,12 +1,12 @@
 /**
- * Agentic / iterative retrieval for hard queries (P2-4) - a **gated**,
+ * Agentic / iterative retrieval for hard queries - a **gated**,
  * CRAG/Self-RAG-style grade-then-reformulate loop.
  *
  * Some multi-hop / temporal questions can't be answered from a single
  * retrieval pass; the naive system returns a confident-but-wrong answer
  * instead of retrieving again. This module adds a small loop: grade the
  * retrieved memories for sufficiency and, when weak, reformulate the
- * query and retrieve once more (optionally widening to the P2-1 graph) -
+ * query and retrieve once more (optionally widening to the graph) -
  * up to a hard iteration cap, then **abstain** rather than confabulate.
  *
  * Both CRAG (arXiv:2401.15884) and Self-RAG (arXiv:2310.11511) add
@@ -187,7 +187,7 @@ export interface RetrievalGradeOptions {
   /** Cancellation signal forwarded to the underlying provider call. */
   readonly signal?: AbortSignal;
   /**
-   * Reformulations already attempted (MRET-11). Surfaced to the grader
+   * Reformulations already attempted. Surfaced to the grader
    * as context so it can propose something genuinely new - the grade
    * itself is ALWAYS judged against the original question, never a
    * reformulation (a narrowed sub-query must not be declared
@@ -355,8 +355,8 @@ export interface IterativeRetrievalResult<H> {
    */
   readonly abstained: boolean;
   /**
-   * `true` when the grader actually judged the result at least once
-   * (memory-retrieval-02). `false` on the single-shot path (gate not
+   * `true` when the grader actually judged the result at least once.
+   * `false` on the single-shot path (gate not
    * hard, or no grader configured) - there `sufficient: true` is a
    * DEFAULT, not a verdict, and consumers must not read it as one.
    */
@@ -375,7 +375,7 @@ export interface IterativeRetrievalDeps<H> {
   /**
    * Run one retrieval pass for `query`. `widen` is `true` on
    * reformulation passes so the caller can broaden recall (e.g. enable
-   * P2-1 one-hop graph expansion).
+   * one-hop graph expansion).
    */
   retrieve(query: string, widen: boolean, signal?: AbortSignal): Promise<ReadonlyArray<H>>;
   /** Snippet shown to the grader for a hit. */
@@ -385,7 +385,7 @@ export interface IterativeRetrievalDeps<H> {
   /** Grader; `null` ⇒ single-shot (no grading, no provider call). */
   grader: RetrievalGrader | null;
   /**
-   * Re-fuse the per-pass hit lists into one ranked list (MRET-2).
+   * Re-fuse the per-pass hit lists into one ranked list.
    * Receives one list per pass in pass order; the result feeds the
    * final `maxResults` cut so a pass-2 find can outrank pass-1 noise.
    * Absent ⇒ the loop falls back to round-robin interleaving (still

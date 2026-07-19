@@ -1,6 +1,6 @@
 /**
- * Rule: `@graphorin/tool-description-required` (RB-49 / suggested
- * DEC-165). Flags `tool({...})` invocations whose `description`
+ * Rule: `@graphorin/tool-description-required` (suggested DEC-165).
+ * Flags `tool({...})` invocations whose `description`
  * field is missing, too short (< 20 characters), or a placeholder
  * value (`'TODO'` / `'FIXME'` / `'tbd'` / `'description'` /
  * `'placeholder'`, case-insensitive).

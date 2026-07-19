@@ -98,7 +98,7 @@ export class PrebindPepperMissingError extends GraphorinServerError {
       'pre-bind-pepper-missing',
       'auth.pepper SecretRef did not resolve to a non-empty pepper.',
       {
-        hint: 'Run `graphorin doctor --check-secrets` (Phase 15) and verify the configured SecretRef.',
+        hint: 'Run `graphorin doctor --check-secrets` and verify the configured SecretRef.',
       },
     );
   }
@@ -114,7 +114,7 @@ export class PrebindSecretUnresolvableError extends GraphorinServerError {
       'pre-bind-secret-unresolvable',
       `Could not resolve SecretRef '${raw}' at config path ${path.join('.')}`,
       {
-        hint: 'Run `graphorin doctor --check-secrets` (Phase 15) and verify the configured SecretRef.',
+        hint: 'Run `graphorin doctor --check-secrets` and verify the configured SecretRef.',
         ...(cause !== undefined ? { cause } : {}),
       },
     );

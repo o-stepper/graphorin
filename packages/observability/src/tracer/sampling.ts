@@ -4,7 +4,7 @@
  * (`memory.embed`, `tool.execute.partial`, …) can be downsampled
  * without affecting the rest of the trace stream. Under the default
  * `'parent-based'` decision maker the per-type rules apply to CHILDREN
- * of a sampled trace too (W-090) - a rule can only downsample inside a
+ * of a sampled trace too - a rule can only downsample inside a
  * sampled trace, never resurrect children of an unsampled parent.
  *
  * @packageDocumentation
@@ -17,7 +17,7 @@ export type SamplingDecisionMaker = 'parent-based' | 'always-on' | 'rate-limit';
 
 /**
  * Per-span-type rate override. Applies on the probabilistic root path
- * AND (W-090) to children of a sampled parent under `'parent-based'` -
+ * AND to children of a sampled parent under `'parent-based'` -
  * `{ type: 'tool.execute', rate: 0.01 }` thins the per-call spans
  * inside every sampled `agent.run` trace. A child dropped by its rule
  * breaks the tree below it: its own descendants inherit
@@ -44,7 +44,7 @@ export interface SamplingOptions {
   readonly decisionMaker?: SamplingDecisionMaker;
   /**
    * Cap for the `'rate-limit'` decision maker: at most this many root spans
-   * are sampled per rolling 1-second window (RP-19). `undefined` ⇒ no cap
+   * are sampled per rolling 1-second window. `undefined` ⇒ no cap
    * (samples everything); `0` ⇒ sample nothing. Ignored by the other
    * decision makers.
    */
@@ -57,7 +57,7 @@ export interface SamplingOptions {
   readonly now?: () => number;
   /**
    * Optional override for streaming-event sampling.
-   * @see RB-52 - streaming event family `tool.execute.{progress,partial}`.
+   * @see the streaming event family `tool.execute.{progress,partial}`.
    */
   readonly streaming?: {
     readonly eventSamplingRate?: number;

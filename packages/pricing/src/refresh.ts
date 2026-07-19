@@ -45,7 +45,7 @@ export interface RefreshPricingOptions {
   /** Caller-supplied abort signal, combined with the timeout. */
   readonly signal?: AbortSignal;
   /**
-   * W-097: accepted body format. `'auto'` (default) tries the native
+   * Accepted body format. `'auto'` (default) tries the native
    * graphorin shape, then auto-detects + converts the
    * `@pydantic/genai-prices` dataset; the explicit values pin one
    * format and fail fast on anything else.
@@ -120,7 +120,7 @@ export async function refreshPricing(opts: RefreshPricingOptions): Promise<Prici
 }
 
 /**
- * W-097: convert a genai-prices dataset body, guarding the currency -
+ * Convert a genai-prices dataset body, guarding the currency -
  * `PricingSnapshot.currency` is a `'USD'` literal, so a body that
  * DECLARES another currency must fail loudly instead of being stamped
  * dollars.

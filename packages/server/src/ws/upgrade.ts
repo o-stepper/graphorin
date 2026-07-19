@@ -63,12 +63,12 @@ export interface WsUpgradeOptions {
   readonly tickets: WsTicketStore;
   /**
    * Token verifier for bearer / ticket upgrades. Optional only in the
-   * IP-13 no-auth loopback mode (`anonymous: true`), where there is no
+   * no-auth loopback mode (`anonymous: true`), where there is no
    * verifier to construct and every upgrade is accepted.
    */
   readonly verifier?: TokenVerifier;
   /**
-   * IP-13: authentication is disabled server-wide (`auth.kind='none'`).
+   * Authentication is disabled server-wide (`auth.kind='none'`).
    * Accept the upgrade unconditionally with a full (`admin:*`) scope grant
    * instead of silently refusing to mount the WS route. Trusted-loopback
    * / single-operator mode only.
@@ -444,7 +444,7 @@ async function resolveUpgradeAuth(
 }
 
 /**
- * IP-13: the anonymous trusted-loopback principal (auth disabled) holds
+ * The anonymous trusted-loopback principal (auth disabled) holds
  * `admin:*` so every per-subject and per-run check passes uniformly.
  */
 const ANONYMOUS_WS_SCOPES: ReadonlyArray<ParsedScope> = [parseScope('admin:*')];

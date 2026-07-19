@@ -2,15 +2,14 @@
  * Built-in structured summary template (RB-46 § 5.2). Historically named
  * "9-section" (the file name is retained for import stability); the
  * template has since grown to 12 sections - the stable id below says
- * `summary-sections` so metadata no longer misstates the shape
- * (context-engine-14).
+ * `summary-sections` so metadata no longer misstates the shape.
  * The template ships in English by default; locale-extensible via
  * `defineContextLocalePack({ compactionSummaryTemplate: { ... } })`.
  *
  * The summarizer's preamble explicitly instructs it to treat
  * `<<<untrusted_content>>>`-wrapped tool results as data, not
  * instructions (cross-cut RB-43). The produced summary is NOT
- * unconditionally trusted (CE-15): when the compacted window carried
+ * unconditionally trusted: when the compacted window carried
  * untrusted envelopes - or the injection heuristics flag the
  * summarizer output - the compactor wraps the LLM-authored body in a
  * `trust="derived"` envelope (see `CompactionResult.summaryTrust`),
@@ -20,8 +19,8 @@
  * The last two sections ("Recent turns preserved verbatim" and
  * "Compaction metadata") are filled by the harness, NOT by the
  * summarizer - those contracts are mechanical and auditable. The
- * other sections (incl. the SOTA-6 "Errors encountered and
- * resolutions" / "Next steps" and the C4 "Constraints and
+ * other sections (incl. the "Errors encountered and
+ * resolutions" / "Next steps" and the "Constraints and
  * non-negotiables") are produced by the LLM call.
  *
  * @packageDocumentation
@@ -80,7 +79,7 @@ export function buildSummarizerPrompt(input: {
   readonly template: RenderedTemplate;
   readonly olderMessages: ReadonlyArray<Message>;
   /**
-   * Character budget for the message dump (context-engine-07). When the
+   * Character budget for the message dump. When the
    * rendered dump exceeds it, the OLDEST lines are elided (newest kept)
    * and a marker notes how many were dropped. `undefined` ⇒ default
    * `DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET`; `0` disables the cap.
@@ -123,14 +122,13 @@ export function buildSummarizerPrompt(input: {
 /**
  * Default character budget for the summarizer's older-messages dump
  * (~24k tokens at 4 chars/token) - bounded so pointing
- * `summarizerModel` at a smaller model does not overflow its window
- * (context-engine-07).
+ * `summarizerModel` at a smaller model does not overflow its window.
  *
  * @stable
  */
 export const DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET = 96_000;
 
-/** Neutralize the dump's own envelope markers inside message text (context-engine-09). */
+/** Neutralize the dump's own envelope markers inside message text. */
 function neutralizeDumpMarkers(text: string): string {
   return text
     .replaceAll('<<</older_messages>>>', '[[/older_messages]]')

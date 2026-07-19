@@ -22,7 +22,7 @@
  * `exportAudit(...)` will no longer match the post-prune chain - treat a
  * prune as invalidating the hashes of earlier exports.
  *
- * The same applies to the D4 Merkle layer (W-062): the RFC-6962 leaves
+ * The same applies to the D4 Merkle layer: the RFC-6962 leaves
  * hash each entry's canonical JSON INCLUDING `prevHash`/`hash`, so
  * `verifyAuditAgainstCheckpoint(...)` against ANY checkpoint signed
  * before the prune fails afterwards - BY DESIGN, and indistinguishably
@@ -38,7 +38,7 @@ import { computeAuditHash, GENESIS_PREV_HASH } from './append.js';
 import type { AuditDb } from './audit-db.js';
 import type { StoredAuditEntry } from './types.js';
 
-/** W-062: survivors re-hashed per closed-iterator batch (see pruneAudit body). */
+/** Survivors re-hashed per closed-iterator batch (see pruneAudit body). */
 const REWRITE_BATCH_SIZE = 500;
 
 /**

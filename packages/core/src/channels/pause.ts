@@ -32,8 +32,8 @@ export class PauseSignal<TValue = unknown> extends Error {
 
 /**
  * Brand attached to the signal thrown by `pause(value)` when the
- * positional replay diverges from the journaled pause identity
- * (W-120). Cross-realm safe like {@link PAUSE_SIGNAL_BRAND}.
+ * positional replay diverges from the journaled pause identity.
+ * Cross-realm safe like {@link PAUSE_SIGNAL_BRAND}.
  *
  * @stable
  */
@@ -42,8 +42,8 @@ export const REPLAY_DIVERGENCE_BRAND: unique symbol = Symbol.for(
 );
 
 /**
- * Identity of one pause as recorded next to its satisfied resume value
- * (W-120): the durable-primitive `kind` (`timer` / `awakeable` /
+ * Identity of one pause as recorded next to its satisfied resume value:
+ * the durable-primitive `kind` (`timer` / `awakeable` /
  * `approval`) and the awakeable/approval `name`. A plain `pause()` has
  * neither - two plain pauses are indistinguishable BY DESIGN (no
  * false positives; the check is deliberately conservative).
@@ -58,7 +58,7 @@ export interface PauseIdentity {
 /**
  * Thrown by `pause(value)` during replay when the CURRENT pause's
  * identity does not match what the journal recorded for this cursor
- * position (W-120): the node body's pause order depends on
+ * position: the node body's pause order depends on
  * time/state/LLM output, so a positional replay would silently hand a
  * resume value to the wrong pause. The workflow engine converts this
  * into a typed `pause-replay-divergence` WorkflowError.
@@ -126,10 +126,10 @@ function identityOfPauseValue(value: unknown): PauseIdentity {
  * @internal
  */
 export interface PauseResumeScope {
-  /** Ordered resume values replayed to successive `pause()` calls (WF-2). */
+  /** Ordered resume values replayed to successive `pause()` calls. */
   readonly values: ReadonlyArray<unknown>;
   /**
-   * W-120: per-value identity of the pause each value answered.
+   * Per-value identity of the pause each value answered.
    * Absent (legacy checkpoints) or `null`/empty entries skip the check.
    */
   readonly meta?: ReadonlyArray<PauseIdentity | null | undefined>;
@@ -141,7 +141,7 @@ const pauseResumeStorage = new AsyncLocalStorage<PauseResumeScope>();
 /**
  * Run `fn` inside a scope where successive `pause(...)` calls return the
  * supplied `values` in order instead of throwing a fresh
- * {@link PauseSignal} (WF-2: a node body re-executes from the top on
+ * {@link PauseSignal} (a node body re-executes from the top on
  * every resume, so earlier pauses must replay their already-delivered
  * values and only the FIRST unsatisfied `pause()` suspends again). An
  * empty `values` array behaves exactly like no scope - every `pause()`

@@ -54,7 +54,7 @@ export interface FactInput {
   readonly validTo?: string;
   readonly supersedes?: string;
   /**
-   * Trust-provenance tag (P1-4). Writers that synthesize memory pass
+   * Trust-provenance tag. Writers that synthesize memory pass
    * `'extraction'` / `'reflection'` so the fact lands quarantined;
    * first-party writers pass `'user'` / `'tool'` (or omit it - absent ⇒
    * treated as first-party `active`). The `status` is *derived* from
@@ -62,7 +62,7 @@ export interface FactInput {
    */
   readonly provenance?: MemoryProvenance;
   /**
-   * Importance hint in `[0, 1]` (X-1 / MCON-12). Feeds the multi-signal
+   * Importance hint in `[0, 1]`. Feeds the multi-signal
    * salience score that orders decay archiving and capacity eviction -
    * higher importance ⇒ evicted later. Values are clamped to `[0, 1]`;
    * non-finite values are dropped. The consolidator's extraction pass
@@ -72,7 +72,7 @@ export interface FactInput {
    */
   readonly importance?: number;
   /**
-   * Principal dimension (D3). The consolidator stamps `'agent'` on
+   * Principal dimension. The consolidator stamps `'agent'` on
    * synthesized writes; user-authored writes may pass `'user'`. Absent
    * (the default) leaves the column NULL - treated as `'user'` at
    * filter time. Never gates default recall.
@@ -81,9 +81,9 @@ export interface FactInput {
 }
 
 /**
- * Per-list weights for {@link FusionStrategy} `'weighted'` fusion (X-2),
+ * Per-list weights for {@link FusionStrategy} `'weighted'` fusion,
  * keyed by retriever *kind* rather than position so they survive the
- * P2-3 multi-query fan-out (which appends extra FTS / vector candidate
+ * multi-query fan-out (which appends extra FTS / vector candidate
  * lists). Each defaults to the neutral `1` (≡ RRF). The HyDE list is a
  * vector list and takes the `vector` weight.
  *
@@ -95,26 +95,26 @@ export interface FusionWeights {
   /** Weight applied to every vector (incl. HyDE) candidate list. Default `1`. */
   readonly vector?: number;
   /**
-   * Weight applied to the graph-expansion candidate list (D5). Default
+   * Weight applied to the graph-expansion candidate list. Default
    * `1` (the previous neutral behaviour). Tune it once the graph leg's
-   * reliability is calibrated against labels - the roadmap's "graph as a
-   * first-class tunable fusion weight" (was hardcoded neutral).
+   * reliability is calibrated against labels - this makes the graph a
+   * first-class tunable fusion weight (it was hardcoded neutral).
    */
   readonly graph?: number;
-  /** Weight applied to the exact entity-match candidate list (D5). Default `1`. */
+  /** Weight applied to the exact entity-match candidate list. Default `1`. */
   readonly entity?: number;
 }
 
 /**
- * Score-fusion strategy for {@link SemanticMemory.search} (X-2).
+ * Score-fusion strategy for {@link SemanticMemory.search}.
  *
  * - `'rrf'` (the default when `fusion` is omitted) fuses the candidate
  *   lists through the configured reranker - the zero-tuning
  *   {@link RRFReranker} unless one was overridden.
  * - `'weighted'` fuses through {@link WeightedRRFReranker}, scaling each
  *   list's reciprocal-rank contribution by its {@link FusionWeights}, for
- *   callers who have calibrated retriever reliability against labels (the
- *   P0-1 eval harness). At equal weights it reproduces RRF.
+ *   callers who have calibrated retriever reliability against labels
+ *   (via `@graphorin/evals`). At equal weights it reproduces RRF.
  *
  * @stable
  */
@@ -134,7 +134,7 @@ export type FusionStrategy =
  */
 /**
  * Search options an operator may default at construction time via
- * `createMemory({ searchDefaults })` (W-086) - the advanced-retrieval
+ * `createMemory({ searchDefaults })` - the advanced-retrieval
  * switches (fan-out, HyDE, graph expansion, fusion, decay) that the
  * model-facing surfaces (`fact_search`, auto-recall, `deep_recall`)
  * cannot reach per-call. Deliberately a `Pick` that EXCLUDES the
@@ -163,7 +163,7 @@ export interface FactSearchOptions {
   /** Override the per-list candidate count (default `60`). */
   readonly candidateTopK?: number;
   /**
-   * Any-of tags filter (MRET-4). A fact matches when it carries at
+   * Any-of tags filter. A fact matches when it carries at
    * least one of the requested tags; untagged facts never match.
    * Applied in-store on the FTS leg and as a record-level filter on
    * the fused result so every candidate leg (vector / HyDE / graph)
@@ -175,13 +175,13 @@ export interface FactSearchOptions {
    * bi-temporal validity interval contains this instant are returned
    * (`valid_from <= asOf < valid_to`, open-ended bounds allowed),
    * applied at the store layer to both the FTS and vector candidate
-   * lists. ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2.
+   * lists. ISO-8601. Absent ⇒ current behaviour is unchanged.
    *
    * @stable
    */
   readonly asOf?: string;
   /**
-   * Include quarantined facts in the result (P1-4). Defaults to
+   * Include quarantined facts in the result. Defaults to
    * `false` - action-driving recall (`fact_search`, auto-recall) never
    * returns quarantined rows. Set `true` only for the validation /
    * inspector path that surfaces quarantined facts to a human for
@@ -191,7 +191,7 @@ export interface FactSearchOptions {
    */
   readonly includeQuarantined?: boolean;
   /**
-   * Rank-time trust discount (C5). `'on'` (default) multiplies each
+   * Rank-time trust discount. `'on'` (default) multiplies each
    * hit's fused score by its trust factor - quarantined-but-included
    * rows by `1 - quarantine` (default 0.3x), foreign-provenance rows by
    * `1 - foreignProvenance` (default 0.8x); first-party active facts are
@@ -203,7 +203,7 @@ export interface FactSearchOptions {
    */
   readonly trustWeighting?: 'on' | 'off';
   /**
-   * Include superseded / validity-expired facts (memory-retrieval-01).
+   * Include superseded / validity-expired facts.
    * Defaults to `false`: a default read behaves as `asOf = now`, so a
    * fact whose validity interval was closed (e.g. by `supersede`)
    * never surfaces as current - what the `fact_supersede` tool
@@ -231,7 +231,7 @@ export interface FactSearchOptions {
     readonly now?: () => number;
   };
   /**
-   * Multi-query / RAG-Fusion (P2-3). When set to `N > 1` *and* a query
+   * Multi-query / RAG-Fusion. When set to `N > 1` *and* a query
    * transformer is configured (`createMemory({ queryTransform })`), the
    * query is fanned into up to `N - 1` reworded variants via one cheap
    * LLM call; each variant is retrieved (FTS + vector) and **all** lists
@@ -246,7 +246,7 @@ export interface FactSearchOptions {
    */
   readonly multiQuery?: number;
   /**
-   * HyDE - Hypothetical Document Embeddings (arXiv:2212.10496), P2-3.
+   * HyDE - Hypothetical Document Embeddings (arXiv:2212.10496).
    * When `true` *and* both a query transformer and an embedder are
    * configured, generate a short hypothetical answer, embed it, and fuse
    * its vector neighbours into the result. Helps short / ambiguous
@@ -258,19 +258,19 @@ export interface FactSearchOptions {
    */
   readonly hyde?: boolean;
   /**
-   * Score-fusion strategy (X-2). Omitted (the default) ⇒ RRF via the
+   * Score-fusion strategy. Omitted (the default) ⇒ RRF via the
    * configured reranker - behaviour is unchanged. `{ strategy:
    * 'weighted', weights }` fuses through {@link WeightedRRFReranker},
    * up-/down-weighting the FTS vs vector candidate lists per
    * {@link FusionWeights}; reserve it for callers who have calibrated the
-   * weights against labels (the P0-1 eval harness). At equal weights it
+   * weights against labels (via `@graphorin/evals`). At equal weights it
    * reproduces RRF.
    *
    * @stable
    */
   readonly fusion?: FusionStrategy;
   /**
-   * One-hop graph expansion (P2-1). With `1` *and* a graph-capable
+   * One-hop graph expansion. With `1` *and* a graph-capable
    * storage adapter (`store.graph`), the facts retrieved by the lexical /
    * vector candidate pass are treated as seeds: facts sharing a canonical
    * entity (subject / object) are fetched via a recursive CTE and fused
@@ -278,15 +278,15 @@ export interface FactSearchOptions {
    * facts the query never matched directly ("what did the person I met in
    * Tbilisi recommend?"). `0` (the default) or a graph-less adapter ⇒ a
    * silent no-op; recall is unchanged. Opt-in + retrieval-heavy. `2`
-   * (D5) widens to two-hop expansion - pair with `graphScoring: 'ppr'`
+   * widens to two-hop expansion - pair with `graphScoring: 'ppr'`
    * so distant neighbours decay instead of tying with direct ones.
    *
    * @stable
    */
   readonly expandHops?: 0 | 1 | 2;
   /**
-   * Graph-expansion scoring (D5). `'flat'` (the default) scores every
-   * graph neighbour `1` (the pre-D5 behaviour). `'ppr'` uses PPR-lite
+   * Graph-expansion scoring. `'flat'` (the default) scores every
+   * graph neighbour `1` (the previous behaviour). `'ppr'` uses PPR-lite
    * damped spreading activation (`damping^hopDepth`) via the store's
    * `expandActivation`, so a two-hop neighbour ranks below a direct one;
    * a no-op without `expandHops >= 1` or a graph-capable adapter.
@@ -295,7 +295,7 @@ export interface FactSearchOptions {
    */
   readonly graphScoring?: 'flat' | 'ppr';
   /**
-   * Exact entity-match retriever (D5). When set, the query terms are
+   * Exact entity-match retriever. When set, the query terms are
    * normalized to entity names and facts linked to a matching canonical
    * entity are fused in as a precise candidate leg (`entity` fusion
    * weight), distinct from the fuzzy FTS / vector legs. A no-op without
@@ -305,7 +305,7 @@ export interface FactSearchOptions {
    */
   readonly entityMatch?: boolean;
   /**
-   * Retrieval-time principal filter (D3). When set, only facts whose
+   * Retrieval-time principal filter. When set, only facts whose
    * `owner` is in the requested set are returned - `'user'` for
    * user-stated facts, `'agent'` for the agent's own inferences,
    * `'shared'` for multi-agent shared records. Rows written before the
@@ -320,7 +320,7 @@ export interface FactSearchOptions {
 }
 
 /**
- * Per-call options for {@link SemanticMemory.searchIterative} (P2-4) -
+ * Per-call options for {@link SemanticMemory.searchIterative} -
  * the gated grade-then-reformulate loop. Extends {@link FactSearchOptions}
  * (every base option applies to each retrieval pass); `topK` doubles as
  * the cap on the accumulated result count.
@@ -341,7 +341,7 @@ export interface IterativeSearchOptions extends FactSearchOptions {
    */
   readonly forceHard?: boolean;
   /**
-   * Difficulty-gate threshold in `[0, 1]` for THIS call (W-088). The
+   * Difficulty-gate threshold in `[0, 1]` for THIS call. The
    * gate's signal lexicon is **English-only** - for non-English
    * deployments lower the threshold or use {@link forceHard}. Omitted ⇒
    * the facade default (`iterativeRetrieval.difficultyThreshold`) or the
@@ -374,7 +374,7 @@ export interface FactRememberOptions {
   /** Cancellation signal forwarded to the embedder + storage layers. */
   readonly signal?: AbortSignal;
   /**
-   * Precomputed contextual-retrieval index text (P1-3, advanced). When
+   * Precomputed contextual-retrieval index text (advanced). When
    * supplied it overrides the instance's `'late-chunk'` computation: the
    * embedding is computed from - and the FTS row indexed against - this
    * text, while the canonical `text` is stored unchanged. The background
@@ -384,7 +384,7 @@ export interface FactRememberOptions {
    */
   readonly indexText?: string;
   /**
-   * Auto-promotion policy (MCON-2). When `true`, a *synthesized* write
+   * Auto-promotion policy. When `true`, a *synthesized* write
    * (consolidator extraction) that is **clean** by the injection heuristics is
    * stored `active` instead of quarantined. Injection-flagged writes always
    * stay quarantined - the security gate is preserved. Off by default; the
@@ -406,7 +406,7 @@ export interface RememberOutcome {
   readonly fact: Fact;
   readonly decision: ConflictDecision;
   /**
-   * Why this write landed quarantined, if it did (P1-4 / MRET-3).
+   * Why this write landed quarantined, if it did.
    * `'injection'` - the offline injection heuristics flagged the text
    * (a memory-poisoning candidate). `'synthesized'` - a consolidator /
    * reflection / induction write awaiting validation. Absent when the
@@ -453,14 +453,14 @@ export class SemanticMemory {
     reranker: ReRanker;
     conflictPipeline?: ConflictPipeline;
     /**
-     * B4 (D-12): optional pluggable injection classifier consulted at
+     * Optional pluggable injection classifier consulted at
      * the write-time quarantine gate AFTER the regex heuristics. A
      * flagged verdict quarantines the write exactly like a regex hit;
      * classifier errors never fail the write (resilience contract).
      */
     injectionClassifier?: InjectionClassifier | null;
     /**
-     * Query transformer for multi-query / HyDE retrieval (P2-3). When
+     * Query transformer for multi-query / HyDE retrieval. When
      * supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one
      * cheap LLM call to rewrite / hypothesize the query; omitted (the
      * default) ⇒ those options are silent no-ops and search stays
@@ -468,7 +468,7 @@ export class SemanticMemory {
      */
     queryTransformer?: QueryTransformer;
     /**
-     * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
+     * Contextual-retrieval mode for the write path. `'late-chunk'`
      * (default) prepends a deterministic situating context to the text
      * that is embedded + FTS-indexed, leaving the canonical `text`
      * untouched; `'off'` indexes the bare text. The hot write path never
@@ -477,7 +477,7 @@ export class SemanticMemory {
      */
     contextualRetrieval?: 'off' | 'late-chunk';
     /**
-     * Entity resolver for the relation graph (P2-1). When supplied,
+     * Entity resolver for the relation graph. When supplied,
      * `remember(...)` resolves a fact's subject / object to canonical
      * entities and links them, enabling `search(..., { expandHops: 1 })`.
      * Omitted (the default) ⇒ writes carry s/p/o but form no entity
@@ -485,7 +485,7 @@ export class SemanticMemory {
      */
     entityResolver?: EntityResolver;
     /**
-     * Retrieval grader for the gated iterative loop (P2-4). When
+     * Retrieval grader for the gated iterative loop. When
      * supplied, `searchIterative(...)` can grade a retrieved set and
      * reformulate on hard queries; omitted (the default) ⇒
      * `searchIterative` runs a single, difficulty-gated pass and makes no
@@ -495,19 +495,19 @@ export class SemanticMemory {
     /** Default total-pass cap for `searchIterative`. Default 3. */
     iterativeMaxIterations?: number;
     /**
-     * Default difficulty-gate threshold for `searchIterative` (W-088).
+     * Default difficulty-gate threshold for `searchIterative`.
      * Omitted ⇒ the gate's built-in `0.5`. Per-call
      * `difficultyThreshold` overrides it.
      */
     iterativeDifficultyThreshold?: number;
     /**
-     * Weights for the rank-time trust discount (C5). Reuses the
+     * Weights for the rank-time trust discount. Reuses the
      * eviction-path `SalienceWeights` semantics; defaults to
      * `DEFAULT_SALIENCE_WEIGHTS`.
      */
     trustWeights?: SalienceWeights;
     /**
-     * Construction-time retrieval defaults (W-086) merged under every
+     * Construction-time retrieval defaults merged under every
      * `search(...)` call - see {@link SemanticSearchDefaults}. Because
      * the merge happens inside `search()`, the model-facing surfaces
      * (`fact_search`, auto-recall, `deep_recall`) inherit them without
@@ -715,7 +715,7 @@ export class SemanticMemory {
   }
 
   /**
-   * Resolve the contextual-retrieval index text (P1-3). A caller
+   * Resolve the contextual-retrieval index text. A caller
    * override (the consolidator's `'llm'` mode) takes precedence; then
    * the instance mode decides. Late-chunk derives the situating context
    * from the *author-supplied* signals on `input` (so an extraction's
@@ -780,7 +780,7 @@ export class SemanticMemory {
   }
 
   /**
-   * P2-1: resolve the fact's subject / object to canonical entities and
+   * Resolve the fact's subject / object to canonical entities and
    * link them so one-hop expansion can traverse this fact. A no-op when
    * no resolver is configured (the default) or the fact has no s/p/o, and
    * resilient - a resolution failure never breaks the write that just
@@ -1057,7 +1057,7 @@ export class SemanticMemory {
   }
 
   /**
-   * Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
+   * Gated, iterative ("deep") recall for hard queries. A cheap
    * local heuristic ({@link assessQueryDifficulty}) decides whether the
    * query is even a loop candidate; simple lookups take exactly one
    * {@link search} pass and make no provider call. For a query judged
@@ -1141,7 +1141,7 @@ export class SemanticMemory {
 
   /**
    * Raw vector KNN neighbours for the consolidator's reconcile
-   * pre-filter (P0-3). Unlike {@link search} this skips FTS, reranking,
+   * pre-filter. Unlike {@link search} this skips FTS, reranking,
    * and decay so the store's normalized `[0, 1]` similarity scores
    * survive intact (Stage 2 maps them back to raw cosine before
    * applying the conflict-pipeline zone thresholds), and it **includes
@@ -1187,7 +1187,7 @@ export class SemanticMemory {
    * callers can answer "how did this fact change over time". Requires
    * a storage adapter that implements
    * `SemanticMemoryStoreExt.historyOf(...)` - the default
-   * `@graphorin/store-sqlite` adapter wires this through. P0-2.
+   * `@graphorin/store-sqlite` adapter wires this through.
    *
    * @stable
    */
@@ -1212,14 +1212,14 @@ export class SemanticMemory {
   }
 
   /**
-   * Promote a quarantined fact to `active` (P1-4). The validation path
+   * Promote a quarantined fact to `active`. The validation path
    * that admits a synthesized memory into action-driving recall once a
    * human (or trusted non-agent caller) has reviewed it. Writes a
    * `memory_history` audit row. Requires a storage adapter that
    * implements `SemanticMemoryStoreExt.setStatus(...)` - the default
    * `@graphorin/store-sqlite` adapter wires this through.
    *
-   * MRET-3 / MST-1: promotion of a fact whose text still trips the
+   * Promotion of a fact whose text still trips the
    * offline injection heuristics is **refused** with
    * {@link QuarantinePromotionRefusedError} - the model-facing
    * `fact_validate` tool calls this with no `force`, so a poisoned
@@ -1292,7 +1292,7 @@ export class SemanticMemory {
   /**
    * Mark `oldId` superseded by a new fact. Returns the new record.
    *
-   * W-019 (security-first, knowledge-preserving): when the successor
+   * Security-first and knowledge-preserving: when the successor
    * lands QUARANTINED (the default for `extraction`/synthesized
    * provenance), the old ACTIVE fact's validity interval is NOT closed
    * - default recall keeps returning the old knowledge until the
@@ -1300,10 +1300,10 @@ export class SemanticMemory {
    * The link is recorded on the successor's `supersedes` field. With
    * `autoPromoteSynthesized` (threaded from the consolidator's
    * `autoPromoteExtraction` escape hatch) an injection-clean successor
-   * is active immediately and the interval closes right away - the
-   * pre-W-019 behaviour. Inverting the default (auto-activating the
-   * successor) would hand a MINJA attacker instant active memory via
-   * any text the reconciler classifies as an 'update'.
+   * is active immediately and the interval closes right away.
+   * Inverting the default (auto-activating the successor) would hand a
+   * MINJA attacker instant active memory via any text the reconciler
+   * classifies as an 'update'.
    */
   async supersede(
     scope: SessionScope,
@@ -1400,7 +1400,7 @@ export class SemanticMemory {
   }
 
   /**
-   * Pure weighted-fusion helper (X-2) - like {@link SemanticMemory.fuseRrf}
+   * Pure weighted-fusion helper - like {@link SemanticMemory.fuseRrf}
    * but scales each list `i`'s reciprocal-rank contribution by
    * `weights[i]`. A missing / invalid entry defaults to `1`, so equal or
    * absent weights reproduce RRF.
@@ -1414,7 +1414,7 @@ export class SemanticMemory {
   }
 
   /**
-   * Multi-query expansion (P2-3). Returns the original query followed by
+   * Multi-query expansion. Returns the original query followed by
    * up to `multiQuery - 1` deduped reworded variants. A no-op (`[query]`)
    * when `multiQuery` is unset / `<= 1` or no transformer is configured -
    * so the default path makes no provider call. A transformer failure
@@ -1444,7 +1444,7 @@ export class SemanticMemory {
   }
 
   /**
-   * HyDE retrieval (P2-3). Generates a hypothetical answer, embeds it,
+   * HyDE retrieval. Generates a hypothetical answer, embeds it,
    * and returns its vector neighbours to fuse into the result. A no-op
    * (`[]`) unless `hyde` is set, a transformer is configured, **and** an
    * embedder + vector surface exist - the embedder guard is checked
@@ -1489,13 +1489,13 @@ export class SemanticMemory {
   }
 
   /**
-   * One-hop graph expansion (P2-1). Seeds on the unique fact ids already
+   * One-hop graph expansion. Seeds on the unique fact ids already
    * gathered into `lists` and fuses in facts sharing a canonical entity,
    * via the adapter's recursive-CTE `graph.expandOneHop`. A no-op (`[]`)
    * unless `expandHops >= 1` and the adapter exposes `graph` - and
    * resilient: a traversal error degrades to no expansion rather than
    * breaking recall. Neighbours carry a `graph` signal so explanations
-   * (X-3) can attribute a hit to the hop.
+   * can attribute a hit to the hop.
    */
   async #tryExpandHops(
     scope: SessionScope,
@@ -1550,7 +1550,7 @@ export class SemanticMemory {
   }
 
   /**
-   * D5 exact entity-match leg. Normalizes the query into candidate
+   * Exact entity-match leg. Normalizes the query into candidate
    * entity names and fetches facts linked to a matching canonical
    * entity. A no-op without `entityMatch`, a graph adapter, or the
    * `factsForEntityName` store method.
@@ -1628,7 +1628,7 @@ export class SemanticMemory {
   }
 
   /**
-   * W-087: the store half of {@link SemanticMemory.#tryVectorSearch} -
+   * The store half of {@link SemanticMemory.#tryVectorSearch} -
    * runs the KNN read against an ALREADY-COMPUTED query vector so the
    * multi-query fan-out can batch its N variant embeddings into one
    * `embed([q1..qN])` call instead of N provider round-trips.
@@ -1659,7 +1659,7 @@ export class SemanticMemory {
   }
 
   /**
-   * W-087: embed every fan-out variant in ONE embedder call. Returns
+   * Embed every fan-out variant in ONE embedder call. Returns
    * `null` - and the caller degrades to the per-variant path - when
    * there is no fan-out, no vector surface, or the batch call fails; a
    * batching failure must never fail the search.
@@ -1690,7 +1690,7 @@ export class SemanticMemory {
   }
 
   /**
-   * C5: multiply each hit's fused score by its trust factor and re-sort.
+   * Multiply each hit's fused score by its trust factor and re-sort.
    * No-ops (returns the same array) when every factor is 1.
    */
   #applyTrustDiscount(hits: ReadonlyArray<MemoryHit<Fact>>): ReadonlyArray<MemoryHit<Fact>> {

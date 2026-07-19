@@ -5,16 +5,16 @@
  *
  *  - Layer 1 (`graphorin_memory_base`) educational template
  *  - Layer 2 user-defined `agent_instructions`
- *  - Layer 3 working-memory blocks (filtered through D2 privacy)
+ *  - Layer 3 working-memory blocks (privacy-filtered)
  *  - Layer 4 procedural rules + skill metadata cards
  *  - Layer 5 memory-metadata counters
  *  - Layer 6 opt-in auto-recall
  *
  * Cross-cuts:
  *
- *  - D2 privacy filter (sensitivity-tier drop)
- *  - D3 cooperation contract (`ContentOrigin` annotation)
- *  - D4 inbound preamble injection (post cache-breakpoint)
+ *  - Privacy filter (sensitivity-tier drop)
+ *  - Cooperation contract (`ContentOrigin` annotation)
+ *  - Inbound preamble injection (post cache-breakpoint)
  *  - RB-44 per-step tool-catalogue cardinality allocator (separate axis)
  *  - RB-46 in-flight session message-history compaction (separate axis)
  *
@@ -114,8 +114,8 @@ export type AutoRecallConfig =
   | {
       readonly topK?: number;
       /**
-       * Minimum fused score a hit must reach to be injected. **Default `0`**
-       * (CE-4) - `topK` already bounds the volume. The scale is
+       * Minimum fused score a hit must reach to be injected. **Default
+       * `0`** - `topK` already bounds the volume. The scale is
        * reranker-dependent: the default RRF reranker fuses the FTS + vector
        * candidate lists as `1/(60 + rank)` per list, so scores top out near
        * `2/(60 + 1) ≈ 0.033` - any positive default would silently drop every
@@ -210,14 +210,14 @@ const DEFAULT_LAYER_CAPS: Readonly<
 
 let heuristicCounterWarned = false;
 
-/** @internal - test seam for the one-time heuristic-counter warning (CE-13). */
+/** @internal - test seam for the one-time heuristic-counter warning. */
 export function _resetHeuristicCounterWarningForTesting(): void {
   heuristicCounterWarned = false;
 }
 
 /**
  * Emission order for the assembled layers - deliberately **distinct from the
- * truncation priority ladder** (CE-9). Allocation still trims by
+ * truncation priority ladder**. Allocation still trims by
  * `DEFAULT_LAYER_PRIORITY` (lowest priority first), but layers are *emitted* in
  * this order so the volatile blocks that change every turn (`memoryMetadata`'s
  * counts, `autoRecall`'s injected facts) sit **after** the stable Layer 1-4
@@ -625,11 +625,11 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
-    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    /** Per-call override of the strategy's preserve-recent count. */
     readonly preserveRecentTurns?: number;
-    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook. */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
-    /** The caller's pinned system prefix - accounting only (context-engine-04). */
+    /** The caller's pinned system prefix - accounting only. */
     readonly prefixMessages?: ReadonlyArray<Message>;
     readonly signal?: AbortSignal;
   }): Promise<{
@@ -934,7 +934,7 @@ function resolvePackInput(input: ContextEngineConfig['locale']): ContextLocalePa
 }
 
 /**
- * Wave-D D4: normalise the configured pre-compaction hooks. No
+ * Normalise the configured pre-compaction hooks. No
  * defaults - an absent config means no pre-hooks run.
  */
 function resolvePreHooks(

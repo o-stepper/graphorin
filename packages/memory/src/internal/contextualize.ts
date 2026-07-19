@@ -1,5 +1,5 @@
 /**
- * Contextual retrieval (P1-3). Before a memory is embedded / FTS-indexed
+ * Contextual retrieval. Before a memory is embedded / FTS-indexed
  * the framework can prepend a short *situating context* (entities,
  * timeframe, topics) so a terse fact like "moved there in March" stays
  * findable by "Where did Anna relocate?". This mirrors Anthropic's
@@ -8,7 +8,7 @@
  * trail is left untouched.
  *
  * Three modes:
- * - `'off'` - index the bare canonical text (pre-P1-3 behaviour).
+ * - `'off'` - index the bare canonical text (no situating prefix).
  * - `'late-chunk'` - the **offline default**: prepend a context derived
  *   deterministically from the memory's own structured metadata. No LLM
  *   call, so the local-first write path is unchanged in cost.
@@ -24,7 +24,7 @@ import type { Provider, ProviderRequest, Usage } from '@graphorin/core';
 
 /**
  * Contextual-retrieval mode. `'late-chunk'` is the offline default;
- * `'llm'` is the opt-in, consolidator-only enrichment. P1-3.
+ * `'llm'` is the opt-in, consolidator-only enrichment.
  *
  * @stable
  */

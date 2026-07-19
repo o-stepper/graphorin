@@ -8,7 +8,7 @@
  * receive `undefined` and the route handler decides how to surface
  * the miss (typically a 404 with a typed error body).
  *
- * W-053: compatibility of `ServerAgentLike` / `ServerWorkflowLike` with
+ * Compatibility of `ServerAgentLike` / `ServerWorkflowLike` with
  * the real `Agent` / `Workflow` surfaces is gated at compile time by
  * `tests/registry-contract.types.test.ts` - a drift in either direction
  * fails the server package's typecheck, not a user's runtime. When a
@@ -34,7 +34,7 @@ export interface ServerAgentLike {
       readonly sessionId?: string;
       readonly userId?: string;
       /**
-       * C3/W-119: HITL resume directive forwarded by
+       * HITL resume directive forwarded by
        * `POST /runs/:runId/resume`. Mirrors the agent package's
        * `ResumeDirective` structurally.
        */
@@ -49,7 +49,7 @@ export interface ServerAgentLike {
     },
   ): Promise<unknown>;
   /**
-   * Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
+   * Streaming surface. `@graphorin/agent` agents satisfy this
    * structurally; `POST /agents/:id/stream` consumes it and emits
    * every event onto the run's WS subject. Optional so plain
    * run-only fixtures keep working (they emit a single terminal frame).
@@ -89,15 +89,15 @@ export interface ServerWorkflowLike {
     directive?: { readonly resume?: unknown },
     opts?: { readonly signal?: AbortSignal },
   ): AsyncIterable<unknown>;
-  /** W-119: replay a failed/aborted thread (`POST /:id/retry`). */
+  /** Replay a failed/aborted thread (`POST /:id/retry`). */
   retry?(threadId: string, opts?: { readonly signal?: AbortSignal }): AsyncIterable<unknown>;
-  /** W-119: fire a due durable timer (`POST /:id/tick`). */
+  /** Fire a due durable timer (`POST /:id/tick`). */
   tick?(
     threadId: string,
     opts?: { readonly now?: number },
   ): Promise<{ readonly fired: boolean; readonly nextWakeAt: number | null }>;
   /**
-   * W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
+   * Resolve a NAMED awakeable/approval (`POST /:id/resume` with
    * `name`) - `approve` is the same primitive under the hood.
    */
   resolveAwakeable?(
@@ -107,7 +107,7 @@ export interface ServerWorkflowLike {
     opts?: { readonly signal?: AbortSignal },
   ): AsyncIterable<unknown>;
   /**
-   * W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
+   * Fork a new thread from a checkpoint (`POST /:id/fork`).
    * `opts.patch` merges channel-level state into the forked root (the
    * `state` field of the fork body).
    */
@@ -118,7 +118,7 @@ export interface ServerWorkflowLike {
   ): Promise<{ readonly newThreadId: string }>;
   getState?(threadId: string): Promise<unknown>;
   listCheckpoints?(threadId: string): Promise<ReadonlyArray<unknown>>;
-  /** W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`). */
+  /** Per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`). */
   deleteThread?(threadId: string): Promise<void>;
 }
 

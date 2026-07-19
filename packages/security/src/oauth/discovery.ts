@@ -170,7 +170,7 @@ function wellKnownUrl(serverUrl: string, suffix: string): string {
   return `${base}/.well-known/${suffix}`;
 }
 
-/** SPL-7: hosts where plain http is acceptable (local development). */
+/** Hosts where plain http is acceptable (local development). */
 function isLoopbackHost(hostname: string): boolean {
   return (
     hostname === 'localhost' ||
@@ -182,7 +182,7 @@ function isLoopbackHost(hostname: string): boolean {
 }
 
 /**
- * SPL-7: refuse non-https endpoints (refresh tokens and Basic client
+ * Refuse non-https endpoints (refresh tokens and Basic client
  * secrets get POSTed to whatever discovery names) - http is allowed
  * only for loopback hosts. Mirrors the supply-chain key fetcher's
  * https-only posture.
@@ -208,7 +208,7 @@ function normalizeIssuer(value: string): string {
 }
 
 /**
- * SPL-7 / RFC 8414 §3.3: the metadata `issuer` MUST be identical to the
+ * RFC 8414 §3.3: the metadata `issuer` MUST be identical to the
  * issuer URL the well-known document was resolved for - otherwise a
  * compromised document can redirect token traffic to attacker-chosen
  * endpoints under a trusted discovery URL.

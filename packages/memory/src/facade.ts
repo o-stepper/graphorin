@@ -89,7 +89,7 @@ export interface CreateMemoryOptions {
   /** Override the reranker used by `SemanticMemory.search`. */
   readonly reranker?: ReRanker;
   /**
-   * Construction-time retrieval defaults (W-086) merged under every
+   * Construction-time retrieval defaults merged under every
    * `SemanticMemory.search(...)` call, per-call options winning
    * key-by-key. This is how the advanced retrieval stack (multi-query
    * fan-out, HyDE, graph expansion, entity matching, weighted fusion,
@@ -106,7 +106,7 @@ export interface CreateMemoryOptions {
    */
   readonly searchDefaults?: SemanticSearchDefaults;
   /**
-   * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
+   * Contextual-retrieval mode for the write path. `'late-chunk'`
    * (default) prepends a deterministic, offline situating context
    * (entities / timeframe / topics, derived from the fact's own
    * structured fields) to the text that is embedded + FTS-indexed, so a
@@ -119,8 +119,8 @@ export interface CreateMemoryOptions {
   /**
    * Behavior when the configured embedder is incompatible with the
    * index this database was built with (different configHash, a
-   * lock-on-first conflict, or a contextualization-mode switch - item
-   * 10 step 2). `'fail'` (default) rethrows the registry error.
+   * lock-on-first conflict, or a contextualization-mode switch).
+   * `'fail'` (default) rethrows the registry error.
    * `'fts-only'` degrades instead of dying: the embedder is dropped
    * for this process, semantic search serves FTS-only results, writes
    * store no vectors, and a WARN plus an `x.memory.embedder-incompatible`
@@ -130,23 +130,23 @@ export interface CreateMemoryOptions {
    */
   readonly onIncompatibleEmbedder?: 'fail' | 'fts-only';
   /**
-   * B3 (item 15): deterministic pre-extraction admission gate over
+   * Deterministic pre-extraction admission gate over
    * persisted session messages, applied on BOTH consolidator batch
    * paths before noise filtering; excluded messages still advance the
    * idempotency cursor. Pass the canonical `verdictIngestGate` to
    * exclude guardrail-blocked / lateral-leak-withheld turns from
    * long-term memory (the safe-by-construction write gate the
-   * auto-promotion and act-grant features of later waves REQUIRE).
+   * auto-promotion and act-grant features REQUIRE).
    */
   readonly ingestGate?: MemoryIngestGate;
   /**
-   * B4 (D-12): optional pluggable injection classifier consulted at
+   * Optional pluggable injection classifier consulted at
    * the semantic write-time quarantine gate after the offline regex
    * heuristics. Default off; classifier errors never fail a write.
    */
   readonly injectionClassifier?: InjectionClassifier;
   /**
-   * Query transformation for retrieval (P2-3, opt-in). When supplied,
+   * Query transformation for retrieval (opt-in). When supplied,
    * `SemanticMemory.search(..., { multiQuery })` fans the query into
    * reworded variants (multi-query / RAG-Fusion) and `{ hyde }` adds a
    * hypothetical-answer embedding - both via one cheap LLM call on the
@@ -165,7 +165,7 @@ export interface CreateMemoryOptions {
     readonly maxTokens?: number;
   };
   /**
-   * Relation-graph entity resolution (P2-1). When `entityResolution` is
+   * Relation-graph entity resolution. When `entityResolution` is
    * `true` **and** the storage adapter exposes a `graph` surface (the
    * default `@graphorin/store-sqlite` does), `remember(...)` resolves a
    * fact's subject / object to canonical entities and links them, so
@@ -182,7 +182,7 @@ export interface CreateMemoryOptions {
     readonly provider?: Provider;
   };
   /**
-   * Agentic / iterative retrieval (P2-4, opt-in). When supplied,
+   * Agentic / iterative retrieval (opt-in). When supplied,
    * `SemanticMemory.searchIterative(...)` and the gated `deep_recall`
    * tool can grade a retrieved set on the given provider and, for queries
    * judged hard, reformulate + retrieve again (widening to one-hop graph
@@ -201,7 +201,7 @@ export interface CreateMemoryOptions {
     /** Output-token ceiling per grade call. Default 256. */
     readonly maxTokens?: number;
     /**
-     * Default difficulty-gate threshold in `[0, 1]` (W-088). The gate's
+     * Default difficulty-gate threshold in `[0, 1]`. The gate's
      * signal lexicon is **English-only**: on non-English deployments the
      * auto-gate never fires, so either lower this threshold or rely on
      * `forceHard` (`deep_recall` already forces the loop). Omitted ⇒ the
@@ -210,7 +210,7 @@ export interface CreateMemoryOptions {
     readonly difficultyThreshold?: number;
   };
   /**
-   * Opt-in workflow induction (P2-2). When set, `ProceduralMemory.induce(...)`
+   * Opt-in workflow induction. When set, `ProceduralMemory.induce(...)`
    * distils a reusable, value-abstracted procedure from a successful agent
    * trajectory and stores it **quarantined** + `provenance: 'induction'`.
    * Omitted (the default) ⇒ `induce(...)` throws
@@ -225,7 +225,7 @@ export interface CreateMemoryOptions {
   };
   /**
    * Promotion-by-demonstrated-success for quarantined induced
-   * procedures (MCON-2 part 4). Fully offline - orthogonal to
+   * procedures. Fully offline - orthogonal to
    * `procedureInduction` (no provider needed). When configured,
    * `procedural.recordOutcome(scope, id, true)` increments the rule's
    * persistent success counter and promotes it into `activate()` once
@@ -238,7 +238,7 @@ export interface CreateMemoryOptions {
     readonly afterSuccesses: number;
   };
   /**
-   * Register the gated `runbook_search` tool (D3) so the model can look
+   * Register the gated `runbook_search` tool so the model can look
    * up validated procedures by task description (content recall over
    * procedural memory, returning whole runbooks). Fully offline - the
    * default `@graphorin/store-sqlite` adapter serves it from the rules
@@ -248,7 +248,7 @@ export interface CreateMemoryOptions {
    */
   readonly runbookSearch?: boolean;
   /**
-   * Memory tool profile (wave-D D3): which slice of the canonical set
+   * Memory tool profile: which slice of the canonical set
    * `memory.tools` carries. `'full'` (default) is the stable-order
    * read+write set; `'interactive'` builds ONLY the read tools - a
    * front-line agent wired with it cannot write memory by construction
@@ -265,7 +265,7 @@ export interface CreateMemoryOptions {
    */
   readonly resolveScope?: ScopeResolver;
   /**
-   * Profile projection (wave-D D2, plan item 6): after each deep
+   * Profile projection: after each deep
    * consolidation phase, one budgeted LLM call projects ACTIVE facts
    * (never quarantined, never pending-supersede) into the reserved
    * read-only `profile` working block as topic / sub-topic / content
@@ -283,7 +283,7 @@ export interface CreateMemoryOptions {
    * placeholder so consumers can still type their interactions without
    * paying the runtime cost. ANY other setting - including offline
    * knobs like `decayCapacity` or `contextualRetrieval` - implicitly
-   * enables the production runtime (MST-4); `enabled: false` together
+   * enables the production runtime; `enabled: false` together
    * with other settings warns once and keeps the placeholder.
    */
   readonly consolidator?: {
@@ -294,13 +294,13 @@ export interface CreateMemoryOptions {
     readonly ceilings?: Partial<ConsolidatorCeilings>;
     readonly onExceed?: OnBudgetExceed;
     /**
-     * USD pricer for phase LLM usage (memory-consolidation-02) - wire
+     * USD pricer for phase LLM usage - wire
      * to `@graphorin/pricing` so `maxCostPerDay` can actually trip.
      */
     readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
-    /** Provider routed to the standard phase when set (MCON-7); falls back to `provider`. */
+    /** Provider routed to the standard phase when set; falls back to `provider`. */
     readonly cheapProvider?: Provider | null;
-    /** Provider routed to the deep + reflection passes when set (MCON-7). */
+    /** Provider routed to the deep + reflection passes when set. */
     readonly deepProvider?: Provider | null;
     readonly cheapModel?: string | null;
     readonly deepModel?: string | null;
@@ -308,14 +308,14 @@ export interface CreateMemoryOptions {
     readonly lockWaitMs?: number;
     readonly decayTauDays?: number;
     readonly decayArchiveThreshold?: number;
-    /** Capacity-bounded eviction target for the light phase (X-1). Default unbounded. */
+    /** Capacity-bounded eviction target for the light phase. Default unbounded. */
     readonly decayCapacity?: number | null;
-    /** Weights for the multi-signal salience score (X-1). */
+    /** Weights for the multi-signal salience score. */
     readonly salienceWeights?: SalienceWeights;
     readonly maxStandardBatchSize?: number;
     /**
      * Input transcript budget for one standard-phase slice, in
-     * characters (W-081). Over-budget batches are half-split before the
+     * characters. Over-budget batches are half-split before the
      * provider call; a lone over-budget message is tail-truncated.
      * Per-tier default (60k chars ~ 15k tokens; 120k on `full`).
      */
@@ -324,54 +324,54 @@ export interface CreateMemoryOptions {
     readonly dlqMaxRetries?: number;
     readonly dlqBaseBackoffMs?: number;
     readonly dlqMaxBackoffMs?: number;
-    /** Auto-form quarantined episodes from processed slices (P1-2). Per-tier default. */
+    /** Auto-form quarantined episodes from processed slices. Per-tier default. */
     readonly formEpisodes?: boolean;
-    /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
+    /** Score episode importance via the consolidator LLM. Per-tier default. */
     readonly importanceScoring?: boolean;
     /**
-     * Opt in to auto-promotion of injection-clean extraction facts
-     * (MCON-2). Default off. Wave-D D4: REQUIRES `ingestGate` - the
+     * Opt in to auto-promotion of injection-clean extraction facts.
+     * Default off. REQUIRES `ingestGate` - the
      * documented precondition is now enforced fail-closed at
      * `createMemory` time ({@link IngestGateRequiredError}).
      */
     readonly autoPromoteExtraction?: boolean;
     /**
-     * Deterministic quarantine-exit policy (wave-D D4, D-7): the deep
+     * Deterministic quarantine-exit policy: the deep
      * phase promotes quarantined facts whose recall evidence clears
      * every threshold through the audited validate path. Default off.
-     * REQUIRES `ingestGate` (fail-closed) - promotion without the B3
+     * REQUIRES `ingestGate` (fail-closed) - promotion without the
      * admission gate would move unvetted content into default recall.
      * Distinct from `autoPromoteExtraction` (write-time hatch).
      */
     readonly promotion?: PromotionPolicyConfig;
-    /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
+    /** Run the deep-phase reflection pass synthesizing cited insights. Per-tier default. */
     readonly reflection?: boolean;
-    /** Accumulated-importance threshold at which reflection fires (P1-1). */
+    /** Accumulated-importance threshold at which reflection fires. */
     readonly importanceThreshold?: number;
-    /** Upper bound on salient questions reflection asks per pass (P1-1). */
+    /** Upper bound on salient questions reflection asks per pass. */
     readonly reflectionMaxQuestions?: number;
-    /** Override the quarantined-insight queue cap (W-082). Default 100. */
+    /** Override the quarantined-insight queue cap. Default 100. */
     readonly reflectionMaxQuarantinedInsights?: number;
     /**
-     * Contextual retrieval for standard-phase fact writes (P1-3).
+     * Contextual retrieval for standard-phase fact writes.
      * `'llm'` opts into one budgeted cheap-model call per write to author
      * a situating prefix (consolidator-only); `'late-chunk'` (default)
      * and `'off'` defer to the write-path mode. Per-tier default.
      */
     readonly contextualRetrieval?: ContextualRetrievalMode;
     /**
-     * Maintain the learned-context digest block (D3): after each deep
+     * Maintain the learned-context digest block: after each deep
      * phase, one budgeted LLM call rewrites the reserved
      * `learned_context` working block (previous digest + recent
      * episodes / active insights / procedures), so the assembled system
      * prompt carries a compact standing summary. Default `false` at
-     * every tier (Wave-D trial).
+     * every tier.
      */
     readonly learnedContext?: boolean;
-    /** Character bound for the learned-context digest (D3). Default `1200`. */
+    /** Character bound for the learned-context digest. Default `1200`. */
     readonly learnedContextMaxChars?: number;
     /**
-     * Curated working blocks the deep phase maintains (wave-D D3) -
+     * Curated working blocks the deep phase maintains -
      * the generalisation of the learned-context pass to a registered
      * list (`learnedContext: true` remains sugar for
      * `[{ label: 'learned_context' }]` and composes with this).

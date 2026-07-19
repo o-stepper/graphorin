@@ -1,5 +1,5 @@
 /**
- * Query transformation for hybrid retrieval (P2-3) - **multi-query /
+ * Query transformation for hybrid retrieval - **multi-query /
  * RAG-Fusion** and optional **HyDE**.
  *
  * Auto-recall is a regex trigger and the default search is single-shot:

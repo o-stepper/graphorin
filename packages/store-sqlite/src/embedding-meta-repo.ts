@@ -18,8 +18,8 @@ export interface EmbeddingMetaRow {
   readonly distanceMetric: 'cosine' | 'dot' | 'euclidean';
   readonly configHash: string;
   /**
-   * Write-path contextualization recipe the index was built with
-   * (item 10 step 1) - e.g. `'late-chunk'`, `'off'`, `'late-chunk+llm'`.
+   * Write-path contextualization recipe the index was built with -
+   * e.g. `'late-chunk'`, `'off'`, `'late-chunk+llm'`.
    * Part of the index version key: a different mode means the stored
    * vectors were computed from differently contextualized text, which
    * is as incompatible as a different model. `null` marks a legacy row
@@ -295,7 +295,7 @@ export interface RegisterEmbedderInput {
   readonly distanceMetric?: 'cosine' | 'dot' | 'euclidean';
   readonly configHash: string;
   /**
-   * Write-path contextualization recipe (item 10 step 1). When
+   * Write-path contextualization recipe. When
    * supplied, it joins the index version key: a legacy `null` row
    * adopts it once, after which a different mode fails registration
    * exactly like a configHash change. Omitted = legacy caller, no

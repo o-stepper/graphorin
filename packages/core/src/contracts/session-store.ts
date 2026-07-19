@@ -135,11 +135,11 @@ export interface SessionStoreExt extends SessionStore {
   pruneAuditEntries(beforeEpochMs: number): Promise<number>;
   /**
    * Hard-delete a session and cascade its session-owned rows - handoffs,
-   * workflow-run attachments, and audit entries (RP-6) - **plus the
+   * workflow-run attachments, and audit entries - **plus the
    * session's content**: its `session_messages` rows (with their FTS and
-   * vector index entries) and any episodes scoped to the session
-   * (store-01). The cascade also erases the checkpoints of suspended
-   * runs (W-005): `workflow_checkpoints` / `workflow_pending_writes`
+   * vector index entries) and any episodes scoped to the
+   * session. The cascade also erases the checkpoints of suspended
+   * runs: `workflow_checkpoints` / `workflow_pending_writes`
    * rows for every thread linked to the session, whether through the
    * workflow-run attachment mapping or through the `sessionId`
    * checkpoint metadata the agent runtime stamps on HITL suspends -
@@ -151,7 +151,7 @@ export interface SessionStoreExt extends SessionStore {
    */
   deleteSession(sessionId: string): Promise<void>;
   /**
-   * Retention sweep (RP-6): hard-delete (cascade) every session matching the
+   * Retention sweep: hard-delete (cascade) every session matching the
    * policy. `beforeEpochMs` limits to sessions created before that instant;
    * `closedOnly` limits to closed sessions. With neither, deletes all sessions.
    * Returns the number of sessions deleted.

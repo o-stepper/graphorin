@@ -1,9 +1,9 @@
 /**
  * The agent's public call surface, built over the factory's run loop:
  * `stream` / `run` (the AsyncIterable wrapper and the drained-run
- * variant, AG-9), `compact` (queued into the loop, CE-3 / AG-13),
- * `fanOut` (AG-7 lifecycle events onto the external queue), and the
- * structured progress-artifact IO (AG-20). Extracted verbatim from
+ * variant), `compact` (queued into the loop), `fanOut` (lifecycle
+ * events onto the external queue), and the structured
+ * progress-artifact IO. Extracted verbatim from
  * `factory.ts` (issue #23); the factory's mutable `activeRunState`
  * scratch is read through a live getter so event payloads observe
  * exactly what the former closures observed.
@@ -109,7 +109,7 @@ export interface AgentSurfaceDeps<TDeps, TOutput> {
   readonly progressIO: ProgressIO;
 }
 
-/** Build the `compact` method (queued into the run loop, CE-3 / AG-13). */
+/** Build the `compact` method (queued into the run loop). */
 export function createCompactMethod<TDeps, TOutput>(
   deps: AgentSurfaceDeps<TDeps, TOutput>,
 ): (options?: CompactOptions) => Promise<CompactionApiResult> {
@@ -137,7 +137,7 @@ export function createCompactMethod<TDeps, TOutput>(
   };
 }
 
-/** Build the `fanOut` method (AG-7: lifecycle events reach the stream). */
+/** Build the `fanOut` method (lifecycle events reach the stream). */
 export function createFanOutMethod<TDeps, TOutput>(
   deps: AgentSurfaceDeps<TDeps, TOutput>,
 ): <TFanOutOutput = unknown>(
@@ -175,7 +175,7 @@ export function createFanOutMethod<TDeps, TOutput>(
   };
 }
 
-/** Build the structured progress-artifact IO surface (AG-20). */
+/** Build the structured progress-artifact IO surface. */
 export function createProgressSurface<TDeps, TOutput>(
   deps: AgentSurfaceDeps<TDeps, TOutput>,
 ): AgentProgressIO {

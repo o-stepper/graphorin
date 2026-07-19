@@ -18,7 +18,7 @@ import { isMissingNativeBindingError, SqliteNativeBindingError } from '../native
 
 /**
  * Cipher selection, validated against the real sqlite3mc vocabulary
- * (CS-13 - `'wxsqlite3'` is the library's name, not a cipher; the peer
+ * (`'wxsqlite3'` is the library's name, not a cipher; the peer
  * rejects it with "Cipher 'wxsqlite3' unknown"). `'sqlcipher'` is the
  * Graphorin default (SQLCipher v4 compatible); `'chacha20'` is the
  * peer's own default cipher.
@@ -29,7 +29,7 @@ export type EncryptionCipher = 'sqlcipher' | 'chacha20' | 'aes256cbc' | 'aes128c
 
 /**
  * The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
- * on a freshly opened connection (CS-7). sqlite3mc defaults to
+ * on a freshly opened connection. sqlite3mc defaults to
  * `chacha20`, so opening a SQLCipher-v4 database with `key` alone
  * reads garbage - every keyed open must pin the cipher first.
  *

@@ -63,7 +63,7 @@ export class EncryptedFileSecretsStore implements SecretsStore {
   readonly #passphrase: SecretValue;
   readonly #enforcePermissions: boolean;
   /**
-   * In-process single-writer guard (SPL-3). Serialises the
+   * In-process single-writer guard. Serialises the
    * read-modify-write critical section so two concurrent `set()` /
    * `delete()` calls against the same instance cannot interleave their
    * reads and clobber each other. Cross-process writers are out of

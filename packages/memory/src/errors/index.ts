@@ -126,7 +126,7 @@ export class WorkingBlockReplaceMismatchError extends GraphorinMemoryError {
 
 /**
  * Thrown when any mutation targets a block defined with
- * `readOnly: true` (MRET-14). Previously this guard threw
+ * `readOnly: true`. Previously this guard threw
  * `WorkingBlockReplaceMismatchError(label, 0)` - semantically "your
  * unique substring matched 0 times", which misled callers that retry
  * replace operations on mismatch.
@@ -174,7 +174,7 @@ export class EmbedderMigrationLockedError extends GraphorinMemoryError {
 /**
  * Raised by `migrateEmbedder(...)` when the runner is interrupted via
  * `AbortSignal`. The surrounding `for-await` loop receives this error so
- * the operator can re-run the migration. MST-12: there is no persisted
+ * the operator can re-run the migration. There is no persisted
  * cursor today, so a re-run restarts from the beginning.
  *
  * @stable
@@ -215,7 +215,7 @@ export class EmbedderMigrationStateError extends GraphorinMemoryError {
 }
 
 /**
- * Raised by `SemanticMemory.validate` (P1-4 / MRET-3) when a caller
+ * Raised by `SemanticMemory.validate` when a caller
  * tries to promote a fact whose quarantine was triggered by the offline
  * injection heuristics. Such a fact is a memory-poisoning candidate: the
  * agent's own `fact_validate` tool must never be able to admit it into
@@ -247,7 +247,7 @@ export class QuarantinePromotionRefusedError extends GraphorinMemoryError {
 }
 
 /**
- * Raised when `ProceduralMemory.induce` (P2-2) is called but no
+ * Raised when `ProceduralMemory.induce` is called but no
  * workflow inducer was configured. Induction abstracts concrete values into
  * variables, which needs a provider - so the capability is opt-in and the
  * default (offline) procedural tier never silently no-ops a requested

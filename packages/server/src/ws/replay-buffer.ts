@@ -61,7 +61,7 @@ export interface ReplayBuffer {
   forget(subject: string): void;
   prune(): void;
   /**
-   * Occupancy snapshot (W-028). OPTIONAL so external implementations
+   * Occupancy snapshot. OPTIONAL so external implementations
    * of this `@stable` interface keep compiling; `createReplayBuffer`
    * always provides it. When absent, the `/v1/metrics` replay-buffer
    * gauge degrades to `0`.
@@ -182,11 +182,11 @@ export function createReplayBuffer(options: ReplayBufferOptions = {}): ReplayBuf
 }
 
 /**
- * W-028: schedule a periodic {@link ReplayBuffer.prune} sweep. Without
+ * Schedule a periodic {@link ReplayBuffer.prune} sweep. Without
  * it TTL expiry only ran lazily inside `push`/`replay`/`size` FOR THE
  * SAME SUBJECT, so every finished run-subject (a fresh runId per run)
  * retained up to `maxEvents` full payloads forever on a long-living
- * server. Mirrors `scheduleRunPruning` (IP-16): `unref`-ed timer,
+ * server. Mirrors `scheduleRunPruning`: `unref`-ed timer,
  * returns a stop function. The sweep applies only the already
  * documented TTL - replay semantics inside the TTL window are
  * unchanged (an immediate `forget` on run completion would break

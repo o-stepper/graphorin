@@ -1,5 +1,5 @@
 /**
- * The data-flow policy engine (P1-3). Pure decision function over a
+ * The data-flow policy engine. Pure decision function over a
  * {@link DataFlowEvaluation}.
  *
  * @packageDocumentation
@@ -45,7 +45,7 @@ function findingFor(
  * 1. `mode === 'off'` or the tool is not a sink → `allow`.
  * 2. Arguments carry untrusted content verbatim → `untrusted-to-sink`.
  * 3. Else, if `derivedTaint: 'strict'` and untrusted content has entered
- *    the run → `derived-untrusted-to-sink` (C6, paraphrase-robust).
+ *    the run → `derived-untrusted-to-sink` (paraphrase-robust).
  * 4. Else, if `guardTrifecta` (default on) and both untrusted **and**
  *    secret-tier content have entered the run → `lethal-trifecta`.
  * 5. No tainted flow → `allow`.

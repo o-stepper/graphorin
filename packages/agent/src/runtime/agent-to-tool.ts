@@ -1,6 +1,6 @@
 /**
- * `agent.toTool()` - expose an agent as a callable sub-agent tool
- * (AG-17 / D2): least-authority seeding from the parent history, the
+ * `agent.toTool()` - expose an agent as a callable sub-agent tool:
+ * least-authority seeding from the parent history, the
  * contextFold distillation of a completed child run, and the coarse
  * child-taint propagation that re-arms the parent's data-flow ledger.
  * Extracted verbatim from `factory.ts` (issue #23); the former factory
@@ -23,9 +23,9 @@ import type { AgentCallOptions, AgentConfig, AgentInput, AgentToToolOptions } fr
 import { foldChildRunUsage } from './messages.js';
 
 /**
- * W-033: fold the child's usage into the parent run through the tool
+ * Fold the child's usage into the parent run through the tool
  * context. `RunContext.state` is typed as a readonly projection for
- * user tools (W-047); this runtime-internal seam is the sanctioned
+ * user tools; this runtime-internal seam is the sanctioned
  * mutation point - the runtime owns the state lifecycle.
  */
 function foldIntoParent(
@@ -67,7 +67,7 @@ export interface ToToolDeps<TDeps, TOutput> {
 }
 
 /**
- * W-001: well-known marker on every `toTool()` tool object. The
+ * Well-known marker on every `toTool()` tool object. The
  * graphorin tool-call walk detects it and executes the sub-agent
  * INLINE (through the same seam as a handoff) so a child suspending on
  * `awaiting_approval` parks on the parent instead of throwing from the
@@ -78,7 +78,7 @@ export interface ToToolDeps<TDeps, TOutput> {
  */
 export const SUBAGENT_TOOL: unique symbol = Symbol.for('graphorin.SubAgentTool');
 
-/** Child taint flags carried across the toTool fold (D2). */
+/** Child taint flags carried across the toTool fold. */
 export interface SubAgentFoldTaint {
   readonly untrusted?: boolean;
   readonly sensitive?: boolean;
@@ -86,7 +86,7 @@ export interface SubAgentFoldTaint {
 }
 
 /**
- * The live references {@link SUBAGENT_TOOL} carries (W-001). Typed
+ * The live references {@link SUBAGENT_TOOL} carries. Typed
  * loosely on purpose: the walk is generic over foreign TDeps/TOutput
  * and only ever passes through values it received from the same
  * factory instance.
@@ -101,9 +101,9 @@ export interface SubAgentToolRefs {
     input: unknown,
     options?: Record<string, unknown>,
   ) => AsyncIterable<AgentEvent<unknown>>;
-  /** D2 capability restriction from `AgentToToolOptions.capability`. */
+  /** Capability restriction from `AgentToToolOptions.capability`. */
   readonly capability?: 'read-only';
-  /** W-036: forwarding policy from `AgentToToolOptions.forwardEvents`. */
+  /** Forwarding policy from `AgentToToolOptions.forwardEvents`. */
   readonly forwardEvents?: 'none' | 'lifecycle' | 'all';
   /** Reproduce `execute()`'s seed semantics (inputFilter + input string). */
   readonly buildSeed: (

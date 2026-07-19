@@ -14,7 +14,7 @@
  *  - `graphorin storage cleanup-backups` - drop stale `.bak` /
  *    `.bak.<ts>` files left by previous encrypt / rekey runs.
  *  - `graphorin storage backup <dest>` - online, consistent copy via
- *    the driver's page-level backup API (store-02). Safe under a live
+ *    the driver's page-level backup API. Safe under a live
  *    writer, preserves rowids (FTS5 mappings survive). Never use
  *    `VACUUM INTO` - rowid renumbering corrupts FTS mappings.
  *
@@ -145,7 +145,7 @@ export interface StorageBackupResult {
 }
 
 /**
- * store-02: online backup via the driver's page-level `backup()` API -
+ * Online backup via the driver's page-level `backup()` API -
  * consistent under a live writer (the daemon can keep running),
  * preserves rowids so FTS5 external-content mappings survive, and for
  * an encrypted store produces an equally-encrypted copy (same key).
@@ -222,7 +222,7 @@ export interface StorageCompactResult {
 }
 
 /**
- * W-064: `graphorin storage compact` - return pruned pages to the OS.
+ * `graphorin storage compact` - return pruned pages to the OS.
  * `VACUUM` stays forbidden (it renumbers implicit rowids and corrupts
  * the FTS5 external-content mappings), but `PRAGMA incremental_vacuum`
  * relocates free pages via the ptrmap WITHOUT rebuilding tables, so it

@@ -541,7 +541,7 @@ function pickString(value: unknown): string | undefined {
 
 /**
  * Normalize a generate() tool call across peers: AI SDK v4 carries
- * `args`, v7 carries `input` (PS-6). The framework shape is `args`.
+ * `args`, v7 carries `input`. The framework shape is `args`.
  */
 function normalizeToolCall(tc: unknown): { toolCallId: string; toolName: string; args: unknown } {
   const t = tc as {
@@ -559,7 +559,7 @@ function normalizeToolCall(tc: unknown): { toolCallId: string; toolName: string;
 }
 
 /**
- * Lift a real HTTP status from a rejected AI SDK call (PS-2). The SDK's
+ * Lift a real HTTP status from a rejected AI SDK call. The SDK's
  * `APICallError` carries a numeric `statusCode`; surfacing it lets
  * `withRetry` / `withFallback` see a genuine 429 / 5xx instead of the
  * `status: 0` network-error placeholder. Returns `0` when no status is

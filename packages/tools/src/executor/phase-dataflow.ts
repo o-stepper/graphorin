@@ -1,5 +1,5 @@
 /**
- * Data-flow provenance sink-gate phase (WI-12 / P1-3): consult the
+ * Data-flow provenance sink-gate phase: consult the
  * optional `DataFlowGuard` before running a `side-effecting` /
  * `external-stateful` tool, audit the verdict, and enforce a `'block'`.
  * (Provenance *recording* of successful outputs happens in the
@@ -28,7 +28,7 @@ export function runDataFlowSinkGate(
     readonly runContext: RunContext;
     readonly stepNumber: number;
     /**
-     * Raw-shaped post-repair arguments from the validate phase (W-118)
+     * Raw-shaped post-repair arguments from the validate phase
      * - the same payload the approval gate saw and the payload the
      * executed `validatedInput` is deterministically derived from.
      * Bytes-equal to `call.args` when no repair ran.

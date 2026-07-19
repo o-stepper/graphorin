@@ -1,5 +1,5 @@
 /**
- * The two code-mode meta-tools (P1-2, step 2).
+ * The two code-mode meta-tools (step 2).
  *
  * Code-mode advertises **only** these two tools to the model instead of
  * the full registry; the model reaches every real tool *through* them:
@@ -41,7 +41,7 @@ export interface CodeSearchMatch {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
-  /** A5: the matched tool's output schema, when declared (renders a return type). */
+  /** The matched tool's output schema, when declared (renders a return type). */
   readonly outputSchema?: Readonly<Record<string, unknown>>;
 }
 
@@ -50,7 +50,7 @@ export interface CodeSearchToolOptions {
   /** Projection over the eager (advertised) tool set. */
   readonly projection: CodeApiProjection;
   /**
-   * Approval-gated tool names (TL-8) - excluded from the code API but
+   * Approval-gated tool names - excluded from the code API but
    * surfaced in matches with a call-directly marker so the model is
    * never silently missing a capability.
    */
@@ -70,7 +70,7 @@ const searchInput = z.object({
   query: z.string().min(1).max(512),
   limit: z.number().int().positive().max(25).optional(),
 });
-/** W-013: explicit interface - no concrete zod generics in the d.ts. */
+/** Explicit interface - no concrete zod generics in the d.ts. */
 export interface CodeSearchInput {
   query: string;
   limit?: number | undefined;
@@ -162,7 +162,7 @@ export interface CodeExecuteToolOptions {
   /** Sandbox limits. */
   readonly limits?: CodeExecuteLimits;
   /**
-   * The code-mode runtime executing the script (E3): any
+   * The code-mode runtime executing the script: any
    * {@link CodeModeRunner} - a subprocess provider, a remote runner, a
    * test fake. Default {@link runBridgedSource} (in-process
    * `worker_threads`). The runner receives only the script source, the
@@ -171,7 +171,7 @@ export interface CodeExecuteToolOptions {
    */
   readonly run?: CodeModeRunner;
   /**
-   * Approval-gated tool names (TL-8) - listed in the catalogue with a
+   * Approval-gated tool names - listed in the catalogue with a
    * call-directly marker (they cannot suspend for HITL mid-script).
    */
   readonly approvalGatedTools?: ReadonlyArray<string>;
@@ -180,7 +180,7 @@ export interface CodeExecuteToolOptions {
 const executeInput = z.object({
   source: z.string().min(1).max(100_000),
 });
-/** W-013: explicit interface - no concrete zod generics in the d.ts. */
+/** Explicit interface - no concrete zod generics in the d.ts. */
 export interface CodeExecuteInput {
   source: string;
 }
@@ -216,7 +216,7 @@ function buildExecuteDescription(
 /**
  * Build the `code_execute` meta-tool. Its output is the script's final
  * value rendered as a string, so the executor's `maxResultTokens` /
- * `'spill-to-file'` pipeline bounds even a large final result (WI-10).
+ * `'spill-to-file'` pipeline bounds even a large final result.
  *
  * @stable
  */

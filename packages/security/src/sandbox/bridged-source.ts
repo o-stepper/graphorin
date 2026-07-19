@@ -1,6 +1,6 @@
 /**
  * Host-bridged source execution - the sandbox primitive behind
- * code-mode / programmatic tool calling (P1-2).
+ * code-mode / programmatic tool calling.
  *
  * The four built-in adapters ({@link createNoneSandbox} et al.) run a
  * **pre-registered handler** (`code.kind === 'handler'`): a module +
@@ -24,7 +24,7 @@
  * Isolation is the `worker-threads` tier's: a fresh V8 isolate per run,
  * an empty environment (the worker is constructed with `env: {}` and the
  * runtime scrubs `process.env` before user code runs, so host secrets
- * are not visible - TL-9), best-effort `node:fs` / `node:net` import
+ * are not visible), best-effort `node:fs` / `node:net` import
  * blocking and a `fetch` refusal (reused from
  * {@link createWorkerThreadsSandbox}), a hard wall-clock timeout via
  * `worker.terminate()`, an optional memory ceiling, and `AbortSignal`

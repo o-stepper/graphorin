@@ -122,7 +122,7 @@ Each checkpoint persists the merged state, the per-channel versions, **and the r
 
 ### Concurrency control
 
-Every checkpoint write is guarded by a compare-and-set against the latest stored checkpoint. Since D1 the CAS is **atomic at the store layer**: `CheckpointStore.put(..., { expectedLatestId })` performs the comparison and the insert in one transaction (the bundled in-memory and SQLite stores both implement it; a custom store that ignores the option falls back to the engine's best-effort pre-check). Two racing resumes (even from different processes over one SQLite file) cannot both advance a thread: exactly one wins, the loser surfaces `checkpoint-version-conflict`. A second `execute()` on a thread whose latest checkpoint is still `running`/`suspended` is refused the same way; re-executing a terminal (`completed`/`failed`/`aborted`) thread is allowed. Within one `Workflow` instance, a concurrent second `resume` fails fast with `concurrent-resume-rejected`.
+Every checkpoint write is guarded by a compare-and-set against the latest stored checkpoint. The CAS is **atomic at the store layer**: `CheckpointStore.put(..., { expectedLatestId })` performs the comparison and the insert in one transaction (the bundled in-memory and SQLite stores both implement it; a custom store that ignores the option falls back to the engine's best-effort pre-check). Two racing resumes (even from different processes over one SQLite file) cannot both advance a thread: exactly one wins, the loser surfaces `checkpoint-version-conflict`. A second `execute()` on a thread whose latest checkpoint is still `running`/`suspended` is refused the same way; re-executing a terminal (`completed`/`failed`/`aborted`) thread is allowed. Within one `Workflow` instance, a concurrent second `resume` fails fast with `concurrent-resume-rejected`.
 
 Within one step, `maxConcurrentTasks` bounds how many planned tasks (including `Dispatch` fan-outs) execute simultaneously; tasks past the cap queue and start as slots free up. Absent, parallelism is unbounded.
 
@@ -139,7 +139,7 @@ Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Te
 
 Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path - instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
 
-The same gate covers everything else that rides the checkpoint (W-121): pause values and approval payloads, `Dispatch` args, satisfied resume values, and operator directives. A `Date` passed as `Directive({ resume })` fails at resume ENTRY (pseudo-channel `<directive>`), before the node body runs - previously it persisted as an ISO string and the body silently received a string on the next replay.
+The same gate covers everything else that rides the checkpoint: pause values and approval payloads, `Dispatch` args, satisfied resume values, and operator directives. A `Date` passed as `Directive({ resume })` fails at resume ENTRY (pseudo-channel `<directive>`), before the node body runs - previously it persisted as an ISO string and the body silently received a string on the next replay.
 
 ### Durability modes
 
@@ -201,7 +201,7 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 
 #### Approvals with a durable deadline (defer-timeout)
 
-`requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the approval WITH an epoch deadline (E1): the pause record carries both `name` and `wakeAt`, so the thread joins the same due-thread enumeration the timer daemon already sweeps. Once the deadline passes un-resolved, `workflow.tick(threadId)` resolves the approval with `timeoutDecision` - `DEFAULT_APPROVAL_TIMEOUT_DECISION` (`{ granted: false, reason: 'defer-timeout' }`) when none is supplied, so an unattended decision fails closed. A human `approve(...)` before the deadline wins as usual. This is the parking half of the agent's `defer` permission verdict (see the [security guide](./security.md#deferred-approvals-with-a-durable-deadline)); how long to wait is caller policy.
+`requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the approval WITH an epoch deadline: the pause record carries both `name` and `wakeAt`, so the thread joins the same due-thread enumeration the timer daemon already sweeps. Once the deadline passes un-resolved, `workflow.tick(threadId)` resolves the approval with `timeoutDecision` - `DEFAULT_APPROVAL_TIMEOUT_DECISION` (`{ granted: false, reason: 'defer-timeout' }`) when none is supplied, so an unattended decision fails closed. A human `approve(...)` before the deadline wins as usual. This is the parking half of the agent's `defer` permission verdict (see the [security guide](./security.md#deferred-approvals-with-a-durable-deadline)); how long to wait is caller policy.
 
 #### Validating resolved payloads
 
@@ -277,7 +277,7 @@ createWorkflow({
 
 ## Dynamic parallelism via `Dispatch(node, args)`
 
-A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step. Construct them via `dispatch(...)` / `new Dispatch(...)` - a bare `{ nodeName, args }` object is treated as channel writes (workflow-13), so a state shape that happens to use those keys is never silently swallowed as a task. `Directive.goto` remains a destructive operator escape hatch: it discards the restored frontier (pending pauses included) in favour of the single goto task.
+A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step. Construct them via `dispatch(...)` / `new Dispatch(...)` - a bare `{ nodeName, args }` object is treated as channel writes, so a state shape that happens to use those keys is never silently swallowed as a task. `Directive.goto` remains a destructive operator escape hatch: it discards the restored frontier (pending pauses included) in favour of the single goto task.
 
 ## Cancellation
 
@@ -316,7 +316,7 @@ workflow.execute(input, { stream: 'updates' });
 
 `workflow.fork(threadId, fromCheckpointId)` creates a parallel timeline branched off a previous checkpoint without touching the original thread. The forked root is self-contained (its `parentId` never dangles into the source thread) and copies the source checkpoint's pending writes, so a forked `failed` thread stays `retry()`-able without re-running the tasks that already succeeded.
 
-**Fork with a state patch (E2).** `fork(threadId, fromCheckpointId, { patch })` merges channel-level values into the forked root's state before it is written - "branch here, but with these corrected values". Patch keys must name declared channels (a typo throws), and the merged state re-runs the same JSON-safety guard every checkpoint passes, so a patch cannot smuggle a `Map`/`Date`/class instance past the envelope. `channelVersions` and pending writes ride along unchanged. Over HTTP the same patch is the optional `state` field of `POST /v1/workflows/:id/fork`.
+**Fork with a state patch.** `fork(threadId, fromCheckpointId, { patch })` merges channel-level values into the forked root's state before it is written - "branch here, but with these corrected values". Patch keys must name declared channels (a typo throws), and the merged state re-runs the same JSON-safety guard every checkpoint passes, so a patch cannot smuggle a `Map`/`Date`/class instance past the envelope. `channelVersions` and pending writes ride along unchanged. Over HTTP the same patch is the optional `state` field of `POST /v1/workflows/:id/fork`.
 
 ### Cross-process durability (the invariant)
 
@@ -351,7 +351,7 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired - counted PER INVOCATION of execute/resume/retry/tick since W-122, so long-lived timer/approval threads never trip it and a capped invocation is retryable; the opt-in `maxTotalSteps` adds a lifetime quota under the same code), `pause-replay-divergence` (W-120: the body's pause order diverged from the journal), `awakeable-payload-invalid` (a resolved payload failed the `awaitExternal` schema - the thread stays suspended on the same awakeable), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired - counted PER INVOCATION of execute/resume/retry/tick, so long-lived timer/approval threads never trip it and a capped invocation is retryable; the opt-in `maxTotalSteps` adds a lifetime quota under the same code), `pause-replay-divergence` (the body's pause order diverged from the journal), `awakeable-payload-invalid` (a resolved payload failed the `awaitExternal` schema - the thread stays suspended on the same awakeable), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
 
 Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 

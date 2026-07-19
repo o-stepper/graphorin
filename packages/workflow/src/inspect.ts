@@ -1,6 +1,6 @@
 /**
- * Read-only thread inspection over a bare `CheckpointStore` (E2, item
- * 16 tail). A `Workflow` handle bakes the namespace and the persisted
+ * Read-only thread inspection over a bare `CheckpointStore`. A
+ * `Workflow` handle bakes the namespace and the persisted
  * envelope/frontier parsing into `getState` / `listCheckpoints`, but an
  * operator surface (the `graphorin workflow` CLI) has no node graph to
  * rebuild the handle from - these helpers expose the SAME read path

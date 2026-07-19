@@ -25,7 +25,7 @@ import { MCPAuthError } from '../errors/index.js';
 /** Options accepted by {@link createOAuthAuthorizationProvider}. */
 export interface OAuthAuthorizationProviderOptions {
   /**
-   * Secrets store the persisted tokens resolve from (SPL-1) - with it,
+   * Secrets store the persisted tokens resolve from - with it,
    * the bridge issues Authorization headers across process restarts.
    */
   readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;

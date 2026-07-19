@@ -5,7 +5,7 @@
  * runtime constructs one writer at warm-up, hands it to the executor for
  * the `'spill-to-file'` truncation strategy, and builds a reader over the
  * same `artifactRoot` so the built-in `read_result` tool can fetch a
- * spilled artifact back on demand (P1-4).
+ * spilled artifact back on demand.
  *
  * @packageDocumentation
  */
@@ -20,8 +20,8 @@ export interface DefaultSpillWriterOptions {
   /** Artifact root. Default `<os.tmpdir()>/graphorin-spill`. */
   readonly root?: string;
   /**
-   * TTL for the best-effort startup sweep of orphaned run directories
-   * (TL-10). Default 7 days; pass `false` to disable the startup sweep.
+   * TTL for the best-effort startup sweep of orphaned run directories.
+   * Default 7 days; pass `false` to disable the startup sweep.
    */
   readonly startupSweepTtlMs?: number | false;
 }
@@ -29,11 +29,11 @@ export interface DefaultSpillWriterOptions {
 /** Default TTL for the startup sweep of orphaned spill runs (7 days). */
 export const DEFAULT_SPILL_SWEEP_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** Suffix of the taint sidecar written next to each spill artifact (tools-03). */
+/** Suffix of the taint sidecar written next to each spill artifact. */
 export const SPILL_SIDECAR_SUFFIX = '.meta.json';
 
 /**
- * Path of the taint sidecar for a spill artifact (tools-03). Shared by
+ * Path of the taint sidecar for a spill artifact. Shared by
  * the default writer and {@link createFileResultReader}.
  *
  * @internal
@@ -47,7 +47,7 @@ export function sidecarPathFor(artifactPath: string): string {
  * `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
  * permissions and tier-aware sensitivity inheritance.
  *
- * Lifecycle (TL-10): `clear(runId)` removes one run's artifacts (the
+ * Lifecycle: `clear(runId)` removes one run's artifacts (the
  * agent calls it on terminal completed/failed runs); `sweep(ttlMs)`
  * removes run directories older than the TTL, and one best-effort
  * 7-day sweep fires at construction to collect orphans from crashed

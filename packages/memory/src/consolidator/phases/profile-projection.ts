@@ -1,5 +1,5 @@
 /**
- * Profile-projection pass (wave-D D2, plan item 6) - materialises a
+ * Profile-projection pass - materialises a
  * structured user-profile block from ACTIVE semantic facts. Where the
  * learned-context pass keeps a free-prose digest, this pass projects
  * facts into topic / sub-topic / content SLOTS with provenance
@@ -7,7 +7,7 @@
  * carries a compact, auditable "who is this user" card.
  *
  * Sourcing is deliberately conservative: only recall-eligible facts
- * (`status = 'active'`, live validity interval) whose W-019 supersede
+ * (`status = 'active'`, live validity interval) whose supersede
  * is NOT pending feed the projection - a value that is already known
  * to be contested must not be presented as profile truth. Quarantined
  * facts never appear.

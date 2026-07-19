@@ -109,7 +109,7 @@ export interface AuditDb {
    */
   readonly replaceEntry: (entry: StoredAuditEntry) => Promise<void>;
   /**
-   * OPTIONAL cross-process fence (W-011): run `fn` inside one write
+   * OPTIONAL cross-process fence: run `fn` inside one write
    * transaction on the underlying handle (`BEGIN IMMEDIATE` semantics -
    * the write lock is held from entry to commit, and a failure rolls
    * back). When present, `appendAudit` wraps its `latest()`+`insert()`

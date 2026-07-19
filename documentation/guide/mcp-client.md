@@ -103,7 +103,7 @@ The adapter:
 
 ## Large resources and result handles
 
-When a tool result includes a `resource_link` content part, the adapter does **not** inline the resource body. It surfaces a compact preview plus the resource `uri` as a *result handle* (ties to the P1-4 result handles), so a large dataset enters context only if the model asks for it. The model fetches it on demand through the built-in `read_result` tool, backed by an MCP resource reader:
+When a tool result includes a `resource_link` content part, the adapter does **not** inline the resource body. It surfaces a compact preview plus the resource `uri` as a *result handle* (the same result-handle mechanism used for spilled tool results), so a large dataset enters context only if the model asks for it. The model fetches it on demand through the built-in `read_result` tool, backed by an MCP resource reader:
 
 ```ts
 import { createAgent } from '@graphorin/agent';
@@ -213,7 +213,7 @@ import { createInMemoryOAuthServerStore, createSecretsStore } from '@graphorin/s
 
 // In production: the persistent OAuthServerStore the login flow wrote to.
 const storage = createInMemoryOAuthServerStore();
-// The SecretsStore holding the persisted token material (SPL-1).
+// The SecretsStore holding the persisted token material.
 const secretsStore = await createSecretsStore();
 
 const authProvider = createOAuthAuthorizationProvider({
@@ -259,7 +259,7 @@ sequenceDiagram
 
 ## OAuth discovery hardening
 
-Discovery is a trust boundary (SPL-7): metadata names the endpoints that will receive authorization codes, refresh tokens and Basic client secrets. The client therefore **rejects non-https endpoints** (plain `http` is allowed only for loopback hosts - `localhost`, `127.0.0.1`, `[::1]` - for local development), **enforces RFC 8414 §3.3 issuer consistency** (the metadata `issuer` must equal the discovery URL it was fetched for), and builds well-known URLs via **RFC 8414 path-insertion** for path-bearing issuers (the suffix-append form is kept as a fallback for pre-RFC servers). The authorization callback also **requires the `state` parameter** (SPL-6) - a callback omitting it is rejected outright as a CSRF/code-injection attempt.
+Discovery is a trust boundary: metadata names the endpoints that will receive authorization codes, refresh tokens and Basic client secrets. The client therefore **rejects non-https endpoints** (plain `http` is allowed only for loopback hosts - `localhost`, `127.0.0.1`, `[::1]` - for local development), **enforces RFC 8414 §3.3 issuer consistency** (the metadata `issuer` must equal the discovery URL it was fetched for), and builds well-known URLs via **RFC 8414 path-insertion** for path-bearing issuers (the suffix-append form is kept as a fallback for pre-RFC servers). The authorization callback also **requires the `state` parameter** - a callback omitting it is rejected outright as a CSRF/code-injection attempt.
 
 ## Error mapping
 

@@ -16,7 +16,7 @@ export const GENESIS_PREV_HASH = '0'.repeat(64);
 
 /**
  * Default reporter for an audit-bridge write that failed and would
- * otherwise be silently dropped (SPL-4). The four bridges
+ * otherwise be silently dropped. The four bridges
  * (secrets / oauth / memory-guard / supply-chain) all accept an
  * optional `onWriteError`; when the consumer does not supply one, the
  * failure must still be visible rather than swallowed - a dropped audit
@@ -54,7 +54,7 @@ export function computeAuditHash(entry: Omit<StoredAuditEntry, 'hash'>): string 
 }
 
 /**
- * Per-`AuditDb` write-serialisation chains (SPL-4). `appendAudit` does
+ * Per-`AuditDb` write-serialisation chains. `appendAudit` does
  * a read-modify-write - `latest()` to read the tip `seq`/`hash`, then
  * `insert()` - with an `await` point between the two. Without
  * serialisation, concurrent callers (the secrets/oauth/memory-guard/
@@ -75,7 +75,7 @@ const WRITE_CHAINS = new WeakMap<AuditDb, Promise<unknown>>();
  * future revision; today it is synchronous on the inside.
  *
  * Concurrent calls against the same `AuditDb` are serialised so the
- * `latest()`→`insert()` read-modify-write never races (SPL-4).
+ * `latest()`→`insert()` read-modify-write never races.
  *
  * @stable
  */

@@ -1,8 +1,8 @@
 /**
  * The terminal path of every agent run: settle leftover manual-compact
- * requests (CE-3 / AG-13), assemble the final {@link AgentResult}
- * (AG-9), clear terminal-run spill artifacts (TL-10), and end the
- * stream with `agent.end` (AG-20). Extracted verbatim from
+ * requests, assemble the final {@link AgentResult}, clear
+ * terminal-run spill artifacts, and end the stream with
+ * `agent.end`. Extracted verbatim from
  * `factory.ts` (issue #23); the former factory closures now hang off
  * {@link createRunFinisher}'s deps.
  *
@@ -18,7 +18,7 @@ import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
 export interface RunFinisherDeps {
   readonly pendingManualCompacts: PendingManualCompact[];
   readonly spillWriter: ReturnType<typeof createDefaultSpillWriter>;
-  /** W-005: thread erasure on terminal runs (`'delete-on-terminal'`). */
+  /** Thread erasure on terminal runs (`'delete-on-terminal'`). */
   readonly checkpointStore?: CheckpointStore | undefined;
   readonly checkpointPolicy?: 'keep' | 'delete-on-terminal' | undefined;
 }
@@ -38,11 +38,11 @@ export function createRunFinisher<TOutput>(
   /**
    * Terminal wrapper around {@link finalize}: every exit path of the run
    * loop - completed, failed, aborted, suspended - ends the stream with
-   * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
+   * an `agent.end` event carrying the final {@link AgentResult}.
    *
    * The parameter is `MutableRunState & RunState`: the single caller
    * (factory `finishRun`) is typed exactly so, and the intersection lets
-   * {@link finalize} assemble `AgentResult.state` without a cast (W-047).
+   * {@link finalize} assemble `AgentResult.state` without a cast.
    */
   async function* finishRunBase(
     state: MutableRunState & RunState,

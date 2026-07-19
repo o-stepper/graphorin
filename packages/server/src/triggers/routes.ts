@@ -11,7 +11,7 @@
  *   POST   /triggers/prune              (scope `triggers:disable`)
  *     body { disabled?: boolean = true, orphaned?: boolean = false } -
  *     `orphaned: true` additionally removes persisted rows with no
- *     live declaration in this process (W-123); only the running
+ * live declaration in this process; only the running
  *     server can tell those apart, which is why the offline CLI prune
  *     cannot.
  *

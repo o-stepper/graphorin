@@ -71,16 +71,16 @@ export interface SerializedRunState {
   readonly handoffs: ReadonlyArray<HandoffRecord>;
   readonly usage: Usage;
   readonly usageByModel?: RunStateUsageByModel;
-  /** AG-19: coarse data-flow taint summary (no untrusted text). */
+  /** Coarse data-flow taint summary (no untrusted text). */
   readonly taintSummary?: RunTaintSummary;
-  /** AG-19: deferred tools promoted by `tool_search` this run. */
+  /** Deferred tools promoted by `tool_search` this run. */
   readonly promotedTools?: ReadonlyArray<string>;
-  /** B3: per-turn security verdicts keyed by `'<step>:<offset>'`. */
+  /** Per-turn security verdicts keyed by `'<step>:<offset>'`. */
   readonly verdicts?: RunVerdicts;
-  /** D6: journaled structured plan/todo list. */
+  /** Journaled structured plan/todo list. */
   readonly todos?: ReadonlyArray<TodoItem>;
   /**
-   * W-001: parked sub-agent runs. Each child snapshot is itself a full
+   * Parked sub-agent runs. Each child snapshot is itself a full
    * `SerializedRunState` - version-stamped and secret-redacted
    * recursively, to any nesting depth.
    */
@@ -91,7 +91,7 @@ export interface SerializedRunState {
 }
 
 /**
- * Serialized twin of core's `PendingSubRun` (W-001): the parked child
+ * Serialized twin of core's `PendingSubRun`: the parked child
  * state travels as its own versioned {@link SerializedRunState}.
  *
  * @stable
@@ -115,8 +115,8 @@ export interface SerializeRunStateOptions {
    * `secret`, …) anywhere in the snapshot - tool results and messages
    * included - replacing their values with `'[redacted]'`. Defaults to
    * `false` for the round-trip canonical helper; the agent runtime
-   * passes `true` when persisting through the checkpoint store
-   * (AG-23). Redaction is best-effort by key name: secrets stored
+   * passes `true` when persisting through the checkpoint store.
+   * Redaction is best-effort by key name: secrets stored
    * under unrelated keys are not detected.
    */
   readonly stripTracingApiKey?: boolean;

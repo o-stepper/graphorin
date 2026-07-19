@@ -9,7 +9,7 @@ import type { ProviderEvent } from '@graphorin/core';
 import { ProviderHttpError } from '../errors/errors.js';
 
 /**
- * W-095: conversion options for the local-adapter message converters.
+ * Conversion options for the local-adapter message converters.
  * `multimodal` mirrors the adapter instance's effective
  * `capabilities.multimodal`; `warn` receives ONE message per convert
  * call when parts were dropped (adapters dedupe it to once per
@@ -30,7 +30,7 @@ const TEXT_ONLY: ChatMessageConversionOptions = { multimodal: false };
  * (`llamaCppServerAdapter` and `openAICompatibleAdapter`); the
  * native-Ollama path uses its own conversion.
  *
- * W-095: with `opts.multimodal === true` image parts are emitted as
+ * With `opts.multimodal === true` image parts are emitted as
  * OpenAI `image_url` content parts (bytes as a data URI, `URL`s passed
  * through as strings - the server dereferences; this adapter never
  * fetches). Audio/file parts have no portable wire form on
@@ -89,7 +89,7 @@ export function toOpenAIChatMessages(
   return converted;
 }
 
-/** W-095: build the OpenAI `content` parts array for a vision model. */
+/** Build the OpenAI `content` parts array for a vision model. */
 function toOpenAIParts(
   parts: ReadonlyArray<unknown>,
   dropped: Set<string>,
@@ -126,7 +126,7 @@ function toOpenAIParts(
 }
 
 /**
- * W-095: bytes become a `data:` URI (default mime `image/png`); `URL`s
+ * Bytes become a `data:` URI (default mime `image/png`); `URL`s
  * pass through as strings - the SERVER dereferences, the adapter makes
  * no network call of its own.
  */
@@ -139,7 +139,7 @@ function imageToUrl(image: unknown, mimeType?: string): string | undefined {
   return undefined;
 }
 
-/** W-095: one honest WARN per convert call when parts were dropped. */
+/** One honest WARN per convert call when parts were dropped. */
 function warnDropped(opts: ChatMessageConversionOptions, dropped: Set<string>): void {
   if (dropped.size === 0 || opts.warn === undefined) return;
   const kinds = [...dropped].sort().join(', ');
@@ -151,8 +151,8 @@ function warnDropped(opts: ChatMessageConversionOptions, dropped: Set<string>): 
 }
 
 /**
- * Convert a graphorin `Message` to Ollama's **native** `/api/chat` shape
- * (PS-13). Unlike the OpenAI form, Ollama's Go server expects `tool_calls`
+ * Convert a graphorin `Message` to Ollama's **native** `/api/chat` shape.
+ * Unlike the OpenAI form, Ollama's Go server expects `tool_calls`
  * with object `arguments` (a `map[string]any`, never a JSON string) and no
  * `id` / `type` fields - sending those breaks its unmarshaller and any
  * multi-turn replay of assistant tool calls.
@@ -210,7 +210,7 @@ export function toOllamaChatMessages(
   return converted;
 }
 
-/** W-095: split parts into flattened text + raw-base64 image payloads. */
+/** Split parts into flattened text + raw-base64 image payloads. */
 function toOllamaContent(
   parts: ReadonlyArray<unknown>,
   dropped: Set<string>,
@@ -306,7 +306,7 @@ function flattenContent(
  * @internal
  */
 /**
- * Default per-request timeout for the baseUrl adapters (PS-24). Scoped
+ * Default per-request timeout for the baseUrl adapters. Scoped
  * to time-to-response (headers): the timer is cleared the moment the
  * server answers, so long streaming bodies are never killed - only a
  * hung server that never responds. Generous because a cold local
@@ -324,7 +324,7 @@ export async function callJsonHttp(args: {
   readonly signal?: AbortSignal;
   readonly fetchImpl?: typeof fetch;
   /**
-   * Time-to-response budget (PS-24). Default
+   * Time-to-response budget. Default
    * {@link DEFAULT_REQUEST_TIMEOUT_MS}; `0` disables.
    */
   readonly timeoutMs?: number;

@@ -39,9 +39,9 @@ export interface MigrationProgress {
   /** Identifier of the target embedder. */
   readonly target: string;
   /**
-   * Identifier for this migration run. With a `state` store wired
-   * (wave-D D5 / MST-12) this is the PERSISTED `migration_state` row id
-   * - a resumed run reports the original id. Without one it is an
+   * Identifier for this migration run. With a `state` store wired this
+   * is the PERSISTED `migration_state` row id - a resumed run reports
+   * the original id. Without one it is an
    * in-memory id and the migration does not resume across processes.
    */
   readonly migrationId: string;
@@ -50,8 +50,8 @@ export interface MigrationProgress {
 }
 
 /**
- * Structural view of the persisted `migration_state` cursor store
- * (wave-D D5 / MST-12). The default implementation is
+ * Structural view of the persisted `migration_state` cursor store.
+ * The default implementation is
  * `@graphorin/store-sqlite`'s `store.embedderMigration.state`; declared
  * structurally here so this package never imports the storage package.
  *
@@ -110,12 +110,12 @@ export interface MigrateEmbedderOptions {
    * Hook that returns the next batch of rows to re-embed for a given
    * kind. `auto-migrate` throws without it. The default
    * `@graphorin/store-sqlite` adapter ships one as
-   * `store.embedderMigration.nextBatch` (wave-D D5); custom adapters
+   * `store.embedderMigration.nextBatch`; custom adapters
    * pass their own paging function.
    */
   readonly nextBatch?: NextBatchHook;
   /**
-   * Persisted cursor store (wave-D D5 / MST-12). When supplied,
+   * Persisted cursor store. When supplied,
    * `auto-migrate` records progress after every batch into
    * `migration_state` and RESUMES from the persisted cursor on the
    * next invocation (same source/target pair) - across process

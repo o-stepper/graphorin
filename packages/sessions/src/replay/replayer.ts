@@ -211,7 +211,7 @@ const emptySource: AsyncIterable<SpanRecord> = {
 };
 
 /**
- * RP-3: stat each referenced artifact for a tool-call record; return the first
+ * Stat each referenced artifact for a tool-call record; return the first
  * path that cannot be opened, or `null` when every reference resolves (or the
  * record references none).
  */

@@ -41,7 +41,7 @@ const unprojectableSchemaWarned = new Set<string>();
 /**
  * Resolve a tool's declared schema - plain Zod (v3/v4), `toJSON()`-bearing,
  * or already-JSON-Schema data - to a JSON Schema record via the shared
- * projection (tools-01). Pre-fix this only honoured `toJSON()` and passed
+ * projection. Pre-fix this only honoured `toJSON()` and passed
  * everything else through verbatim, so every plain-Zod tool serialised as
  * `{"_def":...}` internals on OpenAI-shaped/Ollama/vercel wire bodies.
  * `undefined` when nothing usable can be projected (caller substitutes a
@@ -85,8 +85,8 @@ export function toolToDefinition(tool: Tool): ToolDefinition {
 }
 
 /**
- * Project a tool's worked `examples` onto the provider wire contract
- * (WI-06 / P2-3). Examples are rendered only when the tool eagerly
+ * Project a tool's worked `examples` onto the provider wire contract.
+ * Examples are rendered only when the tool eagerly
  * renders them: the registry resolves the `defer_loading` auto-rule into
  * `examplesEagerlyRendered`, so a deferred tool resolves to `false` and is
  * skipped (its examples stay out of context even once `tool_search`
@@ -128,14 +128,14 @@ export interface StepCatalogueEnv<TDeps, TOutput> {
   readonly promotedDeferred: Set<string>;
   readonly runStartPromotions: Set<string> | undefined;
   /**
-   * E1: the compiled argument-policy guard. Its name-level deny filters
+   * The compiled argument-policy guard. Its name-level deny filters
    * the advertised catalogue (eager + handoffs + promotions) so a
    * denied tool's name/schema never reach the model; the executor's
    * mirror blocks fabricated calls anyway.
    */
   readonly argumentPolicyGuard?: ToolArgumentPolicyGuard | undefined;
   /**
-   * C1/C2: per-run pinned provider (`AgentCallOptions.pinnedProvider`).
+   * Per-run pinned provider (`AgentCallOptions.pinnedProvider`).
    * When set, every step resolves to exactly this provider - it wins
    * over `prepareStep` overrides and the whole preference ladder, and
    * the fallback chain is never consulted (fail-closed model pinning
@@ -163,10 +163,10 @@ export interface StepToolContext<TDeps> {
  * the warm-up registry), so it always uses the warm-up pair.
  *
  * Also assembles the per-step tool catalogue (code-mode meta-tools or
- * eager + handoffs + promotions, read-only filtered under D2), resolves
- * the step's preferred model (AG-15: consulting only the tools the
+ * eager + handoffs + promotions, read-only filtered), resolves
+ * the step's preferred model (consulting only the tools the
  * model CALLED on the previous step), and derives the step's provider
- * fallback chain (RB-48: a `prepareStep` provider override suppresses
+ * fallback chain (a `prepareStep` provider override suppresses
  * the chain).
  */
 export function resolveStepToolContext<TDeps, TOutput>(
@@ -318,11 +318,11 @@ export interface StepRequestEnv<TDeps, TOutput> {
 
 /**
  * Assemble the step's base {@link ProviderRequest} over the shared
- * message buffer: the D6 request-only trailing additions (structured
+ * message buffer: the request-only trailing additions (structured
  * instruction + plan recitation) ride `buildStepMessages`, the
  * `prepareStep` overrides / config knobs spread in exactly as the
  * inline literal did, and the effective reasoning-retention policy
- * rides the request (RB-42).
+ * rides the request.
  */
 export function buildBaseRequest<TDeps, TOutput>(
   env: StepRequestEnv<TDeps, TOutput>,

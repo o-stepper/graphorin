@@ -1,5 +1,5 @@
 /**
- * FTS5 ↔ base-table rowid integrity (CS-10).
+ * FTS5 ↔ base-table rowid integrity.
  *
  * The full-text indexes (`facts_fts`, `episodes_fts`, `session_messages_fts`,
  * `insights_fts`) are keyed to their base tables by the base row's **implicit
@@ -11,7 +11,7 @@
  * Graphorin never issues `VACUUM`, and the encrypted-export path copies the
  * database file byte-for-byte (preserving rowids) before an in-place rekey, so
  * the hazard is latent - but a human running `VACUUM <db>` by hand would
- * corrupt search. This module is the loud guard the audit asked for: a cheap
+ * corrupt search. This module is the loud guard for that hazard: a cheap
  * orphan-row count surfaced at open time (and reusable by `graphorin doctor`).
  *
  * NOTE: never run `VACUUM` on a Graphorin database. Use the export / rekey
@@ -35,7 +35,7 @@ const FTS_PAIRS: ReadonlyArray<readonly [fts: string, base: string]> = [
 ];
 
 /**
- * The FTS tables the CS-10 guard covers (W-113). Exported so the
+ * The FTS tables the integrity guard covers. Exported so the
  * coverage self-check test can diff this list against the `%_fts`
  * tables of a fully-migrated database - a new FTS index that is not
  * registered here fails the test instead of silently escaping the

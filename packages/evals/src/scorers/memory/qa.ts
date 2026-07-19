@@ -3,9 +3,9 @@
  * operation-level cases (HaluMem-format). Grades whether the answer
  * is grounded in the reference (or correctly abstains on an
  * unanswerable probe) instead of fabricating memory content. Built on
- * `llmJudge`, so it inherits the EB-7 injection hardening (sentinel
+ * `llmJudge`, so it inherits the judge's injection hardening (sentinel
  * fences, trailing `SCORE:` marker, throw-on-refusal) and - at the
- * benchmark-runner level - the evals-04 non-self-judge rule: wire it
+ * benchmark-runner level - the non-self-judge rule: wire it
  * to the dedicated judge provider, never the system under test.
  *
  * @packageDocumentation
@@ -22,7 +22,7 @@ import { fenceForJudge, llmJudge } from '../llm/judge.js';
 
 /** @stable */
 export interface MemoryQaHallucinationOptions {
-  /** The judge provider (evals-04: never the system under test). */
+  /** The judge provider (never the system under test). */
   readonly provider: Provider;
   /** Optional name override. Default `'memory-qa-hallucination'`. */
   readonly name?: string;

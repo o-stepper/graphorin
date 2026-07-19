@@ -88,7 +88,7 @@ export type SubscriptionTarget =
       readonly target: 'workflow';
       readonly id: string;
       /**
-       * E-12: the server emits workflow run events ONLY on the
+       * The server emits workflow run events ONLY on the
        * run-scoped subject (`workflow:<id>/runs/<runId>/events`)
        * advertised by `POST /v1/workflows/:id/execute` (and resume),
        * never on the base `workflow:<id>/events` subject - pass the
@@ -112,7 +112,7 @@ export type TransportPreference = TransportKind | 'auto';
  */
 export interface GraphorinClientOptions {
   /**
-   * Session bound to the SSE fallback (IP-3): substituted into the
+   * Session bound to the SSE fallback: substituted into the
    * `:sessionId` slot of `sseSessionPath`. Required to connect over
    * SSE - the old client sent the literal template and could never
    * receive an event.
@@ -127,7 +127,7 @@ export interface GraphorinClientOptions {
   readonly auth: TransportAuth;
   /**
    * Transport selection. Default `'auto'`: WebSocket first, SSE
-   * fallback. W-108 caveat for `'auto'`: SSE carries only the bound
+   * fallback. Caveat for `'auto'`: SSE carries only the bound
    * session subject, so when a RECONNECT falls back from WS to SSE,
    * live WS subscriptions (agent / workflow subjects) cannot be
    * resumed - they are closed with a `TransportFailedError` (their
@@ -137,7 +137,7 @@ export interface GraphorinClientOptions {
    */
   readonly transport?: TransportPreference;
   /**
-   * W-152: per-subscription buffer cap. When the `for await` consumer
+   * Per-subscription buffer cap. When the `for await` consumer
    * falls behind and the buffered queue reaches this many frames, the
    * subscription closes with a typed `flow-overflow` error (mirroring
    * the server's queue-overflow close) instead of growing the heap
@@ -165,7 +165,7 @@ export interface GraphorinClientOptions {
   /** Optional client identifier surfaced on diagnostics. */
   readonly clientId?: string;
   /**
-   * IP-19: per-RPC reply timeout in milliseconds. When set (and > 0), an RPC
+   * Per-RPC reply timeout in milliseconds. When set (and > 0), an RPC
    * that receives no matching reply within this window rejects with a
    * {@link TransportFailedError} instead of hanging forever on a
    * non-responsive server. Default: unset - no timeout, so a legitimately
@@ -186,7 +186,7 @@ export interface SubscriptionMetadata {
   readonly snapshotEventId: string | undefined;
   readonly lastEventId: string | undefined;
   readonly closed: boolean;
-  /** W-152: current buffered (undelivered) event-frame count. */
+  /** Current buffered (undelivered) event-frame count. */
   readonly queuedEvents: number;
 }
 
@@ -215,7 +215,7 @@ interface SubscriptionInternal extends Subscription {
   __target(): SubscriptionTarget;
   __snapshotEventId(): string | undefined;
   __lastEventId(): string | undefined;
-  /** IP-7: re-point this subscription at a new server subscriptionId. */
+  /** Re-point this subscription at a new server subscriptionId. */
   __rebind(newSubscriptionId: string): void;
 }
 
@@ -227,7 +227,7 @@ export class GraphorinClient {
   readonly #pending: Map<ClientMessageId, PendingRpc> = new Map();
   readonly #subscriptions: Map<string, SubscriptionInternal> = new Map();
   /**
-   * E-02: frames the server tagged with a subscriptionId the client
+   * Frames the server tagged with a subscriptionId the client
    * has not mapped yet. The server dispatches replayed frames (and can
    * interleave live ones) BEFORE the subscribe RPC reply lands, so
    * dropping unknown-id frames loses exactly the replay the caller
@@ -236,7 +236,7 @@ export class GraphorinClient {
    */
   readonly #preMapBuffers: Map<string, PreMapFrame[]> = new Map();
   #pendingSubscribes = 0;
-  /** IP-3: the synthetic single subscription an SSE connection carries. */
+  /** The synthetic single subscription an SSE connection carries. */
   #sseSubscription: SubscriptionInternal | undefined;
   #transport: Transport | undefined;
   #idCounter = 0;
@@ -408,12 +408,11 @@ export class GraphorinClient {
    * Resume a paused (HITL) run. The WebSocket protocol intentionally
    * does NOT carry a `resume` control message - resumes are durable
    * + idempotent + body-carrying, which maps onto the REST endpoint
-   * `POST /v1/runs/:runId/resume`. Since C3/W-119 the server resumes
-   * in-process suspensions for real: pass
-   * `{ approvals: [{ toolCallId, granted }] }` as the directive; a run
-   * whose RunState this server process does not retain answers 409
-   * (`run-state-unavailable`) - resume those library-side via
-   * `agent.run(savedState, { directive })`.
+   * `POST /v1/runs/:runId/resume`. The server resumes in-process
+   * suspensions: pass `{ approvals: [{ toolCallId, granted }] }` as
+   * the directive; a run whose RunState this server process does not
+   * retain answers 409 (`run-state-unavailable`) - resume those
+   * library-side via `agent.run(savedState, { directive })`.
    */
   async resume(
     runId: string,
@@ -667,7 +666,7 @@ export class GraphorinClient {
   }
 
   /**
-   * IP-3: on the SSE transport every frame belongs to the single
+   * On the SSE transport every frame belongs to the single
    * implicit session subscription regardless of the server-generated
    * subscriptionId it carries.
    */
@@ -676,7 +675,7 @@ export class GraphorinClient {
   }
 
   /**
-   * E-02: hold a frame whose subscriptionId has no mapping yet. Only
+   * Hold a frame whose subscriptionId has no mapping yet. Only
    * meaningful while a subscribe RPC is outstanding - the server tags
    * replayed frames with the NEW subscriptionId and dispatches them
    * before the RPC reply. With no subscribe in flight the id can never
@@ -697,7 +696,7 @@ export class GraphorinClient {
     buffer.push(frame);
   }
 
-  /** E-02: deliver frames buffered before the id→subscription mapping existed. */
+  /** Deliver frames buffered before the id→subscription mapping existed. */
   #flushPreMapFrames(subscriptionId: string, sub: SubscriptionInternal): void {
     const buffered = this.#preMapBuffers.get(subscriptionId);
     if (buffered === undefined) return;
@@ -1049,7 +1048,7 @@ interface PendingRpc {
   readonly reject: (reason: Error) => void;
 }
 
-/** E-02: frame kinds the server can dispatch before the subscribe RPC reply. */
+/** Frame kinds the server can dispatch before the subscribe RPC reply. */
 type PreMapFrame = ServerEventFrame | ServerLifecycleFrame | ServerReplayMarkerFrame;
 
 function subjectFor(target: SubscriptionTarget): string {

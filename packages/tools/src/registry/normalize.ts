@@ -95,7 +95,7 @@ export const DEFAULT_MAX_RESULT_TOKENS = 16384;
 
 /**
  * Registry-level normalisation knobs threaded from
- * `createToolRegistry(...)` (C6).
+ * `createToolRegistry(...)`.
  *
  * @stable
  */
@@ -107,7 +107,7 @@ export interface NormaliseToolOptions {
    * signal. `built-in` source registrations are exempt: the runtime
    * registers those deliberately (`tool_search`, `read_result`, ...)
    * and deferring the discovery surface itself would be self-defeating.
-   * Default `false` (per-tool opt-in, the pre-C6 behaviour).
+   * Default `false` (per-tool opt-in).
    */
   readonly deferLoadingByDefault?: boolean;
 }

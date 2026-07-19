@@ -161,8 +161,8 @@ export function checkSecrets(): CheckResult[] {
  * encrypted binding, so the doctor surfaces the missing binding as
  * `'fail'` - unless the supplied config has the audit log DISABLED, in
  * which case the binding is not required and the check reports `'skip'`
- * (deep retest 2026-07-19, P2-1: a fresh `init --no-encrypted` +
- * `doctor --all` must not fail on a subsystem the config turned off).
+ * (a fresh `init --no-encrypted` + `doctor --all` must not fail on a
+ * subsystem the config turned off).
  *
  * @stable
  */

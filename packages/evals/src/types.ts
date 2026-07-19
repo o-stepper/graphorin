@@ -44,7 +44,7 @@ export interface RunOptions<I, O> {
    * `concurrency` is `1`: a Graphorin `Agent` instance allows one run
    * in flight and throws `ConcurrentRunError` on overlap, which the
    * runner surfaces as an `EvalConcurrencyError` instead of
-   * recording per-case scorer failures (E-19). For a framework agent
+   * recording per-case scorer failures. For a framework agent
    * at `concurrency > 1`, pass {@link agentFactory} instead.
    */
   readonly agent?: AgentLike<I, O>;
@@ -122,7 +122,7 @@ export interface RegressionOptions {
    */
   readonly maxAvgDurationIncreaseMs?: number;
   /**
-   * E8 (evals-05/08): when `true`, a `pass-rate-drop` finding is only kept if
+   * When `true`, a `pass-rate-drop` finding is only kept if
    * McNemar's paired test over the shared cases rejects "no real change" at
    * {@link significanceAlpha} - a fixed percentage tolerance is blind to
    * sample size (a 5pp drop is one case in a 20-case suite). Off by default

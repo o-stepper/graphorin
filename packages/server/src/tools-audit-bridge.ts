@@ -1,5 +1,5 @@
 /**
- * W-051: bridge the `@graphorin/tools` audit-event bus (`onToolAudit`,
+ * Bridge the `@graphorin/tools` audit-event bus (`onToolAudit`,
  * which `@graphorin/mcp` also emits into) into the server's
  * tamper-evident audit log. Without this, a shadow-mode
  * `tool:dataflow:flagged` was invisible to an operator unless they

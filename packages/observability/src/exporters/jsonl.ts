@@ -48,7 +48,7 @@ export interface JSONLExporterOptions {
    */
   readonly now?: DateProvider;
   /**
-   * Upper bound on simultaneously-open file handles (RP-20). The pool keys
+   * Upper bound on simultaneously-open file handles. The pool keys
    * by `(session, UTC-month)`, so a long-living server would otherwise hold
    * one fd per pair forever; the least-recently-used handle is closed once
    * the cap is reached. Defaults to `64`.
@@ -62,7 +62,7 @@ export interface JSONLExporterOptions {
  * @stable
  */
 export interface JSONLExporter extends TraceExporter {
-  /** Number of file handles currently open in the pool (RP-20). */
+  /** Number of file handles currently open in the pool. */
   openHandleCount(): number;
 }
 

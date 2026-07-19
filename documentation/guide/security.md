@@ -36,7 +36,7 @@ flowchart LR
 
 A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). Today this policy is **advisory for inline (`config.tools`) and MCP-derived tools**: it is resolved and surfaced on the `tool.execute` span / audit row, but those tools execute **in-process** - the agent runtime intentionally ships with no `sandboxResolver` wired. Real out-of-process isolation applies only to **code-mode** scripts and to tools an operator routes through a custom `sandboxResolver`; module-loadable skill / MCP isolation is wired when those land. See the per-field runtime behaviour in [Agent runtime](/guide/agent-runtime).
 
-The `'worker-threads'` tier is **best-effort** isolation, not a security boundary: the worker shares the host process and filesystem. It blocks `fs` / network module imports (ESM resolve hook + a CJS `require` interception) and always denies the process-escape modules `child_process` / `vm` / `cluster` / `inspector` / `worker_threads` (SDF-9), but a determined attacker with native addons or other escapes is not contained - load genuinely untrusted code under `'isolated-vm'` (V8 isolate) or `'docker'` (kernel) instead.
+The `'worker-threads'` tier is **best-effort** isolation, not a security boundary: the worker shares the host process and filesystem. It blocks `fs` / network module imports (ESM resolve hook + a CJS `require` interception) and always denies the process-escape modules `child_process` / `vm` / `cluster` / `inspector` / `worker_threads`, but a determined attacker with native addons or other escapes is not contained - load genuinely untrusted code under `'isolated-vm'` (V8 isolate) or `'docker'` (kernel) instead.
 
 `isolated-vm` and `dockerode` are **opt-in peer dependencies** - they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
@@ -64,7 +64,7 @@ graphorin token revoke <token-id>
 
 The pepper itself is resolved at server boot through a `SecretRef` (typically stored under `keyring:graphorin_server_pepper` or the encrypted-file store). See [Secrets](/guide/secrets) for the resolution pipeline.
 
-**Attenuation-only minting (W-106).** `POST /v1/tokens` never escalates: a token principal can only mint scopes its OWN grant already covers (checked with the same `scopeMatches` rules the middleware uses - `admin:*` covers everything, a two-segment grant covers three-segment requests, but `agents:invoke:foo` does NOT cover the wider `agents:invoke`). A request outside the caller's grant answers `403 { error: 'scope-escalation-denied', denied: [...] }` listing the uncovered scopes. Because the child's `tokens:create` must itself be covered, delegation chains narrow monotonically - a service token holding only `tokens:create` can no longer mint itself `admin:*`. Give minters the full target set (or `admin:*`) if they legitimately need to issue wide tokens. Syntactically invalid scopes are rejected with `400` instead of silently minting a token that grants nothing. The CLI path (`graphorin token create`) operates on the store directly as the operator and is not subject to this rule.
+**Attenuation-only minting.** `POST /v1/tokens` never escalates: a token principal can only mint scopes its OWN grant already covers (checked with the same `scopeMatches` rules the middleware uses - `admin:*` covers everything, a two-segment grant covers three-segment requests, but `agents:invoke:foo` does NOT cover the wider `agents:invoke`). A request outside the caller's grant answers `403 { error: 'scope-escalation-denied', denied: [...] }` listing the uncovered scopes. Because the child's `tokens:create` must itself be covered, delegation chains narrow monotonically - a service token holding only `tokens:create` can no longer mint itself `admin:*`. Give minters the full target set (or `admin:*`) if they legitimately need to issue wide tokens. Syntactically invalid scopes are rejected with `400` instead of silently minting a token that grants nothing. The CLI path (`graphorin token create`) operates on the store directly as the operator and is not subject to this rule.
 
 **Pepper strength.** Consuming a pepper (`createToken`, `rekeyTokens`, the `TokenVerifier`'s first use) runs a weak-secret check: peppers below 32 bytes, with low Shannon entropy, or containing a long run of identical bytes (placeholder/test values) are rejected with a `WeakPepperError` whose `reason` explains the failure. Generate peppers with `crypto.randomBytes(32)` or the auth library's `generatePepper()`. The underlying heuristic is exported as `assessSecretStrength(bytes)` from `@graphorin/security` (and `@graphorin/security/hardening`) - a pure function returning `{ ok, reason, shannonBitsPerByte, maxIdenticalRun, … }` - so you can apply the same bar to your own passphrases.
 
@@ -79,11 +79,11 @@ Every privileged operation writes one row to the audit log:
 - token issuance / revocation;
 - OAuth flows (initiation / token issuance / refresh).
 
-The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain. `config.audit.cipher` selects the cipher and is pinned before `PRAGMA key` on both open paths (W-110); the audit default is `chacha20` - deliberately DIFFERENT from the main store's `sqlcipher` (ADR-030) because every pre-fix audit.db was created in the sqlite3mc default format and pinning `chacha20` keeps them byte-compatible. If you set `audit.cipher: 'sqlcipher'` in a config where it was previously ignored, an existing chacha20 file will now fail to open (correct fail-fast, not data loss) - re-encrypt it or drop the setting.
+The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain. `config.audit.cipher` selects the cipher and is pinned before `PRAGMA key` on both open paths; the audit default is `chacha20` - deliberately DIFFERENT from the main store's `sqlcipher` (ADR-030) because every pre-fix audit.db was created in the sqlite3mc default format and pinning `chacha20` keeps them byte-compatible. If you set `audit.cipher: 'sqlcipher'` in a config where it was previously ignored, an existing chacha20 file will now fail to open (correct fail-fast, not data loss) - re-encrypt it or drop the setting.
 
 The CLI command `graphorin audit verify` walks the chain and reports any breaks (`graphorin audit export` / `prune` round out the group).
 
-### Merkle transparency + signed checkpoints (D4)
+### Merkle transparency + signed checkpoints
 
 The linear hash chain is tamper-*evident* but not tamper-*resistant*: a writer who can rewrite the whole database can re-root the chain (exactly what `pruneAudit` does by design). `@graphorin/security/audit` adds an RFC-6962 Merkle layer over the same rows so the log can be **anchored** and made tamper-resistant against that adversary:
 
@@ -118,7 +118,7 @@ Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditIncl
 
 `pruneAudit` re-roots the surviving suffix (every surviving entry's `prevHash`/`hash` is recomputed), and the RFC-6962 leaves hash the canonical JSON of each entry INCLUDING those fields - so **verification against any checkpoint signed before the prune MUST fail afterwards, by design**. A legitimate retention prune is cryptographically indistinguishable from the truncate-and-re-root attack this layer exists to detect; only the operator's out-of-band procedure tells them apart. Run every retention prune as one atomic ceremony:
 
-1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`). The delete + suffix re-hash executes inside ONE write transaction (W-011): the write lock is held for the whole rewrite, so live appends wait (`busy_timeout`) and then chain to the post-prune tip - schedule prunes of very large chains in a maintenance window. On a custom audit-db binding without the `transact` fence the prune refuses to run (fail closed) rather than risk a permanent chain break.
+1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`). The delete + suffix re-hash executes inside ONE write transaction: the write lock is held for the whole rewrite, so live appends wait (`busy_timeout`) and then chain to the post-prune tip - schedule prunes of very large chains in a maintenance window. On a custom audit-db binding without the `transact` fence the prune refuses to run (fail closed) rather than risk a permanent chain break.
 2. Immediately sign a FRESH checkpoint of the new head: `signAuditCheckpoint(auditDb, { privateKeyPem, writerId })`.
 3. Distribute the new checkpoint to every out-of-band anchor location (other host, object store, ticket).
 4. Revoke or explicitly mark superseded every pre-prune checkpoint, recording the prune timestamp next to them - a later `verifyAuditAgainstCheckpoint` failure against one of them must read as "expected: pre-prune anchor", not as an alarm.
@@ -175,7 +175,7 @@ Local `folder` installations are trusted-by-default but flow through the same va
 
 An operator allow/deny policy gates which package names may be installed. By default a matching allowlist entry wins (so you can deny a whole scope yet allow specific exceptions inside it); set `precedence: 'deny-wins'` to consult the deny lists first, so an explicit denylist entry can never be overridden by a broad allowlist glob.
 
-**Operator trust root (D4).** A valid signature is not authenticity if the signer is anyone - a self-signed skill whose inline key is not pinned would otherwise verify green under the signature-required policy. Pass a `trustRoot` (through `installSkillFromNpm` / `installSkillFromGit` or directly to `verifySkillSignature`) and the resolved signing key must be in it, or verification returns `valid: false` with `reason: 'untrusted-key'`:
+**Operator trust root.** A valid signature is not authenticity if the signer is anyone - a self-signed skill whose inline key is not pinned would otherwise verify green under the signature-required policy. Pass a `trustRoot` (through `installSkillFromNpm` / `installSkillFromGit` or directly to `verifySkillSignature`) and the resolved signing key must be in it, or verification returns `valid: false` with `reason: 'untrusted-key'`:
 
 ```ts
 import { installSkillFromNpm } from '@graphorin/security';
@@ -192,7 +192,7 @@ await installSkillFromNpm({
 
 The root check runs after the ed25519 signature itself is valid, so the result distinguishes a forged signature from an untrusted signer.
 
-The `publishers` leg is domain-bound (W-026): the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
+The `publishers` leg is domain-bound: the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
 
 ## Lateral-leak defense layer
 
@@ -246,13 +246,13 @@ Findings are **metadata-only** - they name the flow kind and the implicated sour
 Four additional propagation legs close gaps the run-local shingle probe cannot see:
 
 - **Model output** - once a run is tainted, the agent records each step's assistant text as derived-untrusted (`llm-derived`), so a later sink call copying the model's own phrasing still trips the verbatim probe.
-- **Channel inbound** (B1.5) - message-borne text from a messenger gateway arms the ledger through the dedicated `'channel-inbound'` trust class and the `AgentCallOptions.inboundTaint` seed, stamped at run init BEFORE the first step. The Rule-of-Two deliberately excludes ordinary user messages from its untrusted-input leg; channel peers are authenticated but their CONTENT is attacker-influenceable, so `'channel-inbound'` is registered in the same single `isUntrustedTrustClass` source both layers consume. Widen-only: the seed can add taint, never clear it.
+- **Channel inbound** - message-borne text from a messenger gateway arms the ledger through the dedicated `'channel-inbound'` trust class and the `AgentCallOptions.inboundTaint` seed, stamped at run init BEFORE the first step. The Rule-of-Two deliberately excludes ordinary user messages from its untrusted-input leg; channel peers are authenticated but their CONTENT is attacker-influenceable, so `'channel-inbound'` is registered in the same single `isUntrustedTrustClass` source both layers consume. Widen-only: the seed can add taint, never clear it.
 - **Memory recall** - the recall tools (`fact_search`, `deep_recall`, `recall_episodes`) attach a taint override when any returned item is quarantined or foreign-provenance, so poisoned memory written in an earlier session re-arms the ledger at recall (the cross-session MINJA leg). Overrides only ever WIDEN a label; nothing can launder an untrusted tool's output.
 - **Suspend/resume** - the persisted `RunState.taintSummary` now carries one-way FNV-1a hashes of the tracked spans' tiles alongside the coarse flags, so a resumed run re-detects verbatim copies of pre-suspend untrusted content (at tile granularity) without any untrusted text ever being persisted.
 
 ### The assistant reply as a sink
 
-Tools are not the only exfiltration surface - the reply itself reaches whoever is on the other end of the conversation (a messenger peer, an exported transcript). Since B4 the run's outgoing assistant text is evaluated as a sink with the stable id `'assistant-output'` (`DataFlowEvaluation.sinkKind: 'assistant-output'`), gated in the commit path BEFORE the message enters the durable history:
+Tools are not the only exfiltration surface - the reply itself reaches whoever is on the other end of the conversation (a messenger peer, an exported transcript). The run's outgoing assistant text is evaluated as a sink with the stable id `'assistant-output'` (`DataFlowEvaluation.sinkKind: 'assistant-output'`), gated in the commit path BEFORE the message enters the durable history:
 
 - **enforce** - a tripped flow withholds the reply: the durable message and the run's final output are replaced by a fixed notice (the streamed deltas already left, exactly like the lateral-leak block; what the gate protects is the persistent buffer and anything delivered downstream). The turn's verdict records `guardrail: 'block'` plus the flow in `dataflowFlags`, so the memory ingest gate also keeps it out of long-term memory.
 - **shadow** - the reply passes; the verdict sidecar records `assistant-output:flag`.
@@ -265,20 +265,20 @@ The regex catalogues catch KNOWN imperative patterns; a classifier catches parap
 | Surface | Wiring |
 |---|---|
 | Inbound sanitisation | `applyInboundSanitizationWithClassifier` (`@graphorin/tools/inbound`); the channel gateway exposes it as `createChannelGateway({ injectionClassifier })`. A flagged verdict appends `classifier:<id>` to `patternsHit`. |
-| Final output (SDF-4) | `injectionClassifierOutputGuardrail(classifier)` - add to `createAgent({ guardrails: { output: [...] } })`; `action: 'warn'` (default) or `'block'`. |
+| Final output | `injectionClassifierOutputGuardrail(classifier)` - add to `createAgent({ guardrails: { output: [...] } })`; `action: 'warn'` (default) or `'block'`. |
 | Memory write gate | `createMemory({ injectionClassifier })` - consulted at the write-time quarantine gate after the regex heuristics; a flagged verdict quarantines the write. Widen-only: a regex hit short-circuits and can never be cleared by the classifier. |
 
-W-103 stays as shipped (D-13): `treatPiiAsSensitive` remains opt-in warn-first framework-wide; the recommended `treatPiiAsSensitive: true` lives in the [channel gateway security preset](/guide/channels#recommended-gateway-security-preset), and the default is revisited on injection-gate eval evidence.
+`treatPiiAsSensitive` remains opt-in warn-first framework-wide; the recommended `treatPiiAsSensitive: true` lives in the [channel gateway security preset](/guide/channels#recommended-gateway-security-preset), and the default is revisited on injection-gate eval evidence.
 
-**Pattern catalogues are signal, not gates.** The injection regex catalogues (the guardrails heuristics and the memory quarantine heuristics) share a Unicode pre-pass - `normalizeForMatching`: NFKC + zero-width strip + lowercase - and the PII catalogue's boolean detector (`containsPii`) applies the case-preserving variant `normalizeForPiiMatching` (W-150; IBAN-style patterns are case-sensitive by design), so cheap character-injection - zero-width splits, fullwidth homoglyphs - no longer slips past either family. Spilled oversized tool results are additionally scanned **whole** at spill time; when that artifact-level scan flagged a pattern, every later page read surfaces the fact via the `tool.inbound.sanitization.cross-page-flag.total` counter, even when the pattern straddles a page boundary that hides it from the per-page scan (W-156). They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate - memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
+**Pattern catalogues are signal, not gates.** The injection regex catalogues (the guardrails heuristics and the memory quarantine heuristics) share a Unicode pre-pass - `normalizeForMatching`: NFKC + zero-width strip + lowercase - and the PII catalogue's boolean detector (`containsPii`) applies the case-preserving variant `normalizeForPiiMatching` (IBAN-style patterns are case-sensitive by design), so cheap character-injection - zero-width splits, fullwidth homoglyphs - no longer slips past either family. Spilled oversized tool results are additionally scanned **whole** at spill time; when that artifact-level scan flagged a pattern, every later page read surfaces the fact via the `tool.inbound.sanitization.cross-page-flag.total` counter, even when the pattern straddles a page boundary that hides it from the per-page scan. They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate - memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
 
 Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` - see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
 
-## Tool-argument policies & Rule-of-Two (D4)
+## Tool-argument policies & Rule-of-Two
 
 The data-flow policy above is *detective* (it flags/blocks at the sink after taint is observed). Two *preventive* layers deny disallowed calls before they run, and compose with it:
 
-**Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are deny-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. Rule effects use the four-value vocabulary `allow | deny | ask | defer` (`'forbid'` stays accepted as the pre-E1 alias of `'deny'`); a `deny` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
+**Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are deny-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. Rule effects use the four-value vocabulary `allow | deny | ask | defer` (`'forbid'` stays accepted as a legacy alias of `'deny'`); a `deny` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
 
 ```ts
 import { createAgent } from '@graphorin/agent';
@@ -302,7 +302,7 @@ createAgent({
 
 A matching `deny` always beats an `allow`, so narrowing composes safely and a later broad allow can never re-open a denied call. When several rules match, the strongest effect wins with priority `deny > defer > ask > allow`.
 
-**Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools; denying `untrustedInput` deterministically blocks calling untrusted-SOURCE tools - those whose trust class the taint engine treats as injection-bearing (`mcp-derived`, `web-search`, `skill-untrusted`; one shared taxonomy, W-101). Note the scope: the leg gates untrusted tool SOURCES; untrusted content arriving in user messages is outside it. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the dropped leg is deterministically blocked, not merely flagged.
+**Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, the same single-writer gate as the read-only capability); denying `sensitiveData` default-denies secret-tier tools; denying `untrustedInput` deterministically blocks calling untrusted-SOURCE tools - those whose trust class the taint engine treats as injection-bearing (`mcp-derived`, `web-search`, `skill-untrusted`; one shared taxonomy). Note the scope: the leg gates untrusted tool SOURCES; untrusted content arriving in user messages is outside it. This turns the coarse lethal-trifecta trigger from detective into **preventive** - the dropped leg is deterministically blocked, not merely flagged.
 
 ```ts
 import { createAgent } from '@graphorin/agent';
@@ -322,7 +322,7 @@ createAgent({
 
 The pure decision engines live in `@graphorin/security/policy` (`evaluatePermissionDecision`, `evaluateToolArgumentPolicy`, `buildRuleOfTwoPolicy`, `isToolDeniedByName`).
 
-### Four-value permission decisions (E1)
+### Four-value permission decisions
 
 Beyond the binary allow/deny, two verdicts route a call to a HUMAN instead of deciding it in code:
 
@@ -361,14 +361,14 @@ createAgent({
 
 Rules the hook lives by:
 
-- **`updatedInput` rewrites** (e.g. redirecting a dangerous tool at a sandbox target) are re-validated against the tool's input schema and then replace BOTH the validated input and the effective args - the approval record a human sees, the argument policy, and the data-flow sink gate all evaluate what will actually run (the W-118 plumbing). A rewrite that fails re-validation fails the call as `invalid_input`.
+- **`updatedInput` rewrites** (e.g. redirecting a dangerous tool at a sandbox target) are re-validated against the tool's input schema and then replace BOTH the validated input and the effective args - the approval record a human sees, the argument policy, and the data-flow sink gate all evaluate what will actually run. A rewrite that fails re-validation fails the call as `invalid_input`.
 - **Purity**: the hook may run more than once per logical call (the run loop's pre-screen and the executor's own phase); it must be pure/idempotent over its input. A throwing hook fails the call closed (`capability_blocked`).
-- **Pre-approved replays**: on a durable-HITL resume the hook must not rewrite the granted args - a differing `updatedInput` fails the call as `invalid_input` instead of executing a payload nobody saw (the same tools-02 rule that disables the repair hook there). An identical echo passes.
-- **Scope**: handoff and `toTool` sub-agent calls are outside the hook (govern the child through its own config - a child's `ask` parks on the parent with the composite `subRunToolCallId` key and resumes through it, W-001). Deny-by-name still covers their names.
+- **Pre-approved replays**: on a durable-HITL resume the hook must not rewrite the granted args - a differing `updatedInput` fails the call as `invalid_input` instead of executing a payload nobody saw (the same rule that disables the repair hook there). An identical echo passes.
+- **Scope**: handoff and `toTool` sub-agent calls are outside the hook (govern the child through its own config - a child's `ask` parks on the parent with the composite `subRunToolCallId` key and resumes through it). Deny-by-name still covers their names.
 
 ### Deferred approvals with a durable deadline
 
-The `defer` composition uses two existing durable primitives: `requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the decision on a workflow thread with an epoch deadline, and the workflow timer daemon (which already sweeps `wakeAt`) resolves a due approval with its timeout decision - `{ granted: false, reason: 'defer-timeout' }` by default (`DEFAULT_APPROVAL_TIMEOUT_DECISION`), so an unattended permission fails closed. The awakeable address triple serializes through `serializeAwakeableRef` for messenger callback data (A3). How long to wait is caller policy; the framework provides the mechanism. A human `workflow.approve(...)` before the deadline wins. The resolved decision maps 1:1 onto the agent's `ResumeDirective`.
+The `defer` composition uses two existing durable primitives: `requestApproval(name, payload, { timeoutAt, timeoutDecision? })` parks the decision on a workflow thread with an epoch deadline, and the workflow timer daemon (which already sweeps `wakeAt`) resolves a due approval with its timeout decision - `{ granted: false, reason: 'defer-timeout' }` by default (`DEFAULT_APPROVAL_TIMEOUT_DECISION`), so an unattended permission fails closed. The awakeable address triple serializes through `serializeAwakeableRef` for messenger callback data. How long to wait is caller policy; the framework provides the mechanism. A human `workflow.approve(...)` before the deadline wins. The resolved decision maps 1:1 onto the agent's `ResumeDirective`.
 
 ### Deny-by-name (three surfaces)
 
@@ -382,10 +382,10 @@ A rule with a `when` predicate is call-time only (its predicate reasons over val
 
 ### Tool-call evaluation order
 
-The executor evaluates one call's gates in this fixed order (documented from the code, D-11):
+The executor evaluates one call's gates in this fixed order (documented from the code):
 
 1. deny-by-name mirror + read-only capability gate (args-independent),
-2. schema validation with the optional single-round repair (tools-02),
+2. schema validation with the optional single-round repair,
 3. the permission hook (rewrites land here, before anything human-facing),
 4. the approval phase (`needsApproval` + gate),
 5. the tool-argument policy (`toolPolicy` / Rule-of-Two),
@@ -425,7 +425,7 @@ This is the precondition for shipping **synthesised** memory safely. Three deriv
 
 See [Memory system § Memory safety](/guide/memory-system#memory-safety-provenance-quarantine) for the API surface.
 
-### Memory writes strictly after guardrails (B3)
+### Memory writes strictly after guardrails
 
 Long-term memory is written strictly AFTER the run loop's security gates, and the ordering is enforced by construction rather than by convention:
 
@@ -439,14 +439,14 @@ The ingest gate is REQUIRED before enabling memory auto-promotion or granting a 
 
 Context compaction is a trust boundary in its own right: the summarizer LLM reads the older portion of the conversation - including tool results wrapped in `<<<untrusted_content>>>` envelopes - and its output is spliced into the live buffer as a `system`-role message the main model treats as authoritative. Without a backstop, that is a classic **injection-laundering** path: text that entered the run untrusted re-enters it as trusted summary prose.
 
-The compactor closes this structurally (CE-15), not just with summarizer prompt wording:
+The compactor closes this structurally, not just with summarizer prompt wording:
 
 - **Window detection.** If any message in the compacted window carries an `<<<untrusted_content>>>` envelope, the LLM-authored summary body is committed **inside a `trust="derived"` envelope** (`<<<untrusted_content trust="derived" tool="compaction-summarizer">>>`), so the model's standing rule for untrusted blocks - data, not instructions - keeps applying to the summary.
 - **Output scan.** Independently of the window, the summarizer's output is run through the offline injection heuristics (the same `ignore previous instructions`-family patterns used by the tool-result sanitizer); a hit degrades the summary to the derived envelope too. The scan **fails closed**: if it cannot complete within its time budget, the summary is committed inside the derived envelope as well.
 - **No break-out.** Envelope marker sequences inside the summary body are neutralized before wrapping, so summarizer output influenced by injected text cannot close the envelope early and smuggle "system text" after it.
 - **Sticky across re-compaction.** A derived summary still carries the envelope when it is itself compacted later, which re-triggers the window detection - taint does not wash out with repeated summarization, consistent with the [data-flow policy](#provenance-data-flow-policy)'s no-laundering rule.
 
-The classification is surfaced as `CompactionResult.summaryTrust` (`'trusted' | 'untrusted-derived'`) for observability. A clean window with a clean summary is committed byte-identically to the pre-CE-15 behaviour.
+The classification is surfaced as `CompactionResult.summaryTrust` (`'trusted' | 'untrusted-derived'`) for observability. A clean window with a clean summary is committed byte-identically - no envelope is added.
 
 ## Known limitations
 
@@ -455,11 +455,11 @@ release enforces. Each is a design-class change (an operator trust root, a signe
 external anchor, a persisted registry) rather than a one-line fix, and is tracked
 rather than shipped speculatively.
 
-- **Without a trust root, skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - for an `inline` key that key comes from the (attacker-authored) frontmatter itself, so a *self-signed* skill verifies as `signatureVerified: true` until you configure an operator trust root. WITH a trust root the story is now stronger (W-026): the `publishers` leg is satisfied only by `well-known` keys served from the publisher's own domain (host-bound, redirects refused), which under the web-PKI assumption IS publisher provenance; the residual caveat applies to inline keys without a `fingerprints` pin. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
+- **Without a trust root, skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - for an `inline` key that key comes from the (attacker-authored) frontmatter itself, so a *self-signed* skill verifies as `signatureVerified: true` until you configure an operator trust root. WITH a trust root the story is stronger: the `publishers` leg is satisfied only by `well-known` keys served from the publisher's own domain (host-bound, redirects refused), which under the web-PKI assumption IS publisher provenance; the residual caveat applies to inline keys without a `fingerprints` pin. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
 - **The audit chain is tamper-*evident*, not tamper-*resistant*.** It is an unkeyed SHA-256 hash chain with no signing key or external anchor. An actor with write access to the audit database - or a compromised process holding the at-rest passphrase - can delete or rewrite entries and re-root the chain so `verifyAuditChain` still reports clean (`pruneAudit` does exactly this re-rooting by design). It defends only against actors *without* DB write access. Anchor the chain head externally if you need resistance against privileged actors. A prune also rewrites surviving entries' hashes, so hashes archived from an earlier `exportAudit` no longer match the live chain.
 - **The installed-skills registry is process-memory only.** `auditInstalledSkills()` reflects only installations performed in the current process; it is not persisted across restarts. Relatedly, the `trusted-with-scripts` trust level is currently unreachable in practice (no folder installer constructs a `{ kind: 'folder' }` source), so skill `postinstall` lifecycles never run.
 
-Smaller residuals tracked alongside these: 1Password Connect / service-account tokens are held as long-lived plain strings (not `SecretValue`); the entity-resolution candidate window is a fixed 1000 most-recent rows; and the verbatim-carry taint probe resumes from one-way tile hashes after a durable-HITL suspend (C6) - so its post-resume granularity is the tile: a verbatim fragment shorter than one tile, or one that never aligns with the canonical probe window, is not re-detected (the load-bearing trifecta gate is unaffected).
+Smaller residuals tracked alongside these: 1Password Connect / service-account tokens are held as long-lived plain strings (not `SecretValue`); the entity-resolution candidate window is a fixed 1000 most-recent rows; and the verbatim-carry taint probe resumes from one-way tile hashes after a durable-HITL suspend - so its post-resume granularity is the tile: a verbatim fragment shorter than one tile, or one that never aligns with the canonical probe window, is not re-detected (the load-bearing trifecta gate is unaffected).
 
 ## Threat model
 

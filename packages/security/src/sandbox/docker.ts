@@ -299,7 +299,7 @@ async function readStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
 }
 
 /**
- * With `Tty: false` (D-02) the daemon multiplexes the log stream into
+ * With `Tty: false` the daemon multiplexes the log stream into
  * 8-byte-framed records - `[streamType, 0, 0, 0, payloadSizeBE32]`
  * followed by the payload, where type 1 is stdout and type 2 stderr -
  * so the raw bytes must be demultiplexed before `JSON.parse`. Strips

@@ -6,8 +6,8 @@
  * This realises Principle #12 (one registry, one collision policy) and
  * gives `createToolRegistry(...)` its first production call-site
  * (`createAgent(...)` warm-up - see `factory.ts`). The run loop consumes
- * the resulting registry in a later work item (WI-03); `tool_search`
- * uses it in WI-05. This module only *builds* it.
+ * the resulting registry; `tool_search` uses it for deferred-tool
+ * discovery. This module only *builds* it.
  *
  * Two deliberate fidelity notes (verified against source, not the plan):
  *  - **MCP tools are not auto-stamped.** `adaptMCPTools(...)` returns
@@ -73,12 +73,12 @@ export interface BuildToolRegistryOptions {
   readonly collisionContext?: CollisionContext;
   /** Audit sink forwarded to the registry (collision + classification rows). */
   readonly emitAudit?: (event: ToolAuditEvent) => void;
-  /** Semantic-search embedder. Passed through; consumed by `tool_search` (WI-05). */
+  /** Semantic-search embedder. Passed through; consumed by `tool_search`. */
   readonly embedder?: ToolSearchEmbedder;
-  /** Cosine threshold for the semantic search stage (WI-05). */
+  /** Cosine threshold for the semantic search stage. */
   readonly semanticScoreThreshold?: number;
   /**
-   * C6: defer-load every tool that does not declare `defer_loading`
+   * Defer-load every tool that does not declare `defer_loading`
    * itself (the minimal-scaffold posture). Passed through to
    * `createToolRegistry(...)`. Default `false`.
    */

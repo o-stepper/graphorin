@@ -14,7 +14,7 @@
  *   `ky`, `ws` (static, dynamic `import(...)`, and `require(...)`)
  *
  * Companion to the `pnpm run check-no-network` static analysis script;
- * the two matchers are kept in lockstep (this rule mirrors the EB-10
+ * the two matchers are kept in lockstep (this rule mirrors the
  * hardening that taught the script about undici/got, raw sockets,
  * WebSocket/EventSource, and HTTP-client import specifiers). The lint
  * surface catches the pattern at author time so reviewers do not need
@@ -22,7 +22,7 @@
  *
  * The rule is intentionally limited to the framework's own code paths
  * - consumer applications can call `fetch` freely. Activation is
- * two-stage (W-039): the linted file path must match
+ * two-stage: the linted file path must match
  * `/packages/<pkg>/src/` AND the nearest package.json's `name` must
  * start with one of `options[0].packagePrefixes` (default
  * `['@graphorin/']`), so a downstream pnpm monorepo with the standard
@@ -31,7 +31,7 @@
  *
  * FAIL-OPEN fallback: when no package.json resolves above the file
  * (virtual paths in editor buffers or programmatic `Linter` runs), the
- * rule activates on the path match alone - exactly the pre-W-039
+ * rule activates on the path match alone - exactly the original
  * behaviour, so a resolution hiccup can only over-flag framework-shaped
  * paths, never silently disable the guard.
  *

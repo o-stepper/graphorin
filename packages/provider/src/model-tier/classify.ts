@@ -103,8 +103,8 @@ export function classifyModelTier(provider: ProviderLike): ModelHint | undefined
 
 /**
  * Bedrock cross-region inference-profile prefix (`us.anthropic.claude-…`).
- * Stripped so region-qualified ids hit the `^anthropic\.claude` rules
- * (core-provider-11).
+ * Stripped so region-qualified ids hit the `^anthropic\.claude` rules.
+ *
  */
 const BEDROCK_REGION_PREFIX = /^(?:us|eu|apac|jp|au|us-gov)\./;
 

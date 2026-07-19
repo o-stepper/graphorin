@@ -1,5 +1,5 @@
 /**
- * Agent-side adapter for the D4 tool-argument policy (Progent) and the
+ * Agent-side adapter for the tool-argument policy (Progent) and the
  * Rule-of-Two capability preset. Compiles `AgentConfig.toolPolicy` /
  * `AgentConfig.ruleOfTwo` into the structural
  * {@link ToolArgumentPolicyGuard} the tool executor consumes plus a
@@ -31,7 +31,7 @@ export type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/p
  * into a single guard. `ruleOfTwo` is compiled first (yielding a base
  * policy + optional read-only floor); an explicit `toolPolicy` is
  * appended so its rules compose - a deny in either always wins
- * (`deny > defer > ask > allow`, E1). The guard carries all three
+ * (`deny > defer > ask > allow`). The guard carries all three
  * evaluation shapes: the legacy binary `evaluate`, the four-value
  * `decide`, and the advertise-time `deniesName`. Returns
  * `{ guard: undefined }` when neither is configured (zero overhead on

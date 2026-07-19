@@ -91,16 +91,16 @@ export interface GraphorinServer {
   /**
    * Optional consolidator daemon - populated when the operator
    * supplied a `Consolidator` instance via `createServer({
-   * consolidator })`. Phase 14c integration.
+   * consolidator })`.
    */
   readonly consolidator: ConsolidatorDaemon | undefined;
   /**
-   * W-032: optional workflow durable-timer daemon - populated when the
+   * Optional workflow durable-timer daemon - populated when the
    * operator wired a `createTimerDriver(...)` at construction time.
    */
   readonly workflowTimers: WorkflowTimerDaemon | undefined;
   /**
-   * B1.6: optional channels daemon - populated when the operator
+   * Optional channels daemon - populated when the operator
    * wired a channel gateway via `createServer({ channels })`.
    */
   readonly channels: ChannelsDaemon | undefined;
@@ -156,14 +156,14 @@ export interface CreateServerOptions {
    */
   readonly triggers?: TriggersDaemonInput;
   /**
-   * W-032: optional workflow durable-timer surface - pass a
+   * Optional workflow durable-timer surface - pass a
    * `createTimerDriver(...)` built over your workflows + checkpoint
    * stores (`{ driver }`), or a pre-built daemon. The server starts
    * and stops it with the lifecycle and reports it on `/v1/health`.
    */
   readonly workflowTimers?: WorkflowTimersInput;
   /**
-   * B1.6: optional channel-gateway surface (`@graphorin/channels`,
+   * Optional channel-gateway surface (`@graphorin/channels`,
    * matched structurally - no package dependency). Pass the gateway
    * (`{ gateway }`) or a pre-built daemon; the server starts/stops it
    * with the lifecycle, reports it on `/v1/health`, and bridges

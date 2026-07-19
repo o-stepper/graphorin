@@ -32,7 +32,7 @@ export interface EmbedOptions {
   /** Optional per-call request id forwarded to the trace span. */
   readonly requestId?: string;
   /**
-   * Asymmetric retrieval role of the input (PS-10). Embedders for models that
+   * Asymmetric retrieval role of the input. Embedders for models that
    * require asymmetric prefixes - the E5 family's `query:` / `passage:` - apply
    * the matching prefix; embedders for symmetric models ignore it. Memory tiers
    * pass `'query'` when embedding a search query and `'passage'` when embedding

@@ -83,7 +83,7 @@ export interface ChildResult<TOutput = unknown> {
   readonly durationMs: number;
   /**
    * Full usage breakdown, present only for usage-reporting children
-   * (an `invoke` resolving to a full `AgentResult`, W-033).
+   * (an `invoke` resolving to a full `AgentResult`).
    */
   readonly usage?: Usage;
 }
@@ -99,7 +99,7 @@ export interface FanOutResult<TOutput = unknown> {
   readonly children: ReadonlyArray<ChildResult<TOutput>>;
   readonly mergeDurationMs: number;
   /**
-   * Sum of every usage-reporting child's usage (W-033); zero when no
+   * Sum of every usage-reporting child's usage; zero when no
    * child reported. The fan-out helper never mutates the parent run's
    * live state (it runs outside the loop and would race it) - folding
    * this into the parent run's accounting is the caller's decision.
@@ -148,7 +148,7 @@ export interface FanOutOptions<TOutput = unknown> {
   /** Optional event emitter for `agent.fanout.spawned / merged`. */
   readonly emit?: (event: AgentEvent) => void;
   /**
-   * Sideways-injection merge guard (AG-7): on `'judge-merge'` the
+   * Sideways-injection merge guard: on `'judge-merge'` the
    * fan-out scores each child's source trust and contribution weight
    * against the judge's merged output; a biased merge emits
    * `agent.lateral-leak.detected` (vector `sideways-injection`) and -
@@ -168,7 +168,7 @@ const DEFAULT_MAX_CONCURRENT_CHILDREN = 4;
 
 /**
  * Structurally detect a full `AgentResult` returned by a child
- * `invoke` (AG-16): an object carrying `output`, a numeric
+ * `invoke`: an object carrying `output`, a numeric
  * `usage.totalTokens`, and a `state` with string `id`/`status`. The
  * three-field match makes accidental collision with a user `TOutput`
  * negligible; children whose genuine output looks like this should

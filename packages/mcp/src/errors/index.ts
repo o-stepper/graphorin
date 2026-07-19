@@ -95,8 +95,8 @@ export class MCPToolNotFoundError extends GraphorinMCPError {
 
 /**
  * Raised when a pinned tool-definition fingerprint does not match the
- * server's current definition and `onPinMismatch: 'reject'` is set
- * (MC-6) - the approve-then-swap rug-pull posture.
+ * server's current definition and `onPinMismatch: 'reject'` is
+ * set - the approve-then-swap rug-pull posture.
  */
 export class MCPToolPinningError extends GraphorinMCPError {
   public readonly kind = 'pin-mismatch' as const;
@@ -104,7 +104,7 @@ export class MCPToolPinningError extends GraphorinMCPError {
 
 /**
  * Raised when the MCP server reports a tool-level failure
- * (`CallToolResult.isError === true`, MC-4). The server's content text
+ * (`CallToolResult.isError === true`). The server's content text
  * rides in the message so the model keeps its self-correction signal -
  * while the executor records a real tool FAILURE (audit, retry and
  * error policies all engage) instead of a fake success.

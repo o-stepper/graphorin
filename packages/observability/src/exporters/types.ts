@@ -52,7 +52,7 @@ export interface SpanRecordEvent {
   readonly timeUnixNano: number;
   readonly attributes: SpanAttributes;
   /**
-   * W-094: per-attribute sensitivity map recorded by
+   * Per-attribute sensitivity map recorded by
    * `addEvent(name, attrs, { sensitivity, sensitivityByAttribute })`.
    * Consumed by the validation exporter; absent ⇒ every attribute is
    * untagged (default-deny below the export floor).

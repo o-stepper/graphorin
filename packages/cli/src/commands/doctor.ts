@@ -59,7 +59,7 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
    */
   readonly home?: string;
   /**
-   * F-06: check the storage / audit paths resolved from this
+   * Check the storage / audit paths resolved from this
    * `graphorin.config.*` file instead of the hardcoded `~/.graphorin`
    * layout, so doctor and `graphorin init` (which writes a PROJECT
    * config) live in the same world. Without the flag the default
@@ -83,12 +83,12 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
   /** Test seam - supply a custom systemd executor. */
   readonly systemdRun?: (cmd: string) => Promise<string>;
   /**
-   * Run the local-first smoke (external audit 2026-07-16, item 6):
-   * native SQLite stack, write / reopen / search round-trip, Ollama
-   * reachability + model inventory, an embedding-dimension probe, and
-   * (with {@link ollamaModel}) a streamed tool-call round-trip through
-   * the real adapter. Deliberately NOT implied by `--all` - the Ollama
-   * legs talk to a local daemon, which CI hosts may not run.
+   * Run the local-first smoke: native SQLite stack, write / reopen /
+   * search round-trip, Ollama reachability + model inventory, an
+   * embedding-dimension probe, and (with {@link ollamaModel}) a
+   * streamed tool-call round-trip through the real adapter.
+   * Deliberately NOT implied by `--all` - the Ollama legs talk to a
+   * local daemon, which CI hosts may not run.
    */
   readonly smokeLocal?: boolean;
   /** Ollama base URL for the smoke. Default `http://127.0.0.1:11434`. */
@@ -263,9 +263,9 @@ export function expectedFileModes(home: string): Readonly<Record<string, number>
 }
 
 /**
- * F-06: expected file modes for a `--config`-driven check - the config
+ * Expected file modes for a `--config`-driven check - the config
  * file itself plus the storage / audit paths it resolves to. Relative
- * paths resolve against the CWD (the IP-20 rule every other store-
+ * paths resolve against the CWD (the same rule every other store-
  * opening command uses). The secrets backend has no configured path
  * (`secrets.source` picks a resolver, not a file), so it stays covered
  * by `--check-secrets` only.

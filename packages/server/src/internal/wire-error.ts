@@ -1,5 +1,5 @@
 /**
- * W-052: machine-readable error envelope for the server boundary.
+ * Machine-readable error envelope for the server boundary.
  *
  * The packages disagree on the error discriminator by history:
  * `@graphorin/agent` / `@graphorin/workflow` use `code`,
@@ -23,7 +23,7 @@ export interface WireError {
   readonly hint?: string;
 }
 
-/** Normalize any thrown value into the wire envelope (W-052). */
+/** Normalize any thrown value into the wire envelope. */
 export function toWireError(err: unknown): WireError {
   if (err !== null && typeof err === 'object') {
     const rec = err as { code?: unknown; kind?: unknown; message?: unknown; hint?: unknown };

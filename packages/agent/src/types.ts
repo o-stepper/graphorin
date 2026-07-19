@@ -71,7 +71,7 @@ export interface OutputSpec<TOutput> {
   readonly kind: 'text' | 'structured';
   /**
    * Local validator (Zod-compatible `{ parse }`) applied to the final
-   * model output on the completed path (AG-3). A parse failure fails
+   * model output on the completed path. A parse failure fails
    * the run with `output-validation-failed` - never a silent cast.
    */
   readonly schema?: { parse(value: unknown): TOutput };
@@ -82,7 +82,7 @@ export interface OutputSpec<TOutput> {
    * `ProviderRequest.outputType` for adapters with native structured
    * output, and embedded in the fallback JSON instruction appended as
    * a trailing system message (the documented contract until adapters
-   * consume `outputType` natively - PS-24).
+   * consume `outputType` natively).
    */
   readonly jsonSchema?: Readonly<Record<string, unknown>>;
 }
@@ -144,12 +144,12 @@ export type HandoffEntry<TDeps = unknown> =
       // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
       readonly target: Agent<TDeps, any>;
       readonly inputFilter?: HandoffFilter;
-      /** W-036: which child events forward into the parent stream. */
+      /** Which child events forward into the parent stream. */
       readonly forwardEvents?: SubagentForwardPolicy;
     };
 
 /**
- * W-036: sub-agent event-forwarding policy. `'lifecycle'` (default)
+ * Sub-agent event-forwarding policy. `'lifecycle'` (default)
  * forwards tool execution/approval, guardrail, lateral-leak,
  * compaction and error events - never the high-frequency text deltas;
  * `'all'` forwards everything; `'none'` keeps the child a black box.
@@ -178,12 +178,12 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly skills?: SkillsRegistryLike;
   readonly memory?: Memory;
   /**
-   * Opt-in auto-induction (wave-D D4): after a run COMPLETES at or
+   * Opt-in auto-induction: after a run COMPLETES at or
    * above every complexity threshold, the runtime calls
    * `memory.procedural.induceFromRun(...)` to distil the trajectory
    * into a procedure candidate. The induced rule always lands
    * QUARANTINED - it reaches the prompt only after validation (or the
-   * D4 promotion policy). Requires `memory` (and a workflow inducer
+   * configured promotion policy). Requires `memory` (and a workflow inducer
    * configured on it - `procedureInduction` on `createMemory`);
    * induction failures WARN once and never fail the run. The call is
    * awaited before `agent.end`, so wire a cheap inducer model. Failed
@@ -201,7 +201,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   };
   /**
    * Opt in to building the per-run system prompt from the memory
-   * `ContextEngine` (CE-1). When `true` **and** `memory` is wired, the
+   * `ContextEngine`. When `true` **and** `memory` is wired, the
    * runtime calls `memory.contextEngine.assemble(...)` once at run start: the
    * agent's `instructions` become Layer 2 and the engine prepends the memory
    * base and appends working blocks, procedural rules, skill cards, the
@@ -212,8 +212,8 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly autoAssembleContext?: boolean;
   /**
-   * Context-scaffolding preset (C6, decision D-10). `'full'` (default)
-   * is exactly the pre-C6 behaviour. `'minimal'` is the cheap-run
+   * Context-scaffolding preset. `'full'` (default) is exactly the
+   * long-standing behaviour. `'minimal'` is the cheap-run
    * posture for proactive fires and heartbeats:
    *
    * - instructions-only system prompt - `autoAssembleContext` must stay
@@ -236,8 +236,8 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
   /**
-   * Deterministic checks run by the loop (AG-2; canonical contract is
-   * `@graphorin/security`'s `GuardrailDefinition` - SDF-4).
+   * Deterministic checks run by the loop (canonical contract is
+   * `@graphorin/security`'s `GuardrailDefinition`).
    *
    * - `input` guardrails run over each **fresh-run seed user message**
    *   (string content) before the first provider call. `'block'` fails
@@ -261,7 +261,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly prepareStep?: PrepareStepHook<TDeps>;
   readonly maxParallelTools?: number;
   /**
-   * How the model invokes tools (P1-2).
+   * How the model invokes tools.
    *
    * - `'direct'` (default) - the model emits one provider tool-call per
    *   tool, each result inlined into the conversation.
@@ -278,7 +278,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly toolInvocation?: 'direct' | 'code-mode';
   /**
-   * E3 (item 13, step 1): the code-mode runtime and its limits. `run`
+   * The code-mode runtime and its limits. `run`
    * substitutes WHERE the model-written script executes (a subprocess
    * provider, a remote runner) - any {@link CodeModeRunner}; default is
    * the in-process `worker_threads` runner (`runBridgedSource`).
@@ -303,21 +303,20 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * {@link ReasoningRetention} default. Wins over the provider-
    * level default when both are present. The agent runtime feeds
    * the effective value into every `provider.stream(...)` call so
-   * the wire-correct contract is honoured per RB-42 / suggested
-   * DEC-158 / suggested ADR-046.
+   * the wire-correct contract is honoured.
    */
   readonly reasoningRetention?: ReasoningRetention;
   readonly causalityMonitor?: CausalityMonitorConfig;
   /**
-   * Sideways-injection merge guard for `agent.fanOut` `'judge-merge'`
-   * (AG-7): scores per-child source trust × contribution weight against
+   * Sideways-injection merge guard for `agent.fanOut` `'judge-merge'`:
+   * scores per-child source trust × contribution weight against
    * the judge's merged output; a biased merge emits
    * `agent.lateral-leak.detected` and `'detect-and-block'` throws
    * `MergeBlockedError`.
    */
   readonly mergeGuard?: MergeGuardConfig;
   /**
-   * Provenance / taint-based data-flow policy (P1-3, opt-in). Enforces
+   * Provenance / taint-based data-flow policy (opt-in). Enforces
    * data-flow rules at the tool-execution boundary using the provenance
    * Graphorin already tracks (trust class + source + sensitivity), to
    * defuse the lethal trifecta: a sink (`side-effecting` /
@@ -338,7 +337,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly dataFlowPolicy?: DataFlowPolicyConfig;
   /**
-   * Additional result-handle readers (P1-4 / WI-13), tried after the
+   * Additional result-handle readers, tried after the
    * built-in spill-file reader. Wire an MCP resource reader
    * (`createMcpResourceReader` from `@graphorin/mcp/client`) here so the
    * model can resolve an MCP `resource_link` on demand via the built-in
@@ -347,7 +346,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly resultReaders?: ReadonlyArray<ResultReader>;
   /**
-   * Opt-in prompt-cache breakpoint policy (core-provider-02), forwarded
+   * Opt-in prompt-cache breakpoint policy, forwarded
    * verbatim on every `ProviderRequest` the loop issues. With
    * `{ breakpoints: 'auto' }` the Anthropic path (vercel adapter) anchors
    * `cache_control` markers on the first and last conversation messages,
@@ -359,7 +358,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly cachePolicy?: ProviderCachePolicy;
   /**
-   * When deferred-tool promotions (via `tool_search`) take effect (C1):
+   * When deferred-tool promotions (via `tool_search`) take effect:
    *
    * - `'immediate'` (default) - a promoted tool joins the catalogue on the
    *   NEXT step. Costs one provider-cache invalidation per promotion
@@ -373,7 +372,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly toolPromotion?: 'immediate' | 'run-boundary';
   /**
-   * C3: rules-based verifiers that run when the model emits a terminal
+   * Rules-based verifiers that run when the model emits a terminal
    * (no-tool-call) response. A failing verifier's feedback is appended
    * to the transcript as a user message and the loop continues, up to
    * `maxVerifierRounds` extra rounds. Verifiers are DETERMINISTIC checks
@@ -383,12 +382,12 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly verifiers?: ReadonlyArray<ResponseVerifier>;
   /**
-   * Cap on verifier-triggered continuation rounds per run (C3).
+   * Cap on verifier-triggered continuation rounds per run.
    * @default 1
    */
   readonly maxVerifierRounds?: number;
   /**
-   * C3: transparent bounded retry for transient tool failures, forwarded
+   * Transparent bounded retry for transient tool failures, forwarded
    * to the executor. Defaults (when set): `maxAttempts: 3`,
    * `backoffMs: 250`, `kinds: ['rate_limited']`; retries only ever run
    * for `pure` / `read-only` tools or tools with an `idempotencyKey`.
@@ -399,7 +398,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
     readonly kinds?: ReadonlyArray<import('@graphorin/core').ToolErrorKind>;
   };
   /**
-   * C3: journal each step's raw model response (text + tool calls +
+   * Journal each step's raw model response (text + tool calls +
    * model id) onto `RunState.steps[].providerResponse`, enabling
    * deterministic replay via `createReplayProvider(state)` - reproduce
    * an entire run without live model calls.
@@ -410,7 +409,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly checkpointStore?: CheckpointStore;
   /**
    * What happens to the run's checkpoint thread when the run reaches a
-   * terminal status (W-005). `'keep'` (default) preserves the current
+   * terminal status. `'keep'` (default) preserves the current
    * behaviour: checkpoints survive for post-hoc debugging and
    * process-restart resume. `'delete-on-terminal'` best-effort deletes
    * the thread after `completed` / `failed` runs; `awaiting_approval`
@@ -421,7 +420,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly checkpointPolicy?: 'keep' | 'delete-on-terminal';
   readonly sensitivity?: Sensitivity;
   /**
-   * Agent-default capability restriction (D2). `'read-only'` builds a
+   * Agent-default capability restriction. `'read-only'` builds a
    * side-effect-free agent: writer tools and handoffs are never
    * advertised and the executor blocks writer calls deterministically
    * (`capability_blocked`). Per-call override:
@@ -429,7 +428,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly capability?: AgentCapability;
   /**
-   * Declarative tool-argument policy (D4 / Progent). Forbid-before-allow
+   * Declarative tool-argument policy (Progent-style). Forbid-before-allow
    * rules over tool name + validated args, evaluated by the executor on
    * every call; default-deny sensitive tools with `defaultDenySensitive`.
    * A forbid verdict blocks the call (`capability_blocked`). Composes on
@@ -437,7 +436,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly toolPolicy?: ToolArgumentPolicy;
   /**
-   * Rule-of-Two capability profile (D4). Declares which of {untrusted
+   * Rule-of-Two capability profile. Declares which of {untrusted
    * input, sensitive data, external side effects} this agent may hold;
    * denying external side effects forces a read-only capability floor
    * and blocks writer tools, denying sensitive data default-denies
@@ -446,23 +445,23 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly ruleOfTwo?: RuleOfTwoProfile;
   /**
-   * E1 pre-tool permission hook: one caller-supplied decision point
+   * Pre-tool permission hook: one caller-supplied decision point
    * (`allow | deny | ask | defer`, optional `updatedInput` rewrite)
    * over every executor-bound tool call. The run loop pre-screens it on
    * validated args so `ask`/`defer` durably suspend the run exactly
    * like `needsApproval` (the `ToolApproval` carries `mode`), `deny`
    * fails the call deterministically, and an allowed rewrite is what
-   * the approval record / policy / data-flow gates see (W-118). The
+   * the approval record / policy / data-flow gates see. The
    * executor evaluates the hook again at dispatch as its own phase
    * (before approval), so the hook must be pure/idempotent; on resume
-   * replays it must not rewrite granted args (tools-02). Handoff and
+   * replays it must not rewrite granted args. Handoff and
    * `toTool` sub-agent calls are outside the hook's scope (govern the
    * child through its own config); deny-by-name still covers their
    * names. See `PermissionHook` in `@graphorin/tools/executor`.
    */
   readonly permissionHook?: PermissionHook;
   /**
-   * Register the D6 structured plan tool (`update_plan`, TodoWrite-style)
+   * Register the structured plan tool (`update_plan`, TodoWrite-style)
    * and recite the plan back into each step's prompt (attention
    * recitation). The plan is journaled in `RunState.todos` and survives
    * resume. Default `false` - off keeps the tool surface unchanged.
@@ -474,7 +473,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
 }
 
 /**
- * Outcome of one {@link ResponseVerifier} check (C3).
+ * Outcome of one {@link ResponseVerifier} check.
  *
  * @stable
  */
@@ -483,7 +482,7 @@ export type VerifierResult =
   | { readonly ok: false; readonly feedback: string };
 
 /**
- * A deterministic check over the model's terminal response (C3). Runs
+ * A deterministic check over the model's terminal response. Runs
  * when the loop is about to complete; `ok: false` feeds `feedback` back
  * to the model (as a user message prefixed `[verifier:<id>]`) and the
  * loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
@@ -517,7 +516,7 @@ export interface ApprovalDecision {
   readonly granted: boolean;
   readonly reason?: string;
   /**
-   * W-001: echo of `ToolApproval.subRunToolCallId` for approvals that
+   * Echo of `ToolApproval.subRunToolCallId` for approvals that
    * belong to a parked sub-agent run. Operators read the pair
    * (`toolCallId`, `subRunToolCallId`) from `RunState.pendingApprovals`
    * and return BOTH fields; decisions match on the composite key, so
@@ -544,7 +543,7 @@ export interface ResumeDirective {
 }
 
 /**
- * B1.5: message-borne untrusted input entering a run from a channel
+ * Message-borne untrusted input entering a run from a channel
  * gateway. Stamped into the run's taint ledger at init, BEFORE the
  * first step, so the data-flow policy's untrusted leg is armed even
  * though the input arrives as a user MESSAGE rather than a tool
@@ -571,13 +570,13 @@ export interface InboundTaintSeed {
 }
 
 /**
- * Run-level budget (C5 / W-084 residual, decision D-8). Enforced as a
+ * Run-level budget. Enforced as a
  * between-step precheck against the run's accumulated usage - the step
  * that crosses a ceiling completes (in-flight overshoot is inherent to
  * between-step enforcement, exactly like the consolidator's
  * `BudgetTracker`), and the run stops before the next provider call.
  * Sub-agent usage is included: handoff / `toTool` children fold their
- * usage into the parent run's accounting (W-033).
+ * usage into the parent run's accounting.
  *
  * The cost leg reads `Usage.cost`, which only exists when the provider
  * chain reports it (wire `withCostTracking` from `@graphorin/provider`
@@ -610,15 +609,15 @@ export interface RunBudget {
   readonly onExceed?: 'stop' | 'throw';
   /**
    * What to do when `maxCostUsd` is set but the accumulated usage
-   * carries no USD cost data, so the ceiling cannot observe spend
-   * (deep retest 2026-07-19, P1-3). `'fail'` (default) is fail-closed:
-   * the run stops at the first between-step check in the `onExceed`
-   * shape (`'stop'` fails the run with `error.code: 'budget-unpriced'`;
-   * `'throw'` rejects with `AgentBudgetUnpricedError`) - a caller who
-   * set a cost cap must never keep spending unmetered. `'warn'`
-   * restores the pre-0.13 behaviour: one console WARN, ceiling
-   * unenforced. Wire `withCostTracking` with a pricing snapshot, or
-   * use `maxTokens` for a provider-independent ceiling.
+   * carries no USD cost data, so the ceiling cannot observe spend.
+   * `'fail'` (default) is fail-closed: the run stops at the first
+   * between-step check in the `onExceed` shape (`'stop'` fails the
+   * run with `error.code: 'budget-unpriced'`; `'throw'` rejects with
+   * `AgentBudgetUnpricedError`) - a caller who set a cost cap must
+   * never keep spending unmetered. `'warn'` restores the pre-0.13
+   * behaviour: one console WARN, ceiling unenforced. Wire
+   * `withCostTracking` with a pricing snapshot, or use `maxTokens`
+   * for a provider-independent ceiling.
    */
   readonly onUnpriced?: 'fail' | 'warn';
 }
@@ -634,14 +633,14 @@ export interface AgentCallOptions<TDeps> {
   readonly sessionId?: string;
   readonly userId?: string;
   /**
-   * Run-level budget (C5): between-step enforcement against the run's
+   * Run-level budget: between-step enforcement against the run's
    * accumulated usage, sub-agents included. See {@link RunBudget}.
    * Not persisted in `RunState`: re-supply it when resuming a
    * suspended run.
    */
   readonly budget?: RunBudget;
   /**
-   * C1/C2: fail-closed per-run model pin. When set, every step of this
+   * Fail-closed per-run model pin. When set, every step of this
    * run resolves to exactly this provider: it wins over `prepareStep`
    * provider overrides and the whole preference ladder
    * (`preferredModel` / tool hints / tier map), and the agent-level
@@ -652,7 +651,7 @@ export interface AgentCallOptions<TDeps> {
    */
   readonly pinnedProvider?: Provider;
   /**
-   * B1.5: stamp message-borne untrusted input into the run's taint
+   * Stamp message-borne untrusted input into the run's taint
    * ledger at init (see {@link InboundTaintSeed}). No-op when the
    * agent has no `dataFlowPolicy` configured.
    */
@@ -664,14 +663,14 @@ export interface AgentCallOptions<TDeps> {
    */
   readonly directive?: ResumeDirective;
   /**
-   * Per-run capability restriction (D2) - overrides
+   * Per-run capability restriction - overrides
    * {@link AgentConfig.capability} for this invocation. See that field
    * for semantics. Not persisted in `RunState`: re-supply it when
    * resuming a suspended run.
    */
   readonly capability?: AgentCapability;
   /**
-   * W-036: parent span for this run's `agent.run` root span - a
+   * Parent span for this run's `agent.run` root span - a
    * multi-agent invocation forms ONE trace tree (the child's run span
    * parents under the caller's step/tool span). The runtime supplies it
    * automatically for handoffs and `toTool` sub-agents. Like
@@ -682,7 +681,7 @@ export interface AgentCallOptions<TDeps> {
 }
 
 /**
- * Run-level capability restriction (D2 - the single-writer constraint
+ * Run-level capability restriction (the single-writer constraint
  * from multi-agent practice). `'read-only'` makes the run
  * side-effect-free by construction: writer tools (`side-effecting` /
  * `external-stateful`) and handoffs are never advertised to the model,
@@ -705,7 +704,7 @@ export interface AgentToToolOptions {
   readonly description?: string;
   readonly exposeTurns?: 'final' | 'all' | 'none';
   /**
-   * Shapes the sub-agent seed from the parent history (AG-17): when
+   * Shapes the sub-agent seed from the parent history: when
    * supplied, the sub-agent is seeded with
    * `[...inputFilter(parentMessages), { role: 'user', content: input }]`.
    * Without a filter the sub-agent sees ONLY the input string - no
@@ -714,17 +713,17 @@ export interface AgentToToolOptions {
    * boundary at all).
    */
   readonly inputFilter?: HandoffFilter;
-  /** W-036: which child events forward into the parent stream. */
+  /** Which child events forward into the parent stream. */
   readonly forwardEvents?: SubagentForwardPolicy;
   /**
-   * Run the sub-agent under a restricted capability (D2): a
+   * Run the sub-agent under a restricted capability: a
    * `'read-only'` worker cannot execute or advertise writer tools. The
    * orchestrator-worker recipe is `parent (full capability) + workers
    * via toTool({ capability: 'read-only', contextFold: true })`.
    */
   readonly capability?: AgentCapability;
   /**
-   * Context folding at the sub-agent boundary (D2): instead of the raw
+   * Context folding at the sub-agent boundary: instead of the raw
    * final output, the parent receives a compact distilled outcome -
    * status, step/tool-call counts, tools used, and the final text
    * clamped to `maxChars` (default 2000). Keeps tool-heavy child runs
@@ -732,8 +731,8 @@ export interface AgentToToolOptions {
    */
   readonly contextFold?: boolean | { readonly maxChars?: number };
   /**
-   * Propagate the child run's coarse taint flags across the fold (D2,
-   * default `true`): when the child saw untrusted / sensitive content,
+   * Propagate the child run's coarse taint flags across the fold
+   * (default `true`): when the child saw untrusted / sensitive content,
    * the tool result carries a widen-only `taint` override
    * (`sourceKind: 'sub-agent'`) that re-arms the PARENT's data-flow
    * ledger. A no-op when the parent has no `dataFlowPolicy`. Set
@@ -757,7 +756,7 @@ export interface AbortOptions {
   readonly drain?: boolean;
   /**
    * What to do with approvals that were already requested but not
-   * resolved at abort time (W-038).
+   * resolved at abort time.
    *
    * - `'deny'` (default) - auto-deny pending approvals; each drained
    *   toolCallId gets a matching tool message so the transcript keeps
@@ -795,8 +794,8 @@ export interface CompactionApiResult {
   readonly hooksFiredCount: number;
   readonly summary: string;
   /**
-   * `true` when the compaction trimmed + spliced the live run buffer
-   * (CE-3/AG-13). `false` results carry an explicit
+   * `true` when the compaction trimmed + spliced the live run buffer.
+   * `false` results carry an explicit
    * {@link skippedReason} instead of silently reporting zeros.
    */
   readonly applied: boolean;
@@ -852,7 +851,7 @@ export interface Agent<TDeps = unknown, TOutput = string> {
   followUp(message: AgentInput): void;
   abort(options?: AbortOptions): void;
   /**
-   * C1: `true` while this instance has a run in flight (the same
+   * `true` while this instance has a run in flight (the same
    * invariant that makes a second `run()` throw `ConcurrentRunError`).
    * The public busy signal for proactive coordination - a heartbeat
    * defers its beat instead of colliding with an interactive run.

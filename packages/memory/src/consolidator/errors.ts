@@ -64,7 +64,7 @@ export class CustomTierMisconfiguredError extends GraphorinMemoryError {
 }
 
 /**
- * Raised when the wave-D D3 `curatedBlocks` config is invalid: a
+ * Raised when the `curatedBlocks` config is invalid: a
  * duplicate label (incl. colliding with the `learnedContext: true`
  * sugar), an empty label, or the reserved `profile` label (the profile
  * projection owns that block and keeps it read-only - a curated-block
@@ -94,7 +94,7 @@ export class CuratedBlocksMisconfiguredError extends GraphorinMemoryError {
 
 /**
  * Raised at `createMemory` time when an auto-promotion feature is
- * enabled without the B3 ingest gate (wave-D D4, fail-closed): both
+ * enabled without the ingest gate (fail-closed): both
  * the deterministic promotion step and the write-time
  * `autoPromoteExtraction` hatch move synthesized content into default
  * recall, so they REQUIRE the admission gate as configured evidence -

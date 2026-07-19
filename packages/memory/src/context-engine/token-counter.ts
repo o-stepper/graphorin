@@ -30,7 +30,7 @@ export interface ContextTokenCounter {
 }
 
 /**
- * Script-aware heuristic (CE-13). The flat chars/4 rule undercounts
+ * Script-aware heuristic. The flat chars/4 rule undercounts
  * non-Latin scripts ~4x - real tokenizers emit roughly one token per
  * CJK character (and per kana / hangul syllable), so a 200k-window
  * threshold expressed in "heuristic tokens" let CJK conversations blow
@@ -46,7 +46,7 @@ const DENSE_SCRIPT_RE =
 
 /**
  * Built-in heuristic counter - chars/4 for Latin-ish text plus one
- * token per dense-script (CJK/kana/hangul) character (CE-13). Stable
+ * token per dense-script (CJK/kana/hangul) character. Stable
  * default when the operator does not pass a real {@link TokenCounter}.
  *
  * @stable
@@ -64,7 +64,7 @@ export const HEURISTIC_TOKEN_COUNTER: ContextTokenCounter = Object.freeze({
 /**
  * Wrap a real {@link TokenCounter} into the narrower
  * {@link ContextTokenCounter} surface - PRESERVING the native
- * message-level `count(messages)` (context-engine-03). The adapter
+ * message-level `count(messages)`. The adapter
  * used to keep only `countText`, which forced
  * {@link countMessageTokens} onto the per-message render path for
  * every real counter; combined with `renderMessageText` ignoring
@@ -113,7 +113,7 @@ export async function countMessageTokens(
  * for token counting. Multimodal parts other than `'text'` /
  * `'reasoning'` contribute a constant approximation so the counter
  * does not silently under-count. Assistant tool calls render their
- * name + serialized args (context-engine-03) - file writes and
+ * name + serialized args - file writes and
  * `code_execute` scripts are frequently the dominant tokens of an
  * agentic step, and the provider serializes + counts them, so the
  * engine's arithmetic must too (mirrors the provider-side

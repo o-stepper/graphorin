@@ -28,7 +28,7 @@
  * (adversarial), everything else (`3` open-domain, `4` single-hop)
  * →info-extraction.
  *
- * Answer handling (W-022): LOCOMO answers may be numbers (e.g. `2022`)
+ * Answer handling: LOCOMO answers may be numbers (e.g. `2022`)
  * - they are stringified, never silently coerced to `''`. A QA pair
  * with NO answer at all (neither `answer` nor `adversarial_answer`) is
  * SKIPPED rather than emitted with an empty `expected`: the LLM judge
@@ -199,7 +199,7 @@ function asString(value: unknown): string | undefined {
 /**
  * LOCOMO reference answers may be strings OR bare numbers (6 of the
  * 1986 QA pairs ship e.g. `2022`). Stringify finite numbers instead of
- * dropping them to `''` (W-022); a blank string counts as "no answer"
+ * dropping them to `''`; a blank string counts as "no answer"
  * so the judge never grades against an empty reference.
  */
 function answerToText(value: unknown): string | undefined {

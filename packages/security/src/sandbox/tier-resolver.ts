@@ -150,7 +150,7 @@ function clampTimeout(value: number | undefined, fallback: number): number {
 }
 
 /**
- * SDF-10: like `clampTimeout` but for forced (untrusted) tiers - a
+ * Like `clampTimeout` but for forced (untrusted) tiers - a
  * non-positive value means "no limit", which is never acceptable here:
  * coerce it to the tier default instead.
  */

@@ -61,10 +61,10 @@ export interface ExecutorOptions {
   /** Approval gate - invoked when a tool's `needsApproval` resolves to `true`. */
   readonly approvalGate?: ApprovalGate;
   /**
-   * Declarative tool-argument policy guard (D4 / Progent). Consulted
+   * Declarative tool-argument policy guard (Progent-style). Consulted
    * AFTER schema validation + approval, BEFORE the data-flow sink gate,
    * on every tool call. A `forbid`/`deny` verdict blocks the call with
-   * a `capability_blocked` outcome; `ask`/`defer` verdicts (E1, via the
+   * a `capability_blocked` outcome; `ask`/`defer` verdicts (via the
    * optional `decide`) fail closed here unless the batch is
    * pre-approved - only the agent pre-screen can suspend. The pure
    * decision engine lives in `@graphorin/security/policy`
@@ -73,7 +73,7 @@ export interface ExecutorOptions {
    */
   readonly argumentPolicy?: ToolArgumentPolicyGuard;
   /**
-   * E1 pre-tool permission hook. Runs as its own phase AFTER schema
+   * Pre-tool permission hook. Runs as its own phase AFTER schema
    * validation (+ repair), BEFORE the approval phase - see
    * {@link PermissionHook} for the decision semantics and the
    * `updatedInput` rewrite contract. Absent ⇒ phase skipped.
@@ -95,11 +95,11 @@ export interface ExecutorOptions {
    */
   readonly cancellationGraceMs?: number;
   /**
-   * W-114: cap on the in-memory handle-producer-taint map (TL-6). The
-   * map previously grew for the executor's whole lifetime; at the cap
+   * Cap on the in-memory handle-producer-taint map. The map
+   * previously grew for the executor's whole lifetime; at the cap
    * the OLDEST entry is evicted FIFO - safe, because the on-disk taint
-   * sidecar restores producer taint for evicted handles (the tools-03
-   * fallback). Default 1024.
+   * sidecar restores producer taint for evicted handles. Default
+   * 1024.
    */
   readonly handleProducerTaintCap?: number;
   /** Pluggable imperative patterns override. */
@@ -107,7 +107,7 @@ export interface ExecutorOptions {
   /**
    * Override for the imperative-pattern scan budget (ms). The scanner returns
    * `null` (= timed out, strip-pass skipped) when it exceeds this budget.
-   * Defaults to `250` ms (TOOLS-EX-02): 5 ms was the long-term target but is
+   * Defaults to `250` ms: 5 ms was the long-term target but is
    * empirically too tight on cold-start / loaded CI runners, where a skipped
    * strip pass silently lets injection through. 250 ms stays below any
    * user-perceptible (one-shot, registration-time) latency. Hot-path callers
@@ -123,7 +123,7 @@ export interface ExecutorOptions {
   /** Default streaming queue depth. Default `256`. */
   readonly streamingEventQueueDepth?: number;
   /**
-   * W-117: byte cap on each call's streaming aggregation buffer (the
+   * Byte cap on each call's streaming aggregation buffer (the
    * buffer-becomes-output `chunks`). Past the cap, chunks keep
    * DELIVERING to the sink but stop accumulating; the aggregator flags
    * `bufferTruncated` and dropped bytes are counted. Default 8 MiB.
@@ -151,12 +151,12 @@ export interface ExecutorOptions {
    * Optional memory-region reader the guard uses to hash the
    * pre/post snapshots. The agent runtime supplies one automatically
    * when `memory` is wired (a scope-aware reader over the working
-   * tier, SDF-1); without a reader the snapshot/verify cycle is
+   * tier); without a reader the snapshot/verify cycle is
    * skipped.
    */
   readonly memoryRegionReader?: MemoryRegionReader;
   /**
-   * Optional provenance / data-flow guard (P1-3). When present, the
+   * Optional provenance / data-flow guard. When present, the
    * executor consults it as a *sink gate* before running any
    * `side-effecting` / `external-stateful` tool (so untrusted content
    * cannot reach an exfiltration/mutation sink ungated) and *records* the
@@ -165,11 +165,11 @@ export interface ExecutorOptions {
    * taint engine threaded through a per-run ledger); when absent, both
    * steps are skipped (zero overhead, feature off). Because every
    * in-script code-mode tool call also flows through `executeOne`, the
-   * same guard composes with code-mode automatically (P1-2).
+   * same guard composes with code-mode automatically.
    */
   readonly dataFlowGuard?: DataFlowGuard;
   /**
-   * Wall-clock limit applied to INLINE tool execution (TL-4). When set,
+   * Wall-clock limit applied to INLINE tool execution. When set,
    * this executor-level value takes precedence; otherwise the resolved
    * per-tool sandbox-tier `timeoutMs` applies when > 0, else
    * `DEFAULT_INLINE_TOOL_TIMEOUT_MS` (60s). Expiry fails the call
@@ -177,7 +177,7 @@ export interface ExecutorOptions {
    */
   readonly inlineToolTimeoutMs?: number;
   /**
-   * C3: transparent bounded retry for transient tool failures. A failed
+   * Transparent bounded retry for transient tool failures. A failed
    * attempt whose error kind is in `kinds` is silently re-executed with
    * exponential backoff (a ToolRateLimitError's `retryAfterMs` wins over
    * the computed backoff) up to `maxAttempts` TOTAL attempts - but only
@@ -226,7 +226,7 @@ export interface DataFlowInspectInput {
   /**
    * Raw-shaped POST-REPAIR arguments (stringified by the guard for
    * probing): what the approval gate saw and what the validate phase
-   * derives the executed input from (W-118). Bytes-equal to the
+   * derives the executed input from. Bytes-equal to the
    * model's `call.args` when no repair hook ran. Residual limitation:
    * probed before schema coercion, so spans introduced purely by Zod
    * `transform`/`default` are not visible to the verbatim probe.
@@ -240,7 +240,7 @@ export interface DataFlowRecordInput {
   readonly toolName: string;
   readonly trustClass: ToolTrustClass;
   /**
-   * C6: per-result taint override from the tool's ToolReturn envelope.
+   * Per-result taint override from the tool's ToolReturn envelope.
    * Flags only ever WIDEN the derived label (guards must never let an
    * override downgrade an untrusted tool's output).
    */
@@ -297,24 +297,24 @@ export interface ExecuteBatchOptions {
   /** Trust level for the per-tool sandbox resolution. Default `'user-defined'`. */
   readonly trustLevel?: SandboxTrustLevel;
   /**
-   * Disable the single-round repair hook for this batch (tools-02).
+   * Disable the single-round repair hook for this batch.
    * Used for PRE-APPROVED calls replayed on a durable-HITL resume: a
    * human granted exactly these args, so a repair rewrite must fail as
    * `invalid_input` rather than execute a payload nobody saw.
    */
   readonly disableRepair?: boolean;
   /**
-   * E1: this batch replays calls a human ALREADY granted through the
+   * This batch replays calls a human ALREADY granted through the
    * agent's durable-HITL pre-screen. `ask`/`defer` verdicts from the
    * permission hook / argument policy are treated as satisfied (the
    * grant IS their resolution) instead of failing closed; `deny` still
-   * blocks, and a hook rewrite of the granted args fails the call
-   * (tools-02). Set together with `disableRepair` by the agent's
+   * blocks, and a hook rewrite of the granted args fails the call.
+   * Set together with `disableRepair` by the agent's
    * resume dispatch.
    */
   readonly preApproved?: boolean;
   /**
-   * Run-level capability restriction (D2 - single-writer constraint).
+   * Run-level capability restriction (single-writer constraint).
    * `'read-only'` deterministically blocks every `side-effecting` /
    * `external-stateful` tool with a `capability_blocked` outcome, no
    * matter what the model asked for - the enforcement half of the
@@ -329,7 +329,7 @@ export interface ToolArgumentPolicyFacts {
   readonly sideEffectClass: SideEffectClass;
   readonly sensitive: boolean;
   /**
-   * Trust class of the tool under evaluation (W-101) - lets guards
+   * Trust class of the tool under evaluation - lets guards
    * enforce trust-taxonomy rules (Rule-of-Two `untrustedInput`).
    */
   readonly trustClass: ToolTrustClass;
@@ -337,7 +337,7 @@ export interface ToolArgumentPolicyFacts {
 }
 
 /**
- * Structural adapter for the D4 tool-argument policy (Progent). The
+ * Structural adapter for the tool-argument policy (Progent-style). The
  * agent runtime wires `evaluateToolArgumentPolicy` /
  * `evaluatePermissionDecision` from `@graphorin/security/policy`;
  * `@graphorin/tools` stays dependency-free on security.
@@ -349,7 +349,7 @@ export interface ToolArgumentPolicyGuard {
     input: ToolArgumentPolicyFacts,
   ): { readonly effect: 'allow' } | { readonly effect: 'forbid'; readonly reason: string };
   /**
-   * E1: four-value evaluation (`deny > defer > ask > allow`). When
+   * Four-value evaluation (`deny > defer > ask > allow`). When
    * present the executor's policy phase prefers it over the binary
    * `evaluate`; `ask`/`defer` verdicts fail closed at the executor
    * unless the batch is pre-approved (only the agent pre-screen can
@@ -361,7 +361,7 @@ export interface ToolArgumentPolicyGuard {
     | { readonly effect: 'allow' }
     | { readonly effect: 'deny' | 'ask' | 'defer'; readonly reason: string };
   /**
-   * E1 deny-by-name: advertise-time check consulted with NO args (the
+   * Deny-by-name: advertise-time check consulted with NO args (the
    * per-step catalogue filter, `tool_search` exclusion and the
    * executor's early mirror). Implementations must honour only
    * predicate-free deny rules so the answer is deterministic for a
@@ -373,7 +373,7 @@ export interface ToolArgumentPolicyGuard {
 }
 
 /**
- * E1: input handed to a {@link PermissionHook}.
+ * Input handed to a {@link PermissionHook}.
  *
  * @stable
  */
@@ -390,7 +390,7 @@ export interface PermissionHookInput {
 }
 
 /**
- * E1: verdict returned by a {@link PermissionHook}.
+ * Verdict returned by a {@link PermissionHook}.
  *
  * @stable
  */
@@ -401,11 +401,11 @@ export interface PermissionHookResult {
    * Re-validated against the tool's input schema; on success it
    * replaces BOTH the validated input and the effective args before the
    * approval phase, so the approval gate, the argument policy and the
-   * data-flow sink gate all see what will actually run (W-118). A
+   * data-flow sink gate all see what will actually run. A
    * rewrite that fails re-validation fails the call as
    * `invalid_input`. On a pre-approved resume replay the hook must not
    * rewrite the granted args: a differing `updatedInput` fails the call
-   * instead of executing a payload nobody saw (tools-02).
+   * instead of executing a payload nobody saw.
    */
   readonly updatedInput?: unknown;
   /** Human-readable reason surfaced on non-allow decisions and audits. */
@@ -413,7 +413,7 @@ export interface PermissionHookResult {
 }
 
 /**
- * E1 pre-tool permission hook: one caller-supplied decision point over
+ * Pre-tool permission hook: one caller-supplied decision point over
  * every tool call, evaluated after schema validation and BEFORE the
  * approval phase. The hook must be pure/idempotent over its input - the
  * agent pre-screen and the executor phase may each invoke it for the
@@ -446,7 +446,7 @@ export interface ToolExecutor {
 }
 
 /**
- * Default wall-clock limit for INLINE tool execution (TL-4). Sandbox
+ * Default wall-clock limit for INLINE tool execution. Sandbox
  * tiers carry their own per-tier defaults; inline closures previously
  * had none - a hanging tool that ignored `ctx.signal` blocked the run
  * indefinitely.
@@ -456,7 +456,7 @@ export interface ToolExecutor {
 export const DEFAULT_INLINE_TOOL_TIMEOUT_MS = 60_000;
 
 /**
- * TL-6: trust class of the tool that PRODUCED a spill artifact, keyed
+ * Trust class of the tool that PRODUCED a spill artifact, keyed
  * by handle URI in {@link ExecutorRuntime.handleProducerTaint}. Handle
  * reads (read_result) re-apply inbound sanitization + dataflow
  * provenance by the PRODUCER's class so an untrusted body cannot
@@ -467,7 +467,7 @@ export interface HandleProducerTaint {
   readonly source: ToolSource;
   readonly sensitivity?: Sensitivity;
   /**
-   * W-156: the spill-time whole-artifact scan found an imperative
+   * The spill-time whole-artifact scan found an imperative
    * pattern somewhere in the FULL artifact. On a tainted handle read
    * the executor increments the cross-page operator counter - the
    * per-page strip pass cannot see a pattern split by a page boundary,
@@ -493,7 +493,7 @@ export interface ExecutorRuntime {
   readonly cancellationGraceMs: number;
   /** Resolved streaming queue depth. Default `256`. */
   readonly streamingEventQueueDepth: number;
-  /** W-117: resolved aggregation-buffer byte cap. Default 8 MiB. */
+  /** Resolved aggregation-buffer byte cap. Default 8 MiB. */
   readonly streamingMaxBufferBytes: number;
   /** Resolved sandbox-dispatch resolver (defaults to inline-only). */
   readonly sandboxResolver: (policy: ResolvedSandboxPolicy) => Sandbox | null;
@@ -506,11 +506,11 @@ export interface ExecutorRuntime {
   /** Resolved spill writer for the `'spill-to-file'` truncation strategy. */
   readonly spillWriter: SpillWriter;
   /**
-   * TL-6: trust class of the tool that PRODUCED each spill artifact,
+   * Trust class of the tool that PRODUCED each spill artifact,
    * keyed by handle URI. In-memory per executor - handles from another
    * executor or a resumed prior process fall back to the reader-reported
    * class, which the default file reader recovers from the artifact's
-   * taint sidecar (tools-03), so the taint survives both boundaries.
+   * taint sidecar, so the taint survives both boundaries.
    */
   readonly handleProducerTaint: Map<string, HandleProducerTaint>;
 }

@@ -47,7 +47,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
     | ((input: TInput, ctx: ToolExecutionContext<TDeps>) => boolean | Promise<boolean>);
   /**
    * Sandbox isolation level. Defaults are picked by
-   * `@graphorin/security`. ADVISORY in the default agent build (AG-18):
+   * `@graphorin/security`. ADVISORY in the default agent build:
    * inline `config.tools` closures cannot be serialised out-of-process,
    * so the resolved policy is surfaced on the `tool.execute` span /
    * audit but the tool runs in-process. Real isolation applies to
@@ -78,7 +78,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
   readonly sensitivity?: import('../types/sensitivity.js').Sensitivity;
   /**
    * Memory-modification guard tier (DEC-153). ACTIVE when the agent is
-   * created with `memory` wired (SDF-1): the runtime binds a scope-aware
+   * created with `memory` wired: the runtime binds a scope-aware
    * region reader over working memory and the executor snapshots/verifies
    * the region around guarded calls. Without `memory` the guard is
    * skipped and the agent emits a one-time WARN.
@@ -101,7 +101,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
    * the input-token cost bounded for installations with dozens of
    * MCP-derived tools.
    *
-   * Naming note (W-127): the snake_case is DELIBERATE - this field
+   * Naming note: the snake_case is DELIBERATE - this field
    * mirrors the wire-level `defer_loading` flag of the Anthropic
    * tool-use surface one-to-one, so grep and serialized payloads
    * match. It is the only snake_case field on `Tool` by design, not
@@ -180,7 +180,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
 }
 
 /**
- * Existentially-typed {@link Tool} for collection seams (W-100).
+ * Existentially-typed {@link Tool} for collection seams.
  *
  * `Tool` is invariant in `TInput` (the `needsApproval` /
  * `idempotencyKey` predicate properties are contravariant in it), so a
@@ -241,7 +241,7 @@ export interface ResolvedTool<TInput = unknown, TOutput = unknown, TDeps = unkno
  */
 export interface ToolReturn<TOutput = unknown> {
   /**
-   * W-115: envelope brand set by the {@link toolReturn} factory.
+   * Envelope brand set by the {@link toolReturn} factory.
    * `Symbol.for`, so duplicate package copies agree. Prefer branding:
    * the structural fallback in the executor is deliberately narrow
    * (own keys within `{output, contentParts, taint}`), and plain data
@@ -252,7 +252,7 @@ export interface ToolReturn<TOutput = unknown> {
   readonly output: TOutput;
   readonly contentParts?: ReadonlyArray<MessageContent>;
   /**
-   * C6: per-result taint override the data-flow ledger honours when
+   * Per-result taint override the data-flow ledger honours when
    * recording this output. Lets a FIRST-PARTY tool whose CONTENT is not
    * first-party (e.g. memory recall returning quarantined /
    * foreign-provenance facts) re-arm the taint ledger, closing the
@@ -267,7 +267,7 @@ export interface ToolReturn<TOutput = unknown> {
 }
 
 /**
- * W-115: cross-realm brand for the {@link ToolReturn} envelope
+ * Cross-realm brand for the {@link ToolReturn} envelope
  * (`SECRET_VALUE_BRAND` precedent - `Symbol.for` survives duplicate
  * package copies).
  *
@@ -276,7 +276,7 @@ export interface ToolReturn<TOutput = unknown> {
 export const TOOL_RETURN_BRAND: unique symbol = Symbol.for('graphorin.ToolReturn');
 
 /**
- * W-115: build a BRANDED {@link ToolReturn} envelope. The executor
+ * Build a BRANDED {@link ToolReturn} envelope. The executor
  * unwraps branded envelopes unconditionally; unbranded objects fall to
  * a deliberately narrow structural sniff (own keys within
  * `{output, contentParts, taint}`), so a tool legitimately returning
@@ -299,7 +299,7 @@ export function toolReturn<TOutput>(fields: {
 }
 
 /**
- * W-115: the ONE guard for the ToolReturn envelope (the executor and
+ * The ONE guard for the ToolReturn envelope (the executor and
  * the registry example-normalizer both consume it). Brand first; the
  * structural fallback accepts only objects whose OWN enumerable keys
  * all belong to the canonical envelope shape - `{output, exitCode}`
@@ -320,7 +320,7 @@ export function isToolReturnEnvelope<TOutput = unknown>(
 }
 
 /**
- * W-115: `true` when {@link isToolReturnEnvelope} matched WITHOUT the
+ * `true` when {@link isToolReturnEnvelope} matched WITHOUT the
  * brand - observability for the future deprecation of the structural
  * sniff.
  *

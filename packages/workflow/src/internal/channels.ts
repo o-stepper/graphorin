@@ -33,8 +33,8 @@ export interface ApplyResult<TState extends object> {
   readonly versions: Readonly<Record<string, number>>;
   readonly changedChannels: ReadonlyArray<string>;
   /**
-   * Merged values of the `ephemeral` channels touched this step
-   * (workflow-07). Ephemeral values are wiped from `state` before this
+   * Merged values of the `ephemeral` channels touched this step.
+   * Ephemeral values are wiped from `state` before this
    * function returns, so the engine surfaces them on the
    * `workflow.channel.update` event instead - the only place a consumer
    * can ever observe them.

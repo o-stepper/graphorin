@@ -1,11 +1,10 @@
 /**
- * C5: trust-aware retrieval ranking (pairs memory-retrieval-01's ranking
- * leg / security-04). The provenance + quarantine discounts that the
- * eviction-time `salience()` composite already applies now also apply at
- * search SCORING time, so a poisoned or foreign-origin memory cannot
- * outrank the user's own words purely on lexical/vector similarity - the
- * direct defense against MINJA-class memory poisoning (query-only
- * injection >95% ASR without rank-time trust).
+ * Trust-aware retrieval ranking. The provenance + quarantine discounts
+ * that the eviction-time `salience()` composite already applies now
+ * also apply at search SCORING time, so a poisoned or foreign-origin
+ * memory cannot outrank the user's own words purely on lexical/vector
+ * similarity - the direct defense against MINJA-class memory poisoning
+ * (query-only injection >95% ASR without rank-time trust).
  *
  * The factor reuses the {@link SalienceWeights} semantics verbatim:
  * quarantined -> `1 - weights.quarantine` (default 0.3x), foreign
@@ -19,7 +18,7 @@
 import { DEFAULT_SALIENCE_WEIGHTS, type SalienceWeights } from '../consolidator/decay.js';
 
 /**
- * `true` for provenance that did not originate first-party (P1-4) -
+ * `true` for provenance that did not originate first-party -
  * mirrors the eviction-path classification: `null` (legacy / direct
  * write), `'user'`, and `'extraction'` (the consolidator distilling the
  * user's own session) are first-party; `'tool'`, `'imported'`,

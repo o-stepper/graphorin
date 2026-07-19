@@ -1,6 +1,6 @@
 /**
- * Wave-D D5 (MST-12 / item 10 steps 3-4) - store-side support for the
- * `@graphorin/memory` embedder-migration runner:
+ * Store-side support for the `@graphorin/memory` embedder-migration
+ * runner:
  *
  *  - {@link EmbedderMigrationStateRepository} revives the dead
  *    `migration_state` table (schema 001) as the persisted,
@@ -23,7 +23,7 @@ import type { SqliteConnection } from './connection.js';
 import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
 import { pickIdColumn, quoteIdent, type VectorTableManager } from './vector-table-mgr.js';
 
-/** One persisted migration-state row (schema 001, revived in wave-D D5). */
+/** One persisted migration-state row (schema 001). */
 export interface EmbedderMigrationStateRow {
   readonly id: string;
   readonly sourceEmbedder: string;
@@ -231,8 +231,8 @@ export function createMigrationBatcher(
 }
 
 /**
- * Drop the vector sidecar tables of every RETIRED embedder (wave-D D5
- * space reclaim). Table names still referenced by an ACTIVE meta are
+ * Drop the vector sidecar tables of every RETIRED embedder (space
+ * reclaim). Table names still referenced by an ACTIVE meta are
  * skipped defensively. Freed pages return to the OS via
  * `PRAGMA incremental_vacuum` (`graphorin storage compact`); this
  * function only drops.

@@ -49,16 +49,16 @@ export interface RuleInput {
   readonly priority?: number;
   readonly tags?: ReadonlyArray<string>;
   /**
-   * Optional structured workflow payload (P2-2). Usually set by
+   * Optional structured workflow payload. Usually set by
    * {@link ProceduralMemory.induce}, but accepted here so an author can
    * round-trip a hand-written procedure. See {@link Rule.steps}.
    */
   readonly steps?: ReadonlyArray<string>;
-  /** Variable names abstracted into {@link RuleInput.steps} (P2-2). */
+  /** Variable names abstracted into {@link RuleInput.steps}. */
   readonly variables?: ReadonlyArray<string>;
-  /** Verifiable success criteria stored with the procedure (P2-2). */
+  /** Verifiable success criteria stored with the procedure. */
   readonly successCriteria?: ReadonlyArray<string>;
-  /** Principal dimension (D3). Absent ⇒ NULL (treated `'user'`). */
+  /** Principal dimension. Absent ⇒ NULL (treated `'user'`). */
   readonly owner?: MemoryOwner;
 }
 
@@ -90,8 +90,8 @@ export interface RuleActivationContext {
  * are deterministic so the agent runtime + ContextEngine can render
  * the active set into the system prompt every step.
  *
- * P2-2 adds {@link ProceduralMemory.induce}: distil a reusable workflow
- * from a successful agent trajectory and store it **quarantined** (it must
+ * {@link ProceduralMemory.induce} distils a reusable workflow
+ * from a successful agent trajectory and stores it **quarantined** (it must
  * not drive actions until validated). Quarantined procedures are excluded
  * from {@link ProceduralMemory.activate} but remain visible to
  * {@link ProceduralMemory.list}.
@@ -101,10 +101,10 @@ export interface RuleActivationContext {
 export class ProceduralMemory {
   readonly #store: MemoryStoreAdapter;
   readonly #tracer: Tracer;
-  /** Opt-in workflow inducer (P2-2). `null` ⇒ {@link induce} throws. */
+  /** Opt-in workflow inducer. `null` ⇒ {@link induce} throws. */
   readonly #inducer: WorkflowInducer | null;
   /**
-   * Promotion-by-demonstrated-success threshold (MCON-2 part 4).
+   * Promotion-by-demonstrated-success threshold.
    * `null` ⇒ outcomes are counted but never auto-promote.
    */
   readonly #promoteAfterSuccesses: number | null;
@@ -124,8 +124,8 @@ export class ProceduralMemory {
   }
 
   /**
-   * Record the outcome of one demonstrated reuse of a procedure
-   * (MCON-2 part 4). A success increments the rule's persistent
+   * Record the outcome of one demonstrated reuse of a procedure.
+   * A success increments the rule's persistent
    * `successCount`; when `procedurePromotion.afterSuccesses` is
    * configured and a QUARANTINED procedure reaches the threshold it is
    * promoted through {@link validate} - the injection gate still
@@ -224,8 +224,8 @@ export class ProceduralMemory {
   }
 
   /**
-   * Induce a reusable procedure (P2-2) from a successful agent trajectory
-   * and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
+   * Induce a reusable procedure from a successful agent trajectory
+   * and store it **quarantined** + `provenance: 'induction'`. Returns
    * the stored {@link Rule}, or `null` when the trajectory was unsuccessful /
    * empty or the inducer produced nothing inducible.
    *
@@ -327,7 +327,7 @@ export class ProceduralMemory {
    * `'tag=<tag>'`. Anything outside that grammar is treated as
    * always-active so callers do not silently lose rules.
    *
-   * **Quarantined procedures are excluded** (P1-4 / P2-2): an induced
+   * **Quarantined procedures are excluded**: an induced
    * procedure must not drive actions until validated, so activation - which
    * feeds the system prompt - never surfaces it.
    */
@@ -342,7 +342,7 @@ export class ProceduralMemory {
   }
 
   /**
-   * Runbook content search (D3): "find the procedure for this task" -
+   * Runbook content search: "find the procedure for this task" -
    * lexical recall over rule text, as opposed to predicate
    * {@link activate}. Returns **whole validated procedures** (the full
    * {@link Rule} incl. steps / variables / success criteria) so a match
@@ -412,7 +412,7 @@ export class ProceduralMemory {
   }
 
   /**
-   * Promote a quarantined (induced) procedure into `activate()` (MCON-2).
+   * Promote a quarantined (induced) procedure into `activate()`.
    * Mirrors {@link SemanticMemory.validate}: re-derives the injection verdict
    * from the stored rule text and **refuses** promotion of an injection-flagged
    * procedure unless an operator passes `{ force: true }`. Induced procedures
@@ -460,7 +460,7 @@ function renderProcedureText(procedure: InducedProcedure): string {
   return lines.join('\n');
 }
 
-/** Lowercased word tokens for the offline runbook-search fallback (D3). */
+/** Lowercased word tokens for the offline runbook-search fallback. */
 function tokenizeForRunbook(text: string): ReadonlyArray<string> {
   return text
     .toLowerCase()

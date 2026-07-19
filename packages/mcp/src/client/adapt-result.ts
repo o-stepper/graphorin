@@ -251,7 +251,7 @@ function mcpContentToMessageContent(
 
 /**
  * Render the compact, model-facing preview for a `resource_link`. The
- * handle is SCOPED to the originating server (mcp-skills-06):
+ * handle is SCOPED to the originating server:
  * `mcp:<serverId>:<uri>` - an
  * {@link import('./mcp-resource-reader.js').createMcpResourceReader}
  * parses the prefix and consults ONLY that server, so a malicious
@@ -273,8 +273,8 @@ function formatResourceLinkPreview(
 }
 
 /**
- * Build the server-scoped `read_result` handle for an MCP resource
- * (mcp-skills-06): `mcp:<serverId>:<uri>`.
+ * Build the server-scoped `read_result` handle for an MCP resource:
+ * `mcp:<serverId>:<uri>`.
  *
  * @stable
  */
@@ -286,13 +286,13 @@ export function scopedResourceHandle(serverId: string, uri: string): string {
   return `mcp:${encodeURIComponent(serverId)}:${uri}`;
 }
 
-/** Human-readable size of a base64 payload's decoded bytes (MC-8). */
+/** Human-readable size of a base64 payload's decoded bytes. */
 function approxDecodedSize(base64: string): string {
   const bytes = Math.floor((base64.length * 3) / 4);
   return bytes >= 1024 ? `${Math.round(bytes / 1024)}kB` : `${bytes}B`;
 }
 
-/** Text descriptor for a non-text content part (MC-8). */
+/** Text descriptor for a non-text content part. */
 function describeBinaryPart(kind: 'image' | 'audio', mimeType: string, data: string): string {
   return `[${kind} ${mimeType}, ~${approxDecodedSize(data)} - full payload in contentParts]`;
 }

@@ -41,7 +41,7 @@ export type ConflictPipelineDecision =
   | 'dedup'
   | 'supersede'
   | 'pending'
-  /** Deep-phase judge failed repeatedly; row closed un-adjudicated (MCON-9). */
+  /** Deep-phase judge failed repeatedly; row closed un-adjudicated. */
   | 'judge-unparseable';
 
 /**
@@ -245,7 +245,7 @@ export class SqliteConflictStore {
 
   /**
    * Stamp `attempted_at` on a pending row whose deep-phase judge call
-   * failed (MCON-9). The deep phase closes the row as
+   * failed. The deep phase closes the row as
    * `'judge-unparseable'` on the NEXT failure, bounding how often a
    * poisoned row can be re-billed.
    *

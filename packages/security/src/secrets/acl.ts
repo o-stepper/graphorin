@@ -61,7 +61,7 @@ export function getActiveToolSecretsContext(): ToolSecretsContext | undefined {
  * @stable
  */
 /**
- * SPL-14: ACL gate for the non-throwing `get()` path. Inside an active
+ * ACL gate for the non-throwing `get()` path. Inside an active
  * tool scope a denied key must read as ABSENT instead of bypassing the
  * per-tool allowlist (any code holding the raw store could otherwise
  * read every key). Returns `true` when the read may proceed; `true`

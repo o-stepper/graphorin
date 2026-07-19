@@ -47,7 +47,7 @@ interface AggregateBucket {
   callCount: number;
   costAmount: number;
   costCurrency: string | null;
-  /** RP-22: set when records carrying differing currencies are aggregated. */
+  /** Set when records carrying differing currencies are aggregated. */
   mixedCurrency: boolean;
   byModel: Map<string, AggregateBucket>;
   exceeded: boolean;
@@ -297,7 +297,7 @@ export function createCostTracker(opts: CostTrackerOptions = {}): CostTracker {
   };
 }
 
-/** W-092: default retention caps - generous for a long-lived assistant. */
+/** Default retention caps - generous for a long-lived assistant. */
 const DEFAULT_MAX_SPAN_ENTRIES = 10_000;
 const DEFAULT_MAX_SCOPE_ENTRIES = 10_000;
 

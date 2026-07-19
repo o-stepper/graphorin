@@ -84,7 +84,7 @@ export interface MountRoutesContext {
   readonly channelsDaemon?: ChannelsDaemon;
 }
 
-/** IP-23: is `host` a loopback interface (so an open /metrics is not exposed)? */
+/** Is `host` a loopback interface (so an open /metrics is not exposed)? */
 function isLoopbackHost(host: string): boolean {
   const h = host.trim().toLowerCase();
   return h === '127.0.0.1' || h === '::1' || h === '[::1]' || h === 'localhost';

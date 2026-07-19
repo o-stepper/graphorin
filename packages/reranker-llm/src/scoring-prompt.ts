@@ -41,7 +41,7 @@ export type ScoringPromptBuilder = (input: ScoringPromptInput) => ScoringPrompt;
 /**
  * Maximum passage length (characters) interpolated into the grading prompt.
  * A poisoned memory can't grow unbounded prompt cost or bury the instruction
- * under a wall of text (PS-14). Operators with longer passages pass a custom
+ * under a wall of text. Operators with longer passages pass a custom
  * {@link ScoringPromptBuilder}.
  */
 export const DEFAULT_PASSAGE_CHAR_CAP = 4_000;
@@ -52,7 +52,7 @@ const PASSAGE_CLOSE = 'PASSAGE>>>';
 /**
  * Neutralise any occurrence of the passage delimiters inside the passage body
  * so an injected `PASSAGE>>>` can't close the data block early and smuggle a
- * forged score line after it (PS-14).
+ * forged score line after it.
  */
 function neutraliseDelimiters(passage: string): string {
   return passage.split(PASSAGE_CLOSE).join('PASSAGE> >>').split(PASSAGE_OPEN).join('<<< PASSAGE');
@@ -62,7 +62,7 @@ function neutraliseDelimiters(passage: string): string {
  * Default English scoring prompt. Asks the model to emit a single integer in
  * `[0, maxScore]` and to omit any other text. The passage is wrapped in
  * explicit delimiters and framed as untrusted DATA - never instructions - so a
- * poisoned memory can't steer its own relevance score (PS-14).
+ * poisoned memory can't steer its own relevance score.
  *
  * @stable
  */

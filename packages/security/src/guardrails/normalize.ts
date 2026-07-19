@@ -1,6 +1,6 @@
 /**
- * C6: shared Unicode pre-pass for the injection/PII pattern catalogues
- * (pairs security-04/07). Character-injection defeats naive regex
+ * Shared Unicode pre-pass for the injection/PII pattern catalogues.
+ * Character-injection defeats naive regex
  * catalogues at up to 100% (Bypassing LLM Guardrails, 2504.11168):
  * zero-width joiners split keywords, fullwidth/compatibility homoglyphs
  * swap code points. Folding to NFKC and stripping the zero-width class
@@ -28,7 +28,7 @@ export function normalizeForMatching(text: string): string {
 
 /**
  * Case-preserving variant of {@link normalizeForMatching} for the PII
- * catalogue (W-150): NFKC + zero-width strip WITHOUT lowercasing.
+ * catalogue: NFKC + zero-width strip WITHOUT lowercasing.
  * Several PII patterns are case-sensitive by design (IBAN's
  * `[A-Z]{2}\d{2}`, base58 BTC addresses), so the injection
  * catalogue's lowercase fold would break them. Both catalogues share

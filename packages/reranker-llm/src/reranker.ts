@@ -156,7 +156,7 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
 
   /**
    * Number of per-passage provider failures swallowed (→ `fallbackScore`) on
-   * the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
+   * the most recent `rerank(...)`. A non-zero value means the ranking
    * is partially degraded - surface it for observability.
    */
   get lastErrorCount(): number {
@@ -301,7 +301,7 @@ function isAbortError(err: unknown): boolean {
 /**
  * Parse the model's reply into a non-negative integer score.
  *
- * PS-14 contract: ONLY a bare integer occupying the whole (trimmed)
+ * The contract: ONLY a bare integer occupying the whole (trimmed)
  * reply is accepted (`/^-?\d+$/`) - `'7'`, `'7\n'`, `' 7 '`. Every
  * verbose form (`'Score: 7'`, `'7/10'`, prose around a number) returns
  * `null` and the reranker substitutes the fallback score. This is a

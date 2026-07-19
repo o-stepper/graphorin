@@ -1,7 +1,7 @@
 /**
  * Truncation phase: split the envelope into text + non-text parts,
- * resolve the PRODUCER's taint for handle reads (TL-6), route
- * structured overflow through spill-to-file (TL-2), bound the body via
+ * resolve the PRODUCER's taint for handle reads, route
+ * structured overflow through spill-to-file, bound the body via
  * `truncateBody(...)`, and emit the truncation / spill audit rows.
  *
  * @packageDocumentation
@@ -23,7 +23,7 @@ import { type ResultEnvelope, splitTextAndContentParts } from '../result/envelop
 import { type TruncationOutcome, truncateBody } from '../result/truncate.js';
 import type { ExecutorRuntime, HandleProducerTaint } from './types.js';
 
-/** TL-6: trust classes whose content must not launder through handle reads. */
+/** Trust classes whose content must not launder through handle reads. */
 export function isUntrustedProducerClass(trustClass: ToolTrustClass): boolean {
   return defaultInboundSanitization(trustClass) === 'detect-and-strip-and-wrap';
 }
@@ -33,7 +33,7 @@ export interface TruncationPhaseResult {
   /** The envelope split into text body + non-text content parts. */
   readonly split: ReturnType<typeof splitTextAndContentParts>;
   readonly truncation: TruncationOutcome;
-  /** TL-6: the producing tool's taint when this call is a handle read. */
+  /** The producing tool's taint when this call is a handle read. */
   readonly producerTaint: HandleProducerTaint | undefined;
   readonly effectiveTrustClass: ToolTrustClass;
   readonly effectiveSource: ToolSource;

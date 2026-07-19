@@ -1,5 +1,5 @@
 /**
- * `reanchorRecentResults({ ... })` - C4 post-compaction hook.
+ * `reanchorRecentResults({ ... })` - post-compaction hook.
  *
  * A compaction routinely summarizes away tool results the model was
  * actively working from; the summary paraphrases them and the handles
@@ -40,7 +40,7 @@ export interface ReanchorRecentResultsOptions {
 }
 
 /**
- * Build a `reanchorRecentResults` hook (C4).
+ * Build a `reanchorRecentResults` hook.
  *
  * @stable
  */

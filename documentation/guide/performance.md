@@ -8,15 +8,13 @@ description: Measured practical limits of the SQLite-backed memory store - hybri
 Graphorin's default store is a single local SQLite file (FTS5 + `sqlite-vec`
 vec0 + an entity graph). This page documents where that stays comfortable,
 measured by the repeatable scale probe in
-[`benchmarks/scale`](https://github.com/o-stepper/graphorin/tree/main/benchmarks/scale)
-(audit 2026-07-04, E7).
+[`benchmarks/scale`](https://github.com/o-stepper/graphorin/tree/main/benchmarks/scale).
 
 ::: warning Numbers are workstation numbers
 Wall-clock results below were measured on one developer machine (Apple
 Silicon, local NVMe). Treat them as order-of-magnitude guidance, not a
 contract; re-run the probe on your hardware (one command, below). CI gates
-never assert absolute wall-clock values - only deterministic plumbing
-(EB-4).
+never assert absolute wall-clock values - only deterministic plumbing.
 :::
 
 ## Measured at 100k facts

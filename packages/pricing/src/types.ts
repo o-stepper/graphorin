@@ -52,7 +52,7 @@ export interface PricingSnapshot {
   readonly sha256: string;
   readonly entries: ReadonlyArray<ModelPrice>;
   /**
-   * W-097: present when `refreshPricing` converted a foreign dataset
+   * Present when `refreshPricing` converted a foreign dataset
    * (today: `@pydantic/genai-prices`) instead of consuming the native
    * shape. `skipped` counts model entries the supported subset could
    * not represent (tiered / conditional pricing).

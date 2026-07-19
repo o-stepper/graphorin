@@ -1,9 +1,9 @@
 /**
  * Dispatch phase: run the tool - either delegated to a resolved
  * `Sandbox` or inline under the secrets scope with an enforced
- * wall-clock limit (TL-4) - racing the linked `AbortSignal` with the
+ * wall-clock limit - racing the linked `AbortSignal` with the
  * hard-kill grace window, then map any failure onto the model-visible
- * `ToolError` (tools-06 structured kinds preserved).
+ * `ToolError` (structured kinds preserved).
  *
  * @packageDocumentation
  */
@@ -27,7 +27,7 @@ import { withSecretsScope } from './tool-context.js';
 import { ToolRateLimitError } from './tool-errors.js';
 import { DEFAULT_INLINE_TOOL_TIMEOUT_MS, type ExecutorRuntime } from './types.js';
 
-/** TL-4: sentinel for the inline wall-clock expiry (maps to kind 'timeout'). */
+/** Sentinel for the inline wall-clock expiry (maps to kind 'timeout'). */
 class InlineToolTimeoutError extends Error {
   constructor(readonly limitMs: number) {
     super(`Tool execution exceeded the ${limitMs}ms wall-clock timeout.`);
@@ -36,7 +36,7 @@ class InlineToolTimeoutError extends Error {
 }
 
 /**
- * tools-06: structured carrier for a non-ok `SandboxResult` so the error
+ * Structured carrier for a non-ok `SandboxResult` so the error
  * kind the sandbox reported survives to the model-visible `ToolError`
  * instead of flattening to `execution_failed`.
  */

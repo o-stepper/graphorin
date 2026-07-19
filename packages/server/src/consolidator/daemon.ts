@@ -28,14 +28,14 @@ export interface ConsolidatorLike {
   drainDlq?(): Promise<number>;
   /**
    * Register the consolidator's cron / idle triggers with the server's
-   * triggers scheduler so background consolidation actually fires (MCON-4).
+   * triggers scheduler so background consolidation actually fires.
    * Called from `beforeStart` when both a consolidator and a triggers daemon
    * are configured. Optional so a consolidator without a `defaultScope` (or a
    * custom surface) simply opts out.
    */
   registerWithScheduler?(scheduler: import('@graphorin/triggers').Scheduler): Promise<unknown>;
   /**
-   * A2 (item 7): activity signal - a tracked run settled, the
+   * Activity signal - a tracked run settled, the
    * transcript may have grown. The server's run tracker calls this so
    * a configured `buffer:N` trigger is re-evaluated against the
    * unconsolidated tail. Optional: older consolidator surfaces simply

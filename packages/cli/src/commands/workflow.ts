@@ -1,6 +1,5 @@
 /**
- * `graphorin workflow` - inspect durable workflow threads (E2, item 16
- * tail).
+ * `graphorin workflow` - inspect durable workflow threads.
  *
  *  - `graphorin workflow inspect <threadId>` - the latest checkpoint of
  *    one thread: status, step, pending pauses (timers / awakeables /

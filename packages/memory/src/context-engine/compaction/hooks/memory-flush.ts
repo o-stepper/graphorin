@@ -1,11 +1,10 @@
 /**
- * `memoryFlushHook` (wave-D D4, plan item 3 / MRET-12) - the built-in
- * budgeted pre-compaction flush: one quiet LLM call salvages durable
- * facts from the buffer that is about to be summarized away and writes
- * them through `memory.semantic.remember` with `provenance:
- * 'extraction'`.
+ * `memoryFlushHook` - the built-in budgeted pre-compaction flush: one
+ * quiet LLM call salvages durable facts from the buffer that is about
+ * to be summarized away and writes them through
+ * `memory.semantic.remember` with `provenance: 'extraction'`.
  *
- * Safe-by-construction with respect to the B3 ingest gate:
+ * Safe-by-construction with respect to the ingest gate:
  *
  *  - the hook sees the MODEL-VISIBLE buffer (post-guardrail content -
  *    raw blocked turns never enter it);
@@ -22,10 +21,10 @@
  * itself is never blocked. The provider call is capped
  * (`maxOutputTokens`) and the transcript slice is char-bounded, so the
  * flush is one bounded call per compaction; pick a cheap model. Note
- * the call happens OUTSIDE the agent loop, so agent run budgets (C5)
- * do not observe it - bound it here.
+ * the call happens OUTSIDE the agent loop, so agent run budgets do
+ * not observe it - bound it here.
  *
- * Retires the inert `SessionMemory.flushImportant` stub (MRET-12):
+ * Retires the inert `SessionMemory.flushImportant` stub:
  * this hook is the single flush surface.
  */
 

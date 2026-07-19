@@ -110,7 +110,7 @@ export interface VerifierOptions {
   /** Concurrent-verify cap. Defaults to 100. */
   readonly maxConcurrentVerify?: number;
   /**
-   * Cap on distinct IPs tracked in the failure/lockout maps (SPL-19).
+   * Cap on distinct IPs tracked in the failure/lockout maps.
    * Default 10 000 - overflow sweeps expired lockouts, then evicts the
    * oldest entries.
    */
@@ -138,7 +138,7 @@ export interface VerifyContext {
 export interface TokenVerifierStatus {
   readonly cacheSize: number;
   readonly inFlight: number;
-  /** Distinct IPs currently in the failure window map (SPL-19, capped). */
+  /** Distinct IPs currently in the failure window map (capped). */
   readonly perIpFailures: number;
   readonly perIpLockouts: number;
   readonly perTokenLockouts: number;
@@ -391,7 +391,7 @@ export class TokenVerifier {
   }
 
   /**
-   * SPL-19: an IPv6-rotating attacker must not inflate the per-IP maps
+   * An IPv6-rotating attacker must not inflate the per-IP maps
    * without bound - each map is capped at `maxTrackedIps` (default
    * 10 000). On overflow, expired lockouts sweep first; then the
    * oldest-inserted entries evict (insertion order ≈ least recently
@@ -473,7 +473,7 @@ interface CachedAuth {
 }
 
 /**
- * SPL-19 (documented semantics): a TOUCH-RESET window, not a true
+ * Documented semantics: a TOUCH-RESET window, not a true
  * sliding window - the count resets only after `windowMs` of full
  * silence; continuous traffic keeps accumulating within one logical
  * window. Deliberately cheap (two fields per key); operators needing

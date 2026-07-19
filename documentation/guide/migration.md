@@ -54,8 +54,7 @@ After upgrading:
 
 ### 0.12.1 -> 0.13.0
 
-0.13.0 closes the 2026-07-19 external deep retest. One deliberate
-breaking default; the rest is additive:
+0.13.0 ships one deliberate breaking default; the rest is additive:
 
 - **BREAKING: an unpriced cost ceiling now stops the run.** With
   `RunBudget.maxCostUsd` set and usage that carries no USD cost data,
@@ -165,25 +164,23 @@ a fix, but several defaults sharpen in ways you can observe:
   was inert). Raise the budget - or drop it - if you relied on the old
   fail-open behavior.
 - **A bare `createMemory()` no longer warns: compaction is simply
-  off** until you pass `providerContextWindow` (MEMORY-C-03). An
-  explicit `compaction` config without a window still throws.
+  off** until you pass `providerContextWindow`. An explicit
+  `compaction` config without a window still throws.
 - **`graphorin triggers prune` requires `--before <cutoff>`.** The
   bare invocation was an epoch-0 no-op; it now errors instead of
-  pretending to prune (OPERATOR-01).
+  pretending to prune.
 - **Revoked server tokens stop authenticating immediately.**
   `DELETE /v1/tokens/:id` invalidates the verifier cache; anything
   that relied on the buggy up-to-60-second grace window sees denials
-  right away (TOKENS-RE-01).
+  right away.
 - **Graceful shutdown closes WebSockets** with close code `4007`
   (`server.shutdown`); clients should treat it as a terminal close,
-  not a network drop to retry instantly (WS-LIFECY-02).
+  not a network drop to retry instantly.
 - **tiktoken-backed counters treat special-token sequences as plain
   text** - `<|endoftext|>` counts as its BPE pieces instead of
-  throwing, so token counts over such content shift slightly
-  (PROVIDER-CT-01).
-- **Session erasure works in the default vec0 mode again**
-  (STORE-SQ-02); if you scripted around the crash, remove the
-  workaround.
+  throwing, so token counts over such content shift slightly.
+- **Session erasure works in the default vec0 mode again**; if you
+  scripted around the crash, remove the workaround.
 
 ### 0.9.x -> 0.10.0
 

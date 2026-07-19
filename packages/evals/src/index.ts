@@ -2,7 +2,7 @@
  * @graphorin/evals - eval framework for the Graphorin framework.
  *
  * Builds on the eval primitives shipped from `@graphorin/observability`
- * (RB-17 / DEC-152) - full orchestrator lives here, post-MVP, decoupled
+ * (DEC-152) - full orchestrator lives here, post-MVP, decoupled
  * from the core observability bundle so consumers do not pay the
  * dataset / reporter cost when only the inline runner is needed.
  *

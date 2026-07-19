@@ -7,7 +7,7 @@
  *  - `graphorin traces prune --before <date>` - manual retention
  *    enforcement.
  *
- * W-007: the spans live in the `spans` table (migration 024, written by
+ * The spans live in the `spans` table (migration 024, written by
  * the `createSqliteSpanExporter` from `@graphorin/store-sqlite`). The
  * command previously targeted a `traces` table that no migration or
  * runtime ever created, making it a permanent no-op - an operator who

@@ -76,7 +76,7 @@ register, and execute tools the model can call:
   (`'worker-threads'` / `'isolated-vm'` / `'docker'` tier
   filesystems) inject their own writer via
   `createToolExecutor({ spill })`. The framework scans the FULL body
-  for imperative patterns once at spill time (W-156: a pattern split
+  for imperative patterns once at spill time (a pattern split
   by a `read_result` page boundary evades the per-page strip pass in
   both halves) and hands the result to every writer as
   `imperativePatternsPresent`; a custom writer that does not persist

@@ -1,9 +1,9 @@
 /**
- * D2 sensitivity-tier filter. Tags every memory record with a
+ * Sensitivity-tier filter. Tags every memory record with a
  * decision (`'pass'` / `'drop'`) before the assembled prompt is
  * compiled. The filter is *tier-based* - it trusts the
  * `record.sensitivity` tag the consolidator / writer set; the
- * outbound prompt-redaction middleware (D3, ADR-045) is the
+ * outbound prompt-redaction middleware (ADR-045) is the
  * universal backstop for content the filter cannot see (raw user
  * input, tool results, MCP responses, skill bodies, agent
  * instructions, tool-call args).

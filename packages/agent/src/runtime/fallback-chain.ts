@@ -1,8 +1,8 @@
 /**
  * The per-step provider fallback chain of the agent run loop: streams
  * the primary provider (emitting the accumulated agent events), applies
- * the AG-6 abort semantics, retries a hard context overflow once after
- * an emergency compaction (context-engine-06), walks the configured
+ * the abort semantics, retries a hard context overflow once after
+ * an emergency compaction, walks the configured
  * fallback providers on eligible errors (emitting
  * `agent.model.fellback`), and records a terminal provider failure on
  * the run state. Extracted verbatim from `factory.ts` (issue #23); the

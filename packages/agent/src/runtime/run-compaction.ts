@@ -1,11 +1,11 @@
 /**
- * Compaction lifecycle for the agent run loop (WI-09 / P1-1, CE-3 /
- * AG-13, context-engine-06): the auto-compaction trigger evaluated
- * before each provider request, the last-resort emergency compaction at
- * hard context overflow, the servicing of `agent.compact()` manual
- * requests, and the prefix-pinned splice shared by all three paths.
- * Extracted verbatim from `factory.ts` (issue #23); the former run-loop
- * closures now take an explicit {@link CompactionRunEnv}.
+ * Compaction lifecycle for the agent run loop: the auto-compaction
+ * trigger evaluated before each provider request, the last-resort
+ * emergency compaction at hard context overflow, the servicing of
+ * `agent.compact()` manual requests, and the prefix-pinned splice
+ * shared by all three paths. Extracted verbatim from `factory.ts`
+ * (issue #23); the former run-loop closures now take an explicit
+ * {@link CompactionRunEnv}.
  *
  * @packageDocumentation
  */
@@ -15,12 +15,12 @@ import type { Memory } from '@graphorin/memory';
 import type { CompactionApiResult, CompactOptions } from '../types.js';
 import type { MutableRunState } from './run-input.js';
 
-/** Return envelope of `ContextEngine.compactNow` (shared splice paths, CE-3). */
+/** Return envelope of `ContextEngine.compactNow` (shared splice paths). */
 export type CompactionEnvelope = Awaited<ReturnType<Memory['contextEngine']['compactNow']>>;
 
 /**
- * Manual-compaction requests enqueued by `agent.compact()` (CE-3 /
- * AG-13). The run loop owns the live message buffer, so the splice
+ * Manual-compaction requests enqueued by `agent.compact()`. The run
+ * loop owns the live message buffer, so the splice
  * must happen inside the loop: `maybeAutoCompact` services the queue
  * at the next step boundary, and `finishRun` settles leftovers as
  * explicit no-ops.
@@ -61,24 +61,24 @@ export interface CompactionRunEnv {
 }
 
 /**
- * Auto-compaction trigger (WI-09 / P1-1). Before assembling each
+ * Auto-compaction trigger. Before assembling each
  * provider request, ask the memory {@link ContextEngine} whether the
  * in-flight buffer has crossed its per-provider threshold
  * (`shouldCompact`); when it has, summarise the older turns
  * (`compactNow`, `source: 'auto-trigger'`), splice the result back in
  * - preserving the byte-stable system prefix and the most-recent
  * turns verbatim - and emit `context.compacted`. The compaction is
- * configured on the memory facade (`createMemory({ contextEngine })`,
- * RB-46); there is no parallel agent-level knob.
+ * configured on the memory facade (`createMemory({ contextEngine })`);
+ * there is no parallel agent-level knob.
  *
  * No-op when no memory is wired, when compaction is disabled or below
  * threshold (the engine returns `false`), or for `secret`-tier runs
  * (secret history is never shipped to the summarizer - a less-trusted
- * external sink; per-result handle references land in WI-10). Best
+ * external sink; per-result references use the result-handle path). Best
  * effort: a misconfigured engine (e.g. no summarizer) is swallowed and
  * the run proceeds uncompacted rather than aborting mid-flight.
  *
- * Operator-requested compactions (`agent.compact()`, CE-3/AG-13) are
+ * Operator-requested compactions (`agent.compact()`) are
  * serviced here too, FIRST - the queue carries the `compact()` promise
  * resolvers, and manual requests bypass the trigger evaluation.
  */
@@ -144,7 +144,7 @@ export async function* maybeAutoCompact<TOutput>(
 }
 
 /**
- * context-engine-06: last-resort tier at hard context overflow. When
+ * Last-resort tier at hard context overflow. When
  * a provider rejects the request as over-window, force ONE aggressive
  * compaction (`preserveRecentTurns: 2`, trigger evaluation bypassed)
  * and let the caller retry the same provider - the fallback chain's
@@ -193,10 +193,10 @@ export async function* tryEmergencyCompact<TOutput>(
 }
 
 /**
- * Prefix-pinned splice shared by the auto + manual compaction paths
- * (CE-3): stable system prefix + [summary, ...recent turns], with the
+ * Prefix-pinned splice shared by the auto + manual compaction
+ * paths: stable system prefix + [summary, ...recent turns], with the
  * post-compaction hooks' text Context Essentials re-anchored as a
- * trailing system message so they survive the trim (RB-46). Mutates
+ * trailing system message so they survive the trim. Mutates
  * BOTH the live loop buffer and `state.messages`.
  */
 function spliceCompacted(env: CompactionRunEnv, envelope: CompactionEnvelope): void {
@@ -225,7 +225,7 @@ function spliceCompacted(env: CompactionRunEnv, envelope: CompactionEnvelope): v
 }
 
 /**
- * Service one `agent.compact()` request inside the loop (CE-3/AG-13):
+ * Service one `agent.compact()` request inside the loop:
  * same prefix-pinned splice as the auto path, `source: 'manual'` (or
  * the caller's `'pre-step'`), `preserveRecentTurns` forwarded as a
  * per-call strategy override. An engine failure rejects the caller's

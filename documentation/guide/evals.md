@@ -103,7 +103,7 @@ The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-
 - [Memory system](/guide/memory-system) - what the memory benchmarks exercise.
 - [Agent runtime](/guide/agent-runtime) - the `agent.run(...)` surface a run drives.
 
-## Honest LongMemEval runs (C8)
+## Honest LongMemEval runs
 
 The LongMemEval runner measures the REAL search path - the old harness-side
 keyword fan-out booster is gone - and every report stamps a `benchConfig`
@@ -124,12 +124,12 @@ block, so a number always says what configuration produced it:
 - `--iterations N` repeats every case and RESULTS reports the pass rate as
   mean ± stddev; the abstention rate over abstention-ability cases is
   always reported.
-- `--conflict-pipeline on|off` (D1) A/Bs the conflict pipeline instead of the
+- `--conflict-pipeline on|off` A/Bs the conflict pipeline instead of the
   historic hardcoded `off`; the mode is stamped into `benchConfig` and the
   RESULTS header. The update-omission A/B itself lives in
   `benchmark-halumem` - here the switch measures the pipeline's effect on
   QA quality.
-- `--max-cost-usd N` (W-084) puts a run-level USD ceiling over the resolved
+- `--max-cost-usd N` puts a run-level USD ceiling over the resolved
   SUT + judge providers (`withCostLimit` composed over `withCostTracking`).
   The ceiling observes the cost the providers themselves report; when a
   provider reports no usage cost the runner WARNs that the cap was

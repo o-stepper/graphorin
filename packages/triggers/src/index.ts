@@ -67,7 +67,7 @@ export interface TriggerOptions {
   readonly maxCatchupRuns?: number;
   /**
    * How far back (from the last successful fire) misses are honored.
-   * Catch-up counts REAL missed fires (RP-12), so the window must
+   * Catch-up counts REAL missed fires, so the window must
    * exceed the trigger period - a 24h window can never catch up a
    * daily cron whose boundary is itself 24h after the last fire.
    * Default 24h.
@@ -81,8 +81,8 @@ export interface TriggerOptions {
    */
   readonly acknowledgeLibMode?: boolean;
   /**
-   * IANA timezone the cron expression's wall clock is evaluated in
-   * (W-124). `cron(...)` validates it eagerly - an unknown zone throws
+   * IANA timezone the cron expression's wall clock is evaluated in.
+   * `cron(...)` validates it eagerly - an unknown zone throws
    * at declaration time. DST transitions follow Vixie semantics (see
    * the cron module doc). Applies to `cron` triggers only; the other
    * kinds ignore it (like the catch-up fields they do not use).
@@ -138,7 +138,7 @@ export interface TriggerDeclaration {
 
 /**
  * Eager validation of the harness fields shared by every declaration
- * factory (C4): a malformed `jitterMs` / `expiresAt` throws at
+ * factory: a malformed `jitterMs` / `expiresAt` throws at
  * declaration time, not at first arm.
  */
 function validateHarnessOptions(kind: TriggerKind, id: string, options: TriggerOptions): void {
@@ -263,13 +263,13 @@ export type SchedulerEvent =
   | { readonly type: 'lib-mode-warning'; readonly id: string }
   /**
    * A persisted trigger row has no re-registered declaration in this
-   * process (W-123). It will never fire; re-register the declaration
+   * process. It will never fire; re-register the declaration
    * or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
    */
   | { readonly type: 'orphaned'; readonly id: string }
   /**
    * The trigger's `expiresAt` instant passed, so the scheduler
-   * auto-paused it (C4): the persistent `disabled` flag is set instead
+   * auto-paused it: the persistent `disabled` flag is set instead
    * of firing the callback. Renew with a later `expiresAt` +
    * `setDisabled(id, false)`, or prune it
    * (`POST /v1/triggers/prune { "disabled": true }`).
@@ -277,7 +277,7 @@ export type SchedulerEvent =
   | { readonly type: 'expired'; readonly id: string };
 
 /**
- * Opt-in scheduler harness for proactive task fleets (C4). Values are
+ * Opt-in scheduler harness for proactive task fleets. Values are
  * bot policy; the defaults are conservative.
  *
  * @stable
@@ -316,7 +316,7 @@ export interface CreateSchedulerOptions {
   readonly setTimeout?: (cb: () => void, ms: number) => unknown;
   readonly clearTimeout?: (handle: unknown) => void;
   /**
-   * Opt-in scheduler harness (C4): interval floor + declaration cap
+   * Opt-in scheduler harness: interval floor + declaration cap
    * enforced at `register(...)` time. Absent = no constraints (the
    * pre-harness behaviour). Pass `{}` for the conservative defaults.
    */
@@ -346,7 +346,7 @@ export interface Scheduler {
   /** Manually fire `id` (used by `graphorin triggers fire`, Phase 15). */
   fire(id: string, payload?: unknown): Promise<void>;
   /**
-   * Flip the persistent `disabled` flag (IP-17). Disabling cancels the
+   * Flip the persistent `disabled` flag. Disabling cancels the
    * armed timer but keeps the trigger registered + persisted; enabling
    * recomputes the next fire from now and re-arms. The destructive
    * removal is `unregister(...)`.
@@ -357,8 +357,8 @@ export interface Scheduler {
   /** Notify the scheduler that the user / runtime is no longer idle. */
   recordActivity(): void;
   /**
-   * Persisted trigger rows with no live declaration in this process
-   * (W-123). These never fire: the callback only exists in memory, so
+   * Persisted trigger rows with no live declaration in this process.
+   * These never fire: the callback only exists in memory, so
    * a row survives only as dead weight until the declaration is
    * re-registered or the row is pruned.
    */
@@ -385,7 +385,7 @@ export function _resetLibModeWarningForTesting(): void {
 
 const DEFAULT_CATCHUP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
-/** Conservative interval/idle floor when the harness is enabled (C4). */
+/** Conservative interval/idle floor when the harness is enabled. */
 const DEFAULT_INTERVAL_FLOOR_MS = 60_000;
 
 /**
@@ -403,7 +403,7 @@ function fnv1a(input: string): number {
 
 /**
  * Node clamps `setTimeout` delays beyond `2^31 - 1` ms to 1 ms - a
- * quarterly cron would fire immediately in a hot loop (RP-15). Delays
+ * quarterly cron would fire immediately in a hot loop. Delays
  * above this arm an intermediate wake-up that re-schedules instead.
  */
 const MAX_TIMEOUT_MS = 2 ** 31 - 1;
@@ -422,7 +422,7 @@ class SchedulerImpl implements Scheduler {
   #parsedCron: Map<string, ParsedCron> = new Map();
   #declarations: Map<string, TriggerDeclaration> = new Map();
   /**
-   * TRIGGERS-01: ids whose persistent `disabled` flag is set. Mirrors the
+   * Ids whose persistent `disabled` flag is set. Mirrors the
    * store's `disabled` column for the triggers this process manages so `fire()`
    * can reject a paused trigger synchronously - a per-fire `store.get()` would
    * add latency to the hot path and reorder event emission under a fake clock.
@@ -432,7 +432,7 @@ class SchedulerImpl implements Scheduler {
   #disabled: Set<string> = new Set();
   /**
    * Triggers whose register-time catch-up was deferred because the
-   * scheduler had not started yet (W-123): user callbacks must never
+   * scheduler had not started yet: user callbacks must never
    * fire before `start()`. Drained by `start()`.
    */
   #pendingCatchup: Set<string> = new Set();
@@ -748,7 +748,7 @@ class SchedulerImpl implements Scheduler {
   // ---------------------------------------------------------------------------
 
   /**
-   * Opt-in harness enforcement (C4). Deterministic and fail-fast: the
+   * Opt-in harness enforcement. Deterministic and fail-fast: the
    * registering caller (often an agent-driven code path) gets the
    * violation back as a typed error instead of a silently rewritten
    * schedule.
@@ -795,9 +795,9 @@ class SchedulerImpl implements Scheduler {
   }
 
   /**
-   * Auto-pause an expired trigger (C4): flip the persistent `disabled`
+   * Auto-pause an expired trigger: flip the persistent `disabled`
    * flag - exactly what `setDisabled(id, true)` does - WARN once and
-   * publish `'expired'`. Best-effort like the RP-14 re-arm path: a
+   * publish `'expired'`. Best-effort like the re-arm path: a
    * store failure must not become an unhandled rejection out of a
    * timer callback.
    */
@@ -825,7 +825,7 @@ class SchedulerImpl implements Scheduler {
 
   /**
    * Deterministic per-id jitter offset in `[0, jitterMs]` for cron /
-   * interval triggers (C4). Applied to the armed delay only - the
+   * interval triggers. Applied to the armed delay only - the
    * persisted schedule and the catch-up math stay on the unjittered
    * grid.
    */
@@ -885,7 +885,7 @@ class SchedulerImpl implements Scheduler {
 
   /**
    * Apply the register-time catch-ups that were deferred because the
-   * scheduler had not started yet (W-123). Runs inside `start()`, so
+   * scheduler had not started yet. Runs inside `start()`, so
    * every fire happens on a started scheduler. Uses the FRESH persisted
    * state on both sides: a manual `fire()` between register and start
    * already advanced `lastFiredAt`, and double-counting those misses

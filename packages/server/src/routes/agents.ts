@@ -38,7 +38,7 @@ export interface AgentRoutesDeps {
   readonly runs: RunStateTracker;
   readonly newRunId?: () => string;
   /**
-   * Streaming dispatcher (IP-2). When present, `POST /:id/stream`
+   * Streaming dispatcher. When present, `POST /:id/stream`
    * actually runs the agent and emits every event onto the
    * `agent:<id>/runs/<runId>/events` subject.
    */
@@ -206,7 +206,7 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
 }
 
 /**
- * IP-2: consume the agent's event stream in the background and emit
+ * Consume the agent's event stream in the background and emit
  * every event onto the run subject. Falls back to `run(...)` (a single
  * terminal frame) for registry entries without a `stream` surface.
  */
@@ -501,7 +501,7 @@ function isSuspendedAgentResult(value: unknown): value is { readonly state: unkn
 }
 
 /**
- * W-151: byte-identical 400 for an invalid run/stream body - both
+ * Byte-identical 400 for an invalid run/stream body - both
  * sibling routes validate through this one helper.
  */
 function invalidBodyResponse(

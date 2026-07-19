@@ -1,6 +1,6 @@
 /**
  * `InsightMemory` - the thin, read-only surface over the reflection
- * insights the consolidator synthesizes (P1-1). Insights are *derived*
+ * insights the consolidator synthesizes. Insights are *derived*
  * (quarantined + `provenance: 'reflection'`), carry mandatory citations,
  * and are retrieval-ranked **below the primary facts they cite**. The
  * write + salience-management paths live in the consolidator's
@@ -23,7 +23,7 @@ import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 export interface InsightSearchOptions {
   readonly topK?: number;
   /**
-   * Include quarantined insights (P1-4). Defaults to `false`. Since
+   * Include quarantined insights. Defaults to `false`. Since
    * reflection-synthesized insights *always* land quarantined, set this
    * `true` to surface them for the validation / inspector path - never
    * for auto-recall fed back into the model.
@@ -122,7 +122,7 @@ export class InsightMemory {
   }
 
   /**
-   * Promote a quarantined insight out of quarantine (MCON-2). Mirrors
+   * Promote a quarantined insight out of quarantine. Mirrors
    * {@link SemanticMemory.validate}: re-derives the injection verdict from the
    * stored text and **refuses** promotion of an injection-flagged insight
    * unless an operator passes `{ force: true }` from a trusted context.
@@ -166,15 +166,14 @@ export class InsightMemory {
 const RANK_CAP_EPSILON = 1e-6;
 
 /**
- * Enforce the P1-1 rank ceiling: an insight may never outrank a primary
+ * Enforce the rank ceiling: an insight may never outrank a primary
  * fact **it cites**. For each insight hit, if any fact it cites is
  * present in `factHits`, its score is lowered to strictly below that
  * cited fact's score - so concatenating the two lists and sorting by
  * score descending can never place the insight above the evidence it
  * was synthesized from. Insights whose cited facts are absent from
  * `factHits` are returned unchanged; this is a relative, not a global,
- * cap (per the execution plan: "never outrank the primary facts they
- * cite").
+ * cap ("never outrank the primary facts they cite").
  *
  * Pure + deterministic - does not mutate its inputs.
  *

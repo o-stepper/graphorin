@@ -44,7 +44,7 @@ export async function mcpAuthRefresh(
   serverId: string,
   options: {
     readonly signal?: AbortSignal;
-    /** SPL-1: resolves the persisted refresh token across processes. */
+    /** Resolves the persisted refresh token across processes. */
     readonly secretsStore?: SecretsStore;
   } = {},
 ): Promise<OAuthSession> {
@@ -58,7 +58,7 @@ export async function mcpAuthRevoke(
   options: {
     readonly reason?: string;
     readonly signal?: AbortSignal;
-    /** SPL-1: resolves the persisted tokens so RFC 7009 actually fires. */
+    /** Resolves the persisted tokens so RFC 7009 revocation actually fires. */
     readonly secretsStore?: SecretsStore;
   } = {},
 ): Promise<void> {

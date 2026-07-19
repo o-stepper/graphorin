@@ -3,14 +3,14 @@
  * into an encrypted one. Backs `graphorin storage encrypt` per
  * ADR-030 § 8.
  *
- * Strategy (CS-7): sqlite3mc ships **no** `sqlcipher_export` function
+ * Strategy: sqlite3mc ships **no** `sqlcipher_export` function
  * (verified against the real peer - the old ATTACH+export path threw
  * "no such function" on every real run), so the export is a
  * **checkpoint → file copy → in-place `PRAGMA rekey`** sequence:
  *
  *  1. open the plaintext source, `wal_checkpoint(TRUNCATE)`, close;
  *  2. byte-copy the file to the target (this trivially preserves every
- *     rowid, so FTS5 external-content mappings stay intact - CS-10);
+ *     rowid, so FTS5 external-content mappings stay intact);
  *  3. open the copy through the cipher peer with NO key, apply the
  *     cipher-selection pragmas, then `PRAGMA rekey = <key>` - sqlite3mc
  *     encrypts a plaintext database in place;
@@ -52,7 +52,7 @@ export interface EncryptDatabaseOptions {
    * `${sourcePath}.bak.${timestamp}` so an operator can recover.
    * Default `false` - the CLI does the swap explicitly.
    *
-   * REQUIRES A STOPPED SERVER (W-012): a live writer keeps its file
+   * REQUIRES A STOPPED SERVER: a live writer keeps its file
    * descriptor on the renamed `.bak` inode and every post-snapshot
    * commit silently diverges from the new encrypted file (and is later
    * deleted by `storage cleanup-backups`). A best-effort live-writer
@@ -91,7 +91,7 @@ export interface EncryptDatabaseResult {
  */
 /**
  * Thrown when `encryptDatabase({ swap: true })` detects another live
- * connection on the source database (W-012). The swap path renames the
+ * connection on the source database. The swap path renames the
  * source file; a live writer would keep writing into the renamed
  * `.bak.<ts>` inode and silently diverge from the encrypted copy.
  *

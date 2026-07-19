@@ -1,6 +1,6 @@
 /**
  * Built-in `read_result` - fetch (a range of) a large tool result that was
- * stored behind a handle instead of being inlined (P1-4).
+ * stored behind a handle instead of being inlined.
  *
  * The agent runtime auto-registers this tool when at least one registered
  * tool opts into the `'spill-to-file'` truncation strategy (the only
@@ -27,7 +27,7 @@ export interface ReadResultToolOptions {
   /** Default `maxBytes` when the model does not pass one. Default `65536`. */
   readonly defaultMaxBytes?: number;
   /**
-   * W-114: allow reading spill handles that belong to ANOTHER run.
+   * Allow reading spill handles that belong to ANOTHER run.
    * Default `false`: spill artifacts live for days under the TTL sweep
    * (confidential bodies included), and a model steered by injection
    * could otherwise page through other runs' results. Opt in only for
@@ -38,7 +38,7 @@ export interface ReadResultToolOptions {
 }
 
 /**
- * W-114: extract the owning runId from a spill handle
+ * Extract the owning runId from a spill handle
  * (`graphorin-spill:<runId>/<toolCallId>.<ext>` - the format pinned by
  * the truncation spill writer). `undefined` when the handle is not a
  * spill URI or has no path segment.
@@ -65,15 +65,15 @@ const outputSchema = z.object({
   bytes: z.number(),
   totalBytes: z.number(),
   eof: z.boolean(),
-  /** TL-6: producer trust class reported by the reader, when known. */
+  /** Producer trust class reported by the reader, when known. */
   producerTrustClass: z.string().optional(),
-  /** tools-03: producer source (a `ToolSource` value) from the taint sidecar, when known. */
+  /** Producer source (a `ToolSource` value) from the taint sidecar, when known. */
   producerSource: z.object({ kind: z.string() }).passthrough().optional(),
-  /** tools-03: producer sensitivity recovered from the taint sidecar, when known. */
+  /** Producer sensitivity recovered from the taint sidecar, when known. */
   producerSensitivity: z.string().optional(),
 });
 
-/** W-013: explicit interfaces - no concrete zod generics in the d.ts. */
+/** Explicit interfaces - no concrete zod generics in the d.ts. */
 export interface ReadResultInput {
   handle: string;
   offset?: number | undefined;

@@ -108,7 +108,7 @@ const refundTool = tool({
 });
 ```
 
-A tool that asks for a secret outside its declared ACL fails closed with `SecretAccessDeniedError` and writes one row to the audit log. An empty / omitted `secretsAllowed` means the tool may not request any secret. Store-backed reads inside the scope are gated the same way: `SecretsStore.require(...)` throws, and the non-throwing `SecretsStore.get(...)` reads a denied key as absent (SPL-14). Note that the gate lives in the accessor and the stores - a direct `resolveSecret(...)` call resolves the ref without consulting the ACL, so route tool code through `ctx.secrets`.
+A tool that asks for a secret outside its declared ACL fails closed with `SecretAccessDeniedError` and writes one row to the audit log. An empty / omitted `secretsAllowed` means the tool may not request any secret. Store-backed reads inside the scope are gated the same way: `SecretsStore.require(...)` throws, and the non-throwing `SecretsStore.get(...)` reads a denied key as absent. Note that the gate lives in the accessor and the stores - a direct `resolveSecret(...)` call resolves the ref without consulting the ACL, so route tool code through `ctx.secrets`.
 
 ## Sub-agent inheritance
 
@@ -182,7 +182,7 @@ Beyond `serviceAccountToken`, the resolver options also support 1Password **Conn
 
 Errors from the CLI surface as typed `OpCliError` codes (`'binary-missing'`, `'signed-out'`, `'reference-not-found'`, `'timeout'`, `'unknown'`) so your code can react cleanly.
 
-## Where OAuth tokens live (SPL-1)
+## Where OAuth tokens live
 
 `graphorin auth login` persists the OAuth **access / refresh / id tokens** into
 the active `SecretsStore` (the same `keyring → encrypted-file → env` chain as
@@ -195,7 +195,7 @@ fresh process resolves the refresh token back from the store, so
 `mcpAuth*` helpers). `auth status` reports
 `hasRefreshToken` only when the ref actually resolves. Without a usable
 secrets store the tokens live in process memory only and do not survive
-a restart (the pre-SPL-1 behaviour, kept as the documented fallback).
+a restart (the previous behaviour, kept as the documented fallback).
 
 ## Telemetry redaction for `SecretValue`s
 

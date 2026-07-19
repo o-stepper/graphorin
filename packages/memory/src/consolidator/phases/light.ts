@@ -1,10 +1,10 @@
 /**
  * Light phase - no LLM. Decays every fact's retention curve and
  * archives facts whose salience has fallen below the configured
- * threshold (plus the X-1 capacity pass). Noise filtering happens in
+ * threshold (plus the capacity pass). Noise filtering happens in
  * the standard phase where the batch is actually consumed - the old
  * advisory re-count here read the same unconsumed messages on every
- * pass for a counter nothing acted on (MCON-17).
+ * pass for a counter nothing acted on.
  *
  * @packageDocumentation
  */
@@ -29,13 +29,13 @@ export interface LightPhaseDeps {
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
   /**
-   * Capacity-bounded eviction (X-1). When non-null, the light phase
+   * Capacity-bounded eviction. When non-null, the light phase
    * archives the lowest-salience live facts in the decay window down to
    * this many, in addition to the threshold archiving. `null` (the
-   * default) leaves storage unbounded - behaviour identical to pre-X-1.
+   * default) leaves storage unbounded.
    */
   readonly decayCapacity: number | null;
-  /** Weights for the multi-signal salience score (X-1). */
+  /** Weights for the multi-signal salience score. */
   readonly salienceWeights: SalienceWeights;
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
   readonly maxBatchSize: number;
@@ -155,7 +155,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
 }
 
 /**
- * `true` for provenance that did not originate first-party (P1-4) - used
+ * `true` for provenance that did not originate first-party - used
  * to apply the mild salience penalty in capacity eviction. First-party
  * is `null` (legacy / direct write), `'user'`, and `'extraction'` (the
  * consolidator distilling the user's own session); `'tool'`,

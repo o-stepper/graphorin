@@ -1,6 +1,6 @@
 /**
  * Integrity-check runner for encrypted databases. sqlite3mc ships no
- * `PRAGMA cipher_integrity_check` (CS-7 - the old call returned an
+ * `PRAGMA cipher_integrity_check` (the old call returned an
  * empty row-set on every real run, so `ok` was always false); the
  * standard `PRAGMA integrity_check` works through the cipher layer
  * once the connection is keyed, which is exactly the property the

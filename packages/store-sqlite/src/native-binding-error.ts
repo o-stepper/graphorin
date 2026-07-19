@@ -1,8 +1,8 @@
 /**
- * Shared leaf for the skipped-native-build failure mode (audit
- * 2026-07-16, P1-3). Lives outside `connection.ts` / `encryption/` so
- * both driver loaders can use it without re-creating the import cycle
- * that `driver-types.ts` exists to break.
+ * Shared leaf for the skipped-native-build failure mode. Lives outside
+ * `connection.ts` / `encryption/` so both driver loaders can use it
+ * without re-creating the import cycle that `driver-types.ts` exists
+ * to break.
  *
  * @packageDocumentation
  */

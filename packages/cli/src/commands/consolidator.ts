@@ -18,7 +18,7 @@
  * writes to (`consolidator_state`, `consolidator_runs`,
  * `consolidator_failed_batches`, `conflict_check_pending`); `set-tier`
  * and `stop` honestly report UNSUPPORTED until a daemon-side control
- * channel exists (IP-4) - nothing polls an admin table.
+ * channel exists - nothing polls an admin table.
  *
  * @packageDocumentation
  */
@@ -221,7 +221,7 @@ export interface ConsolidatorDlqListOptions extends ConsolidatorCommonOptions {
 }
 
 /**
- * W-065: make the permanent `dead-letter queue: N` status warning
+ * Make the permanent `dead-letter queue: N` status warning
  * actionable. Operator-level (DB-wide) view, like the `dlqSize`
  * counter in `runConsolidatorStatus` - `listFailedBatches` on the
  * store is scoped to one `SessionScope.userId`, which a CLI does not
@@ -306,7 +306,7 @@ export interface ConsolidatorDlqClearResult {
 }
 
 /**
- * W-065: clear dead-letter batches. Defaults are conservative:
+ * Clear dead-letter batches. Defaults are conservative:
  * exhausted-only, all users, no age bound. The batch payload (message
  * ids) is lost on delete - that is the explicit point of the command.
  *

@@ -6,7 +6,7 @@ import type { SqliteConnection } from './connection.js';
  * scheduler with persistent rows so cron / interval / idle / event
  * triggers survive process restarts (DEC-150).
  *
- * Concurrency contract (W-133): two scheduler PROCESSES over one
+ * Concurrency contract: two scheduler PROCESSES over one
  * database file are not a supported deployment (see the storage guide's
  * concurrency matrix). `recordFire` still carries a monotonic
  * wall-clock fence as best-effort defense in depth for that
@@ -62,7 +62,7 @@ export class SqliteTriggerStore implements TriggerStore {
   }
 
   /**
-   * Persist a fire. W-133: the update carries a monotonic fence -
+   * Persist a fire. The update carries a monotonic fence -
    * a call whose `firedAt` is not strictly later than the stored
    * `last_fired_at` changes nothing, so a second (unsupported)
    * scheduler process re-fixing an old fire cannot rewind

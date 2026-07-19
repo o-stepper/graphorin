@@ -1,6 +1,6 @@
 /**
- * Active-hours window evaluation shared by the heartbeat (C1) and the
- * cron-leg (C2): a proactive fire outside the window is skipped, so a
+ * Active-hours window evaluation shared by the heartbeat and the
+ * cron-leg: a proactive fire outside the window is skipped, so a
  * bot stays quiet at night without touching its schedule.
  *
  * The wall clock is evaluated in the window's IANA timezone via `Intl`

@@ -1,6 +1,6 @@
 /**
  * Completion / error funnel shared by every executor phase: the frozen
- * `CompletedToolCall` factory (which stamps the C3 recovery envelope),
+ * `CompletedToolCall` factory (which stamps the recovery envelope),
  * the `tool:execute:error` audit + counter emitter, the `failWith`
  * error path, and the `tool.execute.*` streaming-event mappers.
  *
@@ -25,7 +25,7 @@ import { incrementCounter } from '../audit/index.js';
 import type { ExecutorRuntime } from './types.js';
 
 /**
- * C3: derive the recoverable flag + model-facing recovery hint from the
+ * Derive the recoverable flag + model-facing recovery hint from the
  * error kind. Central so every error path (failWith, inline sites,
  * synthesizeFailure) carries the envelope without per-site bookkeeping.
  */

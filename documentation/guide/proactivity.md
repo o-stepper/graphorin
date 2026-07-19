@@ -35,7 +35,7 @@ const heartbeat = createHeartbeat({
   sentinel: 'HEARTBEAT_OK',
   profile: {
     provider: cheapModel, // fail-closed per-beat model pin
-    budgetUsd: 0.05, // per-beat run budget (C5)
+    budgetUsd: 0.05, // per-beat run budget
     isolatedSession: true, // fresh session per beat (default)
   },
   activeHours: { from: '08:00', to: '23:00', timezone: 'Europe/Kyiv' },
@@ -78,7 +78,7 @@ await nightly.start();
 
 Every fire creates a **fresh session** and runs on a **required, fail-closed model pin**: the run resolves to exactly the task's `provider`, winning over `prepareStep` overrides and the whole preference ladder, and the agent-level fallback chain is never consulted - a 03:00 fire must not silently escalate to a more expensive model because the cheap one rate-limited.
 
-**No recursive scheduling.** A proactive run must not register triggers or schedules. The primary enforcement is by construction - dedicate an agent whose toolset simply has no scheduling tools - and `schedulingToolNames` adds a deterministic creation-time check: any listed name reachable from the task's agent registry throws `ProactiveConfigError` unless `allowRecursiveScheduling: true` grants it explicitly. [E1's deny-by-name rules](/guide/security#deny-by-name-three-surfaces) (shipped in 0.9.0) compose as a third, policy-driven layer on top.
+**No recursive scheduling.** A proactive run must not register triggers or schedules. The primary enforcement is by construction - dedicate an agent whose toolset simply has no scheduling tools - and `schedulingToolNames` adds a deterministic creation-time check: any listed name reachable from the task's agent registry throws `ProactiveConfigError` unless `allowRecursiveScheduling: true` grants it explicitly. [Deny-by-name rules](/guide/security#deny-by-name-three-surfaces) (shipped in 0.9.0) compose as a third, policy-driven layer on top.
 
 ## The escalation ladder
 
@@ -101,7 +101,7 @@ A run that escalates **above** its grant (e.g. a `notify` task parks on a gated 
 
 ### The `act` grant is gated on the ingest gate
 
-`grant: 'act'` requires evidence that the [memory ingest gate](/guide/memory-system#the-ingest-gate-memory-writes-strictly-after-guardrails-b3) is active: pass the memory facade and the runner checks `memory.ingestGate !== null` (`createMemory({ ingestGate })`). Without it, task creation throws `ProactiveConfigError` (`act-requires-ingest-gate`). The rule exists because an auto-acting task writes its own consequences back into memory - exactly the loop the B3 gate breaks for guardrail-blocked turns; see the [security guide](/guide/security#memory-writes-strictly-after-guardrails-b3). Enable `act` only after the ladder has run on notify-only for a while.
+`grant: 'act'` requires evidence that the [memory ingest gate](/guide/memory-system#the-ingest-gate-memory-writes-strictly-after-guardrails) is active: pass the memory facade and the runner checks `memory.ingestGate !== null` (`createMemory({ ingestGate })`). Without it, task creation throws `ProactiveConfigError` (`act-requires-ingest-gate`). The rule exists because an auto-acting task writes its own consequences back into memory - exactly the loop the ingest gate breaks for guardrail-blocked turns; see the [security guide](/guide/security#memory-writes-strictly-after-guardrails). Enable `act` only after the ladder has run on notify-only for a while.
 
 ### Routing outcomes
 
@@ -118,9 +118,9 @@ For the agent family, bridge parked fires into the server so REST can find them:
 
 Proactive spend is bounded at three layers:
 
-1. **Per-fire run budget** (C5) - `profile.budgetUsd` / `budget.maxCostUsd` (+ `maxTokens`) pass through to the agent's [run-level budget](/guide/agent-runtime#run-budget) with `onExceed: 'stop'`; sub-agent usage counts. The cost leg needs USD-priced usage (pricing middleware); `maxTokens` works everywhere.
+1. **Per-fire run budget** - `profile.budgetUsd` / `budget.maxCostUsd` (+ `maxTokens`) pass through to the agent's [run-level budget](/guide/agent-runtime#run-budget) with `onExceed: 'stop'`; sub-agent usage counts. The cost leg needs USD-priced usage (pricing middleware); `maxTokens` works everywhere.
 2. **Fail-closed model pin** - the fire cannot silently escalate to a pricier model through fallback.
-3. **Scheduler harness** (C4) - the [interval floor, declaration cap, deterministic jitter and auto-expiry](/guide/standalone-server#scheduler-harness-for-proactive-fleets) bound how often anything fires at all; heartbeat and cron schedules pass `jitterMs` / `expiresAt` straight through. Note the floor also applies to the heartbeat example above: with the harness enabled, a dev-speed beat faster than the floor (for example `every: 300` in a test) makes `scheduler.register` throw `TriggerLimitError('interval-floor')` - pass `intervalFloorMs: 0` in the harness limits for tests, or keep dev beats at or above the floor.
+3. **Scheduler harness** - the [interval floor, declaration cap, deterministic jitter and auto-expiry](/guide/standalone-server#scheduler-harness-for-proactive-fleets) bound how often anything fires at all; heartbeat and cron schedules pass `jitterMs` / `expiresAt` straight through. Note the floor also applies to the heartbeat example above: with the harness enabled, a dev-speed beat faster than the floor (for example `every: 300` in a test) makes `scheduler.register` throw `TriggerLimitError('interval-floor')` - pass `intervalFloorMs: 0` in the harness limits for tests, or keep dev beats at or above the floor.
 
 ## Cost posture
 

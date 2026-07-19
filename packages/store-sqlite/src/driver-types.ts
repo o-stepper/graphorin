@@ -24,14 +24,14 @@ export interface BetterSqlite3Database {
   prepare(query: string): BetterSqlite3Statement;
   /**
    * The returned wrapper also carries the `.deferred` / `.immediate` /
-   * `.exclusive` variants (store-06 uses `.immediate` for every write
+   * `.exclusive` variants (the store uses `.immediate` for every write
    * transaction).
    */
   transaction<T extends (...args: unknown[]) => unknown>(
     fn: T,
   ): T & { readonly deferred: T; readonly immediate: T; readonly exclusive: T };
   /**
-   * Online page-level backup (store-02/05). Consistent under a live
+   * Online page-level backup. Consistent under a live
    * writer and preserves rowids (so FTS5 external-content mappings
    * survive - unlike `VACUUM INTO`).
    */

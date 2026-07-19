@@ -58,7 +58,7 @@ export function _resetMcpAdapterDedupForTesting(): void {
 /** Result returned by {@link adaptMCPTools}. */
 export interface AdaptedToolsResult {
   readonly tools: ReadonlyArray<Tool>;
-  /** MC-6: sha256 definition fingerprint per MCP tool name. */
+  /** sha256 definition fingerprint per MCP tool name. */
   readonly fingerprints: ReadonlyMap<string, string>;
   readonly autoDeferralFired: boolean;
   readonly resolvedDeferLoading: boolean;
@@ -66,7 +66,7 @@ export interface AdaptedToolsResult {
   readonly toolCount: number;
   readonly deferralThreshold: number;
   /**
-   * W-105: tool names the operator downgraded below the sink classes
+   * Tool names the operator downgraded below the sink classes
    * via `sideEffectClassByTool` (`'read-only'` / `'pure'`). Each such
    * tool leaves EVERY sink check - the dataflow gate, the Rule-of-Two
    * writer forbid, the read-only capability gate - so operator audits
@@ -220,9 +220,9 @@ interface BuildAdaptedToolArgs {
   readonly sideEffectClass: import('@graphorin/core').SideEffectClass;
   readonly maxResultTokens?: number;
   readonly truncationStrategy?: import('@graphorin/core').TruncationStrategy;
-  /** Per-call timeout forwarded to `client.callTool` (MC-3/MC-5). */
+  /** Per-call timeout forwarded to `client.callTool`. */
   readonly callTimeoutMs?: number;
-  /** MC-6: sha256 fingerprint of the producing MCP definition. */
+  /** sha256 fingerprint of the producing MCP definition. */
   readonly definitionHash: string;
   readonly logger?: (
     level: 'debug' | 'info' | 'warn' | 'error',

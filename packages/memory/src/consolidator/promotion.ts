@@ -1,14 +1,14 @@
 /**
- * Deterministic promotion policy (wave-D D4, plan item 3 / D-7) - the
+ * Deterministic promotion policy - the
  * closed loop's exit from quarantine: a quarantined fact whose
  * demonstrated usage clears every configured threshold is promoted to
  * `active` through the audited `SemanticMemory.validate` path (which
- * also completes any pending W-019 supersede). Pure function, no I/O -
+ * also completes any pending supersede). Pure function, no I/O -
  * the consolidator's deep phase feeds it candidates and executes the
  * verdicts.
  *
  * Distinct from the write-time `autoPromoteExtraction` escape hatch:
- * that one skips quarantine at WRITE time (and requires the B3 ingest
+ * that one skips quarantine at WRITE time (and requires the ingest
  * gate as evidence); this policy promotes at CONSOLIDATION time from
  * accumulated recall evidence. Default OFF.
  *

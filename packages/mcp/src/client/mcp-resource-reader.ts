@@ -1,6 +1,6 @@
 /**
  * {@link createMcpResourceReader} - resolve MCP `resource_link` handles
- * on demand (WI-13 / P2-2, ties to WI-10 result handles).
+ * on demand.
  *
  * The `toTools()` adapter surfaces an MCP `resource_link` as a preview +
  * the resource `uri` (the {@link import('@graphorin/tools/result').ResultReader}
@@ -15,7 +15,7 @@
  * than one MCP client, the reader tries each until one server resolves
  * the URI.
  *
- * Network note (R4): this reader performs no I/O until `read(...)` is
+ * Network note: this reader performs no I/O until `read(...)` is
  * called, and then only over a connection the operator already opened.
  *
  * @packageDocumentation
@@ -32,7 +32,7 @@ export interface McpResourceReaderOptions {
   /** Default `maxBytes` when `read(...)` is called without one. Default `65536`. */
   readonly defaultMaxBytes?: number;
   /**
-   * mcp-skills-06: allow a BARE (unscoped) resource URI to be tried
+   * Allow a BARE (unscoped) resource URI to be tried
    * against every configured client. Default `false` - handles minted
    * by the adapter are scoped (`mcp:<serverId>:<uri>`) and resolve
    * ONLY against their originating server, so a malicious server's
@@ -112,7 +112,7 @@ export function createMcpResourceReader(opts: McpResourceReaderOptions): ResultR
 }
 
 /**
- * Raw resource bytes (MC-10): text resources as UTF-8, blob resources
+ * Raw resource bytes: text resources as UTF-8, blob resources
  * DECODED from base64 - slicing/totalBytes operate on real payload
  * bytes, never on the ~33%-inflated base64 string (whose arbitrary
  * cuts also break base64 quads).

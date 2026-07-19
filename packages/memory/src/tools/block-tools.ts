@@ -13,7 +13,7 @@ const blockAppendOutputSchema = z.object({
 });
 
 /**
- * W-013: explicit interfaces instead of `z.infer<typeof schema>` - the
+ * Explicit interfaces instead of `z.infer<typeof schema>` - the
  * inferred aliases baked concrete v3 zod object generics into
  * the published d.ts, which do not typecheck under a zod@4 consumer.
  * Interface<->schema equality is pinned by type tests.

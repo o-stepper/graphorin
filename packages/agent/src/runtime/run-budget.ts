@@ -1,10 +1,10 @@
 /**
- * Run-level budget enforcement (C5 / W-084 residual, decision D-8).
+ * Run-level budget enforcement.
  *
  * A pure between-step precheck against the run's accumulated
  * `state.usage`: the run loop calls {@link checkRunBudget} at the top
  * of every step, after the previous step's usage (and any sub-agent
- * folds, W-033) landed. The step that crosses a ceiling completes -
+ * folds) landed. The step that crosses a ceiling completes -
  * in-flight overshoot is inherent to between-step enforcement, exactly
  * like the consolidator's `BudgetTracker` precheck.
  *
@@ -94,7 +94,7 @@ export function checkRunBudget(
 /**
  * `true` when a cost ceiling is configured but the accumulated usage
  * carries no USD cost data - the ceiling is unenforceable. The run
- * loop WARNs once per run on this condition (the `withCostLimit` PS-8
+ * loop WARNs once per run on this condition (the `withCostLimit`
  * precedent: a silently inert limit is worse than none).
  */
 export function isCostCeilingUnpriced(budget: RunBudget, usage: Usage): boolean {

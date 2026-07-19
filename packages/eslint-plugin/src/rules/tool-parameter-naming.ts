@@ -1,5 +1,5 @@
 /**
- * Rule: `@graphorin/tool-parameter-naming` (RB-49). Inspects the
+ * Rule: `@graphorin/tool-parameter-naming`. Inspects the
  * `inputSchema: z.object({...})` declaration of every `tool({...})`
  * invocation and flags two anti-patterns:
  *
@@ -11,7 +11,7 @@
  *
  * Per-tool opt-out: when the tool declares `tags: ['experimental']`
  * or `tags: ['legacy']` the rule is suppressed for that registration.
- * This lets operators defer the rename for a long tail of pre-RB-49
+ * This lets operators defer the rename for a long tail of pre-existing
  * tools while the framework migrates without breaking calling code.
  *
  * @packageDocumentation

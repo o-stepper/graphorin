@@ -215,7 +215,7 @@ export class WorkingMemory {
   }
 
   /**
-   * Hard-delete a block (wave-D D2, GDPR path). Unlike {@link forget}
+   * Hard-delete a block (GDPR path). Unlike {@link forget}
    * (soft tombstone), the stored value is gone. This is the erasure
    * surface for USER-scoped blocks (e.g. the `profile` projection): the
    * session-delete cascade never reaches rows without a session id, so

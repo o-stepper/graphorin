@@ -116,7 +116,7 @@ const DEFAULT_VALIDATION: RedactionValidatorOptions = Object.freeze({
  * @stable
  */
 /**
- * SESSION-R-01: opaque correlation identifiers that must survive any export
+ * Opaque correlation identifiers that must survive any export
  * validation floor - the span exporter keys replay rows on
  * `graphorin.session.id`, and these ids carry no sensitive content.
  */

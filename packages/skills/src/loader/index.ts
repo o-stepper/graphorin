@@ -483,7 +483,7 @@ function parseAndValidate(skillMd: string, options: LoadSkillOptions): ParsedAnd
 }
 
 /**
- * RP-11(d): a frontmatter field that is present but unparseable must not be
+ * A frontmatter field that is present but unparseable must not be
  * silently dropped (`?? []`). Surface an `invalid-field-type` diagnostic so
  * callers can audit the rejected value, as the parser contracts mandate.
  */
@@ -519,7 +519,7 @@ function appendInvalidFieldTypeDiagnostics(
 }
 
 /**
- * RP-11(b): under `conflictPolicy: 'error'`, an error-severity diagnostic
+ * Under `conflictPolicy: 'error'`, an error-severity diagnostic
  * fails the load through the matching typed exception instead of being
  * silently surfaced. Default (`'warn'`) keeps these as diagnostics.
  */
@@ -746,7 +746,7 @@ function extractTrustLevel(source: SkillSource): SkillsTrustLevel | undefined {
 /**
  * Cap a folder skill's self-declared trust level. A directory on disk -
  * possibly downloaded from the internet - cannot self-promote to a trusted
- * tier without an operator override (RP-9): `trusted` /
+ * tier without an operator override: `trusted` /
  * `trusted-with-scripts` collapse to `'unknown'` (sandbox forced, signature
  * optional, outputs taint-marked), while `untrusted` / `unknown` pass
  * through unchanged.

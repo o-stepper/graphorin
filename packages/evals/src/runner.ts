@@ -8,7 +8,7 @@
  *  - `concurrency` - bounded worker pool. Default `1` (sequential).
  *  - `agentFactory` - per-worker agent construction, so single-run
  *    agents (a Graphorin `Agent` allows one run in flight per
- *    instance) work at `concurrency > 1` (E-19).
+ *    instance) work at `concurrency > 1`.
  *  - `signal` - propagated to `agent.run(...)` if the agent accepts a
  *    second `{ signal }` argument; the runner stops issuing new work
  *    on the next loop iteration.
@@ -35,7 +35,7 @@ import type {
  * run in flight per instance). This is a run *configuration* error -
  * every remaining case on the shared instance would fail the same way,
  * so the runner fails fast with the remedy instead of burying the
- * cause in per-case scorer failures (E-19). The original agent error
+ * cause in per-case scorer failures. The original agent error
  * is preserved as `cause`.
  *
  * @stable

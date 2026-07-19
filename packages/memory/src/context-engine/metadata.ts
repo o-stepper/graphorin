@@ -73,7 +73,7 @@ export async function gatherMemoryMetadata(
 }
 
 /**
- * Read a tier's `count(scope)` when the adapter exposes it (CE-5), degrading to
+ * Read a tier's `count(scope)` when the adapter exposes it, degrading to
  * `0` for adapters that do not - honest, and never the old 0/1 probe.
  */
 async function countOrZero(

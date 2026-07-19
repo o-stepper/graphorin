@@ -88,7 +88,7 @@ export interface TriggersCheck extends BaseHealthCheck {
   readonly disabled: number;
   readonly deferred: number;
   /**
-   * SERVER-DO-01: count of persisted triggers whose declaration is not
+   * Count of persisted triggers whose declaration is not
    * registered in this process (they will never fire until re-registered or
    * pruned). The daemon status already exposes this; the health check now
    * surfaces it too.
@@ -104,7 +104,7 @@ export interface ReplayBufferCheck extends BaseHealthCheck {
   readonly subscriptions?: number;
 }
 
-/** B1.6: channel-gateway health. @stable */
+/** Channel-gateway health. @stable */
 export interface ChannelsCheck extends BaseHealthCheck {
   readonly running: boolean;
   /** Number of registered channels (adapters). */
@@ -129,7 +129,7 @@ export type HealthCheck =
   | ChannelsCheck
   | ReplayBufferCheck;
 
-/** W-032: durable-timer driver health. @stable */
+/** Durable-timer driver health. @stable */
 export interface WorkflowTimersCheck {
   readonly status: HealthStatus;
   readonly running: boolean;

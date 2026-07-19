@@ -27,7 +27,7 @@
  * almost always a `SecretValue` in this codebase and (b) the
  * one-line opt-out is cheap.
  *
- * Known collision (W-043): Zod's `ZodOptional`/`ZodNullable`/
+ * Known collision: Zod's `ZodOptional`/`ZodNullable`/
  * `ZodDefault` expose `.unwrap()`, and Rust-style result libraries use
  * it too - schema-introspection code trips the rule. The
  * `allowReceiverPattern` option carves those receivers out: when the

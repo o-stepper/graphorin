@@ -1,5 +1,5 @@
 /**
- * C5: offline fusion-weight fitting. Tuned convex/weighted fusion beats
+ * Offline fusion-weight fitting. Tuned convex/weighted fusion beats
  * RRF with a handful of labelled queries (Bruch et al., TOIS 2023) - this
  * module turns that into a small, pure routine: grid-search
  * {@link FusionWeights} over labelled cases and return the setting that
@@ -70,7 +70,7 @@ export function ndcgAtK(
 }
 
 /**
- * Grid-search fusion weights against labelled cases (C5).
+ * Grid-search fusion weights against labelled cases.
  *
  * @stable
  */

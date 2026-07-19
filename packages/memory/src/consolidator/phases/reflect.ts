@@ -1,5 +1,5 @@
 /**
- * Reflection pass (P1-1) - the deep phase's higher-order synthesis
+ * Reflection pass - the deep phase's higher-order synthesis
  * step, following the Generative-Agents recipe. When the accumulated
  * importance of recent episodes crosses a threshold, ask the model for
  * the few most salient questions, retrieve evidence for each, and
@@ -31,7 +31,7 @@ import type { BudgetTracker } from '../budget.js';
 /** ExpeL starting salience for a freshly-synthesized insight. */
 const STARTING_SALIENCE = 2;
 
-/** W-082 default bound on the unreviewed quarantined-insight queue. */
+/** Default bound on the unreviewed quarantined-insight queue. */
 const DEFAULT_MAX_QUARANTINED_INSIGHTS = 100;
 
 /** How many recent episode summaries to show the salient-questions prompt. */
@@ -53,7 +53,7 @@ export interface ReflectionDeps {
   readonly importanceThreshold: number;
   /**
    * `ended_at` (epoch ms) of the newest episode a prior pass already reflected
-   * on (MCON-13). The gate accumulates importance only from strictly-newer
+   * on. The gate accumulates importance only from strictly-newer
    * episodes, so a deep run with no new episodes never re-fires. `null` /
    * absent ⇒ nothing reflected yet (accumulate over all recent episodes).
    */
@@ -61,7 +61,7 @@ export interface ReflectionDeps {
   /** Upper bound on salient questions asked per pass. */
   readonly maxQuestions: number;
   /**
-   * W-082: cap on the quarantined-insight review queue. Quarantined
+   * Cap on the quarantined-insight review queue. Quarantined
    * insights are EXEMPT from pass-decay (they are invisible to
    * retrieval, so use-it-or-lose-it cannot apply); this cap keeps the
    * unreviewed queue from growing without bound - beyond it the OLDEST
@@ -83,7 +83,7 @@ export interface ReflectionOutcome {
   readonly tokens: number;
   readonly costUsd: number;
   /**
-   * Watermark to persist for the next pass (MCON-13): the `ended_at` (epoch
+   * Watermark to persist for the next pass: the `ended_at` (epoch
    * ms) of the newest episode this pass reflected on, or the incoming
    * watermark unchanged when the pass did not fire. The runtime persists it
    * to `consolidator_state`.

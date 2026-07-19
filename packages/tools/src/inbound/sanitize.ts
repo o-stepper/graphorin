@@ -105,7 +105,7 @@ export function applyInboundSanitization(opts: {
   readonly failClosed?: boolean;
   readonly patterns?: ReadonlyArray<ImperativePattern>;
   /**
-   * Best-effort scan budget in milliseconds. Default `250` (TOOLS-EX-02 - the
+   * Best-effort scan budget in milliseconds. Default `250` (the
    * effective default; see the inline note on why 5 ms was too tight). On a
    * timeout the strip pass is skipped and the body returned unredacted.
    */
@@ -231,7 +231,7 @@ export interface InboundSanitizationWithClassifierOptions {
   readonly patterns?: ReadonlyArray<ImperativePattern>;
   readonly budgetMs?: number;
   /**
-   * B4 (D-12): optional pluggable injection classifier consulted
+   * Optional pluggable injection classifier consulted
    * AFTER the regex pass, on the already-sanitized body. A flagged
    * verdict appends `classifier:<id>` to `patternsHit` (audit
    * signal); the body is never modified by the classifier (it names
@@ -243,7 +243,7 @@ export interface InboundSanitizationWithClassifierOptions {
 
 /**
  * Async variant of {@link applyInboundSanitization} that additionally
- * consults an optional {@link InjectionClassifier} (B4 seam, default
+ * consults an optional {@link InjectionClassifier} (default
  * off). Identical to the sync pass when no classifier is supplied.
  *
  * @stable

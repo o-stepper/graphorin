@@ -1,5 +1,5 @@
 /**
- * Retry phase (C3): transparent bounded retry for transient tool
+ * Retry phase: transparent bounded retry for transient tool
  * failures around a single-attempt runner. See
  * `ExecutorOptions.retry` for the semantics and defaults.
  *

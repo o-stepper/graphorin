@@ -39,10 +39,10 @@ export interface EmbeddedWriteOptions {
     readonly vector: Float32Array;
   };
   /**
-   * Contextual-retrieval index text (P1-3). When supplied, the adapter
+   * Contextual-retrieval index text. When supplied, the adapter
    * indexes its lexical (FTS) surface against this context-prepended
    * text while persisting the canonical `text` unchanged. Absent ⇒ the
-   * canonical text is indexed (pre-P1-3 behaviour).
+   * canonical text is indexed (no situating prefix).
    */
   readonly indexText?: string;
 }
@@ -61,19 +61,19 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
-    /** Point-in-time filter (`started_at <= asOf`, ISO-8601). P0-2. */
+    /** Point-in-time filter (`started_at <= asOf`, ISO-8601). */
     asOf?: string,
-    /** Include quarantined episodes (validation/inspector path). P1-4. */
+    /** Include quarantined episodes (validation/inspector path). */
     includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
   /**
    * Mark an episode archived. Soft-archive - the row stays for replay.
-   * W-154: with `scope`, adapters no-op unless the row belongs to it.
+   * With `scope`, adapters no-op unless the row belongs to it.
    */
   archive?(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
    * Most-recent episodes by end time (newest first), with no FTS / vector
-   * query - recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
+   * query - recency, not relevance. Powers `EpisodicMemory.recent()`
    * and the deep-phase reflection gate. The default `@graphorin/store-sqlite`
    * adapter implements it.
    */
@@ -83,7 +83,7 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     options?: { includeQuarantined?: boolean },
   ): Promise<ReadonlyArray<Episode>>;
   /**
-   * Set an episode's retrieval-trust `status` (MCON-2) - promote a quarantined
+   * Set an episode's retrieval-trust `status` - promote a quarantined
    * (auto-formed) episode into default recall or re-quarantine an active one,
    * with a `memory_history` audit row. Powers {@link EpisodicMemory.validate}.
    */
@@ -94,7 +94,7 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     scope?: SessionScope,
   ): Promise<void>;
   /**
-   * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`,
+   * Count the recall-eligible episodes for the scope - a `COUNT(*)`,
    * never materialising rows. Powers honest `metadata()` counts.
    */
   count?(scope: SessionScope): Promise<number>;
@@ -116,21 +116,21 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
     topK: number,
     /**
      * Point-in-time filter applied after KNN: only facts whose
-     * validity interval contains `asOf` (ISO-8601) survive. P0-2.
+     * validity interval contains `asOf` (ISO-8601) survive.
      */
     asOf?: string,
     /**
      * Include quarantined facts in the KNN result (validation /
-     * inspector path). Default reads exclude them. P1-4.
+     * inspector path). Default reads exclude them.
      */
     includeQuarantined?: boolean,
     /**
      * Include superseded / validity-expired facts. Default reads
-     * evaluate validity at NOW (memory-retrieval-01).
+     * evaluate validity at NOW.
      */
     includeSuperseded?: boolean,
     /**
-     * Retrieval-time principal filter (D3). Rows with no stored owner
+     * Retrieval-time principal filter. Rows with no stored owner
      * are treated as `'user'`. Absent ⇒ no owner filter.
      */
     owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
@@ -139,7 +139,7 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
   get?(id: string): Promise<Fact | null>;
   /**
    * Set a fact's retrieval-trust `status` and write a `memory_history`
-   * audit row (P1-4). Promotes a quarantined fact to `active` (the
+   * audit row. Promotes a quarantined fact to `active` (the
    * validation path) or re-quarantines an active one. Never touches
    * content / embedding / tombstone - quarantine is a retrieval gate.
    * Powers {@link SemanticMemory.validate}; the default
@@ -152,7 +152,7 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
     scope?: SessionScope,
   ): Promise<void>;
   /**
-   * Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
+   * Count the recall-eligible facts for the scope - a `COUNT(*)` with
    * the default recall filters (live, non-archived, non-quarantined), never
    * materialising rows. Powers honest `metadata()` counts.
    */
@@ -164,7 +164,7 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    */
   purge?(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
-   * W-019: record a PENDING supersede link - set `newId.supersedes =
+   * Record a PENDING supersede link - set `newId.supersedes =
    * oldId` WITHOUT closing the old fact's validity interval. Used when
    * a supersede's successor lands quarantined: the old fact must stay
    * in default recall until the successor is validated, at which point
@@ -179,18 +179,18 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * including superseded / soft-deleted rows so callers can answer
    * "how did this fact change over time". Scope-guarded and
    * cycle-safe; returns `[]` for an unknown id. Powers
-   * {@link SemanticMemory.history} (P0-2). The default
+   * {@link SemanticMemory.history}. The default
    * `@graphorin/store-sqlite` adapter implements it.
    */
   historyOf?(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>>;
   /**
-   * Enumerate the recall-eligible facts for the scope (wave-D): live,
+   * Enumerate the recall-eligible facts for the scope: live,
    * non-archived, `status = 'active'`, validity interval containing
    * now - the same view default recall sees, but as a deterministic
    * list (`created_at` order) instead of a ranked search. Powers the
-   * profile-projection pass (D2) and the operation-level benchmark
-   * observation (D1). `excludePendingSupersede` additionally drops
-   * facts whose supersede is still pending W-019 validation (a
+   * profile-projection pass and the operation-level benchmark
+   * observation. `excludePendingSupersede` additionally drops
+   * facts whose supersede is still pending validation (a
    * quarantined successor links to them) - a projection must not
    * present a value that is already known to be contested.
    */
@@ -203,7 +203,7 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
   ): Promise<ReadonlyArray<Fact>>;
   /**
    * Enumerate quarantined, live, non-archived facts together with
-   * their recall statistics (wave-D D4) - the candidate feed for the
+   * their recall statistics - the candidate feed for the
    * deterministic PromotionPolicy: `accessCount` is the monotonic
    * migration-027 counter, `uniqueQueryCount` the migration-036
    * distinct-query ledger count. Deterministic `created_at` order.
@@ -235,7 +235,7 @@ export interface SessionMessageRecord {
   readonly tokenCount: number | null;
   readonly message: Message;
   /**
-   * B3 (item 15): the turn's persisted security verdict, when the run
+   * The turn's persisted security verdict, when the run
    * loop stamped one (`SessionMessagePushOptions.verdict`). Read by
    * the memory ingest gate to exclude guardrail-blocked turns from
    * extraction. Additive to the @stable tuple.
@@ -275,7 +275,7 @@ export interface SessionMemoryStoreExt extends SessionMemoryStore {
     limit: number,
   ): Promise<ReadonlyArray<SessionMessageRecord>>;
   /**
-   * Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
+   * Count the live messages in the scoped session - a `COUNT(*)`, never
    * materialising rows; `0` for a user-only scope. Powers honest `metadata()`
    * counts instead of `list(...)`-materialising up to 1000 rows.
    */
@@ -298,7 +298,7 @@ export interface EmbeddingMetaRegistryLike {
     readonly distanceMetric?: 'cosine' | 'dot' | 'euclidean';
     readonly configHash: string;
     /**
-     * Write-path contextualization recipe (item 10 step 1) - joins the
+     * Write-path contextualization recipe - joins the
      * index version key so a `contextualRetrieval` switch invalidates
      * the index like a model change. Optional-additive: registries
      * predating the field ignore it.
@@ -331,7 +331,7 @@ export type ConflictAuditStage =
  * Final pipeline outcome recorded against the candidate fact. Matches
  * the storage adapter's `ConflictPipelineDecision` exactly.
  * `'judge-unparseable'` closes a pending row whose deep-phase judge
- * call repeatedly failed (MCON-9) so it stops being re-billed forever.
+ * call repeatedly failed so it stops being re-billed forever.
  *
  * @stable
  */
@@ -415,8 +415,8 @@ export interface ConflictMemoryStoreExt {
   listPending(scope: SessionScope, limit?: number): Promise<ReadonlyArray<PendingConflictRowLike>>;
   markResolved(id: number, decision: ConflictAuditDecision): Promise<void>;
   /**
-   * Stamp `attemptedAt` on a pending row whose judge call failed
-   * (MCON-9). The deep phase closes the row as `'judge-unparseable'`
+   * Stamp `attemptedAt` on a pending row whose judge call failed.
+   * The deep phase closes the row as `'judge-unparseable'`
    * on the NEXT failure, so a poisoned row is billed at most twice.
    * Optional - without it the deep phase falls back to skip-and-retry.
    */
@@ -443,7 +443,7 @@ export interface ConsolidatorStateRow {
   readonly activeLockAcquiredAt: number | null;
   /**
    * `ended_at` (epoch ms) of the newest episode the deep-phase reflection
-   * pass has already reflected on (MCON-13). A later pass accumulates
+   * pass has already reflected on. A later pass accumulates
    * importance only from strictly-newer episodes; `null` ⇒ nothing reflected
    * yet.
    */
@@ -496,9 +496,9 @@ export interface ConsolidatorRunFinish {
   readonly conflictsResolved?: number;
   readonly noiseFilteredCount?: number;
   readonly emptyExtractions?: number;
-  /** Episodes auto-formed by the run (P1-2 / MCON-17). */
+  /** Episodes auto-formed by the run. */
   readonly episodesFormed?: number;
-  /** Insights synthesized by the run's reflection pass (P1-1 / MCON-17). */
+  /** Insights synthesized by the run's reflection pass. */
   readonly insightsCreated?: number;
   readonly errorMessage?: string | null;
   readonly retryCount?: number;
@@ -516,7 +516,7 @@ export interface DlqBatchInput {
   readonly nextRetryAt: number;
   readonly retryCount: number;
   /**
-   * Phase that failed (MCON-10) so `drainDlq` replays the SAME phase
+   * Phase that failed so `drainDlq` replays the SAME phase
    * instead of inferring (the old inference hard-coded `'standard'`).
    * Absent / `null` ⇒ legacy row, replayed as `'standard'`.
    */
@@ -534,7 +534,7 @@ export interface DlqBatchRow {
   readonly failedAt: number;
   readonly nextRetryAt: number | null;
   readonly retryCount: number;
-  /** Phase that failed (MCON-10); `null`/absent ⇒ legacy row. */
+  /** Phase that failed; `null`/absent ⇒ legacy row. */
   readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
@@ -629,13 +629,13 @@ export interface DecayMemoryStoreExt {
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
    *
-   * Archived rows are EXCLUDED by default (MCON-6) - they never receive
+   * Archived rows are EXCLUDED by default - they never receive
    * access bumps, so they would pin the LRU head and saturate the decay
    * window, structurally stopping threshold-archiving and capacity
    * eviction for live facts. Inspection paths pass
    * `{ includeArchived: true }`.
    *
-   * `importance` / `status` / `provenance` (X-1) feed the multi-signal
+   * `importance` / `status` / `provenance` feed the multi-signal
    * salience score that orders capacity-bounded eviction.
    */
   listForDecay(
@@ -650,14 +650,14 @@ export interface DecayMemoryStoreExt {
       readonly lastAccessedAt: number | null;
       readonly createdAt: number;
       readonly archived: boolean;
-      /** Importance hint in `[0, 1]`; `null` when unscored (X-1). */
+      /** Importance hint in `[0, 1]`; `null` when unscored. */
       readonly importance: number | null;
-      /** Retrieval-trust state (P1-4): `'active'` | `'quarantined'`. */
+      /** Retrieval-trust state: `'active'` | `'quarantined'`. */
       readonly status: string;
-      /** Trust-provenance tag (P1-4); `null` for first-party rows. */
+      /** Trust-provenance tag; `null` for first-party rows. */
       readonly provenance: string | null;
       /**
-       * Monotonic retrieval-access counter (D3, migration 027). Feeds
+       * Monotonic retrieval-access counter (migration 027). Feeds
        * the opt-in `accessReinforcement` salience weight. Optional -
        * adapters without the column omit it (treated as `0`).
        */
@@ -670,11 +670,11 @@ export interface DecayMemoryStoreExt {
    */
   archiveFact(id: string, reason?: string, scope?: SessionScope): Promise<void>;
   /**
-   * Record a retrieval access for the given facts (MRET-7): stamp
+   * Record a retrieval access for the given facts: stamp
    * `lastAccessedAt` and reinforce `strength` (implementation-capped).
    * Optional - adapters without decay columns may omit it; callers
    * MUST treat failures as non-fatal (the read path never breaks on a
-   * bookkeeping write). With `queryHash` (wave-D D4) the adapter also
+   * bookkeeping write). With `queryHash` the adapter also
    * feeds the persistent recall ledger - the DISTINCT-query counter
    * behind the PromotionPolicy `minUniqueQueries` threshold.
    */
@@ -685,7 +685,7 @@ export interface DecayMemoryStoreExt {
     queryHash?: string,
   ): Promise<void>;
   /**
-   * Narrow decay-column read for exactly the given fact ids (MRET-8) -
+   * Narrow decay-column read for exactly the given fact ids -
    * powers per-search decay re-ranking without the old O(scope)
    * 1000-row window read. Optional; absent ⇒ the tier falls back to
    * `listForDecay`.
@@ -715,8 +715,8 @@ export interface InsightSearchStoreOptions {
 }
 
 /**
- * Optional storage extension for the reflection `insights` table
- * (P1-1). The consolidator's reflection pass inserts quarantined,
+ * Optional storage extension for the reflection `insights` table.
+ * The consolidator's reflection pass inserts quarantined,
  * cited insights here; the thin `InsightMemory` read surface lists /
  * searches them; the ExpeL salience loop bumps + prunes them. Search is
  * FTS-only by design - insights are a soft, rank-capped inspector
@@ -743,7 +743,7 @@ export interface InsightMemoryStoreExt {
   /** Lookup a single insight by id (`null` when absent / pruned). */
   get?(id: string): Promise<Insight | null>;
   /**
-   * Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
+   * Set an insight's retrieval-trust `status` - promote a quarantined
    * (reflection) insight or re-quarantine an active one, with a
    * `memory_history` audit row. Powers {@link InsightMemory.validate}.
    */
@@ -768,7 +768,7 @@ export interface InsightMemoryStoreExt {
 
 /**
  * Extension of the typed `ProceduralMemoryStore` with the optional
- * promotion helper that storage adapters may expose (MCON-2).
+ * promotion helper that storage adapters may expose.
  *
  * @stable
  */
@@ -785,7 +785,7 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
     scope?: SessionScope,
   ): Promise<void>;
   /**
-   * Lexical runbook search over rule text (D3, migration 028) - content
+   * Lexical runbook search over rule text (migration 028) - content
    * recall for "find the procedure for this task", as opposed to
    * predicate activation. Quarantined (unvalidated induced) procedures
    * are excluded unless the inspector opts in. Optional - adapters
@@ -799,7 +799,7 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Rule>>>;
   /**
    * Record one demonstrated successful reuse of a rule and return the
-   * new counter value (MCON-2 part 4). Powers
+   * new counter value. Powers
    * promotion-by-demonstrated-success via
    * {@link ProceduralMemory.recordOutcome}. Optional - adapters without
    * the counter simply never auto-promote.
@@ -828,7 +828,7 @@ export interface EntityWithEmbedding extends GraphEntity {
   readonly embedderId: string | null;
 }
 
-/** One row of the append-only merge / unmerge audit ledger (P2-1). */
+/** One row of the append-only merge / unmerge audit ledger. */
 export interface EntityMergeRecord {
   readonly id: string;
   readonly userId: string;
@@ -851,14 +851,14 @@ export interface ExpandHopsStoreOptions {
   readonly asOf?: string;
   /**
    * Include superseded / validity-expired neighbours. Default reads
-   * evaluate validity at NOW (memory-retrieval-01).
+   * evaluate validity at NOW.
    */
   readonly includeSuperseded?: boolean;
 }
 
 /**
  * Optional storage extension for the lightweight in-SQLite relation
- * graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
+ * graph. Owns the canonical `entities` table, the `fact_entities`
  * mapping, and the append-only `entity_merges` ledger. The entity
  * *resolution policy* (lexical + embedding dedup, optional LLM
  * adjudication) lives in `@graphorin/memory`; this surface is the pure
@@ -884,7 +884,7 @@ export interface GraphMemoryStoreExt {
    * Uncapped indexed lookup of the canonical root for an exact normalized
    * name. Lets the resolver dedup an exact alias of an arbitrarily-old
    * entity without scanning (and deserializing) the bounded
-   * {@link listEntities} candidate window (CS-11). Optional: stores without
+   * {@link listEntities} candidate window. Optional: stores without
    * it fall back to the capped lexical scan inside `resolveEntityDecision`.
    */
   findEntityByNormalizedName?(
@@ -916,7 +916,7 @@ export interface GraphMemoryStoreExt {
     opts?: ExpandHopsStoreOptions,
   ): Promise<ReadonlyArray<Fact>>;
   /**
-   * PPR-lite graded expansion (D5): like {@link expandOneHop} but returns
+   * PPR-lite graded expansion: like {@link expandOneHop} but returns
    * each neighbour with its minimum hop `depth` from the seeds, so the
    * tier can weight it by damped spreading activation. Optional - stores
    * without it fall back to flat one-hop expansion.
@@ -927,7 +927,7 @@ export interface GraphMemoryStoreExt {
     opts?: ExpandHopsStoreOptions,
   ): Promise<ReadonlyArray<{ readonly fact: Fact; readonly depth: number }>>;
   /**
-   * Exact entity-match retriever (D5): facts linked to the canonical
+   * Exact entity-match retriever: facts linked to the canonical
    * entity for `normalizedName`. Optional. Powers a precise
    * "facts about <entity>" candidate leg.
    */
@@ -973,7 +973,7 @@ export interface MemoryStoreAdapter
    */
   readonly consolidator?: ConsolidatorMemoryStoreExt;
   /**
-   * Optional reflection insight surface (P1-1). Defined on the default
+   * Optional reflection insight surface. Defined on the default
    * `@graphorin/store-sqlite` adapter; omitted ⇒ reflection is a no-op
    * and `InsightMemory` reads return empty.
    *
@@ -981,7 +981,7 @@ export interface MemoryStoreAdapter
    */
   readonly insights?: InsightMemoryStoreExt;
   /**
-   * Optional relation-graph surface (P2-1). Defined on the default
+   * Optional relation-graph surface. Defined on the default
    * `@graphorin/store-sqlite` adapter; omitted ⇒ entity resolution on
    * write is a no-op and `search({ expandHops })` skips expansion.
    *

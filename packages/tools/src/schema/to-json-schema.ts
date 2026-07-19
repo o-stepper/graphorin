@@ -1,5 +1,5 @@
 /**
- * Zod-to-JSON-Schema projection (tools-01).
+ * Zod-to-JSON-Schema projection.
  *
  * Providers speak JSON Schema: an OpenAI-shaped `tools[].function.parameters`
  * block, an Anthropic `input_schema`, a code-mode signature - all of them

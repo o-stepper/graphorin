@@ -26,7 +26,7 @@ const factRememberInputSchema = z.object({
 const factRememberOutputSchema = z.object({
   factId: z.string(),
   /**
-   * MRET-3: `true` when the write landed in quarantine (hidden from
+   * `true` when the write landed in quarantine (hidden from
    * default recall until validated). A synthesized consolidator write or
    * a candidate that tripped the injection heuristics quarantines.
    */
@@ -36,7 +36,7 @@ const factRememberOutputSchema = z.object({
 });
 
 /**
- * W-013: explicit interfaces instead of `z.infer<typeof schema>` - the
+ * Explicit interfaces instead of `z.infer<typeof schema>` - the
  * inferred aliases baked concrete v3 zod object generics into
  * the published d.ts, which do not typecheck under a zod@4 consumer.
  * Interface<->schema equality is pinned by type tests. Optionals carry
@@ -73,7 +73,7 @@ const factSearchOutputSchema = z.object({
       /**
        * Set when the fact's validity interval was closed (superseded /
        * expired). Only present on `asOf` reads - default reads exclude
-       * such facts entirely (memory-retrieval-01).
+       * such facts entirely.
        */
       validTo: z.string().optional(),
       /** Id of the fact that superseded this one, when any. */
@@ -386,7 +386,7 @@ export function createFactForgetTool(
  * `fact_history` - trace how a fact changed over time. Returns the
  * full bi-temporal supersede chain the given fact belongs to, oldest →
  * newest, including superseded entries, so the agent can answer "what
- * did the user say before" / "how did this change". Read-only. P0-2.
+ * did the user say before" / "how did this change". Read-only.
  *
  * @stable
  */
@@ -423,12 +423,12 @@ export function createFactHistoryTool(
 }
 
 /**
- * `fact_validate` - promote a quarantined fact to active (P1-4). The
+ * `fact_validate` - promote a quarantined fact to active. The
  * validation path that admits a synthesized (consolidator / reflection)
  * memory into action-driving recall once it has been reviewed; the
  * promotion is audited in `memory_history`.
  *
- * MRET-3 / MST-1 - two gates close the one-turn memory-poisoning chain
+ * Two gates close the one-turn memory-poisoning chain
  * (`fact_remember(poison)` → `fact_validate(id)` → active recall):
  *
  * 1. `needsApproval: true` - the run suspends for a human decision

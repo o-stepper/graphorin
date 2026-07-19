@@ -1,8 +1,8 @@
 /**
- * Pluggable prompt-injection classifier seam (D-12, item 14).
+ * Pluggable prompt-injection classifier seam.
  *
  * The framework's three regex layers (inbound tool sanitization,
- * SDF-4 output guardrails, the memory write-time quarantine
+ * the output guardrails, the memory write-time quarantine
  * heuristics) catch KNOWN imperative patterns; a classifier catches
  * paraphrases and novel phrasings. This module defines the seam
  * only - the framework ships NO classifier (offline default off);
@@ -83,7 +83,7 @@ export interface InjectionClassifierGuardrailOptions {
 }
 
 /**
- * Adapter for the SDF-4 output-guardrail surface: wrap a classifier
+ * Adapter for the output-guardrail surface: wrap a classifier
  * as an `OutputGuardrail` and add it to
  * `createAgent({ guardrails: { output: [...] } })`. Non-string
  * outputs pass through; classifier errors pass through (resilience

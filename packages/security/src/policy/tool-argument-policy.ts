@@ -1,14 +1,14 @@
 /**
- * Progent-style declarative tool-argument policies (D4 / tools-15) and
- * Rule-of-Two capability profiles (D4). Both are **pure, deterministic**
+ * Progent-style declarative tool-argument policies and Rule-of-Two
+ * capability profiles. Both are **pure, deterministic**
  * decision engines the tool executor consults BEFORE a call runs - the
  * preventive layer that turns the coarse lethal-trifecta trigger and the
  * inert `sandboxPolicy` advisory into an enforced default-deny.
  *
  * Progent policy (`ToolArgumentPolicy`):
- * - four-value vocabulary (E1): rule effects are `allow | deny | ask |
+ * - four-value vocabulary: rule effects are `allow | deny | ask |
  *   defer` with priority `deny > defer > ask > allow` (`'forbid'` stays
- *   accepted as the pre-E1 alias of `'deny'`), so narrowing composes
+ *   accepted as a legacy alias of `'deny'`), so narrowing composes
  *   safely and a later broad allow can never re-open a denied call,
  * - default-deny for sensitive tools: when `defaultDenySensitive` is on,
  *   a tool flagged `sensitive` with no matching `allow` is blocked,
@@ -39,7 +39,7 @@ export interface ToolCallFacts {
   /** `true` when the tool reads/handles sensitive data (e.g. `sensitivity: 'secret'`). */
   readonly sensitive?: boolean;
   /**
-   * `true` when the tool is an untrusted-content SOURCE (W-101) - its
+   * `true` when the tool is an untrusted-content SOURCE - its
    * trust class is one the taint engine treats as injection-bearing
    * (mcp-derived / web-search / skill-untrusted; see
    * `isUntrustedTrustClass` in `@graphorin/security/dataflow`). Powers
@@ -52,7 +52,7 @@ export interface ToolCallFacts {
 }
 
 /**
- * Four-value permission vocabulary (E1 / item 11):
+ * Four-value permission vocabulary:
  *
  * - `'allow'` - the call may run.
  * - `'deny'`  - the call must not run (deterministic block).
@@ -71,7 +71,7 @@ export type PermissionEffect = 'allow' | 'deny' | 'ask' | 'defer';
 
 /**
  * Effect accepted on a {@link ToolArgumentRule}: the four-value
- * vocabulary plus `'forbid'`, the pre-E1 spelling kept as a back-compat
+ * vocabulary plus `'forbid'`, the legacy spelling kept as a back-compat
  * alias of `'deny'` (existing policies keep working byte-for-byte).
  *
  * @stable
@@ -109,8 +109,8 @@ export type ToolPolicyDecision =
   | { readonly effect: 'forbid'; readonly reason: string };
 
 /**
- * Four-value decision returned by {@link evaluatePermissionDecision}
- * (E1). Non-`allow` effects always carry a reason.
+ * Four-value decision returned by {@link evaluatePermissionDecision}.
+ * Non-`allow` effects always carry a reason.
  *
  * @stable
  */
@@ -124,7 +124,7 @@ function toolMatches(pattern: string, toolName: string): boolean {
   return pattern === toolName;
 }
 
-/** `'forbid'` is the pre-E1 spelling of `'deny'` - normalise once here. */
+/** `'forbid'` is the legacy spelling of `'deny'` - normalise once here. */
 function normalisedEffect(effect: ToolRuleEffect): PermissionEffect {
   return effect === 'forbid' ? 'deny' : effect;
 }
@@ -138,7 +138,7 @@ const EFFECT_PRIORITY: Readonly<Record<PermissionEffect, number>> = {
 
 /**
  * Evaluate a policy against one tool call under the four-value
- * vocabulary (E1). Every matching rule contributes its (normalised)
+ * vocabulary. Every matching rule contributes its (normalised)
  * effect; the strongest wins with priority `deny > defer > ask >
  * allow`, so a broad late `allow` can never re-open a denied call and
  * an `ask`/`defer` narrows an `allow` but yields to a `deny`. When no
@@ -189,10 +189,10 @@ export function evaluatePermissionDecision(
 
 /**
  * Evaluate a policy against one tool call, projected onto the binary
- * pre-E1 vocabulary. Delegates to {@link evaluatePermissionDecision}
+ * legacy vocabulary. Delegates to {@link evaluatePermissionDecision}
  * and maps every non-`allow` effect to `'forbid'`: a consumer that
- * cannot ask or defer must not run the call (fail-closed). Policies
- * written before E1 contain only `allow`/`forbid` rules, for which this
+ * cannot ask or defer must not run the call (fail-closed). Legacy
+ * policies contain only `allow`/`forbid` rules, for which this
  * is byte-identical to the original forbid-before-allow semantics.
  *
  * @stable
@@ -212,7 +212,7 @@ export type NameDenialDecision =
   | { readonly denied: true; readonly reason: string };
 
 /**
- * Name-level deny check (E1 deny-by-name): does a PREDICATE-FREE
+ * Name-level deny check (deny-by-name): does a PREDICATE-FREE
  * `deny`/`forbid` rule match this tool name? Used at advertise time -
  * the per-step catalogue, `tool_search` results/promotion and the
  * executor's early mirror all consult it BEFORE any args exist. A rule

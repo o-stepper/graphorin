@@ -1,6 +1,6 @@
 /**
  * Per-call context preparation phase: resolves the sandbox policy for
- * the tool, links a per-call `AbortSignal` to the run signal (TL-11),
+ * the tool, links a per-call `AbortSignal` to the run signal,
  * opens the streaming channel, and builds the `ToolExecutionContext`
  * handed to the tool (and to `needsApproval` predicates).
  *
@@ -19,7 +19,7 @@ import type { ExecutorRuntime } from './types.js';
 export interface LinkedAbort {
   readonly signal: AbortSignal;
   readonly abort: () => void;
-  /** TL-11: detach from the parent - settled calls must not accumulate listeners. */
+  /** Detach from the parent - settled calls must not accumulate listeners. */
   readonly release: () => void;
 }
 

@@ -57,7 +57,7 @@ export const DEFAULT_PRESERVE_RECENT_TURNS = 6;
 const UNTRUSTED_MARKER = UNTRUSTED_CONTENT_OPEN_PREFIX;
 
 /**
- * Wall-clock budget for the CE-15 injection scan of the summarizer
+ * Wall-clock budget for the injection scan of the summarizer
  * output. The scanner's 5ms default exists for the per-tool-result
  * hot path; a compaction already paid for an LLM call, the summary
  * body is a single bounded text, and the pattern catalogue is fixed,
@@ -68,7 +68,7 @@ const UNTRUSTED_MARKER = UNTRUSTED_CONTENT_OPEN_PREFIX;
 const COMPACTION_SCAN_BUDGET_MS = Number.POSITIVE_INFINITY;
 
 /**
- * CE-15 trust decision for a freshly produced summary. Exported for
+ * Trust decision for a freshly produced summary. Exported for
  * unit tests because the `scan === null` branch (scanner budget
  * exceeded) MUST fail closed: the scanner's contract is "null = the
  * caller applies its own best-effort degradation", and treating null
@@ -86,17 +86,17 @@ export function resolveSummaryTrust(
   return scan.hits.length > 0 ? 'untrusted-derived' : 'trusted';
 }
 
-/** CE-15: does the compacted window carry inbound-untrusted envelopes? */
+/** Does the compacted window carry inbound-untrusted envelopes? */
 function windowContainsUntrusted(messages: ReadonlyArray<Message>): boolean {
   return messages.some((message) => renderMessageText(message).includes(UNTRUSTED_MARKER));
 }
 
 /**
- * CE-15: wrap the LLM-authored summary body in a derived-trust
+ * Wrap the LLM-authored summary body in a derived-trust
  * envelope. Envelope marker sequences inside the body are neutralized
  * first so summarizer output influenced by injected text cannot break
  * out of the envelope and masquerade as authoritative system text.
- * Delegates to the shared `internal/envelope.ts` helper (W-083) so the
+ * Delegates to the shared `internal/envelope.ts` helper so the
  * whole memory package neutralizes markers with one scheme; the
  * output is byte-identical to the historical inline implementation on
  * literal-marker inputs.
@@ -318,7 +318,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
 }
 
 /**
- * SOTA-1: clear the oldest tool results (zero-LLM), then summarize only if the
+ * Clear the oldest tool results (zero-LLM), then summarize only if the
  * cleared buffer is still over the threshold. The summarizer runs on the
  * already-reduced window, so a few-tool-result buffer compacts for free.
  */

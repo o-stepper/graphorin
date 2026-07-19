@@ -41,7 +41,7 @@ export interface ChannelGatewayLike {
   stop(): Promise<void>;
   status(): Promise<ChannelGatewayStatusLike>;
   /**
-   * A2 bridge seam: when present, the server registers a listener
+   * Bridge seam: when present, the server registers a listener
    * that records scheduler activity on every accepted inbound
    * message (idle-trigger debounce).
    */

@@ -155,7 +155,7 @@ const SCHEMA_RECORD_KEYS = new Set([
  * Strip imperative payloads from the ANNOTATION strings of an MCP tool
  * JSON Schema (`description` / `title` / `$comment` / string
  * `examples`) at any nesting depth, before the schema reaches the
- * provider wire and the `tool_search` projection (W-018, the Invariant
+ * provider wire and the `tool_search` projection (the Invariant
  * Labs tool-poisoning vector `properties.query.description`).
  *
  * Design choices:

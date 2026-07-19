@@ -107,7 +107,7 @@ export interface ResolvedContextEngineConfig {
   readonly reservedForCompaction: number;
   readonly compactionEnabled: boolean;
   /**
-   * Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a
+   * Whether compaction can actually fire: `compactionEnabled` **and** a
    * `providerContextWindow` was supplied. `compactionEnabled: true` with
    * `compactionEffective: false` is the honest signal that compaction is
    * configured-on but a no-op for want of a context window.

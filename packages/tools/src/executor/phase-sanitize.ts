@@ -1,6 +1,6 @@
 /**
  * Inbound-sanitization phase: defang the `content` field of tainted
- * handle reads in place (TL-6), scan the truncated body under the
+ * handle reads in place, scan the truncated body under the
  * tool's (or producer's) sanitization policy, emit the hit / blocked
  * audit rows, and surface `inbound_sanitization_blocked` on a
  * fail-closed block.

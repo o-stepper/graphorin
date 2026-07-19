@@ -56,7 +56,7 @@ export interface SkillRegistryOptions {
    */
   readonly activationStrategy?: 'metadata-only' | 'eager';
   /**
-   * Optional stamping function (RP-11). When supplied, `activate()` runs each
+   * Optional stamping function. When supplied, `activate()` runs each
    * skill's pre-built `Tool[]` through it and surfaces the results on
    * {@link ActivatedSkill.tools}. Without it, `activate()` surfaces no tools -
    * the agent runtime resolves and stamps them itself.
@@ -68,7 +68,7 @@ export interface SkillRegistryOptions {
 export interface SkillRegistry {
   register(skill: Skill): void;
   /**
-   * Upsert a skill by name (RP-11). Unlike {@link SkillRegistry.register},
+   * Upsert a skill by name. Unlike {@link SkillRegistry.register},
    * `replace` overwrites an existing registration instead of throwing on a
    * name collision - the upgrade path for hot-reloading a re-loaded skill.
    */

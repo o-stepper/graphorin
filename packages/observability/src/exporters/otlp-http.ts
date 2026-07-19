@@ -102,7 +102,7 @@ export function createOTLPHttpExporter(opts: OTLPHttpExporterOptions): TraceExpo
 
 /**
  * Convert a finished {@link SpanRecord} into an OTLP-HTTP `resourceSpans`
- * envelope. Exposed (OBS-PRIC-01) so an upstream OTel SDK pipeline can adapt
+ * envelope. Exposed so an upstream OTel SDK pipeline can adapt
  * Graphorin spans inside its own exporter, as the observability and migration
  * guides document.
  *
