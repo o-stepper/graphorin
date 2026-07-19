@@ -14,6 +14,62 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.0 - 2026-07-19
+
+The **fail-closed budget release** (PR #206): the response to the
+2026-07-19 external deep retest - all four P1 and three P2 findings
+closed, one of them with a deliberate breaking default.
+
+### Agent - unpriced cost ceilings are fail-closed (`@graphorin/agent`)
+
+- **BREAKING**: `RunBudget.maxCostUsd` with usage that carries no USD
+  cost data no longer warns and spends unmetered. The new
+  `RunBudget.onUnpriced` defaults to `'fail'`: the run stops at the
+  first between-step check (`'stop'` shape fails the run with
+  `error.code: 'budget-unpriced'`; `onExceed: 'throw'` rejects with the
+  new `AgentBudgetUnpricedError`). A caller who set a cost cap must
+  never keep spending unmetered. Opt back into the pre-0.13 warn-once
+  behaviour with `onUnpriced: 'warn'`, or wire `withCostTracking` with
+  a `@graphorin/pricing` snapshot so the ceiling observes real spend.
+
+### Pricing - the current OpenAI line is priced (`@graphorin/pricing`)
+
+- Added the GPT-5.6 family (`gpt-5.6-luna`, `gpt-5.6-terra`,
+  `gpt-5.6-sol`) to the bundled snapshot at the official standard
+  short-context rates; snapshot date is now 2026-07-19. The retest ran
+  Graphorin live against these models and found `lookupPrice` returned
+  null - which, combined with the old warn-only budget, meant
+  `maxCostUsd` was silently unenforced for the current OpenAI line.
+
+### CLI - onboarding honesty (`@graphorin/cli`, `@graphorin/security`)
+
+- `graphorin init --cloud-consent` is actionable instead of
+  decorative: the chosen tier is delivered as the exact
+  `createMemory({ contextEngine: { privacy } })` snippet - printed as
+  next-steps step 5 and embedded in the `.ts` config comment (memory
+  is composed in code; the server config genuinely cannot enforce it).
+- `graphorin doctor --all` with a config that disables the audit log
+  reports the audit-encryption check as `skip` instead of a false
+  `fail`; the internal "Phase 05" jargon left the hint.
+
+### Also in the repository at this version
+
+- **The spaced-path silent no-op class is dead**: 12 benchmark runners
+  and 2 documentation gates used an entrypoint guard that compared a
+  percent-encoded file URL to a raw path - in any checkout whose path
+  contains a space they imported, ran nothing, and exited 0. All 14 now
+  compare real paths, and the new `check-entry-guards` CI gate (static
+  sweep + a dynamic spaced-directory proof in gates-selftest) keeps the
+  idiom from coming back.
+- TypeDoc knows the house `@stable` tag: API-reference warnings fell
+  from 2721 to ~115 (0 errors), and the api-freshness gate is now
+  environment-independent (source links normalized regardless of git
+  context).
+- The HaluMem offline stub summarizes `scored=not-scored
+  (plumbing-only)` instead of a `passed=0` line that read like a failed
+  quality gate.
+- Transitive `adm-zip` pinned to `>=0.6.0` (GHSA-xcpc-8h2w-3j85).
+
 ## 0.12.1 - 2026-07-17
 
 The **live-verification patch** (PRs #197-#205): the first billed

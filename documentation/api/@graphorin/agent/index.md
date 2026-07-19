@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.12.1**](../../index.md)
+[**Graphorin API reference v0.13.0**](../../index.md)
 
 ***
 
@@ -181,7 +181,7 @@ text.
 
 ---
 
-**Project Graphorin** · v0.12.1 · MIT License · © 2026 Oleksiy
+**Project Graphorin** · v0.13.0 · MIT License · © 2026 Oleksiy
 Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
