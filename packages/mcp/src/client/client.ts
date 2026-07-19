@@ -283,7 +283,7 @@ export async function createMCPClientFromSdkTransport(
   let structuredContentSeenLogged = false;
 
   /**
-   * mcp-skills-02: MCP list operations are cursor-paginated (protocol
+   * MCP list operations are cursor-paginated (protocol
    * 2024-11-05+) and the SDK does NOT auto-paginate - a single call
    * returns page 1 only. Ignoring `nextCursor` silently truncated the
    * catalogue: tools beyond the first page never reached `toTools()`,

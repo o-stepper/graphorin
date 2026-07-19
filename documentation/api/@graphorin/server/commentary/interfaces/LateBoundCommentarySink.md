@@ -11,7 +11,7 @@ Defined in: packages/server/src/commentary/audit-bridge.ts:111
 **`Stable`**
 
 A [DeliveryCommentarySink](/api/@graphorin/server/interfaces/DeliveryCommentarySink.md) whose real target is installed later. The WS
-dispatcher is created before the audit DB opens (IP-21); the server hands it
+dispatcher is created before the audit DB opens; the server hands it
 this forwarding sink and calls [LateBoundCommentarySink.bind](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md#bind) once the
 audit-writing sink exists. Decisions emitted before binding are dropped - the
 dispatcher only sanitizes once it is live (after `start()`, by which point

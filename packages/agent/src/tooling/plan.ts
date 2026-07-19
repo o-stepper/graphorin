@@ -1,5 +1,5 @@
 /**
- * D6 structured plan / todo tool + attention recitation. The tool is a
+ * Structured plan / todo tool + attention recitation. The tool is a
  * TodoWrite-style status-flip mutation over the agent's own working
  * plan, journaled in `RunState.todos` so it survives suspend/resume.
  * Attention recitation renders the current plan back into the prompt

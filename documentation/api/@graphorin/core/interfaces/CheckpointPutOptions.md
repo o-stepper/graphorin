@@ -6,12 +6,12 @@
 
 # Interface: CheckpointPutOptions
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:119
+Defined in: packages/core/src/contracts/checkpoint-store.ts:118
 
 **`Stable`**
 
-Optional atomicity contract for [CheckpointStore.put](/api/@graphorin/core/interfaces/CheckpointStore.md#put) (D1 /
-workflow-01). When `expectedLatestId` is supplied, the store MUST
+Optional atomicity contract for [CheckpointStore.put](/api/@graphorin/core/interfaces/CheckpointStore.md#put).
+When `expectedLatestId` is supplied, the store MUST
 perform the latest-checkpoint comparison and the insert atomically
 (single transaction / synchronous critical section) and throw
 [CheckpointConflictError](/api/@graphorin/core/classes/CheckpointConflictError.md) on mismatch - closing the TOCTOU
@@ -24,4 +24,4 @@ the engine backstops with its own pre-check.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | packages/core/src/contracts/checkpoint-store.ts:120 |
+| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | packages/core/src/contracts/checkpoint-store.ts:119 |

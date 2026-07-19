@@ -1,6 +1,6 @@
 /**
  * Conversion layer between Graphorin shapes and the Vercel AI SDK
- * call contract (core-provider-01).
+ * call contract.
  *
  * The AI SDK does NOT accept Graphorin messages or tool definitions
  * verbatim:
@@ -17,7 +17,7 @@
  *   (`AI_InvalidPromptError`) on the second step of any tool loop.
  *
  * Where the AI SDK renamed keys between major versions the converters
- * emit BOTH spellings (PS-6 dual-shape): `input` + `args` on tool-call
+ * emit BOTH spellings (dual-shape): `input` + `args` on tool-call
  * parts, `output` + `result` on tool-result parts, `mediaType` +
  * `mimeType` on binary parts, `inputSchema` + `parameters` on tools.
  * Both peers zod-strip the key they do not know.
@@ -266,7 +266,7 @@ function flattenToText(content: string | ReadonlyArray<MessageContent>): string 
 
 /**
  * Decorate the first and last converted conversation messages with an
- * Anthropic `cacheControl` provider option (core-provider-02).
+ * Anthropic `cacheControl` provider option.
  *
  * The first-message anchor makes tools + system + the stable prefix a
  * cache segment that is written once and read on every later step; the

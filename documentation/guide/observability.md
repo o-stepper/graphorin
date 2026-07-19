@@ -19,9 +19,9 @@ flowchart LR
     H --> J[workflow.checkpoint]
 ```
 
-The agent loop opens one `agent.run` span per run and one `agent.step` span per step (C7); `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` - so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context - a known limitation, not a wiring bug.
+The agent loop opens one `agent.run` span per run and one `agent.step` span per step; `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` - so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context - a known limitation, not a wiring bug.
 
-Per-type sampling rules act INSIDE a sampled trace too (W-090): under the default parent-based decision maker, `sampling.rules: [{ type: 'tool.execute', rate: 0.01 }]` thins the per-call spans of every sampled `agent.run` - which is where the volume actually lives - instead of only ever applying to root spans. A rule can only downsample: children of an unsampled parent are never resurrected (they would be orphans), and a child dropped by its rule breaks the tree below it - its own descendants inherit `parentSampled=false`. Configurations without rules are byte-identical to before.
+Per-type sampling rules act INSIDE a sampled trace too: under the default parent-based decision maker, `sampling.rules: [{ type: 'tool.execute', rate: 0.01 }]` thins the per-call spans of every sampled `agent.run` - which is where the volume actually lives - instead of only ever applying to root spans. A rule can only downsample: children of an unsampled parent are never resurrected (they would be orphans), and a child dropped by its rule breaks the tree below it - its own descendants inherit `parentSampled=false`. Configurations without rules are byte-identical to before.
 
 Run/step/tool spans carry OTel GenAI attributes (`gen_ai.operation.name` = `invoke_agent` / `execute_tool` / `chat`, `gen_ai.agent.id`, `gen_ai.tool.name`, `gen_ai.request.model`, `gen_ai.usage.input_tokens` / `output_tokens` on close) plus Graphorin-specific ones (`graphorin.run.id`, `graphorin.step.number`, `graphorin.tool.name`, `graphorin.tool.sensitivity`, `graphorin.tool.sandbox.kind`, …).
 
@@ -59,7 +59,7 @@ flowchart LR
     Strip --> Out
 ```
 
-Redaction is **attribute-granular**: an attribute that exceeds the configured floor (or matches a secret / PII pattern) is stripped and counted, and the rest of the span still reaches the exporter. A single untagged or over-tier attribute never makes the whole span vanish - before this fix (RP-18) framework spans, which carry untagged attributes by default, disappeared from every exporter and operators saw empty traces.
+Redaction is **attribute-granular**: an attribute that exceeds the configured floor (or matches a secret / PII pattern) is stripped and counted, and the rest of the span still reaches the exporter. A single untagged or over-tier attribute never makes the whole span vanish - previously framework spans, which carry untagged attributes by default, disappeared from every exporter and operators saw empty traces.
 
 You **cannot** disable the validation wrapper. You can:
 
@@ -157,7 +157,7 @@ Counter names are unprefixed in-process (`snapshotCounters()`); add your own nam
 
 ### Server exposition and the audit chain
 
-On the standalone server both families are wired for you (W-051):
+On the standalone server both families are wired for you:
 
 - **`/v1/metrics`** - every scrape folds the live `tool.*` / `mcp.*` counters into the Prometheus registry as `graphorin_tool_*` / `graphorin_mcp_*` series (dots and dashes map to `_`; series appear lazily, only once they have moved). Counters delta-sync (re-scrapes never double-count) and gauges set absolutely - the snapshot's `kinds` field tells the bridge which is which. Histograms are not bridged yet; their raw observation lists stay available through `snapshotCounters().histograms`.
 - **`/v1/audit`** - when the audit chain is enabled, the tools audit bus feeds it through a bridge governed by `audit.toolEvents`: `'security'` (default) writes only the security-significant subset (dataflow flagged/blocked/declassified, sanitization hits/blocks, approval lifecycle, collisions, cap-disabled), `'all'` adds per-call `tool:execute:*` chatter, `'off'` disables the bridge. Shadow-mode dataflow findings are therefore operator-visible out of the box.

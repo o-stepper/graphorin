@@ -99,8 +99,8 @@ export function inferReasoningContract(input: InferReasoningContractInput): Reas
 /**
  * Bedrock cross-region inference-profile prefix (`us.anthropic.claude-…`,
  * the standard way to invoke Claude on Bedrock since 2025). Stripped
- * before pattern matching so the `^anthropic\.claude` rules still fire
- * (core-provider-11).
+ * before pattern matching so the `^anthropic\.claude` rules still fire.
+ *
  */
 const BEDROCK_REGION_PREFIX = /^(?:us|eu|apac|jp|au|us-gov)\./;
 

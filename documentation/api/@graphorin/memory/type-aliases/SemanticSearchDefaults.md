@@ -23,7 +23,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:148
 **`Stable`**
 
 Search options an operator may default at construction time via
-`createMemory({ searchDefaults })` (W-086) - the advanced-retrieval
+`createMemory({ searchDefaults })` - the advanced-retrieval
 switches (fan-out, HyDE, graph expansion, fusion, decay) that the
 model-facing surfaces (`fact_search`, auto-recall, `deep_recall`)
 cannot reach per-call. Deliberately a `Pick` that EXCLUDES the

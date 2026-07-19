@@ -1,5 +1,5 @@
 /**
- * W-051: bridge the `@graphorin/tools` module-level counter registry
+ * Bridge the `@graphorin/tools` module-level counter registry
  * (which `@graphorin/mcp` also writes) into the server's
  * {@link MetricRegistry}, so `tool.*` / `mcp.*` telemetry - including
  * the shadow-mode `tool.dataflow.*` counters - shows up on

@@ -1,5 +1,5 @@
 /**
- * Wave-D D4 - stable hash for the persistent recall ledger. The
+ * Stable hash for the persistent recall ledger. The
  * ledger counts DISTINCT queries per fact, so the hash must be stable
  * across processes (no seeds) and normalise trivial variance
  * (case / whitespace) without pretending to be semantic dedup.

@@ -15,7 +15,7 @@ Workflow control-flow primitive: a single value handed to
 `pause(...)` resolution) carrying any combination of:
 
 - `goto`   - jump to a named node, bypassing the edge graph.
-  **Destructive (workflow-09):** the restored frontier is discarded -
+**Destructive:** the restored frontier is discarded -
   surviving dynamic tasks, completed-but-unwalked nodes, and every
   pending pause record (including already-delivered pause answers)
   are dropped in favour of the single goto task. Use it as an

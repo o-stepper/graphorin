@@ -2,8 +2,8 @@
  * Tool-batch dispatch bridging for the agent runtime: routes a batch of
  * (non-handoff) tool calls through the shared `@graphorin/tools`
  * executor and surfaces the outcomes as the long-standing
- * `tool.execute.*` agent events + tool messages (R10), including the
- * WI-10 result-handle rendering and the WI-05 `tool_search` promotion
+ * `tool.execute.*` agent events + tool messages, including the
+ * result-handle rendering and the `tool_search` promotion
  * fold. Extracted verbatim from `factory.ts` (issue #23); the former
  * run-loop closure now takes an explicit {@link DispatchRunEnv}.
  *
@@ -62,12 +62,12 @@ export interface DispatchRunEnv {
  * {@link CompletedToolCall} outcomes) so every outcome kind -
  * success, unknown-tool, invalid-input, sanitization-blocked,
  * execution error - yields a consistent event and tool message,
- * preserving the pre-WI-03 stream shape (R10). The executor's
+ * preserving the long-standing stream shape. The executor's
  * genuinely-live streaming events (`tool.execute.progress` /
  * `.partial`, emitted only by streaming-hint tools) are bridged
  * through Adapter E while the batch runs and are purely additive.
  *
- * Parallelism (WI-04): the executor runs independent calls in this
+ * Parallelism: the executor runs independent calls in this
  * batch concurrently, bounded by `maxParallelTools`. `tool.execute.start`
  * is emitted up-front in call order and `.end` / `.error` after the
  * batch settles, also in call order - so result mapping and tool-message

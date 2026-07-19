@@ -62,7 +62,7 @@ export class OAuthRegistrationUnsupportedError extends GraphorinOAuthError {
 
 /**
  * Thrown when the Dynamic Client Registration endpoint returns a non-2xx
- * response (OAUTH-ADV-01). Carries the RFC 7591 `error` / `error_description`
+ * response. Carries the RFC 7591 `error` / `error_description`
  * body fields so callers see the spec-defined cause (e.g.
  * `invalid_client_metadata`) instead of only the bare HTTP status.
  *
@@ -103,7 +103,7 @@ export class OAuthRegistrationError extends GraphorinOAuthError {
  * Best-effort read of the RFC 6749/7591 `error` / `error_description` fields
  * from a non-2xx OAuth JSON response. Never throws (a malformed or empty body
  * yields `{}`), so the caller can still surface the HTTP status when the server
- * returns no spec body (OAUTH-ADV-01/02).
+ * returns no spec body.
  *
  * @stable
  */

@@ -1,10 +1,10 @@
 /**
  * The run-level gates the agent loop applies to its inputs and outputs:
- * input / output guardrail screening (AG-2 / SDF-4), the structured
- * output contract (AG-3: the JSON-only instruction, fence stripping,
+ * input / output guardrail screening, the structured
+ * output contract (the JSON-only instruction, fence stripping,
  * parse + validation), the lateral-leak commit gate on outgoing
- * assistant content (RB-55 / AG-10), the verifier gate on terminal
- * responses (C3), and the shared cancellation path (AG-6). Extracted
+ * assistant content, the verifier gate on terminal
+ * responses, and the shared cancellation path. Extracted
  * verbatim from `factory.ts` (issue #23).
  *
  * @packageDocumentation
@@ -29,7 +29,7 @@ import { buildAssistantMessage } from './messages.js';
 import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
 
 /**
- * B3 (item 15): merge one turn's verdict into the run's plain-object
+ * Merge one turn's verdict into the run's plain-object
  * sidecar. Widen-only: 'block' beats 'rewrite', flags accumulate,
  * nothing is ever cleared here (compaction owns removal). Keys are
  * `'<stepNumber>:<offsetInStep>'`; step 0 is the pre-step input
@@ -65,14 +65,14 @@ const sha256Hex = (input: string): string =>
 
 /**
  * Replacement content committed in place of assistant commentary the
- * causality monitor blocked (AG-10). Worded to not match any built-in
+ * causality monitor blocked. Worded to not match any built-in
  * denial pattern, so the notice itself never re-triggers the monitor.
  */
 export const LATERAL_LEAK_BLOCKED_NOTICE =
   '[graphorin] assistant commentary withheld by the lateral-leak defense.';
 
 /**
- * Strip a single Markdown code fence around a JSON payload (AG-3).
+ * Strip a single Markdown code fence around a JSON payload.
  * Models often wrap structured output in ```json fences even when told
  * not to. ReDoS-safe: the info string is matched with `[^\n]*`.
  */
@@ -83,10 +83,10 @@ export function stripJsonFence(text: string): string {
 }
 
 /**
- * The AG-3 fallback instruction: one trailing system message that
+ * The fallback JSON instruction: one trailing system message that
  * pins JSON-only output and embeds the wire schema / description.
  * This is the documented structured-output contract for adapters that
- * do not yet consume `ProviderRequest.outputType` natively (PS-24).
+ * do not yet consume `ProviderRequest.outputType` natively.
  */
 export function buildStructuredInstruction(spec: {
   readonly description?: string;
@@ -114,14 +114,14 @@ export interface CancellationEnv {
 }
 
 /**
- * AG-6: shared cancellation path for the loop-top abort check, a
- * mid-stream provider abort, and the abort-during-suspend seam (W-038).
+ * Shared cancellation path for the loop-top abort check, a
+ * mid-stream provider abort, and the abort-during-suspend seam.
  * Yields `agent.cancelling`, applies the `onPendingApprovals` policy,
  * and returns `true` when the run was finalized as 'failed' (the 'fail'
  * policy WITH live approvals - the caller must `return finalize(...)`);
  * otherwise it sets `state.status = 'aborted'` and returns `false`.
  *
- * Policy semantics (W-038):
+ * Policy semantics:
  * - `'deny'`: drain every pending approval AND commit a matching tool
  *   message per drained toolCallId - the transcript must not keep a
  *   dangling `tool_use` real providers reject on a later resume.
@@ -176,7 +176,7 @@ export interface GuardrailScreenEnv {
 }
 
 /**
- * AG-2 / SDF-4: input guardrails screen each fresh-run seed user
+ * Input guardrails screen each fresh-run seed user
  * message (string content) BEFORE the first provider call, using the
  * canonical `@graphorin/security` composer. 'block' fails the run
  * without reaching the model; 'rewrite' replaces the content in both
@@ -238,7 +238,7 @@ export interface AssistantCommitEnv {
 }
 
 /**
- * Lateral-leak (RB-55 / AG-10): scan the outgoing assistant
+ * Lateral-leak commit gate: scan the outgoing assistant
  * content BEFORE it is appended, so a 'block' decision keeps
  * the laundered commentary out of the durable history - and
  * therefore out of every subsequent provider request. The
@@ -246,14 +246,14 @@ export interface AssistantCommitEnv {
  * persistent buffer and the run's final output.
  *
  * Commits the (possibly replaced) assistant message to both buffers,
- * records the C6 taint span, and emits `agent.lateral-leak.detected`
+ * records the taint span, and emits `agent.lateral-leak.detected`
  * when the monitor tripped. Returns `true` when the durable text was
- * withheld - by the lateral-leak defense or by the B4
+ * withheld - by the lateral-leak defense or by the
  * assistant-output data-flow sink - so the loop also withholds the
  * run's final output.
  */
 /**
- * B4 (item 14): the outgoing-text replacement when the data-flow
+ * The outgoing-text replacement when the data-flow
  * policy BLOCKS the assistant-output sink in enforce mode (lethal
  * trifecta / verbatim untrusted carry without a declassify). Mirrors
  * {@link LATERAL_LEAK_BLOCKED_NOTICE}.
@@ -367,7 +367,7 @@ export interface VerifierGateResult {
 }
 
 /**
- * C3: verifier seam - deterministic checks run on EVERY terminal
+ * Verifier seam - deterministic checks run on EVERY terminal
  * response (so the outcome is always observable via
  * verifier.result events). Failures feed structured feedback back
  * as a user message and the loop continues, but only while
@@ -428,10 +428,10 @@ export interface RunOutputEnv<TDeps, TOutput> {
 }
 
 /**
- * The terminal output phases of a run, in their frozen order: the AG-24
- * stop-condition cut check, the AG-3 structured-output parse +
+ * The terminal output phases of a run, in their frozen order: the
+ * stop-condition cut check, the structured-output parse +
  * validation (before output guardrails, so they screen the PARSED
- * value), and the AG-2 / SDF-4 output guardrail screen. Mutates
+ * value), and the output guardrail screen. Mutates
  * `state` / `finalSnapshot` exactly as the inline blocks did.
  */
 export async function* finalizeRunOutput<TDeps, TOutput>(

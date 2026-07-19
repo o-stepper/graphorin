@@ -11,8 +11,8 @@
  * active only when `graphorinDenylist === 'auto'` AND a matching pattern
  * is registered via {@link _setFrameworkDenylistForTesting}).
  *
- * The order of the allow vs deny layers is governed by `policy.precedence`
- * (SPL-20):
+ * The order of the allow vs deny layers is governed by
+ * `policy.precedence`:
  *
  * - `'allow-wins'` (default) - the allowlist short-circuits to `'allow'`
  *   before the deny lists are consulted, so an operator can deny a whole

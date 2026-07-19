@@ -15,7 +15,7 @@ Defined in: packages/security/src/policy/tool-argument-policy.ts:150
 **`Stable`**
 
 Evaluate a policy against one tool call under the four-value
-vocabulary (E1). Every matching rule contributes its (normalised)
+vocabulary. Every matching rule contributes its (normalised)
 effect; the strongest wins with priority `deny > defer > ask >
 allow`, so a broad late `allow` can never re-open a denied call and
 an `ask`/`defer` narrows an `allow` but yields to a `deny`. When no

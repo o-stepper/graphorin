@@ -6,11 +6,11 @@
 
 # Interface: CheckpointStoreExt
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:235
+Defined in: packages/core/src/contracts/checkpoint-store.ts:234
 
 **`Stable`**
 
-Retention extension over [CheckpointStore](/api/@graphorin/core/interfaces/CheckpointStore.md) (W-009). The engine
+Retention extension over [CheckpointStore](/api/@graphorin/core/interfaces/CheckpointStore.md). The engine
 intentionally never deletes finished threads itself - a completed
 thread is still needed for inspection and duplicate-resume refusal;
 how long to keep it is an operator decision. These primitives are
@@ -34,7 +34,7 @@ compactThread(
 keepLast): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:255
+Defined in: packages/core/src/contracts/checkpoint-store.ts:254
 
 Keep only the `keepLast` most recent checkpoints (by `stepNumber`)
 of one `(threadId, namespace)` pair, deleting older ones together
@@ -63,7 +63,7 @@ deleted.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:184
+Defined in: packages/core/src/contracts/checkpoint-store.ts:183
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -97,7 +97,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:170
+Defined in: packages/core/src/contracts/checkpoint-store.ts:169
 
 #### Parameters
 
@@ -128,7 +128,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:176
+Defined in: packages/core/src/contracts/checkpoint-store.ts:175
 
 #### Parameters
 
@@ -157,9 +157,9 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:195
+Defined in: packages/core/src/contracts/checkpoint-store.ts:194
 
-W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+Enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
 stamped wakeAt). This is what a durable-timer driver polls -
 without it an operator would have to keep an external registry of
@@ -195,7 +195,7 @@ lacks it (deterministic policy, no silent no-op).
 pruneThreads(opts): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:245
+Defined in: packages/core/src/contracts/checkpoint-store.ts:244
 
 Namespace-scoped retention sweep: for every `(threadId, namespace)`
 pair matching the policy, delete that pair's checkpoints and pending
@@ -228,7 +228,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:154
+Defined in: packages/core/src/contracts/checkpoint-store.ts:153
 
 #### Parameters
 
@@ -261,7 +261,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:162
+Defined in: packages/core/src/contracts/checkpoint-store.ts:161
 
 #### Parameters
 

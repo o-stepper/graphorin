@@ -89,7 +89,7 @@ export interface SessionMemoryFacade {
   ): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
   /**
-   * List messages with their persisted identity (RP-5): the stored message id,
+   * List messages with their persisted identity: the stored message id,
    * sequence, and `createdAt`. Optional - when absent, export falls back to
    * fabricating those fields (the legacy behaviour). Implemented by
    * `@graphorin/memory.session` over the store's real rows.
@@ -111,7 +111,7 @@ export interface SessionMemoryFacade {
 }
 
 /**
- * A stored message paired with its persisted identity (RP-5). The core
+ * A stored message paired with its persisted identity. The core
  * {@link Message} type carries no id / timestamp; these come from the store row.
  *
  * @stable
@@ -155,7 +155,7 @@ export interface CreateSessionManagerOptions {
   /** Replay engine configuration. */
   readonly replay?: CreateSessionReplayerOptions;
   /**
-   * RP-17: default `traceSource` factory for `Session.replay()`. When a
+   * Default `traceSource` factory for `Session.replay()`. When a
    * session is replayed without an explicit `traceSource`, this is invoked
    * with the session id to resolve the persisted spans (e.g.
    * `(id) => traceSourceForSession(store.connection, id)` from
@@ -206,7 +206,7 @@ export interface Session {
     readonly summary?: string;
   }>;
   /**
-   * Append a handoff record. RP-2: this does **not** auto-fire from
+   * Append a handoff record. This does **not** auto-fire from
    * `Agent.toTool()` - the agent accumulates `HandoffRecord`s in its own
    * `RunState`; the operator forwards them here (see `examples/multi-agent-crew`).
    */
@@ -256,7 +256,7 @@ export interface Session {
     },
   ): AsyncIterable<SessionReplayEvent>;
   /**
-   * Begin recording a tool cassette. RP-2: the recorder is **not** wired into
+   * Begin recording a tool cassette. The recorder is **not** wired into
    * the agent runtime automatically - the operator subscribes to the agent's
    * `RunContext` events and forwards `tool.execute.end / .error` into
    * `recorder.recordToolCall(...)`. See `examples/multi-agent-crew` for the
@@ -327,9 +327,9 @@ export interface SessionManager {
     scope: Pick<SessionScope, 'userId' | 'agentId'>,
   ): Promise<ReadonlyArray<SessionMetadata>>;
   /**
-   * Hard-delete a session (RP-6). The cascade removes the session's
+   * Hard-delete a session. The cascade removes the session's
    * bookkeeping (handoffs, workflow-run attachments, audit rows), the
-   * checkpoints of suspended runs linked to it (W-005), AND its content:
+   * checkpoints of suspended runs linked to it, AND its content:
    * messages and episodes with their FTS/vector index rows plus the full
    * registry of session-scoped surfaces (facts, insights, rules, working
    * blocks, spans, consolidator state - see `SESSION_SCOPED_PURGES` in
@@ -340,7 +340,7 @@ export interface SessionManager {
    */
   deleteSession(sessionId: string): Promise<void>;
   /**
-   * Retention sweep (RP-6): delete every session matching the policy. Returns
+   * Retention sweep: delete every session matching the policy. Returns
    * the count deleted. See {@link SessionStoreExt.pruneSessions}.
    */
   pruneSessions(opts: {
@@ -577,7 +577,7 @@ class SessionImpl implements Session {
   readonly scope: SessionScope;
   readonly commentaryPolicy: CommentaryPolicy;
   readonly #args: SessionImplArgs;
-  /** RP-6: best-effort closed-state guard for this instance. */
+  /** Best-effort closed-state guard for this instance. */
   #closed: boolean;
 
   constructor(args: SessionImplArgs) {

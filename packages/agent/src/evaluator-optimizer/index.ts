@@ -3,8 +3,8 @@
  * loop with three rubric kinds and a REQUIRED iteration cap.
  *
  * Iteration boundary discipline: each iteration is a fresh
- * agent.run-equivalent boundary. Intra-loop reasoning per RB-42 /
- * suggested DEC-158 applies WITHIN one iteration, not ACROSS
+ * agent.run-equivalent boundary. Intra-loop reasoning retention
+ * applies WITHIN one iteration, not ACROSS
  * iterations. The Generator's iteration-N input is the original
  * user input + the Evaluator's iteration-(N-1) critique (NOT the
  * Generator's iteration-(N-1) internal message history).

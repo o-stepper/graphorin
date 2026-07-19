@@ -34,4 +34,4 @@ never an exception thrown from the fan-out call itself.
 | <a id="property-status"></a> `status` | `readonly` | `"budget-exceeded"` \| `"completed"` \| `"failed"` \| `"cancelled"` | - | packages/agent/src/fanout/index.ts:78 |
 | <a id="property-tokensused"></a> `tokensUsed` | `readonly` | `number` | - | packages/agent/src/fanout/index.ts:81 |
 | <a id="property-toolcallcount"></a> `toolCallCount` | `readonly` | `number` | - | packages/agent/src/fanout/index.ts:82 |
-| <a id="property-usage"></a> `usage?` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | Full usage breakdown, present only for usage-reporting children (an `invoke` resolving to a full `AgentResult`, W-033). | packages/agent/src/fanout/index.ts:88 |
+| <a id="property-usage"></a> `usage?` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | Full usage breakdown, present only for usage-reporting children (an `invoke` resolving to a full `AgentResult`). | packages/agent/src/fanout/index.ts:88 |

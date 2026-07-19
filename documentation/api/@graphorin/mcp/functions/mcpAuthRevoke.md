@@ -25,7 +25,7 @@ Drive `graphorin auth revoke --mcp <id>`.
 | `serverId` | `string` | - |
 | `options` | \{ `reason?`: `string`; `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); `signal?`: `AbortSignal`; \} | - |
 | `options.reason?` | `string` | - |
-| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | SPL-1: resolves the persisted tokens so RFC 7009 actually fires. |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | Resolves the persisted tokens so RFC 7009 revocation actually fires. |
 | `options.signal?` | `AbortSignal` | - |
 
 ## Returns

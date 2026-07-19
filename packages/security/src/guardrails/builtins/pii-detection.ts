@@ -92,7 +92,7 @@ export interface PiiDetectionOptions {
 }
 
 /**
- * SDF-8 / FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
+ * FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
  * phone, Luhn-valid card, …)? A pure, allocation-light predicate that returns on
  * the first valid match and honours per-pattern `validate` (e.g. Luhn). Used to
  * feed user/PII content into the dataflow taint ledger's `sensitiveSeen` leg so
@@ -131,7 +131,7 @@ export function containsPii(
 /**
  * Construct the PII detection guardrail.
  *
- * Note on normalization (W-150): the boolean detect predicate
+ * Note on normalization: the boolean detect predicate
  * ({@link containsPii}) matches against the NFKC + zero-width-stripped
  * form of the text, so cheap character-injection obfuscation cannot
  * dodge detection. The guardrail's REWRITE path (`redactText` /
@@ -177,7 +177,7 @@ export function piiDetection<TValue = unknown>(
   };
 
   /**
-   * SDF-6: deep-walk string leaves so structured values are REDACTED,
+   * Deep-walk string leaves so structured values are REDACTED,
    * never reported-redacted-but-returned-verbatim. Arrays/plain objects
    * recurse; other values pass through untouched.
    */

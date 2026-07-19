@@ -30,8 +30,8 @@ export interface TransportOptions {
   /** Per-connection identifier surfaced on diagnostics + reconnects. */
   readonly clientId?: string;
   /**
-   * Resume cursor sent as the `Last-Event-ID` header on (re)connect
-   * (periphery-03). The server replays only events AFTER it from the
+   * Resume cursor sent as the `Last-Event-ID` header on (re)connect.
+   * The server replays only events AFTER it from the
    * buffer - without it every SSE reconnect replays the entire
    * buffered history. Consumed by the SSE transport; ignored by WS
    * (whose resubscribe carries the cursor in the RPC).

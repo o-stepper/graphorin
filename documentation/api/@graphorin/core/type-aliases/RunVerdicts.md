@@ -10,11 +10,11 @@
 type RunVerdicts = Record<string, RunTurnVerdict>;
 ```
 
-Defined in: packages/core/src/types/run.ts:265
+Defined in: packages/core/src/types/run.ts:264
 
 **`Stable`**
 
-B3: the plain-object verdict sidecar on [RunState.verdicts](/api/@graphorin/core/interfaces/RunState.md#property-verdicts).
+The plain-object verdict sidecar on [RunState.verdicts](/api/@graphorin/core/interfaces/RunState.md#property-verdicts).
 Keys are turn positions `'<stepNumber>:<offsetInStep>'`. A plain
 JSON-safe object on purpose (core `Message` has no id and `Map` is
 not JSON-serializable).

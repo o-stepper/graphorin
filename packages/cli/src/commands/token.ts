@@ -388,7 +388,7 @@ export function parseDuration(input: string): number {
 }
 
 /**
- * TOKENS-RE-02: the CLI mutates the token STORE directly - it cannot
+ * The CLI mutates the token STORE directly - it cannot
  * reach a running server's in-memory verifier cache, so an
  * out-of-process revoke propagates only when the cache entry expires
  * (`cacheTtlMaxMs`, default 60s). Printed after every revoke-shaped

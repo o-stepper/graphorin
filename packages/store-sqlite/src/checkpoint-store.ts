@@ -13,7 +13,7 @@ import { CheckpointConflictError } from '@graphorin/core/contracts';
 import type { SqliteConnection } from './connection.js';
 
 /**
- * Default `CheckpointStore` implementation (including the W-009
+ * Default `CheckpointStore` implementation (including the
  * `CheckpointStoreExt` retention primitives). Workflow state is
  * encoded as JSON blobs; per-task pending writes survive partial step
  * failure.
@@ -142,7 +142,7 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
-   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * Enumerate threads whose LATEST checkpoint in `namespace` is
    * suspended with a due `wake_at`. Latest-per-thread is decided by max
    * step_number (the same policy as `getTuple`), so a thread whose
    * newest checkpoint moved on (resumed / completed) never fires.
@@ -205,7 +205,7 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
-   * W-009 retention sweep. Policy: a `(thread_id, namespace)` pair
+   * Retention sweep. Policy: a `(thread_id, namespace)` pair
    * qualifies when its LATEST checkpoint (by step_number) is older than
    * the cutoff and - unless `onlyTerminal: false` - terminal
    * ('completed' / 'failed' / 'aborted'); suspended pairs hold live
@@ -250,7 +250,7 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
-   * W-009 compaction: keep only the `keepLast` newest checkpoints (by
+   * Compaction: keep only the `keepLast` newest checkpoints (by
    * step_number) of one `(thread_id, namespace)` pair. Resume reads the
    * latest tuple, so `keepLast >= 1` never breaks resumability; the
    * oldest surviving checkpoint's parent_id may point at a deleted row,

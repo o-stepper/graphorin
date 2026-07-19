@@ -211,6 +211,23 @@ jobs:
         # comment) - V8 instrumentation makes everything slower still.
         run: pnpm exec turbo run test -- --coverage --testTimeout=120000 --hookTimeout=120000
 
+      # Spaced-path regression guard: vitest 3.x collapsed coverage to
+      # nonsense when the checkout path contained a space (A/B on
+      # identical code: 18.87% vs 79.74% lines, threshold false-fail;
+      # 2026-07-19 deep retest). vitest 4 fixed it, and hosted runners
+      # never have spaces in their paths, so without this step the
+      # class would be invisible to CI forever. One package's coverage
+      # from a spaced hardlink copy is enough to pin the behaviour.
+      - name: Coverage from a spaced checkout path
+        shell: bash
+        env:
+          GRAPHORIN_COVERAGE: '1'
+        run: |
+          dest="$RUNNER_TEMP/graphorin cov space"
+          cp -al "$GITHUB_WORKSPACE" "$dest"
+          cd "$dest"
+          pnpm --filter @graphorin/core exec vitest run --coverage --testTimeout=120000 --hookTimeout=120000
+
   examples-smoke:
     name: Examples smoke (stub recipe)
     runs-on: ubuntu-latest

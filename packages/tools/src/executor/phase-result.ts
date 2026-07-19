@@ -1,8 +1,8 @@
 /**
  * Result-assembly phase: build the final `ToolResult` (bounded output,
- * sanitized content parts, WI-10 spill handle), register the artifact's
- * producer taint for later handle reads (TL-6), record the output's
- * provenance with the data-flow guard (WI-12 / P1-3), and emit the
+ * sanitized content parts, spill handle), register the artifact's
+ * producer taint for later handle reads, record the output's
+ * provenance with the data-flow guard, and emit the
  * `tool:execute:end` / `tool:execute:streamed` audit rows plus the
  * `tool.execute.end` streaming event.
  *

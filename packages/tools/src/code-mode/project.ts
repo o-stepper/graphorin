@@ -1,5 +1,5 @@
 /**
- * Project the tool registry as a typed code API (P1-2, step 1).
+ * Project the tool registry as a typed code API (step 1).
  *
  * Code-mode lets the model write a script that calls tools instead of
  * emitting one provider tool-call per step. For that the model needs to
@@ -35,7 +35,7 @@ export interface ProjectableTool {
   readonly name: string;
   readonly description?: string;
   readonly inputSchema?: unknown;
-  /** A5: the tool's output schema; renders the signature's return type. */
+  /** The tool's output schema; renders the signature's return type. */
   readonly outputSchema?: unknown;
   /** Present on `ResolvedTool`; absent tools group under "tools". */
   readonly __source?: ToolSource;
@@ -93,7 +93,7 @@ function oneLine(description: string | undefined): string {
  * Coerce a tool's `inputSchema` to a JSON-Schema fragment. Handles plain
  * Zod schemas (v3/v4 structural conversion), `toJSON()`-bearing schemas,
  * and the already-JSON-Schema records that `ToolSearchMatch.inputSchema`
- * carries (tools-01: the shared converter, mirrored by the agent's
+ * carries (the shared converter, mirrored by the agent's
  * `toolToDefinition`). `undefined` for a missing or unprojectable schema.
  */
 function schemaToJson(inputSchema: unknown): Record<string, unknown> | undefined {
@@ -151,7 +151,7 @@ function inputType(tool: ProjectableTool): string {
   return jsonSchemaToTs(json);
 }
 
-/** A5: render the resolved-value type from a tool's `outputSchema` (or `unknown`). */
+/** Render the resolved-value type from a tool's `outputSchema` (or `unknown`). */
 function outputType(tool: ProjectableTool): string {
   const json = schemaToJson(tool.outputSchema);
   if (json === undefined) return 'unknown';

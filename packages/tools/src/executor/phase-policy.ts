@@ -1,5 +1,5 @@
 /**
- * Tool-argument policy phase (D4 / Progent): forbid-before-allow rules
+ * Tool-argument policy phase (Progent-style): forbid-before-allow rules
  * over the validated args, evaluated after approval and before the
  * data-flow sink gate.
  *

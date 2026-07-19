@@ -54,7 +54,7 @@ export type JsonSchemaLike =
  * `safeParse` method that returns a `ZodLikeSafeParseResult`).
  *
  * The validator also retains the **source JSON Schema** and exposes it
- * via `toJSON()` (tools-01): `toolToDefinition` and the code-mode
+ * via `toJSON()`: `toolToDefinition` and the code-mode
  * signature projection honour `toJSON()`, so without it an MCP tool's
  * parameters serialise to `{}` on the provider wire body - the model
  * would see an argument-less tool. Boolean schemas normalise to their
@@ -283,10 +283,10 @@ function validateString(
   return issues;
 }
 
-/** mcp-skills-07: hard caps on server-supplied `pattern` evaluation. */
+/** Hard caps on server-supplied `pattern` evaluation. */
 const MAX_PATTERN_LENGTH = 1_000;
 const MAX_PATTERN_TEST_LENGTH = 10_000;
-/** W-078: reduced cap applied whenever the pattern has a quantified group. */
+/** Reduced cap applied whenever the pattern has a quantified group. */
 const MAX_QUANTIFIED_GROUP_TEST_LENGTH = 1_000;
 
 /** A group that is itself quantified: `(...)+`, `(...)*`, `(...){2,}`. */
@@ -296,7 +296,7 @@ const GROUP_BODY_ENDS_QUANTIFIED_RE = /[*+}]\s*\)/;
 
 /**
  * Cheap heuristic for exponential-backtracking shapes in a quantified
- * group (mcp-skills-07 / W-078). A pattern is rejected when a
+ * group. A pattern is rejected when a
  * quantified group is present AND either:
  *
  * - the group body ends with a quantifier - the classic nested

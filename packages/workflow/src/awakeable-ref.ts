@@ -1,5 +1,5 @@
 /**
- * Externally reconstructable awakeable address (A3, item 16 tail).
+ * Externally reconstructable awakeable address.
  *
  * The canonical address of a pending awakeable/approval is the triple
  * `(workflowId, threadId, name)` - exactly what the REST surface

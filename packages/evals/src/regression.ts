@@ -24,7 +24,7 @@ const DEFAULT_AVG_SCORE_DROP = 0.05;
 const DEFAULT_AVG_DURATION_INCREASE_MS = Number.POSITIVE_INFINITY;
 
 /**
- * EVALS-REP-01: the boundary is EXCLUSIVE - a metric regresses only when it moves
+ * The boundary is EXCLUSIVE - a metric regresses only when it moves
  * BEYOND its tolerance (a drop exactly equal to the tolerance is tolerated). But
  * naive float subtraction makes an at-tolerance drop (e.g. a 5.00pp drop that
  * `(1 - 0.95) * 100` computes as `5.000000000000004`) overshoot by ~1e-15 and

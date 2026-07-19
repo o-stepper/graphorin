@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/storage.ts:157
 
 **`Stable`**
 
-store-02: online backup via the driver's page-level `backup()` API -
+Online backup via the driver's page-level `backup()` API -
 consistent under a live writer (the daemon can keep running),
 preserves rowids so FTS5 external-content mappings survive, and for
 an encrypted store produces an equally-encrypted copy (same key).

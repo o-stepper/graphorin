@@ -1,5 +1,5 @@
 /**
- * W-080: opt-in managed MCP client with automatic reconnection.
+ * Opt-in managed MCP client with automatic reconnection.
  *
  * `createMCPClient` connections are deliberately one-shot: transient
  * Streamable-HTTP hiccups are healed by the SDK itself (Last-Event-ID),

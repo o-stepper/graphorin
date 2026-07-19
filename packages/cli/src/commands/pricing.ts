@@ -80,7 +80,7 @@ export interface PricingRefreshOptions extends PricingCommonOptions {
    */
   readonly out?: string;
   /**
-   * W-097: accepted body format - `auto` (default) tries the native
+   * Accepted body format - `auto` (default) tries the native
    * shape then auto-detects the `@pydantic/genai-prices` dataset.
    */
   readonly format?: 'auto' | 'graphorin' | 'genai-prices';

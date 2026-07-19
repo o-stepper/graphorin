@@ -37,10 +37,10 @@ import {
 import { openStoreContext } from '../internal/store-context.js';
 
 /**
- * Resolve the CLI's secrets store for OAuth token persistence (SPL-1):
+ * Resolve the CLI's secrets store for OAuth token persistence:
  * the already-active store when one exists, else the default auto
  * chain (keyring → encrypted-file → env). Best-effort - a store
- * failure degrades to the in-memory-only pre-SPL-1 behavior instead of
+ * failure degrades to the in-memory-only legacy behavior instead of
  * blocking the auth command.
  */
 async function resolveAuthSecretsStore(): Promise<

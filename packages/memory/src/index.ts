@@ -1,7 +1,7 @@
 /**
  * `@graphorin/memory` - seven-tier memory system for the Graphorin
- * framework (MST-13: working / session / episodic / semantic /
- * procedural / shared + the read-only insight tier from P1-1).
+ * framework (working / session / episodic / semantic / procedural /
+ * shared + the read-only insight tier).
  *
  * Surface overview:
  *
@@ -16,8 +16,8 @@
  *    `deep_recall`, registered only when iterative retrieval is
  *    configured): `block_append`, `block_replace`, `block_rethink`,
  *    `fact_remember`, `fact_search`, `fact_supersede`, `fact_forget`,
- *    `recall_episodes`, `conversation_search`, `fact_history` (P0-2),
- *    `fact_validate` (P1-4).
+ *    `recall_episodes`, `conversation_search`, `fact_history`,
+ *    `fact_validate`.
  *  - The hybrid search composition under `./search`, including the
  *    built-in {@link RRFReranker} (k=60 default) and the
  *    {@link ReRanker} contract.

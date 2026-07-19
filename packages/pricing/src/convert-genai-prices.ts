@@ -1,5 +1,5 @@
 /**
- * W-097: pure converter from the `@pydantic/genai-prices` published
+ * Pure converter from the `@pydantic/genai-prices` published
  * dataset into graphorin-native {@link ModelPrice} entries, so
  * `graphorin pricing refresh --url <genai-prices raw URL>` actually
  * works - previously the docs pointed operators at that dataset while

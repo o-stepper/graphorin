@@ -21,7 +21,7 @@ import type {
 } from '@graphorin/core';
 
 /**
- * AG-21: classify a **thrown** provider error into a {@link ProviderErrorKind}
+ * Classify a **thrown** provider error into a {@link ProviderErrorKind}
  * so the fallback chain can act on it, instead of flattening every exception to
  * `'unknown'` (which is always fallback-ineligible). Structural - reads the
  * `kind` carried by `@graphorin/provider`'s `GraphorinProviderError` subclasses

@@ -2,7 +2,7 @@
  * Static `tool({...})` discovery + per-tool grader. Used by both the
  * three `tool-*` ESLint rules and by the `graphorin tools lint` CLI
  * subcommand (Phase 15) so the rule logic has a single source of
- * truth (per the working plan acceptance criteria for RB-49).
+ * truth.
  *
  * The discovery is intentionally text-based - it scans a source
  * string for `tool(` call expressions and extracts the immediate
@@ -15,7 +15,7 @@
  * dynamic import will not be picked up by this lint surface; that
  * is the documented contract for the v0.1 lint surface.
  *
- * **Comment-awareness (W-044).** Discovery AND grading run over a
+ * **Comment-awareness.** Discovery AND grading run over a
  * comment-blanked view of the source: line-comment and block-comment
  * content is replaced with spaces (newlines preserved, so line numbers
  * and offsets never shift) while string/template literals - and,
@@ -31,9 +31,9 @@
  * `.tool(` and locally-defined helpers that happen to share the name.
  * Renamed or wrapped invocations (`const t = tool; t({...})`) are NOT
  * seen. This is the accepted cost of the text-based surface that lets
- * the CLI and the ESLint rules share one implementation (RB-49).
+ * the CLI and the ESLint rules share one implementation.
  *
- * **Per-tool grader rubric (RB-49 calibration):**
+ * **Per-tool grader rubric:**
  *
  *   - **description axis (0..40 points):**
  *     - 0 if missing / placeholder / shorter than 20 chars.
@@ -51,8 +51,8 @@
  *     - -10/N per numeric-suffix finding (partial penalty per param).
  *     - 15 baseline when no parameters are discoverable.
  *
- *   Total: 0..100 points. Calibrated against the RB-49 fixture
- *   catalog so `wellDescribedTool` scores 82, `placeholderDescriptionTool`
+ *   Total: 0..100 points. Calibrated against the fixture catalog
+ *   so `wellDescribedTool` scores 82, `placeholderDescriptionTool`
  *   scores 20, and `examplesPiiTool` scores 61.
  *
  * @stable
@@ -85,7 +85,7 @@ export interface DiscoveredTool {
    */
   readonly source: string;
   /**
-   * W-044: the same slice with comments blanked - what discovery
+   * The same slice with comments blanked - what discovery
    * parsed and what every grading path (examples PII scan,
    * description/parameter scoring) consumes. Same length and line
    * structure as `source`.
@@ -172,7 +172,7 @@ export const AMBIGUOUS_PARAMETER_NAMES: ReadonlyArray<string> = Object.freeze([
  * Tag values that, when present in a tool's `tags: [...]` literal,
  * suppress the parameter-naming rule for that tool. The opt-out
  * exists so operators can defer the rename for a long tail of
- * pre-RB-49 tools while the framework migrates without breaking
+ * pre-existing tools while the framework migrates without breaking
  * calling code.
  *
  * @stable
@@ -236,7 +236,7 @@ export function discoverToolCallsInSource(file: string, source: string): Discove
 }
 
 /**
- * W-044: blank the CONTENTS of string/template literals (quotes kept,
+ * Blank the CONTENTS of string/template literals (quotes kept,
  * newlines preserved) so the discovery regex cannot match `tool(`
  * inside prose. Used only for SEARCHING - parsing reads the
  * strings-intact view.
@@ -272,7 +272,7 @@ function blankStringContents(source: string): string {
 }
 
 /**
- * W-044: replace line-comment and block-comment CONTENT with spaces
+ * Replace line-comment and block-comment CONTENT with spaces
  * while preserving every newline (offsets and 1-indexed lines never
  * shift).
  * String and template literals pass through untouched; regex literals
@@ -364,7 +364,7 @@ const EMAIL_PATTERN = /[\w.+%-]+@[\w.-]+\.[A-Za-z]{2,}/;
 const NUMERIC_SUFFIX_PATTERN = /^[A-Za-z]+\d+$/;
 
 /**
- * Run the three RB-49 rules against a discovered tool and return the
+ * Run the three `tool-*` rules against a discovered tool and return the
  * findings. The CLI grader maps these findings into per-axis scores;
  * the ESLint rules forward them to `context.report(...)`.
  *
@@ -497,7 +497,7 @@ export function runToolRules(
 /**
  * Compute the per-tool grader score (0..100). Each axis is gated by
  * the findings produced for that axis. The rubric is calibrated
- * against the RB-49 fixture catalog (`wellDescribedTool` -> 82,
+ * against the fixture catalog (`wellDescribedTool` -> 82,
  * `placeholderDescriptionTool` -> 20, `examplesPiiTool` -> 61).
  *
  * @stable

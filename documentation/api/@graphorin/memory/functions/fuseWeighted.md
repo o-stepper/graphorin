@@ -18,10 +18,10 @@ Defined in: packages/memory/src/search/rrf.ts:148
 
 **`Stable`**
 
-Weighted / convex generalization of [fuseRrf](/api/@graphorin/memory/functions/fuseRrf.md) (X-2). Each input
+Weighted / convex generalization of [fuseRrf](/api/@graphorin/memory/functions/fuseRrf.md). Each input
 list `i` contributes `weights[i] · 1 / (k + rank)` to a record's fused
 score instead of the flat `1 / (k + rank)`, so a caller who has
-calibrated list reliability against labels (the P0-1 eval harness) can
+calibrated list reliability against labels (via `@graphorin/evals`) can
 trust one retriever over another. RRF stays the zero-tuning default: a
 `weights` of `undefined` (or all-`1`) is byte-for-byte identical to
 [fuseRrf](/api/@graphorin/memory/functions/fuseRrf.md). A missing, non-finite, or negative entry falls back to

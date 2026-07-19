@@ -179,7 +179,7 @@ function effectivePolicy(
 }
 
 /**
- * PS-22: callers can supply a pattern without the global flag. `.replace` /
+ * Callers can supply a pattern without the global flag. `.replace` /
  * `.match` then stop after the FIRST occurrence, so a second secret on the same
  * line is neither redacted nor counted. Re-compile every non-global pattern
  * with the `g` flag so all occurrences are covered. The 14 built-ins already

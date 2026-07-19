@@ -40,7 +40,7 @@ import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
  * validity interval; episodes have no close column so they match once
  * they have started. Each `?` is bound with the same epoch.
  *
- * memory-retrieval-01: default fact reads (no explicit `asOf`) behave
+ * Default fact reads (no explicit `asOf`) behave
  * as `asOf = now`, so superseded / validity-expired facts no longer
  * surface as current - exactly what the `fact_supersede` tool
  * promises. Callers opt back into the full history with
@@ -52,7 +52,7 @@ const FACT_VALIDITY_CLAUSE =
 const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
 
 /**
- * Normalize the D3 owner filter to a bind list. `undefined` (the
+ * Normalize the owner filter to a bind list. `undefined` (the
  * default) ⇒ `null` ⇒ no predicate, so reads are byte-identical until a
  * caller opts in. Rows written before migration 026 have `owner IS
  * NULL` and are treated as `'user'` at filter time.
@@ -77,7 +77,7 @@ function ownerFromRow(value: string | null | undefined): MemoryOwner | undefined
 }
 
 /**
- * Resolve the validity epoch for a fact read (memory-retrieval-01):
+ * Resolve the validity epoch for a fact read:
  * explicit `asOf` wins; otherwise default reads evaluate the validity
  * interval at NOW unless the caller asked for superseded rows. Returns
  * `null` when no validity filtering should apply.
@@ -91,7 +91,7 @@ function resolveFactValidityEpoch(
 }
 
 /**
- * MRET-9 / store-03: the vec0 k-nearest slice is GLOBAL (no user
+ * The vec0 k-nearest slice is GLOBAL (no user
  * partition) and every scope / validity / quarantine filter applies
  * AFTER the cut - a minority user could be starved to zero by a
  * dominant user's vectors. Over-fetch and widen iteratively until
@@ -114,7 +114,7 @@ function widenKnn<Row>(
 }
 
 /**
- * Quarantine retrieval-gate fragments (P1-4). Appended to default
+ * Quarantine retrieval-gate fragments. Appended to default
  * reads so `status = 'quarantined'` rows never surface in
  * action-driving recall; omitted only when the caller passes
  * `includeQuarantined` (the validation / inspector path). Each is a
@@ -126,7 +126,7 @@ const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
 const INSIGHT_NOT_QUARANTINED = "AND i.status != 'quarantined'";
 
 /**
- * MRET-4: any-of tags predicate against the `tags_json` array column.
+ * Any-of tags predicate against the `tags_json` array column.
  * Rows without tags never match. The caller appends one bind per tag.
  */
 function factTagsPredicate(tagCount: number): string {
@@ -137,7 +137,7 @@ function factTagsPredicate(tagCount: number): string {
 }
 
 /**
- * MRET-4: episode/date-range overlap - an episode matches when its
+ * Episode/date-range overlap - an episode matches when its
  * `[started_at, ended_at]` span intersects `[from, to]` (missing bounds
  * are open). The caller appends `from` / `to` epoch binds in order.
  */
@@ -171,14 +171,15 @@ export interface EmbeddingPayload {
 export interface SqliteMemoryWriteOptions {
   readonly embedding?: EmbeddingPayload;
   /**
-   * Contextual-retrieval index text (P1-3). When supplied, the FTS5 row
+   * Contextual-retrieval index text. When supplied, the FTS5 row
    * is indexed against this (context-prepended) text instead of the
    * canonical `fact.text`, so a terse fact stays findable by a
    * vaguely-worded query. The persisted `facts.text` column - the value
    * shown to the user / audit trail - is always the canonical text; only
    * the lexical index is affected. The caller's `embedding.vector` should
    * be computed from the same index text so the vector and FTS surfaces
-   * agree. Absent ⇒ the FTS row uses `fact.text` (pre-P1-3 behaviour).
+   * agree. Absent ⇒ the FTS row uses `fact.text` (the historical
+   * behaviour).
    */
   readonly indexText?: string;
 }
@@ -202,9 +203,9 @@ export class SqliteMemoryStore implements MemoryStoreExt {
   readonly shared: SharedMemoryStore;
   readonly conflicts: SqliteConflictStore;
   readonly consolidator: SqliteConsolidatorStateStore;
-  /** Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. */
+  /** Reflection insight surface. FTS-only; no per-embedder vec0 table. */
   readonly insights: SqliteInsightStore;
-  /** Lightweight relation-graph surface (P2-1): entities + one-hop CTE. */
+  /** Lightweight relation-graph surface: entities + one-hop CTE. */
   readonly graph: SqliteGraphStore;
 
   constructor(conn: SqliteConnection, embeddings: EmbeddingMetaRepository) {
@@ -243,7 +244,7 @@ export class SqliteMemoryStore implements MemoryStoreExt {
   }
 
   /**
-   * store-04: retention prune for the `memory_history` audit trail -
+   * Retention prune for the `memory_history` audit trail -
    * without one the table grows unboundedly (every supersede /
    * quarantine transition appends). Deletes rows older than
    * `olderThanMs`; returns the number pruned. Operators call this from
@@ -343,7 +344,7 @@ class WorkingMemoryStoreImpl implements WorkingMemoryStore {
   }
 
   /**
-   * Hard-delete a block row (wave-D D2, GDPR path). Unlike `delete`
+   * Hard-delete a block row (GDPR path). Unlike `delete`
    * (tombstone), the row is gone - this is the erasure surface for
    * USER-scoped blocks (e.g. the profile projection), which the
    * session-delete cascade deliberately never touches
@@ -463,7 +464,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
   }
 
   /**
-   * RP-5: like {@link list}, but each message carries its persisted identity
+   * Like {@link list}, but each message carries its persisted identity
    * (stored id, sequence, `createdAt`) so an exporter preserves message identity
    * + chronology rather than fabricating fresh ids / the export wall-clock.
    */
@@ -505,7 +506,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
   }
 
   /**
-   * Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
+   * Count the live messages in the scoped session - a `COUNT(*)`, never
    * materialising rows. Returns `0` for a user-only scope (no session to count).
    */
   async count(scope: SessionScope): Promise<number> {
@@ -786,7 +787,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
 
   /**
    * Most-recent episodes by `ended_at` (newest first), with no FTS / vector
-   * query - recency, not relevance (MCON-1). Powers the deep-phase reflection
+   * query - recency, not relevance. Powers the deep-phase reflection
    * gate and `EpisodicMemory.recent()`, both of which previously probed with a
    * `'*'` FTS query that matches zero rows on real SQLite.
    */
@@ -931,7 +932,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
-   * Promote / demote an episode's retrieval-trust `status` (MCON-2) and write a
+   * Promote / demote an episode's retrieval-trust `status` and write a
    * `memory_history` audit row. Mirrors `setStatus` on facts - a retrieval gate
    * only. Powers {@link EpisodicMemory.validate} so a quarantined (auto-formed)
    * episode can be promoted into default recall.
@@ -974,11 +975,11 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
-   * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`
+   * Count the recall-eligible episodes for the scope - a `COUNT(*)`
    * with the same default filters as the FTS search (live, non-archived,
-   * non-quarantined). W-155: `archived = 0` was missing, so the
-   * "Episodes: N" line of the memory-metadata prompt block drifted from
-   * what recall could actually reach after any `archive()`.
+   * non-quarantined). The `archived = 0` filter is load-bearing: without
+   * it the "Episodes: N" line of the memory-metadata prompt block drifts
+   * from what recall can actually reach after any `archive()`.
    */
   async count(scope: SessionScope): Promise<number> {
     const row = this.#conn.get<{ n: number }>(
@@ -1156,7 +1157,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    * migrations never bleed cross-embedder hits.
    *
    * Returns `MemoryHit<Fact>` with `score` populated via
-   * `scoreFromDistance` (CS-3): a normalized `[0, 1]` similarity,
+   * `scoreFromDistance`: a normalized `[0, 1]` similarity,
    * `(1 + cos) / 2` for the cosine metric.
    *
    * @stable
@@ -1291,7 +1292,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * W-019: pending supersede link - `newId.supersedes = oldId` without
+   * Pending supersede link - `newId.supersedes = oldId` without
    * closing the old fact's interval (that happens on validation).
    *
    * @stable
@@ -1348,14 +1349,14 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Enumerate the recall-eligible facts for the scope (wave-D): the
+   * Enumerate the recall-eligible facts for the scope: the
    * same default filters as `count()` / FTS search (live,
    * non-archived, `status = 'active'`, validity at NOW), returned as a
    * deterministic `created_at`-ordered list. With
-   * `excludePendingSupersede` facts whose W-019 supersede is still
+   * `excludePendingSupersede`, facts whose supersede is still
    * pending (a live quarantined successor links to them) are dropped
    * too. Surfaced through `SemanticMemoryStoreExt.listActive`; powers
-   * the D2 profile projection and the operation-level benchmarks.
+   * the profile projection and the operation-level benchmarks.
    *
    * @stable
    */
@@ -1387,8 +1388,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Quarantined, live, non-archived facts + their recall statistics
-   * (wave-D D4) - the deterministic candidate feed for the
+   * Quarantined, live, non-archived facts + their recall statistics -
+   * the deterministic candidate feed for the
    * PromotionPolicy. Surfaced through
    * `SemanticMemoryStoreExt.listPromotionCandidates`.
    *
@@ -1446,7 +1447,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Set a fact's retrieval-trust `status` (P1-4) and write a
+   * Set a fact's retrieval-trust `status` and write a
    * `memory_history` audit row. Quarantine is a retrieval gate, so this
    * touches neither the row's content nor its embedding / tombstone -
    * it only flips eligibility for default recall. Promotion
@@ -1493,7 +1494,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
+   * Count the recall-eligible facts for the scope - a `COUNT(*)` with
    * the same default filters as the FTS search (live, non-archived,
    * non-quarantined). Replaces the old `search({ query: '*', topK: 1 })` probe
    * that returned at most 1 and was deterministically 0 on real SQLite.
@@ -1573,7 +1574,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Record a retrieval access for the given facts (MRET-7): stamps
+   * Record a retrieval access for the given facts: stamps
    * `last_accessed_at` and bumps `strength` by 0.1 per access, capped
    * at 2.0 (the decay model reads `tauMs * max(0.5, strength)`, so the
    * cap bounds how far reinforcement can stretch retention). Failures
@@ -1622,7 +1623,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Narrow decay-column read for exactly the given fact ids (MRET-8).
+   * Narrow decay-column read for exactly the given fact ids.
    * Replaces the per-search 1000-row LRU-window scan.
    *
    * @stable
@@ -1815,7 +1816,7 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
   }
 
   /**
-   * Lexical runbook search over rule text (D3, migration 028) - powers
+   * Lexical runbook search over rule text (migration 028) - powers
    * "find the procedure for this task" content recall, as opposed to
    * predicate activation. Returns whole rules; quarantined (unvalidated
    * induced) procedures are excluded unless the inspector opts in.
@@ -1855,7 +1856,7 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
   }
 
   /**
-   * Promote / demote a procedural rule's retrieval-trust `status` (MCON-2) and
+   * Promote / demote a procedural rule's retrieval-trust `status` and
    * write a `memory_history` audit row. Mirrors `setStatus` on facts - a
    * retrieval gate only, never touching content. Powers
    * {@link ProceduralMemory.validate} so an induced (quarantined) procedure can
@@ -1898,8 +1899,8 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
   }
 
   /**
-   * Record one demonstrated successful reuse of a rule (MCON-2 part 4,
-   * migration 020) and return the new counter value. Feeds
+   * Record one demonstrated successful reuse of a rule
+   * (migration 020) and return the new counter value. Feeds
    * promotion-by-demonstrated-success for quarantined induced
    * procedures.
    *
@@ -1952,7 +1953,7 @@ class SharedMemoryStoreImpl implements SharedMemoryStore {
 
 /**
  * `SqliteInsightStore` - owns the `insights` + `insights_fts` tables
- * shipped in migration 014 (P1-1). Implements the structural
+ * shipped in migration 014. Implements the structural
  * `InsightMemoryStoreExt` surface defined in
  * `@graphorin/memory/internal/storage-adapter.ts`.
  *
@@ -2059,7 +2060,7 @@ export class SqliteInsightStore {
   }
 
   /**
-   * Promote / demote an insight's retrieval-trust `status` (MCON-2) and write a
+   * Promote / demote an insight's retrieval-trust `status` and write a
    * `memory_history` audit row. Mirrors `setStatus` on facts - a retrieval gate
    * only. Powers {@link InsightMemory.validate} so a quarantined (reflection)
    * insight can be promoted out of quarantine.
@@ -2175,7 +2176,7 @@ interface SqliteEntityMergeRecord {
 }
 
 /**
- * Lightweight in-SQLite relation-graph store (P2-1). Owns the canonical
+ * Lightweight in-SQLite relation-graph store. Owns the canonical
  * `entities` table, the `fact_entities` mapping, and the append-only
  * `entity_merges` ledger. Entity *resolution* (lexical + embedding dedup,
  * optional LLM adjudication) lives in `@graphorin/memory`; this class is
@@ -2267,7 +2268,7 @@ export class SqliteGraphStore {
    * name. Backed by the partial-unique index on `(scope_user_id,
    * normalized_name) WHERE merged_into IS NULL`, so the resolver dedups an
    * exact alias of an arbitrarily-old entity without paging the bounded
-   * {@link listEntities} candidate window or deserializing its BLOBs (CS-11).
+   * {@link listEntities} candidate window or deserializing its BLOBs.
    */
   async findEntityByNormalizedName(
     scope: SessionScope,
@@ -2484,7 +2485,7 @@ export class SqliteGraphStore {
   }
 
   /**
-   * PPR-lite graded expansion (D5): the same recursive entity-graph walk
+   * PPR-lite graded expansion: the same recursive entity-graph walk
    * as {@link expandOneHop}, but returns each reachable fact with its
    * MINIMUM hop distance from the seed set, so callers can weight
    * neighbours by damped spreading activation instead of a flat score.
@@ -2569,7 +2570,7 @@ export class SqliteGraphStore {
   }
 
   /**
-   * Exact entity-match retriever (D5): facts linked to the entity whose
+   * Exact entity-match retriever: facts linked to the entity whose
    * normalized name equals `normalizedName` (canonicalising merges).
    * Powers a precise "facts about <entity>" candidate leg distinct from
    * the fuzzy vector/FTS legs.
@@ -2801,7 +2802,7 @@ function rowToBlock(row: WorkingBlockRow): Block {
 }
 
 /**
- * B3: parse a persisted verdict column defensively - a malformed row
+ * Parse a persisted verdict column defensively - a malformed row
  * degrades to 'no verdict' instead of failing the read path.
  */
 function parseVerdictJson(raw: string): RunTurnVerdict | undefined {

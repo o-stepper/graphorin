@@ -18,7 +18,7 @@ discipline; the executor passes it to `toResultEnvelope({ chunks })`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-buffertruncated"></a> `bufferTruncated` | `readonly` | `boolean` | W-117: `true` when the aggregation buffer hit `maxBufferBytes` and later chunks were dropped from the ASSEMBLED body (sink delivery continued). Consumers building an output / spill artifact from `chunks` must treat the body as incomplete. | packages/tools/src/streaming/channel.ts:98 |
+| <a id="property-buffertruncated"></a> `bufferTruncated` | `readonly` | `boolean` | `true` when the aggregation buffer hit `maxBufferBytes` and later chunks were dropped from the ASSEMBLED body (sink delivery continued). Consumers building an output / spill artifact from `chunks` must treat the body as incomplete. | packages/tools/src/streaming/channel.ts:98 |
 | <a id="property-chunkcount"></a> `chunkCount` | `readonly` | `number` | - | packages/tools/src/streaming/channel.ts:89 |
 | <a id="property-chunks"></a> `chunks` | `readonly` | readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[] | - | packages/tools/src/streaming/channel.ts:88 |
 | <a id="property-progresseventcount"></a> `progressEventCount` | `readonly` | `number` | - | packages/tools/src/streaming/channel.ts:90 |

@@ -10,11 +10,11 @@
 type AgentCapability = "read-only";
 ```
 
-Defined in: packages/agent/src/types.ts:696
+Defined in: packages/agent/src/types.ts:695
 
 **`Stable`**
 
-Run-level capability restriction (D2 - the single-writer constraint
+Run-level capability restriction (the single-writer constraint
 from multi-agent practice). `'read-only'` makes the run
 side-effect-free by construction: writer tools (`side-effecting` /
 `external-stateful`) and handoffs are never advertised to the model,

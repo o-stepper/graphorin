@@ -17,8 +17,8 @@ Defined in: packages/security/src/audit/secrets-bridge.ts:64
 Subscribe the audit-log subsystem to the secrets-layer audit
 emitter. Returns a teardown function.
 
-Writes are serialised through a per-bridge queue (and, since SPL-4,
-also at the source inside `appendAudit`, which serialises every
+Writes are serialised through a per-bridge queue (and also at the
+source inside `appendAudit`, which serialises every
 caller of one `AuditDb`) so concurrent secrets events never race on
 `db.latest()` and produce duplicate `seq` values. A failed write is
 isolated from the secret access path via the `onWriteError` callback;

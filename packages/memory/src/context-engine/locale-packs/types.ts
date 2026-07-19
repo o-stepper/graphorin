@@ -42,7 +42,7 @@ export interface BaseTemplateFragments {
 }
 
 /**
- * D4 inbound-sanitization preamble fragment. Injected after the
+ * Inbound-sanitization preamble fragment. Injected after the
  * cache breakpoint (Layer 5/6 territory) on steps containing
  * untrusted tool output.
  *
@@ -99,7 +99,7 @@ export interface ContextLocalePack {
   readonly baseTemplate: BaseTemplateFragments;
   /** Auto-recall trigger regex set. */
   readonly autoRecallTriggers: AutoRecallTriggers;
-  /** Inbound-sanitization preamble (D4 - RB-43). */
+  /** Inbound-sanitization preamble (RB-43). */
   readonly inboundSanitizationPreamble: InboundSanitizationPreamble;
   /** Structured compaction summary template (RB-46). */
   readonly compactionSummaryTemplate: CompactionSummaryTemplate;

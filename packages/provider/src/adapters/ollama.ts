@@ -62,15 +62,15 @@ export interface OllamaAdapterOptions {
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetchImpl?: typeof fetch;
   /**
-   * Time-to-response budget per request (PS-24). Default
+   * Time-to-response budget per request. Default
    * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
    */
   readonly timeoutMs?: number;
   /**
-   * Thinking control for reasoning-capable models (audit 2026-07-16,
-   * P1-4). Sent as Ollama's top-level `think` field: `false` disables
-   * thinking on models that default to it (e.g. qwen3), `true` enables
-   * it, and `'low' | 'medium' | 'high'` select an effort level on
+   * Thinking control for reasoning-capable models. Sent as Ollama's
+   * top-level `think` field: `false` disables thinking on models that
+   * default to it (e.g. qwen3), `true` enables it, and
+   * `'low' | 'medium' | 'high'` select an effort level on
    * models that grade it (e.g. gpt-oss). Omitted -> the model's own
    * default. Any truthy value also flips `capabilities.reasoning` to
    * `true` unless an explicit `capabilities` override says otherwise.
@@ -80,7 +80,7 @@ export interface OllamaAdapterOptions {
   readonly think?: boolean | 'low' | 'medium' | 'high';
   /**
    * Context window to request from the Ollama server, sent as
-   * `options.num_ctx` on every call (audit 2026-07-16, P1-5). Without
+   * `options.num_ctx` on every call. Without
    * it Ollama sizes the context itself (4096 by default) while this
    * adapter declares `capabilities.contextWindow` 8192 - three numbers
    * that silently disagree. Setting `numCtx` uses ONE value for both
@@ -415,8 +415,8 @@ function mapUsage(chunk: OllamaChatChunk): Usage {
 }
 
 /**
- * Ollama server timings for one call, in milliseconds (audit
- * 2026-07-16, item 8). The server reports them in nanoseconds on the
+ * Ollama server timings for one call, in milliseconds. The
+ * server reports them in nanoseconds on the
  * terminal chunk; normalized here so model load, prompt processing and
  * generation are distinguishable in events and traces. Surfaced under
  * `providerMetadata.ollama` on the `finish` event / `generate()`
@@ -484,7 +484,7 @@ function defaultLogger(level: 'warn' | 'info', message: string, meta?: object): 
   }
 }
 
-/** W-095: one dropped-content WARN per adapter instance. */
+/** One dropped-content WARN per adapter instance. */
 const droppedContentWarned = new WeakSet<object>();
 
 function conversionOptionsFor(options: OllamaAdapterOptions): ChatMessageConversionOptions {

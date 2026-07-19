@@ -44,15 +44,15 @@ export interface OpenAICompatibleAdapterOptions {
    */
   readonly allowInsecureTransport?: boolean;
   /**
-   * Capability overrides merged on top of the adapter defaults
-   * (core-provider-10). Use them to widen `contextWindow` /
+   * Capability overrides merged on top of the adapter defaults.
+   * Use them to widen `contextWindow` /
    * `maxOutput` for large-context servers or to set
    * `structuredOutput: false` for servers that reject
    * `response_format`.
    */
   readonly capabilities?: Partial<ProviderCapabilities>;
   /**
-   * Time-to-response budget per request (PS-24). Default 120s; `0`
+   * Time-to-response budget per request. Default 120s; `0`
    * disables.
    */
   readonly timeoutMs?: number;

@@ -101,7 +101,7 @@ provider event union - adapters hide vendor specifics.
 }
 ```
 
-Closes the current reasoning block (W-024). Deltas stay textual;
+Closes the current reasoning block. Deltas stay textual;
 this terminator carries the provider's opaque round-trip metadata
 (e.g. the Anthropic thinking-block `signature`, or `data` for a
 redacted block) so multi-step tool use with extended thinking can

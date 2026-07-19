@@ -1,13 +1,13 @@
 /**
  * Untrusted-content envelope helpers shared across the memory package.
  *
- * Extracted from the CE-15 compaction-summary neutralization
+ * Extracted from the compaction-summary neutralization
  * (`wrapSummaryAsDerived` in `context-engine/compaction/compactor.ts`)
  * so every prompt that interpolates untrusted memory text (compaction
  * summaries, reconcile neighbours, deep-phase judge candidates,
  * reflection evidence) delimits it with ONE substitution scheme. The
  * scheme is the same visible bracket-substitution `@graphorin/tools`
- * applies in `wrapEnvelope` (W-030): the closing marker
+ * applies in `wrapEnvelope`: the closing marker
  * `<<</untrusted_content>>>` becomes `[[/untrusted_content]]` and the
  * opening prefix `<<<untrusted_content` becomes `[[untrusted_content`,
  * tolerant to case and whitespace. Zero-width insertion is not used -
@@ -55,7 +55,7 @@ export function neutralizeEnvelopeMarkers(body: string): string {
  * attributes, neutralizing embedded markers first. Attribute insertion
  * order is preserved, so
  * `wrapUntrusted(body, { trust: 'derived', tool: 'compaction-summarizer' })`
- * reproduces the historical CE-15 output byte-for-byte.
+ * reproduces the historical output byte-for-byte.
  *
  * @internal
  */

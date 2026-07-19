@@ -143,7 +143,7 @@ Defined in: packages/store-sqlite/src/conflict-store.ts:254
 **`Stable`**
 
 Stamp `attempted_at` on a pending row whose deep-phase judge call
-failed (MCON-9). The deep phase closes the row as
+failed. The deep phase closes the row as
 `'judge-unparseable'` on the NEXT failure, bounding how often a
 poisoned row can be re-billed.
 

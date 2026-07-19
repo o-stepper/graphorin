@@ -1,19 +1,20 @@
 /**
  * Cooperation contract between the {@link ContextEngine} and the
- * outbound prompt-redaction middleware (D3, see ADR-045 / DEC-157)
- * + the inbound tool-result sanitization middleware (D4, see
+ * outbound prompt-redaction middleware (see ADR-045 / DEC-157)
+ * + the inbound tool-result sanitization middleware (see
  * RB-43 / DEC-159).
  *
  * Every {@link MessageContent} part assembled by the ContextEngine
  * carries two **independent** annotations:
  *
  * - `graphorin.content.origin` - where the content came from. Used
- *   by D3 (`withRedaction`) under `scanScope: 'untrusted'` to
- *   decide whether to re-scan a part that already passed the D2
- *   sensitivity-tier filter.
+ *   by the redaction middleware (`withRedaction`) under
+ *   `scanScope: 'untrusted'` to decide whether to re-scan a part that
+ *   already passed the sensitivity-tier filter.
  * - `graphorin.content.inbound.trust` - what trust class the source
- *   carries. Used by D4 (`withInboundSanitization`) and by Phase 12
- *   (agent runtime) to gate the per-step preamble injection.
+ *   carries. Used by the sanitization middleware
+ *   (`withInboundSanitization`) and by Phase 12 (agent runtime) to
+ *   gate the per-step preamble injection.
  *
  * Both annotations live as **span attributes only** (observability)
  * - they are never serialized to the wire payload. The wire-stable
@@ -61,16 +62,16 @@ export type ContentOrigin =
  * Sibling axis to {@link ContentOrigin}; the two are independent.
  *
  * - `'trusted'` - built-in framework tools + trusted-skill-bundled
- *   tools; D4 preamble does NOT fire on steps containing only
- *   these parts.
+ *   tools; the inbound preamble does NOT fire on steps containing
+ *   only these parts.
  * - `'user-defined'` - tools registered via `tool({...})` from user
- *   application code; D4 preamble fires.
- * - `'untrusted-skill'` - tools bundled by an untrusted skill; D4
+ *   application code; the inbound preamble fires.
+ * - `'untrusted-skill'` - tools bundled by an untrusted skill; the
+ *   inbound preamble fires; default policy is strip-and-wrap.
+ * - `'mcp'` - every `Tool` produced by `MCPClient.toTools(...)`; the
+ *   inbound preamble fires; default policy is strip-and-wrap.
+ * - `'web-search'` - built-in `web_search` adapter; the inbound
  *   preamble fires; default policy is strip-and-wrap.
- * - `'mcp'` - every `Tool` produced by `MCPClient.toTools(...)`; D4
- *   preamble fires; default policy is strip-and-wrap.
- * - `'web-search'` - built-in `web_search` adapter; D4 preamble
- *   fires; default policy is strip-and-wrap.
  * - `'n/a'` - non-tool-result parts for which the inbound-trust
  *   axis is meaningless (`'user:input'`, `'memory:tier-filtered'`,
  *   `'system:framework'`, `'agent:instructions'`,
@@ -143,7 +144,7 @@ export function toSpanAttributes(annotation: ContentAnnotation): Readonly<Record
 }
 
 /**
- * Decide whether the per-step inbound-sanitization preamble (D4)
+ * Decide whether the per-step inbound-sanitization preamble
  * should fire for an assembled message list. The preamble fires
  * iff at least one part carries an inbound-trust value other than
  * `'trusted'` and `'n/a'`. Trusted-only steps skip the preamble for

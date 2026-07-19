@@ -89,7 +89,7 @@ get lastErrorCount(): number;
 Defined in: src/reranker.ts:162
 
 Number of per-passage provider failures swallowed (→ `fallbackScore`) on
-the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
+the most recent `rerank(...)`. A non-zero value means the ranking
 is partially degraded - surface it for observability.
 
 ##### Returns

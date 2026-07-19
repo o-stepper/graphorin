@@ -19,7 +19,7 @@ Defined in: packages/server/src/config.ts:46
 | `audit.enabled` | `readonly` | `boolean` | - | packages/server/src/config.ts:138 |
 | `audit.passphraseRef?` | `readonly` | `string` | - | packages/server/src/config.ts:140 |
 | `audit.path?` | `readonly` | `string` | - | packages/server/src/config.ts:139 |
-| `audit.toolEvents` | `readonly` | `"all"` \| `"off"` \| `"security"` | W-051: which tools/MCP audit-bus events land in the audit chain. `'security'` (default) writes the security-significant subset (dataflow flagged/blocked/declassified, sanitization, approvals, collisions, cap-disabled); `'all'` adds per-call `tool:execute:*` chatter; `'off'` disables the bridge. | packages/server/src/config.ts:149 |
+| `audit.toolEvents` | `readonly` | `"all"` \| `"off"` \| `"security"` | Which tools/MCP audit-bus events land in the audit chain. `'security'` (default) writes the security-significant subset (dataflow flagged/blocked/declassified, sanitization, approvals, collisions, cap-disabled); `'all'` adds per-call `tool:execute:*` chatter; `'off'` disables the bridge. | packages/server/src/config.ts:149 |
 | <a id="property-auth"></a> `auth` | `readonly` | \{ `kind`: `"none"` \| `"token"`; `pepperRef?`: `string`; `perIpFailureThreshold?`: `number`; `perIpLockoutMs?`: `number`; `tokenEnvironments`: readonly `string`[]; `tokenPrefix`: `string`; \} | - | packages/server/src/config.ts:155 |
 | `auth.kind` | `readonly` | `"none"` \| `"token"` | - | packages/server/src/config.ts:156 |
 | `auth.pepperRef?` | `readonly` | `string` | - | packages/server/src/config.ts:157 |

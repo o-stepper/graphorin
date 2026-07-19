@@ -27,7 +27,7 @@ scope?): Promise<void>;
 
 Defined in: packages/core/src/contracts/memory-store.ts:200
 
-Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+Soft-delete a fact. When `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
 deterministic no-op (0 rows changed) - defense in depth so a
 leaked / cross-user id reaching a mutator cannot touch another

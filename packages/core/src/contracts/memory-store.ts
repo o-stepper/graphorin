@@ -20,7 +20,7 @@ import type { SessionScope } from '../types/session-scope.js';
  * pick its own physical layout (one big table, six tables, mixed) while
  * preserving append-only semantics - soft-delete only.
  *
- * **Baseline vs full adapter (W-048).** This interface is the MINIMUM a
+ * **Baseline vs full adapter.** This interface is the MINIMUM a
  * third-party adapter must implement; `@graphorin/memory` accepts it and
  * degrades gracefully (vector search, decay, consolidation, insights,
  * graph expansion, conflict audit switch off where the surface is
@@ -50,7 +50,7 @@ export interface MemoryStore {
 }
 
 /**
- * Maintenance extension over {@link MemoryStore} (W-066), mirroring
+ * Maintenance extension over {@link MemoryStore}, mirroring
  * the `SessionStoreExt` precedent: capabilities the sqlite adapter
  * guarantees but a custom `MemoryStore` is not obliged to implement.
  * The base contract is unchanged - existing implementations keep
@@ -79,7 +79,7 @@ export interface WorkingMemoryStore {
   upsert(scope: SessionScope, block: Block): Promise<void>;
   delete(scope: SessionScope, label: string, reason?: string): Promise<void>;
   /**
-   * Hard-delete a block row - no tombstone left behind (wave-D D2).
+   * Hard-delete a block row - no tombstone left behind.
    * `delete` stays the soft tombstone; `purge` is the GDPR path for
    * USER-scoped blocks (e.g. the `profile` projection), which the
    * session-delete cascade never reaches (`scope_session_id IS NULL`).
@@ -102,7 +102,7 @@ export interface MessageRef {
 }
 
 /**
- * A stored message paired with its persisted identity (RP-5). The {@link Message}
+ * A stored message paired with its persisted identity. The {@link Message}
  * type itself carries no id / timestamp; these come from the store row, so an
  * exporter can preserve message identity + chronology across a round-trip.
  *
@@ -116,7 +116,7 @@ export interface SessionMessageWithMetadata {
 }
 
 /**
- * B3 (item 15): optional per-message write metadata. `verdict` is the
+ * Optional per-message write metadata. `verdict` is the
  * turn's security verdict from the run loop's commit gates
  * (`RunState.verdicts`); persisted so the memory ingest gate can
  * exclude guardrail-blocked turns from extraction deterministically.
@@ -138,7 +138,7 @@ export interface SessionMemoryStore {
   ): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
   /**
-   * List messages with their persisted identity (RP-5). Optional: stores that
+   * List messages with their persisted identity. Optional: stores that
    * don't implement it fall back to `list` + fabricated ids on the export path.
    */
   listWithMetadata?(
@@ -148,7 +148,7 @@ export interface SessionMemoryStore {
   /**
    * Full-text search over the scoped session messages.
    *
-   * Query precedence (W-127): the POSITIONAL `query` parameter is
+   * Query precedence: the POSITIONAL `query` parameter is
    * authoritative; when the caller also sets `opts.query` (the field
    * exists because {@link MemorySearchOptions} is shared with the
    * option-object search surfaces), implementations MUST ignore it.
@@ -187,7 +187,7 @@ export interface SemanticMemoryStore {
   search(scope: SessionScope, opts: MemorySearchOptions): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   supersede(oldId: string, newFact: Fact, reason?: string): Promise<void>;
   /**
-   * Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+   * Soft-delete a fact. When `scope` is supplied, adapters that
    * support tenant isolation MUST treat a fact outside the scope as a
    * deterministic no-op (0 rows changed) - defense in depth so a
    * leaked / cross-user id reaching a mutator cannot touch another

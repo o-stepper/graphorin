@@ -1,7 +1,7 @@
 /**
  * Schema projection surface: the shared Zod-to-JSON-Schema converter
  * used by the agent's `toolToDefinition`, the code-mode signature
- * projection, and `ToolSearchMatch` (tools-01).
+ * projection, and `ToolSearchMatch`.
  *
  * @packageDocumentation
  */

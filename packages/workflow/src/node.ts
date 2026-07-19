@@ -17,7 +17,7 @@ import type {
  * Construct a {@link WorkflowNode}. The wrapper exists to give the
  * engine a stable shape and to keep `createWorkflow({...})` callers
  * from instantiating nodes by hand. Carries the optional per-node
- * execution policy (D1 / workflow-03): `timeoutMs` + `retry`.
+ * execution policy: `timeoutMs` + `retry`.
  *
  * @stable
  */

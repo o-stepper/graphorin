@@ -28,7 +28,7 @@ interface TiktokenEncoding {
 }
 
 /**
- * PROVIDER-CT-01: js-tiktoken's `encode` defaults `disallowedSpecial` to
+ * js-tiktoken's `encode` defaults `disallowedSpecial` to
  * `'all'` and THROWS when the input contains a special-token sequence
  * (e.g. `<|endoftext|>`). For token COUNTING of arbitrary user/model text
  * that is a crash on ordinary input, so we disallow nothing and treat any

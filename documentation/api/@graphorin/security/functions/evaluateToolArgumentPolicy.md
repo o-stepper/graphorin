@@ -15,10 +15,10 @@ Defined in: packages/security/src/policy/tool-argument-policy.ts:200
 **`Stable`**
 
 Evaluate a policy against one tool call, projected onto the binary
-pre-E1 vocabulary. Delegates to [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
+legacy vocabulary. Delegates to [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
 and maps every non-`allow` effect to `'forbid'`: a consumer that
-cannot ask or defer must not run the call (fail-closed). Policies
-written before E1 contain only `allow`/`forbid` rules, for which this
+cannot ask or defer must not run the call (fail-closed). Legacy
+policies contain only `allow`/`forbid` rules, for which this
 is byte-identical to the original forbid-before-allow semantics.
 
 ## Parameters

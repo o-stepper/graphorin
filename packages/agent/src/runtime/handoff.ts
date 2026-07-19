@@ -111,7 +111,7 @@ export function sanitizeHandoffSeed(messages: ReadonlyArray<Message>): Message[]
 export interface HandoffEntry<TDeps> {
   readonly agent: Agent<TDeps, unknown>;
   readonly filter: DescribedFilter | undefined;
-  /** W-036: which child events forward into the parent stream. */
+  /** Which child events forward into the parent stream. */
   readonly forwardEvents?: SubagentForwardPolicy | undefined;
 }
 
@@ -124,10 +124,10 @@ export interface HandoffRunEnv<TDeps, TOutput> {
   readonly sessionId: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
-  /** The run's usage accumulator - child-run usage folds into it (W-033). */
+  /** The run's usage accumulator - child-run usage folds into it. */
   readonly usageAcc: UsageAccumulator;
   /**
-   * W-036: live read of the parent's current step span, the parent for
+   * Live read of the parent's current step span, the parent for
    * a sub-agent's `agent.run` span (one trace tree).
    */
   readonly getCurrentStepSpan?: () => import('@graphorin/core').AISpan | undefined;
@@ -208,7 +208,7 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   }
 }
 
-/** Branch-specific spec for the shared sub-run seam (W-001). */
+/** Branch-specific spec for the shared sub-run seam. */
 export interface SubRunSpec {
   /** The child agent's configured name (parking + usage folding). */
   readonly agentName: string;
@@ -220,14 +220,14 @@ export interface SubRunSpec {
     subResult: AgentResult<unknown>,
     turns: ReadonlyArray<string>,
   ) => { readonly output: unknown; readonly taint?: SubAgentFoldTaint };
-  /** Optional taint sink (the inline toTool path records D2 folds). */
+  /** Optional taint sink (the inline toTool path records taint folds). */
   readonly recordTaint?: (taint: SubAgentFoldTaint, renderedText: string) => void;
-  /** W-036: forwarding policy (default `'lifecycle'`). */
+  /** Forwarding policy (default `'lifecycle'`). */
   readonly forwardEvents?: SubagentForwardPolicy;
 }
 
 /**
- * W-036: the `'lifecycle'` forwarding whitelist - load-bearing child
+ * The `'lifecycle'` forwarding whitelist - load-bearing child
  * events, never the high-frequency text/reasoning deltas.
  */
 const LIFECYCLE_FORWARD_TYPES: ReadonlySet<string> = new Set([
@@ -252,7 +252,7 @@ function shouldForwardSubagentEvent(policy: SubagentForwardPolicy, eventType: st
 }
 
 /**
- * W-001: compose the sub-run routing path. An approval mirrored from a
+ * Compose the sub-run routing path. An approval mirrored from a
  * child that itself parked a grandchild already carries the CHILD-level
  * routing; prefixing this level's park key keeps the full path intact
  * (`<parentCallId>/<childCallId>/...`), so each resume level strips one
@@ -263,7 +263,7 @@ export function composeSubRunPath(parkKey: string, nested: string | undefined): 
   return nested === undefined ? parkKey : `${parkKey}/${nested}`;
 }
 
-/** Split one routing segment off a composed sub-run path (W-001). */
+/** Split one routing segment off a composed sub-run path. */
 export function splitSubRunPath(path: string): {
   readonly head: string;
   readonly rest: string | undefined;
@@ -273,7 +273,7 @@ export function splitSubRunPath(path: string): {
   return { head: path.slice(0, idx), rest: path.slice(idx + 1) };
 }
 
-/** Park (or refresh) a suspended child on the parent state (W-001). */
+/** Park (or refresh) a suspended child on the parent state. */
 function parkSubRun(
   state: MutableRunState & RunState,
   call: ToolCall,
@@ -297,7 +297,7 @@ function parkSubRun(
 }
 
 /**
- * W-001: the shared sub-run seam behind handoff and inline `toTool`
+ * The shared sub-run seam behind handoff and inline `toTool`
  * execution. Observes the child stream and settles the outcome:
  *
  * - `awaiting_approval`: the child PARKS on `state.pendingSubRuns`, its
@@ -306,7 +306,7 @@ function parkSubRun(
  *   step. The parked toolCallId keeps NO tool message - exactly like a
  *   directly-gated call - and the resume guard keeps it out of the
  *   provider loop.
- * - terminal failure: a typed tool error (the pre-W-001 behavior).
+ * - terminal failure: a typed tool error (the pre-parking behavior).
  * - completed: the branch-shaped output becomes the tool message.
  *
  * Usage folds on terminal outcomes only - the child's cumulative usage

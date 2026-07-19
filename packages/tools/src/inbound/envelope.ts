@@ -11,8 +11,8 @@
  * read as content OUTSIDE the untrusted region.
  *
  * Neutralization uses the same VISIBLE bracket-substitution the memory
- * package applies to compaction summaries (CE-15,
- * `wrapSummaryAsDerived`): the closing marker becomes
+ * package applies to compaction summaries
+ * (`wrapSummaryAsDerived`): the closing marker becomes
  * `[[/untrusted_content]]` and the opening prefix becomes
  * `[[untrusted_content`. Zero-width insertion is deliberately NOT used
  * as a mechanism: models read straight through zero-width splits
@@ -79,7 +79,7 @@ const ANGLE_RUN_CLOSE_RE = />{3,}/g;
  * prematurely close (or spoof a nested opening of) the envelope that
  * `applyInboundSanitization` wraps around it.
  *
- * The substitution scheme is identical to the memory package's CE-15
+ * The substitution scheme is identical to the memory package's
  * summary neutralization on literal markers:
  * `<<</untrusted_content>>>` becomes `[[/untrusted_content]]` and the
  * `<<<untrusted_content` prefix becomes `[[untrusted_content`. Bodies

@@ -1,10 +1,10 @@
 /**
- * Cron-leg proactive task (C2): a "fresh session per fire" runner over
+ * Cron-leg proactive task: a "fresh session per fire" runner over
  * the durable trigger scheduler.
  *
  * Every fire creates a new session, runs a dedicated agent on a
  * REQUIRED pinned model (fail-closed: the fire never inherits the
- * agent's fallback chain - decision D-8/C2), and classifies the result
+ * agent's fallback chain), and classifies the result
  * onto the typed escalation ladder:
  *
  * - `completed` -> `notify` (or `act` for a task granted `'act'` whose
@@ -16,17 +16,17 @@
  *   approvals are auto-denied and the fire reports `escalationBlocked`.
  *
  * Grant -> capability mapping (deterministic enforcement, independent
- * of E1's permission vocabulary): `notify` / `question` tasks run
+ * of the permission vocabulary): `notify` / `question` tasks run
  * `capability: 'read-only'` - writer tools are never advertised and
  * the executor blocks fabricated writer calls, so acting without the
  * grant is impossible by construction. Recursive scheduling is blocked
  * the same way: the dedicated agent's toolset must not carry
  * trigger-registering tools (checked at creation via
- * `schedulingToolNames`); E1's deny-by-name rules (shipped in 0.9.0)
+ * `schedulingToolNames`); deny-by-name rules (shipped in 0.9.0)
  * add a second, policy-driven layer on top.
  *
  * Composes with the existing workflow timer-daemon rather than
- * re-hosting it (D-9): a task that parks inside a durable workflow
+ * re-hosting it: a task that parks inside a durable workflow
  * resumes through `POST /v1/workflows/:id/resume` and the daemon's
  * ticks; this runner only owns the agent leg.
  *
@@ -54,15 +54,15 @@ import { type ActiveHours, isWithinActiveHours, validateActiveHours } from './ac
 import { serializeApprovalRef } from './approval-ref.js';
 import { ProactiveConfigError } from './errors.js';
 
-/** When the task fires. C4 harness fields pass through. @stable */
+/** When the task fires. Scheduler harness fields pass through. @stable */
 export interface ProactiveCronSchedule {
   /** 5-field cron expression. */
   readonly cron: string;
-  /** IANA timezone for the expression (W-124). */
+  /** IANA timezone for the expression. */
   readonly timezone?: string;
-  /** Deterministic per-id jitter (C4). */
+  /** Deterministic per-id jitter. */
   readonly jitterMs?: number;
-  /** Auto-pause instant (C4). */
+  /** Auto-pause instant. */
   readonly expiresAt?: string | number;
 }
 
@@ -129,7 +129,7 @@ export interface CreateProactiveCronTaskOptions<TDeps = unknown> {
    * Maximum escalation rung (default `'notify'`). `'notify'` /
    * `'question'` fires run `capability: 'read-only'` - side effects
    * are impossible by construction. `'act'` additionally requires
-   * `memory` with an ACTIVE ingest gate (B3) - fail-closed config
+   * `memory` with an ACTIVE ingest gate - fail-closed config
    * check.
    */
   readonly grant?: ProactiveGrant;
@@ -139,7 +139,7 @@ export interface CreateProactiveCronTaskOptions<TDeps = unknown> {
    * for lower grants.
    */
   readonly memory?: MemoryIngestGateEvidence;
-  /** Per-fire run budget (C5). `onExceed` is pinned to `'stop'`. */
+  /** Per-fire run budget. `onExceed` is pinned to `'stop'`. */
   readonly budget?: Pick<RunBudget, 'maxCostUsd' | 'maxTokens'>;
   /** Daily window in which fires may run. Absent = always. */
   readonly activeHours?: ActiveHours;

@@ -10,7 +10,7 @@ Defined in: packages/sessions/src/facade.ts:119
 
 **`Stable`**
 
-A stored message paired with its persisted identity (RP-5). The core
+A stored message paired with its persisted identity. The core
 [Message](/api/@graphorin/core/type-aliases/Message.md) type carries no id / timestamp; these come from the store row.
 
 ## Properties

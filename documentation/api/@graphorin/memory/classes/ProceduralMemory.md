@@ -15,8 +15,8 @@ current context matches the rule's predicate. The activation rules
 are deterministic so the agent runtime + ContextEngine can render
 the active set into the system prompt every step.
 
-P2-2 adds [ProceduralMemory.induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce): distil a reusable workflow
-from a successful agent trajectory and store it **quarantined** (it must
+[ProceduralMemory.induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce) distils a reusable workflow
+from a successful agent trajectory and stores it **quarantined** (it must
 not drive actions until validated). Quarantined procedures are excluded
 from [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate) but remain visible to
 [ProceduralMemory.list](/api/@graphorin/memory/classes/ProceduralMemory.md#list).
@@ -61,7 +61,7 @@ supports the literals `'always'`, `'topic=<topic>'`, and
 `'tag=<tag>'`. Anything outside that grammar is treated as
 always-active so callers do not silently lose rules.
 
-**Quarantined procedures are excluded** (P1-4 / P2-2): an induced
+**Quarantined procedures are excluded**: an induced
 procedure must not drive actions until validated, so activation - which
 feeds the system prompt - never surfaces it.
 
@@ -112,8 +112,8 @@ opts?): Promise<Rule | null>;
 
 Defined in: packages/memory/src/tiers/procedural-memory.ts:235
 
-Induce a reusable procedure (P2-2) from a successful agent trajectory
-and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
+Induce a reusable procedure from a successful agent trajectory
+and store it **quarantined** + `provenance: 'induction'`. Returns
 the stored [Rule](/api/@graphorin/core/interfaces/Rule.md), or `null` when the trajectory was unsuccessful /
 empty or the inducer produced nothing inducible.
 
@@ -202,8 +202,8 @@ Defined in: packages/memory/src/tiers/procedural-memory.ts:142
 
 **`Stable`**
 
-Record the outcome of one demonstrated reuse of a procedure
-(MCON-2 part 4). A success increments the rule's persistent
+Record the outcome of one demonstrated reuse of a procedure.
+A success increments the rule's persistent
 `successCount`; when `procedurePromotion.afterSuccesses` is
 configured and a QUARANTINED procedure reaches the threshold it is
 promoted through [validate](/api/@graphorin/memory/classes/ProceduralMemory.md#validate) - the injection gate still
@@ -271,7 +271,7 @@ opts?): Promise<readonly MemoryHit<Rule>[]>;
 
 Defined in: packages/memory/src/tiers/procedural-memory.ts:360
 
-Runbook content search (D3): "find the procedure for this task" -
+Runbook content search: "find the procedure for this task" -
 lexical recall over rule text, as opposed to predicate
 [activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate). Returns **whole validated procedures** (the full
 [Rule](/api/@graphorin/core/interfaces/Rule.md) incl. steps / variables / success criteria) so a match
@@ -314,7 +314,7 @@ options?): Promise<void>;
 
 Defined in: packages/memory/src/tiers/procedural-memory.ts:421
 
-Promote a quarantined (induced) procedure into `activate()` (MCON-2).
+Promote a quarantined (induced) procedure into `activate()`.
 Mirrors [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict
 from the stored rule text and **refuses** promotion of an injection-flagged
 procedure unless an operator passes `{ force: true }`. Induced procedures

@@ -14,7 +14,7 @@ Defined in: src/tool-discovery.ts:373
 
 **`Stable`**
 
-Run the three RB-49 rules against a discovered tool and return the
+Run the three `tool-*` rules against a discovered tool and return the
 findings. The CLI grader maps these findings into per-axis scores;
 the ESLint rules forward them to `context.report(...)`.
 

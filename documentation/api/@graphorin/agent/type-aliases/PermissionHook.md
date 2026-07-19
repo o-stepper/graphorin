@@ -16,7 +16,7 @@ Defined in: [packages/tools/dist/executor/types.d.ts](https://github.com/o-stepp
 
 **`Stable`**
 
-E1 pre-tool permission hook: one caller-supplied decision point over
+Pre-tool permission hook: one caller-supplied decision point over
 every tool call, evaluated after schema validation and BEFORE the
 approval phase. The hook must be pure/idempotent over its input - the
 agent pre-screen and the executor phase may each invoke it for the

@@ -27,7 +27,7 @@
 const counters = new Map<string, number>();
 const histograms = new Map<string, number[]>();
 /**
- * W-051: counters and gauges share the `counters` map, so an exporter
+ * Counters and gauges share the `counters` map, so an exporter
  * bridging into a delta-synced Prometheus registry cannot tell a
  * monotonic counter (delta-inc) from a gauge (absolute set) by value
  * alone. Track the kind per KEY at write time; last writer wins for a
@@ -112,7 +112,7 @@ export interface CounterSnapshot {
   readonly counters: Readonly<Record<string, number>>;
   readonly histograms: Readonly<Record<string, ReadonlyArray<number>>>;
   /**
-   * W-051: per-key instrument kind - `'counter'` (monotonic; bridge
+   * Per-key instrument kind - `'counter'` (monotonic; bridge
    * with a delta-inc) vs `'gauge'` (absolute; bridge with a set). Keys
    * mirror `counters`.
    */

@@ -13,6 +13,13 @@
  * protect consumers, and a packaging regression only exists in the
  * published artifacts.
  *
+ * A second scenario is the docs promise test: the quickstart
+ * hello-world (documentation/guide/quickstart.md) as a runtime twin -
+ * stub agent stream, explicit `memory.semantic.remember`, then a COLD
+ * PROCESS reopen that must recall the fact. The quickstart page
+ * promises stream + persist + restart-survival; this is what holds the
+ * published packages (and the page) to that promise.
+ *
  * Needs npm-registry network access - wired as a scheduled / dispatch
  * workflow (.github/workflows/consumer-smoke.yml), not a per-PR gate.
  *
@@ -47,6 +54,107 @@ const CONSUMER_PACKAGE_JSON = {
     onlyBuiltDependencies: ['better-sqlite3', 'sqlite-vec'],
   },
 };
+
+/** Same recipe for the quickstart promise test (separate project). */
+const QUICKSTART_PACKAGE_JSON = {
+  ...CONSUMER_PACKAGE_JSON,
+  name: 'graphorin-quickstart-smoke',
+};
+
+/**
+ * The docs promise test: a runtime twin of the hello-world in
+ * documentation/guide/quickstart.md (types stripped, split into two
+ * PROCESSES so "survives a restart" is exercised literally, not
+ * simulated). Keep the flow in lockstep with the docs snippet - the
+ * page promises stream + persist + cold recall, and this smoke is what
+ * holds the published packages to that promise.
+ */
+const QUICKSTART_MJS = `import { zeroUsage } from '@graphorin/core';
+import { createAgent } from '@graphorin/agent';
+import { createMemory } from '@graphorin/memory';
+import { createProvider } from '@graphorin/provider';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+
+function createStubProvider() {
+  const reply = (req) => {
+    const last = [...req.messages].reverse().find((m) => m.role === 'user');
+    return 'stub-echo: ' + (typeof last?.content === 'string'
+      ? last.content
+      : (last?.content ?? []).filter((p) => p.type === 'text').map((p) => p.text).join(' '));
+  };
+  return {
+    name: 'stub',
+    modelId: 'stub-echo',
+    capabilities: {
+      streaming: true,
+      toolCalling: false,
+      parallelToolCalls: false,
+      multimodal: false,
+      structuredOutput: false,
+      reasoning: false,
+      contextWindow: 8192,
+      maxOutput: 1024,
+      reasoningContract: 'optional',
+    },
+    acceptsSensitivity: ['public', 'internal', 'secret'],
+    async *stream(req) {
+      yield { type: 'stream-start', metadata: { providerName: 'stub', modelId: 'stub-echo' } };
+      yield { type: 'text-delta', delta: reply(req) };
+      yield { type: 'finish', finishReason: 'stop', usage: zeroUsage() };
+    },
+    async generate(req) {
+      return { text: reply(req), usage: zeroUsage(), finishReason: 'stop' };
+    },
+  };
+}
+
+const phase = process.argv[2];
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+await sqlite.init();
+const memory = createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder: createTransformersJsEmbedder(),
+  contextEngine: { compaction: false },
+});
+
+if (phase === 'write') {
+  const provider = createProvider(createStubProvider(), {
+    acceptsSensitivity: ['public', 'internal'],
+  });
+  const agent = createAgent({
+    name: 'hello',
+    instructions: 'Be brief and helpful.',
+    provider,
+    memory,
+    tools: memory.tools,
+  });
+  let streamed = '';
+  for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })) {
+    if (event.type === 'text.delta') streamed += event.delta;
+  }
+  if (!streamed.includes('stub-echo: Hi!')) {
+    console.error('write phase: agent stream did not surface the stub reply; got:', streamed);
+    process.exit(1);
+  }
+  await memory.semantic.remember(
+    { userId: 'u1' },
+    { text: 'Front squat working set: 5x5 at 100 kg.' },
+  );
+} else if (phase === 'read') {
+  const hits = await memory.semantic.search({ userId: 'u1' }, 'how heavy are my front squats?');
+  if (!hits.some((h) => h.record.text.includes('100 kg'))) {
+    console.error('read phase: persisted fact not recalled; hits =', JSON.stringify(hits));
+    process.exit(1);
+  }
+} else {
+  console.error('usage: node quickstart.mjs <write|read>');
+  process.exit(2);
+}
+await sqlite.close();
+console.log('quickstart ' + phase + ' phase OK');
+`;
 
 /**
  * The consumer program: phase `write` persists one fact and closes;
@@ -99,7 +207,9 @@ function run(label, command, args, options) {
 }
 
 const projectDir = mkdtempSync(join(tmpdir(), 'graphorin-consumer-smoke-'));
+const quickstartDir = mkdtempSync(join(tmpdir(), 'graphorin-quickstart-smoke-'));
 process.stdout.write(`[smoke-consumer] consumer project: ${projectDir}\n`);
+process.stdout.write(`[smoke-consumer] quickstart project: ${quickstartDir}\n`);
 process.stdout.write(`[smoke-consumer] package version tag: ${VERSION}\n`);
 let failed = false;
 
@@ -153,13 +263,78 @@ try {
       failed = true;
     }
   }
+
+  // Scenario 2: the quickstart docs promise test (stream + persist +
+  // cold-process recall) against the same published version.
+  if (!failed) {
+    writeFileSync(
+      join(quickstartDir, 'package.json'),
+      `${JSON.stringify(QUICKSTART_PACKAGE_JSON, null, 2)}\n`,
+    );
+    writeFileSync(join(quickstartDir, 'quickstart.mjs'), QUICKSTART_MJS);
+    const install = run(
+      'quickstart: pnpm add (published packages incl. agent + embedder)',
+      'pnpm',
+      [
+        'add',
+        `@graphorin/core@${VERSION}`,
+        `@graphorin/agent@${VERSION}`,
+        `@graphorin/memory@${VERSION}`,
+        `@graphorin/provider@${VERSION}`,
+        `@graphorin/store-sqlite@${VERSION}`,
+        `@graphorin/embedder-transformersjs@${VERSION}`,
+        'better-sqlite3',
+        'sqlite-vec',
+        'zod',
+      ],
+      { cwd: quickstartDir },
+    );
+    if (install.status !== 0) {
+      console.error('[smoke-consumer] FAIL: quickstart pnpm add exited non-zero');
+      failed = true;
+    } else if (/Ignored build scripts:[^\n]*better-sqlite3/.test(install.output)) {
+      console.error(
+        '[smoke-consumer] FAIL: pnpm ignored the better-sqlite3 build script despite onlyBuiltDependencies',
+      );
+      failed = true;
+    }
+  }
+  if (!failed) {
+    const write = run(
+      'quickstart phase 1/2: agent stream + explicit remember + close',
+      'node',
+      ['quickstart.mjs', 'write'],
+      { cwd: quickstartDir },
+    );
+    if (write.status !== 0) {
+      console.error('[smoke-consumer] FAIL: quickstart write phase exited non-zero');
+      failed = true;
+    }
+  }
+  if (!failed) {
+    const read = run(
+      'quickstart phase 2/2: cold-process reopen + recall',
+      'node',
+      ['quickstart.mjs', 'read'],
+      { cwd: quickstartDir },
+    );
+    if (read.status !== 0) {
+      console.error('[smoke-consumer] FAIL: quickstart read phase exited non-zero');
+      failed = true;
+    }
+  }
 } finally {
   if (failed) {
-    process.stdout.write(`[smoke-consumer] kept for inspection: ${projectDir}\n`);
+    process.stdout.write(
+      `[smoke-consumer] kept for inspection: ${projectDir} and ${quickstartDir}\n`,
+    );
   } else {
     rmSync(projectDir, { recursive: true, force: true });
+    rmSync(quickstartDir, { recursive: true, force: true });
   }
 }
 
 if (failed) process.exit(1);
-process.stdout.write('\n[smoke-consumer] PASS: consumer install + write / reopen / search\n');
+process.stdout.write(
+  '\n[smoke-consumer] PASS: consumer write / reopen / search + quickstart stream / persist / cold recall\n',
+);

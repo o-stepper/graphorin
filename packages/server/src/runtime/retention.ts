@@ -1,9 +1,9 @@
 /**
- * W-010 / W-008: the unified server-side retention scheduler.
+ * The unified server-side retention scheduler.
  *
  * Every prune primitive in the store layer used to be manual and
  * disconnected (CLI-only, API-only, or - like the idempotency sweep
- * before W-061 - dead code). This module owns ONE periodic sweep over
+ * once was - dead code). This module owns ONE periodic sweep over
  * every SQLite growth surface, driven by the `config.retention`
  * section. Policy: derived / recoverable data (span telemetry,
  * consolidator run counters, exhausted DLQ batches, expired
@@ -168,7 +168,7 @@ function consolidatorOf(store: RetentionStoreLike): ConsolidatorPruneLike | unde
 }
 
 /**
- * W-010: schedule the periodic retention sweep. Same lifecycle shape
+ * Schedule the periodic retention sweep. Same lifecycle shape
  * as `scheduleRunPruning`: `unref`-ed `setInterval` + a stop function.
  * The FIRST sweep runs immediately on scheduling - a server that is
  * restarted more often than `intervalMs` would otherwise never prune

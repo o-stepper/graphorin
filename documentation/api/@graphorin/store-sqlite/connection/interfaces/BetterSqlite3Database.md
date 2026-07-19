@@ -31,7 +31,7 @@ backup(destinationPath): Promise<unknown>;
 
 Defined in: packages/store-sqlite/src/driver-types.ts:38
 
-Online page-level backup (store-02/05). Consistent under a live
+Online page-level backup. Consistent under a live
 writer and preserves rowids (so FTS5 external-content mappings
 survive - unlike `VACUUM INTO`).
 
@@ -156,7 +156,7 @@ transaction<T>(fn): T & {
 Defined in: packages/store-sqlite/src/driver-types.ts:30
 
 The returned wrapper also carries the `.deferred` / `.immediate` /
-`.exclusive` variants (store-06 uses `.immediate` for every write
+`.exclusive` variants (the store uses `.immediate` for every write
 transaction).
 
 #### Type Parameters

@@ -1,5 +1,5 @@
 /**
- * Lightweight in-SQLite relation graph (P2-1): entity resolution +
+ * Lightweight in-SQLite relation graph: entity resolution +
  * one-hop expansion. The store-side persistence + recursive CTE live in
  * the adapter's `graph` capability (`@graphorin/store-sqlite`); this
  * sub-module is the provider-agnostic resolution policy.

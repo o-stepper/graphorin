@@ -2,7 +2,7 @@
  * Cassette recorder. The high-level ergonomic API surfaced by
  * `Session.recordToolCassette({...})`.
  *
- * The recorder owns the JSONL writer + the running counters. RP-2: it is **not**
+ * The recorder owns the JSONL writer + the running counters. It is **not**
  * auto-wired into the agent runtime - the operator subscribes to the agent's
  * `RunContext` events and forwards each `tool.execute.end / .error` into
  * `recorder.recordToolCall(...)` (see `examples/multi-agent-crew`). The recorder

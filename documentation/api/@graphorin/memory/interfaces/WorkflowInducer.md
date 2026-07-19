@@ -6,7 +6,7 @@
 
 # Interface: WorkflowInducer
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:105
+Defined in: packages/memory/src/consolidator/phases/induce.ts:106
 
 **`Stable`**
 
@@ -24,7 +24,7 @@ induce(trajectory, options?): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:106
+Defined in: packages/memory/src/consolidator/phases/induce.ts:107
 
 #### Parameters
 

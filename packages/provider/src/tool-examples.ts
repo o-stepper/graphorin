@@ -1,5 +1,5 @@
 /**
- * A1 (SOTA): fold a tool's worked `examples` into its model-facing description.
+ * Fold a tool's worked `examples` into its model-facing description.
  *
  * `ToolDefinition` already carries `examples` on the wire (the agent projects
  * them from `Tool.examples`), and the contract notes implementations MAY fold

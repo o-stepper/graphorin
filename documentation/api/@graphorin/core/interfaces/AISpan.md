@@ -46,7 +46,7 @@ addEvent(
 Defined in: packages/core/src/contracts/tracer.ts:149
 
 Append a span event (attribute-bearing time-stamped marker). The
-optional `opts` (W-094) tags the event's attributes with a
+optional `opts` tags the event's attributes with a
 sensitivity tier so the validation exporter can pass safe ones
 through the default-deny floor - untagged attributes keep being
 dropped below the floor.

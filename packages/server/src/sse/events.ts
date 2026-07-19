@@ -42,7 +42,7 @@ import type { WsDispatcher } from '../ws/dispatcher.js';
  */
 export interface SseRoutesDeps {
   /**
-   * Cap on the per-connection SSE delivery queue (IP-9). A consumer
+   * Cap on the per-connection SSE delivery queue. A consumer
    * that stops reading past this many buffered frames is closed
    * instead of growing the queue without bound. Default 1000.
    */

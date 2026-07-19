@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:318
 
 Thrown when planning stalls with no runnable tasks and no satisfied
-END edge (WF-14) - an all-false conditional fan is an error, not a
+END edge - an all-false conditional fan is an error, not a
 silent completion.
 
 ## Extends

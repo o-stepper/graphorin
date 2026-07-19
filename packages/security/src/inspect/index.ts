@@ -1,6 +1,6 @@
 /**
  * `@graphorin/security/inspect` - pluggable content-inspection seams
- * (D-12 injection classifier).
+ * (the injection classifier).
  *
  * @packageDocumentation
  */

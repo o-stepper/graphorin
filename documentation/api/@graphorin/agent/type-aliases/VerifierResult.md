@@ -17,8 +17,8 @@ type VerifierResult =
 };
 ```
 
-Defined in: packages/agent/src/types.ts:481
+Defined in: packages/agent/src/types.ts:480
 
 **`Stable`**
 
-Outcome of one [ResponseVerifier](/api/@graphorin/agent/interfaces/ResponseVerifier.md) check (C3).
+Outcome of one [ResponseVerifier](/api/@graphorin/agent/interfaces/ResponseVerifier.md) check.

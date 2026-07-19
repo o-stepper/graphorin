@@ -10,7 +10,7 @@ Defined in: packages/agent/src/run-state/index.ts:99
 
 **`Stable`**
 
-Serialized twin of core's `PendingSubRun` (W-001): the parked child
+Serialized twin of core's `PendingSubRun`: the parked child
 state travels as its own versioned [SerializedRunState](/api/@graphorin/agent/run-state/interfaces/SerializedRunState.md).
 
 ## Properties

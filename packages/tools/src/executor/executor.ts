@@ -23,17 +23,17 @@
  * per-call phases, each of which lives in its own sibling module:
  *
  *  - `phase-batch.ts`        - batch partitioning + bounded scheduling
- *  - `phase-retry.ts`        - C3 transparent bounded retry
+ *  - `phase-retry.ts`        - transparent bounded retry
  *  - `phase-validate.ts`     - schema validation + single-round repair
- *  - `phase-permission.ts`   - E1 pre-tool permission hook (before approval)
+ *  - `phase-permission.ts`   - pre-tool permission hook (before approval)
  *  - `phase-approval.ts`     - `needsApproval` predicate + approval gate
- *  - `phase-policy.ts`       - D4 / Progent tool-argument policy
- *  - `phase-dataflow.ts`     - WI-12 data-flow provenance sink gate
+ *  - `phase-policy.ts`       - Progent-style tool-argument policy
+ *  - `phase-dataflow.ts`     - data-flow provenance sink gate
  *  - `phase-context.ts`      - sandbox resolve + linked abort + channel + ctx
  *  - `phase-memory-guard.ts` - memory-guard snapshot / verify
  *  - `phase-dispatch.ts`     - sandbox / inline execution + failure mapping
  *  - `phase-envelope.ts`     - streaming-buffer reconcile + output schema
- *  - `phase-truncate.ts`     - TL-6 producer taint + truncation / spill
+ *  - `phase-truncate.ts`     - producer taint + truncation / spill
  *  - `phase-sanitize.ts`     - inbound sanitization on the bounded body
  *  - `phase-result.ts`       - result assembly + provenance + end events
  *

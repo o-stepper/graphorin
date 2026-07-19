@@ -31,7 +31,7 @@ appendHandoff(record): Promise<HandoffRecord>;
 
 Defined in: packages/sessions/src/facade.ts:213
 
-Append a handoff record. RP-2: this does **not** auto-fire from
+Append a handoff record. This does **not** auto-fire from
 `Agent.toTool()` - the agent accumulates `HandoffRecord`s in its own
 `RunState`; the operator forwards them here (see `examples/multi-agent-crew`).
 
@@ -301,7 +301,7 @@ recordToolCassette(opts): ToolCassetteRecorder;
 
 Defined in: packages/sessions/src/facade.ts:265
 
-Begin recording a tool cassette. RP-2: the recorder is **not** wired into
+Begin recording a tool cassette. The recorder is **not** wired into
 the agent runtime automatically - the operator subscribes to the agent's
 `RunContext` events and forwards `tool.execute.end / .error` into
 `recorder.recordToolCall(...)`. See `examples/multi-agent-crew` for the

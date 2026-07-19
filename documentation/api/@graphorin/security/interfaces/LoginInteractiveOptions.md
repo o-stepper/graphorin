@@ -22,7 +22,7 @@ Options accepted by [loginInteractive](/api/@graphorin/security/functions/loginI
 | <a id="property-deviceflow"></a> `deviceFlow?` | `readonly` | `boolean` | Default `false` - Authorization Code is the default. | packages/security/src/oauth/library.ts:39 |
 | <a id="property-metadata"></a> `metadata?` | `readonly` | [`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md) | - | packages/security/src/oauth/library.ts:46 |
 | <a id="property-scope"></a> `scope?` | `readonly` | `string` | - | packages/security/src/oauth/library.ts:42 |
-| <a id="property-secretsstore"></a> `secretsStore?` | `readonly` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | Secrets store the session tokens are persisted into (SPL-1) so the login survives the process. | packages/security/src/oauth/library.ts:34 |
+| <a id="property-secretsstore"></a> `secretsStore?` | `readonly` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | Secrets store the session tokens are persisted into so the login survives the process. | packages/security/src/oauth/library.ts:34 |
 | <a id="property-serverid"></a> `serverId` | `readonly` | `string` | - | packages/security/src/oauth/library.ts:35 |
 | <a id="property-serverurl"></a> `serverUrl` | `readonly` | `string` | - | packages/security/src/oauth/library.ts:36 |
 | <a id="property-storage"></a> `storage` | `readonly` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | - | packages/security/src/oauth/library.ts:37 |

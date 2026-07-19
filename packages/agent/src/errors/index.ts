@@ -148,7 +148,7 @@ export class ToolNotFoundError extends AgentRuntimeError {
  */
 /**
  * Thrown when a second `run()` / `stream()` starts while another run is
- * in flight on the same `Agent` instance (AG-11). The public surface
+ * in flight on the same `Agent` instance. The public surface
  * (`steer` / `followUp` / `abort` / `compact`) addresses "the run"
  * without a run handle, so overlapping runs would share the abort
  * controller, steer queue, and executor bridge - start the second run
@@ -180,7 +180,7 @@ export class MultipleHandoffsInStepError extends AgentRuntimeError {
 
 /**
  * Thrown when a resume directive routes a decision into a parked
- * sub-agent run (W-001) but the resuming agent instance cannot resolve
+ * sub-agent run but the resuming agent instance cannot resolve
  * the target: the parked toolName matches neither a configured handoff
  * target nor a `toTool` sub-agent tool. Resume a parked sub-run on the
  * SAME parent instance (or an identically-configured one).
@@ -306,7 +306,7 @@ export class ProgressWriteError extends AgentRuntimeError {
 
 /**
  * Thrown when a run crosses its `RunBudget` ceiling under
- * `onExceed: 'throw'` (C5). The run's promise REJECTS with this error
+ * `onExceed: 'throw'`. The run's promise REJECTS with this error
  * after an `agent.error` event; graceful finalization is skipped. The
  * default `onExceed: 'stop'` never throws - it resolves the run as
  * `status: 'failed'` with `error.code: 'budget-exceeded'` instead.
@@ -337,7 +337,7 @@ export class AgentBudgetExceededError extends AgentRuntimeError {
 }
 
 /**
- * Deep retest 2026-07-19 (P1-3): `RunBudget.maxCostUsd` is set but the
+ * `RunBudget.maxCostUsd` is set but the
  * accumulated usage carries no USD cost data, so the ceiling cannot
  * observe spend. Under the fail-closed default
  * (`RunBudget.onUnpriced: 'fail'`) the run stops at the first

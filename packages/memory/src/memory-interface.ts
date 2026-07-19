@@ -71,9 +71,9 @@ export interface ContextEngine {
     options?: {
       readonly precomputedTokens?: number;
       /**
-       * Index of the first COMPACTABLE message (context-engine-04): the
+       * Index of the first COMPACTABLE message: the
        * caller's pinned, never-compacted system prefix ends here. The
-       * SOTA-4 reclaim floor counts only `messages.slice(from)` older
+       * The reclaim floor counts only `messages.slice(from)` older
        * turns as reclaimable - without it a large system prompt is
        * counted as reclaimable and the floor fires the summarizer for
        * near-zero real reclaim. Default `0` (everything compactable).
@@ -95,13 +95,13 @@ export interface ContextEngine {
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
-    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    /** Per-call override of the strategy's preserve-recent count. */
     readonly preserveRecentTurns?: number;
-    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook. */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     /**
      * The caller's pinned system prefix - the messages EXCLUDED from
-     * `messages` before this call (context-engine-04). Used only for
+     * `messages` before this call. Used only for
      * accounting: the anti-thrash guard and the "still above threshold"
      * warning must compare against the FULL post-splice context
      * (prefix + summary + preserved + essentials), or a real system
@@ -132,7 +132,7 @@ export interface Memory {
   readonly procedural: ProceduralMemory;
   readonly shared: SharedMemory;
   /**
-   * Read surface over reflection insights (P1-1). A no-op (returns
+   * Read surface over reflection insights. A no-op (returns
    * empty) when the storage adapter does not expose the optional
    * insight surface.
    */
@@ -146,7 +146,7 @@ export interface Memory {
   /** The active embedder, when configured. `null` otherwise. */
   readonly embedder: EmbedderProvider | null;
   /**
-   * The configured pre-extraction ingest gate (B3), or `null` when
+   * The configured pre-extraction ingest gate, or `null` when
    * none is active. Surfaced as EVIDENCE for fail-closed config
    * checks: enabling a proactive `act` grant or memory auto-promotion
    * requires an active gate, and a self-asserted boolean would be no

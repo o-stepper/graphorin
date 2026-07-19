@@ -35,16 +35,15 @@ export interface Checkpoint {
 export interface CheckpointMetadata {
   /**
    * Durability mode that produced this write. The legacy `'async'`
-   * value was removed (workflow-14 / WF-7 - it was byte-identical to
-   * `'sync'`); adapters normalize legacy persisted rows to `'sync'` at
-   * read time.
+   * value was removed (it was byte-identical to `'sync'`); adapters
+   * normalize legacy persisted rows to `'sync'` at read time.
    */
   readonly source: 'sync' | 'exit';
   readonly status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   readonly nodeName?: string;
   readonly tags?: ReadonlyArray<string>;
   /**
-   * Session this checkpoint's state belongs to, when known (W-005).
+   * Session this checkpoint's state belongs to, when known.
    * The agent runtime stamps it on every HITL-suspend write so a
    * session hard-delete can cascade into `workflow_checkpoints` /
    * `workflow_pending_writes` without parsing the opaque state blob.
@@ -54,7 +53,7 @@ export interface CheckpointMetadata {
    */
   readonly sessionId?: string;
   /**
-   * W-032: earliest due durable timer among this checkpoint's frontier
+   * Earliest due durable timer among this checkpoint's frontier
    * pauses (epoch ms). The workflow engine stamps it on every
    * `suspended` write whose frontier holds a timer, so a store's
    * {@link CheckpointStore.listSuspended} can enumerate due threads
@@ -104,8 +103,8 @@ export interface ListOptions {
 }
 
 /**
- * Optional atomicity contract for {@link CheckpointStore.put} (D1 /
- * workflow-01). When `expectedLatestId` is supplied, the store MUST
+ * Optional atomicity contract for {@link CheckpointStore.put}.
+ * When `expectedLatestId` is supplied, the store MUST
  * perform the latest-checkpoint comparison and the insert atomically
  * (single transaction / synchronous critical section) and throw
  * {@link CheckpointConflictError} on mismatch - closing the TOCTOU
@@ -184,7 +183,7 @@ export interface CheckpointStore {
   deleteThread(threadId: string): Promise<void>;
 
   /**
-   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * Enumerate threads whose LATEST checkpoint in `namespace` is
    * `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
    * stamped wakeAt). This is what a durable-timer driver polls -
    * without it an operator would have to keep an external registry of
@@ -221,7 +220,7 @@ export interface PruneThreadsOptions {
 }
 
 /**
- * Retention extension over {@link CheckpointStore} (W-009). The engine
+ * Retention extension over {@link CheckpointStore}. The engine
  * intentionally never deletes finished threads itself - a completed
  * thread is still needed for inspection and duplicate-resume refusal;
  * how long to keep it is an operator decision. These primitives are

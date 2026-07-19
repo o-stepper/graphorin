@@ -21,7 +21,7 @@ import type {
  * transport. The id is suitable for use as a registry key and as the
  * operator-facing label in audit rows + trace attributes.
  *
- * W-016: the id derives ONLY from operator-controlled data (the
+ * The id derives ONLY from operator-controlled data (the
  * transport config) plus the optional operator-supplied
  * `serverInfoName` override. The name a server self-reports on
  * `initialize` never participates: every security-relevant surface

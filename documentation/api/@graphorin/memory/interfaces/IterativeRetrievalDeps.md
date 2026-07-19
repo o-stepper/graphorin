@@ -35,7 +35,7 @@ optional fuse(lists): readonly H[];
 
 Defined in: packages/memory/src/search/iterative.ts:394
 
-Re-fuse the per-pass hit lists into one ranked list (MRET-2).
+Re-fuse the per-pass hit lists into one ranked list.
 Receives one list per pass in pass order; the result feeds the
 final `maxResults` cut so a pass-2 find can outrank pass-1 noise.
 Absent ⇒ the loop falls back to round-robin interleaving (still
@@ -88,7 +88,7 @@ Defined in: packages/memory/src/search/iterative.ts:380
 
 Run one retrieval pass for `query`. `widen` is `true` on
 reformulation passes so the caller can broaden recall (e.g. enable
-P2-1 one-hop graph expansion).
+one-hop graph expansion).
 
 #### Parameters
 

@@ -1,5 +1,5 @@
 /**
- * Code-mode / programmatic tool calling (P1-2). Public surface:
+ * Code-mode / programmatic tool calling. Public surface:
  *
  * - {@link projectToolApi} - project a resolved tool set as a typed code
  *   API (catalogue + per-tool signatures).

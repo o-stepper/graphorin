@@ -28,7 +28,7 @@ import type {
  */
 export interface LoginInteractiveOptions {
   /**
-   * Secrets store the session tokens are persisted into (SPL-1) so the
+   * Secrets store the session tokens are persisted into so the
    * login survives the process.
    */
   readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
@@ -154,7 +154,7 @@ export async function refreshOAuthSession(
   serverId: string,
   options: {
     readonly signal?: AbortSignal;
-    /** SPL-1: resolves the persisted refresh token across processes. */
+    /** Resolves the persisted refresh token across processes. */
     readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
   } = {},
 ): Promise<OAuthSession> {
@@ -185,7 +185,7 @@ export async function revokeOAuthSession(
   options: {
     readonly reason?: string;
     readonly signal?: AbortSignal;
-    /** SPL-1: resolves the persisted tokens so RFC 7009 actually fires. */
+    /** Resolves the persisted tokens so RFC 7009 actually fires. */
     readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
   } = {},
 ): Promise<void> {

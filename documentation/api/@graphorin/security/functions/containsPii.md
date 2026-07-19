@@ -14,7 +14,7 @@ Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:103
 
 **`Stable`**
 
-SDF-8 / FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
+FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
 phone, Luhn-valid card, …)? A pure, allocation-light predicate that returns on
 the first valid match and honours per-pattern `validate` (e.g. Luhn). Used to
 feed user/PII content into the dataflow taint ledger's `sensitiveSeen` leg so

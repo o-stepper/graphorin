@@ -23,7 +23,7 @@ import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import { newId } from '../internal/ids.js';
 
-/** The built-in deferred-discovery tool's stable name (WI-05 / P0-3). */
+/** The built-in deferred-discovery tool's stable name. */
 export const TOOL_SEARCH_NAME = 'tool_search';
 
 /**
@@ -63,7 +63,7 @@ export function registerToolSearch(
   );
 }
 
-/** The built-in result-handle reader tool's stable name (WI-10 / P1-4). */
+/** The built-in result-handle reader tool's stable name. */
 export const READ_RESULT_NAME = 'read_result';
 
 /**
@@ -71,7 +71,7 @@ export const READ_RESULT_NAME = 'read_result';
  * registered tool opts into the `'spill-to-file'` truncation strategy
  * (the sole producer of spill handles today) - or when `force` is set,
  * which the agent passes when an operator wires external result readers
- * (e.g. an MCP `resource_link` reader; WI-13). The tool is eager, so it
+ * (e.g. an MCP `resource_link` reader). The tool is eager, so it
  * is advertised alongside the producing tool and the model can fetch a
  * handle back on demand instead of inlining the full blob. No-op when
  * nothing produces handles (zero overhead) or when a user tool already
@@ -97,7 +97,7 @@ export function registerReadResult(
 
 /**
  * Compose result readers into one that tries each in order, returning
- * the first that resolves the handle (WI-13). The spill-file reader is
+ * the first that resolves the handle. The spill-file reader is
  * placed first so `graphorin-spill:` handles resolve locally; operator
  * readers (e.g. an MCP resource reader) resolve the rest. Each reader
  * rejects handles it does not own, so resolution falls through cleanly.
@@ -120,7 +120,7 @@ export function composeResultReaders(readers: ReadonlyArray<ResultReader>): Resu
   };
 }
 
-/** The code-mode meta-tools' stable names (WI-11 / P1-2). */
+/** The code-mode meta-tools' stable names. */
 export const CODE_EXECUTE_NAME = 'code_execute';
 export const CODE_SEARCH_NAME = 'code_search';
 
@@ -129,7 +129,7 @@ export const isApprovalGated = (t: { readonly needsApproval?: unknown }): boolea
   t.needsApproval === true || typeof t.needsApproval === 'function';
 
 /**
- * Wire code-mode (P1-2) into `registry`: register the `code_search` /
+ * Wire code-mode into `registry`: register the `code_search` /
  * `code_execute` meta-tools and return them as the tools to advertise in
  * place of the full catalogue. The model reaches every other tool through
  * `code_execute`, whose in-script `tools.<name>(args)` calls route back

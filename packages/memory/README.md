@@ -86,7 +86,7 @@ any `EmbedderProvider`; the default is
   LLM call that also rates its importance `1-10` (normalized to `[0, 1]`),
   so episodic triple-signal retrieval (recency × relevance × importance) finally
   runs on all three signals. Auto-formed episodes carry `provenance: 'extraction'`
-  + `status: 'quarantined'` (P1-4) - surfaced for review via
+  + `status: 'quarantined'` - surfaced for review via
   `episodic.search(..., { includeQuarantined: true })`. Importance is a *soft*
   signal (never a retention gate). Controlled by the per-tier `formEpisodes` /
   `importanceScoring` flags (on at `standard` / `full`); budget-aware
@@ -191,7 +191,7 @@ any `EmbedderProvider`; the default is
   + Voyager-style success criteria for self-verification on reuse
   (`checkSuccessCriteria`). Induction fires on **success only** (a failed run
   never calls the inducer), and the result lands **quarantined** +
-  `provenance: 'induction'` (P1-4) - procedures drive *actions*, so this is the
+  `provenance: 'induction'` - procedures drive *actions*, so this is the
   highest-poisoning-risk write and is excluded from `activate()` until validated.
   `trajectoryFromRunState(runState)` distils the agent's already-emitted run
   state, so capture needs **no agent change**. Wire it with

@@ -19,7 +19,7 @@ import type { Usage } from './usage.js';
  * with `fromWireAgentEvent`. Adding a variant here counts as a
  * wire-format change; track it through changesets.
  *
- * Correlation policy (W-049): events are consumed from a per-run
+ * Correlation policy: events are consumed from a per-run
  * stream, so cross-run attribution is the ENVELOPE's job (`subject`
  * carries `agentId`/`runId`); an in-payload `runId` exists only on the
  * variants that historically carry one and is deliberately NOT
@@ -69,7 +69,7 @@ export type AgentEvent<TOutput = string> =
   | AgentErrorEvent;
 
 /**
- * W-036: a CHILD sub-agent's event forwarded into the parent stream,
+ * A CHILD sub-agent's event forwarded into the parent stream,
  * wrapped so it never aliases the parent's own step/run events. Which
  * child events forward is governed by the `forwardEvents` policy on
  * the handoff entry / `AgentToToolOptions` (default `'lifecycle'`).
@@ -144,7 +144,7 @@ export interface ToolExecuteStartEvent {
   readonly type: 'tool.execute.start';
   readonly toolCallId: string;
   /**
-   * Convenience duplicate of the executing tool's name (W-049).
+   * Convenience duplicate of the executing tool's name.
    * Correlation within a tool lifecycle is by `toolCallId`; this field
    * spares direct subscribers a stateful join back to the
    * `tool.call.start` that carried the name. Optional for wire
@@ -193,7 +193,7 @@ export interface ToolExecutePartialEvent {
 export interface ToolExecuteEndEvent {
   readonly type: 'tool.execute.end';
   readonly toolCallId: string;
-  /** See {@link ToolExecuteStartEvent.toolName} (W-049). */
+  /** See {@link ToolExecuteStartEvent.toolName}. */
   readonly toolName?: string;
   readonly result: unknown;
   readonly durationMs: number;
@@ -203,7 +203,7 @@ export interface ToolExecuteEndEvent {
 export interface ToolExecuteErrorEvent {
   readonly type: 'tool.execute.error';
   readonly toolCallId: string;
-  /** See {@link ToolExecuteStartEvent.toolName} (W-049). */
+  /** See {@link ToolExecuteStartEvent.toolName}. */
   readonly toolName?: string;
   readonly error: ToolError;
 }
@@ -214,7 +214,7 @@ export interface ToolApprovalRequestedEvent {
   readonly toolCallId: string;
   readonly reason?: string;
   /**
-   * E1: which permission verdict parked the approval (`'ask'` |
+   * Which permission verdict parked the approval (`'ask'` |
    * `'defer'`); absent for plain `needsApproval` gates. Mirrors
    * `ToolApproval.mode` so a subscriber can route deferred approvals
    * without re-reading the run state.
@@ -263,7 +263,7 @@ export interface HandoffEvent {
 }
 
 /**
- * A provider-generated file surfaced from the model stream (AG-26) -
+ * A provider-generated file surfaced from the model stream -
  * previously these `'file'` provider events were silently dropped.
  *
  * @stable
@@ -275,7 +275,7 @@ export interface FileGeneratedEvent {
 }
 
 /**
- * A provider citation surfaced from the model stream (AG-26) -
+ * A provider citation surfaced from the model stream -
  * previously these `'source'` provider events were silently dropped.
  *
  * @stable
@@ -302,7 +302,7 @@ export interface GuardrailTrippedEvent {
 }
 
 /**
- * Outcome of a terminal-response verifier check (C3). Emitted once per
+ * Outcome of a terminal-response verifier check. Emitted once per
  * verifier per verification round; a failed verifier's `feedback` is
  * also appended to the transcript so the model can address it.
  *
@@ -565,7 +565,7 @@ export interface AgentLateralLeakDetectedEvent {
  * `error` - `agent.run(...)` does not reject on run failure (only on
  * configuration/usage errors thrown before the loop starts). A suspended
  * run resolves with `status: 'awaiting_approval'` and a resumable
- * `state` (AG-9).
+ * `state`.
  *
  * @stable
  */
@@ -577,7 +577,7 @@ export interface AgentResult<TOutput = string> {
   /** Populated when the run failed; mirrors `RunState.error`. */
   readonly error?: RunError;
   /**
-   * B3 (item 15): the run's per-turn security verdicts (mirrors
+   * The run's per-turn security verdicts (mirrors
    * `state.verdicts`). Surfaced directly so callers can apply them at
    * the `Session.push` boundary without digging into the state.
    */

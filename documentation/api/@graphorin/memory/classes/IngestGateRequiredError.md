@@ -11,7 +11,7 @@ Defined in: packages/memory/src/consolidator/errors.ts:105
 **`Stable`**
 
 Raised at `createMemory` time when an auto-promotion feature is
-enabled without the B3 ingest gate (wave-D D4, fail-closed): both
+enabled without the ingest gate (fail-closed): both
 the deterministic promotion step and the write-time
 `autoPromoteExtraction` hatch move synthesized content into default
 recall, so they REQUIRE the admission gate as configured evidence -

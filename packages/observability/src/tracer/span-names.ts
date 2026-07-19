@@ -3,7 +3,7 @@
  * can override the name by passing `name` through a custom
  * `setAttributes(...)` call after `startSpan(...)` returns.
  *
- * E8 (audit 2026-07-04): the OTel GenAI semantic conventions name spans
+ * E8: the OTel GenAI semantic conventions name spans
  * `"{operation} {target}"` (`chat gpt-4.1`, `execute_tool get_weather`,
  * `invoke_agent planner`) so trace UIs group like operations while
  * keeping the target visible. When the span's initial attributes carry

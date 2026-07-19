@@ -1,5 +1,5 @@
 /**
- * Escalation-ladder routing (C3): turn a typed `ProactiveOutcome` into
+ * Escalation-ladder routing: turn a typed `ProactiveOutcome` into
  * a channel delivery payload, and build awakeable-parked outcomes for
  * workflow-based tasks.
  *
@@ -49,7 +49,7 @@ const DEFAULT_QUESTION_OPTIONS: ReadonlyArray<ProactiveOutcomeOption> = Object.f
 ]);
 
 /**
- * Route an outcome onto a channel delivery (C3): `notify` / `act` are
+ * Route an outcome onto a channel delivery: `notify` / `act` are
  * plain text; `question` / `review` carry the HITL question block
  * whose `ref` rides into messenger callback-data. The gateway
  * outbound-sanitizes at its own boundary - this function only shapes.
@@ -78,10 +78,10 @@ export function outcomeToDelivery(
  * Build a `question` / `review` outcome for a task parked inside a
  * durable WORKFLOW (`awaitExternal` / `requestApproval`): the resolve
  * ref is the serialized awakeable address (`wf:<workflowId>:<threadId>:
- * <name>`, decision D-1/A3), resolved through the existing
+ * <name>`), resolved through the existing
  * `POST /v1/workflows/:id/resume` route and ticked by the workflow
  * timer-daemon - this package composes with that daemon, it never
- * re-hosts it (D-9).
+ * re-hosts it.
  *
  * @stable
  */

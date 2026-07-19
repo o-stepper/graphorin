@@ -32,12 +32,12 @@ export interface ToolSearchToolOptions {
    * description so the model is never promised availability the harness
    * does not deliver. `'next-step'` (default) matches the agent's
    * immediate promotion mode; `'next-run'` matches
-   * `toolPromotion: 'run-boundary'` (C1), where the catalogue is frozen
+   * `toolPromotion: 'run-boundary'`, where the catalogue is frozen
    * for the current run.
    */
   readonly availability?: 'next-step' | 'next-run';
   /**
-   * E1 deny-by-name: matches returning `true` are dropped from the
+   * Deny-by-name: matches returning `true` are dropped from the
    * results BEFORE the model sees them, so a name-denied deferred tool
    * is neither discoverable nor promoted into the advertised set (its
    * name and schema would otherwise leak while execution stays
@@ -64,7 +64,7 @@ const outputSchema = z.object({
   ),
 });
 
-/** W-013: explicit interfaces - no concrete zod generics in the d.ts. */
+/** Explicit interfaces - no concrete zod generics in the d.ts. */
 export interface ToolSearchInput {
   query: string;
   k?: number | undefined;

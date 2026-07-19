@@ -22,7 +22,7 @@ concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/conne
 | <a id="property-encrypted"></a> `encrypted` | `readonly` | `boolean` | Whether the connection is encryption-enabled. | packages/store-sqlite/src/connection.ts:34 |
 | <a id="property-inmemory"></a> `inMemory` | `readonly` | `boolean` | Whether the connection wraps a `:memory:` database. | packages/store-sqlite/src/connection.ts:36 |
 | <a id="property-path"></a> `path` | `readonly` | `string` | Path to the underlying database file (`':memory:'` for in-memory). | packages/store-sqlite/src/connection.ts:32 |
-| <a id="property-vectorsearchmode"></a> `vectorSearchMode?` | `readonly` | `"vec0"` \| `"linear-fallback"` \| `"disabled"` | How vector sidecars are served (wave-D D5): `'vec0'` (sqlite-vec loaded), `'linear-fallback'` (plain tables + in-process cosine scan), or `'disabled'` (`skipSqliteVec`). Optional so existing structural stubs keep compiling; absent reads as `'vec0'`. | packages/store-sqlite/src/connection.ts:43 |
+| <a id="property-vectorsearchmode"></a> `vectorSearchMode?` | `readonly` | `"vec0"` \| `"linear-fallback"` \| `"disabled"` | How vector sidecars are served: `'vec0'` (sqlite-vec loaded), `'linear-fallback'` (plain tables + in-process cosine scan), or `'disabled'` (`skipSqliteVec`). Optional so existing structural stubs keep compiling; absent reads as `'vec0'`. | packages/store-sqlite/src/connection.ts:43 |
 
 ## Methods
 

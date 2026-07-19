@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/provider.ts:82
 
 **`Stable`**
 
-Opt-in prompt-cache breakpoint policy (core-provider-02).
+Opt-in prompt-cache breakpoint policy.
 
 `breakpoints: 'auto'` asks the adapter to place provider-native cache
 anchors around the stable request prefix: the Anthropic path (via the

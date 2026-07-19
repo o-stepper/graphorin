@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/tracer.ts:120
 
 **`Stable`**
 
-W-094: sensitivity opts for [AISpan.addEvent](/api/@graphorin/core/interfaces/AISpan.md#addevent). Event attributes
+Sensitivity opts for [AISpan.addEvent](/api/@graphorin/core/interfaces/AISpan.md#addevent). Event attributes
 used to be un-taggable, so a default-`'public'` export floor dropped
 ALL of them - including `exception.type` from `recordException`.
 

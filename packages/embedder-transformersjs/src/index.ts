@@ -65,7 +65,7 @@ export interface TransformersJsEmbedderOptions {
    */
   readonly dim?: number;
   /**
-   * Disable the automatic E5 `query:` / `passage:` prefixing (PS-10). The
+   * Disable the automatic E5 `query:` / `passage:` prefixing. The
    * prefixes are applied by default for E5-family models (the multilingual-e5
    * default and any model whose id carries an `e5` token), because the E5 model
    * card requires them and omitting them measurably degrades retrieval. Set
@@ -143,7 +143,7 @@ export class TransformersJsEmbedder implements EmbedderProvider {
   readonly #dtype: string | undefined;
   readonly #device: string | undefined;
   readonly #pipelineFactory: PipelineFactory | undefined;
-  /** Whether to apply E5 `query:` / `passage:` prefixes (PS-10). */
+  /** Whether to apply E5 `query:` / `passage:` prefixes. */
   readonly #taskPrefix: boolean;
   #extractor: FeatureExtractor | null = null;
   #loading: Promise<FeatureExtractor> | null = null;
@@ -168,13 +168,12 @@ export class TransformersJsEmbedder implements EmbedderProvider {
 
   /**
    * Output dimension - the explicit `dim` option, a known-model
-   * default, or the width resolved from the first `embed()`.
-   * periphery-05 (the PS-11 fix ported from the Ollama embedder):
-   * throws for an unknown model with no `dim` hint instead of silently
-   * assuming 768 - a wrong assumed width bakes a wrong-width id AND a
-   * wrong-width vec0 table, and the id then CHANGES after the first
-   * `embed()` resolves the truth, which `lock-on-first` reads as an
-   * embedder swap.
+   * default, or the width resolved from the first `embed()`. Like the
+   * Ollama embedder, this throws for an unknown model with no `dim`
+   * hint instead of silently assuming 768 - a wrong assumed width
+   * bakes a wrong-width id AND a wrong-width vec0 table, and the id
+   * then CHANGES after the first `embed()` resolves the truth, which
+   * `lock-on-first` reads as an embedder swap.
    */
   dim(): number {
     if (this.#resolvedDim !== null) return this.#resolvedDim;
@@ -304,7 +303,7 @@ function guessDefaultDim(model: string): number | null {
 
 /**
  * True when a model id belongs to the E5 family, which requires asymmetric
- * `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a
+ * `query:` / `passage:` prefixes. Matches an `e5` token bounded by a
  * path / dash / underscore so it covers `multilingual-e5-base`, `e5-large`,
  * `intfloat/e5-mistral`, etc. without false-matching unrelated names.
  */

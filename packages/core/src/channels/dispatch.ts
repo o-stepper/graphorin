@@ -11,7 +11,7 @@
  */
 export class Dispatch<TArgs = unknown> {
   /**
-   * Cross-realm brand (workflow-13): the engine's structural fallback
+   * Cross-realm brand: the engine's structural fallback
    * requires this marker so a plain state object that happens to carry
    * `nodeName` + `args` keys is treated as channel WRITES, never
    * silently swallowed as a dispatch. A plain own property (not a

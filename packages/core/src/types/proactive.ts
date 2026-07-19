@@ -1,5 +1,5 @@
 /**
- * Proactive-task outcome ladder (C3). A proactive fire (heartbeat
+ * Proactive-task outcome ladder. A proactive fire (heartbeat
  * beat, cron-leg task) ends in exactly one rung of a four-step
  * escalation ladder; the framework routes each rung differently
  * (notify -> channel delivery; question / review -> HITL parking;
@@ -52,7 +52,7 @@ export type ProactiveGrant = ProactiveOutcomeKind;
 
 /**
  * `true` when `kind` sits at or below `grant` on the ladder.
- * Deterministic, pure - the C3 routing policy helper.
+ * Deterministic, pure - the ladder routing policy helper.
  *
  * @stable
  */
@@ -141,7 +141,7 @@ export interface ProactiveActOutcome extends ProactiveOutcomeBase {
 
 /**
  * Discriminated union over the four rungs - what a proactive fire
- * reports to `onOutcome` observers and what the C3 router consumes.
+ * reports to `onOutcome` observers and what the ladder router consumes.
  *
  * @stable
  */

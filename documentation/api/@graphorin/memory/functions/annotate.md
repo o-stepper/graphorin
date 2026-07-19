@@ -10,7 +10,7 @@
 function annotate(origin, inboundTrust): ContentAnnotation;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:125
+Defined in: packages/memory/src/context-engine/annotations.ts:126
 
 **`Stable`**
 

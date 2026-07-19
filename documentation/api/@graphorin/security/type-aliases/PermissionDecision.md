@@ -21,5 +21,5 @@ Defined in: packages/security/src/policy/tool-argument-policy.ts:117
 
 **`Stable`**
 
-Four-value decision returned by [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md)
-(E1). Non-`allow` effects always carry a reason.
+Four-value decision returned by [evaluatePermissionDecision](/api/@graphorin/security/functions/evaluatePermissionDecision.md).
+Non-`allow` effects always carry a reason.

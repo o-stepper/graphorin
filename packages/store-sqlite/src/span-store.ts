@@ -1,5 +1,5 @@
 /**
- * RP-17: durable span persistence on top of the `spans` table (migration 024).
+ * Durable span persistence on top of the `spans` table (migration 024).
  *
  * - {@link createSqliteSpanExporter} is a `@graphorin/observability`
  *   `TraceExporter` that writes finished spans into SQLite. Wrap it in
@@ -110,7 +110,7 @@ export async function* traceSourceForSession(
 }
 
 /**
- * Delete every persisted span of one session (W-006). Called by the
+ * Delete every persisted span of one session. Called by the
  * session hard-delete cascade (the `spans` entry of
  * `SESSION_SCOPED_PURGES`); exported for hosts that manage spans out
  * of band. Returns the number of rows deleted.
@@ -123,7 +123,7 @@ export function deleteSpansForSession(conn: SqliteConnection, sessionId: string)
 }
 
 /**
- * Age-based span retention (W-008): delete every span that FINISHED
+ * Age-based span retention: delete every span that FINISHED
  * before the cutoff, including rows with `session_id IS NULL` (not
  * attached to any session, so age is their only deletion path). The
  * cutoff is epoch **milliseconds** - the ns conversion happens here so

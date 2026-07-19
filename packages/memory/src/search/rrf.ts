@@ -56,9 +56,9 @@ export class RRFReranker implements ReRanker {
 }
 
 /**
- * Weighted-RRF reranker (X-2). Fuses parallel ranked lists through
+ * Weighted-RRF reranker. Fuses parallel ranked lists through
  * {@link fuseWeighted}, applying a per-list `weights[i]` so a caller who
- * has calibrated list reliability against labels (the P0-1 eval harness)
+ * has calibrated list reliability against labels (via `@graphorin/evals`)
  * can trust one retriever over another - e.g. up-weight dense vector
  * hits over lexical FTS hits. `weights` is **positional**: aligned to the
  * input `lists` order (the built-in hybrid search passes FTS first, then
@@ -125,10 +125,10 @@ export function fuseRrf<TRecord extends MemoryRecord>(
 }
 
 /**
- * Weighted / convex generalization of {@link fuseRrf} (X-2). Each input
+ * Weighted / convex generalization of {@link fuseRrf}. Each input
  * list `i` contributes `weights[i] · 1 / (k + rank)` to a record's fused
  * score instead of the flat `1 / (k + rank)`, so a caller who has
- * calibrated list reliability against labels (the P0-1 eval harness) can
+ * calibrated list reliability against labels (via `@graphorin/evals`) can
  * trust one retriever over another. RRF stays the zero-tuning default: a
  * `weights` of `undefined` (or all-`1`) is byte-for-byte identical to
  * {@link fuseRrf}. A missing, non-finite, or negative entry falls back to

@@ -15,7 +15,7 @@ Defined in: packages/memory/src/tools/recall-tools.ts:252
 **`Stable`**
 
 `deep_recall` - gated, multi-pass ("deep") recall over the user's
-factual memory for HARD questions (P2-4). A local difficulty gate keeps
+factual memory for HARD questions. A local difficulty gate keeps
 simple lookups single-shot; only queries judged hard trigger a
 grade-and-reformulate loop (bounded by `maxIterations`, hard-capped at
 5), widening to one-hop graph expansion on reformulation passes. The

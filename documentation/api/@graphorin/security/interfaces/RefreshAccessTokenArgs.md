@@ -14,7 +14,7 @@ Internal arguments for the refresh helper.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-force"></a> `force?` | `readonly` | `boolean` | Bypass the in-flight dedupe (SPL-12): a forced refresh always issues a fresh token-endpoint request instead of joining the shared in-flight promise. | packages/security/src/oauth/refresh.ts:42 |
+| <a id="property-force"></a> `force?` | `readonly` | `boolean` | Bypass the in-flight dedupe: a forced refresh always issues a fresh token-endpoint request instead of joining the shared in-flight promise. | packages/security/src/oauth/refresh.ts:42 |
 | <a id="property-metadata"></a> `metadata` | `readonly` | [`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md) | - | packages/security/src/oauth/refresh.ts:22 |
 | <a id="property-refreshtoken"></a> `refreshToken` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | - | packages/security/src/oauth/refresh.ts:24 |
 | <a id="property-registration"></a> `registration` | `readonly` | [`OAuthRegistration`](/api/@graphorin/security/interfaces/OAuthRegistration.md) | - | packages/security/src/oauth/refresh.ts:23 |

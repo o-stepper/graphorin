@@ -22,7 +22,7 @@ one-shot generation methods.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-acceptssensitivity"></a> `acceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | Sensitivity tiers this provider is allowed to receive. Used by the ContextEngine sensitivity filter (D2) and the outbound redaction middleware (D3) to decide what content is safe to forward. | packages/core/src/contracts/provider.ts:37 |
+| <a id="property-acceptssensitivity"></a> `acceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | Sensitivity tiers this provider is allowed to receive. Used by the ContextEngine sensitivity filter and the outbound redaction middleware to decide what content is safe to forward. | packages/core/src/contracts/provider.ts:37 |
 | <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ProviderCapabilities`](/api/@graphorin/core/interfaces/ProviderCapabilities.md) | - | packages/core/src/contracts/provider.ts:21 |
 | <a id="property-modelid"></a> `modelId` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:20 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:19 |

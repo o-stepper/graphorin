@@ -9,7 +9,7 @@ import type { TaintLabel } from './types.js';
 
 /**
  * Trust classes whose output is treated as untrusted - content a prompt
- * injection could be hidden in. Mirrors the plan's P1-3 taint sources.
+ * injection could be hidden in.
  */
 const UNTRUSTED_TRUST_CLASSES: ReadonlySet<ToolTrustClass> = new Set<ToolTrustClass>([
   'mcp-derived',
@@ -24,7 +24,7 @@ const UNTRUSTED_TRUST_CLASSES: ReadonlySet<ToolTrustClass> = new Set<ToolTrustCl
 ]);
 
 /**
- * Whether a tool trust class is an UNTRUSTED-content source (W-101).
+ * Whether a tool trust class is an UNTRUSTED-content source.
  * The single definition shared by the taint engine
  * ({@link deriveTaintLabel}) and the Rule-of-Two `untrustedInput` leg -
  * the two layers must never disagree about what "untrusted" means.
@@ -54,7 +54,7 @@ export function deriveTaintLabel(input: {
   readonly sensitivity?: Sensitivity;
   /**
    * Sensitivity tiers that count as "sensitive" for the lethal-trifecta
-   * leg (SDF-8). Default `['secret']` - out of the box only secret-tagged
+   * leg. Default `['secret']` - out of the box only secret-tagged
    * content arms the trifecta, so the gate does not fire on every run.
    * Widen to e.g. `['secret', 'internal']` to also treat ordinary
    * user/PII content (which defaults to `'internal'`) as sensitive.

@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/consolidator.ts:232
 
 **`Stable`**
 
-W-065: make the permanent `dead-letter queue: N` status warning
+Make the permanent `dead-letter queue: N` status warning
 actionable. Operator-level (DB-wide) view, like the `dlqSize`
 counter in `runConsolidatorStatus` - `listFailedBatches` on the
 store is scoped to one `SessionScope.userId`, which a CLI does not

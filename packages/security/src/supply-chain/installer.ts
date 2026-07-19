@@ -51,7 +51,7 @@ export interface InstallSkillFromNpmOptions {
   readonly trustLevel?: SkillTrustLevel;
   readonly policy?: SupplyChainPolicy;
   /**
-   * Operator trust root (D4 / security-01) threaded into signature
+   * Operator trust root threaded into signature
    * verification: a valid signature from a key not in the root is
    * rejected. See {@link SkillTrustRoot}.
    */
@@ -204,7 +204,7 @@ export async function installSkillFromNpm(
  * @stable
  */
 export interface InstallSkillFromGitOptions {
-  /** Operator trust root (D4 / security-01). See {@link SkillTrustRoot}. */
+  /** Operator trust root. See {@link SkillTrustRoot}. */
   readonly trustRoot?: SkillTrustRoot;
   readonly repoUrl: string;
   readonly ref?: string;
@@ -319,7 +319,7 @@ export async function installSkillFromGit(
 }
 
 /**
- * Verify the signature of an already-installed skill (RP-10: install-then-
+ * Verify the signature of an already-installed skill (install-then-
  * verify). The `resolveSkillMd` thunk is only invoked when the trust policy
  * requires a signature, so a softer policy never touches the install path.
  * On a rejection (missing / tampered signature under a strict policy) the
@@ -379,7 +379,7 @@ async function verifyAfterInstall(args: {
 const SKILL_MANIFEST_FILENAME = 'SKILL.md';
 
 /**
- * Resolve the SKILL.md used for signature verification (RP-10). A caller-
+ * Resolve the SKILL.md used for signature verification. A caller-
  * supplied `provided` value (offline / pre-fetch) wins; otherwise - and only
  * for a real install - the manifest is read from the install path. In
  * `dryRun` mode nothing was installed, so there is nothing to read.

@@ -46,7 +46,7 @@ into a tool failure - which is why it stays opt-in.
 | ------ | ------ | ------ |
 | `opts` | \{ `body`: `string`; `budgetMs?`: `number`; `contentOrigin?`: `string`; `failClosed?`: `boolean`; `patterns?`: readonly [`ImperativePattern`](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ImperativePattern.md)[]; `policy`: [`InboundSanitizationPolicy`](/api/@graphorin/core/type-aliases/InboundSanitizationPolicy.md); `toolName`: `string`; `trustClass`: [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md); \} | - |
 | `opts.body` | `string` | - |
-| `opts.budgetMs?` | `number` | Best-effort scan budget in milliseconds. Default `250` (TOOLS-EX-02 - the effective default; see the inline note on why 5 ms was too tight). On a timeout the strip pass is skipped and the body returned unredacted. |
+| `opts.budgetMs?` | `number` | Best-effort scan budget in milliseconds. Default `250` (the effective default; see the inline note on why 5 ms was too tight). On a timeout the strip pass is skipped and the body returned unredacted. |
 | `opts.contentOrigin?` | `string` | - |
 | `opts.failClosed?` | `boolean` | - |
 | `opts.patterns?` | readonly [`ImperativePattern`](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ImperativePattern.md)[] | - |

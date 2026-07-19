@@ -229,7 +229,7 @@ export function buildOAuthSession(
   });
 }
 
-/** SPL-12: the documented default for `callbackTimeoutMs`. */
+/** The documented default for `callbackTimeoutMs`. */
 const DEFAULT_CALLBACK_TIMEOUT_MS = 5 * 60_000;
 
 async function waitWithTimeout<T>(promise: Promise<T>, timeoutMs: number | undefined): Promise<T> {

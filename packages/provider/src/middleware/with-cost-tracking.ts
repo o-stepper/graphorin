@@ -32,7 +32,7 @@ export interface CostTrackingTotals {
 }
 
 /**
- * A process-local cost accumulator (PS-8). Wire {@link CostAccumulator.onUsage}
+ * A process-local cost accumulator. Wire {@link CostAccumulator.onUsage}
  * into {@link withCostTracking} and read the running totals - keyed by
  * `provider × model` - back via {@link CostAccumulator.totals} /
  * {@link CostAccumulator.totalFor}.
@@ -115,10 +115,12 @@ export interface WithCostTrackingOptions {
    * Optional pricing lookup. When set, the middleware computes
    * `costUsd` from the returned price and surfaces it on the hook.
    *
-   * `cachedReadPerMtok` / `cacheWritePerMtok` price the prompt-cache legs
-   * (core-provider-02); when omitted, cache tokens are billed at the full
-   * input rate (never cheaper than reality, so absent price data degrades
-   * to the pre-cache behaviour).
+   * `cachedReadPerMtok` / `cacheWritePerMtok` price the prompt-cache legs;
+   * when omitted, cache tokens are billed at the full
+   * input rate. For reads that over-counts (reads are discounted), but for
+   * writes it can UNDER-count: providers with a write premium (Anthropic,
+   * and OpenAI from GPT-5.6 on) charge 1.25x input for cache writes, so
+   * keep the write rate populated for models that report `cacheWriteTokens`.
    */
   readonly priceLookup?: (info: { readonly providerName: string; readonly modelId: string }) => {
     readonly inputPerMtok?: number;

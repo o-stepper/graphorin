@@ -14,7 +14,7 @@ Defined in: packages/evals/src/scorers/llm/judge.ts:124
 
 **`Stable`**
 
-EB-7: wrap untrusted content in unambiguous sentinel fences so the judge can
+Wrap untrusted content in unambiguous sentinel fences so the judge can
 tell data from instructions. Exported so caller-supplied `buildPrompt`
 functions (e.g. the prebuilt scorers, the LongMemEval judge) fence the same
 way the default builder does.

@@ -111,7 +111,7 @@ export function createDefaultOpCli(): OpCli {
 }
 
 /**
- * Grace period after SIGTERM before escalating to SIGKILL (SPL-22). A
+ * Grace period after SIGTERM before escalating to SIGKILL. A
  * well-behaved `op` exits on SIGTERM well within this window; a wedged one
  * (ignoring SIGTERM in an uninterruptible read) is force-killed so the hard
  * timeout actually settles the promise.

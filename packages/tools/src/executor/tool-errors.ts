@@ -1,6 +1,6 @@
 /**
  * Typed errors tool authors throw from `execute(...)` to reach a specific
- * model-visible `ToolErrorKind` (tools-06). Anything else a tool throws
+ * model-visible `ToolErrorKind`. Anything else a tool throws
  * flattens to `execution_failed`; these carriers keep the taxonomy honest:
  *
  * - {@link ToolRateLimitError} → kind `'rate_limited'` - the upstream

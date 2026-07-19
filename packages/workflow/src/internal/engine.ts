@@ -8,7 +8,7 @@
  * 5. honour the suspended-or-cancelled exit conditions, and
  * 6. repeat until the run terminates (or `maxSteps` is reached).
  *
- * Durability contract (WF-1/2/3/12): every persisted checkpoint carries a
+ * Durability contract: every persisted checkpoint carries a
  * *frontier envelope* in `metadata.tags` - the full set of pending pauses,
  * dynamic tasks, and completed-but-unwalked nodes - so a resume (or a
  * crash-recovery resume from a `'running'` checkpoint, or a `retry` from a
@@ -110,7 +110,7 @@ export interface EngineResumeOptions<TState extends object> {
    */
   readonly mode?: 'resume' | 'retry';
   /**
-   * D1: pick WHICH pending pause receives the resume value. Used by
+   * Pick WHICH pending pause receives the resume value. Used by
    * `resolveAwakeable` / `approve` (match by `name`) and `tick` (match
    * by due `wakeAt`). Absent ⇒ the first pause (legacy behaviour). A
    * selector that matches nothing fails with `pause-not-found`.
@@ -118,7 +118,7 @@ export interface EngineResumeOptions<TState extends object> {
   readonly selectPause?: (pause: PendingPauseRecord) => boolean;
   /** Human-readable target for the pause-not-found error message. */
   readonly selectPauseLabel?: string;
-  /** Skip the workflow-version pin check (D1). */
+  /** Skip the workflow-version pin check. */
   readonly allowVersionMismatch?: boolean;
 }
 
@@ -132,7 +132,7 @@ export function namespaceFor(config: { readonly name: string }): string {
 }
 
 /**
- * W-120: identity of a pause record for the replay-divergence check -
+ * Identity of a pause record for the replay-divergence check -
  * durable-primitive `kind` off the pause value plus the awakeable /
  * approval `name`. A plain `pause()` yields `{}` (never checked).
  */
@@ -156,7 +156,7 @@ function describePauseIdentity(id: { readonly kind?: string; readonly name?: str
   return parts.length > 0 ? parts.join(' / ') : 'a plain pause';
 }
 
-/** W-120: prior satisfiedMeta, padded with nulls for legacy records. */
+/** Prior satisfiedMeta, padded with nulls for legacy records. */
 function priorMetaOf(record: {
   readonly satisfied?: ReadonlyArray<unknown>;
   readonly satisfiedMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
@@ -168,7 +168,7 @@ function priorMetaOf(record: {
 let warnedLegacyAsyncDurability = false;
 
 /**
- * WF-7: `'async'` was removed from {@link DurabilityMode} - it was
+ * `'async'` was removed from {@link DurabilityMode} - it was
  * byte-identical to `'sync'`. Legacy JS callers that still pass it get
  * `'sync'` behaviour and a one-time warning instead of a crash.
  */
@@ -194,12 +194,12 @@ interface PlannedTask {
   readonly source: 'edge' | 'dispatch' | 'resume' | 'start';
   readonly dispatchArgs?: unknown;
   /**
-   * Ordered values replayed to the node's `pause()` calls on re-run
-   * (WF-2). Empty array = run with an active-but-empty replay scope, so
+   * Ordered values replayed to the node's `pause()` calls on re-run.
+   * Empty array = run with an active-but-empty replay scope, so
    * every programmatic `pause()` suspends (the static-before case).
    */
   readonly resumeValues?: ReadonlyArray<unknown>;
-  /** W-120: identity of the pause each resume value answers. */
+  /** Identity of the pause each resume value answers. */
   readonly resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
   readonly staticBefore?: boolean;
   readonly staticAfter?: boolean;
@@ -222,10 +222,10 @@ interface RunInternalState<TState extends object> {
   lastCompletedNodes: string[];
   stepNumber: number;
   /**
-   * W-122: steps taken by THIS invocation (execute/resume/retry/tick).
+   * Steps taken by THIS invocation (execute/resume/retry/tick).
    * `maxSteps` caps this counter - a long-lived thread cycling through
    * timers/approvals must not die at 200 CUMULATIVE steps. The
-   * cumulative `stepNumber` stays untouched (WF-4 checkpoint ordering
+   * cumulative `stepNumber` stays untouched (checkpoint ordering
    * depends on it) and is capped only by the opt-in `maxTotalSteps`.
    */
   stepsThisInvocation: number;
@@ -1569,7 +1569,7 @@ function planTasks<TState extends object>(
 }
 
 /**
- * WF-5 join gate. A node is barrier-gated when at least two of its
+ * Join gate. A node is barrier-gated when at least two of its
  * in-edge sources are writers of the same Barrier channel - the
  * declared fan-in join shape. Single-writer edges never defer, so a
  * barrier writer's unrelated out-edges keep firing normally.
@@ -1709,7 +1709,7 @@ function groupWritesByTask(writes: ReadonlyArray<ChannelWrite>): Map<string, Cha
 }
 
 /**
- * WF-9 helper: freeze a structured clone in depth so node bodies cannot
+ * Freeze a structured clone in depth so node bodies cannot
  * mutate the shared step snapshot. Cycle-safe (structuredClone output
  * may contain cycles).
  */
@@ -1735,10 +1735,10 @@ interface PersistCheckpointArgs<TState extends object> {
 
 /**
  * Persist one checkpoint. Returns the new checkpoint id, or `null` when
- * the configured durability mode skipped the put (WF-8) - callers must
+ * the configured durability mode skipped the put - callers must
  * not report or parent-link a checkpoint that does not exist.
  *
- * WF-12: before writing, the latest stored checkpoint is compared
+ * Before writing, the latest stored checkpoint is compared
  * against the run's parent pointer - if another writer advanced the
  * thread in between, a `checkpoint-version-conflict` error is thrown
  * instead of forking the timeline.
@@ -1910,7 +1910,7 @@ function signalAbortReason(signal: AbortSignal): string {
   return 'aborted';
 }
 
-/** Reserved journal keys for opt-in step journaling (D1 / workflow-04). */
+/** Reserved journal keys for opt-in step journaling. */
 const STEP_INTENT_TASK_ID = '__graphorin_step_intent__' as const;
 const STEP_INTENT_CHANNEL = '__graphorin_step_intent__' as const;
 const TASK_DONE_CHANNEL = '__graphorin_task_done__' as const;
@@ -1921,13 +1921,13 @@ interface StepIntentTask {
   readonly source: PlannedTask['source'];
   readonly dispatchArgs?: unknown;
   readonly resumeValues?: ReadonlyArray<unknown>;
-  /** W-120: identity of the pause each resume value answers. */
+  /** Identity of the pause each resume value answers. */
   readonly resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
   readonly staticBefore?: boolean;
 }
 
 /**
- * D1 / workflow-04: decode the interrupted step's journal from the
+ * Decode the interrupted step's journal from the
  * latest checkpoint's pending writes. Returns `null` when no intent for
  * the expected step is journaled (crash happened outside a journaled
  * step, or journaling was off) - the caller then falls back to the
@@ -1995,7 +1995,7 @@ function readStepJournal(
 }
 
 /**
- * D1 / workflow-10: minimal counting semaphore for the per-step task
+ * Minimal counting semaphore for the per-step task
  * pool. `limit` undefined / non-positive ⇒ unbounded (a no-op acquire).
  */
 function createSemaphore(limit: number | undefined): {
@@ -2027,7 +2027,7 @@ function createSemaphore(limit: number | undefined): {
 }
 
 /**
- * D1 / workflow-03: run a node body under its per-node policy.
+ * Run a node body under its per-node policy.
  *
  * - `timeoutMs` is a hard per-TASK wall-clock budget: on expiry the
  *   task's own controller aborts (so a well-behaved body can stop) and
@@ -2113,12 +2113,12 @@ const PAUSE_TAG_PREFIX = 'pause:' as const;
 const FRONTIER_TAG_PREFIX = 'frontier:' as const;
 
 /**
- * The resumable frontier persisted with every checkpoint (WF-1/2/3):
+ * The resumable frontier persisted with every checkpoint:
  * everything the engine had in flight at persist time.
  */
 interface FrontierEnvelope {
   readonly v: 1;
-  /** Workflow definition version pin at persist time (D1). */
+  /** Workflow definition version pin at persist time. */
   readonly version?: string;
   /** Every pause raised by the suspension - parallel pausers included. */
   readonly pauses: ReadonlyArray<PendingPauseRecord>;
@@ -2126,7 +2126,7 @@ interface FrontierEnvelope {
   readonly dynamic: ReadonlyArray<{ readonly nodeName: string; readonly dispatchArgs?: unknown }>;
   /** Nodes that completed but whose outgoing edges were not walked yet. */
   readonly completed: ReadonlyArray<string>;
-  /** Task list of a failed step - drives `retry` replay (WF-3/WF-6). */
+  /** Task list of a failed step - drives `retry` replay. */
   readonly stepTasks?: ReadonlyArray<{
     readonly taskId: string;
     readonly nodeName: string;
@@ -2156,7 +2156,7 @@ function frontierFromInternal<TState extends object>(
 }
 
 /**
- * W-121: fail-fast walk of every frontier payload that will be
+ * Fail-fast walk of every frontier payload that will be
  * `JSON.stringify`-ed into checkpoint tags: pause values (incl.
  * approval payloads), dispatchArgs, satisfied resume values and their
  * metas, dynamic-task args, and the failure-frontier stepTasks args.
@@ -2285,10 +2285,10 @@ function restoreState<TState extends object>(
 /**
  * @internal - restore a `Workflow.fork` clone. Copies the source
  * thread's state into a fresh thread id while leaving the original
- * timeline untouched. E2: an optional channel-level `patch` merges
+ * timeline untouched. An optional channel-level `patch` merges
  * into the forked root's state ("branch here, but with these corrected
  * values") - patched keys must name declared channels, and the merged
- * object re-runs the WF-10 JSON-safety serialization so a patch cannot
+ * object re-runs the JSON-safety serialization so a patch cannot
  * smuggle non-JSON-safe values past the envelope guard.
  */
 export async function forkThread<TState extends object>(input: {

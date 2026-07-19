@@ -3,7 +3,7 @@
  * parallel calls, serialises the sequential ones first (deterministic
  * ordering), pumps the parallel ones under the `maxParallelTools`
  * bound, and synthesizes `execution_failed` outcomes for rejections
- * that escape the per-call pipeline (TL-12 / tools-07).
+ * that escape the per-call pipeline.
  *
  * @packageDocumentation
  */

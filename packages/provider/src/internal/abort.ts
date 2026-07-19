@@ -1,5 +1,5 @@
 /**
- * Abort detection shared by the retry / fallback predicates (PS-2).
+ * Abort detection shared by the retry / fallback predicates.
  *
  * A network failure surfaces as `ProviderHttpError{ status: 0, cause }`,
  * and a user/agent abort surfaces the same way - the distinguishing

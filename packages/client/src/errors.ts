@@ -11,7 +11,7 @@
 import { RPC_ERROR_CODES } from '@graphorin/protocol';
 
 /**
- * IP-19: map a JSON-RPC error code from a server `RpcFailure` frame to the
+ * Map a JSON-RPC error code from a server `RpcFailure` frame to the
  * client's discriminated {@link GraphorinClientErrorKind}, so a rate-limited
  * or scope-denied RPC is distinguishable from a genuine protocol violation.
  */
@@ -57,7 +57,7 @@ export type GraphorinClientErrorKind =
   | 'server-error'
   | 'aborted'
   /**
-   * W-152: the per-subscription client buffer hit
+   * The per-subscription client buffer hit
    * `subscriptionQueueLimit` because the `for await` consumer fell
    * behind the event flow; the subscription is closed with this typed
    * error instead of growing the heap or silently dropping frames.

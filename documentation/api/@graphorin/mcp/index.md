@@ -41,7 +41,7 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   by default (`onPinMismatch: 'warn'` downgrades to a warning);
   description-injection heuristics at registration feed the
   `mcp.tool-description.injection-flagged.total` counter. The full pin
-  lifecycle (W-079): tools ADDED after the first recording are rejected
+  lifecycle: tools ADDED after the first recording are rejected
   by default too (`mcp.tools.pin-added.total` under `'warn'`), removals
   are observable (`mcp.tools.pin-removed.total`, never an exception),
   and `onPinMismatch: 'accept-and-update'` is the explicit operator
@@ -77,7 +77,7 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   `'auto-prefix'`), and the optional per-client `priority` field;
   the registry consumes the trio when its strategy-aware
   `assertNoDuplicates(strategy, ctx)` overload runs.
-- **Transport-derived identity (W-016).** `serverIdentity.id` derives
+- **Transport-derived identity.** `serverIdentity.id` derives
   from the operator-controlled transport config (HTTP ids include a
   non-default port), never from the name a server self-reports on
   `initialize` - TOFU pins, `mcp:<id>:<uri>` handle scoping and taint

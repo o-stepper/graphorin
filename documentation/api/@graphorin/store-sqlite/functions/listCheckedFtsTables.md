@@ -14,7 +14,7 @@ Defined in: packages/store-sqlite/src/fts-integrity.ts:46
 
 **`Internal`**
 
-The FTS tables the CS-10 guard covers (W-113). Exported so the
+The FTS tables the integrity guard covers. Exported so the
 coverage self-check test can diff this list against the `%_fts`
 tables of a fully-migrated database - a new FTS index that is not
 registered here fails the test instead of silently escaping the

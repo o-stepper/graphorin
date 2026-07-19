@@ -26,7 +26,7 @@ import type {
 import type { PromotionPolicyConfig, ResolvedPromotionPolicy } from './promotion.js';
 
 /**
- * B3 (item 15): deterministic pre-extraction admission gate. Runs on
+ * Deterministic pre-extraction admission gate. Runs on
  * every fetched {@link SessionMessageRecord} BEFORE noise filtering on
  * both consolidator batch paths (runtime dispatch pre-fetch and the
  * standard phase's self-fetch). Return `true` to admit the record
@@ -94,7 +94,7 @@ export interface ConsolidatorTriggerReason {
  * handled depends on {@link OnBudgetExceed}: `'pause'` / `'throw'`
  * enforce, `'log'` (the shipped standard/full presets) only WARNs and
  * keeps running. The USD leg accumulates only when a `priceUsage`
- * pricer is configured (memory-consolidation-02) - without one every
+ * pricer is configured - without one every
  * call prices at $0 and `maxCostPerDay` can never trip. The default
  * ceiling shape per tier is captured in
  * {@link CONSOLIDATOR_TIER_DEFAULTS}.
@@ -105,7 +105,7 @@ export interface ConsolidatorCeilings {
   readonly maxTokensPerDay: number;
   readonly maxCostPerDay: number;
   /**
-   * ADVISORY (MCON-8): the per-scope lock serializes runs, so effective
+   * ADVISORY: the per-scope lock serializes runs, so effective
    * concurrency is always 1 per scope regardless of this value. The
    * field is retained for forward compatibility; it enforces nothing
    * today.
@@ -113,7 +113,7 @@ export interface ConsolidatorCeilings {
   readonly maxConcurrentRuns: number;
   readonly maxRunDurationMs: number;
   /**
-   * Minimum quiet period between non-manual runs per scope (MCON-8).
+   * Minimum quiet period between non-manual runs per scope.
    * After each run the runtime persists `nextEligibleAt = now +
    * cooldownMs`; trigger-driven runs (`turn` / `idle` / `cron` /
    * `event` / `budget`) inside that window defer with reason
@@ -153,21 +153,21 @@ export interface ConsolidatorConfig {
   readonly onExceed: OnBudgetExceed;
   /**
    * Advisory label for the standard phase's model - recorded on spans /
-   * run telemetry only (MCON-7). Routing happens via
+   * run telemetry only. Routing happens via
    * `CreateConsolidatorOptions.cheapProvider`; this string disables
    * nothing.
    */
   readonly cheapModel: string | null;
   /**
-   * Advisory label for the deep phase's model - telemetry only
-   * (MCON-7). Routing happens via
+   * Advisory label for the deep phase's model - telemetry only.
+   * Routing happens via
    * `CreateConsolidatorOptions.deepProvider`.
    */
   readonly deepModel: string | null;
   readonly budgetResetSemantics: 'utc' | 'local' | 'sliding-24h';
   readonly noiseFilters: ReadonlyArray<'default' | 'minimal' | 'none'>;
   /**
-   * B3 (item 15): deterministic pre-extraction admission gate. `null`
+   * Deterministic pre-extraction admission gate. `null`
    * (default) admits everything. See {@link MemoryIngestGate}.
    */
   readonly ingestGate: MemoryIngestGate | null;
@@ -175,16 +175,16 @@ export interface ConsolidatorConfig {
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
   /**
-   * Capacity-bounded eviction target for the light phase (X-1). When set,
+   * Capacity-bounded eviction target for the light phase. When set,
    * each light pass archives the lowest-salience live facts in the LRU
    * decay window down to this many - **cost / staleness control, not an
-   * accuracy lever**. `null` (the default at every tier) leaves storage
-   * unbounded, so behaviour is identical to pre-X-1. Archiving is a soft,
-   * recoverable move; nothing is hard-deleted.
+   * accuracy lever**. `null` (the default at every tier) leaves
+   * storage unbounded. Archiving is a soft, recoverable move; nothing
+   * is hard-deleted.
    */
   readonly decayCapacity: number | null;
   /**
-   * Weights for the multi-signal salience score (X-1) that orders both
+   * Weights for the multi-signal salience score that orders both
    * threshold archiving and capacity eviction. Defaults to
    * `DEFAULT_SALIENCE_WEIGHTS`; with neutral importance, active
    * status, and first-party provenance salience equals plain retention.
@@ -193,7 +193,7 @@ export interface ConsolidatorConfig {
   readonly maxStandardBatchSize: number;
   /**
    * Input-side transcript budget for the standard phase, in characters
-   * (W-081; chars/4 is the package's deterministic token proxy, so the
+   * (chars/4 is the package's deterministic token proxy, so the
    * 60k default approximates 15k tokens). `maxStandardBatchSize` bounds
    * only the MESSAGE COUNT of a slice; without a size budget a batch of
    * near-cap messages can render to hundreds of kilobytes, overflow a
@@ -211,7 +211,7 @@ export interface ConsolidatorConfig {
   readonly dlqMaxBackoffMs: number;
   /**
    * Auto-form a quarantined episode from each processed standard-phase
-   * slice (P1-2). Defaults on at the `standard`+ tiers, off at `free` /
+   * slice. Defaults on at the `standard`+ tiers, off at `free` /
    * `cheap` / `custom`. The episode summary is one budgeted LLM call;
    * when the budget is exhausted (or no episodic tier is wired) the
    * phase degrades to fact-only behaviour.
@@ -220,13 +220,13 @@ export interface ConsolidatorConfig {
   /**
    * Ask the episode-summarization call for an LLM importance score
    * (1-10, normalized to `[0, 1]`) so episodic triple-signal retrieval
-   * (recency × relevance × importance) runs on all three signals
-   * (P1-2). Importance is always a *soft* signal - it never gates
+   * (recency × relevance × importance) runs on all three signals.
+   * Importance is always a *soft* signal - it never gates
    * retention. Defaults track {@link formEpisodes}.
    */
   readonly importanceScoring: boolean;
   /**
-   * Auto-promotion policy (MCON-2). When `true`, the standard phase admits an
+   * Auto-promotion policy. When `true`, the standard phase admits an
    * injection-clean **extraction** fact as `active` instead of quarantined, so
    * routine distillation surfaces in default recall without a manual
    * `memory review --promote`. Injection-flagged facts always stay quarantined
@@ -237,7 +237,7 @@ export interface ConsolidatorConfig {
    */
   readonly autoPromoteExtraction: boolean;
   /**
-   * Run the deep-phase reflection pass (P1-1): when accumulated episode
+   * Run the deep-phase reflection pass: when accumulated episode
    * importance crosses {@link importanceThreshold}, synthesize
    * higher-order, cited insights over recent memories (Generative
    * Agents). Insights land quarantined + `provenance: 'reflection'` and
@@ -256,7 +256,7 @@ export interface ConsolidatorConfig {
   /** Upper bound on salient questions reflection asks per pass. Defaults to `3`. */
   readonly reflectionMaxQuestions: number;
   /**
-   * W-082: cap on the unreviewed (quarantined) insight queue. Quarantined
+   * Cap on the unreviewed (quarantined) insight queue. Quarantined
    * insights are exempt from reflection pass-decay - their decay clock
    * starts at validation - and this bound keeps the review queue from
    * growing without limit: beyond it the oldest quarantined insights are
@@ -264,7 +264,7 @@ export interface ConsolidatorConfig {
    */
   readonly reflectionMaxQuarantinedInsights: number;
   /**
-   * Contextual retrieval for facts written by the standard phase (P1-3).
+   * Contextual retrieval for facts written by the standard phase.
    * `'late-chunk'` (default at every tier) relies on the offline
    * situating-context prefix the shared {@link SemanticMemory} computes
    * for every write - no extra LLM call. `'llm'` is the opt-in
@@ -276,18 +276,18 @@ export interface ConsolidatorConfig {
    */
   readonly contextualRetrieval: ContextualRetrievalMode;
   /**
-   * Maintain the learned-context digest block (D3): after the deep
+   * Maintain the learned-context digest block: after the deep
    * phase, one budgeted LLM call rewrites the reserved
    * `learned_context` working block from the previous digest + recent
    * episodes / active insights / active procedures, so the system
    * prompt carries a compact standing summary. Defaults **off at every
-   * tier** (Wave-D trial) - a no-op without a working tier handle.
+   * tier** - a no-op without a working tier handle.
    */
   readonly learnedContext: boolean;
   /** Character bound enforced on the learned-context digest. Default `1200`. */
   readonly learnedContextMaxChars: number;
   /**
-   * Curated working blocks the deep phase maintains (wave-D D3) - the
+   * Curated working blocks the deep phase maintains - the
    * generalisation of the learned-context pass to a registered list.
    * Resolved: the `learnedContext: true` sugar contributes a
    * `learned_context` entry; labels are unique and never `profile`.
@@ -295,7 +295,7 @@ export interface ConsolidatorConfig {
    */
   readonly curatedBlocks: ReadonlyArray<ResolvedCuratedBlock>;
   /**
-   * Profile-projection pass configuration (wave-D D2): after the
+   * Profile-projection pass configuration: after the
    * curated-block passes, one budgeted LLM call projects ACTIVE facts
    * into the reserved read-only `profile` working block (topic /
    * sub-topic / content slots with fact-id provenance). `null` (the
@@ -304,11 +304,11 @@ export interface ConsolidatorConfig {
    */
   readonly profileProjection: ResolvedProfileProjectionConfig | null;
   /**
-   * Deterministic quarantine-exit policy (wave-D D4, D-7): the deep
+   * Deterministic quarantine-exit policy: the deep
    * phase promotes quarantined facts whose recall evidence clears
    * every threshold, through the audited `SemanticMemory.validate`
    * path. `null` (default at every tier) disables the step. Enabling
-   * it REQUIRES the B3 ingest gate (fail-closed config check in
+   * it REQUIRES the ingest gate (fail-closed config check in
    * `createMemory`).
    */
   readonly promotion: ResolvedPromotionPolicy | null;
@@ -396,17 +396,17 @@ export interface PhaseOutcome {
   readonly factsCreated: number;
   readonly factsUpdated: number;
   readonly conflictsResolved: number;
-  /** Episodes auto-formed from the processed slice (P1-2). */
+  /** Episodes auto-formed from the processed slice. */
   readonly episodesFormed: number;
-  /** Insights synthesized by the deep-phase reflection pass (P1-1). */
+  /** Insights synthesized by the deep-phase reflection pass. */
   readonly insightsCreated: number;
-  /** True when the learned-context digest block was rewritten (D3). */
+  /** True when the learned-context digest block was rewritten. */
   readonly learnedContextUpdated?: boolean;
-  /** How many curated blocks were rewritten this pass (wave-D D3). */
+  /** How many curated blocks were rewritten this pass. */
   readonly curatedBlocksUpdated?: number;
-  /** True when the profile block content changed (wave-D D2). */
+  /** True when the profile block content changed. */
   readonly profileProjectionUpdated?: boolean;
-  /** Facts promoted out of quarantine by the promotion step (wave-D D4). */
+  /** Facts promoted out of quarantine by the promotion step. */
   readonly factsPromoted?: number;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
@@ -451,12 +451,12 @@ export interface CreateConsolidatorOptions {
    * The {@link EpisodicMemory} tier instance from the parent
    * `createMemory(...)` facade. When supplied (and `formEpisodes` is
    * on) the standard phase auto-forms a quarantined episode per
-   * processed slice (P1-2). Omitted ⇒ episode formation is skipped.
+   * processed slice. Omitted ⇒ episode formation is skipped.
    */
   readonly episodic?: EpisodicMemory;
   /**
    * The {@link WorkingMemory} tier instance from the parent
-   * `createMemory(...)` facade (D3). Required for the learned-context
+   * `createMemory(...)` facade. Required for the learned-context
    * pass - without it the pass is a silent no-op even when
    * `learnedContext` is enabled.
    */
@@ -478,7 +478,7 @@ export interface CreateConsolidatorOptions {
   readonly ceilings?: Partial<ConsolidatorCeilings>;
   readonly onExceed?: OnBudgetExceed;
   /**
-   * USD pricer for phase LLM usage (memory-consolidation-02). Wire it
+   * USD pricer for phase LLM usage. Wire it
    * to `@graphorin/pricing`'s `calculateCost` (or any per-token rate)
    * so the `maxCostPerDay` ceiling can actually accumulate spend -
    * without it every phase prices its calls at $0 and the USD ceiling
@@ -492,67 +492,67 @@ export interface CreateConsolidatorOptions {
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
   /**
    * Provider routed to the standard phase (extraction / episode /
-   * reconcile / situating-context calls) when set (MCON-7). Falls back
+   * reconcile / situating-context calls) when set. Falls back
    * to `provider`. Pair with `cheapModel` for the telemetry label.
    */
   readonly cheapProvider?: Provider | null;
   /**
    * Provider routed to the deep phase (conflict judge) and the
-   * reflection pass when set (MCON-7). Falls back to `provider`.
+   * reflection pass when set. Falls back to `provider`.
    */
   readonly deepProvider?: Provider | null;
   readonly cheapModel?: string | null;
   readonly deepModel?: string | null;
   readonly budgetResetSemantics?: 'utc' | 'local' | 'sliding-24h';
   readonly noiseFilters?: ReadonlyArray<'default' | 'minimal' | 'none'>;
-  /** B3: override {@link ConsolidatorConfig.ingestGate}. */
+  /** Override {@link ConsolidatorConfig.ingestGate}. */
   readonly ingestGate?: MemoryIngestGate;
   readonly lockWaitMs?: number;
   readonly decayTauDays?: number;
   readonly decayArchiveThreshold?: number;
-  /** Override the {@link ConsolidatorConfig.decayCapacity} default (X-1). */
+  /** Override the {@link ConsolidatorConfig.decayCapacity} default. */
   readonly decayCapacity?: number | null;
-  /** Override the {@link ConsolidatorConfig.salienceWeights} default (X-1). */
+  /** Override the {@link ConsolidatorConfig.salienceWeights} default. */
   readonly salienceWeights?: SalienceWeights;
   readonly maxStandardBatchSize?: number;
-  /** Override the per-tier {@link ConsolidatorConfig.maxTranscriptChars} default (W-081). */
+  /** Override the per-tier {@link ConsolidatorConfig.maxTranscriptChars} default. */
   readonly maxTranscriptChars?: number;
   readonly maxDeepConflictsPerRun?: number;
   readonly dlqMaxRetries?: number;
   readonly dlqBaseBackoffMs?: number;
   readonly dlqMaxBackoffMs?: number;
-  /** Override the per-tier {@link ConsolidatorConfig.formEpisodes} default (P1-2). */
+  /** Override the per-tier {@link ConsolidatorConfig.formEpisodes} default. */
   readonly formEpisodes?: boolean;
-  /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default (P1-2). */
+  /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default. */
   readonly importanceScoring?: boolean;
   /**
-   * Opt in to auto-promotion of injection-clean extraction facts (MCON-2).
+   * Opt in to auto-promotion of injection-clean extraction facts.
    * Defaults `false`. See {@link ConsolidatorConfig.autoPromoteExtraction}.
    */
   readonly autoPromoteExtraction?: boolean;
-  /** Override the per-tier {@link ConsolidatorConfig.reflection} default (P1-1). */
+  /** Override the per-tier {@link ConsolidatorConfig.reflection} default. */
   readonly reflection?: boolean;
-  /** Override the {@link ConsolidatorConfig.importanceThreshold} default (P1-1). */
+  /** Override the {@link ConsolidatorConfig.importanceThreshold} default. */
   readonly importanceThreshold?: number;
-  /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default (P1-1). */
+  /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default. */
   readonly reflectionMaxQuestions?: number;
-  /** Override the {@link ConsolidatorConfig.reflectionMaxQuarantinedInsights} default (W-082). */
+  /** Override the {@link ConsolidatorConfig.reflectionMaxQuarantinedInsights} default. */
   readonly reflectionMaxQuarantinedInsights?: number;
-  /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default (P1-3). */
+  /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default. */
   readonly contextualRetrieval?: ContextualRetrievalMode;
-  /** Override the per-tier {@link ConsolidatorConfig.learnedContext} default (D3). */
+  /** Override the per-tier {@link ConsolidatorConfig.learnedContext} default. */
   readonly learnedContext?: boolean;
-  /** Override the {@link ConsolidatorConfig.learnedContextMaxChars} default (D3). */
+  /** Override the {@link ConsolidatorConfig.learnedContextMaxChars} default. */
   readonly learnedContextMaxChars?: number;
   /**
-   * Curated working blocks the deep phase maintains (wave-D D3).
+   * Curated working blocks the deep phase maintains.
    * `learnedContext: true` remains sugar for
    * `[{ label: 'learned_context' }]` and composes with this list.
    */
   readonly curatedBlocks?: ReadonlyArray<CuratedBlockSpec>;
-  /** Enable the profile-projection pass (wave-D D2). Default off. */
+  /** Enable the profile-projection pass. Default off. */
   readonly profileProjection?: ProfileProjectionConfig;
-  /** Enable the deterministic promotion step (wave-D D4). Default off. */
+  /** Enable the deterministic promotion step. Default off. */
   readonly promotion?: PromotionPolicyConfig;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
@@ -574,7 +574,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly cheapModel: string | null;
       readonly deepModel: string | null;
       readonly onExceed: OnBudgetExceed;
-      /** W-081: input transcript budget for one standard-phase slice. */
+      /** Input transcript budget for one standard-phase slice. */
       readonly maxTranscriptChars: number;
       readonly formEpisodes: boolean;
       readonly importanceScoring: boolean;

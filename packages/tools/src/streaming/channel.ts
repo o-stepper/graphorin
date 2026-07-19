@@ -27,7 +27,7 @@ import { incrementCounter, observeHistogram } from '../audit/index.js';
 export type StreamingEvent = ToolExecuteProgressEvent | ToolExecutePartialEvent;
 
 /**
- * W-117: default byte cap on the per-call aggregation buffer. Generous -
+ * Default byte cap on the per-call aggregation buffer. Generous -
  * an ordinary tool result is orders of magnitude smaller; the cap exists
  * so an unbounded streaming producer cannot exhaust host memory.
  *
@@ -49,7 +49,7 @@ export interface StreamingChannelOptions {
    */
   readonly eventQueueDepth?: number;
   /**
-   * W-117: byte cap on the in-memory aggregation buffer (the
+   * Byte cap on the in-memory aggregation buffer (the
    * buffer-becomes-output `chunks`). Past the cap, chunks still DELIVER
    * to the sink (subscribers keep streaming) but stop accumulating, the
    * dropped bytes are counted (`tool.streaming.buffer.dropped-bytes.total`)
@@ -90,7 +90,7 @@ export interface StreamingAggregator {
   readonly progressEventCount: number;
   readonly totalBytes: number;
   /**
-   * W-117: `true` when the aggregation buffer hit `maxBufferBytes` and
+   * `true` when the aggregation buffer hit `maxBufferBytes` and
    * later chunks were dropped from the ASSEMBLED body (sink delivery
    * continued). Consumers building an output / spill artifact from
    * `chunks` must treat the body as incomplete.

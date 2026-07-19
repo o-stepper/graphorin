@@ -98,10 +98,10 @@ initialise a fresh store (it gets `auto_vacuum=2`) and move the data across.
 
 ### Embedder migration and space reclaim runbook
 
-Switching embedding models re-embeds every stored vector (wave-D D5 - MST-12 closed):
+Switching embedding models re-embeds every stored vector:
 
 1. **Author the factory module** (the CLI never downloads models implicitly - DEC-154): a local JS file exporting `{ embedders: { '<canonical-id>': () => EmbedderProvider } }` keyed by the ids `graphorin memory status` reports.
-2. **Run the migration**: `graphorin memory migrate --from <old-id> --to <new-id> --strategy auto-migrate --embedders ./embedders.mjs`. Progress persists into `migration_state` after every batch; the runner walks facts, then episodes (session messages carry no vector reads today). Each batch is one write transaction - it *contends* for the write lock (see the matrix above): keep `--batch-size` modest (default 512; smaller on busy deployments - the W-070 event-loop caveat applies), or stop the server for very large stores.
+2. **Run the migration**: `graphorin memory migrate --from <old-id> --to <new-id> --strategy auto-migrate --embedders ./embedders.mjs`. Progress persists into `migration_state` after every batch; the runner walks facts, then episodes (session messages carry no vector reads today). Each batch is one write transaction - it *contends* for the write lock (see the matrix above): keep `--batch-size` modest (default 512; smaller on busy deployments - the event-loop caveat above applies), or stop the server for very large stores.
 3. **Kill / crash / abort are fine**: re-running the SAME invocation resumes from the persisted cursor - across process restarts. A committed migration retires the source embedder.
 4. **Reclaim the space**: retirement alone keeps the old vector tables at full size. `--reclaim` (or a later `graphorin memory migrate ... --reclaim` re-run after manual retirement) drops the retired embedder's `*_vec_*` sidecar tables and runs `PRAGMA incremental_vacuum`. Freed pages return to the OS only on `auto_vacuum=INCREMENTAL` databases (everything Graphorin created recently); older files keep their high-water size - `graphorin storage compact` explains the options.
 5. **Contention symptoms**: a busy server surfaces as `SqliteBusyError` after `busy_timeout` (default 5 s; raise via `busyTimeoutMs` for maintenance windows). The migration is safe to interrupt at any point - resume covers it.
@@ -118,7 +118,7 @@ SQLCipher v4 compatible) and adds:
   correctly against the chacha20-defaulting peer).
 - `encryptDatabase` / `rekeyDatabase` - back `graphorin storage encrypt` and
   `graphorin storage rekey`. The export is an **online page-level `backup()`
-  copy → in-place `PRAGMA rekey`** sequence (CS-7): sqlite3mc ships no
+  copy → in-place `PRAGMA rekey`** sequence: sqlite3mc ships no
   `sqlcipher_export`, and the page-level backup preserves implicit rowids so
   FTS5 mappings stay intact. Rekey drops to `journal_mode = DELETE` for the
   rotation (sqlite3mc refuses to rekey in WAL) and restores WAL after.

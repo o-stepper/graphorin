@@ -14,11 +14,11 @@ Defined in: packages/server/src/ws/replay-buffer.ts:197
 
 **`Stable`**
 
-W-028: schedule a periodic [ReplayBuffer.prune](/api/@graphorin/server/interfaces/ReplayBuffer.md#prune) sweep. Without
+Schedule a periodic [ReplayBuffer.prune](/api/@graphorin/server/interfaces/ReplayBuffer.md#prune) sweep. Without
 it TTL expiry only ran lazily inside `push`/`replay`/`size` FOR THE
 SAME SUBJECT, so every finished run-subject (a fresh runId per run)
 retained up to `maxEvents` full payloads forever on a long-living
-server. Mirrors `scheduleRunPruning` (IP-16): `unref`-ed timer,
+server. Mirrors `scheduleRunPruning`: `unref`-ed timer,
 returns a stop function. The sweep applies only the already
 documented TTL - replay semantics inside the TTL window are
 unchanged (an immediate `forget` on run completion would break

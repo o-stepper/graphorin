@@ -204,7 +204,7 @@ deleteSession(sessionId): Promise<void>;
 
 Defined in: packages/store-sqlite/src/session-store.ts:238
 
-RP-6: hard-delete a session + its handoffs / workflow runs / audit rows.
+Hard-delete a session + its handoffs / workflow runs / audit rows.
 
 #### Parameters
 
@@ -404,7 +404,7 @@ pruneSessions(opts): Promise<number>;
 
 Defined in: packages/store-sqlite/src/session-store.ts:245
 
-RP-6: retention sweep - delete every session matching the policy.
+Retention sweep - delete every session matching the policy.
 
 #### Parameters
 

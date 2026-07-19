@@ -1,9 +1,9 @@
 /**
- * `graphorin tools lint` - RB-49 / suggested DEC-165.
+ * `graphorin tools lint` (suggested DEC-165).
  *
  * Discovers every `tool({...})` registration in the operator's project
  * via a text-based static scan (no runtime probe; no `tsc` invocation), runs
- * the three RB-49 rules from `@graphorin/eslint-plugin`, computes the
+ * the three `tool-*` rules from `@graphorin/eslint-plugin`, computes the
  * per-tool grader score (40 + 30 + 30 = 100 points), aggregates a
  * structured report, and exits `1` when any tool falls below the
  * `--threshold` (default `60`).
@@ -13,7 +13,7 @@
  *   graphorin tools lint [--config <path>] [--threshold <n>]
  *                        [--format <text|json>] [--source <pattern>]
  *
- * ## Grader rubric (RB-49 calibration - 40 + 30 + 30 = 100 points)
+ * ## Grader rubric (40 + 30 + 30 = 100 points)
  *
  * - **description axis (0..40):** 0 if missing / placeholder / shorter
  *   than 20 chars; 16 if length >= 20; 24 if length >= 30; 32 if
@@ -67,8 +67,8 @@ import {
  * 04) can wire the counter into Prometheus / OTLP without touching
  * the CLI runtime. Default: no-op.
  *
- * Mirrors the `tool.lint.threshold.violations.total{toolName,score,
- * threshold}` contract documented in RB-49 § Counter emission.
+ * Mirrors the documented counter contract
+ * `tool.lint.threshold.violations.total{toolName,score,threshold}`.
  *
  * @stable
  */
@@ -100,7 +100,7 @@ export interface ToolsLintOptions extends CommonOutputOptions {
   readonly inlineSources?: ReadonlyArray<{ readonly file: string; readonly source: string }>;
   /**
    * Optional sink for the `tool.lint.threshold.violations.total`
-   * counter (RB-49). The CLI calls this once per below-threshold tool
+   * counter. The CLI calls this once per below-threshold tool
    * per invocation. Default: no-op.
    */
   readonly counterSink?: ToolsLintCounterSink;

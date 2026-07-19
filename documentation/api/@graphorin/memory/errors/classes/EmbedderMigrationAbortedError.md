@@ -12,7 +12,7 @@ Defined in: packages/memory/src/errors/index.ts:182
 
 Raised by `migrateEmbedder(...)` when the runner is interrupted via
 `AbortSignal`. The surrounding `for-await` loop receives this error so
-the operator can re-run the migration. MST-12: there is no persisted
+the operator can re-run the migration. There is no persisted
 cursor today, so a re-run restarts from the beginning.
 
 ## Extends

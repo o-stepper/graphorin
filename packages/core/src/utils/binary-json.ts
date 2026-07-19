@@ -1,5 +1,5 @@
 /**
- * JSON-safe projection of binary-bearing message content (W-004).
+ * JSON-safe projection of binary-bearing message content.
  *
  * `Message` and `ToolResult.contentParts` carry `Uint8Array | URL`
  * payloads that a naive `JSON.stringify` silently corrupts: a
@@ -141,7 +141,7 @@ export type WirePendingSubRun = Omit<PendingSubRun, 'state'> & {
 /**
  * JSON-safe twin of {@link RunState}: `messages`, every
  * `steps[].toolCalls[].outcome.contentParts`, and each parked
- * `pendingSubRuns[].state` (recursively, W-001) are projected through
+ * `pendingSubRuns[].state` (recursively) are projected through
  * the binary codec. Everything else is structurally identical.
  *
  * `pendingApprovals[].args` and `ToolResult.output` are model-produced

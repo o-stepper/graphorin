@@ -167,7 +167,7 @@ export interface CreateSqliteStoreOptions {
    */
   readonly skipSqliteVec?: boolean;
   /**
-   * Wave-D D5: policy when the `sqlite-vec` peer is missing/broken.
+   * Policy when the `sqlite-vec` peer is missing/broken.
    * `'fail'` (default) throws {@link SqliteVecMissingError};
    * `'linear-fallback'` serves vectors from plain sidecar tables with
    * an in-process batched cosine scan. See
@@ -181,17 +181,17 @@ export interface CreateSqliteStoreOptions {
   /** If `true`, skip the WAL hardening pragmas (only for `:memory:`). */
   readonly disableWalHardening?: boolean;
   /**
-   * W-067: busy-handler wait for a contended write lock before the
+   * Busy-handler wait for a contended write lock before the
    * operation fails with `SqliteBusyError`. Default `5000`.
    */
   readonly busyTimeoutMs?: number;
   /**
-   * Sink for non-fatal startup warnings - currently the CS-10 FTS↔rowid
+   * Sink for non-fatal startup warnings - currently the FTS↔rowid
    * integrity check. Defaults to `console.warn`.
    */
   readonly warn?: (message: string) => void;
   /**
-   * If `true`, skip the open-time FTS integrity check (CS-10). The check is a
+   * If `true`, skip the open-time FTS integrity check. The check is a
    * cheap orphan-row scan; disable it only for very large stores where a
    * per-open scan is undesirable.
    */
@@ -229,7 +229,7 @@ export interface GraphorinSqliteStore {
   readonly connection: SqliteConnection;
   readonly appliedMigrations: readonly AppliedMigration[];
   /**
-   * Wave-D D5 (MST-12): store-side embedder-migration support - the
+   * Store-side embedder-migration support - the
    * persisted resumable cursor over `migration_state`, the `nextBatch`
    * pager the `@graphorin/memory` runner consumes (structural match),
    * and the retired-vec-table space reclaim.

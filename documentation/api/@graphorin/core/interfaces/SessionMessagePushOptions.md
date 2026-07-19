@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:128
 
 **`Stable`**
 
-B3 (item 15): optional per-message write metadata. `verdict` is the
+Optional per-message write metadata. `verdict` is the
 turn's security verdict from the run loop's commit gates
 (`RunState.verdicts`); persisted so the memory ingest gate can
 exclude guardrail-blocked turns from extraction deterministically.

@@ -15,7 +15,7 @@ Defined in: packages/agent/src/filters/index.ts:89
 **`Stable`**
 
 Keep the parent's system prompt and the last `n` non-system
-messages. Default `n = 10` per DEC-146 / RB-40 security-first
+messages. Default `n = 10` per the DEC-146 security-first
 compose.
 
 ## Parameters

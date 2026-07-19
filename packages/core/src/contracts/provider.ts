@@ -31,8 +31,8 @@ export interface Provider {
 
   /**
    * Sensitivity tiers this provider is allowed to receive. Used by the
-   * ContextEngine sensitivity filter (D2) and the outbound redaction
-   * middleware (D3) to decide what content is safe to forward.
+   * ContextEngine sensitivity filter and the outbound redaction
+   * middleware to decide what content is safe to forward.
    */
   readonly acceptsSensitivity?: ReadonlyArray<Sensitivity>;
 }
@@ -67,7 +67,7 @@ export interface ProviderCapabilities {
 }
 
 /**
- * Opt-in prompt-cache breakpoint policy (core-provider-02).
+ * Opt-in prompt-cache breakpoint policy.
  *
  * `breakpoints: 'auto'` asks the adapter to place provider-native cache
  * anchors around the stable request prefix: the Anthropic path (via the
@@ -101,7 +101,7 @@ export interface ProviderRequest {
   readonly providerOptions?: Readonly<Record<string, unknown>>;
   readonly cachePolicy?: ProviderCachePolicy;
   /**
-   * C7: live parent span for the provider call. Like `signal`, this is a
+   * Live parent span for the provider call. Like `signal`, this is a
    * runtime handle (never serialized): `withTracing` parents its
    * provider.generate/stream span under it so a run's traces form one
    * tree instead of disconnected fragments.
@@ -140,9 +140,9 @@ export interface ProviderRequestMetadata {
 export interface ProviderResponse {
   readonly text?: string;
   /**
-   * Tool invocations the model requested. W-127: reuses the canonical
-   * {@link ToolCall} (the inline shape here was structurally identical
-   * and only invited drift).
+   * Tool invocations the model requested. Reuses the canonical
+   * {@link ToolCall} (the previous inline shape was structurally
+   * identical and only invited drift).
    */
   readonly toolCalls?: ReadonlyArray<ToolCall>;
   readonly usage: Usage;
@@ -173,7 +173,7 @@ export type ProviderEvent =
   | { readonly type: 'stream-start'; readonly metadata: ResponseMetadata }
   | { readonly type: 'reasoning-delta'; readonly delta: string }
   /**
-   * Closes the current reasoning block (W-024). Deltas stay textual;
+   * Closes the current reasoning block. Deltas stay textual;
    * this terminator carries the provider's opaque round-trip metadata
    * (e.g. the Anthropic thinking-block `signature`, or `data` for a
    * redacted block) so multi-step tool use with extended thinking can
@@ -254,7 +254,7 @@ export interface ToolDefinition {
   readonly description?: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
   /**
-   * A5: the tool's output schema (JSON Schema), when declared. The agent runtime
+   * The tool's output schema (JSON Schema), when declared. The agent runtime
    * populates it from `Tool.outputSchema`; structured-output providers and typed
    * code-mode use it to validate / type the tool's result. Absent when the tool
    * declares no output schema.

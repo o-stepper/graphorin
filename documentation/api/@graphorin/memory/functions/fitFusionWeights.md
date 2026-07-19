@@ -14,7 +14,7 @@ Defined in: packages/memory/src/search/fit-weights.ts:77
 
 **`Stable`**
 
-Grid-search fusion weights against labelled cases (C5).
+Grid-search fusion weights against labelled cases.
 
 ## Type Parameters
 

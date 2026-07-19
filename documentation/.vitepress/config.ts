@@ -118,6 +118,15 @@ const baseConfig = defineConfig({
     search: {
       provider: 'local',
       options: {
+        // The generated API reference (~2700 pages, 14 MB of markdown)
+        // used to dominate the client-side search index - 6.8 MiB of
+        // JS shipped to every visitor. Guide/reference prose stays
+        // indexed; API symbols are better reached via the sidebar or
+        // llms-api.txt, so those pages are excluded from the index.
+        _render(src, env, md) {
+          if (env.relativePath.startsWith('api/')) return '';
+          return md.render(src, env);
+        },
         miniSearch: {
           searchOptions: {
             fuzzy: 0.2,

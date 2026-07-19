@@ -283,7 +283,7 @@ purge(scope, label): Promise<void>;
 
 Defined in: packages/memory/src/tiers/working-memory.ts:227
 
-Hard-delete a block (wave-D D2, GDPR path). Unlike [forget](/api/@graphorin/memory/classes/WorkingMemory.md#forget)
+Hard-delete a block (GDPR path). Unlike [forget](/api/@graphorin/memory/classes/WorkingMemory.md#forget)
 (soft tombstone), the stored value is gone. This is the erasure
 surface for USER-scoped blocks (e.g. the `profile` projection): the
 session-delete cascade never reaches rows without a session id, so

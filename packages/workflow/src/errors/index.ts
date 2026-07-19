@@ -199,10 +199,10 @@ export class NodeExecutionError extends WorkflowError {
 }
 
 /**
- * Thrown when a node body exceeds its wall-clock budget (D1 /
- * workflow-03). The task's `ctx.signal` is aborted first so a
- * well-behaved body can stop; bodies that ignore the signal keep
- * running in the background (same contract as cancellation).
+ * Thrown when a node body exceeds its wall-clock budget. The task's
+ * `ctx.signal` is aborted first so a well-behaved body can stop;
+ * bodies that ignore the signal keep running in the background (same
+ * contract as cancellation).
  */
 export class NodeTimeoutError extends WorkflowError {
   readonly nodeName: string;
@@ -220,9 +220,9 @@ export class NodeTimeoutError extends WorkflowError {
 
 /**
  * Thrown on resume when the stored frontier was written by a different
- * `WorkflowConfig.version` (D1 / workflow-14) - replaying
- * persisted state through changed code must fail loudly, not silently
- * diverge. Opt out per call via `allowVersionMismatch`.
+ * `WorkflowConfig.version` - replaying persisted state through
+ * changed code must fail loudly, not silently diverge. Opt out per
+ * call via `allowVersionMismatch`.
  */
 export class WorkflowVersionMismatchError extends WorkflowError {
   readonly threadId: string;
@@ -246,7 +246,7 @@ export class WorkflowVersionMismatchError extends WorkflowError {
 
 /**
  * Thrown on resume when the persisted frontier references nodes that no
- * longer exist in the workflow definition (D1) - the definition changed
+ * longer exist in the workflow definition - the definition changed
  * mid-flight and a silent re-plan would diverge from the journal.
  */
 export class WorkflowDivergenceError extends WorkflowError {
@@ -268,7 +268,7 @@ export class WorkflowDivergenceError extends WorkflowError {
 }
 
 /**
- * Thrown by `resolveAwakeable` / `approve` (D1) when no pending pause
+ * Thrown by `resolveAwakeable` / `approve` when no pending pause
  * carries the requested name.
  */
 export class PauseNotFoundError extends WorkflowError {
@@ -289,7 +289,7 @@ export class PauseNotFoundError extends WorkflowError {
 
 /**
  * Thrown when a checkpoint write detects that another writer advanced
- * the thread concurrently (WF-12) - the loser must not fork the
+ * the thread concurrently - the loser must not fork the
  * timeline.
  */
 export class CheckpointVersionConflictError extends WorkflowError {
@@ -312,7 +312,7 @@ export class CheckpointVersionConflictError extends WorkflowError {
 
 /**
  * Thrown when planning stalls with no runnable tasks and no satisfied
- * END edge (WF-14) - an all-false conditional fan is an error, not a
+ * END edge - an all-false conditional fan is an error, not a
  * silent completion.
  */
 export class DeadEndError extends WorkflowError {
@@ -333,9 +333,9 @@ export class DeadEndError extends WorkflowError {
 
 /**
  * Thrown when a value that rides the checkpoint would not survive a
- * JSON round-trip (WF-10) - Map/Set/Date/class instances silently
+ * JSON round-trip - Map/Set/Date/class instances silently
  * degrade with the SQLite store, so every store rejects them eagerly.
- * Covers EVERYTHING that round-trips through the checkpoint (W-121):
+ * Covers EVERYTHING that round-trips through the checkpoint:
  * channel state, pause values and approval payloads, dispatchArgs,
  * satisfied resume values, and operator directives (validated at
  * resume entry, before the node body runs). The pseudo-channels

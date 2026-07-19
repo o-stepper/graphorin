@@ -6,8 +6,8 @@
 
 # policy
 
-Declarative tool-argument policies + Rule-of-Two capability profiles
-(D4). Pure decision engines consumed by the tool executor's policy
+Declarative tool-argument policies + Rule-of-Two capability profiles.
+Pure decision engines consumed by the tool executor's policy
 hook and the agent runtime's capability floor.
 
 ## References

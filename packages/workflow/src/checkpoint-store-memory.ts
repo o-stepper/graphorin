@@ -167,7 +167,7 @@ export class InMemoryCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
-   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * Enumerate threads whose LATEST checkpoint in `namespace` is
    * suspended with a due `wakeAt` - parity with the SQLite adapter.
    */
   async listSuspended(
@@ -193,7 +193,7 @@ export class InMemoryCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
-   * W-009 retention sweep - parity with the SQLite implementation:
+   * Retention sweep - parity with the SQLite implementation:
    * namespace-SCOPED (entries key as `threadId::namespace`), latest
    * checkpoint decides age + status, suspended pairs survive unless
    * `onlyTerminal: false`.
@@ -226,7 +226,7 @@ export class InMemoryCheckpointStore implements CheckpointStoreExt {
     return pruned;
   }
 
-  /** W-009 compaction - keep the `keepLast` newest checkpoints of one pair. */
+  /** Compaction - keep the `keepLast` newest checkpoints of one pair. */
   async compactThread(threadId: string, namespace: string, keepLast: number): Promise<number> {
     const keep = Math.max(1, Math.floor(keepLast));
     const indexKey = `${threadId}::${namespace}`;

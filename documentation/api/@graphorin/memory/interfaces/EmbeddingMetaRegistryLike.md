@@ -116,7 +116,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:293
 | `input.distanceMetric?` | `"cosine"` \| `"dot"` \| `"euclidean"` | - |
 | `input.embedderKind` | `string` | - |
 | `input.id` | `string` | - |
-| `input.indexMode?` | `string` \| `null` | Write-path contextualization recipe (item 10 step 1) - joins the index version key so a `contextualRetrieval` switch invalidates the index like a model change. Optional-additive: registries predating the field ignore it. |
+| `input.indexMode?` | `string` \| `null` | Write-path contextualization recipe - joins the index version key so a `contextualRetrieval` switch invalidates the index like a model change. Optional-additive: registries predating the field ignore it. |
 | `input.model` | `string` | - |
 | `input.notes?` | `string` \| `null` | - |
 

@@ -56,7 +56,7 @@ Defined in: packages/server/src/registry/index.ts:30
 | ------ | ------ | ------ |
 | `input` | `unknown` | - |
 | `options?` | \{ `directive?`: \{ `approvals?`: readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[]; \}; `sessionId?`: `string`; `signal?`: `AbortSignal`; `userId?`: `string`; \} | - |
-| `options.directive?` | \{ `approvals?`: readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[]; \} | C3/W-119: HITL resume directive forwarded by `POST /runs/:runId/resume`. Mirrors the agent package's `ResumeDirective` structurally. |
+| `options.directive?` | \{ `approvals?`: readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[]; \} | HITL resume directive forwarded by `POST /runs/:runId/resume`. Mirrors the agent package's `ResumeDirective` structurally. |
 | `options.directive.approvals?` | readonly \{ `granted`: `boolean`; `reason?`: `string`; `subRunToolCallId?`: `string`; `toolCallId`: `string`; \}[] | - |
 | `options.sessionId?` | `string` | - |
 | `options.signal?` | `AbortSignal` | - |
@@ -101,7 +101,7 @@ optional stream(input, options?): AsyncIterable<unknown>;
 
 Defined in: packages/server/src/registry/index.ts:57
 
-Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
+Streaming surface. `@graphorin/agent` agents satisfy this
 structurally; `POST /agents/:id/stream` consumes it and emits
 every event onto the run's WS subject. Optional so plain
 run-only fixtures keep working (they emit a single terminal frame).

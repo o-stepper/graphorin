@@ -1,5 +1,5 @@
 /**
- * W-056: the single source of the compaction-summary wrapper marker.
+ * The single source of the compaction-summary wrapper marker.
  *
  * The string is a cross-package protocol: the memory package stamps it
  * around every rendered compaction summary ({@link renderFinalSummary}),

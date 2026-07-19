@@ -10,7 +10,7 @@
 const CONTENT_ORIGIN_ATTR: "graphorin.content.origin";
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:30
+Defined in: packages/memory/src/context-engine/annotations.ts:31
 
 **`Stable`**
 

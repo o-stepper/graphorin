@@ -71,7 +71,7 @@ export interface LlamaCppNodeAdapterOptions {
   readonly modelOverride?: LlamaModelInstance;
   /**
    * Optional session factory override. When unset, the adapter builds a
-   * real session from the peer (PS-3): `model.createContext()` →
+   * real session from the peer: `model.createContext()` →
    * `new LlamaChatSession({ contextSequence })`, streaming through
    * `prompt(text, { onTextChunk })`. Overrides
    * (`runtimeOverrides.createSession` or this option) keep the test
@@ -82,7 +82,7 @@ export interface LlamaCppNodeAdapterOptions {
     system?: string,
   ) => Promise<LlamaSessionInstance>;
   /**
-   * W-096: reuse ONE session (context + KV cache) across requests
+   * Reuse ONE session (context + KV cache) across requests
    * instead of creating and disposing a fresh one per call - an agent
    * loop then avoids re-prefilling the growing transcript on every
    * step. Requests serialise through a promise mutex (a llama context
@@ -301,8 +301,8 @@ interface SessionLease {
 type SessionManager = (model: LlamaModelInstance, system?: string) => Promise<SessionLease>;
 
 /**
- * W-096: per-request sessions by default (create -> use -> dispose, the
- * memory-safe core-provider-08 lifecycle); with `persistentSession:
+ * Per-request sessions by default (create -> use -> dispose, the
+ * memory-safe lifecycle); with `persistentSession:
  * true` ONE cached session serialised by a promise mutex (a llama
  * context sequence is single-threaded) whose history re-syncs via
  * `setChatHistory` on every request. A cached session that turns out
@@ -362,7 +362,7 @@ function buildSessionManager(
 }
 
 /**
- * W-096: split the request into node-llama-cpp chat-history turns plus
+ * Split the request into node-llama-cpp chat-history turns plus
  * the trailing user text (the prompt). The system message is included
  * as a history item because `setChatHistory` REPLACES the session's
  * whole history - including the slot the constructor `systemPrompt`
@@ -410,7 +410,7 @@ async function resolveModel(options: LlamaCppNodeAdapterOptions): Promise<LlamaM
 }
 
 /**
- * The REAL default session factory (PS-3): `model.createContext()` →
+ * The REAL default session factory: `model.createContext()` →
  * `context.getSequence()` → `new LlamaChatSession({ contextSequence })`
  * from the lazily-loaded peer, adapting its callback-streaming
  * `prompt(text, { onTextChunk })` to the adapter's
@@ -450,7 +450,7 @@ async function defaultSessionFactory(
  * Bridge the peer's callback-streaming `prompt(...)` into the
  * AsyncIterable the adapter consumes. A rejection from `prompt`
  * rejects the pending/next iteration so the stream's error path
- * (PS-4) observes it.
+ * observes it.
  */
 function promptToIterable(
   session: LlamaChatSessionPeer,

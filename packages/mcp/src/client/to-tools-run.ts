@@ -1,10 +1,10 @@
 /**
- * W-080: the full `toTools()` pipeline (list -> adapt -> drift diff ->
+ * The full `toTools()` pipeline (list -> adapt -> drift diff ->
  * pin comparison / TOFU store legs) extracted from `client.ts` and
  * parameterized by an {@link MCPClient}. Two callers:
  *
- * - the plain client's own `toTools()` (client = itself, the pre-W-080
- *   behaviour byte-for-byte), and
+ * - the plain client's own `toTools()` (client = itself, the
+ *   pre-extraction behaviour byte-for-byte), and
  * - the managed wrapper's `toTools()` (client = THE WRAPPER), so every
  *   adapted `Tool.execute` closes over the wrapper and keeps working
  *   after the wrapper swaps its inner client on reconnect - no
@@ -19,7 +19,7 @@ import { MCPToolPinningError } from '../errors/index.js';
 import { adaptMCPTools } from './to-tools.js';
 import type { CreateMCPClientOptions, MCPClient, MCPToToolsOptions } from './types.js';
 
-/** Mutable cross-snapshot fingerprint cell (MC-6 drift tracking). */
+/** Mutable cross-snapshot fingerprint cell (drift tracking). */
 export interface ToolFingerprintRef {
   current: ReadonlyMap<string, string> | undefined;
 }

@@ -1,5 +1,5 @@
 /**
- * Tool-definition pinning (MC-6): stable fingerprints over MCP tool
+ * Tool-definition pinning: stable fingerprints over MCP tool
  * definitions so approve-then-swap rug-pulls - a server changing a
  * tool's description/schema behind an already-approved name - are
  * detectable across snapshots and process restarts.
@@ -32,7 +32,7 @@ function stableStringify(value: unknown): string {
 }
 
 /**
- * Stable sha256 fingerprint of one MCP tool definition (MC-6).
+ * Stable sha256 fingerprint of one MCP tool definition.
  *
  * @stable
  */

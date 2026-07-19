@@ -17,7 +17,7 @@ Defined in: src/tool-discovery.ts:64
 | <a id="property-description"></a> `description?` | `readonly` | `string` | Tool description (`description:` value) when extractable. | src/tool-discovery.ts:72 |
 | <a id="property-examplescount"></a> `examplesCount` | `readonly` | `number` | Number of examples declared in the `examples:` array. | src/tool-discovery.ts:74 |
 | <a id="property-file"></a> `file` | `readonly` | `string` | Source file the call was found in. | src/tool-discovery.ts:66 |
-| <a id="property-gradingsource"></a> `gradingSource` | `readonly` | `string` | W-044: the same slice with comments blanked - what discovery parsed and what every grading path (examples PII scan, description/parameter scoring) consumes. Same length and line structure as `source`. | src/tool-discovery.ts:93 |
+| <a id="property-gradingsource"></a> `gradingSource` | `readonly` | `string` | The same slice with comments blanked - what discovery parsed and what every grading path (examples PII scan, description/parameter scoring) consumes. Same length and line structure as `source`. | src/tool-discovery.ts:93 |
 | <a id="property-hasexamples"></a> `hasExamples` | `readonly` | `boolean` | Whether `examples:` is a non-empty array literal. | src/tool-discovery.ts:76 |
 | <a id="property-line"></a> `line` | `readonly` | `number` | 1-indexed line of the `tool(` token. | src/tool-discovery.ts:68 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | Tool name extracted from the `name:` property when present. | src/tool-discovery.ts:70 |

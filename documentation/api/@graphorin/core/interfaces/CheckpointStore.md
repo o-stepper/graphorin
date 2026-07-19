@@ -6,7 +6,7 @@
 
 # Interface: CheckpointStore
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:153
+Defined in: packages/core/src/contracts/checkpoint-store.ts:152
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:184
+Defined in: packages/core/src/contracts/checkpoint-store.ts:183
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -55,7 +55,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:170
+Defined in: packages/core/src/contracts/checkpoint-store.ts:169
 
 #### Parameters
 
@@ -82,7 +82,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:176
+Defined in: packages/core/src/contracts/checkpoint-store.ts:175
 
 #### Parameters
 
@@ -107,9 +107,9 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:195
+Defined in: packages/core/src/contracts/checkpoint-store.ts:194
 
-W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+Enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
 stamped wakeAt). This is what a durable-timer driver polls -
 without it an operator would have to keep an external registry of
@@ -146,7 +146,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:154
+Defined in: packages/core/src/contracts/checkpoint-store.ts:153
 
 #### Parameters
 
@@ -175,7 +175,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:162
+Defined in: packages/core/src/contracts/checkpoint-store.ts:161
 
 #### Parameters
 

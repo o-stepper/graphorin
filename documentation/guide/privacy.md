@@ -21,7 +21,7 @@ There is **no telemetry**, **no version pings**, **no analytics**, **no crash up
 
 The repository ships a `pnpm run check-no-network` script that scans every published package's source tree for forbidden network primitives (`fetch`, `http.request`, `https.request`, `http.get`, `https.get`, `net.createConnection`, `net.connect`, `tls.connect`, `dgram.createSocket`, `WebSocket`, `XMLHttpRequest`, `EventSource`, plus imports of `node-fetch` / `undici` / `got` / `axios` / `ky` / `ws` and their namespaced call forms). The check fails the build the moment a non-allow-listed network call is introduced.
 
-The allow-list is small and explicit - five file-level entries (W-074):
+The allow-list is small and explicit - five file-level entries:
 
 | Allow-listed area | Why |
 |---|---|
@@ -31,7 +31,7 @@ The allow-list is small and explicit - five file-level entries (W-074):
 | OTLP-HTTP exporter (`packages/observability/src/exporters/otlp-http.ts`) | Only when the operator wires a collector URL. |
 | Pricing refresh (`packages/pricing/src/refresh.ts`) | Only on `graphorin pricing refresh` invocation. |
 
-Provider adapters, MCP transports, embedders, and storage backends are **not** allow-listed: since W-074 they take an injected fetch (`fetchImpl ?? globalThis.fetch`) instead of naming a network primitive in their own source, so their user-initiated traffic (the bullet list above) exists without any scanner exemption.
+Provider adapters, MCP transports, embedders, and storage backends are **not** allow-listed: they take an injected fetch (`fetchImpl ?? globalThis.fetch`) instead of naming a network primitive in their own source, so their user-initiated traffic (the bullet list above) exists without any scanner exemption.
 
 The CI workflow that runs the check is [`.github/workflows/check-no-network.yml`](https://github.com/o-stepper/graphorin/blob/main/.github/workflows/check-no-network.yml).
 
@@ -72,7 +72,7 @@ Deletion in a memory-bearing framework spans roughly a dozen persistence surface
 |---|---|---|---|
 | `sessions`, `session_messages`, `episodes` (+ FTS/vec rows) | conversation transcript and episode summaries | `deleteSession` / `pruneSessions` cascade | - |
 | `facts`, `insights`, `rules` (+ FTS/vec rows, entity links) | distilled memory | session-scoped rows: the same cascade; user-scoped rows: `MemoryStore.purge(id)` per record | a session delete never touches user-level rows (`scope_session_id IS NULL`) |
-| `working_blocks` (incl. the user-scoped `profile` projection block, wave-D D2) | working blocks / projected profile slots | session-scoped rows: the same cascade; user-scoped rows: `memory.working.purge(userScope, label)` (hard delete; `forget()` is only a tombstone) | a session delete never touches user-scoped blocks - the `profile` block deliberately survives session deletion and MUST be purged explicitly during user erasure |
+| `working_blocks` (incl. the user-scoped `profile` projection block) | working blocks / projected profile slots | session-scoped rows: the same cascade; user-scoped rows: `memory.working.purge(userScope, label)` (hard delete; `forget()` is only a tombstone) | a session delete never touches user-scoped blocks - the `profile` block deliberately survives session deletion and MUST be purged explicitly during user erasure |
 | `memory_history` | audit trail of memory mutations | values are scrubbed to event skeletons by the cascade and by `purge()`; row skeletons remain | full row deletion (use `graphorin memory prune-history --older-than`) |
 | `workflow_checkpoints`, `workflow_pending_writes` | suspended-run snapshots (full serialized conversation) | session cascade (via the `sessionId` metadata stamped on HITL suspends and the workflow-run mapping); age-based: `CheckpointStoreExt.pruneThreads`; per-thread: `deleteThread` / `compactThread` | - |
 | `spans` | run traces (tool names, error strings, memory-search ids) | session cascade; age-based: `graphorin traces prune --before` / `pruneSpans` | spans with no session id are only deleted by age |

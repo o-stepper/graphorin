@@ -9,12 +9,12 @@
  * credential path: persist the pepper (stdin, never argv), migrate,
  * then mint a real token with `graphorin token create`.
  *
- * W-003: init deliberately does NOT emit a token itself. Token
+ * Init deliberately does NOT emit a token itself. Token
  * verification requires an HMAC lookup in the auth-token store, which
  * requires migrations + the pepper - init's contract is "write the
  * config file, touch nothing else" (pinned by tests), so any token it
  * printed was guaranteed to 401. Honestly pointing at `token create`
- * follows the IP-4 precedent (no phantom credentials).
+ * follows the no-phantom-credentials precedent.
  *
  * `--non-interactive` accepts every choice through flags or env vars
  * so the command works equally well in CI / image-build pipelines.
@@ -36,7 +36,7 @@ import { confirm, select } from '../internal/prompts.js';
 export interface InitCommandOptions {
   readonly out?: string;
   /**
-   * F-05: config flavour. `'ts'` (default) writes a `defineConfig`
+   * Config flavour. `'ts'` (default) writes a `defineConfig`
    * `graphorin.config.ts` - loading it later requires a Node that can
    * import TypeScript (23.6+/22.18+ type stripping or a registered
    * loader like tsx) AND `@graphorin/server` resolvable from the
@@ -248,7 +248,7 @@ ${consentSnippet(input.cloudConsent)
 }
 
 /**
- * Deep retest 2026-07-19 (P1-4): the exact `createMemory` privacy
+ * the exact `createMemory` privacy
  * snippet that ENFORCES the chosen cloud-consent tier. `init` cannot
  * wire it itself (memory composition is programmatic by design - the
  * server config carries no adapters), so the honest contract is: record

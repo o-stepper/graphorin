@@ -3,9 +3,9 @@
  * consume the agent's `@graphorin/security` / `@graphorin/memory` /
  * `@graphorin/provider` surfaces.
  *
- * These are built and unit-tested in isolation (WI-01). The run loop
- * wires them into `createToolExecutor(...)` in a later work item
- * (WI-03); nothing here is exported from the package entrypoint yet.
+ * These are built and unit-tested in isolation. The run loop wires
+ * them into `createToolExecutor(...)`; nothing here is exported from
+ * the package entrypoint yet.
  *
  * Every adapter is typed against the executor's `ExecutorOptions` via
  * indexed access, so the values they produce are guaranteed assignable
@@ -110,7 +110,7 @@ export interface SandboxResolverOptions {
   /**
    * Per-kind factory overrides. Defaults wire the three out-of-process
    * `@graphorin/security` adapters. Tests inject fakes so unit runs
-   * never spawn real worker threads / containers (offline; R4). The
+   * never spawn real worker threads / containers (offline). The
    * factories are invoked **lazily** - never at build time - so the
    * production default costs nothing until a tool actually needs that
    * isolation kind.
@@ -163,7 +163,7 @@ export interface MemoryGuardOptions {
    * Options for the `'memory-aware'` API-boundary guard. The guard
    * requires an operation allowlist + a recorder of observed
    * `<scope>.<op>` calls, both supplied by the runtime once a run scope
-   * exists (WI-03). When omitted, the factory returns `null` for the
+   * exists. When omitted, the factory returns `null` for the
    * `'memory-aware'` tier and the executor skips the guard.
    */
   readonly apiBoundary?: ApiBoundaryGuardOptions;
@@ -174,7 +174,7 @@ export interface MemoryGuardOptions {
   /**
    * The region reader the guard hashes pre/post execution. The reader
    * is **scope-bound** (it materialises memory regions for a specific
-   * run scope), so the runtime supplies it in WI-03 - the `Memory`
+   * run scope), so the runtime supplies it at wiring time - the `Memory`
    * facade exposes no scope-free read surface. When omitted, the
    * executor skips the snapshot/verify cycle (it only runs the guard
    * when the reader is present).
@@ -233,7 +233,7 @@ export function buildMemoryGuard(
 
 /**
  * Construct a `MemoryRegionReader` from an explicit region list and a
- * read function. WI-03 uses this to bind the agent's `Memory` tiers to
+ * read function. The runtime uses this to bind the agent's `Memory` tiers to
  * named regions once a run scope exists; exposed here so the reader
  * contract is unit-testable in isolation.
  */
@@ -274,7 +274,7 @@ export interface ToolTokenCounterOptions {
  * (deterministic, offline) and allow a *synchronous* tokenizer (e.g.
  * js-tiktoken's `encode`) to be injected when a caller wants
  * vendor-accurate counts without blocking. The async provider counter
- * stays reserved for budget accounting elsewhere (WI-09), not for
+ * stays reserved for budget accounting elsewhere, not for
  * executor truncation.
  */
 export function buildToolTokenCounter(options: ToolTokenCounterOptions = {}): ToolTokenCounter {

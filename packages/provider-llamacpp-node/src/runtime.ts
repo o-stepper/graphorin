@@ -31,7 +31,7 @@ export interface LlamaModelInstance {
 }
 
 /**
- * Structural mirror of node-llama-cpp v3's `ChatHistoryItem` (W-096).
+ * Structural mirror of node-llama-cpp v3's `ChatHistoryItem`.
  * A `'model'` turn carries its text as `response: string[]`.
  *
  * @internal
@@ -56,7 +56,7 @@ export interface LlamaSessionInstance {
     },
   ): AsyncIterable<string>;
   /**
-   * W-096: replace the session's chat history (node-llama-cpp v3
+   * Replace the session's chat history (node-llama-cpp v3
    * `setChatHistory`). When present, the adapter feeds multi-turn
    * transcripts as REAL chat history + prompts only the last user turn
    * - instead of serialising the whole conversation into one
@@ -92,7 +92,7 @@ export interface LlamaCppNodeRuntimeOverrides {
   ) => Promise<LlamaSessionInstance>;
   /**
    * Override the `LlamaChatSession` constructor used by the REAL
-   * default session factory (PS-3). Tests stub it; production loads it
+   * default session factory. Tests stub it; production loads it
    * from the `node-llama-cpp` peer.
    */
   readonly LlamaChatSession?: LlamaChatSessionCtor;
@@ -100,7 +100,7 @@ export interface LlamaCppNodeRuntimeOverrides {
 
 /**
  * Structural slice of the peer's `LlamaChatSession` class used by the
- * default session factory (PS-3): `prompt(text, { onTextChunk })`
+ * default session factory: `prompt(text, { onTextChunk })`
  * resolves with the full response while streaming chunks through the
  * callback.
  *
@@ -116,7 +116,7 @@ export interface LlamaChatSessionPeer {
       readonly onTextChunk?: (chunk: string) => void;
     },
   ): Promise<string>;
-  /** W-096: node-llama-cpp v3 chat-history setter (optional slice). */
+  /** node-llama-cpp v3 chat-history setter (optional slice). */
   setChatHistory?(history: ReadonlyArray<LlamaChatHistoryItem>): void;
 }
 
@@ -162,7 +162,7 @@ export async function loadLlamaModule(
 
 /**
  * Lazily resolve the peer's `LlamaChatSession` constructor for the
- * real default session factory (PS-3). Cached per process; the
+ * real default session factory. Cached per process; the
  * override wins for tests.
  *
  * @internal

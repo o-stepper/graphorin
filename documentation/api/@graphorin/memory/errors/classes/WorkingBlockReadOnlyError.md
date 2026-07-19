@@ -11,7 +11,7 @@ Defined in: packages/memory/src/errors/index.ts:136
 **`Stable`**
 
 Thrown when any mutation targets a block defined with
-`readOnly: true` (MRET-14). Previously this guard threw
+`readOnly: true`. Previously this guard threw
 `WorkingBlockReplaceMismatchError(label, 0)` - semantically "your
 unique substring matched 0 times", which misled callers that retry
 replace operations on mismatch.

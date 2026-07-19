@@ -17,9 +17,9 @@ Defined in: packages/memory/src/conflict/types.ts:54
 Hard-coded defaults for the three-zone thresholds. Imported by the
 pipeline + the test suite so call sites stay aligned.
 
-The values are **raw cosine** similarities (DEC-130). Storage
+The values are **raw cosine** similarities. Storage
 adapters normalize KNN scores into `[0, 1]` (`(1 + cos) / 2` for the
-cosine metric - CS-3, `scoreFromDistance` in
+cosine metric, `scoreFromDistance` in
 `@graphorin/store-sqlite`), so Stage 2 / Stage 5 first map incoming
 hit scores back to raw cosine via `rawCosineFromStoreScore`
 before comparing against these thresholds.

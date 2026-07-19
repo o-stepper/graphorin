@@ -4,7 +4,7 @@
  * boundaries (SSE, WebSocket, REST body, HTTP header, audit row).
  *
  * The default policy mirrors the deployment-posture matrix from the
- * lateral-leak design (DEC-171 / suggested ADR-059):
+ * lateral-leak design (DEC-171):
  *
  * - `'sse' | 'http-header'`  → `'strict'`  (escape control chars to
  *   `\xNN` hex literals; the safest default for cleartext frame

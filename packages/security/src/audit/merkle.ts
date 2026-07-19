@@ -1,5 +1,5 @@
 /**
- * RFC-6962 Merkle layer over the audit log (D4). The write path stays
+ * RFC-6962 Merkle layer over the audit log. The write path stays
  * the O(1) linear hash chain (`appendAudit`); this module adds the
  * transparency-log machinery the chain alone cannot provide:
  *

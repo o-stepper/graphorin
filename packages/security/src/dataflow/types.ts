@@ -1,5 +1,5 @@
 /**
- * Provenance / taint types for the data-flow policy engine (P1-3).
+ * Provenance / taint types for the data-flow policy engine.
  *
  * The engine derives *provenance* from the metadata Graphorin already
  * attaches to every registered tool - its {@link ToolTrustClass}, its
@@ -48,7 +48,7 @@ export type DataFlowMode = 'off' | 'shadow' | 'enforce';
  *   even when no verbatim carry is provable. Catches the paraphrased
  *   "untrusted instruction drives a secret exfiltration" case at the cost
  *   of more false positives (hence shadow-mode-first + declassification).
- * - `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) - the
+ * - `'derived-untrusted-to-sink'` (`derivedTaint: 'strict'`) - the
  *   CaMeL-style control-flow-integrity signal: once untrusted content has
  *   entered the run, EVERY subsequent model-driven sink call is treated
  *   as derived from it - paraphrase-robust by construction, deliberately
@@ -155,7 +155,7 @@ export interface TaintLedger {
    * the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked
    * verbatim spans (those are untrusted text and must not be persisted). Used
    * to rehydrate the ledger across a suspend/resume so the sink gate is not
-   * silently weakened on the HITL boundary (AG-19).
+   * silently weakened on the HITL boundary.
    */
   snapshot(): TaintLedgerSnapshot;
 }
@@ -200,8 +200,8 @@ export interface DataFlowPolicyConfig {
    */
   readonly guardTrifecta?: boolean;
   /**
-   * Sensitivity tiers that arm the lethal-trifecta `sensitive` leg
-   * (SDF-8). Default `['secret']` (out-of-the-box behaviour is
+   * Sensitivity tiers that arm the lethal-trifecta `sensitive` leg.
+   * Default `['secret']` (out-of-the-box behaviour is
    * byte-identical - only secret-tagged content counts). Set e.g.
    * `['secret', 'internal']` so ordinary user/PII content (default
    * `'internal'`) also counts; the agent's guard builder threads this
@@ -210,7 +210,7 @@ export interface DataFlowPolicyConfig {
    */
   readonly sensitiveTiers?: ReadonlyArray<import('@graphorin/core').Sensitivity>;
   /**
-   * FIDES-lattice (SDF-8): when `true`, a tool output that the PII catalogue
+   * FIDES-lattice: when `true`, a tool output that the PII catalogue
    * flags (email, SSN, card, …) arms the lethal-trifecta `sensitive` leg even
    * without a `'secret'` tag - so exfiltrating user/PII content trips the gate.
    * The agent's guard builder wires `containsPii` into the ledger. Default
@@ -228,12 +228,12 @@ export interface DataFlowPolicyConfig {
    * Minimum length of a shared verbatim span (in normalized characters)
    * for the ledger to treat a sink's arguments as carrying untrusted
    * content. Lower = more sensitive (more false positives), clamped up
-   * to an 8-char floor below which the probe cannot be meaningful
-   * (SDF-5). Default `20`.
+   * to an 8-char floor below which the probe cannot be meaningful.
+   * Default `20`.
    */
   readonly minSpanLength?: number;
   /**
-   * C6 (pairs security-05): derived-taint propagation mode.
+   * Derived-taint propagation mode.
    *
    * - `'off'` (default) - current behaviour: sinks gate on verbatim carry
    *   and (optionally) the lethal trifecta.

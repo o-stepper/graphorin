@@ -6,7 +6,7 @@
 
 # Interface: RunError
 
-Defined in: packages/core/src/types/run.ts:315
+Defined in: packages/core/src/types/run.ts:314
 
 **`Stable`**
 
@@ -17,6 +17,6 @@ used by `agent.error` events.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:317 |
-| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:318 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:316 |
+| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:316 |
+| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:317 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:315 |

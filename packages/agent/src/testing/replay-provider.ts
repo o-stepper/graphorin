@@ -1,6 +1,6 @@
 /**
  * `createReplayProvider(state)` - a Provider that replays the model
- * responses journaled on `RunState.steps[].providerResponse` (C3, opt-in
+ * responses journaled on `RunState.steps[].providerResponse` (opt-in
  * via `AgentConfig.recordProviderResponses`). Re-running the same input
  * against a replay provider reproduces the original run deterministically
  * with zero live model calls - the mocked-completion harness that gives

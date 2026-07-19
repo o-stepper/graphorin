@@ -19,7 +19,7 @@ the visible `[[` / `]]` bracket-substitution so the body cannot
 prematurely close (or spoof a nested opening of) the envelope that
 `applyInboundSanitization` wraps around it.
 
-The substitution scheme is identical to the memory package's CE-15
+The substitution scheme is identical to the memory package's
 summary neutralization on literal markers:
 `<<</untrusted_content>>>` becomes `[[/untrusted_content]]` and the
 `<<<untrusted_content` prefix becomes `[[untrusted_content`. Bodies

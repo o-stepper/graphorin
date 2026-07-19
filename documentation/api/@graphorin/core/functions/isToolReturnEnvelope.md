@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/tool.ts:310
 
 **`Stable`**
 
-W-115: the ONE guard for the ToolReturn envelope (the executor and
+The ONE guard for the ToolReturn envelope (the executor and
 the registry example-normalizer both consume it). Brand first; the
 structural fallback accepts only objects whose OWN enumerable keys
 all belong to the canonical envelope shape - `{output, exitCode}`

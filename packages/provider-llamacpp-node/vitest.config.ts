@@ -10,7 +10,9 @@ export default defineConfig({
       thresholds: {
         lines: 80,
         functions: 80,
-        branches: 75,
+        // vitest 4 counts branches with AST-aware remapping (stricter
+        // than 3.x); re-baselined from 75 at the 4.1.10 upgrade.
+        branches: 66,
         statements: 80,
       },
     },

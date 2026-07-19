@@ -10,7 +10,7 @@
 const SUMMARY_TEMPLATE_VERSION: "1.3" = '1.3';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:42
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:41
 
 **`Stable`**
 

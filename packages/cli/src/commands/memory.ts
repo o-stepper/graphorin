@@ -127,12 +127,12 @@ export interface MemoryMigrateOptions extends MemoryCommonOptions {
    * pointer.
    */
   readonly embeddersModule?: string;
-  /** Rows per re-embed batch (wave-D D5). Default `512`. */
+  /** Rows per re-embed batch. Default `512`. */
   readonly batchSize?: number;
   /**
    * After a committed migration, drop the RETIRED embedders' vector
-   * sidecar tables and run `PRAGMA incremental_vacuum` (wave-D D5
-   * space reclaim). Default `false`.
+   * sidecar tables and run `PRAGMA incremental_vacuum` (space
+   * reclaim). Default `false`.
    */
   readonly reclaim?: boolean;
 }
@@ -147,13 +147,13 @@ export interface MemoryMigrateResult {
 }
 
 /**
- * `graphorin memory migrate` - embedder swap (wave-D D5, real
- * implementation). Loads the operator's `--embedders` factory module,
- * opens the configured store, and drives `@graphorin/memory`'s
- * `migrateEmbedder(...)` with the store-side pager + the PERSISTED
- * `migration_state` cursor - so a killed / aborted migration resumes
- * from where it stopped on the next invocation. `--reclaim`
- * additionally drops retired vector tables and compacts free pages.
+ * `graphorin memory migrate` - embedder swap. Loads the operator's
+ * `--embedders` factory module, opens the configured store, and
+ * drives `@graphorin/memory`'s `migrateEmbedder(...)` with the
+ * store-side pager + the PERSISTED `migration_state` cursor - so a
+ * killed / aborted migration resumes from where it stopped on the
+ * next invocation. `--reclaim` additionally drops retired vector
+ * tables and compacts free pages.
  *
  * @stable
  */
@@ -310,7 +310,7 @@ interface FactInspectRow {
   readonly text: string;
   readonly status: string | null;
   readonly provenance: string | null;
-  /** X-1 / migration 015: per-fact salience hint. */
+  /** Per-fact salience hint (migration 015). */
   readonly importance: number | null;
   readonly valid_from: number | null;
   readonly valid_to: number | null;
@@ -325,7 +325,7 @@ export interface MemoryInspectFact {
   readonly text: string;
   readonly status: string;
   readonly provenance: string | null;
-  /** X-1 / migration 015: per-fact importance (salience hint), if set. */
+  /** Per-fact importance (salience hint), if set (migration 015). */
   readonly importance: number | null;
   readonly validFrom: string | null;
   readonly validTo: string | null;
@@ -335,7 +335,7 @@ export interface MemoryInspectFact {
 }
 
 /**
- * A canonical entity a fact links to (P2-1 / migration 016). `name` follows
+ * A canonical entity a fact links to (migration 016). `name` follows
  * `merged_into` to the surviving entity, so a merged link shows its canonical.
  *
  * @stable
@@ -381,7 +381,7 @@ export interface MemoryInspectResult {
   readonly history: ReadonlyArray<MemoryHistoryEntry>;
   readonly conflicts: ReadonlyArray<MemoryConflictEntry>;
   readonly citingInsights: ReadonlyArray<MemoryCitingInsight>;
-  /** Canonical entities this fact links to (P2-1 / migration 016). */
+  /** Canonical entities this fact links to (migration 016). */
   readonly linkedEntities: ReadonlyArray<MemoryInspectEntity>;
 }
 
@@ -734,7 +734,7 @@ interface SpanExplainRow {
  * `graphorin memory why` - explain why facts were recalled, by decoding the
  * `memory.search.semantic.explain` attribute off the persisted recall spans.
  * Pure read-only inspection; requires the SQLite span exporter to have recorded
- * spans (RP-17). Empty when nothing was recorded.
+ * spans. Empty when nothing was recorded.
  *
  * @stable
  */
@@ -826,7 +826,7 @@ export interface MemoryReviewResult {
   /** Set when `--promote <id>` succeeded. */
   readonly promoted?: { readonly id: string; readonly type: string };
   /**
-   * Set when a `--promote <id>` request failed (MEMORY-CL-02). Carried on the
+   * Set when a `--promote <id>` request failed. Carried on the
    * payload so `--json` consumers receive a structured failure on stdout
    * instead of an empty document; the process exit code is the machine signal.
    */
@@ -861,7 +861,7 @@ const EMPTY_REVIEW: MemoryReviewResult = Object.freeze({
  * procedures the consolidator left in quarantine (read-only), or promote a
  * reviewed item out of quarantine with `--promote <id>`. The promote path runs
  * through the tier `validate(...)`, so an injection-flagged memory is refused
- * unless `--force` is supplied after review (MCON-2).
+ * unless `--force` is supplied after review.
  *
  * @stable
  */
@@ -1149,7 +1149,7 @@ export interface MemoryPruneHistoryResult {
 }
 
 /**
- * `graphorin memory prune-history --older-than <duration|date>` (W-066)
+ * `graphorin memory prune-history --older-than <duration|date>`
  * - the supported surface over `MemoryStoreExt.pruneHistory`.
  * `memory_history` grows by design (every supersede / quarantine
  * transition appends) and `purge()` already scrubs sensitive text;

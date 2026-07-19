@@ -12,7 +12,7 @@ Defined in: packages/proactive/src/heartbeat.ts:38
 
 When the heartbeat fires. Exactly one of `every` / `cron` is
 required. `jitterMs` / `expiresAt` pass through to the trigger
-declaration (the C4 scheduler harness).
+declaration (the scheduler harness).
 
 ## Properties
 
@@ -20,6 +20,6 @@ declaration (the C4 scheduler harness).
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cron"></a> `cron?` | `readonly` | `string` | 5-field cron expression. | packages/proactive/src/heartbeat.ts:42 |
 | <a id="property-every"></a> `every?` | `readonly` | `number` | Fixed interval in milliseconds. | packages/proactive/src/heartbeat.ts:40 |
-| <a id="property-expiresat"></a> `expiresAt?` | `readonly` | `string` \| `number` | Auto-pause instant (C4). | packages/proactive/src/heartbeat.ts:48 |
-| <a id="property-jitterms"></a> `jitterMs?` | `readonly` | `number` | Deterministic per-id jitter (C4). | packages/proactive/src/heartbeat.ts:46 |
-| <a id="property-timezone"></a> `timezone?` | `readonly` | `string` | IANA timezone for the cron expression (W-124). | packages/proactive/src/heartbeat.ts:44 |
+| <a id="property-expiresat"></a> `expiresAt?` | `readonly` | `string` \| `number` | Auto-pause instant. | packages/proactive/src/heartbeat.ts:48 |
+| <a id="property-jitterms"></a> `jitterMs?` | `readonly` | `number` | Deterministic per-id jitter. | packages/proactive/src/heartbeat.ts:46 |
+| <a id="property-timezone"></a> `timezone?` | `readonly` | `string` | IANA timezone for the cron expression. | packages/proactive/src/heartbeat.ts:44 |

@@ -1,5 +1,5 @@
 /**
- * Convenience re-export of the English D4 inbound-sanitization
+ * Convenience re-export of the English inbound-sanitization
  * preamble. Lives at the documented path
  * `@graphorin/memory/context-engine/preambles/inbound-en.ts` so
  * Phase 12 (agent runtime) can import it directly when wiring
@@ -15,5 +15,5 @@
 
 import { enLocalePack } from '../locale-packs/en.js';
 
-/** English D4 preamble text (~80-120 tokens, cache-friendly). */
+/** English inbound preamble text (~80-120 tokens, cache-friendly). */
 export const INBOUND_SANITIZATION_PREAMBLE_EN = enLocalePack.inboundSanitizationPreamble.text;

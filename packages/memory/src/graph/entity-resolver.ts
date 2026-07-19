@@ -1,5 +1,5 @@
 /**
- * Entity resolution for the lightweight in-SQLite relation graph (P2-1).
+ * Entity resolution for the lightweight in-SQLite relation graph.
  *
  * Raw `subject` / `object` strings on facts fragment ("Anna", "Anna S.",
  * "my sister" become unrelated rows), which kills multi-hop recall. This
@@ -13,7 +13,7 @@
  *      is *ambiguous*; an opt-in LLM call (provider + `llmAdjudication`)
  *      decides. **Offline / by default the ambiguous band mints a new
  *      entity** - the resolver never auto-merges on weak evidence, because
- *      a wrong merge fuses two distinct people (the stated P2-1 risk).
+ *      a wrong merge fuses two distinct people.
  *
  * The pure policy ({@link resolveEntityDecision}) is provider-agnostic and
  * does no I/O; {@link EntityResolver} wires it to an injected store +
@@ -60,7 +60,7 @@ export interface ResolutionCandidate {
   readonly normalizedName: string;
   readonly vector: Float32Array | null;
   /**
-   * MST-11: the embedder that produced `vector`. When both this and the
+   * The embedder that produced `vector`. When both this and the
    * query's `vectorEmbedderId` are known and differ, the candidate is skipped
    * for embedding comparison - vectors from different models live in different
    * spaces, so their cosine is meaningless. Absent on either side ⇒ compared
@@ -73,7 +73,7 @@ export interface ResolutionCandidate {
 export interface ResolveDecisionInput {
   readonly normalizedName: string;
   readonly vector?: Float32Array | null;
-  /** MST-11: the embedder that produced `vector` (gates cross-embedder cosine). */
+  /** The embedder that produced `vector` (gates cross-embedder cosine). */
   readonly vectorEmbedderId?: string | null;
   readonly candidates: ReadonlyArray<ResolutionCandidate>;
   readonly mergeThreshold: number;

@@ -14,7 +14,7 @@ Defined in: packages/memory/src/context-engine/compaction/types.ts:250
 
 **`Stable`**
 
-Pre-compaction hook signature (wave-D D4). Side-effect only - a
+Pre-compaction hook signature. Side-effect only - a
 pre-hook cannot alter what gets compacted; a throwing hook is
 recorded in `hookFailures` and never blocks the compaction.
 

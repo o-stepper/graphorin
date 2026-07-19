@@ -29,12 +29,13 @@ export type ParsedTrigger =
   | { readonly kind: 'event'; readonly name: string; readonly raw: string }
   | { readonly kind: 'budget'; readonly threshold: number; readonly raw: string }
   /**
-   * Item 7 (A2): fire when the unconsolidated transcript tail (from
-   * the standard-phase cursor) reaches `tokens` tokens (chars/4 proxy,
-   * same measure as the W-081 transcript budget). Evaluated on
-   * activity signals via `Consolidator.notifyActivity(...)` - the
-   * scheduler cannot measure the tail on its own. Not to be confused
-   * with `budget:F`, which is a spent-budget fraction.
+   * Fire when the unconsolidated transcript tail (from the
+   * standard-phase cursor) reaches `tokens` tokens (chars/4 proxy, the
+   * same measure as the `maxTranscriptChars` transcript budget).
+   * Evaluated on activity signals via
+   * `Consolidator.notifyActivity(...)` - the scheduler cannot measure
+   * the tail on its own. Not to be confused with `budget:F`, which is
+   * a spent-budget fraction.
    */
   | { readonly kind: 'buffer'; readonly tokens: number; readonly raw: string };
 

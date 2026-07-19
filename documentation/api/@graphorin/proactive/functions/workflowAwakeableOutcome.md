@@ -19,10 +19,10 @@ Defined in: packages/proactive/src/ladder.ts:88
 Build a `question` / `review` outcome for a task parked inside a
 durable WORKFLOW (`awaitExternal` / `requestApproval`): the resolve
 ref is the serialized awakeable address (`wf:&lt;workflowId&gt;:&lt;threadId&gt;:
-&lt;name&gt;`, decision D-1/A3), resolved through the existing
+&lt;name&gt;`), resolved through the existing
 `POST /v1/workflows/:id/resume` route and ticked by the workflow
 timer-daemon - this package composes with that daemon, it never
-re-hosts it (D-9).
+re-hosts it.
 
 ## Parameters
 

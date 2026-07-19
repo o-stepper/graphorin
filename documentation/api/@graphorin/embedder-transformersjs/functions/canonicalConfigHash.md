@@ -10,7 +10,7 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:323
+Defined in: packages/embedder-transformersjs/src/index.ts:322
 
 **`Stable`**
 

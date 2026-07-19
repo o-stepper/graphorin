@@ -84,7 +84,7 @@ export function shouldArchive(args: {
 export const NEUTRAL_IMPORTANCE = 0.5;
 
 /**
- * Tunable weights for the multi-signal {@link salience} score (X-1).
+ * Tunable weights for the multi-signal {@link salience} score.
  * Each weight is the *magnitude* of the corresponding signal's pull on
  * the retention curve; all default to values chosen so the ordering is
  * sensible without ever inverting it.
@@ -93,13 +93,13 @@ export const NEUTRAL_IMPORTANCE = 0.5;
  */
 export interface SalienceWeights {
   /**
-   * How strongly importance (P1-2) stretches retention. At the default
+   * How strongly importance stretches retention. At the default
    * `0.6`, importance `1.0` multiplies retention by `1.3` and importance
    * `0.0` by `0.7`; neutral importance leaves it unchanged.
    */
   readonly importance: number;
   /**
-   * Penalty applied to a **quarantined** fact (P1-4) - the explicit
+   * Penalty applied to a **quarantined** fact - the explicit
    * security-risk negative term. At the default `0.7`, a quarantined
    * fact keeps only `0.3` of its retention, so it is evicted first under
    * capacity pressure. Never a hard delete: the fact is archived,
@@ -107,13 +107,13 @@ export interface SalienceWeights {
    */
   readonly quarantine: number;
   /**
-   * Mild penalty for a fact with non-first-party provenance (P1-4) -
+   * Mild penalty for a fact with non-first-party provenance -
    * e.g. `'tool'` / `'imported'` content that did not originate with the
    * user. At the default `0.2` such a fact keeps `0.8` of its retention.
    */
   readonly foreignProvenance: number;
   /**
-   * Retrieval-frequency reinforcement (D3) - the use-it-or-lose-it
+   * Retrieval-frequency reinforcement - the use-it-or-lose-it
    * signal. How strongly the monotonic access counter stretches
    * retention: the factor is
    * `1 + weight * min(1, log1p(count) / log1p(saturation))`, saturating
@@ -126,8 +126,8 @@ export interface SalienceWeights {
 }
 
 /**
- * Access count at which retrieval-frequency reinforcement saturates
- * (D3). `log1p`-scaled, so the first few accesses matter most and
+ * Access count at which retrieval-frequency reinforcement saturates.
+ * `log1p`-scaled, so the first few accesses matter most and
  * anything past this count contributes the full weight.
  *
  * @stable
@@ -136,7 +136,7 @@ export const ACCESS_REINFORCEMENT_SATURATION = 32;
 
 /**
  * Default {@link SalienceWeights}. Chosen so that an active,
- * first-party, unscored fact has `salience === retention` (the X-1
+ * first-party, unscored fact has `salience === retention` (the
  * change is invisible until a fact carries an importance hint, is
  * quarantined, or has foreign provenance).
  *
@@ -152,9 +152,9 @@ export const DEFAULT_SALIENCE_WEIGHTS: SalienceWeights = Object.freeze({
 });
 
 /**
- * Multi-signal salience for capacity-bounded forgetting (X-1). Combines
+ * Multi-signal salience for capacity-bounded forgetting. Combines
  * the Ebbinghaus {@link retention} curve (temporal relevance + access
- * frequency via `strength`) with the P1-2 importance hint and a P1-4
+ * frequency via `strength`) with the importance hint and a
  * security-risk negative term:
  *
  * ```
@@ -176,12 +176,12 @@ export function salience(args: {
   readonly tauDays: number;
   /** Importance hint in `[0, 1]`; `null` → {@link NEUTRAL_IMPORTANCE}. */
   readonly importance: number | null;
-  /** P1-4: a quarantined fact gets the {@link SalienceWeights.quarantine} penalty. */
+  /** A quarantined fact gets the {@link SalienceWeights.quarantine} penalty. */
   readonly quarantined: boolean;
-  /** P1-4: a non-first-party fact gets the {@link SalienceWeights.foreignProvenance} penalty. */
+  /** A non-first-party fact gets the {@link SalienceWeights.foreignProvenance} penalty. */
   readonly foreignProvenance: boolean;
   /**
-   * Monotonic retrieval-access count (D3); `null` / absent ⇒ `0`.
+   * Monotonic retrieval-access count; `null` / absent ⇒ `0`.
    * Contributes only when {@link SalienceWeights.accessReinforcement}
    * is non-zero (the default `0` keeps salience unchanged).
    */
@@ -218,7 +218,7 @@ export function salience(args: {
 }
 
 /**
- * Capacity-bounded eviction selector (X-1). Given facts scored by
+ * Capacity-bounded eviction selector. Given facts scored by
  * {@link salience}, return the ids of the lowest-salience ones to
  * archive so that at most `capacity` remain. Pure and deterministic:
  * ties break by id so a given batch always evicts the same set.

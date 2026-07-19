@@ -15,7 +15,7 @@ export interface AppliedMigration {
 }
 
 /**
- * W-111: tuning knobs for {@link runMigrations}. Only `upTo` exists so
+ * Tuning knobs for {@link runMigrations}. Only `upTo` exists so
  * far and it is test-only.
  *
  * @internal
@@ -108,7 +108,7 @@ export function runMigrations(
 
 /**
  * The migrations bundled with this build that are NOT recorded as
- * applied in the supplied database (W-068). Read-only: when the
+ * applied in the supplied database. Read-only: when the
  * `schema_migrations` table does not exist yet (a database this code
  * never touched), every bundled migration is pending and the foreign
  * file is NOT marked by creating the table.

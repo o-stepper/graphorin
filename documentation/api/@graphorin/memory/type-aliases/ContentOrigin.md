@@ -18,7 +18,7 @@ type ContentOrigin =
   | "tool-call:args";
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:49
+Defined in: packages/memory/src/context-engine/annotations.ts:50
 
 **`Stable`**
 

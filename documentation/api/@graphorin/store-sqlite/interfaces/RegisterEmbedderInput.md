@@ -23,6 +23,6 @@ deterministic hash over the embedder's full configuration.
 | <a id="property-distancemetric"></a> `distanceMetric?` | `readonly` | `"cosine"` \| `"dot"` \| `"euclidean"` | - | packages/store-sqlite/src/embedding-meta-repo.ts:295 |
 | <a id="property-embedderkind"></a> `embedderKind` | `readonly` | `string` | - | packages/store-sqlite/src/embedding-meta-repo.ts:292 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/store-sqlite/src/embedding-meta-repo.ts:291 |
-| <a id="property-indexmode"></a> `indexMode?` | `readonly` | `string` \| `null` | Write-path contextualization recipe (item 10 step 1). When supplied, it joins the index version key: a legacy `null` row adopts it once, after which a different mode fails registration exactly like a configHash change. Omitted = legacy caller, no mode check. | packages/store-sqlite/src/embedding-meta-repo.ts:304 |
+| <a id="property-indexmode"></a> `indexMode?` | `readonly` | `string` \| `null` | Write-path contextualization recipe. When supplied, it joins the index version key: a legacy `null` row adopts it once, after which a different mode fails registration exactly like a configHash change. Omitted = legacy caller, no mode check. | packages/store-sqlite/src/embedding-meta-repo.ts:304 |
 | <a id="property-model"></a> `model` | `readonly` | `string` | - | packages/store-sqlite/src/embedding-meta-repo.ts:293 |
 | <a id="property-notes"></a> `notes?` | `readonly` | `string` \| `null` | - | packages/store-sqlite/src/embedding-meta-repo.ts:305 |

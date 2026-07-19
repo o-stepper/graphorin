@@ -22,8 +22,8 @@ import { toWireError } from '../internal/wire-error.js';
 
 /**
  * Stable status discriminator for a run snapshot. Mirrors the values
- * exposed on the public REST surface. `'awaiting_approval'` (C3 /
- * W-119): the run suspended on durable HITL and its resumable
+ * exposed on the public REST surface. `'awaiting_approval'`: the run
+ * suspended on durable HITL and its resumable
  * `RunState` is retained by the tracker until
  * `POST /runs/:runId/resume` (or an abort) settles it.
  *
@@ -54,7 +54,7 @@ export type RunKind = 'agent' | 'workflow';
 export type TerminalRunStatus = Extract<RunStatus, 'completed' | 'failed' | 'aborted'>;
 
 /**
- * IP-15: payload handed to the {@link RunStateTracker} `onTerminal` callback
+ * Payload handed to the {@link RunStateTracker} `onTerminal` callback
  * the first time a run reaches a terminal state. The server turns this into
  * the `graphorin_agent_runs_total` counter + `graphorin_agent_run_duration_seconds`
  * summary. `durationMs` is omitted for a run that was aborted before it ever
@@ -114,8 +114,8 @@ export type RunDescriptor =
     };
 
 /**
- * Activity event emitted by the tracker's optional listener (A2,
- * item 7): `run-start` when a run enters `running`, `run-end` on the
+ * Activity event emitted by the tracker's optional listener:
+ * `run-start` when a run enters `running`, `run-end` on the
  * first terminal transition.
  *
  * @stable
@@ -148,7 +148,7 @@ interface RunRecord {
   completedAt?: number;
   error?: { readonly message: string; readonly code?: string; readonly hint?: string };
   /**
-   * C3/W-119: the resumable `RunState` of a run suspended on durable
+   * The resumable `RunState` of a run suspended on durable
    * HITL. Opaque to the server (the agent runtime owns its shape).
    * Retained while `status === 'awaiting_approval'`; cleared on
    * resume-settle and on abort.
@@ -206,7 +206,7 @@ export class RunStateTracker {
     options: {
       readonly now?: () => number;
       /**
-       * IP-15: invoked exactly once per run, the first time it settles into a
+       * Invoked exactly once per run, the first time it settles into a
        * terminal state. Used to drive the run-count + duration metrics. Never
        * throws into the tracker - wrap your handler if it might.
        */
@@ -218,7 +218,7 @@ export class RunStateTracker {
   }
 
   /**
-   * A2 (item 7): register the server-side activity listener. The
+   * Register the server-side activity listener. The
    * tracker is the single choke point every REST/WS run passes
    * through, so this is where the server bridges "a run started /
    * settled" into `scheduler.recordActivity()` (idle debounce) and
@@ -347,7 +347,7 @@ export class RunStateTracker {
   }
 
   /**
-   * C3/W-119: park a run whose agent suspended on durable HITL. The
+   * Park a run whose agent suspended on durable HITL. The
    * tracker retains the resumable `RunState` (opaque) so the REST
    * resume endpoint can re-enter the agent loop in-process. Emits the
    * `run-end` activity (active work stopped) but NOT the terminal
@@ -363,7 +363,7 @@ export class RunStateTracker {
   }
 
   /**
-   * C3: register an EXTERNALLY-suspended run (e.g. a proactive fire
+   * Register an EXTERNALLY-suspended run (e.g. a proactive fire
    * that ran in-process, outside the REST surface) so the messenger's
    * `POST /runs/:runId/resume` can find and resume it. Declares the
    * record when unknown; no activity events (the run never "started"
@@ -384,7 +384,7 @@ export class RunStateTracker {
     this.#persistSuspended(record, state);
   }
 
-  /** Peek the retained suspended state (C3). `undefined` when none. */
+  /** Peek the retained suspended state. `undefined` when none. */
   suspendedStateOf(runId: string): unknown {
     return this.#records.get(runId)?.suspendedState;
   }
@@ -511,13 +511,13 @@ export class RunStateTracker {
   }
 }
 
-/** Default cadence for the terminal-record prune sweep (IP-16). */
+/** Default cadence for the terminal-record prune sweep. */
 export const DEFAULT_RUN_PRUNE_INTERVAL_MS = 60_000;
 /** Default retention for terminal run records before they are dropped. */
 export const DEFAULT_RUN_RETENTION_MS = 5 * 60_000;
 
 /**
- * IP-16: schedule a periodic prune of terminal run records. Without this the
+ * Schedule a periodic prune of terminal run records. Without this the
  * tracker's `prune()` was never called, so every run / stream / workflow left
  * a `RunRecord` (each holding an `AbortController`) in memory forever - an
  * unbounded leak on a long-living server. Returns a stop function that clears
@@ -539,11 +539,11 @@ export function scheduleRunPruning(
   return () => clearInterval(timer);
 }
 
-/** Default cadence for the idempotency-record sweep (W-061). */
+/** Default cadence for the idempotency-record sweep. */
 export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
 
 /**
- * W-061: schedule a periodic prune of EXPIRED idempotency records.
+ * Schedule a periodic prune of EXPIRED idempotency records.
  * `idempotency_records` stores each keyed POST's full `response_json`
  * with an `expires_at` column, but expiry was only ever checked on the
  * READ path - the bodies accumulated on disk indefinitely. The sweep
@@ -552,7 +552,7 @@ export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
  * Best-effort: store errors are swallowed. Same shape as
  * {@link scheduleRunPruning}: `unref`-ed timer + stop function.
  *
- * Since W-010 the standalone server drives this surface through the
+ * The standalone server now drives this surface through the
  * unified retention scheduler (`config.retention.idempotency`); this
  * standalone primitive remains for embedders running the store
  * without the server.
@@ -573,7 +573,7 @@ export function scheduleIdempotencyPruning(
 }
 
 /**
- * W-107: the per-resource scope a caller must hold to touch this run.
+ * The per-resource scope a caller must hold to touch this run.
  * `'read'` gates state inspection; `'control'` gates abort/resume.
  * Derived from the run descriptor: agent runs bind to
  * `agents:{read|invoke}:<agentId>`, workflow runs to

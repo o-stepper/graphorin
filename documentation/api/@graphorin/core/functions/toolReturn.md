@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/tool.ts:288
 
 **`Stable`**
 
-W-115: build a BRANDED [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope. The executor
+Build a BRANDED [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope. The executor
 unwraps branded envelopes unconditionally; unbranded objects fall to
 a deliberately narrow structural sniff (own keys within
 `{output, contentParts, taint}`), so a tool legitimately returning

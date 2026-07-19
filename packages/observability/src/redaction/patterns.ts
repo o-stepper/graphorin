@@ -63,7 +63,7 @@ export interface RedactionPattern {
   /** Replacement string used when `mode === 'mask'`. */
   readonly mask?: string;
   /**
-   * Optional per-match predicate (RP-21). When present, a regex hit is only
+   * Optional per-match predicate. When present, a regex hit is only
    * treated as a real match - and masked - when this returns `true` for the
    * matched substring. Used by the `creditcard` pattern to require a valid
    * Luhn checksum so look-alike digit runs (epoch-ms timestamps, order ids)
@@ -241,7 +241,7 @@ export const OPT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS.filter(
 export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 
 /**
- * Luhn (mod-10) checksum validator used by the `creditcard` pattern (RP-21).
+ * Luhn (mod-10) checksum validator used by the `creditcard` pattern.
  * Strips spaces / dashes, bounds the length to 13-19 digits, and verifies the
  * checksum so a digit run that merely *looks* like a PAN is not redacted.
  */

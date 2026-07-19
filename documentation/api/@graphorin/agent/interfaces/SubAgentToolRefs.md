@@ -8,7 +8,7 @@
 
 Defined in: packages/agent/src/runtime/agent-to-tool.ts:94
 
-The live references [SUBAGENT\_TOOL](/api/@graphorin/agent/variables/SUBAGENT_TOOL.md) carries (W-001). Typed
+The live references [SUBAGENT\_TOOL](/api/@graphorin/agent/variables/SUBAGENT_TOOL.md) carries. Typed
 loosely on purpose: the walk is generic over foreign TDeps/TOutput
 and only ever passes through values it received from the same
 factory instance.
@@ -19,8 +19,8 @@ factory instance.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-agentname"></a> `agentName` | `readonly` | `string` | - | packages/agent/src/runtime/agent-to-tool.ts:95 |
 | <a id="property-buildseed"></a> `buildSeed` | `readonly` | (`input`, `parentMessages`) => [`AgentInput`](/api/@graphorin/agent/type-aliases/AgentInput.md) | Reproduce `execute()`'s seed semantics (inputFilter + input string). | packages/agent/src/runtime/agent-to-tool.ts:109 |
-| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | D2 capability restriction from `AgentToToolOptions.capability`. | packages/agent/src/runtime/agent-to-tool.ts:105 |
-| <a id="property-forwardevents"></a> `forwardEvents?` | `readonly` | `"none"` \| `"lifecycle"` \| `"all"` | W-036: forwarding policy from `AgentToToolOptions.forwardEvents`. | packages/agent/src/runtime/agent-to-tool.ts:107 |
+| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | Capability restriction from `AgentToToolOptions.capability`. | packages/agent/src/runtime/agent-to-tool.ts:105 |
+| <a id="property-forwardevents"></a> `forwardEvents?` | `readonly` | `"none"` \| `"lifecycle"` \| `"all"` | Forwarding policy from `AgentToToolOptions.forwardEvents`. | packages/agent/src/runtime/agent-to-tool.ts:107 |
 | <a id="property-run"></a> `run` | `readonly` | (`input`, `options?`) => `Promise`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`unknown`\&gt;\> | - | packages/agent/src/runtime/agent-to-tool.ts:96 |
 | <a id="property-shapecompleted"></a> `shapeCompleted` | `readonly` | (`result`, `turns`) => \{ `output`: `unknown`; `taint?`: [`SubAgentFoldTaint`](/api/@graphorin/agent/interfaces/SubAgentFoldTaint.md); \} | Reproduce `execute()`'s output shaping (exposeTurns/contextFold/taint). | packages/agent/src/runtime/agent-to-tool.ts:114 |
 | <a id="property-stream"></a> `stream` | `readonly` | (`input`, `options?`) => `AsyncIterable`\<[`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\&lt;`unknown`\&gt;\> | - | packages/agent/src/runtime/agent-to-tool.ts:100 |

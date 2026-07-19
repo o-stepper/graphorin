@@ -14,6 +14,6 @@ Defined in: packages/core/src/contracts/tool.ts:276
 
 **`Stable`**
 
-W-115: cross-realm brand for the [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope
+Cross-realm brand for the [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope
 (`SECRET_VALUE_BRAND` precedent - `Symbol.for` survives duplicate
 package copies).

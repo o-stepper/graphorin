@@ -108,14 +108,14 @@ notifyActivity(scope?): Promise<
 
 Defined in: packages/memory/src/consolidator/runtime.ts:149
 
-Activity signal from the embedding runtime (item 7, A2): a turn
-finished / the transcript grew. Re-evaluates the `buffer:N`
-trigger - when the unconsolidated transcript tail (from the
-standard-phase cursor) reaches the configured token threshold
-(chars/4 proxy, the same measure as the W-081 transcript budget),
-the light+standard chain fires with reason `{ kind: 'buffer' }`.
+Activity signal from the embedding runtime: a turn finished / the
+transcript grew. Re-evaluates the `buffer:N` trigger - when the
+unconsolidated transcript tail (from the standard-phase cursor)
+reaches the configured token threshold (chars/4 proxy, the same
+measure as the `maxTranscriptChars` transcript budget), the
+light+standard chain fires with reason `{ kind: 'buffer' }`.
 The documented contract is "buffer:N OR idle:T": whichever comes
-first consolidates the settled segment, and the MCON-8 cooldown
+first consolidates the settled segment, and the cooldown
 still applies so message bursts cannot storm the pipeline. No-op
 when no `buffer:N` trigger is configured, when the consolidator
 is stopped/paused, or when no scope is resolvable. The server
@@ -183,7 +183,7 @@ recordExternalSpend(tokens, costUsd?): void;
 Defined in: packages/memory/src/consolidator/runtime.ts:118
 
 Record memory-pipeline LLM spend that happened OUTSIDE a phase run
-(MCON-15 - e.g. workflow induction) so the daily ceilings cover it.
+(e.g. workflow induction) so the daily ceilings cover it.
 Counted under the deep-phase bucket.
 
 #### Parameters
@@ -209,7 +209,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:129
 
 Register this consolidator's cron / idle triggers with a
 `@graphorin/triggers` scheduler so they fire `trigger(...)`
-automatically (the daemon ↔ triggers bridge - MCON-4). Uses the
+automatically (the daemon ↔ triggers bridge). Uses the
 configured `defaultScope`; throws if none was set. Turn / event
 triggers are skipped (consumer-emitted). The standalone server calls
 this in `beforeStart`.

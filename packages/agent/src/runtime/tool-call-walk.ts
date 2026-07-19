@@ -3,9 +3,9 @@
  * non-handoff calls for the executor (flushing before a handoff and
  * before each approval-gated call so execution order is kept), executes
  * the ≤1 handoff inline, pre-screens `needsApproval` with validated
- * args (tools-02), collects EVERY gated call (agent-01), and performs
+ * args, collects EVERY gated call, and performs
  * the once-per-step durable-HITL suspend with its taint / promotion
- * snapshot + checkpoint (AG-19 / AG-23). Extracted verbatim from
+ * snapshot + checkpoint. Extracted verbatim from
  * `factory.ts` (issue #23); the former inline walk now takes an
  * explicit {@link ToolCallWalkEnv} and returns `{ suspended }` instead
  * of finishing the run itself.
@@ -52,9 +52,9 @@ export interface ToolCallWalkEnv<TDeps, TOutput> extends HandoffRunEnv<TDeps, TO
   readonly toolDataFlowGuard: AssistantCommitEnv['toolDataFlowGuard'];
   readonly promotedDeferred: Set<string>;
   readonly dispatchBatch: DispatchBatchFn<TDeps, TOutput>;
-  /** E1: the caller's pre-tool permission hook (absent ⇒ skipped). */
+  /** The caller's pre-tool permission hook (absent ⇒ skipped). */
   readonly permissionHook?: PermissionHook | undefined;
-  /** E1: the compiled argument-policy guard (four-value + name-level). */
+  /** The compiled argument-policy guard (four-value + name-level). */
   readonly argumentPolicyGuard?: ToolArgumentPolicyGuard | undefined;
 }
 
@@ -64,7 +64,7 @@ export interface ToolCallWalkEnv<TDeps, TOutput> extends HandoffRunEnv<TDeps, TO
  * Non-handoff calls accumulate into a batch dispatched through
  * the ToolExecutor; the batch is flushed before a handoff and
  * before each approval-gated call so execution order is kept.
- * Gated calls are COLLECTED (all of them, agent-01) and the run
+ * Gated calls are COLLECTED (all of them) and the run
  * suspends once after the walk, so every non-gated toolCallId
  * has a tool message before the suspend snapshot - a dropped
  * call would persist a dangling `tool_use` that real providers
@@ -343,11 +343,11 @@ export async function* processStepToolCalls<TDeps, TOutput>(
 }
 
 /**
- * W-001: execute a `toTool` sub-agent call INLINE (mirroring the
+ * Execute a `toTool` sub-agent call INLINE (mirroring the
  * handoff seam): reproduce `execute()`'s seed and output shaping via
  * the tool's {@link SubAgentToolRefs}, and settle through the shared
  * {@link runSubAgentCall} so a suspending child parks instead of
- * throwing. The D2 taint fold that the executor would have applied from
+ * throwing. The taint fold that the executor would have applied from
  * the ToolReturn envelope is recorded directly on the data-flow guard.
  */
 async function* executeSubAgentToolCall<TDeps, TOutput>(

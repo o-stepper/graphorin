@@ -4,13 +4,13 @@
  * `graphorin-spill:<rel>` handle URI it resolves the artifact **within the
  * configured root only** and returns a bounded byte- or line-range, so the
  * built-in `read_result` tool can page through a large spilled result
- * without inlining the whole blob (P1-4).
+ * without inlining the whole blob.
  *
  * Security: the handle is opaque and resolution is confined to
  * `artifactRoot`; any URI that resolves outside the root (e.g. via `..`)
  * is rejected, so a model - even one steered by injected content - cannot
  * read arbitrary files. Non-`graphorin-spill:` schemes are rejected
- * (MCP `resource_link` resolution is reserved for WI-13).
+ * (MCP `resource_link` resolution is reserved for future work).
  *
  * @packageDocumentation
  */
@@ -60,18 +60,18 @@ export interface ResultReadOutcome {
   readonly eof: boolean;
   /**
    * Trust class of the producer of the resolved artifact, when the
-   * reader knows it (TL-6) - e.g. the MCP resource reader always
+   * reader knows it - e.g. the MCP resource reader always
    * reports `'mcp-derived'`, and the file reader recovers it from the
-   * artifact's taint sidecar (tools-03). The executor re-applies
+   * artifact's taint sidecar. The executor re-applies
    * inbound sanitization + dataflow provenance by this class.
    */
   readonly producerTrustClass?: import('@graphorin/core').ToolTrustClass;
-  /** Source of the producing tool, when the reader knows it (tools-03). */
+  /** Source of the producing tool, when the reader knows it. */
   readonly producerSource?: import('@graphorin/core').ToolSource;
-  /** Sensitivity of the produced content, when the reader knows it (tools-03). */
+  /** Sensitivity of the produced content, when the reader knows it. */
   readonly producerSensitivity?: import('@graphorin/core').Sensitivity;
   /**
-   * W-156: `true` when the spill-time whole-artifact scan found a
+   * `true` when the spill-time whole-artifact scan found a
    * catalogued imperative pattern anywhere in the FULL artifact - a
    * page-boundary-independent signal the per-page strip pass cannot
    * derive from one page. Recovered from the taint sidecar by the file
@@ -154,9 +154,10 @@ export function createFileResultReader(opts: FileResultReaderOptions): ResultRea
 
 /**
  * Read the taint sidecar for an artifact, if present. Absent / corrupt
- * sidecars (artifacts written before tools-03, foreign writers) yield
- * an empty record - the executor then falls back to its in-memory map
- * or the reading tool's own class, exactly the pre-sidecar behaviour.
+ * sidecars (artifacts predating the sidecar format, foreign writers)
+ * yield an empty record - the executor then falls back to its
+ * in-memory map or the reading tool's own class, exactly the
+ * pre-sidecar behaviour.
  */
 async function readSidecarTaint(artifactPath: string): Promise<{
   readonly producerTrustClass?: import('@graphorin/core').ToolTrustClass;

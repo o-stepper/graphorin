@@ -44,11 +44,11 @@ export function lastUserText(messages: ReadonlyArray<Message>): string | undefin
  * Resolve the effective {@link ReasoningRetention} for a step. The
  * agent-level setting wins over the provider-level default; when
  * neither is supplied, the provider's `reasoningContract`
- * capability drives the default per RB-42 / suggested DEC-158.
+ * capability drives the default.
  *
  * The contract-driven defaults mirror `REASONING_RETENTION_DEFAULTS` in
  * `@graphorin/provider` (the documented, conservative defaults - see
- * providers.md). REASONING-02: `optional` resolves to `'strip'`, not
+ * providers.md). `optional` resolves to `'strip'`, not
  * `'pass-through-all'` - the conservative default keeps chain-of-thought
  * out of the persisted transcript and off the next provider call unless a
  * caller opts in via an agent- or provider-level override.
@@ -77,7 +77,7 @@ export function effectiveReasoningRetention(
  * effective {@link ReasoningRetention} is not `'strip'`, the
  * assembled `reasoning` content parts ride along on `content` so
  * the next provider call honours the wire-correct round-trip
- * contract per RB-42.
+ * contract.
  */
 export function buildAssistantMessage(
   text: string,
@@ -132,7 +132,7 @@ export function stripReasoningFromMessages(messages: Message[]): { stripped: num
 /**
  * Count the leading contiguous run of `system` messages in the initial
  * buffer - the trusted, KV-cache-stable instruction prefix. Captured
- * once at run start (WI-09 / P1-1): auto-compaction summarises only the
+ * once at run start: auto-compaction summarises only the
  * messages after this prefix, so the prefix stays byte-identical across
  * every step (the provider's cache breakpoint is real) and a long run
  * never re-pays for the system prompt.
@@ -146,12 +146,12 @@ export function stripReasoningFromMessages(messages: Message[]): { stripped: num
  * folds it into a fresh summary-of-summary.
  */
 /**
- * Marker prefix stamped on every compaction summary. context-engine-05:
- * the prefix scan must stop at it - after a compact-then-suspend cycle
+ * Marker prefix stamped on every compaction summary. The prefix scan
+ * must stop at it - after a compact-then-suspend cycle
  * the summary is a SYSTEM message sitting right after the true prefix,
  * and counting it in would pin it (and every later summary) outside the
  * compactable window forever, growing the uncompactable prefix by one
- * summary per cycle. W-056: the constant is canonical in
+ * summary per cycle. The constant is canonical in
  * `@graphorin/memory` (next to the summary template that stamps it);
  * re-exported here for the runtime's internal imports.
  */
@@ -172,14 +172,14 @@ export function countLeadingSystemMessages(messages: ReadonlyArray<Message>): nu
 
 /**
  * Immutable usage sum. Optional token fields (reasoning + prompt-cache
- * legs, core-provider-02) appear in the result only when at least one
+ * legs) appear in the result only when at least one
  * side carries them, so pre-cache serialized shapes stay byte-identical.
  */
 /**
- * D6: assemble the per-step request messages. Trailing, request-only
+ * Assemble the per-step request messages. Trailing, request-only
  * additions ride the LAST prompt-cache anchor and never touch the shared
  * `messages` buffer or the persisted RunState: the structured-output
- * instruction (AG-3) and the attention-recitation plan block are both
+ * instruction and the attention-recitation plan block are both
  * appended here, in that order, so the stable prompt prefix is unchanged
  * and only the small trailing tail is re-sent each step.
  */
@@ -228,7 +228,7 @@ export function addUsage(a: Usage, b: Usage): Usage {
 }
 
 /**
- * C3: render a ToolError for the model. The first line keeps the
+ * Render a ToolError for the model. The first line keeps the
  * long-standing `Error: <message>` shape; a bracketed second line carries
  * the typed kind + the recovery envelope, which is what actually changes
  * model behaviour after a failure (retry vs. fix args vs. give up).
@@ -275,7 +275,7 @@ export function accumulateUsage(target: Usage, delta: Usage): void {
 /**
  * Fold a completed (or failed - tokens were spent either way) child
  * run's usage into the parent run's accounting: `state.usage`,
- * `state.usageByModel` and the run's {@link UsageAccumulator} (W-033).
+ * `state.usageByModel` and the run's {@link UsageAccumulator}.
  * Children carrying a per-model breakdown fold model-by-model (each
  * child model entry counts as one attempt on the parent); a child
  * without `usageByModel` folds its aggregate under the synthetic id
@@ -316,7 +316,7 @@ export function foldChildRunUsage(
 
 /**
  * Resolve the effective reasoning-retention policy for
- * this step (RB-42). Drop any buffered reasoning when the
+ * this step. Drop any buffered reasoning when the
  * contract downgrades to `'strip'`.
  */
 export function applyReasoningRetention(

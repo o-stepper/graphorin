@@ -87,8 +87,13 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     cacheWriteUsdPerToken: 18.75 / 1_000_000,
   },
   // -----------------------------------------------------------------
-  // OpenAI - cache reads are automatic (no breakpoints) and there is no
-  // cache-write charge, so entries carry only `cachedReadUsdPerToken`.
+  // OpenAI - through GPT-5.x, cache reads are automatic (no
+  // breakpoints) and writes are free, so those entries carry only
+  // `cachedReadUsdPerToken`. The GPT-5.6 family switched to explicit
+  // prompt-caching controls WITH a write charge (1.25x input, mirroring
+  // the Anthropic convention), so its entries must also carry
+  // `cacheWriteUsdPerToken` - omitting it silently bills writes at the
+  // cheaper input rate.
   // -----------------------------------------------------------------
   {
     provider: 'openai',
@@ -111,14 +116,15 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     outputUsdPerToken: 0.4 / 1_000_000,
     cachedReadUsdPerToken: 0.005 / 1_000_000,
   },
-  // GPT-5.6 family (deep retest 2026-07-19, P1-3): standard tier,
-  // short-context rates from the official OpenAI pricing page.
+  // GPT-5.6 family: standard tier, short-context rates from the
+  // official OpenAI pricing page (2026-07-19).
   {
     provider: 'openai',
     model: 'gpt-5.6-luna',
     inputUsdPerToken: 1 / 1_000_000,
     outputUsdPerToken: 6 / 1_000_000,
     cachedReadUsdPerToken: 0.1 / 1_000_000,
+    cacheWriteUsdPerToken: 1.25 / 1_000_000,
   },
   {
     provider: 'openai',
@@ -126,6 +132,7 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     inputUsdPerToken: 2.5 / 1_000_000,
     outputUsdPerToken: 15 / 1_000_000,
     cachedReadUsdPerToken: 0.25 / 1_000_000,
+    cacheWriteUsdPerToken: 3.125 / 1_000_000,
   },
   {
     provider: 'openai',
@@ -133,6 +140,19 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     inputUsdPerToken: 5 / 1_000_000,
     outputUsdPerToken: 30 / 1_000_000,
     cachedReadUsdPerToken: 0.5 / 1_000_000,
+    cacheWriteUsdPerToken: 6.25 / 1_000_000,
+  },
+  // Bare `gpt-5.6` is an official OpenAI alias: the API routes it to
+  // `gpt-5.6-sol` (changelog 2026-07-09), so it is priced at sol rates.
+  // Kept as a plain snapshot row - `lookupPrice` has no alias
+  // indirection, and a request sent as `gpt-5.6` is billed as sol.
+  {
+    provider: 'openai',
+    model: 'gpt-5.6',
+    inputUsdPerToken: 5 / 1_000_000,
+    outputUsdPerToken: 30 / 1_000_000,
+    cachedReadUsdPerToken: 0.5 / 1_000_000,
+    cacheWriteUsdPerToken: 6.25 / 1_000_000,
   },
   {
     provider: 'openai',

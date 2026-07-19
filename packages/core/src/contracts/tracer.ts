@@ -60,7 +60,7 @@ export type KnownSpanType =
   | 'mcp.list-tools';
 
 /**
- * Namespaced escape hatch for user-defined span kinds (W-126): any
+ * Namespaced escape hatch for user-defined span kinds: any
  * string under the `x.` prefix, e.g. `'x.acme.rerank'`. The prefix
  * keeps typo-safety for the known literals - `'memory.serch.semantic'`
  * is still a compile error because it does not start with `x.` -
@@ -111,7 +111,7 @@ export type SpanAttributeValue =
   | ReadonlyArray<boolean>;
 
 /**
- * W-094: sensitivity opts for {@link AISpan.addEvent}. Event attributes
+ * Sensitivity opts for {@link AISpan.addEvent}. Event attributes
  * used to be un-taggable, so a default-`'public'` export floor dropped
  * ALL of them - including `exception.type` from `recordException`.
  *
@@ -141,7 +141,7 @@ export interface AISpan<T extends SpanType = SpanType> {
   setAttributes(attrs: SpanAttributes): void;
   /**
    * Append a span event (attribute-bearing time-stamped marker). The
-   * optional `opts` (W-094) tags the event's attributes with a
+   * optional `opts` tags the event's attributes with a
    * sensitivity tier so the validation exporter can pass safe ones
    * through the default-deny floor - untagged attributes keep being
    * dropped below the floor.

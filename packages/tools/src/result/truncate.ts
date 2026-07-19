@@ -71,7 +71,7 @@ export interface TruncationOutcome {
    */
   readonly resultHandle?: string;
   /**
-   * W-156: result of the single spill-time imperative-pattern scan
+   * Result of the single spill-time imperative-pattern scan
    * over the FULL body (only set for `'spill-to-file'`, and only when
    * the scan completed within budget). `true` means the artifact
    * contains at least one catalogued imperative pattern - including
@@ -117,8 +117,8 @@ export interface SpillWriter {
     readonly body: string;
     readonly sensitivityTier?: string;
     /**
-     * Trust class of the tool that produced this body (TL-6 /
-     * tools-03). Writers persist it (the default writer stores a
+     * Trust class of the tool that produced this body.
+     * Writers persist it (the default writer stores a
      * `<file>.meta.json` sidecar) so a reader in ANOTHER executor or a
      * resumed process can re-taint the content - without it, an
      * untrusted spill read back through the trusted `read_result`
@@ -131,7 +131,7 @@ export interface SpillWriter {
      */
     readonly producerSource?: unknown;
     /**
-     * W-156: whether the framework's single whole-artifact scan found
+     * Whether the framework's single whole-artifact scan found
      * at least one catalogued imperative pattern in the FULL body
      * (including patterns a future `read_result` page boundary would
      * split, invisible to the per-page strip pass). The scan runs
@@ -147,14 +147,14 @@ export interface SpillWriter {
     readonly imperativePatternsPresent?: boolean;
   }): Promise<{ readonly path: string; readonly bytes: number }>;
   /**
-   * Remove every artifact of one run (TL-10). The agent calls this when
+   * Remove every artifact of one run. The agent calls this when
    * a run ends `completed`/`failed`; `awaiting_approval` and `aborted`
    * runs keep theirs (handles must survive resume). Optional - custom
    * writers without it rely on the TTL sweep / external rotation.
    */
   clear?(runId: string): Promise<void>;
   /**
-   * Remove run directories older than `ttlMs` (TL-10). Returns the
+   * Remove run directories older than `ttlMs`. Returns the
    * number of run directories removed. The default writer fires one
    * best-effort sweep at construction (7-day TTL) to collect orphans.
    */
@@ -176,7 +176,7 @@ export interface TruncateOptions {
   /**
    * Effective trust class of the content's producer, forwarded to
    * {@link SpillWriter.write} so the artifact's taint survives process
-   * / executor boundaries (tools-03).
+   * / executor boundaries.
    */
   readonly producerTrustClass?: string;
   /**
@@ -185,7 +185,7 @@ export interface TruncateOptions {
    */
   readonly producerSource?: unknown;
   /**
-   * Pattern catalogue for the W-156 single-scan over the FULL body at
+   * Pattern catalogue for the single scan over the FULL body at
    * spill time (defaults to the built-in catalogue). The per-page
    * strip pass in the executor cannot see a pattern split by a
    * `read_result` page boundary; this whole-artifact scan can.
@@ -429,7 +429,7 @@ function sliceByTokens(
 }
 
 /**
- * A8: an actionable next step for the model, not just "this was truncated".
+ * An actionable next step for the model, not just "this was truncated".
  * An opaque annotation makes the model retry blindly or give up; a concrete
  * recovery path (narrow the request, or fetch the spilled handle) keeps the
  * self-correction loop productive.

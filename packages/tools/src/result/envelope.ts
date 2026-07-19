@@ -25,7 +25,7 @@ export interface ResultEnvelope<TOutput = unknown> {
   readonly textBody: string;
   /** Multipart wire payload (text + non-text parts). */
   readonly contentParts: ReadonlyArray<MessageContent>;
-  /** C6: per-result taint override carried from the ToolReturn envelope. */
+  /** Per-result taint override carried from the ToolReturn envelope. */
   readonly taint?: {
     readonly untrusted?: boolean;
     readonly sensitive?: boolean;

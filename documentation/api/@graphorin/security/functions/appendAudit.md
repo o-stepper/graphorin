@@ -19,7 +19,7 @@ the canonical-JSON serializer + SHA-256 in a worker pool in a
 future revision; today it is synchronous on the inside.
 
 Concurrent calls against the same `AuditDb` are serialised so the
-`latest()`→`insert()` read-modify-write never races (SPL-4).
+`latest()`→`insert()` read-modify-write never races.
 
 ## Parameters
 

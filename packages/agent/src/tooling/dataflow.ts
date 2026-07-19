@@ -1,6 +1,6 @@
 /**
  * Adapter: build the executor's {@link DataFlowGuard} from a
- * {@link DataFlowPolicyConfig} (WI-12 / P1-3).
+ * {@link DataFlowPolicyConfig}.
  *
  * Bridges `@graphorin/security`'s pure taint engine (policy + per-run
  * ledger + provenance derivation) to the `@graphorin/tools` executor hook.
@@ -15,8 +15,8 @@
  * The live ledger (with its verbatim-probe spans) is in-memory and
  * run-scoped, but its summary survives suspend/resume: the agent persists
  * `snapshotLedger()` onto `RunState.taintSummary` on every exit and
- * re-seeds via `seedLedger()` on resume (AG-19 / agent-08). The summary
- * carries the coarse flags plus ONE-WAY span-tile hashes (C6) - never
+ * re-seeds via `seedLedger()` on resume. The summary
+ * carries the coarse flags plus ONE-WAY span-tile hashes - never
  * untrusted text - so the verbatim probe re-arms for pre-suspend content
  * at tile granularity while live spans keep full sensitivity. The map is bounded by
  * insertion-order eviction so a long-lived agent never leaks ledgers.
@@ -63,7 +63,7 @@ function stringifyArgs(value: unknown): string {
  * @internal
  */
 /**
- * The executor's {@link DataFlowGuard} plus AG-19 ledger-persistence hooks the
+ * The executor's {@link DataFlowGuard} plus ledger-persistence hooks the
  * agent uses to carry the coarse taint summary across a suspend/resume.
  */
 export interface DataFlowGuardWithLedgers extends DataFlowGuard {
@@ -72,20 +72,20 @@ export interface DataFlowGuardWithLedgers extends DataFlowGuard {
   /** Pre-seed a run's ledger from a persisted summary on resume. */
   seedLedger(runId: string, summary: TaintLedgerSnapshot): void;
   /**
-   * C6: record the model's own step output as derived-untrusted (no-op on
+   * Record the model's own step output as derived-untrusted (no-op on
    * an untainted run). Makes the verbatim probe catch args the model
    * copied from its own untrusted-derived phrasing, and feeds the
    * `derivedTaint: 'strict'` policy leg.
    */
   recordAssistant(runId: string, text: string): void;
   /**
-   * B1.5: stamp message-borne untrusted input (channel inbound) into a
+   * Stamp message-borne untrusted input (channel inbound) into a
    * run's ledger. Called at run init, before the first step, from the
    * `AgentCallOptions.inboundTaint` seed. Widen-only.
    */
   recordInboundMessage(runId: string, seed: InboundTaintSeed): void;
   /**
-   * B4 (item 14): evaluate the run's OUTGOING assistant text as a
+   * Evaluate the run's OUTGOING assistant text as a
    * sink (stable sink id `'assistant-output'`, declassifiable via
    * `declassifySinks`). Called by the commit gate BEFORE the message
    * is appended; `'block'` replaces the outgoing text with a notice.

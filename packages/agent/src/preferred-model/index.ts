@@ -9,7 +9,7 @@
  *      override always wins.
  *   2. `Tool.preferredModel`        - the tool author's per-tool hint.
  *      Only the tools the model actually CALLED on the previous step
- *      are consulted (AG-15) - an advertised-but-uncalled hint never
+ *      are consulted - an advertised-but-uncalled hint never
  *      escalates the run. Multi-tool ties resolve to the highest cost
  *      tier (`'smart' > 'balanced' > 'fast'`; explicit `ModelSpec` is
  *      treated as the highest tier).
@@ -42,7 +42,7 @@ export interface PreferredModelResolution {
     | 'agent-preferred'
     | 'fallthrough-default'
     /**
-     * C1/C2: the run was invoked with `AgentCallOptions.pinnedProvider` -
+     * The run was invoked with `AgentCallOptions.pinnedProvider` -
      * invocation-scoped intent that wins over every preference ladder
      * and suppresses the fallback chain (fail-closed pinning for
      * proactive fires).
@@ -86,7 +86,7 @@ function modelIdFromSpec(spec: ModelSpec): string {
  * Pick the highest-cost tier across the supplied per-tool hints.
  * Explicit `ModelSpec` entries are treated as the highest tier
  * (`'smart'`) for tie-breaking - the conservative-correctness rule
- * documented in DEC-169 / suggested ADR-057.
+ * documented in DEC-169.
  *
  * Returns the picked hint together with the original `ModelSpec`
  * (when an explicit spec won the tie-break).

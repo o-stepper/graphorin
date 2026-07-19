@@ -6,11 +6,11 @@
 
 # Interface: ResponseVerifier
 
-Defined in: packages/agent/src/types.ts:497
+Defined in: packages/agent/src/types.ts:496
 
 **`Stable`**
 
-A deterministic check over the model's terminal response (C3). Runs
+A deterministic check over the model's terminal response. Runs
 when the loop is about to complete; `ok: false` feeds `feedback` back
 to the model (as a user message prefixed `[verifier:<id>]`) and the
 loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
@@ -23,7 +23,7 @@ take down a run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:498 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:497 |
 
 ## Methods
 
@@ -35,7 +35,7 @@ verify(ctx):
 | Promise<VerifierResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:499
+Defined in: packages/agent/src/types.ts:498
 
 #### Parameters
 

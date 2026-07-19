@@ -15,7 +15,7 @@ Defined in: packages/tools/src/inbound/sanitize.ts:251
 **`Stable`**
 
 Async variant of [applyInboundSanitization](/api/@graphorin/tools/functions/applyInboundSanitization.md) that additionally
-consults an optional [InjectionClassifier](/api/@graphorin/tools/interfaces/InjectionClassifier.md) (B4 seam, default
+consults an optional [InjectionClassifier](/api/@graphorin/tools/interfaces/InjectionClassifier.md) (default
 off). Identical to the sync pass when no classifier is supplied.
 
 ## Parameters

@@ -31,7 +31,7 @@ export interface RunStep {
   readonly agentId: string;
   /**
    * The model response this step produced, recorded when the agent runs
-   * with `recordProviderResponses: true` (C3). Enables deterministic
+   * with `recordProviderResponses: true`. Enables deterministic
    * replay: `createReplayProvider(state)` serves these back in order so
    * a run re-executes without live model calls.
    */
@@ -39,7 +39,7 @@ export interface RunStep {
 }
 
 /**
- * Journaled model response for one step (C3, opt-in via the agent's
+ * Journaled model response for one step (opt-in via the agent's
  * `recordProviderResponses`). Captures the RAW model output - the text
  * before any lateral-leak block replaced it in the transcript - so a
  * replay reproduces the original run faithfully.
@@ -88,7 +88,7 @@ export interface RunState {
   /**
    * The agent whose model drives the NEXT step. During a handoff it is
    * the target for exactly the child observation window and is restored
-   * to the parent when the child returns (W-034) - the child's identity
+   * to the parent when the child returns - the child's identity
    * is durably recorded in {@link RunState.handoffs}, never here.
    */
   readonly currentAgentId: string;
@@ -102,14 +102,13 @@ export interface RunState {
   readonly usage: Usage;
   /**
    * Per-model usage breakdown. Populated by the per-step retry loop
-   * when `Agent.fallbackModels` fires (RB-48 / suggested DEC-164 /
-   * suggested ADR-052). Backward-compat: rehydrating a serialized
-   * state that omits the field synthesizes a single-entry map for
-   * the primary model.
+   * when `Agent.fallbackModels` fires. Backward-compat: rehydrating a
+   * serialized state that omits the field synthesizes a single-entry
+   * map for the primary model.
    */
   usageByModel?: RunStateUsageByModel;
   /**
-   * AG-19: coarse data-flow taint summary, carried across suspend/resume so a
+   * Coarse data-flow taint summary, carried across suspend/resume so a
    * resumed run does not start with an empty ledger that silently un-gates
    * sinks exposed before the suspend. Structurally matches
    * `@graphorin/security`'s `TaintLedgerSnapshot` (core takes no security
@@ -118,12 +117,12 @@ export interface RunState {
    */
   taintSummary?: RunTaintSummary;
   /**
-   * AG-19: names of deferred tools promoted by `tool_search` this run, carried
+   * Names of deferred tools promoted by `tool_search` this run, carried
    * across suspend/resume so discovered tools remain in the per-step catalogue.
    */
   promotedTools?: ReadonlyArray<string>;
   /**
-   * B3 (item 15): per-turn security verdicts, keyed by turn position
+   * Per-turn security verdicts, keyed by turn position
    * `'<stepNumber>:<offsetInStep>'` (the step's assistant turn is
    * offset 0; step 0 is the pre-step input stage). Stamped by the run
    * loop's commit gates so downstream consumers - the `Session.push`
@@ -134,14 +133,14 @@ export interface RunState {
    */
   verdicts?: RunVerdicts;
   /**
-   * D6 structured plan/todo list - the agent's own working plan,
+   * Structured plan/todo list - the agent's own working plan,
    * journaled so it survives suspend/resume (a TodoWrite-style tool
    * mutates it, and attention-recitation renders it back into the
    * prompt each turn). Absent until the agent writes one.
    */
   todos?: ReadonlyArray<TodoItem>;
   /**
-   * W-001: sub-agent runs parked on this (parent) run because the
+   * Sub-agent runs parked on this (parent) run because the
    * child suspended with `awaiting_approval`. Each entry snapshots the
    * suspended child state; the child's pending approvals are mirrored
    * onto this run's `pendingApprovals` with `subRunToolCallId` set to
@@ -155,7 +154,7 @@ export interface RunState {
 
 /**
  * One sub-agent run parked on its parent because the child suspended
- * awaiting approvals (W-001). `state` is a JSON-compatible snapshot of
+ * awaiting approvals. `state` is a JSON-compatible snapshot of
  * the suspended child run; in serialized form (the agent package's
  * `SerializedRunState`) it carries the child's own version-stamped,
  * secret-redacted snapshot, recursively.
@@ -175,7 +174,7 @@ export interface PendingSubRun {
 
 /**
  * Read-only projection of {@link RunState} handed to tools and hooks
- * via {@link RunContext.state} (W-047). Structurally identical to
+ * via {@link RunContext.state}. Structurally identical to
  * `RunState` - `RunState` is assignable to it - but every property is
  * `readonly` and every array a `ReadonlyArray`, so typed tool code
  * cannot corrupt run bookkeeping (splice `pendingApprovals`, flip
@@ -217,7 +216,7 @@ export interface ReadonlyRunState {
 
 /**
  * Coarse, serializable data-flow taint summary persisted in {@link RunState}
- * across suspend/resume (AG-19). Structurally identical to
+ * across suspend/resume. Structurally identical to
  * `@graphorin/security`'s `TaintLedgerSnapshot`; carries no untrusted text.
  *
  * @stable
@@ -227,7 +226,7 @@ export interface RunTaintSummary {
   readonly sensitiveSeen: boolean;
   readonly untrustedSourceKinds: ReadonlyArray<string>;
   /**
-   * C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms
+   * One-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms
    * the verbatim-carry probe after a resume at tile granularity. Hashes
    * only - no untrusted text is ever persisted (the invariant above
    * holds).
@@ -236,7 +235,7 @@ export interface RunTaintSummary {
 }
 
 /**
- * B3 (item 15): one turn's security verdict. All fields are optional
+ * One turn's security verdict. All fields are optional
  * and additive; the ABSENCE of a verdict entry means the turn passed
  * every gate untouched.
  *
@@ -255,7 +254,7 @@ export interface RunTurnVerdict {
 }
 
 /**
- * B3: the plain-object verdict sidecar on {@link RunState.verdicts}.
+ * The plain-object verdict sidecar on {@link RunState.verdicts}.
  * Keys are turn positions `'<stepNumber>:<offsetInStep>'`. A plain
  * JSON-safe object on purpose (core `Message` has no id and `Map` is
  * not JSON-serializable).
@@ -265,7 +264,7 @@ export interface RunTurnVerdict {
 export type RunVerdicts = Record<string, RunTurnVerdict>;
 
 /**
- * One item in the agent's structured plan (D6). `status` drives both
+ * One item in the agent's structured plan. `status` drives both
  * the recitation rendering and progress reporting; `id` lets a
  * status-flip mutation target an item without rewriting the list.
  *
@@ -339,14 +338,14 @@ export interface RunContext<TDeps = unknown> {
   readonly stepNumber: number;
   readonly messages: ReadonlyArray<Message>;
   /**
-   * Read-only snapshot of the run's state (W-047). Tools observe the
+   * Read-only snapshot of the run's state. Tools observe the
    * run; they do not mutate its bookkeeping - writes to `status`,
    * `pendingApprovals` etc. are compile errors. The runtime keeps the
    * only mutable reference.
    */
   readonly state: ReadonlyRunState;
   /**
-   * C7: the current `agent.step` span (when the runtime traces). Spans
+   * The current `agent.step` span (when the runtime traces). Spans
    * created inside tool execution parent under it so a run's traces
    * form one tree.
    */

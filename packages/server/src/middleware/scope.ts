@@ -93,7 +93,7 @@ export function createScopeMiddleware(
 }
 
 /**
- * W-107: authentication-only gate. Lets any authenticated principal
+ * Authentication-only gate. Lets any authenticated principal
  * (token or the anonymous trusted-loopback operator) through and
  * rejects only `unauthenticated` with 401. Used where possession of a
  * valid principal is the whole requirement - e.g. the ws-ticket mint,
@@ -121,7 +121,7 @@ export function createAuthenticatedMiddleware(): MiddlewareHandler<{
 }
 
 /**
- * W-107: imperative scope check for handlers that must resolve the
+ * Imperative scope check for handlers that must resolve the
  * resource BEFORE the requirement is known (per-resource run control:
  * snapshot first, then require the owning agent's/workflow's scope).
  * Mirrors the middleware exactly: anonymous allows, unauthenticated

@@ -80,7 +80,7 @@ import {
 
 /**
  * Age after which an unresolved CONFLICT-CHECK row is expired as
- * `'admit'` at tiers with no deep phase (memory-consolidation-04) -
+ * `'admit'` at tiers with no deep phase -
  * the judge that would resolve it never runs there.
  */
 const PENDING_CONFLICT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -112,7 +112,7 @@ export interface Consolidator {
   onPhaseFinished(listener: PhaseListener): () => void;
   /**
    * Record memory-pipeline LLM spend that happened OUTSIDE a phase run
-   * (MCON-15 - e.g. workflow induction) so the daily ceilings cover it.
+   * (e.g. workflow induction) so the daily ceilings cover it.
    * Counted under the deep-phase bucket.
    */
   recordExternalSpend(tokens: number, costUsd?: number): void;
@@ -121,7 +121,7 @@ export interface Consolidator {
   /**
    * Register this consolidator's cron / idle triggers with a
    * `@graphorin/triggers` scheduler so they fire `trigger(...)`
-   * automatically (the daemon ↔ triggers bridge - MCON-4). Uses the
+   * automatically (the daemon ↔ triggers bridge). Uses the
    * configured `defaultScope`; throws if none was set. Turn / event
    * triggers are skipped (consumer-emitted). The standalone server calls
    * this in `beforeStart`.
@@ -132,14 +132,14 @@ export interface Consolidator {
   /** Drain DLQ rows whose `nextRetryAt` <= now. */
   drainDlq(scope: SessionScope): Promise<number>;
   /**
-   * Activity signal from the embedding runtime (item 7, A2): a turn
-   * finished / the transcript grew. Re-evaluates the `buffer:N`
-   * trigger - when the unconsolidated transcript tail (from the
-   * standard-phase cursor) reaches the configured token threshold
-   * (chars/4 proxy, the same measure as the W-081 transcript budget),
-   * the light+standard chain fires with reason `{ kind: 'buffer' }`.
+   * Activity signal from the embedding runtime: a turn finished / the
+   * transcript grew. Re-evaluates the `buffer:N` trigger - when the
+   * unconsolidated transcript tail (from the standard-phase cursor)
+   * reaches the configured token threshold (chars/4 proxy, the same
+   * measure as the `maxTranscriptChars` transcript budget), the
+   * light+standard chain fires with reason `{ kind: 'buffer' }`.
    * The documented contract is "buffer:N OR idle:T": whichever comes
-   * first consolidates the settled segment, and the MCON-8 cooldown
+   * first consolidates the settled segment, and the cooldown
    * still applies so message bursts cannot storm the pipeline. No-op
    * when no `buffer:N` trigger is configured, when the consolidator
    * is stopped/paused, or when no scope is resolvable. The server
@@ -168,11 +168,11 @@ class ConsolidatorImpl implements Consolidator {
   readonly #now: () => number;
   readonly #randomId: () => string;
   readonly #provider: Provider | null;
-  /** Per-phase provider overrides (MCON-7); fall back to `#provider`. */
+  /** Per-phase provider overrides; fall back to `#provider`. */
   readonly #cheapProvider: Provider | null;
   readonly #deepProvider: Provider | null;
   /**
-   * USD pricer for phase LLM usage (memory-consolidation-02). Without
+   * USD pricer for phase LLM usage. Without
    * it every phase's `priceUsage?.(...) ?? 0` evaluates to zero and the
    * `maxCostPerDay` ceiling can never trip.
    */
@@ -189,7 +189,7 @@ class ConsolidatorImpl implements Consolidator {
   #deferredRuns = 0;
   /**
    * Message ids of the batch the in-flight `#dispatch` operates on,
-   * keyed by {@link scopeKey} (MCON-10, W-142). Captured so a thrown
+   * keyed by {@link scopeKey}. Captured so a thrown
    * phase can enqueue its DLQ row with the REAL failed slice instead of
    * `[]` - replays must target the window that failed, not whatever the
    * cursor points at later. Keyed per scope because the lock is
@@ -211,7 +211,7 @@ class ConsolidatorImpl implements Consolidator {
   /**
    * Smallest configured `buffer:N` threshold (tokens, chars/4 proxy),
    * parsed once at construction. `null` = no buffer trigger declared,
-   * `notifyActivity(...)` is a no-op (item 7, A2).
+   * `notifyActivity(...)` is a no-op.
    */
   readonly #bufferThresholdTokens: number | null;
 
@@ -495,7 +495,7 @@ class ConsolidatorImpl implements Consolidator {
   }
 
   /**
-   * memory-consolidation-04: at tiers with no deep phase the pending
+   * At tiers with no deep phase the pending
    * CONFLICT-CHECK queue has no drain. Resolve rows older than 7 days
    * as `'admit'` (the safe direction - the candidate fact stays live;
    * only the never-coming judge call is skipped), bounded per sweep.
@@ -579,7 +579,7 @@ class ConsolidatorImpl implements Consolidator {
   }
 
   /**
-   * W-081: poison-slice skip. When a standard-phase batch exhausts its
+   * Poison-slice skip. When a standard-phase batch exhausts its
    * DLQ retries while the cursor still points before / inside the failed
    * window, every future trigger re-reads the SAME slice, fails the same
    * way and consolidation for the scope stalls forever (each drain also
@@ -831,7 +831,7 @@ class ConsolidatorImpl implements Consolidator {
   }
 
   /**
-   * W-143: surface a swallowed completion-accounting error as a
+   * Surface a swallowed completion-accounting error as a
    * dedicated error span. Swallowing is deliberate (the phase's work is
    * committed; the lock must be released), but a systematic store
    * problem must stay visible to operators.
@@ -1070,7 +1070,7 @@ class ConsolidatorImpl implements Consolidator {
   }
 
   /**
-   * Wave-D D4: execute the deterministic promotion policy - list the
+   * Execute the deterministic promotion policy - list the
    * quarantined candidates with their recall stats, apply the pure
    * `shouldPromote` verdict, and promote each winner through the
    * audited `SemanticMemory.validate` path (which refuses
@@ -1218,7 +1218,7 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
 }
 
 /**
- * Wave-D D3: merge the `learnedContext: true` sugar with the explicit
+ * Merge the `learnedContext: true` sugar with the explicit
  * `curatedBlocks` list into the resolved config, validating labels
  * (unique, non-empty, never the reserved `profile`).
  */
@@ -1267,8 +1267,8 @@ function defaultTriggers(): ConsolidatorTriggerSpec[] {
 }
 
 /**
- * Smallest `buffer:N` threshold among the configured trigger specs
- * (item 7, A2). Unparseable specs are skipped here - they already
+ * Smallest `buffer:N` threshold among the configured trigger specs.
+ * Unparseable specs are skipped here - they already
  * fail loudly at registration / config-validation time.
  */
 function minBufferThreshold(specs: ReadonlyArray<ConsolidatorTriggerSpec>): number | null {

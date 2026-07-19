@@ -1,6 +1,6 @@
 /**
  * Recall explainability for `@graphorin/memory` - "why was this
- * recalled?" (X-3). Turns the per-signal scores the hybrid pipeline
+ * recalled?". Turns the per-signal scores the hybrid pipeline
  * already records on each {@link MemoryHit} (FTS `bm25`, vector
  * similarity, the fused reciprocal-rank term, the decay multiplier,
  * future graph-hop terms) into a structured, renderable explanation.
@@ -50,7 +50,7 @@ export interface RecalledMemoryExplanation {
  * {@link SemanticMemory.search} call: the query, the reranker that
  * fused the candidate lists, and the per-memory signal breakdown in
  * final-rank order. Pure data - safe to attach to a span, log, or
- * render. X-3.
+ * render.
  *
  * @stable
  */

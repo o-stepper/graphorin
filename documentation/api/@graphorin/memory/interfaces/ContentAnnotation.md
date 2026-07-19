@@ -6,7 +6,7 @@
 
 # Interface: ContentAnnotation
 
-Defined in: packages/memory/src/context-engine/annotations.ts:111
+Defined in: packages/memory/src/context-engine/annotations.ts:112
 
 **`Stable`**
 
@@ -16,5 +16,5 @@ Single typed annotation for an assembled message-content part.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-inboundtrust"></a> `inboundTrust` | `readonly` | [`InboundTrust`](/api/@graphorin/memory/type-aliases/InboundTrust.md) | packages/memory/src/context-engine/annotations.ts:113 |
-| <a id="property-origin"></a> `origin` | `readonly` | [`ContentOrigin`](/api/@graphorin/memory/type-aliases/ContentOrigin.md) | packages/memory/src/context-engine/annotations.ts:112 |
+| <a id="property-inboundtrust"></a> `inboundTrust` | `readonly` | [`InboundTrust`](/api/@graphorin/memory/type-aliases/InboundTrust.md) | packages/memory/src/context-engine/annotations.ts:114 |
+| <a id="property-origin"></a> `origin` | `readonly` | [`ContentOrigin`](/api/@graphorin/memory/type-aliases/ContentOrigin.md) | packages/memory/src/context-engine/annotations.ts:113 |

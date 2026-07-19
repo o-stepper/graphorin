@@ -1,6 +1,6 @@
 /**
  * Conversion from Graphorin messages to the Anthropic Messages API
- * wire shape, used by `AnthropicAPICounter` (core-provider-04).
+ * wire shape, used by `AnthropicAPICounter`.
  *
  * The `count_tokens` endpoint accepts the same body as `/v1/messages`:
  * only `user` / `assistant` roles in `messages`, system prompts in the

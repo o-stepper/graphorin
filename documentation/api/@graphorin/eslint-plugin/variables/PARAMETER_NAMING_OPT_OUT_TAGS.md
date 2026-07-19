@@ -17,5 +17,5 @@ Defined in: src/tool-discovery.ts:180
 Tag values that, when present in a tool's `tags: [...]` literal,
 suppress the parameter-naming rule for that tool. The opt-out
 exists so operators can defer the rename for a long tail of
-pre-RB-49 tools while the framework migrates without breaking
+pre-existing tools while the framework migrates without breaking
 calling code.

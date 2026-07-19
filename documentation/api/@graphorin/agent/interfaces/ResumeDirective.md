@@ -6,7 +6,7 @@
 
 # Interface: ResumeDirective
 
-Defined in: packages/agent/src/types.ts:542
+Defined in: packages/agent/src/types.ts:541
 
 **`Stable`**
 
@@ -22,4 +22,4 @@ approvals: [...] } })` to resume.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:543 |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:542 |

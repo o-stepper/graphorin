@@ -28,7 +28,7 @@ refresh.
 | `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | - |
 | `serverId` | `string` | - |
 | `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); `signal?`: `AbortSignal`; \} | - |
-| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | SPL-1: resolves the persisted refresh token across processes. |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | Resolves the persisted refresh token across processes. |
 | `options.signal?` | `AbortSignal` | - |
 
 ## Returns

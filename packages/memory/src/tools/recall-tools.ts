@@ -23,13 +23,13 @@ const recallEpisodesOutputSchema = z.object({
       score: z.number(),
       startedAt: z.string(),
       endedAt: z.string(),
-      /** Trust-provenance tag (MST-10) - synthesized episodes say so. */
+      /** Trust-provenance tag - synthesized episodes say so. */
       provenance: z.string().optional(),
     }),
   ),
 });
 
-/** W-013: explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
+/** Explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
 export interface RecallEpisodesInput {
   query: string;
   topK?: number | undefined;
@@ -82,7 +82,7 @@ const deepRecallOutputSchema = z.object({
       text: z.string(),
       score: z.number(),
       sensitivity: deepRecallSensitivityEnum,
-      /** Trust-provenance tag (MST-10) - synthesized facts say so. */
+      /** Trust-provenance tag - synthesized facts say so. */
       provenance: z.string().optional(),
       /** Closed validity end (only surfaces on `asOf` reads). */
       validTo: z.string().optional(),
@@ -93,8 +93,8 @@ const deepRecallOutputSchema = z.object({
   sufficient: z.boolean(),
   abstained: z.boolean(),
   /**
-   * Whether the grader actually judged sufficiency
-   * (memory-retrieval-02). When `false`, `sufficient: true` is a
+   * Whether the grader actually judged sufficiency.
+   * When `false`, `sufficient: true` is a
    * default, not a verdict.
    */
   graded: z.boolean(),
@@ -237,7 +237,7 @@ export function createConversationSearchTool(
 
 /**
  * `deep_recall` - gated, multi-pass ("deep") recall over the user's
- * factual memory for HARD questions (P2-4). A local difficulty gate keeps
+ * factual memory for HARD questions. A local difficulty gate keeps
  * simple lookups single-shot; only queries judged hard trigger a
  * grade-and-reformulate loop (bounded by `maxIterations`, hard-capped at
  * 5), widening to one-hop graph expansion on reformulation passes. The

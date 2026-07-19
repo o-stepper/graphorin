@@ -1,5 +1,5 @@
 /**
- * Learned-context pass (D3) - Letta-style sleep-time maintenance of a
+ * Learned-context pass - Letta-style sleep-time maintenance of a
  * persistent, size-bounded, agent-editable digest block. The deep phase
  * rewrites one reserved working-memory block (`learned_context`) from
  * the previous digest + fresh evidence (recent episodes, active
@@ -16,7 +16,7 @@
  *
  * Runs after the deep-phase reflection pass, reusing the same budget /
  * lock / run-audit envelope. Gated off by default at every tier
- * (`learnedContext: false`) - Wave-D trial discipline.
+ * (`learnedContext: false`).
  *
  * @packageDocumentation
  */
@@ -35,7 +35,7 @@ export const LEARNED_CONTEXT_BLOCK_LABEL = 'learned_context';
 export const DEFAULT_LEARNED_CONTEXT_MAX_CHARS = 1200;
 
 /**
- * One curated-block declaration (wave-D D3): the deep phase maintains
+ * One curated-block declaration: the deep phase maintains
  * a rewrite pass per entry - `learnedContext: true` is sugar for
  * `[{ label: 'learned_context' }]`. `prompt` overrides the maintenance
  * system prompt (the default is a generic fold-the-evidence rewrite,
@@ -92,7 +92,7 @@ export interface LearnedContextDeps {
   readonly now?: () => number;
 }
 
-/** Inputs accepted by {@link runCuratedBlockPass} (wave-D D3). */
+/** Inputs accepted by {@link runCuratedBlockPass}. */
 export interface CuratedBlockDeps extends LearnedContextDeps {
   /** Which working block this pass maintains. */
   readonly label: string;
@@ -127,7 +127,7 @@ export function normalizeLearnedContext(raw: string, maxChars: number): string |
 
 /**
  * Generic maintenance prompt for a curated block that is not the
- * learned-context digest (wave-D D3).
+ * learned-context digest.
  */
 export function curatedBlockSystemPrompt(label: string): string {
   return [
@@ -147,7 +147,7 @@ export function buildLearnedContextRequest(args: {
   readonly insights: ReadonlyArray<string>;
   readonly procedures: ReadonlyArray<string>;
   readonly maxChars: number;
-  /** Maintenance system prompt override (wave-D D3 curated blocks). */
+  /** Maintenance system prompt override (curated blocks). */
   readonly systemPrompt?: string;
 }): ProviderRequest {
   const sections: string[] = [
@@ -177,7 +177,7 @@ export function buildLearnedContextRequest(args: {
 /**
  * Run the learned-context rewrite. Resilient by construction: a
  * provider failure or empty rewrite leaves the existing block untouched
- * and never throws; only storage errors propagate. Since wave-D D3 this
+ * and never throws; only storage errors propagate. This pass
  * is sugar over {@link runCuratedBlockPass} with the reserved
  * `learned_context` label + its canonical prompt.
  */
@@ -188,7 +188,7 @@ export async function runLearnedContextPass(
 }
 
 /**
- * Run one curated-block rewrite (wave-D D3) - the generalised
+ * Run one curated-block rewrite - the generalised
  * learned-context pass: previous block value + recent episodes +
  * active insights + active procedures fold into a size-bounded
  * rewrite of the block named by `deps.label`. Same resilience

@@ -45,7 +45,7 @@ optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMeta
 
 Defined in: packages/core/src/contracts/memory-store.ts:144
 
-List messages with their persisted identity (RP-5). Optional: stores that
+List messages with their persisted identity. Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
 
 #### Parameters
@@ -99,7 +99,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:159
 
 Full-text search over the scoped session messages.
 
-Query precedence (W-127): the POSITIONAL `query` parameter is
+Query precedence: the POSITIONAL `query` parameter is
 authoritative; when the caller also sets `opts.query` (the field
 exists because [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOptions.md) is shared with the
 option-object search surfaces), implementations MUST ignore it.

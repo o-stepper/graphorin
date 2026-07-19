@@ -1,18 +1,19 @@
 /**
- * Procedural memory extraction (P2-2) - AWM-style workflow induction. From
+ * Procedural memory extraction - AWM-style workflow induction. From
  * a **successful** agent trajectory, distil a reusable procedure: a goal, a
  * value-abstracted step sequence (`"search for {product}"`), the variable
  * names that abstraction introduced, and Voyager-style success criteria the
  * reuse can self-verify against. The induced procedure is stored in the
- * procedural tier **quarantined** + `provenance: 'induction'` (P1-4) -
+ * procedural tier **quarantined** + `provenance: 'induction'` -
  * procedures drive *actions*, so this is the highest-poisoning-risk write in
  * the system and must never bypass the quarantine gate.
  *
- * Provider-agnostic seam, mirroring the P2-3 / P2-4 retrieval seams: pure
- * request builder ({@link buildInductionRequest}) + tolerant pure parser
- * ({@link parseInducedProcedure}) + a resilient provider-backed inducer
- * ({@link createProviderWorkflowInducer}) + a pure orchestrator
- * ({@link runWorkflowInduction}) that does no I/O of its own. The module
+ * Provider-agnostic seam, mirroring the query-transform / iterative
+ * retrieval seams: pure request builder ({@link buildInductionRequest}) +
+ * tolerant pure parser ({@link parseInducedProcedure}) + a resilient
+ * provider-backed inducer ({@link createProviderWorkflowInducer}) + a
+ * pure orchestrator ({@link runWorkflowInduction}) that does no I/O of
+ * its own. The module
  * imports only `@graphorin/core` types, so the default (no-inducer) path is
  * fully offline - induction only ever calls a model when a provider is wired
  * via `createMemory({ procedureInduction: { provider } })`.
@@ -229,7 +230,7 @@ export function createProviderWorkflowInducer(
   options: {
     readonly maxTokens?: number;
     /**
-     * Usage callback (MCON-15) - induction is the framework's highest
+     * Usage callback - induction is the framework's highest
      * poisoning-risk LLM spend and previously flowed past every budget
      * envelope. `createMemory` wires this into the consolidator budget
      * when one is enabled; standalone callers can record it themselves.

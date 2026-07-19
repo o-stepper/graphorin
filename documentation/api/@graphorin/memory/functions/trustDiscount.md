@@ -10,7 +10,7 @@
 function trustDiscount(record, weights?): number;
 ```
 
-Defined in: packages/memory/src/search/trust.ts:48
+Defined in: packages/memory/src/search/trust.ts:47
 
 **`Stable`**
 

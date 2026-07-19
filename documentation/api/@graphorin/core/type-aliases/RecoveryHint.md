@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/tool.ts:255
 
 **`Stable`**
 
-Model-facing recovery guidance attached to a [ToolError](/api/@graphorin/core/interfaces/ToolError.md) (C3).
+Model-facing recovery guidance attached to a [ToolError](/api/@graphorin/core/interfaces/ToolError.md).
 Practitioner evidence converges on these two fields being what changes
 model behaviour after a failure:
 

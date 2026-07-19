@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:295
 
 Thrown when a checkpoint write detects that another writer advanced
-the thread concurrently (WF-12) - the loser must not fork the
+the thread concurrently - the loser must not fork the
 timeline.
 
 ## Extends

@@ -1,13 +1,13 @@
 /**
- * E1 permission pre-screen for the agent run loop: combine the
+ * Permission pre-screen for the agent run loop: combine the
  * caller's {@link PermissionHook} with the four-value argument-policy
  * verdict BEFORE a call is dispatched, so `ask`/`defer` can ride the
- * agent's durable-HITL suspend (the only surface that can park a run,
- * N-9) instead of failing closed inside the executor.
+ * agent's durable-HITL suspend (the only surface that can park a
+ * run) instead of failing closed inside the executor.
  *
  * Evaluation mirrors the executor's phase order: the hook runs first
  * (its allowed `updatedInput` rewrite is re-validated and becomes the
- * input every later gate sees, W-118), then the policy `decide` runs
+ * input every later gate sees), then the policy `decide` runs
  * over the post-rewrite validated input. The verdicts combine by the
  * vocabulary priority `deny > defer > ask > allow`.
  *

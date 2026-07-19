@@ -1,5 +1,5 @@
 /**
- * A7 (SOTA): prompt-cache-aware tool-catalogue ordering.
+ * Prompt-cache-aware tool-catalogue ordering.
  *
  * The per-step catalogue is `[...eagerTools, ...promotedTools, ...handoffTools]`.
  * The eager prefix is already stable (the registry lists in insertion order), so

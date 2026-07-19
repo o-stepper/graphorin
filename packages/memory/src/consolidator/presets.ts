@@ -1,12 +1,12 @@
 /**
- * Reviser preset (wave-D D3, plan item 5) - a ready-made consolidator
- * configuration for the sleep-time curation agent: a cheap provider
+ * Reviser preset - a ready-made consolidator configuration for the
+ * sleep-time curation agent: a cheap provider
  * profile, an idle + cron cadence that actually reaches the deep phase
  * (deep runs only on cron / manual / budget triggers), the curated
  * blocks it maintains, and a HARD budget posture. The tier defaults for
  * `onExceed` at `standard`/`full` are `'log'` - acceptable for
  * interactive use, wrong for an unattended reviser, so this preset
- * REQUIRES `'pause' | 'throw'` and rejects `'log'` (D-8: the reviser
+ * REQUIRES `'pause' | 'throw'` and rejects `'log'` (the reviser
  * stays on the consolidator's own budget mechanism; the agent-level run
  * budget does not apply here).
  *

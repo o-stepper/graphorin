@@ -147,7 +147,7 @@ for await (const event of stream) {
   completes; `requestApproval(name, payload?)` + `workflow.approve(
   threadId, name, decision)` persist a typed approval round-trip
   resolved by name.
-- **Firing durable timers (W-032).** `createTimerDriver({ workflows:
+- **Firing durable timers.** `createTimerDriver({ workflows:
   [{ workflow, checkpointStore }] })` polls each store's
   `listSuspended(namespace, { dueBefore })` (the engine stamps
   `CheckpointMetadata.wakeAt` on timer suspends) and calls

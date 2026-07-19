@@ -1,5 +1,5 @@
 /**
- * C6: taint override for memory-recall tool results. The recall tools are
+ * Taint override for memory-recall tool results. The recall tools are
  * first-party (`sideEffectClass: 'read-only'`), so the data-flow ledger
  * would derive their outputs as trusted - but the CONTENT they return can
  * be quarantined or foreign-provenance memory written in an earlier

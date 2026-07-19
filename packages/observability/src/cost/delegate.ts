@@ -1,6 +1,6 @@
 /**
- * W-092: the documented-but-missing bridge between the provider
- * middleware `withCostTracking` and a {@link CostTracker}. The
+ * The bridge between the provider middleware `withCostTracking`
+ * and a {@link CostTracker}. The
  * middleware's `onUsage` hook carries per-call figures (incl. the
  * prompt-cache legs and a computed `costUsd`); this adapter converts
  * them into a {@link CostRecordInput} and records it - STRUCTURALLY,

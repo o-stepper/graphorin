@@ -1,13 +1,13 @@
 /**
- * Client-side request handlers for server-initiated MCP requests
- * (WI-13 / P2-2): **elicitation** (`elicitation/create`) and **sampling**
+ * Client-side request handlers for server-initiated MCP requests:
+ * **elicitation** (`elicitation/create`) and **sampling**
  * (`sampling/createMessage`).
  *
  * Both are gated: the client advertises a capability and registers a
  * handler *only* when the operator supplies the matching callback on
  * {@link CreateMCPClientOptions}. A conforming server will not issue a
  * request for an un-advertised capability, so the default client is inert
- * (no implicit prompting, no implicit model calls - R4).
+ * (no implicit prompting, no implicit model calls).
  *
  * The SDK request/result schemas are kept inside this module; the public
  * surface speaks only the Graphorin-typed {@link MCPElicitationRequest} /
@@ -49,7 +49,7 @@ export interface ClientRequestHandlerOptions {
  * based on which server-initiated handlers the operator supplied.
  * Returns `undefined` when none are configured (advertise nothing).
  *
- * Elicitation is advertised as `{ form: {} }` (W-141): the handler
+ * Elicitation is advertised as `{ form: {} }`: the handler
  * supports form-mode only, and the 2025-11-25 spec expresses that as
  * the `form` sub-capability. A bare `{}` is spec-equivalent through
  * the backward-compat preprocess rule, but the explicit shape states
@@ -177,7 +177,7 @@ export function registerClientRequestHandlers(
   }
 }
 
-/** Normalise SDK message content (block | block[]) to a block array (MC-13). */
+/** Normalise SDK message content (block | block[]) to a block array. */
 function contentBlocks(
   content: unknown,
 ): ReadonlyArray<{ readonly type?: unknown; [k: string]: unknown }> {

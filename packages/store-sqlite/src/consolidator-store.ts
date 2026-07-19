@@ -30,7 +30,7 @@ export interface ConsolidatorStateRow {
   readonly activeLockAcquiredAt: number | null;
   /**
    * `ended_at` (epoch ms) of the newest episode the deep-phase reflection
-   * pass has already reflected on (MCON-13). A later pass accumulates
+   * pass has already reflected on. A later pass accumulates
    * importance only from strictly-newer episodes; `null` ⇒ nothing reflected
    * yet.
    */
@@ -69,9 +69,9 @@ export interface ConsolidatorRunFinish {
   readonly conflictsResolved?: number;
   readonly noiseFilteredCount?: number;
   readonly emptyExtractions?: number;
-  /** Episodes auto-formed by the run (P1-2 / MCON-17). */
+  /** Episodes auto-formed by the run. */
   readonly episodesFormed?: number;
-  /** Insights synthesized by the run's reflection pass (P1-1 / MCON-17). */
+  /** Insights synthesized by the run's reflection pass. */
   readonly insightsCreated?: number;
   readonly errorMessage?: string | null;
   readonly retryCount?: number;
@@ -88,7 +88,7 @@ export interface DlqBatchInput {
   readonly failedAt: number;
   readonly nextRetryAt: number;
   readonly retryCount: number;
-  /** Phase that failed (MCON-10); `null`/absent ⇒ legacy 'standard' replay. */
+  /** Phase that failed; `null`/absent ⇒ legacy 'standard' replay. */
   readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
@@ -103,7 +103,7 @@ export interface DlqBatchRow {
   readonly failedAt: number;
   readonly nextRetryAt: number | null;
   readonly retryCount: number;
-  /** Phase that failed (MCON-10); `null` ⇒ legacy row. */
+  /** Phase that failed; `null` ⇒ legacy row. */
   readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
@@ -382,10 +382,10 @@ export class SqliteConsolidatorStateStore {
   }
 
   /**
-   * W-133: despite the name, this is a plain SELECT of due DLQ batches
+   * Despite the name, this is a plain SELECT of due DLQ batches
    * WITHOUT any lease/claim semantics - two concurrent callers see the
    * same rows. Serializing concurrent drains is the CALLER's job via
-   * the CS-8 consolidator scope lock (the runtime always drains under
+   * the consolidator scope lock (the runtime always drains under
    * it); the worst case of a bypassed lock is duplicated LLM replay
    * spend, not corruption. The name is kept because the method sits on
    * the stable contract surface - renaming would be a breaking change
@@ -440,7 +440,7 @@ export class SqliteConsolidatorStateStore {
   }
 
   /**
-   * W-065: retention for the per-tick run log. Deletes terminal runs
+   * Retention for the per-tick run log. Deletes terminal runs
    * that started before the cutoff; in-flight rows
    * (`status = 'running'`) always survive. Returns rows deleted.
    *
@@ -455,7 +455,7 @@ export class SqliteConsolidatorStateStore {
   }
 
   /**
-   * W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
+   * Retention for the dead-letter queue. Deletes only EXHAUSTED
    * batches (`next_retry_at IS NULL` - parked forever by
    * `markBatchExhausted`) that failed before the cutoff; batches still
    * awaiting a retry are never touched (they belong to

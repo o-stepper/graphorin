@@ -24,7 +24,7 @@ The kind of tainted data flow the policy detected at a sink.
   even when no verbatim carry is provable. Catches the paraphrased
   "untrusted instruction drives a secret exfiltration" case at the cost
   of more false positives (hence shadow-mode-first + declassification).
-- `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) - the
+- `'derived-untrusted-to-sink'` (`derivedTaint: 'strict'`) - the
   CaMeL-style control-flow-integrity signal: once untrusted content has
   entered the run, EVERY subsequent model-driven sink call is treated
   as derived from it - paraphrase-robust by construction, deliberately

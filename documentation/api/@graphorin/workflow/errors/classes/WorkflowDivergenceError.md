@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:252
 
 Thrown on resume when the persisted frontier references nodes that no
-longer exist in the workflow definition (D1) - the definition changed
+longer exist in the workflow definition - the definition changed
 mid-flight and a silent re-plan would diverge from the journal.
 
 ## Extends

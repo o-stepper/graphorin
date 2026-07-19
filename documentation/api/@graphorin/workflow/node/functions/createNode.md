@@ -17,7 +17,7 @@ Defined in: packages/workflow/src/node.ts:24
 Construct a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). The wrapper exists to give the
 engine a stable shape and to keep `createWorkflow({...})` callers
 from instantiating nodes by hand. Carries the optional per-node
-execution policy (D1 / workflow-03): `timeoutMs` + `retry`.
+execution policy: `timeoutMs` + `retry`.
 
 ## Type Parameters
 

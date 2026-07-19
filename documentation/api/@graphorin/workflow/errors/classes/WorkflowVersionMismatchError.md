@@ -9,9 +9,9 @@
 Defined in: packages/workflow/src/errors/index.ts:227
 
 Thrown on resume when the stored frontier was written by a different
-`WorkflowConfig.version` (D1 / workflow-14) - replaying
-persisted state through changed code must fail loudly, not silently
-diverge. Opt out per call via `allowVersionMismatch`.
+`WorkflowConfig.version` - replaying persisted state through
+changed code must fail loudly, not silently diverge. Opt out per
+call via `allowVersionMismatch`.
 
 ## Extends
 

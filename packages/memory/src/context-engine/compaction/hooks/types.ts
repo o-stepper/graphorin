@@ -33,8 +33,8 @@ export interface HookDeps {
   /** Optional context tags surfaced to the procedural-rules query. */
   readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
   /**
-   * D2 privacy evaluator threaded from the engine's resolved privacy
-   * config (context-engine-02). `true` = the provider may see content of
+   * Privacy evaluator threaded from the engine's resolved privacy
+   * config. `true` = the provider may see content of
    * this sensitivity. Built-in hooks MUST consult it before re-injecting
    * tier content: `assemble()` filters what ships to the provider, and
    * the post-compaction splice ships to the SAME provider - without the
@@ -56,7 +56,7 @@ export interface HookDeps {
 export interface NamedPostCompactionHook {
   readonly id: string;
   /**
-   * `ctx` carries the REAL compaction outcome (CE-6) - result, scope,
+   * `ctx` carries the REAL compaction outcome - result, scope,
    * runId, sessionId, agentId, source - built by `compactNow` after the
    * pipeline finishes. Record-form built-ins may ignore it; the
    * function-form wrapper forwards it to the operator's hook verbatim.

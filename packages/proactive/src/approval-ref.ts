@@ -1,9 +1,9 @@
 /**
- * Serialized agent-approval address for messenger callback-data (C3).
+ * Serialized agent-approval address for messenger callback-data.
  *
  * The workflow side already has `wf:<workflowId>:<threadId>:<name>`
- * (`serializeAwakeableRef` in `@graphorin/workflow`, decision D-1 /
- * A3); this is the agent-approval counterpart: a parked agent run is
+ * (`serializeAwakeableRef` in `@graphorin/workflow`); this is the
+ * agent-approval counterpart: a parked agent run is
  * addressed by its run id plus the pending approval's tool-call id,
  * and resolved through `POST /v1/runs/:runId/resume` with an
  * `approvals: [{ toolCallId, granted }]` body. The `run:` prefix keeps

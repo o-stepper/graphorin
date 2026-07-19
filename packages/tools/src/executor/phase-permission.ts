@@ -1,22 +1,22 @@
 /**
- * Permission phase (E1 / item 11): the caller-supplied
+ * Permission phase: the caller-supplied
  * {@link PermissionHook} evaluated on the VALIDATED input, after the
  * validate phase and BEFORE the approval phase.
  *
  * Decision semantics at this surface (the executor cannot suspend a
- * run - N-9):
+ * run):
  *
  * - `'allow'`  - proceed; an `updatedInput` rewrite is re-validated and
  *   replaces both the validated input and the effective args, so the
  *   approval gate / argument policy / data-flow gate all see what will
- *   actually run (W-118).
+ * actually run.
  * - `'deny'`   - deterministic block (`capability_blocked`).
  * - `'ask'` / `'defer'` - fail closed (`approval_denied`) unless the
  *   batch is pre-approved: only the agent pre-screen can durably
  *   suspend, and it resolves these verdicts BEFORE dispatch. On a
  *   pre-approved replay the human's grant IS the resolution, so the
  *   verdict passes - but a rewrite of the granted args fails the call
- *   (tools-02: never execute a payload nobody saw).
+ *   (never execute a payload nobody saw).
  * - a THROWING hook fails the call closed (`capability_blocked`).
  *
  * @packageDocumentation
@@ -118,7 +118,7 @@ export async function runPermissionPhase(
           tool,
           'invalid_input',
           'Permission hook attempted to rewrite pre-approved args on a resume replay - ' +
-            'the grant covered the original payload, so the rewrite is refused (tools-02).',
+            'the grant covered the original payload, so the rewrite is refused.',
           runContext,
           stepNumber,
         ),

@@ -1,12 +1,12 @@
 /**
  * Eleven memory tools registered with `@graphorin/tools` by the
- * `createMemory()` facade - plus an opt-in twelfth, `deep_recall` (P2-4),
+ * `createMemory()` facade - plus an opt-in twelfth, `deep_recall`,
  * appended only when iterative retrieval is configured. Each factory
  * takes a {@link MemoryToolDeps} bundle so consumers can scope the tool
  * surface (per-tier ACL, scope resolver, etc.) without rebuilding the
  * underlying memory facade.
  *
- * Wave-D D3 adds tool PROFILES: `'full'` (the canonical stable-order
+ * Tool PROFILES: `'full'` (the canonical stable-order
  * set), `'interactive'` (read-only - the front-line conversational
  * agent cannot write memory by construction; curation belongs to the
  * reviser), and `'reviser'` (the full read+write surface, semantically
@@ -61,7 +61,7 @@ export { createRunbookSearchTool } from './runbook-tools.js';
 export type { MemoryToolDeps, ScopeResolver } from './types.js';
 
 /**
- * Memory tool profile (wave-D D3): which slice of the canonical set an
+ * Memory tool profile: which slice of the canonical set an
  * agent receives. `'interactive'` is read-only by construction.
  *
  * @stable
@@ -82,7 +82,7 @@ export const MEMORY_TOOL_PROFILES: ReadonlyArray<MemoryToolProfile> = Object.fre
  */
 export interface BuildMemoryToolsOptions {
   /**
-   * Tool profile (wave-D D3). `'full'` (default) keeps the canonical
+   * Tool profile. `'full'` (default) keeps the canonical
    * stable-order set; `'interactive'` builds ONLY the read tools
    * (`fact_search`, `recall_episodes`, `conversation_search`,
    * `fact_history`, plus the gated read appendices) - write tools do
@@ -92,13 +92,13 @@ export interface BuildMemoryToolsOptions {
    */
   readonly profile?: MemoryToolProfile;
   /**
-   * Append the gated `deep_recall` tool (P2-4) as a twelfth tool. The
+   * Append the gated `deep_recall` tool as a twelfth tool. The
    * facade sets this only when `iterativeRetrieval` is configured, so the
    * default tool surface stays at the canonical eleven. Default `false`.
    */
   readonly includeDeepRecall?: boolean;
   /**
-   * Append the gated `runbook_search` tool (D3). The facade sets this
+   * Append the gated `runbook_search` tool. The facade sets this
    * only when `createMemory({ runbookSearch: true })` opts in, so the
    * default tool surface is unchanged. Default `false`.
    */
@@ -108,9 +108,9 @@ export interface BuildMemoryToolsOptions {
 /**
  * Build the canonical memory-tool array for a profile. Order is stable
  * for `'full'` / `'reviser'` - consumers can rely on the indices for
- * snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are
+ * snapshot tests. `fact_history` and `fact_validate` are
  * appended last so the original nine indices are unchanged. With
- * `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is
+ * `{ includeDeepRecall: true }` the gated `deep_recall` tool is
  * appended after the stable eleven; `runbook_search` after it. Both
  * gated appendices are reads, so they appear in every profile.
  *

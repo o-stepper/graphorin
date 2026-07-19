@@ -100,7 +100,7 @@ export class OllamaEmbedderError extends Error {
  * first `embed()` resolves the real width from a response. Only single-width
  * families are listed; size-variant families (e.g. `qwen3-embedding`, whose
  * dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so
- * an ambiguous bind fails loudly rather than baking a wrong width (PS-11).
+ * an ambiguous bind fails loudly rather than baking a wrong width.
  */
 export const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number> = new Map([
   ['nomic-embed-text', 768],
@@ -182,7 +182,7 @@ export class OllamaEmbedder implements EmbedderProvider {
 
   /**
    * Output dimension - the explicit `dim` option, the resolved width from the
-   * first `embed()`, or a known-family default. PS-11: throws for an unknown
+   * first `embed()`, or a known-family default. Throws for an unknown
    * model with no `dim` hint instead of returning `0` (which the store would
    * persist and use to create a `float[0]` vec0 table, silently breaking
    * vector search). Pass `dim` for any model not in {@link

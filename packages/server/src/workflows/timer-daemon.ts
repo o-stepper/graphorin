@@ -1,5 +1,5 @@
 /**
- * W-032: durable-timer driver integration with the server lifecycle.
+ * Durable-timer driver integration with the server lifecycle.
  *
  * Mirrors the triggers daemon: the operator builds a
  * `createTimerDriver(...)` (from `@graphorin/workflow`) over their

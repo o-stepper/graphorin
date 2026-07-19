@@ -211,7 +211,7 @@ interface SubscriberRecord {
 
 interface SubscriptionRecord {
   readonly subscriberId: string;
-  /** IP-18: the authenticating principal's token id (not the connection id). */
+  /** The authenticating principal's token id (not the connection id). */
   readonly tokenId: string;
   readonly subscriptionId: string;
   readonly subject: string;
@@ -434,7 +434,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
   }
 
   /**
-   * W-027: single choke point for delivering a frame to a
+   * Single choke point for delivering a frame to a
    * subscription. Sanitizes, dispatches, and advances `lastEventId` -
    * BOTH the live path and the replay path go through here so a future
    * delivery path cannot silently bypass the commentary sanitizer

@@ -81,7 +81,7 @@ function stripReasoningFromMessage(msg: Message): Message {
 
 /**
  * Keep the parent's system prompt and the last `n` non-system
- * messages. Default `n = 10` per DEC-146 / RB-40 security-first
+ * messages. Default `n = 10` per the DEC-146 security-first
  * compose.
  *
  * @stable
@@ -171,8 +171,8 @@ export function summary(text: string): DescribedFilter {
  * Drop messages that carry the literal `[REDACTED:secret]` redaction
  * token when `maxTier` sits below `'secret'`.
  *
- * WEAK CONTRACT - read before relying on it at a trust boundary
- * (AGENT-FIL-01): `MessageContent` has NO part-level sensitivity /
+ * WEAK CONTRACT - read before relying on it at a trust
+ * boundary: `MessageContent` has NO part-level sensitivity /
  * `secret` / `inboundTrust` annotation in the current surface, so
  * this filter can only key on the redaction token the framework's
  * redaction layer stamps into text. Content that was never
@@ -221,7 +221,7 @@ export function stripReasoning(): DescribedFilter {
 /**
  * Strip tool messages whose `content` carries a literal
  * `[REDACTED:` redaction token - ANY redaction tier trips it, not
- * only `secret` (AGENT-FIL-02). There is no `secret` annotation on
+ * only `secret`. There is no `secret` annotation on
  * the message surface in the current slice; the token stamped by the
  * redaction layer at session-write time is the only signal this
  * filter scans, so an output that was never redaction-stamped passes

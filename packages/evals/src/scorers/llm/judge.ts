@@ -2,7 +2,7 @@
  * `llmJudge` - asks a `Provider` to grade the candidate output
  * against a rubric. Default scale `0..10`; pass threshold `>= 7`.
  *
- * ## Prompt-injection hardening (EB-7)
+ * ## Prompt-injection hardening
  *
  * The candidate output is untrusted (it is whatever the system under test
  * produced). To keep a malicious candidate from steering its own grade, the
@@ -98,7 +98,7 @@ export function llmJudge<I = unknown, O = unknown>(options: LlmJudgeOptions<I, O
 }
 
 /**
- * EB-7: parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
+ * Parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
  * the reply. Anchoring on a deliberate, trailing marker - rather than the first
  * integer anywhere - means a number the judge echoes from the candidate, or a
  * refusal that mentions the `0-10` range, cannot be mistaken for the grade.
@@ -114,7 +114,7 @@ export function parseScore(text: string): number | null {
 }
 
 /**
- * EB-7: wrap untrusted content in unambiguous sentinel fences so the judge can
+ * Wrap untrusted content in unambiguous sentinel fences so the judge can
  * tell data from instructions. Exported so caller-supplied `buildPrompt`
  * functions (e.g. the prebuilt scorers, the LongMemEval judge) fence the same
  * way the default builder does.
@@ -126,7 +126,7 @@ export function fenceForJudge(label: string, value: unknown): string {
 }
 
 /**
- * EB-7: the canonical instruction `llmJudge` appends to every prompt - defines
+ * The canonical instruction `llmJudge` appends to every prompt - defines
  * the parseable output marker and forbids following instructions inside fences.
  *
  * @stable

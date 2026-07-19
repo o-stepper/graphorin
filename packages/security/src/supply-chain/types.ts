@@ -136,7 +136,7 @@ export interface SupplyChainPolicy {
    * denylist entry is never overridden by a broad allowlist glob - the safer
    * posture when the denylist is the security-critical list.
    *
-   * SPL-20: defaults to `'allow-wins'` (byte-identical to prior behaviour).
+   * Defaults to `'allow-wins'` (byte-identical to prior behaviour).
    */
   readonly precedence?: 'allow-wins' | 'deny-wins';
 }

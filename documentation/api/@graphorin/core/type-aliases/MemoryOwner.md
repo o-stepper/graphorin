@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/memory.ts:68
 
 **`Stable`**
 
-Principal a memory belongs to (D3) - the *who-owns-this* dimension,
+Principal a memory belongs to - the *who-owns-this* dimension,
 orthogonal to [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md) (*where-it-came-from*):
 `user` for user-stated content, `agent` for the agent's own
 inferences (consolidator extraction / reflection / induction stamp

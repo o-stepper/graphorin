@@ -10,7 +10,7 @@
 function renderFinalSummary(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:191
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:189
 
 **`Stable`**
 

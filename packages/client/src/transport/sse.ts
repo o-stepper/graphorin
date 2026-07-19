@@ -5,7 +5,7 @@
  * (subscribe / abort / resume) must go through REST endpoints
  * exposed by `@graphorin/server`.
  *
- * IP-3: implemented on **fetch streaming**, not `EventSource`. The
+ * Implemented on **fetch streaming**, not `EventSource`. The
  * server writes *named* events (`event: <frame.type>`), which an
  * `EventSource` delivers only to listeners registered per type - an
  * unbounded catalogue the old `message`-only listener never saw.

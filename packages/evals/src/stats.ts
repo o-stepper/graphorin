@@ -1,7 +1,7 @@
 /**
- * Shared eval statistics (audit 2026-07-04, E8; closes the evals-05 /
- * evals-08 gap): confidence intervals, pass^k, and paired significance
- * for benchmark deltas. Everything here is pure and dependency-free so
+ * Shared eval statistics: confidence intervals, pass^k, and paired
+ * significance for benchmark deltas. Everything here is pure and
+ * dependency-free so
  * the runner, the regression gate, and the benchmarks can share one
  * implementation instead of each inlining its own mean/stddev.
  *
@@ -78,7 +78,7 @@ const ITERATION_SUFFIX_RE = /-iter-\d+$/;
 
 /**
  * Strip the `-iter-N` disambiguation suffix the runner appends under
- * `iterations > 1` (EB-6), recovering the base case id.
+ * `iterations > 1`, recovering the base case id.
  *
  * @stable
  */

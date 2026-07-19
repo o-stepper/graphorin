@@ -1,5 +1,5 @@
 /**
- * Rule: `@graphorin/tool-examples-recommended` (RB-49). Flags
+ * Rule: `@graphorin/tool-examples-recommended`. Flags
  * `tool({...})` invocations whose `examples` field is missing,
  * empty, or longer than the documented upper bound (5).
  *

@@ -27,7 +27,7 @@ export interface Migration {
   /** Owning module - surfaced in error messages. */
   readonly owner: string;
   /**
-   * W-111: optional data-repair hook. The runner invokes it INSIDE the
+   * Optional data-repair hook. The runner invokes it INSIDE the
    * migration's transaction, immediately BEFORE `sql`, and only when
    * the migration is actually pending. It exists so a migration whose
    * DDL cannot tolerate pre-existing bad data (e.g. a CREATE UNIQUE
@@ -86,7 +86,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
 };
 
 /**
- * W-111: data-repair preflights for bundled migrations, keyed by
+ * Data-repair preflights for bundled migrations, keyed by
  * version (see {@link Migration.preflight}).
  */
 const BUILTIN_PREFLIGHTS: Readonly<Record<string, (conn: SqliteConnection) => void>> = {

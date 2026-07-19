@@ -1,5 +1,5 @@
 /**
- * Durable workflow primitives (D1) built on the `pause(...)` substrate:
+ * Durable workflow primitives built on the `pause(...)` substrate:
  *
  * - {@link sleepUntil} / {@link sleepFor} - **durable timers**: the node
  *   suspends with a persisted wake-at timestamp; `workflow.tick(threadId)`
@@ -19,7 +19,7 @@
  * recognises (`kind: 'graphorin.timer' | 'graphorin.awakeable' |
  * 'graphorin.approval'`) to stamp `wakeAt` / `name` onto the persisted
  * pause record. On resume the body re-executes from the top and the
- * already-delivered values replay in order (WF-2), exactly like plain
+ * already-delivered values replay in order, exactly like plain
  * `pause(...)`.
  *
  * @packageDocumentation
@@ -27,11 +27,11 @@
 
 import { pause } from './pause.js';
 
-/** Reserved pause-value kind for durable timers (D1). */
+/** Reserved pause-value kind for durable timers. */
 export const TIMER_PAUSE_KIND = 'graphorin.timer' as const;
-/** Reserved pause-value kind for awakeables / durable promises (D1). */
+/** Reserved pause-value kind for awakeables / durable promises. */
 export const AWAKEABLE_PAUSE_KIND = 'graphorin.awakeable' as const;
-/** Reserved pause-value kind for persisted approvals (D1). */
+/** Reserved pause-value kind for persisted approvals. */
 export const APPROVAL_PAUSE_KIND = 'graphorin.approval' as const;
 
 /** Pause value carried by a durable-timer suspension. */
@@ -56,14 +56,14 @@ export interface ApprovalPauseValue {
   /** Free-form payload surfaced to the approver (what is being approved). */
   readonly payload?: unknown;
   /**
-   * E1 defer-timeout: epoch-ms deadline. An approval carrying one joins
+   * Defer-timeout: epoch-ms deadline. An approval carrying one joins
    * the durable-timer enumeration (the suspended checkpoint's `wakeAt`
    * metadata, which the workflow timer daemon already scans); once due,
    * `workflow.tick(threadId)` resolves the approval with
    * {@link ApprovalPauseValue.timeoutDecision} instead of waiting for a
    * human - the auto-deny composition for deferred permission
-   * decisions. Absent ⇒ the approval waits indefinitely (pre-E1
-   * behaviour).
+   * decisions. Absent ⇒ the approval waits indefinitely (the
+   * historical behaviour).
    */
   readonly wakeAt?: number;
   /**
@@ -242,7 +242,7 @@ export function awaitExternal<TResume = unknown>(
   return value;
 }
 
-/** Options for {@link requestApproval} (E1 defer-timeout). @stable */
+/** Options for {@link requestApproval} (defer-timeout). @stable */
 export interface RequestApprovalOptions {
   /**
    * Absolute deadline. When it passes with the approval still pending,

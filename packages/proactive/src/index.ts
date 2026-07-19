@@ -1,12 +1,12 @@
 /**
  * `@graphorin/proactive` - the proactivity layer of the Graphorin
- * framework: a checklist-driven heartbeat runner (C1) and a cron-leg
- * task runner (C2), both emitting the typed
+ * framework: a checklist-driven heartbeat runner and a cron-leg
+ * task runner, both emitting the typed
  * notify / question / review / act escalation ladder from
  * `@graphorin/core`.
  *
  * Single-process by design: schedules ride `@graphorin/triggers`,
- * whose SQLite store is single-process (W-133).
+ * whose SQLite store is single-process.
  *
  * @packageDocumentation
  */

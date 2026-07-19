@@ -10,7 +10,7 @@
 const NON_INBOUND_ORIGINS: ReadonlySet<ContentOrigin>;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:96
+Defined in: packages/memory/src/context-engine/annotations.ts:97
 
 **`Stable`**
 

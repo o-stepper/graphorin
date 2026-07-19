@@ -10,7 +10,7 @@ Defined in: packages/tools/src/executor/types.ts:380
 
 **`Stable`**
 
-E1: input handed to a [PermissionHook](/api/@graphorin/tools/type-aliases/PermissionHook.md).
+Input handed to a [PermissionHook](/api/@graphorin/tools/type-aliases/PermissionHook.md).
 
 ## Properties
 

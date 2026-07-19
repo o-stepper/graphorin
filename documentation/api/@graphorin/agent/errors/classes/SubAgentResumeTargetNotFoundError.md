@@ -11,7 +11,7 @@ Defined in: packages/agent/src/errors/index.ts:190
 **`Stable`**
 
 Thrown when a resume directive routes a decision into a parked
-sub-agent run (W-001) but the resuming agent instance cannot resolve
+sub-agent run but the resuming agent instance cannot resolve
 the target: the parked toolName matches neither a configured handoff
 target nor a `toTool` sub-agent tool. Resume a parked sub-run on the
 SAME parent instance (or an identically-configured one).

@@ -105,7 +105,7 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
-W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+Enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
 stamped wakeAt). This is what a durable-timer driver polls -
 without it an operator would have to keep an external registry of

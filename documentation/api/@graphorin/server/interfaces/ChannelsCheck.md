@@ -10,7 +10,7 @@ Defined in: packages/server/src/health/checks.ts:108
 
 **`Stable`**
 
-B1.6: channel-gateway health.
+Channel-gateway health.
 
 ## Extends
 

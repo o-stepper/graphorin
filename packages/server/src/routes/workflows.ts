@@ -3,12 +3,12 @@
  *
  *   POST   /workflows/:id/execute              (idempotent; scope `workflows:execute`)
  *   POST   /workflows/:id/resume               (scope `workflows:resume[:id]`;
- *                                               `name` targets an awakeable/approval, W-119)
- *   POST   /workflows/:id/retry                (scope `workflows:resume[:id]`, W-119)
- *   POST   /workflows/:id/tick                 (scope `workflows:resume[:id]`, W-119)
+ * `name` targets an awakeable/approval)
+ * POST /workflows/:id/retry (scope `workflows:resume[:id]`)
+ * POST /workflows/:id/tick (scope `workflows:resume[:id]`)
  *   GET    /workflows/:id/state                (scope `workflows:read`)
  *   GET    /workflows/:id/checkpoints          (scope `workflows:read`)
- *   POST   /workflows/:id/fork                 (scope `workflows:execute`; real fork, W-119)
+ * POST /workflows/:id/fork (scope `workflows:execute`; real fork)
  *   DELETE /workflows/:id/threads/:threadId    (scope `workflows:delete`)
  *
  * @packageDocumentation
@@ -33,7 +33,7 @@ export interface WorkflowRoutesDeps {
   readonly workflows: WorkflowRegistry;
   readonly runs: RunStateTracker;
   readonly newRunId?: () => string;
-  /** Streaming dispatcher (IP-2): workflow events reach the run subject. */
+  /** Streaming dispatcher: workflow events reach the run subject. */
   readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
 }
 
@@ -52,7 +52,7 @@ const ResumeBodySchema = z
     threadId: z.string().min(1),
     resume: z.unknown().optional(),
     /**
-     * W-119: awakeable/approval name. When present the resume routes
+     * Awakeable/approval name. When present the resume routes
      * through `resolveAwakeable(threadId, name, resume)` - `approve` is
      * the same primitive, no alias route needed.
      */
@@ -71,7 +71,7 @@ const ForkBodySchema = z
     fromThreadId: z.string().min(1),
     fromCheckpointId: z.string().min(1).optional(),
     /**
-     * E2: channel-level state patch applied to the forked root
+     * Channel-level state patch applied to the forked root
      * ("branch here, but with these corrected values"). Keys must name
      * declared channels of the workflow; the engine re-runs its
      * JSON-safety guard over the merged state.
@@ -556,7 +556,7 @@ function backgroundExecute(
 }
 
 /**
- * periphery-01 / W-119: mirror of {@link backgroundExecute} for the
+ * Mirror of {@link backgroundExecute} for the
  * resume path. A `name` in the body routes through
  * `resolveAwakeable(threadId, name, resume)`; a plain resume goes
  * through `resume(threadId, {resume})`. Both receive the tracker's
@@ -596,9 +596,9 @@ function backgroundResume(
 }
 
 /**
- * W-119: shared background iteration for resume / named resume / retry -
+ * Shared background iteration for resume / named resume / retry -
  * emit every event on the run subject, complete the tracked run, wrap
- * failures in the W-052 wire envelope.
+ * failures in the normalized wire-error envelope.
  */
 function backgroundIterate(
   factory: () => AsyncIterable<unknown>,

@@ -15,7 +15,7 @@ Defined in: packages/store-sqlite/src/encryption/index.ts:38
 **`Stable`**
 
 The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
-on a freshly opened connection (CS-7). sqlite3mc defaults to
+on a freshly opened connection. sqlite3mc defaults to
 `chacha20`, so opening a SQLCipher-v4 database with `key` alone
 reads garbage - every keyed open must pin the cipher first.
 

@@ -4,7 +4,7 @@ import type { Sensitivity } from './sensitivity.js';
  * Kinds of memory record in the Graphorin model. The first six are the
  * storage tiers the {@link MemoryStore} contract exposes as 1:1
  * sub-namespaces; `insight` is the derived, reflection-synthesized
- * record kind (P1-1) - it has no base-tier namespace and is persisted
+ * record kind - it has no base-tier namespace and is persisted
  * through the optional insight surface adapters expose. Used as the
  * discriminator for span types and the `MemoryRecord` union.
  *
@@ -26,9 +26,9 @@ export type MemoryKind =
  * `extraction` (consolidator distilled it from a transcript),
  * `reflection` (a synthesis pass inferred it), and `induction` (an
  * AWM-style pass distilled a reusable workflow from a successful agent
- * trajectory, P2-2) are *derived* and therefore land quarantined by
- * default; `imported` is bulk-loaded from an external store. Used by
- * P1-4 to gate action-driving recall against memory-poisoning (MINJA /
+ * trajectory) are *derived* and therefore land quarantined by
+ * default; `imported` is bulk-loaded from an external store. Used
+ * to gate action-driving recall against memory-poisoning (MINJA /
  * MemoryGraft) - induced procedures drive *actions*, so the quarantine
  * gate matters most for them.
  *
@@ -45,7 +45,7 @@ export type MemoryProvenance =
 /**
  * Retrieval-trust state of a memory. `active` rows are eligible for
  * default recall; `quarantined` rows are persisted and auditable but
- * excluded from action-driving recall until explicitly validated (P1-4).
+ * excluded from action-driving recall until explicitly validated.
  * Quarantine is a *retrieval gate*, never a delete.
  *
  * @stable
@@ -53,7 +53,7 @@ export type MemoryProvenance =
 export type MemoryStatus = 'active' | 'quarantined';
 
 /**
- * Principal a memory belongs to (D3) - the *who-owns-this* dimension,
+ * Principal a memory belongs to - the *who-owns-this* dimension,
  * orthogonal to {@link MemoryProvenance} (*where-it-came-from*):
  * `user` for user-stated content, `agent` for the agent's own
  * inferences (consolidator extraction / reflection / induction stamp
@@ -140,7 +140,7 @@ export interface Fact extends MemoryRecord {
   readonly text: string;
   /**
    * Structured `(subject, predicate, object)` triple for the in-SQLite
-   * relation graph (P2-1). The consolidator's extraction prompt emits
+   * relation graph. The consolidator's extraction prompt emits
    * these; first-party `remember({ text })` writes usually omit them.
    * `subject`/`object` are the graph *entities* (resolved to canonical
    * ids in `fact_entities`); `predicate` is the relation label and is
@@ -150,14 +150,14 @@ export interface Fact extends MemoryRecord {
    * memory tier's search opts in), never a recall gate.
    */
   readonly subject?: string;
-  /** Relation label of the {@link Fact.subject}→{@link Fact.object} triple (P2-1). */
+  /** Relation label of the {@link Fact.subject}→{@link Fact.object} triple. */
   readonly predicate?: string;
-  /** Object entity of the s/p/o triple (P2-1). See {@link Fact.subject}. */
+  /** Object entity of the s/p/o triple. See {@link Fact.subject}. */
   readonly object?: string;
   readonly confidence?: number;
   /**
-   * Optional salience hint in `[0, 1]` for multi-signal forgetting
-   * (X-1). A *soft* signal - higher importance slows a fact's decay and
+   * Optional salience hint in `[0, 1]` for multi-signal forgetting.
+   * A *soft* signal - higher importance slows a fact's decay and
    * delays capacity-bounded eviction, but never gates recall and never
    * forces retention. Absent on rows written before the feature
    * (treated as neutral, `0.5`).
@@ -172,18 +172,18 @@ export interface Fact extends MemoryRecord {
   /** ID of the fact that supersedes this one, if any. */
   readonly supersededBy?: string;
   /**
-   * Trust-provenance tag (P1-4). Absent on rows written before the
+   * Trust-provenance tag. Absent on rows written before the
    * feature; treated as first-party (`active`) when missing.
    */
   readonly provenance?: MemoryProvenance;
   /**
-   * Retrieval-trust state (P1-4). Defaults to `active`; derived /
+   * Retrieval-trust state. Defaults to `active`; derived /
    * injection-flagged writes land `quarantined` and are excluded from
    * default recall.
    */
   readonly status?: MemoryStatus;
   /**
-   * Principal dimension (D3). `'agent'` on consolidator-synthesized
+   * Principal dimension. `'agent'` on consolidator-synthesized
    * facts; absent ⇒ treated as `'user'` at filter time. Never gates
    * default recall - only an explicit owner search filter reads it.
    */
@@ -204,11 +204,11 @@ export interface Episode extends MemoryRecord {
   readonly endedAt: string;
   /** Optional importance score in `[0, 1]`. */
   readonly importance?: number;
-  /** Trust-provenance tag (P1-4). See {@link MemoryProvenance}. */
+  /** Trust-provenance tag. See {@link MemoryProvenance}. */
   readonly provenance?: MemoryProvenance;
-  /** Retrieval-trust state (P1-4). See {@link MemoryStatus}. */
+  /** Retrieval-trust state. See {@link MemoryStatus}. */
   readonly status?: MemoryStatus;
-  /** Principal dimension (D3). See {@link MemoryOwner}. */
+  /** Principal dimension. See {@link MemoryOwner}. */
   readonly owner?: MemoryOwner;
 }
 
@@ -224,55 +224,55 @@ export interface Rule extends MemoryRecord {
   readonly priority: number;
   /**
    * Ordered, value-abstracted step sequence of an *induced* workflow
-   * (P2-2) - e.g. `['search for {product}', 'add {quantity} to cart',
+   * - e.g. `['search for {product}', 'add {quantity} to cart',
    * 'check out']`. Present only on procedures distilled from successful
    * agent trajectories; author-defined rules omit it.
    */
   readonly steps?: ReadonlyArray<string>;
   /**
    * Names of the variables abstracted from the trajectory's concrete
-   * values (P2-2) - the `{product}` / `{quantity}` placeholders that
+   * values - the `{product}` / `{quantity}` placeholders that
    * appear in {@link Rule.steps}. Lets a reused procedure be re-bound to
    * fresh arguments instead of replaying one run's literals.
    */
   readonly variables?: ReadonlyArray<string>;
   /**
    * Voyager-style verifiable success criteria stored alongside an induced
-   * procedure (P2-2) so a reuse can *self-verify* its outcome instead of
+   * procedure so a reuse can *self-verify* its outcome instead of
    * trusting the procedure blindly. Author-defined rules omit it.
    */
   readonly successCriteria?: ReadonlyArray<string>;
   /**
-   * Trust-provenance tag (P1-4 / P2-2). Induced procedures are
+   * Trust-provenance tag. Induced procedures are
    * `'induction'`; author-defined rules omit it (treated first-party).
    * See {@link MemoryProvenance}.
    */
   readonly provenance?: MemoryProvenance;
   /**
-   * Retrieval-trust state (P1-4 / P2-2). Induced procedures land
+   * Retrieval-trust state. Induced procedures land
    * `'quarantined'` and are excluded from activation (they must not drive
    * actions) until validated; author-defined rules omit it (treated
    * `'active'`). See {@link MemoryStatus}.
    */
   readonly status?: MemoryStatus;
   /**
-   * Demonstrated-success counter (MCON-2 part 4). Incremented by
+   * Demonstrated-success counter. Incremented by
    * `ProceduralMemory.recordOutcome(...)` on each verified successful
    * reuse; drives promotion-by-demonstrated-success for quarantined
    * induced procedures once the configured threshold is reached.
    * Absent ⇒ never counted (adapters without the column).
    */
   readonly successCount?: number;
-  /** Principal dimension (D3). `'agent'` on induced procedures. See {@link MemoryOwner}. */
+  /** Principal dimension. `'agent'` on induced procedures. See {@link MemoryOwner}. */
   readonly owner?: MemoryOwner;
 }
 
 /**
  * Insight - a higher-order observation the consolidator's reflection
- * pass (P1-1) synthesizes over recent memories ("the user has cancelled
+ * pass synthesizes over recent memories ("the user has cancelled
  * three evening plans this month - they may be overcommitted"). No
  * single turn states it; it is *inferred*, so it is always
- * `provenance: 'reflection'` and lands `status: 'quarantined'` (P1-4),
+ * `provenance: 'reflection'` and lands `status: 'quarantined'`,
  * excluded from action-driving recall until validated.
  *
  * Every insight carries **mandatory citations** (`cites`) - the ids of
@@ -284,8 +284,8 @@ export interface Rule extends MemoryRecord {
  *
  * Core defines only the record shape; the storage surface for insights
  * is NOT part of the baseline {@link MemoryStore} contract - it lives in
- * the optional `InsightMemoryStoreExt` exported from `@graphorin/memory`
- * (W-048). Adapters without it simply have no insight tier.
+ * the optional `InsightMemoryStoreExt` exported from `@graphorin/memory`.
+ * Adapters without it simply have no insight tier.
  *
  * @stable
  */
@@ -306,22 +306,22 @@ export interface Insight extends MemoryRecord {
    */
   readonly salience: number;
   /**
-   * Trust-provenance tag (P1-4). Reflection-synthesized insights are
+   * Trust-provenance tag. Reflection-synthesized insights are
    * `'reflection'`. See {@link MemoryProvenance}.
    */
   readonly provenance?: MemoryProvenance;
   /**
-   * Retrieval-trust state (P1-4). Insights land `'quarantined'`. See
+   * Retrieval-trust state. Insights land `'quarantined'`. See
    * {@link MemoryStatus}.
    */
   readonly status?: MemoryStatus;
-  /** Principal dimension (D3). Reflection-synthesized insights are `'agent'`. */
+  /** Principal dimension. Reflection-synthesized insights are `'agent'`. */
   readonly owner?: MemoryOwner;
 }
 
 /**
  * Role a {@link GraphEntity} plays in a {@link Fact}'s s/p/o triple
- * (P2-1) - the `subject` or the `object`. The `predicate` is a relation
+ * - the `subject` or the `object`. The `predicate` is a relation
  * label, not an entity, so it has no role here.
  *
  * @stable
@@ -329,7 +329,7 @@ export interface Insight extends MemoryRecord {
 export type EntityRole = 'subject' | 'object';
 
 /**
- * Canonical entity in the lightweight in-SQLite relation graph (P2-1).
+ * Canonical entity in the lightweight in-SQLite relation graph.
  * The entity resolver (`@graphorin/memory`) deduplicates the raw
  * `subject`/`object` strings on facts into canonical entities - merging
  * aliases ("Anna", "Anna S.", "my sister") via lexical + embedding
@@ -345,7 +345,7 @@ export type EntityRole = 'subject' | 'object';
  * Core defines only the record shape; the storage surface for the graph
  * (upsert / link / merge / one-hop expansion) is NOT part of the
  * baseline {@link MemoryStore} contract - it lives in the optional
- * `GraphMemoryStoreExt` exported from `@graphorin/memory` (W-048).
+ * `GraphMemoryStoreExt` exported from `@graphorin/memory`.
  * Adapters without it simply have no relation graph.
  *
  * @stable
@@ -380,7 +380,7 @@ export interface MemorySearchOptions {
   readonly dateRange?: { readonly from?: string; readonly to?: string };
   readonly includeArchived?: boolean;
   /**
-   * Include quarantined memories in the result set (P1-4). Defaults to
+   * Include quarantined memories in the result set. Defaults to
    * `false`: action-driving recall never returns quarantined rows. Set
    * `true` only for the validation / inspector path - never for
    * auto-recall fed back into the model.
@@ -396,8 +396,8 @@ export interface MemorySearchOptions {
    */
   readonly asOf?: string;
   /**
-   * Include superseded / validity-expired facts in the result set
-   * (memory-retrieval-01). Defaults to `false`: a default read behaves
+   * Include superseded / validity-expired facts in the result set.
+   * Defaults to `false`: a default read behaves
    * as `asOf = now`, so a fact whose `validTo` was closed (e.g. by
    * `supersede`) never surfaces as current - exactly what the
    * `fact_supersede` tool promises. Set `true` only for inspector /
@@ -406,7 +406,7 @@ export interface MemorySearchOptions {
    */
   readonly includeSuperseded?: boolean;
   /**
-   * Retrieval-time principal filter (D3). When set, only records whose
+   * Retrieval-time principal filter. When set, only records whose
    * owner is in the requested set match; rows written before the
    * feature (owner absent) are treated as `'user'`. Absent ⇒ no owner
    * filter - behaviour is unchanged.

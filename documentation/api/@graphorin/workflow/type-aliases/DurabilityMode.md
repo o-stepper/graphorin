@@ -16,9 +16,9 @@ Defined in: packages/workflow/src/types.ts:57
 
 Allowed durability modes for the checkpoint writer.
 
-WF-7: the advertised `'async'` mode was byte-identical to `'sync'`
-(both awaited the same put), so it was removed rather than shipped
-as a fake third behaviour - a fire-and-forget writer would conflict
-with the WF-12 compare-and-set guard and the WF-8 only-report-real-
-writes contract. The runtime still coerces a legacy `'async'` input
-to `'sync'` with a one-time warning.
+The formerly advertised `'async'` mode was byte-identical to
+`'sync'` (both awaited the same put), so it was removed rather than
+shipped as a fake third behaviour - a fire-and-forget writer would
+conflict with the compare-and-set checkpoint guard and the
+only-report-real-writes contract. The runtime still coerces a
+legacy `'async'` input to `'sync'` with a one-time warning.

@@ -14,7 +14,7 @@ Defined in: packages/memory/src/context-engine/compaction/hooks/reanchor-recent-
 
 **`Stable`**
 
-Build a `reanchorRecentResults` hook (C4).
+Build a `reanchorRecentResults` hook.
 
 ## Parameters
 

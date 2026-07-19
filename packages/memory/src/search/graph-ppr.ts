@@ -1,5 +1,5 @@
 /**
- * PPR-lite graph scoring (D5) - damped spreading activation over the
+ * PPR-lite graph scoring - damped spreading activation over the
  * entity-graph neighbourhood, generalizing the flat one-hop expansion.
  * Pure: given the seed facts (the lexical/vector candidates retrieved so
  * far) and the graded neighbours (`{ fact, depth }` from
@@ -10,7 +10,7 @@
  * This is HippoRAG-style personalized-PageRank, "lite": a single damped
  * BFS pass seeded from retrieval rather than an iterative power method.
  * Seeding from query-matched entities (rather than retrieved candidates)
- * is the eval-gated extension the roadmap defers until numbers justify.
+ * is a possible eval-gated extension, deferred until numbers justify it.
  *
  * @packageDocumentation
  */

@@ -17,4 +17,4 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:338
 Final pipeline outcome recorded against the candidate fact. Matches
 the storage adapter's `ConflictPipelineDecision` exactly.
 `'judge-unparseable'` closes a pending row whose deep-phase judge
-call repeatedly failed (MCON-9) so it stops being re-billed forever.
+call repeatedly failed so it stops being re-billed forever.

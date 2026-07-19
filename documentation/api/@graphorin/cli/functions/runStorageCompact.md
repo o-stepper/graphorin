@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/storage.ts:241
 
 **`Stable`**
 
-W-064: `graphorin storage compact` - return pruned pages to the OS.
+`graphorin storage compact` - return pruned pages to the OS.
 `VACUUM` stays forbidden (it renumbers implicit rowids and corrupts
 the FTS5 external-content mappings), but `PRAGMA incremental_vacuum`
 relocates free pages via the ptrmap WITHOUT rebuilding tables, so it

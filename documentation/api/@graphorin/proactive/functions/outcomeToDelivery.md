@@ -14,7 +14,7 @@ Defined in: packages/proactive/src/ladder.ts:59
 
 **`Stable`**
 
-Route an outcome onto a channel delivery (C3): `notify` / `act` are
+Route an outcome onto a channel delivery: `notify` / `act` are
 plain text; `question` / `review` carry the HITL question block
 whose `ref` rides into messenger callback-data. The gateway
 outbound-sanitizes at its own boundary - this function only shapes.

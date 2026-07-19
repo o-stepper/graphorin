@@ -61,9 +61,9 @@ deleteSession(sessionId): Promise<void>;
 
 Defined in: packages/sessions/src/facade.ts:341
 
-Hard-delete a session (RP-6). The cascade removes the session's
+Hard-delete a session. The cascade removes the session's
 bookkeeping (handoffs, workflow-run attachments, audit rows), the
-checkpoints of suspended runs linked to it (W-005), AND its content:
+checkpoints of suspended runs linked to it, AND its content:
 messages and episodes with their FTS/vector index rows plus the full
 registry of session-scoped surfaces (facts, insights, rules, working
 blocks, spans, consolidator state - see `SESSION_SCOPED_PURGES` in
@@ -215,7 +215,7 @@ pruneSessions(opts): Promise<number>;
 
 Defined in: packages/sessions/src/facade.ts:346
 
-Retention sweep (RP-6): delete every session matching the policy. Returns
+Retention sweep: delete every session matching the policy. Returns
 the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/interfaces/SessionStoreExt.md#prunesessions).
 
 #### Parameters

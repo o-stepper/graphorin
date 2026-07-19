@@ -35,7 +35,7 @@ export interface SqliteConnection {
   /** Whether the connection wraps a `:memory:` database. */
   readonly inMemory: boolean;
   /**
-   * How vector sidecars are served (wave-D D5): `'vec0'` (sqlite-vec
+   * How vector sidecars are served: `'vec0'` (sqlite-vec
    * loaded), `'linear-fallback'` (plain tables + in-process cosine
    * scan), or `'disabled'` (`skipSqliteVec`). Optional so existing
    * structural stubs keep compiling; absent reads as `'vec0'`.
@@ -86,9 +86,9 @@ export interface OpenConnectionOptions {
    */
   readonly skipSqliteVec?: boolean;
   /**
-   * Wave-D D5 (item 10 step 3): policy when the `sqlite-vec` peer is
-   * missing or fails to load. `'fail'` (default) rethrows
-   * {@link SqliteVecMissingError} - the pre-wave behaviour.
+   * Policy when the `sqlite-vec` peer is missing or fails to load.
+   * `'fail'` (default) rethrows
+   * {@link SqliteVecMissingError} - the historical behaviour.
    * `'linear-fallback'` degrades instead of dying: vector sidecars are
    * kept in PLAIN tables (same names/columns) and KNN runs as an
    * in-process batched cosine scan with `setImmediate` yields. Suits
@@ -128,7 +128,7 @@ export interface OpenConnectionOptions {
    */
   readonly cipherLoader?: () => Promise<BetterSqlite3Constructor>;
   /**
-   * W-067: how long the driver's busy handler waits for a contended
+   * How long the driver's busy handler waits for a contended
    * write lock before the operation fails with {@link SqliteBusyError}.
    * Applied AFTER the hardening pragmas so the exported
    * {@link WAL_HARDENING_PRAGMAS} constant keeps its documented bytes;
@@ -450,7 +450,7 @@ export class SqliteVecMissingError extends Error {
 
 /**
  * Typed wrapper for the driver's raw `SQLITE_BUSY` /
- * `SQLITE_BUSY_SNAPSHOT` errors (W-067): the write lock stayed
+ * `SQLITE_BUSY_SNAPSHOT` errors: the write lock stayed
  * contended past `busy_timeout`. Carries `code = 'SQLITE_BUSY'` for
  * compatibility with callers that already branch on the driver's
  * `err.code`, plus the driver error as `cause`. No auto-retry by
@@ -475,7 +475,7 @@ export class SqliteBusyError extends Error {
   }
 }
 
-/** W-067: does a driver error carry one of the busy codes? */
+/** Does a driver error carry one of the busy codes? */
 function isDriverBusyError(err: unknown): boolean {
   if (err === null || typeof err !== 'object') return false;
   const code = (err as { code?: unknown }).code;

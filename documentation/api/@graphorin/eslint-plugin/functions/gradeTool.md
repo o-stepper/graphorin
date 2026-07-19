@@ -16,7 +16,7 @@ Defined in: src/tool-discovery.ts:505
 
 Compute the per-tool grader score (0..100). Each axis is gated by
 the findings produced for that axis. The rubric is calibrated
-against the RB-49 fixture catalog (`wellDescribedTool` -> 82,
+against the fixture catalog (`wellDescribedTool` -> 82,
 `placeholderDescriptionTool` -> 20, `examplesPiiTool` -> 61).
 
 ## Parameters

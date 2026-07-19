@@ -10,7 +10,7 @@ Defined in: packages/cli/src/commands/memory.ts:343
 
 **`Stable`**
 
-A canonical entity a fact links to (P2-1 / migration 016). `name` follows
+A canonical entity a fact links to (migration 016). `name` follows
 `merged_into` to the surviving entity, so a merged link shows its canonical.
 
 ## Properties

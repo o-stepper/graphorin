@@ -6,7 +6,7 @@
 
 # Interface: Agent\&lt;TDeps, TOutput\&gt;
 
-Defined in: packages/agent/src/types.ts:840
+Defined in: packages/agent/src/types.ts:839
 
 **`Stable`**
 
@@ -23,10 +23,10 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:842 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:841 |
-| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:878 |
-| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:886 |
+| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:841 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:840 |
+| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:877 |
+| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:885 |
 
 ## Methods
 
@@ -36,7 +36,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 abort(options?): void;
 ```
 
-Defined in: packages/agent/src/types.ts:853
+Defined in: packages/agent/src/types.ts:852
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Defined in: packages/agent/src/types.ts:853
 compact(options?): Promise<CompactionApiResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:862
+Defined in: packages/agent/src/types.ts:861
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/agent/src/types.ts:862
 deserializeState(serialized): RunState;
 ```
 
-Defined in: packages/agent/src/types.ts:903
+Defined in: packages/agent/src/types.ts:902
 
 Rehydrate a `RunState` previously produced by
 [Agent.serializeState](/api/@graphorin/agent/interfaces/Agent.md#serializestate) (or the exported `runStateToJSON`).
@@ -102,7 +102,7 @@ on an unreadable payload. The result feeds straight back into
 fanOut<TFanOutOutput>(options): Promise<FanOutResult<TFanOutOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:870
+Defined in: packages/agent/src/types.ts:869
 
 Convenience wrapper around the standalone `runFanOut(...)`. The
 returned `FanOutResult` carries per-child status + the merged
@@ -134,7 +134,7 @@ strategy decides whether to propagate).
 followUp(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:852
+Defined in: packages/agent/src/types.ts:851
 
 #### Parameters
 
@@ -154,9 +154,9 @@ Defined in: packages/agent/src/types.ts:852
 isBusy(): boolean;
 ```
 
-Defined in: packages/agent/src/types.ts:860
+Defined in: packages/agent/src/types.ts:859
 
-C1: `true` while this instance has a run in flight (the same
+`true` while this instance has a run in flight (the same
 invariant that makes a second `run()` throw `ConcurrentRunError`).
 The public busy signal for proactive coordination - a heartbeat
 defers its beat instead of colliding with an interactive run.
@@ -173,7 +173,7 @@ defers its beat instead of colliding with an interactive run.
 run(input, options?): Promise<AgentResult<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:847
+Defined in: packages/agent/src/types.ts:846
 
 #### Parameters
 
@@ -194,7 +194,7 @@ Defined in: packages/agent/src/types.ts:847
 serializeState(state): string;
 ```
 
-Defined in: packages/agent/src/types.ts:895
+Defined in: packages/agent/src/types.ts:894
 
 Render the canonical durable JSON form of a (typically suspended)
 `RunState`: version-stamped (`graphorin-run-state/x.y`), binary
@@ -221,7 +221,7 @@ process restart; pairs with [Agent.deserializeState](/api/@graphorin/agent/inter
 steer(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:851
+Defined in: packages/agent/src/types.ts:850
 
 #### Parameters
 
@@ -241,7 +241,7 @@ Defined in: packages/agent/src/types.ts:851
 stream(input, options?): AsyncIterable<AgentEvent<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:843
+Defined in: packages/agent/src/types.ts:842
 
 #### Parameters
 
@@ -264,7 +264,7 @@ toTool(options?): Tool<{
 }, TOutput, TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:861
+Defined in: packages/agent/src/types.ts:860
 
 #### Parameters
 

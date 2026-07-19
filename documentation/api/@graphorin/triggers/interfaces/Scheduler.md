@@ -98,8 +98,8 @@ orphans(): Promise<readonly TriggerState[]>;
 
 Defined in: packages/triggers/src/index.ts:365
 
-Persisted trigger rows with no live declaration in this process
-(W-123). These never fire: the callback only exists in memory, so
+Persisted trigger rows with no live declaration in this process.
+These never fire: the callback only exists in memory, so
 a row survives only as dead weight until the declaration is
 re-registered or the row is pruned.
 
@@ -153,7 +153,7 @@ setDisabled(id, disabled): Promise<TriggerState>;
 
 Defined in: packages/triggers/src/index.ts:354
 
-Flip the persistent `disabled` flag (IP-17). Disabling cancels the
+Flip the persistent `disabled` flag. Disabling cancels the
 armed timer but keeps the trigger registered + persisted; enabling
 recomputes the next fire from now and re-arms. The destructive
 removal is `unregister(...)`.

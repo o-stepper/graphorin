@@ -1,5 +1,5 @@
 /**
- * Heartbeat runner (C1): a checklist-driven periodic agent beat.
+ * Heartbeat runner: a checklist-driven periodic agent beat.
  *
  * Every fire evaluates a bot-supplied `checklist()`; an empty checklist
  * skips the beat entirely (zero model calls), a busy agent defers it
@@ -7,15 +7,15 @@
  * bot quiet at night, and an all-quiet model reply - the sentinel - is
  * suppressed instead of delivered. Every real finding is reported as a
  * `notify` rung of the proactive outcome ladder; the heavier rungs
- * (question / review / act) belong to cron-leg tasks (C2/C3).
+ * (question / review / act) belong to cron-leg tasks.
  *
  * Cost posture: beats default to an isolated session and pass the
- * per-beat ceilings through the agent's run-level budget (C5) and the
+ * per-beat ceilings through the agent's run-level budget and the
  * fail-closed model pin (`pinnedProvider`). Pair the agent with
- * `scaffold: 'minimal'` (C6) for the cheap-run scaffold.
+ * `scaffold: 'minimal'` for the cheap-run scaffold.
  *
  * Single-process by design: schedules ride `@graphorin/triggers`,
- * whose SQLite store is single-process (W-133). Run one heartbeat
+ * whose SQLite store is single-process. Run one heartbeat
  * process per store.
  *
  * @packageDocumentation
@@ -31,7 +31,7 @@ import { type ActiveHours, isWithinActiveHours, validateActiveHours } from './ac
 /**
  * When the heartbeat fires. Exactly one of `every` / `cron` is
  * required. `jitterMs` / `expiresAt` pass through to the trigger
- * declaration (the C4 scheduler harness).
+ * declaration (the scheduler harness).
  *
  * @stable
  */
@@ -40,11 +40,11 @@ export interface HeartbeatSchedule {
   readonly every?: number;
   /** 5-field cron expression. */
   readonly cron?: string;
-  /** IANA timezone for the cron expression (W-124). */
+  /** IANA timezone for the cron expression. */
   readonly timezone?: string;
-  /** Deterministic per-id jitter (C4). */
+  /** Deterministic per-id jitter. */
   readonly jitterMs?: number;
-  /** Auto-pause instant (C4). */
+  /** Auto-pause instant. */
   readonly expiresAt?: string | number;
 }
 
@@ -65,9 +65,9 @@ export interface HeartbeatProfile {
    * (`AgentCallOptions.pinnedProvider`).
    */
   readonly provider?: AgentCallOptions<unknown>['pinnedProvider'];
-  /** Per-beat USD ceiling (run-level budget, C5). */
+  /** Per-beat USD ceiling (run-level budget). */
   readonly budgetUsd?: number;
-  /** Per-beat token ceiling (run-level budget, C5). */
+  /** Per-beat token ceiling (run-level budget). */
   readonly maxTokens?: number;
 }
 

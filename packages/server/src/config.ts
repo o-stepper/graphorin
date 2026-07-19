@@ -140,7 +140,7 @@ export interface ServerConfigSpec {
     readonly passphraseRef?: SecretRefString;
     readonly cipher?: string;
     /**
-     * W-051: which tools/MCP audit-bus events land in the audit chain.
+     * Which tools/MCP audit-bus events land in the audit chain.
      * `'security'` (default) writes the security-significant subset
      * (dataflow flagged/blocked/declassified, sanitization, approvals,
      * collisions, cap-disabled); `'all'` adds per-call
@@ -330,7 +330,7 @@ const storageSchema = z
   .default({});
 
 /**
- * W-010 / W-008 retention policy. Default-on ONLY for derived or
+ * Retention policy. Default-on ONLY for derived or
  * recoverable data (span telemetry, consolidator run counters, the
  * exhausted consolidator DLQ, expired idempotency response bodies).
  * Primary user content - sessions, memory history, workflow threads,

@@ -14,7 +14,6 @@
  *
  * References:
  *  - DEC-135 - process hardening (mandatory POSIX modes).
- *  - RB-22 - file perms / umask / dump prevention.
  *
  * @packageDocumentation
  */

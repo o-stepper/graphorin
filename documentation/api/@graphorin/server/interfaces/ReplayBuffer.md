@@ -127,7 +127,7 @@ optional stats(): ReplayBufferStats;
 
 Defined in: packages/server/src/ws/replay-buffer.ts:69
 
-Occupancy snapshot (W-028). OPTIONAL so external implementations
+Occupancy snapshot. OPTIONAL so external implementations
 of this `@stable` interface keep compiling; `createReplayBuffer`
 always provides it. When absent, the `/v1/metrics` replay-buffer
 gauge degrades to `0`.

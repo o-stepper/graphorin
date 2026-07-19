@@ -29,7 +29,7 @@ export interface TriggersDaemonStatus {
   readonly disabled: number;
   readonly deferred: number;
   /**
-   * Persisted rows with no live declaration in this process (W-123) -
+   * Persisted rows with no live declaration in this process -
    * they never fire until re-registered or pruned.
    */
   readonly orphaned?: number;

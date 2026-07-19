@@ -80,7 +80,7 @@ export type CollisionResolution =
       readonly winner: ToolSource;
       readonly losers: ReadonlyArray<ToolSource>;
       /**
-       * W-116: an auto-prefix loser whose rename was impossible (the
+       * An auto-prefix loser whose rename was impossible (the
        * residual case after the fallback namespace + truncation - e.g.
        * a pathological future source shape). The loser is dropped from
        * the catalogue, but never silently: this record, a
@@ -101,7 +101,7 @@ export interface ToolSearchMatch {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
-  /** A5: the matched tool's output schema, when declared (renders a return type). */
+  /** The matched tool's output schema, when declared (renders a return type). */
   readonly outputSchema?: Readonly<Record<string, unknown>>;
   readonly score: number;
   readonly source: 'semantic' | 'bm25' | 'regex-name';

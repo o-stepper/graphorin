@@ -122,7 +122,7 @@ options?): Promise<void>;
 
 Defined in: packages/memory/src/tiers/insight-memory.ts:130
 
-Promote a quarantined insight out of quarantine (MCON-2). Mirrors
+Promote a quarantined insight out of quarantine. Mirrors
 [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the
 stored text and **refuses** promotion of an injection-flagged insight
 unless an operator passes `{ force: true }` from a trusted context.

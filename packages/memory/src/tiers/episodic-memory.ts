@@ -32,18 +32,18 @@ export interface EpisodeInput {
   readonly sensitivity?: Sensitivity;
   readonly tags?: ReadonlyArray<string>;
   /**
-   * Trust-provenance tag (P1-4). Episodes auto-formed by the
+   * Trust-provenance tag. Episodes auto-formed by the
    * consolidator pass `'extraction'` so they land quarantined; omit
    * (defaults to first-party `active`) for user-authored episodes.
    */
   readonly provenance?: MemoryProvenance;
   /**
-   * Retrieval-trust state (P1-4). Defaults to `active`; the
+   * Retrieval-trust state. Defaults to `active`; the
    * consolidator records auto-formed episodes as `'quarantined'` so
    * they are excluded from action-driving recall until validated.
    */
   readonly status?: MemoryStatus;
-  /** Principal dimension (D3). `'agent'` on auto-formed episodes. */
+  /** Principal dimension. `'agent'` on auto-formed episodes. */
   readonly owner?: MemoryOwner;
 }
 
@@ -79,16 +79,16 @@ export interface EpisodeSearchOptions {
   /**
    * Point-in-time ("as of") read. When set, only episodes that had
    * started by this instant (`started_at <= asOf`) are returned.
-   * ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2.
+   * ISO-8601. Absent ⇒ current behaviour is unchanged.
    *
    * @stable
    */
   readonly asOf?: string;
   /**
-   * Include quarantined episodes in the result set (P1-4). Defaults to
+   * Include quarantined episodes in the result set. Defaults to
    * `false`: action-driving recall never returns quarantined rows. Set
    * `true` only for the validation / inspector path - never for
-   * auto-recall fed back into the model. Auto-formed episodes (P1-2)
+   * auto-recall fed back into the model. Auto-formed episodes
    * land quarantined, so this is how an operator surfaces them for
    * review.
    *
@@ -270,7 +270,7 @@ export class EpisodicMemory {
 
   /**
    * Most-recent episodes by end time (newest first), with no embedding / FTS
-   * query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` - the default
+   * query. Requires `EpisodicMemoryStoreExt.listRecent` - the default
    * `@graphorin/store-sqlite` adapter implements it. Optionally includes
    * quarantined episodes (the importance source for the reflection gate).
    */
@@ -299,7 +299,7 @@ export class EpisodicMemory {
   }
 
   /**
-   * Promote a quarantined episode into default recall (MCON-2). Mirrors
+   * Promote a quarantined episode into default recall. Mirrors
    * {@link SemanticMemory.validate}: re-derives the injection verdict from the
    * stored summary and **refuses** promotion of an injection-flagged episode
    * (`QuarantinePromotionRefusedError`) unless an operator passes

@@ -248,7 +248,7 @@ function isPositiveLabel(label: string): boolean {
  * pair order. Cross-encoder classifiers return either a single-best
  * `{label, score}` per pair (the default single-logit bge exports) or an array
  * of `topk` entries. For the array shape we read the POSITIVE label's
- * confidence - NOT the max of any label (PS-16): an irrelevant pair's most
+ * confidence - NOT the max of any label: an irrelevant pair's most
  * confident class is the *negative* one, so taking the max would invert the
  * ranking for any 2-label classifier. When no label looks positive (single-logit
  * or unrecognised labels) we fall back to the top score.

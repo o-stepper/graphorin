@@ -1,5 +1,5 @@
 /**
- * W-032: the durable-timer polling driver. `sleepUntil`/`sleepFor`
+ * The durable-timer polling driver. `sleepUntil`/`sleepFor`
  * persist a `wakeAt` and `workflow.tick(threadId)` fires a due timer -
  * but until this module nothing in the framework CALLED tick, so a
  * thread sleeping for 24h slept forever unless the operator built a
@@ -102,7 +102,7 @@ function isBenignConflict(error: unknown): boolean {
 }
 
 /**
- * Build a polling driver over the supplied workflows (W-032). Call
+ * Build a polling driver over the supplied workflows. Call
  * `start()` to begin polling; the next pass is scheduled at
  * `min(pollIntervalMs, earliest nextWakeAt)` so a short timer does not
  * wait out a long poll interval.

@@ -86,7 +86,7 @@ optional purge(scope, label): Promise<void>;
 
 Defined in: packages/core/src/contracts/memory-store.ts:89
 
-Hard-delete a block row - no tombstone left behind (wave-D D2).
+Hard-delete a block row - no tombstone left behind.
 `delete` stays the soft tombstone; `purge` is the GDPR path for
 USER-scoped blocks (e.g. the `profile` projection), which the
 session-delete cascade never reaches (`scope_session_id IS NULL`).

@@ -1,5 +1,5 @@
 /**
- * JSON-safe wire projection of {@link AgentEvent} (W-046).
+ * JSON-safe wire projection of {@link AgentEvent}.
  *
  * Three `AgentEvent` variants carry payloads that `JSON.stringify`
  * corrupts: `file.generated` (`data: Uint8Array`),
@@ -72,7 +72,7 @@ export interface WireAgentEndEvent<TOutput = string>
  * @stable
  */
 /**
- * Wire twin of {@link SubagentEvent} (W-036): the wrapped child event
+ * Wire twin of {@link SubagentEvent}: the wrapped child event
  * projects recursively - a forwarded child `agent.end` carries a full
  * `RunState` of its own.
  *

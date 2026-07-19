@@ -20,4 +20,4 @@ Defined in: packages/cli/src/commands/memory.ts:377
 | <a id="property-fact"></a> `fact` | `readonly` | \| [`MemoryInspectFact`](/api/@graphorin/cli/interfaces/MemoryInspectFact.md) \| `null` | - | packages/cli/src/commands/memory.ts:379 |
 | <a id="property-found"></a> `found` | `readonly` | `boolean` | - | packages/cli/src/commands/memory.ts:378 |
 | <a id="property-history"></a> `history` | `readonly` | readonly [`MemoryHistoryEntry`](/api/@graphorin/cli/interfaces/MemoryHistoryEntry.md)[] | - | packages/cli/src/commands/memory.ts:381 |
-| <a id="property-linkedentities"></a> `linkedEntities` | `readonly` | readonly [`MemoryInspectEntity`](/api/@graphorin/cli/interfaces/MemoryInspectEntity.md)[] | Canonical entities this fact links to (P2-1 / migration 016). | packages/cli/src/commands/memory.ts:385 |
+| <a id="property-linkedentities"></a> `linkedEntities` | `readonly` | readonly [`MemoryInspectEntity`](/api/@graphorin/cli/interfaces/MemoryInspectEntity.md)[] | Canonical entities this fact links to (migration 016). | packages/cli/src/commands/memory.ts:385 |

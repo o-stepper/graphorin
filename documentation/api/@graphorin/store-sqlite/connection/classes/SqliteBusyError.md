@@ -11,7 +11,7 @@ Defined in: packages/store-sqlite/src/connection.ts:462
 **`Stable`**
 
 Typed wrapper for the driver's raw `SQLITE_BUSY` /
-`SQLITE_BUSY_SNAPSHOT` errors (W-067): the write lock stayed
+`SQLITE_BUSY_SNAPSHOT` errors: the write lock stayed
 contended past `busy_timeout`. Carries `code = 'SQLITE_BUSY'` for
 compatibility with callers that already branch on the driver's
 `err.code`, plus the driver error as `cause`. No auto-retry by

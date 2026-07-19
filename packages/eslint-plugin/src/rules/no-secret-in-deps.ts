@@ -1,5 +1,5 @@
 /**
- * Rule: `@graphorin/no-secret-in-deps` (RB-24 / DEC-137). Flags any
+ * Rule: `@graphorin/no-secret-in-deps` (DEC-137). Flags any
  * call shaped like `withChildToolSecretsContext({ secretsAllowed:
  * [...] }, fn)` where the `secretsAllowed` array is non-empty and the
  * surrounding call site does not include a comment whose text starts

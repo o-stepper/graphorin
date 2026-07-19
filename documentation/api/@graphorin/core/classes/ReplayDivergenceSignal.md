@@ -12,7 +12,7 @@ Defined in: packages/core/src/channels/pause.ts:68
 
 Thrown by `pause(value)` during replay when the CURRENT pause's
 identity does not match what the journal recorded for this cursor
-position (W-120): the node body's pause order depends on
+position: the node body's pause order depends on
 time/state/LLM output, so a positional replay would silently hand a
 resume value to the wrong pause. The workflow engine converts this
 into a typed `pause-replay-divergence` WorkflowError.

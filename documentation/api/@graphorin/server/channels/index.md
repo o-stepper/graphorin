@@ -6,7 +6,7 @@
 
 # channels
 
-`@graphorin/server/channels` - B1.6 lifecycle adapter for a
+`@graphorin/server/channels` - lifecycle adapter for a
 channel gateway (structural typing over `@graphorin/channels`; no
 package dependency).
 

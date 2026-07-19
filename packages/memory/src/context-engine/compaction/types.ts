@@ -54,7 +54,7 @@ export interface CompactionResult {
   readonly durationMs: number;
   readonly hooksFiredCount: number;
   /**
-   * Trust classification of the produced summary (CE-15).
+   * Trust classification of the produced summary.
    * `'untrusted-derived'` when the compacted window contained
    * `<<<untrusted_content>>>` envelopes or the injection heuristics
    * flagged the summarizer output - the LLM-authored summary body is
@@ -77,7 +77,7 @@ export interface CompactionTriggerConfig {
   readonly thresholdTokens?: number;
   readonly thresholdRatio?: number;
   /**
-   * SOTA-4 reclaim-floor: defer a compaction whose predicted reclaim - the
+   * Reclaim floor: defer a compaction whose predicted reclaim - the
    * older, compactable portion of the buffer (everything but the preserved
    * recent turns) - is below this many tokens. Prevents compact-thrash at the
    * threshold (paying a summarizer call to reclaim a handful of tokens). Opt-in;
@@ -90,7 +90,7 @@ export interface CompactionTriggerConfig {
  * Strategy discriminator. The default
  * `'summarize-old-preserve-recent'` strategy invokes the
  * configured summarizer and replaces the older portion with a
- * structured section summary; `'clear-old-tool-results'` (SOTA-1) is
+ * structured section summary; `'clear-old-tool-results'` is
  * a zero-LLM tier that replaces the oldest tool results with compact
  * placeholders BEFORE any summarizer call, falling back to summarize
  * only if clearing did not reclaim enough; the `'custom'` variant
@@ -108,7 +108,7 @@ export type CompactionStrategy =
       readonly preStep?: boolean;
       /**
        * Character budget for the older-messages dump embedded in the
-       * summarizer prompt (context-engine-07). Without a cap the
+       * summarizer prompt. Without a cap the
        * single-shot prompt carries the ENTIRE older window (~85% of the
        * main model's window at default thresholds) and overflows any
        * smaller `summarizerModel` - the failure is swallowed, so the
@@ -119,7 +119,7 @@ export type CompactionStrategy =
        */
       readonly summarizerInputCharBudget?: number;
       /**
-       * C4: keep the most recent N USER messages from the summarized
+       * Keep the most recent N USER messages from the summarized
        * window verbatim (re-inserted between the summary and the
        * preserved tail) - only assistant/tool content is summarized
        * away. User words are the task statement; paraphrase loses
@@ -129,7 +129,7 @@ export type CompactionStrategy =
     }
   | {
       /**
-       * SOTA-1 zero-LLM clearing tier (Anthropic `clear_tool_uses`): replace the
+       * Zero-LLM clearing tier (Anthropic `clear_tool_uses`): replace the
        * oldest tool results with placeholders before paying for a summarizer.
        */
       readonly kind: 'clear-old-tool-results';
@@ -140,20 +140,20 @@ export type CompactionStrategy =
       /** Tool names whose results are never cleared. */
       readonly excludeTools?: ReadonlyArray<string>;
       /**
-       * C4 (clear_tool_uses_20250919 parity): additionally blank the
+       * Parity with `clear_tool_uses_20250919`: additionally blank the
        * PAIRED assistant tool-call arguments when a result is cleared,
        * reclaiming the input side of verbose calls too. Default `false`.
        */
       readonly clearToolInputs?: boolean;
       /**
-       * C4 (context-engine-11): the retrieval tool the externalized-handle
+       * The retrieval tool the externalized-handle
        * placeholder advertises. Pass `null` when the runtime does not
        * register `read_result` so the placeholder never promises a tool
        * the model cannot call. Default `'read_result'`.
        */
       readonly readResultToolName?: string | null;
       /**
-       * A6 / SOTA-2 - recoverable clearing. Wire to a spill / `read_result`
+       * Recoverable clearing. Wire to a spill / `read_result`
        * registry: cleared content is saved behind a handle and the placeholder
        * references it so the model can re-fetch via `read_result`. Omitted ⇒ bare
        * placeholders (irrecoverable). Only fires for clears that commit.
@@ -198,7 +198,7 @@ export interface PostCompactionHookContext {
   readonly agentId: string;
   readonly source: CompactionSource;
   /**
-   * C4: the messages this compaction dropped (summarized away /
+   * The messages this compaction dropped (summarized away /
    * cleared), in original order. Lets re-anchoring hooks recover
    * references - e.g. `reanchorRecentResults` re-lists the result
    * handles that just left the window.
@@ -218,7 +218,7 @@ export type PostCompactionHook = (
 ) => Promise<ReadonlyArray<import('@graphorin/core').MessageContent>>;
 
 /**
- * Per-call context handed to a PRE-compaction hook (wave-D D4) -
+ * Per-call context handed to a PRE-compaction hook -
  * fired BEFORE the summarizer runs, while the full buffer is still
  * available. This is the seam the built-in `memoryFlushHook` uses to
  * salvage durable facts from content that is about to be summarized
@@ -241,7 +241,7 @@ export interface PreCompactionHookContext {
 }
 
 /**
- * Pre-compaction hook signature (wave-D D4). Side-effect only - a
+ * Pre-compaction hook signature. Side-effect only - a
  * pre-hook cannot alter what gets compacted; a throwing hook is
  * recorded in `hookFailures` and never blocks the compaction.
  *
@@ -282,7 +282,7 @@ export interface CompactionConfig {
   readonly strategy?: CompactionStrategy;
   readonly postCompactionHooks?: ReadonlyArray<PostCompactionHook>;
   /**
-   * Pre-compaction hooks (wave-D D4): fired before the summarizer,
+   * Pre-compaction hooks: fired before the summarizer,
    * with the full buffer in context. Default: none - the built-in
    * `memoryFlushHook` is opt-in. Accepts plain functions or named
    * hooks.

@@ -26,7 +26,7 @@ export interface TokensRoutesDeps {
   readonly defaultEnv: string;
   readonly allowedEnvs: ReadonlyArray<string>;
   /**
-   * TOKENS-RE-01 / SPL-9: the live token verifier, so a REST revoke
+   * The live token verifier, so a REST revoke
    * invalidates its LRU entry immediately - otherwise a just-used token
    * keeps authenticating from the cache for up to `cacheTtlMaxMs` (60s).
    */

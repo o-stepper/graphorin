@@ -13,7 +13,7 @@ function ensureDirMode(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/hardening/file-modes.ts:77
+Defined in: packages/security/src/hardening/file-modes.ts:76
 
 **`Stable`**
 

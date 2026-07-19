@@ -10,8 +10,8 @@ Defined in: packages/core/src/channels/pause.ts:53
 
 **`Stable`**
 
-Identity of one pause as recorded next to its satisfied resume value
-(W-120): the durable-primitive `kind` (`timer` / `awakeable` /
+Identity of one pause as recorded next to its satisfied resume value:
+the durable-primitive `kind` (`timer` / `awakeable` /
 `approval`) and the awakeable/approval `name`. A plain `pause()` has
 neither - two plain pauses are indistinguishable BY DESIGN (no
 false positives; the check is deliberately conservative).

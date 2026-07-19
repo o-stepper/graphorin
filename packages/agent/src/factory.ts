@@ -233,7 +233,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // D2: capability of the ACTIVE run - read by the code-mode bridge so
   // in-script tool calls inherit the run's single-writer restriction.
   let activeRunCapability: 'read-only' | undefined;
-  /** AG-11: guards the one-in-flight-run-per-instance invariant. */
+  /** Guards the one-in-flight-run-per-instance invariant. */
   let runInFlight = false;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
 
@@ -276,7 +276,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     : undefined;
 
   /**
-   * AG-11: one in-flight run per Agent instance. `steer` / `followUp` /
+   * One in-flight run per Agent instance. `steer` / `followUp` /
    * `abort` / `compact` address "the run" with no run handle, so
    * overlapping runs on one instance cannot be expressed safely - they
    * would share the abort controller, steer queue, active-run ref and

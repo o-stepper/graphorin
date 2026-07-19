@@ -140,7 +140,7 @@ export async function revokeToken(
   opts: {
     readonly now?: () => number;
     /**
-     * SPL-9: pass the live `TokenVerifier` so revocation invalidates its
+     * Pass the live `TokenVerifier` so revocation invalidates its
      * LRU entry immediately - without it a revoked token keeps verifying
      * from the cache for up to `cacheTtlMaxMs` (default 60s).
      */
@@ -171,7 +171,7 @@ export async function rotateToken(
     readonly id: string;
     readonly env?: TokenEnvironment | string;
     readonly scopesOverride?: ReadonlyArray<string>;
-    /** SPL-9: invalidates the rotated-out token's verifier cache entry. */
+    /** Invalidates the rotated-out token's verifier cache entry. */
     readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
   },
 ): Promise<{ readonly old: TokenMetadata; readonly next: CreatedToken }> {
@@ -311,7 +311,7 @@ async function hmacHexAsync(pepper: SecretValue, raw: string): Promise<string> {
   );
 }
 
-/** @internal - shared with the verifier's lazy first-use check (SPL-11). */
+/** @internal - shared with the verifier's lazy first-use check. */
 export async function assertPepperStrength(pepper: SecretValue): Promise<void> {
   const assessment = await pepper.useBuffer((buf) => assessSecretStrength(buf));
   if (!assessment.ok) {

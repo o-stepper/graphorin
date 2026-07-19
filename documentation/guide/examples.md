@@ -98,7 +98,7 @@ The security and replay showcase: the same scripted agent flow runs three times 
 
 ## `structured-verifier`
 
-The structured-output contract end-to-end (audit item 9): one extraction agent declares a CLOSED wire `jsonSchema` (mapped to strict `response_format: json_schema` by native adapters), a zod `schema` parse gate that fails a violating draft with the typed `output-validation-failed` error, and a deterministic C3 `ResponseVerifier` that bounces a placeholder draft back to the model for exactly one bounded continuation round - the smoke tests also pin that the schema is forwarded on EVERY provider call.
+The structured-output contract end-to-end: one extraction agent declares a CLOSED wire `jsonSchema` (mapped to strict `response_format: json_schema` by native adapters), a zod `schema` parse gate that fails a violating draft with the typed `output-validation-failed` error, and a deterministic `ResponseVerifier` that bounces a placeholder draft back to the model for exactly one bounded continuation round - the smoke tests also pin that the schema is forwarded on EVERY provider call.
 
 - Demonstrates: `outputType: { kind: 'structured' }` (wire schema + local parse gate), `verifiers` + `maxVerifierRounds`, both typed failure modes.
 - Source: [`examples/structured-verifier/`](https://github.com/o-stepper/graphorin/tree/main/examples/structured-verifier).

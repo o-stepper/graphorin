@@ -1,8 +1,7 @@
 /**
- * `graphorin doctor --smoke-local` - the local-first first-run smoke
- * (external audit 2026-07-16, item 6). Exercises the exact stack a new
- * local deployment depends on, through the same code paths consumers
- * use:
+ * `graphorin doctor --smoke-local` - the local-first first-run smoke.
+ * Exercises the exact stack a new local deployment depends on,
+ * through the same code paths consumers use:
  *
  * 1. `smoke:native` - the native SQLite stack loads (`better-sqlite3`
  *    binding + the `sqlite-vec` extension). A pnpm-10 skipped-build

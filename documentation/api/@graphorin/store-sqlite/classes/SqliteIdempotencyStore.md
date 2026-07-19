@@ -101,7 +101,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:96
 Delete records whose expiry is older than the supplied epoch-ms
 instant. Production caller: the server's hourly
 `scheduleIdempotencyPruning` sweep (started by `app-lifecycle`),
-so expired rows no longer accumulate forever (W-065).
+so expired rows no longer accumulate forever.
 
 #### Parameters
 

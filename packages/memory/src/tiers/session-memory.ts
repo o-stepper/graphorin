@@ -64,7 +64,7 @@ export class SessionMemory {
   }
 
   /**
-   * Persist a message. Returns the storage reference. B3:
+   * Persist a message. Returns the storage reference.
    * `options.verdict` threads the run loop's per-turn security
    * verdict onto the stored row for the memory ingest gate.
    */
@@ -114,7 +114,7 @@ export class SessionMemory {
   }
 
   /**
-   * RP-5: list messages with their persisted identity (stored id / sequence /
+   * List messages with their persisted identity (stored id / sequence /
    * `createdAt`) so an exporter preserves message identity + chronology.
    * Delegates to the store when it supports the richer read.
    */
@@ -161,12 +161,12 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) - always resolves `{ flushed: 0 }` and
+   * NOT IMPLEMENTED - always resolves `{ flushed: 0 }` and
    * performs no work. The consolidator pipeline (extraction → facts /
    * episodes) superseded the planned "silent flush turn"; this method
    * remains only for contract stability. Do not branch on its counter.
    *
-   * @deprecated Wave-D D4 retired this surface in favour of the
+   * @deprecated Retired in favour of the
    * pre-compaction `memoryFlushHook` (`contextEngine: { compaction: {
    * preCompactionHooks: [memoryFlushHook({ provider })] } }`) - the
    * single flush surface, fired exactly when content is about to be
@@ -187,7 +187,7 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) - always resolves
+   * NOT IMPLEMENTED - always resolves
    * `{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
    * Session-context compaction is owned by the context engine
    * (`memory.contextEngine.compactNow`, driven by the agent runtime);
@@ -259,7 +259,7 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) - always resolves `[]`. The agent
+   * NOT IMPLEMENTED - always resolves `[]`. The agent
    * registry lives in `@graphorin/sessions` and has never been
    * threaded into this tier; the previous JSDoc claimed the default
    * sqlite adapter "resolves" registry rows here, which was false. Use

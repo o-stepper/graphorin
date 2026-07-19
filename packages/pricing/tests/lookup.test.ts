@@ -266,7 +266,7 @@ describe('W-045 - Cost.amount units pin (whole dollars, never minor units)', () 
   });
 });
 
-describe('deep retest 2026-07-19 P1-3 - GPT-5.6 family is priced', () => {
+describe('GPT-5.6 family pricing', () => {
   it('resolves luna/terra/sol at the official standard short-context rates', () => {
     const luna = lookupPrice({ provider: 'openai', model: 'gpt-5.6-luna' });
     expect(luna?.inputUsdPerToken).toBeCloseTo(1 / 1_000_000, 12);
@@ -280,5 +280,39 @@ describe('deep retest 2026-07-19 P1-3 - GPT-5.6 family is priced', () => {
     const sol = lookupPrice({ provider: 'openai', model: 'gpt-5.6-sol' });
     expect(sol?.inputUsdPerToken).toBeCloseTo(5 / 1_000_000, 12);
     expect(sol?.outputUsdPerToken).toBeCloseTo(30 / 1_000_000, 12);
+  });
+
+  it('carries the explicit cache-write premium (1.25x input) for all three variants', () => {
+    const luna = lookupPrice({ provider: 'openai', model: 'gpt-5.6-luna' });
+    expect(luna?.cacheWriteUsdPerToken).toBeCloseTo(1.25 / 1_000_000, 12);
+    const terra = lookupPrice({ provider: 'openai', model: 'gpt-5.6-terra' });
+    expect(terra?.cacheWriteUsdPerToken).toBeCloseTo(3.125 / 1_000_000, 12);
+    const sol = lookupPrice({ provider: 'openai', model: 'gpt-5.6-sol' });
+    expect(sol?.cacheWriteUsdPerToken).toBeCloseTo(6.25 / 1_000_000, 12);
+  });
+
+  it('resolves the bare `gpt-5.6` alias at sol rates (the API routes it to sol)', () => {
+    const alias = lookupPrice({ provider: 'openai', model: 'gpt-5.6' });
+    const sol = lookupPrice({ provider: 'openai', model: 'gpt-5.6-sol' });
+    expect(alias).not.toBeNull();
+    expect(alias?.inputUsdPerToken).toBe(sol?.inputUsdPerToken);
+    expect(alias?.outputUsdPerToken).toBe(sol?.outputUsdPerToken);
+    expect(alias?.cachedReadUsdPerToken).toBe(sol?.cachedReadUsdPerToken);
+    expect(alias?.cacheWriteUsdPerToken).toBe(sol?.cacheWriteUsdPerToken);
+  });
+
+  it('calculateCost matches the official four-leg formula (base + cached read + cache write + output)', () => {
+    // luna: 1000 base-input + 500 cached reads + 200 cache writes + 300 output
+    // = (1000*1.00 + 500*0.10 + 200*1.25 + 300*6.00) / 1e6
+    // = (1000 + 50 + 250 + 1800) / 1e6 = $0.0031
+    const cost = calculateCost({
+      provider: 'openai',
+      model: 'gpt-5.6-luna',
+      inputTokens: 1_000,
+      outputTokens: 300,
+      cachedReadTokens: 500,
+      cacheWriteTokens: 200,
+    });
+    expect(cost?.amount).toBeCloseTo(0.0031, 12);
   });
 });

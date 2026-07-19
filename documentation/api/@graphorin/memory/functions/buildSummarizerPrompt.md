@@ -10,7 +10,7 @@
 function buildSummarizerPrompt(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:79
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:78
 
 **`Stable`**
 
@@ -32,7 +32,7 @@ result is committed to the in-flight buffer.
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
 | `input` | \{ `maxDumpChars?`: `number`; `olderMessages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `template`: [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md); \} | - |
-| `input.maxDumpChars?` | `number` | Character budget for the message dump (context-engine-07). When the rendered dump exceeds it, the OLDEST lines are elided (newest kept) and a marker notes how many were dropped. `undefined` ⇒ default `DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET`; `0` disables the cap. |
+| `input.maxDumpChars?` | `number` | Character budget for the message dump. When the rendered dump exceeds it, the OLDEST lines are elided (newest kept) and a marker notes how many were dropped. `undefined` ⇒ default `DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET`; `0` disables the cap. |
 | `input.olderMessages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
 | `input.template` | [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md) | - |
 

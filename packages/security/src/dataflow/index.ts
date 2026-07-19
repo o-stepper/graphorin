@@ -1,6 +1,6 @@
 /**
  * Provenance / taint-based data-flow policy for `@graphorin/security`
- * (P1-3, toward CaMeL).
+ * (toward CaMeL).
  *
  * Enforces data-flow rules at a tool-execution boundary using the
  * provenance Graphorin already tracks (trust class + source + sensitivity)

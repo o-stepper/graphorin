@@ -13,7 +13,7 @@ function verifyFileMode(path, expected): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/hardening/file-modes.ts:98
+Defined in: packages/security/src/hardening/file-modes.ts:97
 
 **`Stable`**
 

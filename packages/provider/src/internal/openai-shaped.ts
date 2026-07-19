@@ -52,7 +52,7 @@ export interface OpenAIShapedOptions {
   readonly allowInsecureTransport?: boolean;
   readonly capabilities?: Partial<ProviderCapabilities>;
   /**
-   * Time-to-response budget per request (PS-24). Default
+   * Time-to-response budget per request. Default
    * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
    */
   readonly timeoutMs?: number;
@@ -518,7 +518,7 @@ function defaultLogger(level: 'warn' | 'info', message: string, meta?: object): 
 }
 
 /**
- * W-095: one dropped-content WARN per adapter INSTANCE (keyed on the
+ * One dropped-content WARN per adapter INSTANCE (keyed on the
  * factory's options object, following KNOWN_LOOPBACK_OVERRIDES_WARNED),
  * so a chat loop does not repeat it every call.
  */

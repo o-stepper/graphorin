@@ -87,7 +87,7 @@ export interface EvalReport<I, O> {
       >
     >;
     /**
-     * 95% Wilson score interval on the overall pass rate (E8 / evals-05).
+     * 95% Wilson score interval on the overall pass rate.
      * Always present on reports produced by `runEvals`; optional so older
      * persisted reports keep parsing.
      */

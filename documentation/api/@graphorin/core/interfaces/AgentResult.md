@@ -17,7 +17,7 @@ A failed run **resolves** with `status: 'failed'` and the error in
 `error` - `agent.run(...)` does not reject on run failure (only on
 configuration/usage errors thrown before the loop starts). A suspended
 run resolves with `status: 'awaiting_approval'` and a resumable
-`state` (AG-9).
+`state`.
 
 ## Type Parameters
 
@@ -34,4 +34,4 @@ run resolves with `status: 'awaiting_approval'` and a resumable
 | <a id="property-state"></a> `state` | `readonly` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) | The run's final state. Resumable when `status === 'awaiting_approval'` - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally round-tripped through `runStateToJSON`/`runStateFromJSON` for durability). Treat as an immutable snapshot. | packages/core/src/types/agent-event.ts:591 |
 | <a id="property-status"></a> `status` | `readonly` | [`RunStatus`](/api/@graphorin/core/type-aliases/RunStatus.md) | Terminal status of this run-loop invocation. | packages/core/src/types/agent-event.ts:576 |
 | <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | - | packages/core/src/types/agent-event.ts:574 |
-| <a id="property-verdicts"></a> `verdicts?` | `readonly` | [`RunVerdicts`](/api/@graphorin/core/type-aliases/RunVerdicts.md) | B3 (item 15): the run's per-turn security verdicts (mirrors `state.verdicts`). Surfaced directly so callers can apply them at the `Session.push` boundary without digging into the state. | packages/core/src/types/agent-event.ts:584 |
+| <a id="property-verdicts"></a> `verdicts?` | `readonly` | [`RunVerdicts`](/api/@graphorin/core/type-aliases/RunVerdicts.md) | The run's per-turn security verdicts (mirrors `state.verdicts`). Surfaced directly so callers can apply them at the `Session.push` boundary without digging into the state. | packages/core/src/types/agent-event.ts:584 |

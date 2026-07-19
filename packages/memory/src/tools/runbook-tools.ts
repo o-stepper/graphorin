@@ -1,5 +1,5 @@
 /**
- * Runbook tool (D3) - gated content recall over procedural memory.
+ * Runbook tool - gated content recall over procedural memory.
  * `runbook_search` finds validated procedures whose text / steps match
  * a task description and returns them **whole** (title line, numbered
  * steps, variables, success criteria), so the model can follow a known
@@ -33,7 +33,7 @@ const runbookSearchOutputSchema = z.object({
   ),
 });
 
-/** W-013: explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
+/** Explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
 export interface RunbookSearchInput {
   query: string;
   topK?: number | undefined;

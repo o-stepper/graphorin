@@ -86,10 +86,10 @@ interface LauncherSpec {
 }
 
 /**
- * SPL-18: the launcher URL ultimately derives from fetched OAuth
+ * The launcher URL ultimately derives from fetched OAuth
  * discovery metadata. Reject anything that is not a plain http(s) URL,
  * and refuse shell/cmd metacharacters outright - defence in depth on
- * top of SPL-7's discovery validation.
+ * top of the discovery validation.
  */
 function assertSafeLaunchUrl(url: string): void {
   let parsed: URL;
@@ -123,7 +123,7 @@ function resolveLauncher(url: string, plat: NodeJS.Platform = platform()): Launc
   return { command: 'xdg-open', args: [url] };
 }
 
-/** @experimental - test seam for the platform-specific launcher (SPL-18). */
+/** @experimental - test seam for the platform-specific launcher. */
 export function _resolveLauncherForTesting(url: string, plat: NodeJS.Platform): LauncherSpec {
   return resolveLauncher(url, plat);
 }

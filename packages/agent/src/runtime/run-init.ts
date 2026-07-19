@@ -1,8 +1,8 @@
 /**
  * Fresh-run message-buffer initialization: resolve the agent's
- * `instructions` (string or per-run function form, AG-8), optionally
+ * `instructions` (string or per-run function form), optionally
  * assemble the memory-aware 6-layer system prompt via the context
- * engine (CE-1, opt-in), and seed the buffer + RunState mirror.
+ * engine (opt-in), and seed the buffer + RunState mirror.
  * Extracted verbatim from `factory.ts` (issue #23).
  *
  * @packageDocumentation
@@ -105,7 +105,7 @@ export interface RunStateInitEnv<TDeps, TOutput> {
   readonly sessionId: string;
   readonly userId: string | undefined;
   readonly toolDataFlowGuard: ReturnType<typeof buildDataFlowGuard> | undefined;
-  /** B1.5: message-borne taint seed from `AgentCallOptions.inboundTaint`. */
+  /** Message-borne taint seed from `AgentCallOptions.inboundTaint`. */
   readonly inboundTaint?: InboundTaintSeed;
 }
 
@@ -118,10 +118,9 @@ export interface InitializedRunState {
 
 /**
  * Bootstrap the run's state: create (or adopt) the {@link RunState},
- * rehydrate the run-scoped security state (AG-19: the persisted coarse
+ * rehydrate the run-scoped security state (the persisted coarse
  * taint summary re-seeds the enforce-mode sink gate), and restore the
- * `tool_search` promotion set (TL-7 / AG-19, with the C1
- * `'run-boundary'` snapshot).
+ * `tool_search` promotion set (with the `'run-boundary'` snapshot).
  */
 export function initializeRunState<TDeps, TOutput>(
   env: RunStateInitEnv<TDeps, TOutput>,

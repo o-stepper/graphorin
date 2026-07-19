@@ -9,7 +9,7 @@
 Defined in: packages/mcp/src/errors/index.ts:112
 
 Raised when the MCP server reports a tool-level failure
-(`CallToolResult.isError === true`, MC-4). The server's content text
+(`CallToolResult.isError === true`). The server's content text
 rides in the message so the model keeps its self-correction signal -
 while the executor records a real tool FAILURE (audit, retry and
 error policies all engage) instead of a fake success.

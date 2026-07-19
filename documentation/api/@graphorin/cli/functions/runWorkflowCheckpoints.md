@@ -10,7 +10,7 @@
 function runWorkflowCheckpoints(options): Promise<readonly ThreadCheckpointSummary[]>;
 ```
 
-Defined in: packages/cli/src/commands/workflow.ts:108
+Defined in: packages/cli/src/commands/workflow.ts:107
 
 **`Stable`**
 

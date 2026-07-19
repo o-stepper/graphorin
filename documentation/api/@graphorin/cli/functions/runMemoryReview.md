@@ -18,7 +18,7 @@ Defined in: packages/cli/src/commands/memory.ts:868
 procedures the consolidator left in quarantine (read-only), or promote a
 reviewed item out of quarantine with `--promote <id>`. The promote path runs
 through the tier `validate(...)`, so an injection-flagged memory is refused
-unless `--force` is supplied after review (MCON-2).
+unless `--force` is supplied after review.
 
 ## Parameters
 

@@ -48,7 +48,7 @@ export interface Cost {
    * Amount in WHOLE units of `currency` - for USD that is dollars, and
    * fractional values are expected (a typical LLM call costs a fraction
    * of a cent, e.g. `0.0042`). This is deliberately NOT "minor units" /
-   * cents (W-045): the canonical producer -
+   * cents: the canonical producer -
    * `calculateCost` in `@graphorin/pricing` - and every consumer
    * (`CostTracker` in `@graphorin/observability`, the memory
    * consolidator's `costUsd` budget, persisted checkpoints) already

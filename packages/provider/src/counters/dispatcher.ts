@@ -113,7 +113,7 @@ export function createDefaultCounter(options: CreateDefaultCounterOptions): Toke
 }
 
 /**
- * PS-20: pick the fallback tiktoken encoding by model family. `js-tiktoken`'s
+ * Pick the fallback tiktoken encoding by model family. `js-tiktoken`'s
  * `encodingForModel` handles ids it recognises; this is the explicit fallback
  * for ids it does not (the 2025/2026 families). gpt-4o / gpt-4.1 / gpt-5+ and
  * the o-series reasoning models use `o200k_base`; legacy gpt-4 / gpt-3.5 stay

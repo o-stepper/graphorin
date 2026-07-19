@@ -10,11 +10,11 @@
 function isForeignProvenance(provenance): boolean;
 ```
 
-Defined in: packages/memory/src/search/trust.ts:30
+Defined in: packages/memory/src/search/trust.ts:29
 
 **`Stable`**
 
-`true` for provenance that did not originate first-party (P1-4) -
+`true` for provenance that did not originate first-party -
 mirrors the eviction-path classification: `null` (legacy / direct
 write), `'user'`, and `'extraction'` (the consolidator distilling the
 user's own session) are first-party; `'tool'`, `'imported'`,

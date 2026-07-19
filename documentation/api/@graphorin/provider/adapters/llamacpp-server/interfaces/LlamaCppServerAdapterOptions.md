@@ -26,4 +26,4 @@ Options accepted by [llamaCppServerAdapter](/api/@graphorin/provider/adapters/ll
 | <a id="property-logger"></a> `logger?` | `readonly` | (`level`, `message`, `meta?`) => `void` | Optional log sink. Tests pass a fixture sink to silence the console. | packages/provider/src/adapters/llamacpp-server.ts:60 |
 | <a id="property-model"></a> `model` | `readonly` | `string` | GGUF model identifier exposed by the running server (e.g. `'qwen2.5:7b-instruct-q4_k_m'`). | packages/provider/src/adapters/llamacpp-server.ts:33 |
 | <a id="property-name"></a> `name?` | `readonly` | `string` | Provider name attached to spans / log lines. | packages/provider/src/adapters/llamacpp-server.ts:58 |
-| <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Time-to-response budget per request (PS-24). Default `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables. | packages/provider/src/adapters/llamacpp-server.ts:46 |
+| <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Time-to-response budget per request. Default `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables. | packages/provider/src/adapters/llamacpp-server.ts:46 |

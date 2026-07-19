@@ -234,14 +234,14 @@ export class SqliteSessionStore implements SessionStoreExt {
     return result.changes ?? 0;
   }
 
-  /** RP-6: hard-delete a session + its handoffs / workflow runs / audit rows. */
+  /** Hard-delete a session + its handoffs / workflow runs / audit rows. */
   async deleteSession(sessionId: string): Promise<void> {
     this.#conn.transaction(() => {
       this.#deleteSessionCascade(sessionId);
     });
   }
 
-  /** RP-6: retention sweep - delete every session matching the policy. */
+  /** Retention sweep - delete every session matching the policy. */
   async pruneSessions(opts: {
     readonly beforeEpochMs?: number;
     readonly closedOnly?: boolean;
@@ -296,7 +296,7 @@ export class SqliteSessionStore implements SessionStoreExt {
   }
 
   /**
-   * store-01 / W-029: a hard-delete must remove the CONTENT, not just
+   * A hard-delete must remove the CONTENT, not just
    * the registry rows. The purge is driven by the declarative
    * {@link SESSION_SCOPED_PURGES} registry so completeness is enforced
    * by construction: a schema-introspection gate test asserts that
@@ -424,8 +424,8 @@ export interface SessionScopedPurge {
   /** Tables referencing the base rows - cleared BEFORE the base rows. */
   readonly refs?: ReadonlyArray<{ readonly table: string; readonly column: string }>;
   /**
-   * Scrub `memory_history` values for the deleted rows (store-04
-   * parity). `valueMatch` additionally clears history rows whose
+   * Scrub `memory_history` values for the deleted rows.
+   * `valueMatch` additionally clears history rows whose
    * values equal the deleted row's text (the SUPERSEDE shape).
    */
   readonly history?: {
@@ -439,7 +439,7 @@ const VALID_IDENTIFIER = /^[A-Za-z0-9_]+$/;
 
 /**
  * Declarative registry of every session-scoped CONTENT surface the
- * session hard-delete cascade purges (W-029/W-060). The gate test in
+ * session hard-delete cascade purges. The gate test in
  * `tests/erasure-cascade.test.ts` diffs this list (plus
  * {@link SESSION_TABLE_EXEMPTIONS}) against the live schema: a new
  * table with a session column fails the suite until its author decides

@@ -1,9 +1,9 @@
 /**
  * Warm-up wiring of the agent's tool-execution stack: the spill
- * writer / result-reader pair (WI-10 / WI-13), the memory guard,
+ * writer / result-reader pair, the memory guard,
  * data-flow guard and Progent argument-policy hooks, the shared
- * `ToolExecutor` factory (WI-03), and the opt-in code-mode meta-tool
- * surface (WI-11). Extracted verbatim from `factory.ts` (issue #23).
+ * `ToolExecutor` factory, and the opt-in code-mode meta-tool
+ * surface. Extracted verbatim from `factory.ts` (issue #23).
  *
  * @packageDocumentation
  */
@@ -71,7 +71,7 @@ export interface ExecutorWiring<TDeps> {
   readonly toolExecutor: ToolExecutor;
   readonly toolDataFlowGuard: ReturnType<typeof buildDataFlowGuard> | undefined;
   /**
-   * E1: the compiled argument-policy guard, shared with the run loop -
+   * The compiled argument-policy guard, shared with the run loop -
    * the walk's permission pre-screen (four-value `decide`) and the
    * deny-by-name surfaces (catalogue filter, `tool_search` exclusion,
    * inline handoff/sub-agent check) all consult the same object the
@@ -84,7 +84,7 @@ export interface ExecutorWiring<TDeps> {
 }
 
 /**
- * Construct the unified ToolExecutor once at warm-up (WI-03 / P0-1),
+ * Construct the unified ToolExecutor once at warm-up,
  * bound to the registry above. Routing tool execution through the
  * executor activates the documented tool fields the inline loop
  * bypassed: per-tool `secretsAllowed` ACL, result truncation

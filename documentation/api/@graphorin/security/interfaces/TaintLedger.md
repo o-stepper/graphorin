@@ -140,7 +140,7 @@ Coarse, serializable summary of the load-bearing trifecta-gate signal -
 the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked
 verbatim spans (those are untrusted text and must not be persisted). Used
 to rehydrate the ledger across a suspend/resume so the sink gate is not
-silently weakened on the HITL boundary (AG-19).
+silently weakened on the HITL boundary.
 
 #### Returns
 

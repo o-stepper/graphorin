@@ -78,7 +78,7 @@ getByHash(hashHex): Promise<
 
 Defined in: packages/store-sqlite/src/auth-token-store.ts:40
 
-Indexed lookup by HMAC hash (SPL-19). When present, the verifier
+Indexed lookup by HMAC hash. When present, the verifier
 uses it on cache-miss instead of walking `list()` - O(1) instead of
 an O(n) full-table scan per verification.
 

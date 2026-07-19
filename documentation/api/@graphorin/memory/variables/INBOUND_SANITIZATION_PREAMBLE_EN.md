@@ -12,4 +12,4 @@ const INBOUND_SANITIZATION_PREAMBLE_EN: string = enLocalePack.inboundSanitizatio
 
 Defined in: packages/memory/src/context-engine/preambles/inbound-en.ts:19
 
-English D4 preamble text (~80-120 tokens, cache-friendly).
+English inbound preamble text (~80-120 tokens, cache-friendly).

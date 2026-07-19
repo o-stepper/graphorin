@@ -26,7 +26,7 @@ export interface ZodLikeError<_TInput = unknown> {
   readonly message: string;
   readonly issues: ReadonlyArray<{
     /**
-     * W-013: `PropertyKey`, not `string | number` - zod 4 bases
+     * `PropertyKey`, not `string | number` - zod 4 bases
      * `$ZodIssue.path` on `PropertyKey`, and this shim must be a
      * SUPERSET of both supported peer majors or the canonical
      * `tool({ inputSchema: z.object({...}) })` fails to typecheck for

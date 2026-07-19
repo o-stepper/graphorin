@@ -10,7 +10,7 @@ Defined in: packages/memory/src/consolidator/errors.ts:75
 
 **`Stable`**
 
-Raised when the wave-D D3 `curatedBlocks` config is invalid: a
+Raised when the `curatedBlocks` config is invalid: a
 duplicate label (incl. colliding with the `learnedContext: true`
 sugar), an empty label, or the reserved `profile` label (the profile
 projection owns that block and keeps it read-only - a curated-block

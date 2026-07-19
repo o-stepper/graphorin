@@ -64,7 +64,7 @@ export interface ToolRegistryOptions {
   /** Cosine threshold above which a semantic match counts. Default `0.5`. */
   readonly semanticScoreThreshold?: number;
   /**
-   * C6: treat tools that do not declare `defer_loading` as deferred
+   * Treat tools that do not declare `defer_loading` as deferred
    * (the minimal-scaffold posture). An explicit `defer_loading: false`
    * on the tool still wins. Default `false` (per-tool opt-in).
    */
@@ -766,7 +766,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
 }
 
 /**
- * C2: the text a deferred tool is FOUND by - name + description + tags +
+ * The text a deferred tool is FOUND by - name + description + tags +
  * worked-example comments. Example comments routinely carry the concrete
  * phrasing a model searches with ("resize an image to a width"), so
  * indexing them measurably widens recall over name+description alone.

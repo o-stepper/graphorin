@@ -1,5 +1,5 @@
 /**
- * Neighbour-aware write reconciliation (P0-3) - the `reconcile` half of
+ * Neighbour-aware write reconciliation - the `reconcile` half of
  * Mem0's extract→reconcile loop (arXiv:2504.19413), with Graphorin's
  * bi-temporal twist.
  *

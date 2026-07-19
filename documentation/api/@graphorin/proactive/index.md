@@ -37,5 +37,5 @@ Single-process by design: schedules ride `@graphorin/triggers`, whose SQLite sto
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/proactive/README.md) | `@graphorin/proactive` - the proactivity layer of the Graphorin framework: a checklist-driven heartbeat runner (C1) and a cron-leg task runner (C2), both emitting the typed notify / question / review / act escalation ladder from `@graphorin/core`. |
+| [](/api/@graphorin/proactive/README.md) | `@graphorin/proactive` - the proactivity layer of the Graphorin framework: a checklist-driven heartbeat runner and a cron-leg task runner, both emitting the typed notify / question / review / act escalation ladder from `@graphorin/core`. |
 | [package.json](/api/@graphorin/proactive/package.json/index.md) | - |

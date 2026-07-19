@@ -1,5 +1,5 @@
 /**
- * SOTA-1: zero-LLM tool-result clearing - the cheapest pre-compaction tier.
+ * Zero-LLM tool-result clearing - the cheapest pre-compaction tier.
  *
  * Mirrors Anthropic context editing (`clear_tool_uses_20250919`): when the
  * buffer crosses the compaction threshold, replace the oldest tool results with
@@ -39,7 +39,7 @@ export interface ClearToolResultsOptions {
     readonly clearedTokens: number;
   }) => string;
   /**
-   * A6 / SOTA-2 - recoverable clearing. When provided, the original tool-result
+   * Recoverable clearing. When provided, the original tool-result
    * text of each cleared message is handed to this callback (wire it to a spill
    * store / the `read_result` handle registry) and the placeholder references the
    * returned handle id + preview, so the model can re-fetch the full result via
@@ -56,7 +56,7 @@ export interface ClearToolResultsOptions {
     },
   ) => Promise<{ readonly handleId: string; readonly preview?: string }>;
   /**
-   * C4 (context-engine-11): the tool the externalized-handle placeholder
+   * The tool the externalized-handle placeholder
    * advertises. The memory package cannot know whether the agent
    * registered `read_result` (that depends on spill wiring), so callers
    * whose runtime does NOT expose it pass `null` and the placeholder
@@ -65,7 +65,7 @@ export interface ClearToolResultsOptions {
    */
   readonly readResultToolName?: string | null;
   /**
-   * C4 (clear_tool_uses_20250919 parity): additionally blank the PAIRED
+   * Parity with `clear_tool_uses_20250919`: additionally blank the PAIRED
    * assistant message's tool-call arguments for every cleared result,
    * reclaiming the input side of verbose calls too. Default `false`.
    */
@@ -83,7 +83,7 @@ function defaultPlaceholder(info: { toolName?: string; clearedTokens: number }):
   return `${CLEARED_TOOL_RESULT_MARKER} · ${info.toolName ?? 'tool'} · ${info.clearedTokens} tokens elided · re-run the tool if needed]`;
 }
 
-/** A6: a placeholder that points at the externalized handle (recoverable via read_result). */
+/** A placeholder that points at the externalized handle (recoverable via read_result). */
 function handlePlaceholder(info: {
   toolName?: string;
   clearedTokens: number;
