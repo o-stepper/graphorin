@@ -10,7 +10,9 @@
 function runSecretsList(options?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L60)
+Defined in: packages/cli/src/commands/secrets.ts:60
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/secrets.ts:60](https://github.com/o-stepp
 ## Returns
 
 `Promise`\&lt;readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\&gt;
-
-## Stable

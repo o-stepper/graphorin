@@ -6,15 +6,15 @@
 
 # Interface: ChannelGateway
 
-Defined in: [packages/channels/src/gateway.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L137)
+Defined in: packages/channels/src/gateway.ts:137
+
+**`Stable`**
 
 The gateway handle. `setActivityListener` is the A2 bridge seam:
 the server (or any host) registers a callback fired on every
 ACCEPTED inbound message, and wires it to
 `Scheduler.recordActivity()` so idle triggers debounce on channel
 traffic. Single listener slot.
-
-## Stable
 
 ## Methods
 
@@ -24,7 +24,7 @@ traffic. Single listener slot.
 deliver(payload): Promise<DeliveryReceipt>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L142)
+Defined in: packages/channels/src/gateway.ts:142
 
 Proactive outbound send (outbound-sanitized like replies).
 
@@ -46,7 +46,7 @@ Proactive outbound send (outbound-sanitized like replies).
 setActivityListener(listener): void;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:143](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L143)
+Defined in: packages/channels/src/gateway.ts:143
 
 #### Parameters
 
@@ -66,7 +66,7 @@ Defined in: [packages/channels/src/gateway.ts:143](https://github.com/o-stepper/
 start(): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L138)
+Defined in: packages/channels/src/gateway.ts:138
 
 #### Returns
 
@@ -80,7 +80,7 @@ Defined in: [packages/channels/src/gateway.ts:138](https://github.com/o-stepper/
 status(): Promise<ChannelGatewayStatus>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:140](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L140)
+Defined in: packages/channels/src/gateway.ts:140
 
 #### Returns
 
@@ -94,7 +94,7 @@ Defined in: [packages/channels/src/gateway.ts:140](https://github.com/o-stepper/
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L139)
+Defined in: packages/channels/src/gateway.ts:139
 
 #### Returns
 

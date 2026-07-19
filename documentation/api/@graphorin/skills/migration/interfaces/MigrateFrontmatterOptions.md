@@ -6,7 +6,7 @@
 
 # Interface: MigrateFrontmatterOptions
 
-Defined in: [packages/skills/src/migration/index.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L39)
+Defined in: packages/skills/src/migration/index.ts:39
 
 Options accepted by [migrateFrontmatter](/api/@graphorin/skills/migration/functions/migrateFrontmatter.md).
 
@@ -14,5 +14,5 @@ Options accepted by [migrateFrontmatter](/api/@graphorin/skills/migration/functi
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-apply"></a> `apply?` | `readonly` | `boolean` | When `true`, rewrites are applied to the returned `migratedSkillMd`. When `false` (default), `migratedSkillMd === originalSkillMd` and the function operates as a dry-run report. | [packages/skills/src/migration/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L47) |
-| <a id="property-skillid"></a> `skillId?` | `readonly` | `string` | Identifier used in audit / error messages. Defaults to `'<inline>'`. | [packages/skills/src/migration/index.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L41) |
+| <a id="property-apply"></a> `apply?` | `readonly` | `boolean` | When `true`, rewrites are applied to the returned `migratedSkillMd`. When `false` (default), `migratedSkillMd === originalSkillMd` and the function operates as a dry-run report. | packages/skills/src/migration/index.ts:47 |
+| <a id="property-skillid"></a> `skillId?` | `readonly` | `string` | Identifier used in audit / error messages. Defaults to `'<inline>'`. | packages/skills/src/migration/index.ts:41 |

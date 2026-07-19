@@ -10,8 +10,8 @@
 const CONTENT_ORIGIN_ATTR: "graphorin.content.origin";
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L30)
+Defined in: packages/memory/src/context-engine/annotations.ts:30
+
+**`Stable`**
 
 Span-attribute key for the origin axis.
-
-## Stable

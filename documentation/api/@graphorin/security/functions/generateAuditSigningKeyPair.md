@@ -13,7 +13,9 @@ function generateAuditSigningKeyPair(): {
 };
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:361](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L361)
+Defined in: packages/security/src/audit/merkle.ts:361
+
+**`Stable`**
 
 Generate an Ed25519 keypair for audit-checkpoint signing (PEM SPKI /
 PKCS8). Convenience for operators without existing key material.
@@ -29,7 +31,5 @@ PKCS8). Convenience for operators without existing key material.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `privateKeyPem` | `string` | [packages/security/src/audit/merkle.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L363) |
-| `publicKeyPem` | `string` | [packages/security/src/audit/merkle.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L362) |
-
-## Stable
+| `privateKeyPem` | `string` | packages/security/src/audit/merkle.ts:363 |
+| `publicKeyPem` | `string` | packages/security/src/audit/merkle.ts:362 |

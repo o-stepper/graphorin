@@ -10,7 +10,9 @@
 type ComposeProviderMiddleware = (middlewares) => ProviderMiddleware;
 ```
 
-Defined in: [packages/core/src/contracts/provider.ts:328](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L328)
+Defined in: packages/core/src/contracts/provider.ts:328
+
+**`Stable`**
 
 Type signature for the canonical middleware composer (the runtime
 implementation lives in `@graphorin/provider`).
@@ -29,5 +31,3 @@ is the only blessed entry point for chaining middleware in
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

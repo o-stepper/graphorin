@@ -10,6 +10,6 @@
 const SPAN_SESSION_ATTRIBUTE: "graphorin.session.id" = 'graphorin.session.id';
 ```
 
-Defined in: [packages/store-sqlite/src/span-store.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/span-store.ts#L23)
+Defined in: packages/store-sqlite/src/span-store.ts:23
 
 The span attribute the exporter keys session-scoped rows off.

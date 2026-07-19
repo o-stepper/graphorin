@@ -6,13 +6,13 @@
 
 # Interface: WorkflowEdge\&lt;TState\&gt;
 
-Defined in: [packages/workflow/src/types.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L254)
+Defined in: packages/workflow/src/types.ts:254
+
+**`Stable`**
 
 Edge between two nodes. Edges with a `when` predicate fire only
 when the predicate evaluates to truthy; unconditional edges always
 fire when the source node completes.
-
-## Stable
 
 ## Type Parameters
 
@@ -24,6 +24,6 @@ fire when the source node completes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-from"></a> `from` | `readonly` | `string` | [packages/workflow/src/types.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L255) |
-| <a id="property-to"></a> `to` | `readonly` | `string` | [packages/workflow/src/types.ts:256](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L256) |
-| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\&lt;`TState`\&gt; | [packages/workflow/src/types.ts:257](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L257) |
+| <a id="property-from"></a> `from` | `readonly` | `string` | packages/workflow/src/types.ts:255 |
+| <a id="property-to"></a> `to` | `readonly` | `string` | packages/workflow/src/types.ts:256 |
+| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:257 |

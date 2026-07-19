@@ -6,19 +6,19 @@
 
 # Interface: ChannelRuntimeContext
 
-Defined in: [packages/channels/src/spi.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L127)
+Defined in: packages/channels/src/spi.ts:127
+
+**`Stable`**
 
 Runtime context handed to [ChannelAdapter.start](/api/@graphorin/channels/interfaces/ChannelAdapter.md#start). The adapter
 pushes normalized inbound messages through `onInbound` and observes
 `signal` for shutdown.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | Aborted when the gateway stops; adapters should cease polling/subscriptions. | [packages/channels/src/spi.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L135) |
+| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | Aborted when the gateway stops; adapters should cease polling/subscriptions. | packages/channels/src/spi.ts:135 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ pushes normalized inbound messages through `onInbound` and observes
 onInbound(message): Promise<InboundAcceptance>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L133)
+Defined in: packages/channels/src/spi.ts:133
 
 Enqueue a normalized inbound message. Resolves once the message
 is accepted into (or shed from) the gateway's bounded queue -

@@ -6,21 +6,21 @@
 
 # Interface: WsSubscriberHandle
 
-Defined in: [packages/server/src/ws/dispatcher.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L76)
+Defined in: packages/server/src/ws/dispatcher.ts:76
+
+**`Stable`**
 
 Subscriber surface used by the dispatcher. Each WebSocket
 connection wraps its `WSContext.send` in this interface so the
 dispatcher does not depend on `@hono/node-ws` types directly.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-grantedscopes"></a> `grantedScopes` | `readonly` | readonly [`ParsedScope`](/api/@graphorin/security/type-aliases/ParsedScope.md)[] | [packages/server/src/ws/dispatcher.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L79) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/server/src/ws/dispatcher.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L77) |
-| <a id="property-tokenid"></a> `tokenId` | `readonly` | `string` | [packages/server/src/ws/dispatcher.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L78) |
+| <a id="property-grantedscopes"></a> `grantedScopes` | `readonly` | readonly [`ParsedScope`](/api/@graphorin/security/type-aliases/ParsedScope.md)[] | packages/server/src/ws/dispatcher.ts:79 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/ws/dispatcher.ts:77 |
+| <a id="property-tokenid"></a> `tokenId` | `readonly` | `string` | packages/server/src/ws/dispatcher.ts:78 |
 
 ## Methods
 
@@ -30,7 +30,7 @@ dispatcher does not depend on `@hono/node-ws` types directly.
 optional bufferedAmount(): number;
 ```
 
-Defined in: [packages/server/src/ws/dispatcher.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L93)
+Defined in: packages/server/src/ws/dispatcher.ts:93
 
 Optional buffered-byte sample. The dispatcher reads this on every
 emit to detect sustained backpressure and close the connection
@@ -52,7 +52,7 @@ outstanding-event counter.
 close(code, reason): void;
 ```
 
-Defined in: [packages/server/src/ws/dispatcher.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L83)
+Defined in: packages/server/src/ws/dispatcher.ts:83
 
 Close the underlying WebSocket with a Graphorin close code.
 
@@ -75,7 +75,7 @@ Close the underlying WebSocket with a Graphorin close code.
 send(frame): void;
 ```
 
-Defined in: [packages/server/src/ws/dispatcher.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L81)
+Defined in: packages/server/src/ws/dispatcher.ts:81
 
 Send a server frame; the dispatcher already validated it.
 

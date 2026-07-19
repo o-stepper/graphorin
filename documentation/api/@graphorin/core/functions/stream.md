@@ -10,7 +10,9 @@
 function stream<T>(opts?): Stream<T>;
 ```
 
-Defined in: [packages/core/src/channels/channels.ts:171](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L171)
+Defined in: packages/core/src/channels/channels.ts:171
+
+**`Stable`**
 
 Construct a `Stream` channel.
 
@@ -31,5 +33,3 @@ Construct a `Stream` channel.
 ## Returns
 
 [`Stream`](/api/@graphorin/core/interfaces/Stream.md)\&lt;`T`\&gt;
-
-## Stable

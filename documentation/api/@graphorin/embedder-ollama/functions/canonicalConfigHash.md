@@ -10,7 +10,9 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:375](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L375)
+Defined in: packages/embedder-ollama/src/index.ts:375
+
+**`Stable`**
 
 Canonical-JSON deterministic hash over an embedder configuration.
 Object keys are sorted lexicographically so the resulting hash is
@@ -25,5 +27,3 @@ stable across `JSON.stringify` reorderings.
 ## Returns
 
 `string`
-
-## Stable

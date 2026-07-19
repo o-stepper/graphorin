@@ -10,10 +10,10 @@
 const PROTOCOL_VERSION: "1" = '1';
 ```
 
-Defined in: [packages/protocol/src/subprotocol.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/subprotocol.ts#L31)
+Defined in: src/subprotocol.ts:31
+
+**`Stable`**
 
 Wire-format major version literal carried on every message body.
 The pair `(SUBPROTOCOL_NAME, PROTOCOL_VERSION)` is the binding
 contract a client commits to when it receives a successful upgrade.
-
-## Stable

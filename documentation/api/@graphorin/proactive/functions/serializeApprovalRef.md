@@ -10,7 +10,9 @@
 function serializeApprovalRef(ref): string;
 ```
 
-Defined in: [packages/proactive/src/approval-ref.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/approval-ref.ts#L29)
+Defined in: packages/proactive/src/approval-ref.ts:29
+
+**`Stable`**
 
 Serialize an approval address as `run:<runId>:<toolCallId>` with
 URI-encoded segments. Throws `TypeError` on an empty segment.
@@ -24,5 +26,3 @@ URI-encoded segments. Throws `TypeError` on an empty segment.
 ## Returns
 
 `string`
-
-## Stable

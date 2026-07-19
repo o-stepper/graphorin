@@ -6,15 +6,15 @@
 
 # Interface: BridgeAuthToAuditOptions
 
-Defined in: [packages/security/src/audit/auth-bridge.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L17)
+Defined in: packages/security/src/audit/auth-bridge.ts:17
+
+**`Stable`**
 
 Options for [bridgeAuthToAudit](/api/@graphorin/security/functions/bridgeAuthToAudit.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-db"></a> `db` | `readonly` | [`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md) | [packages/security/src/audit/auth-bridge.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L18) |
-| <a id="property-onwriteerror"></a> `onWriteError?` | `readonly` | (`event`, `error`) => `void` | [packages/security/src/audit/auth-bridge.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L19) |
+| <a id="property-db"></a> `db` | `readonly` | [`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md) | packages/security/src/audit/auth-bridge.ts:18 |
+| <a id="property-onwriteerror"></a> `onWriteError?` | `readonly` | (`event`, `error`) => `void` | packages/security/src/audit/auth-bridge.ts:19 |

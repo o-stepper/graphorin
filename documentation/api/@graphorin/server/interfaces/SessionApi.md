@@ -6,13 +6,13 @@
 
 # Interface: SessionApi
 
-Defined in: [packages/server/src/routes/sessions.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L32)
+Defined in: packages/server/src/routes/sessions.ts:32
+
+**`Stable`**
 
 Minimal contract route handlers consume. Real deployments wire
 `@graphorin/sessions.SessionManager` in directly; tests pass a
 lighter stub.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ lighter stub.
 create(input): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L38)
+Defined in: packages/server/src/routes/sessions.ts:38
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: [packages/server/src/routes/sessions.ts:38](https://github.com/o-ste
 optional exportSession(sessionId, opts): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L51)
+Defined in: packages/server/src/routes/sessions.ts:51
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: [packages/server/src/routes/sessions.ts:51](https://github.com/o-ste
 get(sessionId): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L37)
+Defined in: packages/server/src/routes/sessions.ts:37
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Defined in: [packages/server/src/routes/sessions.ts:37](https://github.com/o-ste
 list(opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L33)
+Defined in: packages/server/src/routes/sessions.ts:33
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: [packages/server/src/routes/sessions.ts:33](https://github.com/o-ste
 listHandoffs(sessionId): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L50)
+Defined in: packages/server/src/routes/sessions.ts:50
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: [packages/server/src/routes/sessions.ts:50](https://github.com/o-ste
 listMessages(sessionId, opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L46)
+Defined in: packages/server/src/routes/sessions.ts:46
 
 #### Parameters
 
@@ -154,7 +154,7 @@ Defined in: [packages/server/src/routes/sessions.ts:46](https://github.com/o-ste
 remove(sessionId): Promise<boolean>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L45)
+Defined in: packages/server/src/routes/sessions.ts:45
 
 #### Parameters
 
@@ -174,7 +174,7 @@ Defined in: [packages/server/src/routes/sessions.ts:45](https://github.com/o-ste
 optional replaySession(sessionId, opts): AsyncIterable<unknown>;
 ```
 
-Defined in: [packages/server/src/routes/sessions.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/sessions.ts#L58)
+Defined in: packages/server/src/routes/sessions.ts:58
 
 #### Parameters
 

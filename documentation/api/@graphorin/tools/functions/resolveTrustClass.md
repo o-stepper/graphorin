@@ -10,7 +10,9 @@
 function resolveTrustClass(source): ToolTrustClass;
 ```
 
-Defined in: [packages/tools/src/builder/trust-class.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/builder/trust-class.ts#L33)
+Defined in: packages/tools/src/builder/trust-class.ts:33
+
+**`Stable`**
 
 Resolve the trust class for a registration. The `'web-search'`
 subsystem name is special-cased so the built-in web-search adapter
@@ -26,5 +28,3 @@ though it is structurally a built-in tool.
 ## Returns
 
 [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md)
-
-## Stable

@@ -17,11 +17,11 @@ type StreamMode =
   | "custom";
 ```
 
-Defined in: [packages/workflow/src/types.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L67)
+Defined in: packages/workflow/src/types.ts:67
+
+**`Stable`**
 
 Stream emission modes accepted by `workflow.execute(input, { stream })`.
 The default is `values`. The `messages` mode is reserved for future
 tighter integration with the LLM message channel and currently
 behaves as `updates`.
-
-## Stable

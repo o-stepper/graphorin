@@ -10,7 +10,9 @@
 function createConsolidatorPlaceholder(options?): Consolidator;
 ```
 
-Defined in: [packages/memory/src/consolidator/index.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/index.ts#L187)
+Defined in: packages/memory/src/consolidator/index.ts:187
+
+**`Stable`**
 
 Build a no-op consolidator that honours the full [Consolidator](/api/@graphorin/memory/interfaces/Consolidator.md)
 interface but performs no background work. Useful for consumers
@@ -30,5 +32,3 @@ Phase 10c's [createConsolidator](/api/@graphorin/memory/functions/createConsolid
 ## Returns
 
 [`Consolidator`](/api/@graphorin/memory/interfaces/Consolidator.md)
-
-## Stable

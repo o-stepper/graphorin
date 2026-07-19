@@ -40,7 +40,9 @@ type ParsedTrigger =
 };
 ```
 
-Defined in: [packages/memory/src/consolidator/triggers.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/triggers.ts#L25)
+Defined in: packages/memory/src/consolidator/triggers.ts:25
+
+**`Stable`**
 
 Parsed trigger declaration. The `kind` discriminator drives the
 runtime dispatch; the `value` carries the spec-specific argument
@@ -125,5 +127,3 @@ same measure as the W-081 transcript budget). Evaluated on
 activity signals via `Consolidator.notifyActivity(...)` - the
 scheduler cannot measure the tail on its own. Not to be confused
 with `budget:F`, which is a spent-budget fraction.
-
-## Stable

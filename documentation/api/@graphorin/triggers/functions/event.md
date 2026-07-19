@@ -14,7 +14,9 @@ function event(
    options?): TriggerDeclaration;
 ```
 
-Defined in: [packages/triggers/src/index.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L225)
+Defined in: packages/triggers/src/index.ts:225
+
+**`Stable`**
 
 ## Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/triggers/src/index.ts:225](https://github.com/o-stepper/gr
 ## Returns
 
 [`TriggerDeclaration`](/api/@graphorin/triggers/interfaces/TriggerDeclaration.md)
-
-## Stable

@@ -10,7 +10,9 @@
 function assessQueryDifficulty(query, options?): DifficultyAssessment;
 ```
 
-Defined in: [packages/memory/src/search/iterative.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L118)
+Defined in: packages/memory/src/search/iterative.ts:118
+
+**`Stable`**
 
 Score a query's retrieval difficulty with cheap, deterministic, fully
 **local** heuristics (no I/O). Conservative by design - it prefers to
@@ -29,5 +31,3 @@ passes only where they are likely to help. Used by
 ## Returns
 
 [`DifficultyAssessment`](/api/@graphorin/memory/interfaces/DifficultyAssessment.md)
-
-## Stable

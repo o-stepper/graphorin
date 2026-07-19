@@ -10,7 +10,7 @@
 function _resetGenAISystemWarningsForTesting(): void;
 ```
 
-Defined in: [packages/observability/src/gen-ai/system-derivation.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/system-derivation.ts#L50)
+Defined in: packages/observability/src/gen-ai/system-derivation.ts:50
 
 **`Internal`**
 

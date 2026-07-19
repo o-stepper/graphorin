@@ -10,12 +10,12 @@
 type SandboxPolicy = "none" | "sandboxed" | "isolated" | "docker";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L12)
+Defined in: packages/core/src/types/tool.ts:12
+
+**`Stable`**
 
 Sandbox isolation level requested for a tool's `execute` method.
 
 The exact semantics live in `@graphorin/security`; downstream packages
 type their config field as `SandboxPolicy` so they don't take a security
 dependency just to type their inputs.
-
-## Stable

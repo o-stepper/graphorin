@@ -10,7 +10,9 @@
 function isValidTimeZone(timeZone): boolean;
 ```
 
-Defined in: [packages/triggers/src/cron.ts:273](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/cron.ts#L273)
+Defined in: packages/triggers/src/cron.ts:273
+
+**`Stable`**
 
 `true` when `timeZone` is an IANA zone name this runtime's Intl data
 resolves. The `cron(...)` helper uses it for eager validation so a
@@ -25,5 +27,3 @@ typo fails at registration time, never at first fire.
 ## Returns
 
 `boolean`
-
-## Stable

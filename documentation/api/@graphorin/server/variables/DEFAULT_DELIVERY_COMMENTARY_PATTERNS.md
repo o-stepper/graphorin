@@ -10,7 +10,9 @@
 const DEFAULT_DELIVERY_COMMENTARY_PATTERNS: ReadonlyArray<DeliveryCommentaryPattern> = OUTBOUND_COMMENTARY_PATTERNS;
 ```
 
-Defined in: [packages/server/src/commentary/built-in-patterns.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/built-in-patterns.ts#L33)
+Defined in: packages/server/src/commentary/built-in-patterns.ts:33
+
+**`Stable`**
 
 The framework-shipped catalogue. Snapshot bytes-equal across the
 `ws` / `sse` / `rest` transports; idempotent on a single payload
@@ -19,5 +21,3 @@ second pass over a previously-sanitized payload is a no-op).
 
 Re-exported from the shared `@graphorin/tools/outbound` catalogue
 (same array reference).
-
-## Stable

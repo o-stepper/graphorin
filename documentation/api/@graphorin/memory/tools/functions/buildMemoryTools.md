@@ -10,7 +10,9 @@
 function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unknown>[];
 ```
 
-Defined in: [packages/memory/src/tools/index.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L122)
+Defined in: packages/memory/src/tools/index.ts:122
+
+**`Stable`**
 
 Build the canonical memory-tool array for a profile. Order is stable
 for `'full'` / `'reviser'` - consumers can rely on the indices for
@@ -33,5 +35,3 @@ relative order from the canonical set.
 ## Returns
 
 readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[]
-
-## Stable

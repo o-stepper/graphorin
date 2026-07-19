@@ -43,6 +43,7 @@ export type {
 } from '@graphorin/security/guardrails';
 export {
   AgentBudgetExceededError,
+  AgentBudgetUnpricedError,
   AgentResolutionError,
   AgentRuntimeError,
   type AgentRuntimeErrorCode,

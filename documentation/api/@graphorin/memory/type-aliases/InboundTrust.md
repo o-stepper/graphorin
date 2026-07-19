@@ -16,7 +16,9 @@ type InboundTrust =
   | "n/a";
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L81)
+Defined in: packages/memory/src/context-engine/annotations.ts:81
+
+**`Stable`**
 
 Trust-class discriminator for an assembled message-content part.
 Sibling axis to [ContentOrigin](/api/@graphorin/memory/type-aliases/ContentOrigin.md); the two are independent.
@@ -36,5 +38,3 @@ Sibling axis to [ContentOrigin](/api/@graphorin/memory/type-aliases/ContentOrigi
   axis is meaningless (`'user:input'`, `'memory:tier-filtered'`,
   `'system:framework'`, `'agent:instructions'`,
   `'tool-call:args'`).
-
-## Stable

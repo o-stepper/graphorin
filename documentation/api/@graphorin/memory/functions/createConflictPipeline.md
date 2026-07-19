@@ -10,7 +10,9 @@
 function createConflictPipeline(options?): ConflictPipeline;
 ```
 
-Defined in: [packages/memory/src/conflict/pipeline.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/pipeline.ts#L64)
+Defined in: packages/memory/src/conflict/pipeline.ts:64
+
+**`Stable`**
 
 Returns a frozen pipeline handle wired with the supplied options.
 
@@ -23,5 +25,3 @@ Returns a frozen pipeline handle wired with the supplied options.
 ## Returns
 
 [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md)
-
-## Stable

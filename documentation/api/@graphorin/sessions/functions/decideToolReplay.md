@@ -13,7 +13,9 @@ function decideToolReplay(
    policy): CassetteReplayDecision;
 ```
 
-Defined in: [packages/sessions/src/cassette/replay.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/replay.ts#L126)
+Defined in: packages/sessions/src/cassette/replay.ts:126
+
+**`Stable`**
 
 Pure-function decision engine. Takes a single cassette record + the
 live invocation and returns either a `'substituted'` /
@@ -33,5 +35,3 @@ decision.
 ## Returns
 
 [`CassetteReplayDecision`](/api/@graphorin/sessions/type-aliases/CassetteReplayDecision.md)
-
-## Stable

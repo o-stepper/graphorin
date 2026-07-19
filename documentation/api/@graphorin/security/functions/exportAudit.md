@@ -12,7 +12,9 @@ function exportAudit(db, options): Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/audit/export.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/export.ts#L53)
+Defined in: packages/security/src/audit/export.ts:53
+
+**`Stable`**
 
 Stream every entry in `[fromSeq, toSeq]` (inclusive) into `writer`
 as JSONL. Each line is canonical JSON terminated by `\n`.
@@ -31,5 +33,3 @@ Returns the number of lines written.
 `Promise`\<\{
   `rows`: `number`;
 \}\>
-
-## Stable

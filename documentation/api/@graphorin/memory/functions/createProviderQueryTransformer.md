@@ -10,7 +10,9 @@
 function createProviderQueryTransformer(provider, options?): QueryTransformer;
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:197](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L197)
+Defined in: packages/memory/src/search/query-transform.ts:197
+
+**`Stable`**
 
 Wrap a [Provider](/api/@graphorin/core/interfaces/Provider.md) as a [QueryTransformer](/api/@graphorin/memory/interfaces/QueryTransformer.md). Both methods
 are **resilient**: a provider error or unparseable response degrades
@@ -30,5 +32,3 @@ caller's `multiQuery` value (a latency guardrail).
 ## Returns
 
 [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md)
-
-## Stable

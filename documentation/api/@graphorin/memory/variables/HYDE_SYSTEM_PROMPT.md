@@ -10,7 +10,7 @@
 const HYDE_SYSTEM_PROMPT: string;
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L97)
+Defined in: packages/memory/src/search/query-transform.ts:97
 
 **`Internal`**
 

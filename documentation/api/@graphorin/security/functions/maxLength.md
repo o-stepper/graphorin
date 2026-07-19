@@ -10,7 +10,9 @@
 function maxLength<TValue>(opts): GuardrailDefinition<TValue>;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/max-length.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/max-length.ts#L47)
+Defined in: packages/security/src/guardrails/builtins/max-length.ts:47
+
+**`Stable`**
 
 Construct a `maxLength` guardrail. Returns an input or output
 variant depending on the `stage` option.
@@ -30,5 +32,3 @@ variant depending on the `stage` option.
 ## Returns
 
 [`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\&lt;`TValue`\&gt;
-
-## Stable

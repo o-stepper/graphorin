@@ -10,7 +10,9 @@
 function createSecretsStore(opts?): Promise<SecretsStore>;
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:312](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L312)
+Defined in: packages/security/src/secrets/factory.ts:312
+
+**`Stable`**
 
 Activate a `SecretsStore` for the current process. The result is
 cached; subsequent calls overwrite the previous active store and
@@ -25,5 +27,3 @@ re-wire the `ref:` resolver.
 ## Returns
 
 `Promise`\&lt;[`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md)\&gt;
-
-## Stable

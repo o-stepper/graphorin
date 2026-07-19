@@ -10,12 +10,12 @@
 function listOAuthStrategies(): readonly OAuthStrategy[];
 ```
 
-Defined in: [packages/security/src/oauth/strategies.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/strategies.ts#L57)
+Defined in: packages/security/src/oauth/strategies.ts:57
+
+**`Stable`**
 
 Snapshot of the registered strategies. Used by `getOAuthStatus()`.
 
 ## Returns
 
 readonly [`OAuthStrategy`](/api/@graphorin/security/interfaces/OAuthStrategy.md)[]
-
-## Stable

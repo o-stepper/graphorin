@@ -36,9 +36,9 @@ type ToolAuditAction =
   | "tool:collision:suppressed";
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L52)
+Defined in: packages/tools/src/audit/index.ts:52
+
+**`Stable`**
 
 Discriminator for the audit-event family emitted by the tools
 subsystem.
-
-## Stable

@@ -6,12 +6,12 @@
 
 # Interface: StreamingChannel
 
-Defined in: [packages/tools/src/streaming/channel.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L107)
+Defined in: packages/tools/src/streaming/channel.ts:107
+
+**`Stable`**
 
 Public channel surface. Implementations are returned by
 [createStreamingChannel](/api/@graphorin/tools/functions/createStreamingChannel.md).
-
-## Stable
 
 ## Methods
 
@@ -21,7 +21,7 @@ Public channel surface. Implementations are returned by
 abort(reason): void;
 ```
 
-Defined in: [packages/tools/src/streaming/channel.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L113)
+Defined in: packages/tools/src/streaming/channel.ts:113
 
 Mark the channel cancelled (post-cancellation calls are no-ops).
 
@@ -46,7 +46,7 @@ reportProgress(
    message?): void;
 ```
 
-Defined in: [packages/tools/src/streaming/channel.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L109)
+Defined in: packages/tools/src/streaming/channel.ts:109
 
 Emit a progress event into the channel.
 
@@ -70,7 +70,7 @@ Emit a progress event into the channel.
 snapshot(): StreamingAggregator;
 ```
 
-Defined in: [packages/tools/src/streaming/channel.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L115)
+Defined in: packages/tools/src/streaming/channel.ts:115
 
 Snapshot the aggregated buffer.
 
@@ -86,7 +86,7 @@ Snapshot the aggregated buffer.
 streamContent(chunk): void;
 ```
 
-Defined in: [packages/tools/src/streaming/channel.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L111)
+Defined in: packages/tools/src/streaming/channel.ts:111
 
 Emit a content chunk into the channel.
 

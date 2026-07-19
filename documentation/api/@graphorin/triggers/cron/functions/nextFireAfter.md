@@ -13,7 +13,9 @@ function nextFireAfter(
    timeZone?): Date | null;
 ```
 
-Defined in: [packages/triggers/src/cron.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/cron.ts#L193)
+Defined in: packages/triggers/src/cron.ts:193
+
+**`Stable`**
 
 Compute the next fire time strictly after `from` for the supplied
 cron schedule. Returns a UTC `Date`.
@@ -38,5 +40,3 @@ combination that never aligns).
 ## Returns
 
 `Date` \| `null`
-
-## Stable

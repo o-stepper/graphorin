@@ -10,7 +10,9 @@
 function injectionClassifierOutputGuardrail(classifier, options?): OutputGuardrail<unknown>;
 ```
 
-Defined in: [packages/security/src/inspect/injection-classifier.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/inspect/injection-classifier.ts#L94)
+Defined in: packages/security/src/inspect/injection-classifier.ts:94
+
+**`Stable`**
 
 Adapter for the SDF-4 output-guardrail surface: wrap a classifier
 as an `OutputGuardrail` and add it to
@@ -28,5 +30,3 @@ contract).
 ## Returns
 
 [`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`unknown`\&gt;
-
-## Stable

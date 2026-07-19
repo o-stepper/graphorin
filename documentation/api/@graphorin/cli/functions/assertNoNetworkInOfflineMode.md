@@ -10,7 +10,9 @@
 function assertNoNetworkInOfflineMode(operation): void;
 ```
 
-Defined in: [packages/cli/src/internal/offline.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/offline.ts#L35)
+Defined in: packages/cli/src/internal/offline.ts:35
+
+**`Stable`**
 
 Throws when the operator opted into offline mode. Phase 14a calls
 this from every subcommand entry point so the contract is
@@ -25,5 +27,3 @@ enforced uniformly.
 ## Returns
 
 `void`
-
-## Stable

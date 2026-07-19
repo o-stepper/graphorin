@@ -10,7 +10,7 @@
 function parseScore(text): number | null;
 ```
 
-Defined in: [packages/evals/src/scorers/llm/judge.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/llm/judge.ts#L107)
+Defined in: packages/evals/src/scorers/llm/judge.ts:107
 
 EB-7: parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
 the reply. Anchoring on a deliberate, trailing marker - rather than the first

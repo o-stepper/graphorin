@@ -10,7 +10,7 @@
 function serialiseMessageForCount(msg): SerializedMessage;
 ```
 
-Defined in: [packages/provider/src/counters/serialize.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L31)
+Defined in: packages/provider/src/counters/serialize.ts:31
 
 **`Internal`**
 

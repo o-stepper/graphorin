@@ -17,6 +17,6 @@ type SpanAttributeValue =
 | ReadonlyArray<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/tracer.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L104)
+Defined in: packages/core/src/contracts/tracer.ts:104
 
-## Stable
+**`Stable`**

@@ -19,6 +19,8 @@ type Channel<T> =
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Discriminated union of every channel descriptor.
 
 Channels are a *description* of the merge strategy, not a runtime
@@ -30,5 +32,3 @@ fields (`reduce`, `from`, `unique`) to decide how to combine writes.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `T` | `unknown` |
-
-## Stable

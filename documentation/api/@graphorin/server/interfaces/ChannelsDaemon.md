@@ -6,15 +6,15 @@
 
 # Interface: ChannelsDaemon
 
-Defined in: [packages/server/src/channels/daemon.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L62)
+Defined in: packages/server/src/channels/daemon.ts:62
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-gateway"></a> `gateway` | `readonly` | [`ChannelGatewayLike`](/api/@graphorin/server/interfaces/ChannelGatewayLike.md) | [packages/server/src/channels/daemon.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L66) |
+| <a id="property-gateway"></a> `gateway` | `readonly` | [`ChannelGatewayLike`](/api/@graphorin/server/interfaces/ChannelGatewayLike.md) | packages/server/src/channels/daemon.ts:66 |
 
 ## Methods
 
@@ -24,7 +24,7 @@ Defined in: [packages/server/src/channels/daemon.ts:62](https://github.com/o-ste
 start(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L63)
+Defined in: packages/server/src/channels/daemon.ts:63
 
 #### Returns
 
@@ -38,7 +38,7 @@ Defined in: [packages/server/src/channels/daemon.ts:63](https://github.com/o-ste
 status(): Promise<ChannelGatewayStatusLike>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L65)
+Defined in: packages/server/src/channels/daemon.ts:65
 
 #### Returns
 
@@ -52,7 +52,7 @@ Defined in: [packages/server/src/channels/daemon.ts:65](https://github.com/o-ste
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L64)
+Defined in: packages/server/src/channels/daemon.ts:64
 
 #### Returns
 

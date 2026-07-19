@@ -13,7 +13,9 @@ function proveAuditConsistency(
 newer): Promise<readonly string[]>;
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L250)
+Defined in: packages/security/src/audit/merkle.ts:250
+
+**`Stable`**
 
 Produce an RFC-6962 consistency proof that the log at `older.size`
 is a prefix of the log at `newer.size`.
@@ -29,5 +31,3 @@ is a prefix of the log at `newer.size`.
 ## Returns
 
 `Promise`\&lt;readonly `string`[]\&gt;
-
-## Stable

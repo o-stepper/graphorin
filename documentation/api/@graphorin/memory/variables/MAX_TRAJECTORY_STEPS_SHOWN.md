@@ -10,6 +10,6 @@
 const MAX_TRAJECTORY_STEPS_SHOWN: 60 = 60;
 ```
 
-Defined in: [packages/memory/src/consolidator/phases/induce.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L41)
+Defined in: packages/memory/src/consolidator/phases/induce.ts:41
 
 Upper bound on trajectory steps rendered into the induction prompt.

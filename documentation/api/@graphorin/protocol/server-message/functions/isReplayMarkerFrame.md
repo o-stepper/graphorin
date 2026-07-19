@@ -10,7 +10,9 @@
 function isReplayMarkerFrame(message): message is { droppedCount?: number; eventId: string; kind: "replay-marker"; note?: string; subscriptionId: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:240](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L240)
+Defined in: src/server-message.ts:240
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:240](https://github.com/o-s
 ## Returns
 
 `message is { droppedCount?: number; eventId: string; kind: "replay-marker"; note?: string; subscriptionId: string; v: "1" }`
-
-## Stable

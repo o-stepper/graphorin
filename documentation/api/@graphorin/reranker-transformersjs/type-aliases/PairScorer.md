@@ -10,7 +10,7 @@
 type PairScorer = (pairs, signal?) => Promise<number[]>;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L81)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:81
 
 **`Internal`**
 

@@ -10,7 +10,9 @@
 function adaptTokenCounter(counter): ContextTokenCounter & Pick<TokenCounter, "count">;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-counter.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L76)
+Defined in: packages/memory/src/context-engine/token-counter.ts:76
+
+**`Stable`**
 
 Wrap a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) into the narrower
 [ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface - PRESERVING the native
@@ -30,5 +32,3 @@ before / after count while the provider billed for them.
 ## Returns
 
 [`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) & `Pick`\&lt;[`TokenCounter`](/api/@graphorin/core/interfaces/TokenCounter.md), `"count"`\&gt;
-
-## Stable

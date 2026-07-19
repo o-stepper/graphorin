@@ -10,7 +10,9 @@
 function sleep(durationMs, signal?): Promise<void>;
 ```
 
-Defined in: [packages/client/src/reconnect.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/reconnect.ts#L67)
+Defined in: packages/client/src/reconnect.ts:67
+
+**`Stable`**
 
 Resolve when the requested number of milliseconds elapsed, or
 reject (with a `DOMException`-style abort error) when the
@@ -26,5 +28,3 @@ supplied `AbortSignal` fires first.
 ## Returns
 
 `Promise`\&lt;`void`\&gt;
-
-## Stable

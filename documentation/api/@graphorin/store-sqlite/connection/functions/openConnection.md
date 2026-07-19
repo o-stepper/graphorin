@@ -10,7 +10,9 @@
 function openConnection(options): Promise<SqliteConnection>;
 ```
 
-Defined in: [packages/store-sqlite/src/connection.ts:214](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/connection.ts#L214)
+Defined in: packages/store-sqlite/src/connection.ts:214
+
+**`Stable`**
 
 Opens a connection. Side effects (in this order):
   1. Resolve the encryption passphrase if `encryption.enabled === true`.
@@ -30,5 +32,3 @@ Opens a connection. Side effects (in this order):
 ## Returns
 
 `Promise`\&lt;[`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md)\&gt;
-
-## Stable

@@ -12,7 +12,9 @@ function createRunRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/agents.ts:271](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/agents.ts#L271)
+Defined in: packages/server/src/routes/agents.ts:271
+
+**`Stable`**
 
 Companion router for the `/runs/...` surface. Kept separate so the
 `createServer` factory can mount it under the top-level base path
@@ -29,5 +31,3 @@ rather than under `/agents`.
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

@@ -6,9 +6,9 @@
 
 # Class: GraphorinClient
 
-Defined in: [packages/client/src/graphorin-client.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L225)
+Defined in: packages/client/src/graphorin-client.ts:225
 
-## Stable
+**`Stable`**
 
 ## Constructors
 
@@ -18,7 +18,7 @@ Defined in: [packages/client/src/graphorin-client.ts:225](https://github.com/o-s
 new GraphorinClient(options): GraphorinClient;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:247](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L247)
+Defined in: packages/client/src/graphorin-client.ts:247
 
 #### Parameters
 
@@ -42,7 +42,7 @@ get transportKind():
   | undefined;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:509](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L509)
+Defined in: packages/client/src/graphorin-client.ts:509
 
 Return the active transport kind (or `undefined` if not connected).
 
@@ -59,7 +59,7 @@ Return the active transport kind (or `undefined` if not connected).
 cancel(runId, opts?): Promise<unknown>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:382](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L382)
+Defined in: packages/client/src/graphorin-client.ts:382
 
 Cancel a server-side run. Sends the `run.cancel` RPC and
 resolves with the server's `result` payload (typically
@@ -87,7 +87,7 @@ resolves with the server's `result` payload (typically
 cancelNotify(requestId): void;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:466](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L466)
+Defined in: packages/client/src/graphorin-client.ts:466
 
 Send an MCP-compatible cancellation notification. Does not wait
 for a server reply (notifications have no `id`).
@@ -110,7 +110,7 @@ for a server reply (notifications have no `id`).
 connect(): Promise<void>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:262](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L262)
+Defined in: packages/client/src/graphorin-client.ts:262
 
 Open the underlying transport. Resolves once the server has
 accepted the handshake (`'open'`); rejects with a typed
@@ -131,7 +131,7 @@ it during another `connect()` returns the same promise.
 disconnect(): Promise<void>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:484](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L484)
+Defined in: packages/client/src/graphorin-client.ts:484
 
 Disconnect the underlying transport and abort every pending RPC
 + subscription. Idempotent.
@@ -148,7 +148,7 @@ Disconnect the underlying transport and abort every pending RPC
 ping(): Promise<void>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:296](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L296)
+Defined in: packages/client/src/graphorin-client.ts:296
 
 Send a `ping` RPC and resolve when the server replies with `pong`.
 
@@ -167,7 +167,7 @@ resume(
 opts?): Promise<unknown>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:418](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L418)
+Defined in: packages/client/src/graphorin-client.ts:418
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
 does NOT carry a `resume` control message - resumes are durable
@@ -200,7 +200,7 @@ whose RunState this server process does not retain answers 409
 subscribe(target, opts?): Promise<Subscription>;
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:306](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L306)
+Defined in: packages/client/src/graphorin-client.ts:306
 
 Subscribe to a server-side event stream. Resolves with a
 [Subscription](/api/@graphorin/client/client/interfaces/Subscription.md) once the server confirms with the matching

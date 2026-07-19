@@ -6,17 +6,17 @@
 
 # Interface: ResolvedChannelRoute
 
-Defined in: [packages/channels/src/router.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L45)
+Defined in: packages/channels/src/router.ts:45
+
+**`Stable`**
 
 The routing outcome: which agent handles the conversation and
 under which session key.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | [packages/channels/src/router.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L46) |
-| <a id="property-routeindex"></a> `routeIndex` | `readonly` | `number` | Index of the matched row in the supplied route table (audit). | [packages/channels/src/router.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L49) |
-| <a id="property-sessionkey"></a> `sessionKey` | `readonly` | `string` | - | [packages/channels/src/router.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L47) |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | packages/channels/src/router.ts:46 |
+| <a id="property-routeindex"></a> `routeIndex` | `readonly` | `number` | Index of the matched row in the supplied route table (audit). | packages/channels/src/router.ts:49 |
+| <a id="property-sessionkey"></a> `sessionKey` | `readonly` | `string` | - | packages/channels/src/router.ts:47 |

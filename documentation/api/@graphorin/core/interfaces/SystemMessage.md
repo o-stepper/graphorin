@@ -6,13 +6,13 @@
 
 # Interface: SystemMessage
 
-Defined in: [packages/core/src/types/message.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L144)
+Defined in: packages/core/src/types/message.ts:144
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | `string` | [packages/core/src/types/message.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L146) |
-| <a id="property-role"></a> `role` | `readonly` | `"system"` | [packages/core/src/types/message.ts:145](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L145) |
+| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/message.ts:146 |
+| <a id="property-role"></a> `role` | `readonly` | `"system"` | packages/core/src/types/message.ts:145 |

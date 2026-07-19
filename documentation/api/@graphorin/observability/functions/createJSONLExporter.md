@@ -10,7 +10,9 @@
 function createJSONLExporter(opts): JSONLExporter;
 ```
 
-Defined in: [packages/observability/src/exporters/jsonl.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/jsonl.ts#L75)
+Defined in: packages/observability/src/exporters/jsonl.ts:75
+
+**`Stable`**
 
 Build a JSONL trace exporter. Call `withValidation(exporter)` before
 passing the result to `createTracer({ exporters })`.
@@ -24,5 +26,3 @@ passing the result to `createTracer({ exporters })`.
 ## Returns
 
 `JSONLExporter`
-
-## Stable

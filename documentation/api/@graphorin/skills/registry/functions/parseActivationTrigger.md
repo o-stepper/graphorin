@@ -10,7 +10,9 @@
 function parseActivationTrigger(raw): ParsedActivationTrigger;
 ```
 
-Defined in: [packages/skills/src/registry/index.ts:389](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/registry/index.ts#L389)
+Defined in: packages/skills/src/registry/index.ts:389
+
+**`Stable`**
 
 Parse a single activation trigger. Slash-command bodies
 (`/skill:<name>`) are routed through the slash parser; bare names
@@ -29,5 +31,3 @@ surface the error to the user).
 ## Returns
 
 [`ParsedActivationTrigger`](/api/@graphorin/skills/registry/interfaces/ParsedActivationTrigger.md)
-
-## Stable

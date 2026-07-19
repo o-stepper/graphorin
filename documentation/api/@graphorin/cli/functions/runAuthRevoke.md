@@ -12,7 +12,9 @@ function runAuthRevoke(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/auth.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L184)
+Defined in: packages/cli/src/commands/auth.ts:184
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/auth.ts:184](https://github.com/o-stepper
 `Promise`\<\{
   `ok`: `true`;
 \}\>
-
-## Stable

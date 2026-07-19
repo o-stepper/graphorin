@@ -10,7 +10,9 @@
 function reanchorProjectRules(options?): NamedPostCompactionHook;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/hooks/reanchor-project-rules.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/reanchor-project-rules.ts#L18)
+Defined in: packages/memory/src/context-engine/compaction/hooks/reanchor-project-rules.ts:18
+
+**`Stable`**
 
 Build a `reanchorProjectRules` hook.
 
@@ -24,5 +26,3 @@ Build a `reanchorProjectRules` hook.
 ## Returns
 
 [`NamedPostCompactionHook`](/api/@graphorin/memory/interfaces/NamedPostCompactionHook.md)
-
-## Stable

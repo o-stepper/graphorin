@@ -10,7 +10,9 @@
 function runSecretsRef(options): Promise<SecretsRefResult>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L213)
+Defined in: packages/cli/src/commands/secrets.ts:213
+
+**`Stable`**
 
 Test resolution of a `SecretRef` URI. The CLI parses the URI first
 (sanity check + scheme echo), then resolves through the registered
@@ -25,5 +27,3 @@ resolver chain.
 ## Returns
 
 `Promise`\&lt;[`SecretsRefResult`](/api/@graphorin/cli/interfaces/SecretsRefResult.md)\&gt;
-
-## Stable

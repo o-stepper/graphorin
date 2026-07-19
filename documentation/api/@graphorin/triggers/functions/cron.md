@@ -14,7 +14,9 @@ function cron(
    options?): TriggerDeclaration;
 ```
 
-Defined in: [packages/triggers/src/index.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L170)
+Defined in: packages/triggers/src/index.ts:170
+
+**`Stable`**
 
 Build a cron trigger declaration. The expression is validated
 eagerly - a malformed cron expression throws at registration time,
@@ -32,5 +34,3 @@ not at first fire.
 ## Returns
 
 [`TriggerDeclaration`](/api/@graphorin/triggers/interfaces/TriggerDeclaration.md)
-
-## Stable

@@ -6,12 +6,12 @@
 
 # Interface: Ephemeral\&lt;T\&gt;
 
-Defined in: [packages/core/src/channels/channels.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L114)
+Defined in: packages/core/src/channels/channels.ts:114
+
+**`Stable`**
 
 Value scoped to a single execution step - discarded when the step
 ends.
-
-## Stable
 
 ## Type Parameters
 
@@ -23,5 +23,5 @@ ends.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | `T` | [packages/core/src/channels/channels.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L116) |
-| <a id="property-kind"></a> `kind` | `readonly` | `"ephemeral"` | [packages/core/src/channels/channels.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L115) |
+| <a id="property-default"></a> `default?` | `readonly` | `T` | packages/core/src/channels/channels.ts:116 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"ephemeral"` | packages/core/src/channels/channels.ts:115 |

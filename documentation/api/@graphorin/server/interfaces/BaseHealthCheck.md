@@ -6,13 +6,13 @@
 
 # Interface: BaseHealthCheck
 
-Defined in: [packages/server/src/health/checks.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L42)
+Defined in: packages/server/src/health/checks.ts:42
+
+**`Stable`**
 
 Common discriminator carried on every per-subsystem check entry.
 Concrete shapes extend this with subsystem-specific fields per the
 documented contract.
-
-## Stable
 
 ## Extended by
 
@@ -29,5 +29,5 @@ documented contract.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-message"></a> `message?` | `readonly` | `string` | [packages/server/src/health/checks.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L44) |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [packages/server/src/health/checks.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L43) |
+| <a id="property-message"></a> `message?` | `readonly` | `string` | packages/server/src/health/checks.ts:44 |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | packages/server/src/health/checks.ts:43 |

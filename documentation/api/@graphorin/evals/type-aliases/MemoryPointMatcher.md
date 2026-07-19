@@ -10,7 +10,9 @@
 type MemoryPointMatcher = (gold, observed) => boolean;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/util.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/util.ts#L17)
+Defined in: packages/evals/src/scorers/memory/util.ts:17
+
+**`Stable`**
 
 Decides whether an observed memory point expresses a gold point.
 
@@ -24,5 +26,3 @@ Decides whether an observed memory point expresses a gold point.
 ## Returns
 
 `boolean`
-
-## Stable

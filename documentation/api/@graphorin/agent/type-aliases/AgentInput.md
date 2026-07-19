@@ -13,11 +13,11 @@ type AgentInput =
 | ReadonlyArray<Message>;
 ```
 
-Defined in: [packages/agent/src/types.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L63)
+Defined in: packages/agent/src/types.ts:63
+
+**`Stable`**
 
 Forward-compatible type alias for the input accepted by
 `Agent.stream / run / steer / followUp`. v0.1 ships with the
 canonical text + multimodal Message shape; future versions may
 add structured inputs.
-
-## Stable

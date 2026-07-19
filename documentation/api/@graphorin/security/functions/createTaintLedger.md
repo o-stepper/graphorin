@@ -10,7 +10,9 @@
 function createTaintLedger(opts?): TaintLedger;
 ```
 
-Defined in: [packages/security/src/dataflow/ledger.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/ledger.ts#L92)
+Defined in: packages/security/src/dataflow/ledger.ts:92
+
+**`Stable`**
 
 Create a run-scoped [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md).
 
@@ -39,5 +41,3 @@ they are the load-bearing signal for the lethal-trifecta gate.
 ## Returns
 
 [`TaintLedger`](/api/@graphorin/security/interfaces/TaintLedger.md)
-
-## Stable

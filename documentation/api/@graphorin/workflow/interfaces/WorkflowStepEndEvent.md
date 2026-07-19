@@ -8,7 +8,7 @@
 
 Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
-## Stable
+**`Stable`**
 
 ## Type Parameters
 

@@ -10,7 +10,9 @@
 function detectLanguage(text): DetectedLanguage;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/language-whitelist.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/language-whitelist.ts#L125)
+Defined in: packages/security/src/guardrails/builtins/language-whitelist.ts:125
+
+**`Stable`**
 
 Default language detector. The detector scores text by:
 
@@ -33,5 +35,3 @@ override `detect`.
 ## Returns
 
 [`DetectedLanguage`](/api/@graphorin/security/type-aliases/DetectedLanguage.md)
-
-## Stable

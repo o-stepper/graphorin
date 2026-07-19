@@ -10,7 +10,9 @@
 function createSampler(opts?): Sampler;
 ```
 
-Defined in: [packages/observability/src/tracer/sampling.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L93)
+Defined in: packages/observability/src/tracer/sampling.ts:93
+
+**`Stable`**
 
 Build a [Sampler](/api/@graphorin/observability/interfaces/Sampler.md) from the supplied options. The sampler is
 intentionally inexpensive - every decision boils down to a single
@@ -25,5 +27,3 @@ intentionally inexpensive - every decision boils down to a single
 ## Returns
 
 [`Sampler`](/api/@graphorin/observability/interfaces/Sampler.md)
-
-## Stable

@@ -10,7 +10,7 @@
 function setLookupWarnSink(sink): void;
 ```
 
-Defined in: [packages/pricing/src/lookup.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L21)
+Defined in: pricing/src/lookup.ts:21
 
 **`Internal`**
 

@@ -6,13 +6,13 @@
 
 # Interface: LoopbackAdapter
 
-Defined in: [packages/channels/src/testkit/loopback-adapter.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L38)
+Defined in: packages/channels/src/testkit/loopback-adapter.ts:38
+
+**`Stable`**
 
 The in-memory loopback adapter: a full `ChannelAdapter` whose
 transport is the test itself. Tests `inject()` inbound messages
 and read `deliveries` for what the gateway sent back.
-
-## Stable
 
 ## Extends
 
@@ -22,10 +22,10 @@ and read `deliveries` for what the gateway sent back.
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ChannelCapabilities`](/api/@graphorin/channels/interfaces/ChannelCapabilities.md) | - | [`ChannelAdapter`](/api/@graphorin/channels/interfaces/ChannelAdapter.md).[`capabilities`](/api/@graphorin/channels/interfaces/ChannelAdapter.md#property-capabilities) | [packages/channels/src/spi.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L216) |
-| <a id="property-deliveries"></a> `deliveries` | `readonly` | readonly [`DeliveryPayload`](/api/@graphorin/channels/interfaces/DeliveryPayload.md)[] | Every payload delivered so far, in order (post-sanitization). | - | [packages/channels/src/testkit/loopback-adapter.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L42) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable channel id; becomes `ChannelIdentity.channelId` on inbound. | [`ChannelAdapter`](/api/@graphorin/channels/interfaces/ChannelAdapter.md).[`id`](/api/@graphorin/channels/interfaces/ChannelAdapter.md#property-id) | [packages/channels/src/spi.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L215) |
-| <a id="property-started"></a> `started` | `readonly` | `boolean` | - | - | [packages/channels/src/testkit/loopback-adapter.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L43) |
+| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ChannelCapabilities`](/api/@graphorin/channels/interfaces/ChannelCapabilities.md) | - | [`ChannelAdapter`](/api/@graphorin/channels/interfaces/ChannelAdapter.md).[`capabilities`](/api/@graphorin/channels/interfaces/ChannelAdapter.md#property-capabilities) | packages/channels/src/spi.ts:216 |
+| <a id="property-deliveries"></a> `deliveries` | `readonly` | readonly [`DeliveryPayload`](/api/@graphorin/channels/interfaces/DeliveryPayload.md)[] | Every payload delivered so far, in order (post-sanitization). | - | packages/channels/src/testkit/loopback-adapter.ts:42 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable channel id; becomes `ChannelIdentity.channelId` on inbound. | [`ChannelAdapter`](/api/@graphorin/channels/interfaces/ChannelAdapter.md).[`id`](/api/@graphorin/channels/interfaces/ChannelAdapter.md#property-id) | packages/channels/src/spi.ts:215 |
+| <a id="property-started"></a> `started` | `readonly` | `boolean` | - | - | packages/channels/src/testkit/loopback-adapter.ts:43 |
 
 ## Methods
 
@@ -35,7 +35,7 @@ and read `deliveries` for what the gateway sent back.
 deliver(payload): Promise<DeliveryReceipt>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L225)
+Defined in: packages/channels/src/spi.ts:225
 
 Deliver one outbound payload. Throws [ChannelDeliveryError](/api/@graphorin/channels/classes/ChannelDeliveryError.md)
 after in-call retries are exhausted (D-14: no durable outbox).
@@ -62,7 +62,7 @@ after in-call retries are exhausted (D-14: no durable outbox).
 failNextDeliver(): void;
 ```
 
-Defined in: [packages/channels/src/testkit/loopback-adapter.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L45)
+Defined in: packages/channels/src/testkit/loopback-adapter.ts:45
 
 Make the next `deliver` call throw a retryable ChannelDeliveryError.
 
@@ -78,7 +78,7 @@ Make the next `deliver` call throw a retryable ChannelDeliveryError.
 inject(input): Promise<InboundAcceptance>;
 ```
 
-Defined in: [packages/channels/src/testkit/loopback-adapter.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L40)
+Defined in: packages/channels/src/testkit/loopback-adapter.ts:40
 
 Push one inbound message through the gateway (must be started).
 
@@ -100,7 +100,7 @@ Push one inbound message through the gateway (must be started).
 start(ctx): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:218](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L218)
+Defined in: packages/channels/src/spi.ts:218
 
 Subscribe / start polling. Resolves once the adapter is receiving.
 
@@ -126,7 +126,7 @@ Subscribe / start polling. Resolves once the adapter is receiving.
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/channels/src/spi.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L220)
+Defined in: packages/channels/src/spi.ts:220
 
 Stop receiving; idempotent.
 

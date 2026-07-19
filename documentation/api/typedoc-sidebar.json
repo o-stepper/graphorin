@@ -18,6 +18,10 @@
                 "link": "/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md"
               },
               {
+                "text": "AgentBudgetUnpricedError",
+                "link": "/api/@graphorin/agent/errors/classes/AgentBudgetUnpricedError.md"
+              },
+              {
                 "text": "AgentResolutionError",
                 "link": "/api/@graphorin/agent/errors/classes/AgentResolutionError.md"
               },

@@ -17,6 +17,6 @@ type NameDenialDecision =
 };
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:210](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L210)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:210
 
 Result of [isToolDeniedByName](/api/@graphorin/security/functions/isToolDeniedByName.md).

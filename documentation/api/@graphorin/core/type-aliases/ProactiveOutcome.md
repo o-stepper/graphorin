@@ -14,9 +14,9 @@ type ProactiveOutcome =
   | ProactiveActOutcome;
 ```
 
-Defined in: [packages/core/src/types/proactive.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/proactive.ts#L148)
+Defined in: packages/core/src/types/proactive.ts:148
+
+**`Stable`**
 
 Discriminated union over the four rungs - what a proactive fire
 reports to `onOutcome` observers and what the C3 router consumes.
-
-## Stable

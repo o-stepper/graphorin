@@ -10,7 +10,9 @@
 function createFactForgetTool(deps): Tool<FactForgetInput, FactForgetOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/fact-tools.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L363)
+Defined in: packages/memory/src/tools/fact-tools.ts:363
+
+**`Stable`**
 
 `fact_forget` - soft-delete a fact (kept for replay; never hard-
 deleted at this layer).
@@ -24,5 +26,3 @@ deleted at this layer).
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactForgetInput`, `FactForgetOutput`\&gt;
-
-## Stable

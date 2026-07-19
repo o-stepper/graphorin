@@ -27,10 +27,10 @@ type BuiltInPatternName =
   | "ipv6";
 ```
 
-Defined in: [packages/observability/src/redaction/patterns.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/patterns.ts#L26)
+Defined in: packages/observability/src/redaction/patterns.ts:26
+
+**`Stable`**
 
 Stable pattern identifier. The catalogue is curated; user-supplied
 patterns can use any identifier they want and will be passed through
 the validator in addition to the built-ins.
-
-## Stable

@@ -10,7 +10,9 @@
 function sanitizeChannelInbound(body, options): SanitizationOutcome;
 ```
 
-Defined in: [packages/channels/src/inbound.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/inbound.ts#L48)
+Defined in: packages/channels/src/inbound.ts:48
+
+**`Stable`**
 
 Sanitize one inbound channel message body. Thin wrapper over
 `applyInboundSanitization` with `trustClass: 'channel-inbound'`;
@@ -27,5 +29,3 @@ boundary with one call.
 ## Returns
 
 [`SanitizationOutcome`](/api/@graphorin/channels/interfaces/SanitizationOutcome.md)
-
-## Stable

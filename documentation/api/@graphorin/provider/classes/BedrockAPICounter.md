@@ -6,9 +6,9 @@
 
 # Class: BedrockAPICounter
 
-Defined in: [packages/provider/src/counters/bedrock.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L28)
+Defined in: packages/provider/src/counters/bedrock.ts:28
 
-## Stable
+**`Stable`**
 
 ## Implements
 
@@ -22,7 +22,7 @@ Defined in: [packages/provider/src/counters/bedrock.ts:28](https://github.com/o-
 new BedrockAPICounter(options): BedrockAPICounter;
 ```
 
-Defined in: [packages/provider/src/counters/bedrock.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L33)
+Defined in: packages/provider/src/counters/bedrock.ts:33
 
 #### Parameters
 
@@ -38,8 +38,8 @@ Defined in: [packages/provider/src/counters/bedrock.ts:33](https://github.com/o-
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/provider/src/counters/bedrock.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L29) |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/provider/src/counters/bedrock.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L30) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/bedrock.ts:29 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/bedrock.ts:30 |
 
 ## Methods
 
@@ -49,7 +49,7 @@ Defined in: [packages/provider/src/counters/bedrock.ts:33](https://github.com/o-
 count(messages): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/bedrock.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L39)
+Defined in: packages/provider/src/counters/bedrock.ts:39
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -75,7 +75,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/bedrock.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/bedrock.ts#L43)
+Defined in: packages/provider/src/counters/bedrock.ts:43
 
 Count tokens in a raw text string.
 

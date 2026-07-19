@@ -10,7 +10,9 @@
 function resolveEntityDecision(input): EntityResolveDecision;
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L129)
+Defined in: packages/memory/src/graph/entity-resolver.ts:129
+
+**`Stable`**
 
 Pure resolution policy: lexical exact match → embedding cosine →
 ambiguous band → new. No I/O; deterministic. The caller decides what
@@ -25,5 +27,3 @@ to do with `ambiguous` (LLM adjudicate, or conservatively mint new).
 ## Returns
 
 [`EntityResolveDecision`](/api/@graphorin/memory/type-aliases/EntityResolveDecision.md)
-
-## Stable

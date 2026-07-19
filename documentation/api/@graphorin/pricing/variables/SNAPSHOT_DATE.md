@@ -7,10 +7,10 @@
 # Variable: SNAPSHOT\_DATE
 
 ```ts
-const SNAPSHOT_DATE: "2026-07-04" = '2026-07-04';
+const SNAPSHOT_DATE: "2026-07-19" = '2026-07-19';
 ```
 
-Defined in: [packages/pricing/src/snapshot/bundled.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/snapshot/bundled.ts#L19)
+Defined in: pricing/src/snapshot/bundled.ts:19
 
 **`Internal`**
 

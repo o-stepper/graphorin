@@ -6,12 +6,12 @@
 
 # Interface: ProceduralMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:775](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L775)
+Defined in: packages/memory/src/internal/storage-adapter.ts:775
+
+**`Stable`**
 
 Extension of the typed `ProceduralMemoryStore` with the optional
 promotion helper that storage adapters may expose (MCON-2).
-
-## Stable
 
 ## Extends
 
@@ -73,7 +73,7 @@ Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/
 optional recordSuccess(id): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:807](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L807)
+Defined in: packages/memory/src/internal/storage-adapter.ts:807
 
 Record one demonstrated successful reuse of a rule and return the
 new counter value (MCON-2 part 4). Powers
@@ -127,7 +127,7 @@ optional search(
 opts?): Promise<readonly MemoryHit<Rule>[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:795](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L795)
+Defined in: packages/memory/src/internal/storage-adapter.ts:795
 
 Lexical runbook search over rule text (D3, migration 028) - content
 recall for "find the procedure for this task", as opposed to
@@ -162,7 +162,7 @@ optional setStatus(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:781](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L781)
+Defined in: packages/memory/src/internal/storage-adapter.ts:781
 
 Set a rule's retrieval-trust `status` - promote a quarantined (induced)
 procedure into `activate()` or re-quarantine an active one, with a

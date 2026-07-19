@@ -10,6 +10,6 @@
 const DEFAULT_MULTILINGUAL_MODEL: "BAAI/bge-reranker-v2-m3" = 'BAAI/bge-reranker-v2-m3';
 ```
 
-Defined in: [packages/reranker-transformersjs/src/model-selection.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/model-selection.ts#L26)
+Defined in: packages/reranker-transformersjs/src/model-selection.ts:26
 
-## Stable
+**`Stable`**

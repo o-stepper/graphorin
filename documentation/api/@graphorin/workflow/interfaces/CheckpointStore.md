@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
+**`Stable`**
+
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
-
-## Stable
 
 ## Methods
 

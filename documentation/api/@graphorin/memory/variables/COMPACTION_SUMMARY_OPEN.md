@@ -10,8 +10,8 @@
 const COMPACTION_SUMMARY_OPEN: "<graphorin_compaction_summary>";
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/templates/marker.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/marker.ts#L22)
+Defined in: packages/memory/src/context-engine/compaction/templates/marker.ts:22
+
+**`Stable`**
 
 Opening wrapper line of a rendered summary.
-
-## Stable

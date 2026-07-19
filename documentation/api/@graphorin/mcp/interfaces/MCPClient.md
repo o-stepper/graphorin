@@ -6,25 +6,25 @@
 
 # Interface: MCPClient
 
-Defined in: [packages/mcp/src/client/types.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L348)
+Defined in: packages/mcp/src/client/types.ts:348
+
+**`Stable`**
 
 Public surface of an active MCP client.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-collisionstrategy"></a> `collisionStrategy` | `readonly` | [`CollisionStrategy`](/api/@graphorin/tools/type-aliases/CollisionStrategy.md) | Per-client default collision strategy. | [packages/mcp/src/client/types.ts:356](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L356) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier - derived from the transport. | [packages/mcp/src/client/types.ts:350](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L350) |
-| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Per-client priority value used by the `'priority'` strategy. | [packages/mcp/src/client/types.ts:358](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L358) |
-| <a id="property-resumable"></a> ~~`resumable`~~ | `readonly` | `boolean` | **Deprecated** Alias of [sessionIdPresent](/api/@graphorin/mcp/interfaces/MCPClient.md#property-sessionidpresent) - same value, misleading name. | [packages/mcp/src/client/types.ts:369](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L369) |
-| <a id="property-serveridentity"></a> `serverIdentity` | `readonly` | [`ServerIdentity`](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) | Server identity descriptor consumed by the tool-registry resolver. | [packages/mcp/src/client/types.ts:354](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L354) |
-| <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | [packages/mcp/src/client/types.ts:352](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L352) |
-| `serverInfo.name` | `readonly` | `string` | - | [packages/mcp/src/client/types.ts:352](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L352) |
-| `serverInfo.version` | `readonly` | `string` | - | [packages/mcp/src/client/types.ts:352](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L352) |
-| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing - it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | [packages/mcp/src/client/types.ts:367](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L367) |
+| <a id="property-collisionstrategy"></a> `collisionStrategy` | `readonly` | [`CollisionStrategy`](/api/@graphorin/tools/type-aliases/CollisionStrategy.md) | Per-client default collision strategy. | packages/mcp/src/client/types.ts:356 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier - derived from the transport. | packages/mcp/src/client/types.ts:350 |
+| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Per-client priority value used by the `'priority'` strategy. | packages/mcp/src/client/types.ts:358 |
+| <a id="property-resumable"></a> ~~`resumable`~~ | `readonly` | `boolean` | **Deprecated** Alias of [sessionIdPresent](/api/@graphorin/mcp/interfaces/MCPClient.md#property-sessionidpresent) - same value, misleading name. | packages/mcp/src/client/types.ts:369 |
+| <a id="property-serveridentity"></a> `serverIdentity` | `readonly` | [`ServerIdentity`](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) | Server identity descriptor consumed by the tool-registry resolver. | packages/mcp/src/client/types.ts:354 |
+| <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | packages/mcp/src/client/types.ts:352 |
+| `serverInfo.name` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:352 |
+| `serverInfo.version` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:352 |
+| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing - it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:367 |
 
 ## Methods
 
@@ -37,7 +37,7 @@ callTool(
 opts?): Promise<MCPCallToolResult>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:374](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L374)
+Defined in: packages/mcp/src/client/types.ts:374
 
 #### Parameters
 
@@ -61,7 +61,7 @@ Defined in: [packages/mcp/src/client/types.ts:374](https://github.com/o-stepper/
 close(): Promise<void>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:397](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L397)
+Defined in: packages/mcp/src/client/types.ts:397
 
 #### Returns
 
@@ -80,7 +80,7 @@ getPrompt(
 }>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:391](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L391)
+Defined in: packages/mcp/src/client/types.ts:391
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: [packages/mcp/src/client/types.ts:391](https://github.com/o-stepper/
 listPrompts(opts?): Promise<readonly MCPPromptDefinition[]>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:373](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L373)
+Defined in: packages/mcp/src/client/types.ts:373
 
 #### Parameters
 
@@ -126,7 +126,7 @@ Defined in: [packages/mcp/src/client/types.ts:373](https://github.com/o-stepper/
 listResources(opts?): Promise<readonly MCPResourceDefinition[]>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:372](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L372)
+Defined in: packages/mcp/src/client/types.ts:372
 
 #### Parameters
 
@@ -147,7 +147,7 @@ Defined in: [packages/mcp/src/client/types.ts:372](https://github.com/o-stepper/
 listTools(opts?): Promise<readonly MCPToolDefinition[]>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:371](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L371)
+Defined in: packages/mcp/src/client/types.ts:371
 
 #### Parameters
 
@@ -168,7 +168,7 @@ Defined in: [packages/mcp/src/client/types.ts:371](https://github.com/o-stepper/
 readResource(uri, opts?): Promise<MCPResourceContent>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:385](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L385)
+Defined in: packages/mcp/src/client/types.ts:385
 
 First content item of the resource. mcp-skills-11: a multi-content
 response (one URI can yield several items) is truncated to the
@@ -195,7 +195,7 @@ FIRST item - a WARN + counter fire when that happens; use
 readResourceContents(uri, opts?): Promise<readonly MCPResourceContent[]>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:387](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L387)
+Defined in: packages/mcp/src/client/types.ts:387
 
 Every content item of the resource (mcp-skills-11).
 
@@ -219,7 +219,7 @@ Every content item of the resource (mcp-skills-11).
 toTools(opts?): Promise<readonly Tool<unknown, unknown, unknown>[]>;
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:396](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L396)
+Defined in: packages/mcp/src/client/types.ts:396
 
 #### Parameters
 

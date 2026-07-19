@@ -10,7 +10,7 @@
 function _getToolAuditListenerCountForTesting(): number;
 ```
 
-Defined in: [packages/tools/src/audit/index.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L150)
+Defined in: packages/tools/src/audit/index.ts:150
 
 **`Experimental`**
 

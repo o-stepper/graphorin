@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
-Specialization of `Reducer<T[]>` that appends each write to a list.
+**`Stable`**
 
-## Stable
+Specialization of `Reducer<T[]>` that appends each write to a list.
 
 ## Type Parameters
 

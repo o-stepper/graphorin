@@ -10,7 +10,7 @@
 function _setDcrFetcherForTesting(fetcher): void;
 ```
 
-Defined in: [packages/security/src/oauth/dynamic-client-registration.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L32)
+Defined in: packages/security/src/oauth/dynamic-client-registration.ts:32
 
 **`Experimental`**
 

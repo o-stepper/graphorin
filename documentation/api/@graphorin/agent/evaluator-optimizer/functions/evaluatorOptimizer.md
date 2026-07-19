@@ -10,7 +10,9 @@
 function evaluatorOptimizer<TOutput>(input, options): Promise<EvaluatorOptimizerOutcome<TOutput>>;
 ```
 
-Defined in: [packages/agent/src/evaluator-optimizer/index.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L110)
+Defined in: packages/agent/src/evaluator-optimizer/index.ts:110
+
+**`Stable`**
 
 Run the Generator → Evaluator iteration loop.
 
@@ -30,5 +32,3 @@ Run the Generator → Evaluator iteration loop.
 ## Returns
 
 `Promise`\<[`EvaluatorOptimizerOutcome`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md)\&lt;`TOutput`\&gt;\>
-
-## Stable

@@ -6,7 +6,7 @@
 
 # Interface: MigrationResult
 
-Defined in: [packages/skills/src/migration/index.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L30)
+Defined in: packages/skills/src/migration/index.ts:30
 
 Result of a single SKILL.md migration.
 
@@ -14,8 +14,8 @@ Result of a single SKILL.md migration.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-changed"></a> `changed` | `readonly` | `boolean` | [packages/skills/src/migration/index.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L35) |
-| <a id="property-migratedskillmd"></a> `migratedSkillMd` | `readonly` | `string` | [packages/skills/src/migration/index.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L34) |
-| <a id="property-originalskillmd"></a> `originalSkillMd` | `readonly` | `string` | [packages/skills/src/migration/index.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L33) |
-| <a id="property-rewrites"></a> `rewrites` | `readonly` | readonly [`MigrationRewrite`](/api/@graphorin/skills/migration/interfaces/MigrationRewrite.md)[] | [packages/skills/src/migration/index.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L32) |
-| <a id="property-skillid"></a> `skillId` | `readonly` | `string` | [packages/skills/src/migration/index.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/migration/index.ts#L31) |
+| <a id="property-changed"></a> `changed` | `readonly` | `boolean` | packages/skills/src/migration/index.ts:35 |
+| <a id="property-migratedskillmd"></a> `migratedSkillMd` | `readonly` | `string` | packages/skills/src/migration/index.ts:34 |
+| <a id="property-originalskillmd"></a> `originalSkillMd` | `readonly` | `string` | packages/skills/src/migration/index.ts:33 |
+| <a id="property-rewrites"></a> `rewrites` | `readonly` | readonly [`MigrationRewrite`](/api/@graphorin/skills/migration/interfaces/MigrationRewrite.md)[] | packages/skills/src/migration/index.ts:32 |
+| <a id="property-skillid"></a> `skillId` | `readonly` | `string` | packages/skills/src/migration/index.ts:31 |

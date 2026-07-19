@@ -6,9 +6,9 @@
 
 # Interface: CostTracker
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L28)
+Defined in: packages/observability/src/cost/cost-tracker.ts:28
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -18,7 +18,7 @@ Defined in: [packages/observability/src/cost/cost-tracker.ts:28](https://github.
 onRollup(listener): () => void;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L38)
+Defined in: packages/observability/src/cost/cost-tracker.ts:38
 
 Subscribe to per-scope rollup notifications. Returns an unsubscribe.
 
@@ -40,7 +40,7 @@ Subscribe to per-scope rollup notifications. Returns an unsubscribe.
 record(input): void;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L30)
+Defined in: packages/observability/src/cost/cost-tracker.ts:30
 
 Record a single LLM-call usage / cost figure.
 
@@ -62,7 +62,7 @@ Record a single LLM-call usage / cost figure.
 reset(): void;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L36)
+Defined in: packages/observability/src/cost/cost-tracker.ts:36
 
 Reset every counter back to zero.
 
@@ -78,7 +78,7 @@ Reset every counter back to zero.
 usage(scope, id): CostSnapshot;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L32)
+Defined in: packages/observability/src/cost/cost-tracker.ts:32
 
 Snapshot for a given scope id. Returns zero figures when unknown.
 
@@ -101,7 +101,7 @@ Snapshot for a given scope id. Returns zero figures when unknown.
 usageForSpan(spanId): CostSnapshot;
 ```
 
-Defined in: [packages/observability/src/cost/cost-tracker.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/cost-tracker.ts#L34)
+Defined in: packages/observability/src/cost/cost-tracker.ts:34
 
 Snapshot for a single span id (carries nested attributions).
 

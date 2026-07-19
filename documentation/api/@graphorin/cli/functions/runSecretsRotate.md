@@ -12,7 +12,9 @@ function runSecretsRotate(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L275)
+Defined in: packages/cli/src/commands/secrets.ts:275
+
+**`Stable`**
 
 `graphorin secrets rotate <key>` - overwrite the existing value
 with a fresh one. Functionally identical to `set` but the CLI
@@ -30,5 +32,3 @@ a rotation from an initial write.
 `Promise`\<\{
   `ok`: `true`;
 \}\>
-
-## Stable

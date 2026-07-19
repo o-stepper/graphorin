@@ -12,7 +12,9 @@ function extractSignatureBlock(frontmatter):
   | null;
 ```
 
-Defined in: [packages/security/src/supply-chain/frontmatter.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L75)
+Defined in: packages/security/src/supply-chain/frontmatter.ts:75
+
+**`Stable`**
 
 Extract a `graphorin-signature:` block from the parsed frontmatter.
 Returns `null` when no signature block is present.
@@ -27,5 +29,3 @@ Returns `null` when no signature block is present.
 
   \| [`SkillSignatureBlock`](/api/@graphorin/security/interfaces/SkillSignatureBlock.md)
   \| `null`
-
-## Stable

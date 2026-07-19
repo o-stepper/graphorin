@@ -10,7 +10,7 @@
 function serializedToString(msg): string;
 ```
 
-Defined in: [packages/provider/src/counters/serialize.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L79)
+Defined in: packages/provider/src/counters/serialize.ts:79
 
 **`Internal`**
 

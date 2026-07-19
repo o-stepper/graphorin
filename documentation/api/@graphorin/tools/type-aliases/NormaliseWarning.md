@@ -33,6 +33,6 @@ type NormaliseWarning =
 };
 ```
 
-Defined in: [packages/tools/src/registry/normalize.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L72)
+Defined in: packages/tools/src/registry/normalize.ts:72
 
 Discriminator for the registration-time WARN family.

@@ -10,7 +10,9 @@
 type PassphraseResolver = () => Promise<string | Buffer>;
 ```
 
-Defined in: [packages/store-sqlite/src/encryption/index.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L85)
+Defined in: packages/store-sqlite/src/encryption/index.ts:85
+
+**`Stable`**
 
 Passphrase resolver shape. Implementations live in
 `@graphorin/security` (`'env:GRAPHORIN_DB_PASSPHRASE'`,
@@ -20,5 +22,3 @@ binary-keyed cipher variants.
 ## Returns
 
 `Promise`\&lt;`string` \| `Buffer`\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function parseTicketSubprotocol(clientList): string | undefined;
 ```
 
-Defined in: [packages/protocol/src/subprotocol.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/subprotocol.ts#L67)
+Defined in: src/subprotocol.ts:67
+
+**`Stable`**
 
 Extract the ticket value from a single comma-separated client list
 (e.g. `'graphorin.protocol.v1, ticket.abc-123'`). Returns
@@ -26,5 +28,3 @@ each comma-separated token is ignored.
 ## Returns
 
 `string` \| `undefined`
-
-## Stable

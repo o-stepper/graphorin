@@ -10,11 +10,11 @@
 type ProactiveGrant = ProactiveOutcomeKind;
 ```
 
-Defined in: [packages/core/src/types/proactive.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/proactive.ts#L51)
+Defined in: packages/core/src/types/proactive.ts:51
+
+**`Stable`**
 
 Maximum rung a proactive task may produce. A task declares its grant
 once (default `'notify'`); the runner clamps or rejects outcomes
 above it. `'act'` additionally requires the memory ingest gate to be
 active (fail-closed config check in the proactive runner).
-
-## Stable

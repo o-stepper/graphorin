@@ -13,7 +13,7 @@ function anyMatch(
    matcher): boolean;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/util.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/util.ts#L62)
+Defined in: packages/evals/src/scorers/memory/util.ts:62
 
 True when some observed point matches the gold text.
 

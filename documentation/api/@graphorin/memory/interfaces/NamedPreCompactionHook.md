@@ -6,19 +6,19 @@
 
 # Interface: NamedPreCompactionHook
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:259](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L259)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:259
+
+**`Stable`**
 
 Named pre-compaction hook (built-in form): receives the shared hook
 deps (memory handle, scope, privacy filter) plus the pre-compaction
 context. Mirrors `NamedPostCompactionHook`.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/memory/src/context-engine/compaction/types.ts:260](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L260) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:260 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ context. Mirrors `NamedPostCompactionHook`.
 run(deps, ctx): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:261](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L261)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:261
 
 #### Parameters
 

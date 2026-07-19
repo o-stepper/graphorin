@@ -10,7 +10,9 @@
 function splitSkillMd(skillMd): SplitSkillMd;
 ```
 
-Defined in: [packages/skills/src/frontmatter/index.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L51)
+Defined in: packages/skills/src/frontmatter/index.ts:51
+
+**`Stable`**
 
 Split a raw SKILL.md string into the YAML frontmatter and the
 markdown body. The frontmatter delimiter is the canonical
@@ -25,5 +27,3 @@ markdown body. The frontmatter delimiter is the canonical
 ## Returns
 
 [`SplitSkillMd`](/api/@graphorin/skills/frontmatter/interfaces/SplitSkillMd.md)
-
-## Stable

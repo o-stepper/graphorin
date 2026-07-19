@@ -10,8 +10,8 @@
 type PerToolReplayMode = Readonly<Record<string, "live" | "recorded">>;
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:244](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L244)
+Defined in: packages/sessions/src/cassette/types.ts:244
+
+**`Stable`**
 
 Per-tool override consulted under `'mixed'`.
-
-## Stable

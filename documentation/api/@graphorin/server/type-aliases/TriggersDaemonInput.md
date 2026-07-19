@@ -16,11 +16,11 @@ type TriggersDaemonInput =
 };
 ```
 
-Defined in: [packages/server/src/app-daemons.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/app-daemons.ts#L27)
+Defined in: packages/server/src/app-daemons.ts:27
+
+**`Stable`**
 
 Discriminated union accepted by `CreateServerOptions.triggers`. A
 caller may either supply a fully-built daemon (e.g. constructed
 around a custom `Scheduler`) or just the underlying scheduler - the
 server wraps it with [createTriggersDaemon](/api/@graphorin/server/functions/createTriggersDaemon.md) automatically.
-
-## Stable

@@ -10,7 +10,9 @@
 function parseCron(expression): ParsedCron;
 ```
 
-Defined in: [packages/triggers/src/cron.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/cron.ts#L90)
+Defined in: packages/triggers/src/cron.ts:90
+
+**`Stable`**
 
 Parse a 5-field cron expression. Throws [CronParseError](/api/@graphorin/triggers/cron/classes/CronParseError.md) on
 any malformed input.
@@ -24,5 +26,3 @@ any malformed input.
 ## Returns
 
 [`ParsedCron`](/api/@graphorin/triggers/cron/interfaces/ParsedCron.md)
-
-## Stable

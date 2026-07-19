@@ -6,7 +6,7 @@
 
 # Interface: ProviderLike
 
-Defined in: [packages/core/src/contracts/preferred-model.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L40)
+Defined in: packages/core/src/contracts/preferred-model.ts:40
 
 **`Internal`**
 
@@ -19,5 +19,5 @@ importing the heavier `Provider` interface.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | [packages/core/src/contracts/preferred-model.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L42) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/core/src/contracts/preferred-model.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L41) |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/contracts/preferred-model.ts:42 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/core/src/contracts/preferred-model.ts:41 |

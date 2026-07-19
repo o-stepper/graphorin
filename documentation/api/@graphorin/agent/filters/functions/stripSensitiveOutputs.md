@@ -10,7 +10,9 @@
 function stripSensitiveOutputs(): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L232)
+Defined in: packages/agent/src/filters/index.ts:232
+
+**`Stable`**
 
 Strip tool messages whose `content` carries a literal
 `[REDACTED:` redaction token - ANY redaction tier trips it, not
@@ -23,5 +25,3 @@ through. Same weak-contract caveat as [bySensitivity](/api/@graphorin/agent/filt
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

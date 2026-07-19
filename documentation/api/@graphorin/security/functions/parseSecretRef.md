@@ -10,7 +10,9 @@
 function parseSecretRef(uri): ParsedSecretRef;
 ```
 
-Defined in: [packages/security/src/secrets/secret-ref.ts:376](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L376)
+Defined in: packages/security/src/secrets/secret-ref.ts:376
+
+**`Stable`**
 
 Strict RFC 3986-subset parser for `SecretRef` URIs. Rejects every
 input that does not conform to the grammar declared in the
@@ -25,5 +27,3 @@ architecture spec; never silently falls back to a default scheme.
 ## Returns
 
 [`ParsedSecretRef`](/api/@graphorin/security/interfaces/ParsedSecretRef.md)
-
-## Stable

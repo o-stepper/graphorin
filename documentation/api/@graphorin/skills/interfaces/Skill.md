@@ -6,7 +6,9 @@
 
 # Interface: Skill
 
-Defined in: [packages/skills/src/types/index.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L276)
+Defined in: packages/skills/src/types/index.ts:276
+
+**`Stable`**
 
 Loaded skill record returned by [SkillRegistry.getSkill](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#getskill) and
 [loadSkills](/api/@graphorin/skills/loader/functions/loadSkills.md). Three-tier semantics:
@@ -20,17 +22,15 @@ Loaded skill record returned by [SkillRegistry.getSkill](/api/@graphorin/skills/
   declarations; the actual `Tool[]` is materialised by the agent
   runtime through the `@graphorin/tools` registry.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-basepath"></a> `basePath?` | `readonly` | `string` | [packages/skills/src/types/index.ts:279](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L279) |
-| <a id="property-metadata"></a> `metadata` | `readonly` | [`SkillMetadata`](/api/@graphorin/skills/interfaces/SkillMetadata.md) | [packages/skills/src/types/index.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L277) |
-| <a id="property-signature"></a> `signature?` | `readonly` | [`SkillSignatureVerificationResult`](/api/@graphorin/skills/interfaces/SkillSignatureVerificationResult.md) | [packages/skills/src/types/index.ts:281](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L281) |
-| <a id="property-source"></a> `source` | `readonly` | [`SkillSource`](/api/@graphorin/skills/type-aliases/SkillSource.md) | [packages/skills/src/types/index.ts:278](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L278) |
-| <a id="property-trustpolicy"></a> `trustPolicy` | `readonly` | [`ResolvedSkillTrustPolicy`](/api/@graphorin/skills/interfaces/ResolvedSkillTrustPolicy.md) | [packages/skills/src/types/index.ts:280](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L280) |
+| <a id="property-basepath"></a> `basePath?` | `readonly` | `string` | packages/skills/src/types/index.ts:279 |
+| <a id="property-metadata"></a> `metadata` | `readonly` | [`SkillMetadata`](/api/@graphorin/skills/interfaces/SkillMetadata.md) | packages/skills/src/types/index.ts:277 |
+| <a id="property-signature"></a> `signature?` | `readonly` | [`SkillSignatureVerificationResult`](/api/@graphorin/skills/interfaces/SkillSignatureVerificationResult.md) | packages/skills/src/types/index.ts:281 |
+| <a id="property-source"></a> `source` | `readonly` | [`SkillSource`](/api/@graphorin/skills/type-aliases/SkillSource.md) | packages/skills/src/types/index.ts:278 |
+| <a id="property-trustpolicy"></a> `trustPolicy` | `readonly` | [`ResolvedSkillTrustPolicy`](/api/@graphorin/skills/interfaces/ResolvedSkillTrustPolicy.md) | packages/skills/src/types/index.ts:280 |
 
 ## Methods
 
@@ -40,7 +40,7 @@ Loaded skill record returned by [SkillRegistry.getSkill](/api/@graphorin/skills/
 body(signal?): Promise<string>;
 ```
 
-Defined in: [packages/skills/src/types/index.ts:282](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L282)
+Defined in: packages/skills/src/types/index.ts:282
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: [packages/skills/src/types/index.ts:282](https://github.com/o-steppe
 diagnostics(): readonly FrontmatterDiagnostic[];
 ```
 
-Defined in: [packages/skills/src/types/index.ts:293](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L293)
+Defined in: packages/skills/src/types/index.ts:293
 
 #### Returns
 
@@ -74,7 +74,7 @@ readonly [`FrontmatterDiagnostic`](/api/@graphorin/skills/interfaces/Frontmatter
 resources(signal?): Promise<readonly SkillResource[]>;
 ```
 
-Defined in: [packages/skills/src/types/index.ts:283](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L283)
+Defined in: packages/skills/src/types/index.ts:283
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: [packages/skills/src/types/index.ts:283](https://github.com/o-steppe
 toolDeclarations(): readonly SkillToolDeclaration[];
 ```
 
-Defined in: [packages/skills/src/types/index.ts:292](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L292)
+Defined in: packages/skills/src/types/index.ts:292
 
 #### Returns
 
@@ -108,7 +108,7 @@ readonly [`SkillToolDeclaration`](/api/@graphorin/skills/interfaces/SkillToolDec
 tools(): readonly InlineSkillTool[];
 ```
 
-Defined in: [packages/skills/src/types/index.ts:291](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L291)
+Defined in: packages/skills/src/types/index.ts:291
 
 Pre-built tools shipped with the skill. The inline source is the
 only path through which the loader carries actual `Tool[]`

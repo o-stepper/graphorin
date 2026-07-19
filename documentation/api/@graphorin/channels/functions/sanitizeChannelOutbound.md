@@ -10,7 +10,9 @@
 function sanitizeChannelOutbound(text, policy?): OutboundSanitizationResult;
 ```
 
-Defined in: [packages/channels/src/outbound.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/outbound.ts#L49)
+Defined in: packages/channels/src/outbound.ts:49
+
+**`Stable`**
 
 Sanitize one outbound channel text. `'strip'` (default) removes
 matched fragments AND drops segments an upstream boundary already
@@ -27,5 +29,3 @@ wrapped; `'wrap'` behaves like the server/session boundaries
 ## Returns
 
 [`OutboundSanitizationResult`](/api/@graphorin/channels/interfaces/OutboundSanitizationResult.md)
-
-## Stable

@@ -12,10 +12,10 @@ type SessionReplayEvent =
   | CassetteReplayDecision;
 ```
 
-Defined in: [packages/sessions/src/replay/types.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/replay/types.ts#L74)
+Defined in: packages/sessions/src/replay/types.ts:74
+
+**`Stable`**
 
 Single event yielded by `Session.replay({...})`. Combines the
 sanitized observability replay events + the cassette-driven
 decisions surfaced by the cassette engine.
-
-## Stable

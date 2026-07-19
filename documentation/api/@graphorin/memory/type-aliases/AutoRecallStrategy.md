@@ -10,7 +10,9 @@
 type AutoRecallStrategy = (ctx) => AutoRecallTriggerResult;
 ```
 
-Defined in: [packages/memory/src/context-engine/auto-recall.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/auto-recall.ts#L43)
+Defined in: packages/memory/src/context-engine/auto-recall.ts:43
+
+**`Stable`**
 
 Pluggable strategy signature.
 
@@ -23,5 +25,3 @@ Pluggable strategy signature.
 ## Returns
 
 [`AutoRecallTriggerResult`](/api/@graphorin/memory/interfaces/AutoRecallTriggerResult.md)
-
-## Stable

@@ -10,7 +10,7 @@
 function namespaceFor(config): string;
 ```
 
-Defined in: [packages/workflow/src/internal/engine.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/internal/engine.ts#L130)
+Defined in: packages/workflow/src/internal/engine.ts:130
 
 **`Internal`**
 

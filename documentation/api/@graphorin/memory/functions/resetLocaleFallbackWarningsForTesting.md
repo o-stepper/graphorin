@@ -10,7 +10,7 @@
 function _resetLocaleFallbackWarningsForTesting(): void;
 ```
 
-Defined in: [packages/memory/src/context-engine/locale-packs/resolver.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/resolver.ts#L22)
+Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:22
 
 **`Internal`**
 

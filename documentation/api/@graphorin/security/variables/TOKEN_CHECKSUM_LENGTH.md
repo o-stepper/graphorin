@@ -10,6 +10,6 @@
 const TOKEN_CHECKSUM_LENGTH: 6 = 6;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L51)
+Defined in: packages/security/src/auth/token-format.ts:51
 
 Canonical CRC32 checksum length in characters when base62-encoded.

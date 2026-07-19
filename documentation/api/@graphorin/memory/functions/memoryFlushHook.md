@@ -10,7 +10,9 @@
 function memoryFlushHook(options): NamedPreCompactionHook;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/hooks/memory-flush.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/memory-flush.ts#L67)
+Defined in: packages/memory/src/context-engine/compaction/hooks/memory-flush.ts:67
+
+**`Stable`**
 
 Build the pre-compaction memory-flush hook. Register via
 `contextEngine: { compaction: { preCompactionHooks: [memoryFlushHook({ provider })] } }`.
@@ -24,5 +26,3 @@ Build the pre-compaction memory-flush hook. Register via
 ## Returns
 
 [`NamedPreCompactionHook`](/api/@graphorin/memory/interfaces/NamedPreCompactionHook.md)
-
-## Stable

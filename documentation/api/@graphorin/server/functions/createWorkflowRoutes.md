@@ -12,7 +12,9 @@ function createWorkflowRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/workflows.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/workflows.ts#L86)
+Defined in: packages/server/src/routes/workflows.ts:86
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/routes/workflows.ts:86](https://github.com/o-st
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

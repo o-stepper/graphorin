@@ -10,7 +10,9 @@
 function isUnsubscribedFrame(message): message is { kind: "unsubscribed"; subscriptionId: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L230)
+Defined in: src/server-message.ts:230
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:230](https://github.com/o-s
 ## Returns
 
 `message is { kind: "unsubscribed"; subscriptionId: string; v: "1" }`
-
-## Stable

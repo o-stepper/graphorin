@@ -10,7 +10,9 @@
 function readToolCassette(body): ToolCassetteReadResult;
 ```
 
-Defined in: [packages/sessions/src/cassette/reader.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/reader.ts#L55)
+Defined in: packages/sessions/src/cassette/reader.ts:55
+
+**`Stable`**
 
 Parse a cassette body. Validates the sentinel header / footer,
 the schema MAJOR band, the body checksum (when present), and the
@@ -25,5 +27,3 @@ the schema MAJOR band, the body checksum (when present), and the
 ## Returns
 
 [`ToolCassetteReadResult`](/api/@graphorin/sessions/interfaces/ToolCassetteReadResult.md)
-
-## Stable

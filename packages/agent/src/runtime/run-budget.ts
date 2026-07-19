@@ -39,6 +39,15 @@ export function validateRunBudget(budget: RunBudget | undefined): RunBudget | un
       );
     }
   }
+  if (
+    budget.onUnpriced !== undefined &&
+    budget.onUnpriced !== 'fail' &&
+    budget.onUnpriced !== 'warn'
+  ) {
+    throw new TypeError(
+      `[graphorin/agent] RunBudget.onUnpriced must be 'fail' or 'warn', got ${String(budget.onUnpriced)}`,
+    );
+  }
   return budget;
 }
 

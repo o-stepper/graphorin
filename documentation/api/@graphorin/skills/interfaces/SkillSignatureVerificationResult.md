@@ -8,9 +8,9 @@
 
 Defined in: [packages/security/dist/supply-chain/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/supply-chain/types.d.ts)
 
-Result of a `verifySkillSignature` call.
+**`Stable`**
 
-## Stable
+Result of a `verifySkillSignature` call.
 
 ## Properties
 

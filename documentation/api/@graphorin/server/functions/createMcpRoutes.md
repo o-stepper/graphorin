@@ -12,7 +12,9 @@ function createMcpRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/mcp.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L49)
+Defined in: packages/server/src/routes/mcp.ts:49
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/routes/mcp.ts:49](https://github.com/o-stepper/
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

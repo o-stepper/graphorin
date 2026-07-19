@@ -15,7 +15,9 @@ function readThreadState(
 | null>;
 ```
 
-Defined in: [packages/workflow/src/inspect.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/inspect.ts#L64)
+Defined in: packages/workflow/src/inspect.ts:64
+
+**`Stable`**
 
 Read the latest checkpoint of `threadId` under workflow
 `workflowName` and decode it exactly like `Workflow.getState` does
@@ -36,5 +38,3 @@ that instead of throwing.
 `Promise`\<
   \| [`ThreadInspection`](/api/@graphorin/workflow/interfaces/ThreadInspection.md)
   \| `null`\>
-
-## Stable

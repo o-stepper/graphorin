@@ -10,7 +10,9 @@
 function tryGetValidatorCounters(validator): RedactionCounters;
 ```
 
-Defined in: [packages/observability/src/exporters/with-validation.ts:212](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/with-validation.ts#L212)
+Defined in: packages/observability/src/exporters/with-validation.ts:212
+
+**`Stable`**
 
 Pull the counters out of any exporter wrapped by [withValidation](/api/@graphorin/observability/functions/withValidation.md).
 Returns `null` for exporters that were never wrapped.
@@ -24,5 +26,3 @@ Returns `null` for exporters that were never wrapped.
 ## Returns
 
 [`RedactionCounters`](/api/@graphorin/observability/interfaces/RedactionCounters.md)
-
-## Stable

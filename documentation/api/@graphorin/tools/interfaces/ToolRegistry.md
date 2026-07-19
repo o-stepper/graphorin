@@ -6,11 +6,11 @@
 
 # Interface: ToolRegistry
 
-Defined in: [packages/tools/src/registry/registry.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L79)
+Defined in: packages/tools/src/registry/registry.ts:79
+
+**`Stable`**
 
 Strategy-aware tool registry.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ Strategy-aware tool registry.
 assertNoDuplicates(): void;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L105)
+Defined in: packages/tools/src/registry/registry.ts:105
 
 Pure-detection collision check. Throws
 [DuplicateToolNameError](/api/@graphorin/tools/errors/classes/DuplicateToolNameError.md) on first-party / inline collisions
@@ -39,7 +39,7 @@ never wired a strategy.
 assertNoDuplicates(strategy, ctx): readonly CollisionResolution[];
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L112)
+Defined in: packages/tools/src/registry/registry.ts:112
 
 Strategy-aware collision overload. Returns the
 [CollisionResolution](/api/@graphorin/tools/type-aliases/CollisionResolution.md) records for the audit emitter +
@@ -65,7 +65,7 @@ readonly [`CollisionResolution`](/api/@graphorin/tools/type-aliases/CollisionRes
 clear(): void;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L125)
+Defined in: packages/tools/src/registry/registry.ts:125
 
 Tear down the registry - clears every entry.
 
@@ -83,7 +83,7 @@ get<TInput, TOutput, TDeps>(name):
   | undefined;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L85)
+Defined in: packages/tools/src/registry/registry.ts:85
 
 #### Type Parameters
 
@@ -112,7 +112,7 @@ Defined in: [packages/tools/src/registry/registry.ts:85](https://github.com/o-st
 list(): readonly RegistryEntry[];
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L88)
+Defined in: packages/tools/src/registry/registry.ts:88
 
 #### Returns
 
@@ -126,7 +126,7 @@ readonly [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)[
 listByTag(tag): readonly RegistryEntry[];
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L98)
+Defined in: packages/tools/src/registry/registry.ts:98
 
 Filter the registry by `tag`. Each registered tool's `tags` array is
 inspected; tools that include `tag` are returned in registration
@@ -152,7 +152,7 @@ readonly [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)[
 listDeferred(): readonly RegistryEntry[];
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L90)
+Defined in: packages/tools/src/registry/registry.ts:90
 
 #### Returns
 
@@ -166,7 +166,7 @@ readonly [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)[
 listEager(): readonly RegistryEntry[];
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L89)
+Defined in: packages/tools/src/registry/registry.ts:89
 
 #### Returns
 
@@ -180,7 +180,7 @@ readonly [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)[
 register<TInput, TOutput, TDeps>(tool, source?): RegistryEntry<TInput, TOutput, TDeps>;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L80)
+Defined in: packages/tools/src/registry/registry.ts:80
 
 #### Type Parameters
 
@@ -209,7 +209,7 @@ Defined in: [packages/tools/src/registry/registry.ts:80](https://github.com/o-st
 searchDeferred(query, k?): Promise<readonly ToolSearchMatch[]>;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L121)
+Defined in: packages/tools/src/registry/registry.ts:121
 
 Search the deferred pool for tools matching `query`. Three-tier
 composable chain: semantic (embedder-backed) ⟶ BM25 fallback ⟶
@@ -234,7 +234,7 @@ regex name-match final fallback.
 size(): number;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L123)
+Defined in: packages/tools/src/registry/registry.ts:123
 
 Snapshot for tests.
 
@@ -250,7 +250,7 @@ Snapshot for tests.
 unregister(name): boolean;
 ```
 
-Defined in: [packages/tools/src/registry/registry.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/registry.ts#L84)
+Defined in: packages/tools/src/registry/registry.ts:84
 
 #### Parameters
 

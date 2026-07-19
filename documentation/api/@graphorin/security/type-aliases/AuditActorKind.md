@@ -10,8 +10,8 @@
 type AuditActorKind = "token" | "cli" | "agent" | "tool" | "system" | "subagent";
 ```
 
-Defined in: [packages/security/src/audit/types.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/types.ts#L12)
+Defined in: packages/security/src/audit/types.ts:12
+
+**`Stable`**
 
 Discriminator for the actor that initiated an audited action.
-
-## Stable

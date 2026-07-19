@@ -10,7 +10,9 @@
 type AuthAuditListener = (event) => void;
 ```
 
-Defined in: [packages/security/src/auth/audit-emitter.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/audit-emitter.ts#L57)
+Defined in: packages/security/src/auth/audit-emitter.ts:57
+
+**`Stable`**
 
 Listener signature.
 
@@ -23,5 +25,3 @@ Listener signature.
 ## Returns
 
 `void`
-
-## Stable

@@ -6,13 +6,13 @@
 
 # Class: MetricRegistry
 
-Defined in: [packages/server/src/metrics/registry.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L57)
+Defined in: packages/server/src/metrics/registry.ts:57
+
+**`Stable`**
 
 Lightweight Prometheus registry. Each instance owns its metric
 catalogue + per-label samples; `render()` emits the canonical text
 exposition block.
-
-## Stable
 
 ## Constructors
 
@@ -34,7 +34,7 @@ new MetricRegistry(): MetricRegistry;
 contentType(): string;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L196)
+Defined in: packages/server/src/metrics/registry.ts:196
 
 #### Returns
 
@@ -51,7 +51,7 @@ inc(
    by?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L78)
+Defined in: packages/server/src/metrics/registry.ts:78
 
 #### Parameters
 
@@ -76,7 +76,7 @@ observe(
    labels?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L108)
+Defined in: packages/server/src/metrics/registry.ts:108
 
 #### Parameters
 
@@ -101,7 +101,7 @@ registerCounter(
    labelNames?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L63)
+Defined in: packages/server/src/metrics/registry.ts:63
 
 #### Parameters
 
@@ -126,7 +126,7 @@ registerGauge(
    labelNames?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L68)
+Defined in: packages/server/src/metrics/registry.ts:68
 
 #### Parameters
 
@@ -151,7 +151,7 @@ registerSummary(
    labelNames?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L73)
+Defined in: packages/server/src/metrics/registry.ts:73
 
 #### Parameters
 
@@ -173,7 +173,7 @@ Defined in: [packages/server/src/metrics/registry.ts:73](https://github.com/o-st
 render(): string;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L150)
+Defined in: packages/server/src/metrics/registry.ts:150
 
 Render the current snapshot in Prometheus text exposition
 format (v0.0.4). Never throws - incomplete sample buckets are
@@ -191,7 +191,7 @@ skipped instead of failing the scrape.
 reset(): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L126)
+Defined in: packages/server/src/metrics/registry.ts:126
 
 #### Returns
 
@@ -208,7 +208,7 @@ set(
    labels?): void;
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L97)
+Defined in: packages/server/src/metrics/registry.ts:97
 
 #### Parameters
 
@@ -245,7 +245,7 @@ snapshot(): {
 };
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L201)
+Defined in: packages/server/src/metrics/registry.ts:201
 
 Snapshot for tests / assertions.
 
@@ -272,6 +272,6 @@ Snapshot for tests / assertions.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `counters` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | [packages/server/src/metrics/registry.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L202) |
-| `gauges` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | [packages/server/src/metrics/registry.ts:203](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L203) |
-| `summaries` | `Record`\<`string`, `ReadonlyArray`\<\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\&lt;`number`\&gt;; `sum`: `number`; \}\>\> | [packages/server/src/metrics/registry.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L204) |
+| `counters` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:202 |
+| `gauges` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:203 |
+| `summaries` | `Record`\<`string`, `ReadonlyArray`\<\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\&lt;`number`\&gt;; `sum`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:204 |

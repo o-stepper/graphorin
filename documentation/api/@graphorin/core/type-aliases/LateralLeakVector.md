@@ -14,7 +14,9 @@ type LateralLeakVector =
   | "protocol-header";
 ```
 
-Defined in: [packages/core/src/types/agent-event.ts:534](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L534)
+Defined in: packages/core/src/types/agent-event.ts:534
+
+**`Stable`**
 
 Lateral-leak vector classification surfaced on
 [AgentLateralLeakDetectedEvent.vector](/api/@graphorin/core/interfaces/AgentLateralLeakDetectedEvent.md#property-vector).
@@ -29,5 +31,3 @@ Lateral-leak vector classification surfaced on
 - `'protocol-header'`      - control-character bytes or a
   protocol-frame separator was about to escape one of the
   internal-service delivery boundaries.
-
-## Stable

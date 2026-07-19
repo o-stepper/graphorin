@@ -22,6 +22,8 @@ type GuardrailResult<TValue> =
 
 Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
 
+**`Stable`**
+
 Result of a single guardrail check.
 
 ## Type Parameters
@@ -29,5 +31,3 @@ Result of a single guardrail check.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TValue` | `unknown` |
-
-## Stable

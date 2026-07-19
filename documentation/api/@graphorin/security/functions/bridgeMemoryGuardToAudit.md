@@ -10,7 +10,9 @@
 function bridgeMemoryGuardToAudit(opts): MemoryGuardBridgeTeardown;
 ```
 
-Defined in: [packages/security/src/audit/memory-guard-bridge.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/memory-guard-bridge.ts#L55)
+Defined in: packages/security/src/audit/memory-guard-bridge.ts:55
+
+**`Stable`**
 
 Subscribe the audit-log subsystem to the guard audit emitter.
 Returns a teardown function.
@@ -29,5 +31,3 @@ the `onWriteError` callback.
 ## Returns
 
 [`MemoryGuardBridgeTeardown`](/api/@graphorin/security/interfaces/MemoryGuardBridgeTeardown.md)
-
-## Stable

@@ -10,7 +10,9 @@
 function runWorkflowCheckpoints(options): Promise<readonly ThreadCheckpointSummary[]>;
 ```
 
-Defined in: [packages/cli/src/commands/workflow.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/workflow.ts#L108)
+Defined in: packages/cli/src/commands/workflow.ts:108
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/workflow.ts:108](https://github.com/o-ste
 ## Returns
 
 `Promise`\&lt;readonly [`ThreadCheckpointSummary`](/api/@graphorin/workflow/interfaces/ThreadCheckpointSummary.md)[]\&gt;
-
-## Stable

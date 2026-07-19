@@ -6,7 +6,7 @@
 
 # Interface: ClassifierResult
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L49)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:49
 
 **`Internal`**
 
@@ -20,5 +20,5 @@ sees a consistent shape.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-label"></a> `label` | `readonly` | `string` | [packages/reranker-transformersjs/src/cross-encoder.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L50) |
-| <a id="property-score"></a> `score` | `readonly` | `number` | [packages/reranker-transformersjs/src/cross-encoder.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L51) |
+| <a id="property-label"></a> `label` | `readonly` | `string` | packages/reranker-transformersjs/src/cross-encoder.ts:50 |
+| <a id="property-score"></a> `score` | `readonly` | `number` | packages/reranker-transformersjs/src/cross-encoder.ts:51 |

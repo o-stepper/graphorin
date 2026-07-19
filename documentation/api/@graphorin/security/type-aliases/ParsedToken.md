@@ -23,10 +23,10 @@ type ParsedToken =
 };
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L80)
+Defined in: packages/security/src/auth/token-format.ts:80
+
+**`Stable`**
 
 Result of `parseToken(...)`. Splitting the parsed shape lets the
 caller branch on the discriminated `ok` field without exception
 plumbing on the verify hot path.
-
-## Stable

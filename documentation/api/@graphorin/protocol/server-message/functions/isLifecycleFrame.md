@@ -10,7 +10,9 @@
 function isLifecycleFrame(message): message is { kind: "lifecycle"; reason?: string; status: "aborted" | "running" | "paused" | "completed" | "failed"; subscriptionId: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L215)
+Defined in: src/server-message.ts:215
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:215](https://github.com/o-s
 ## Returns
 
 message is \{ kind: "lifecycle"; reason?: string; status: "aborted" \| "running" \| "paused" \| "completed" \| "failed"; subscriptionId: string; v: "1" \}
-
-## Stable

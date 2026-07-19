@@ -10,7 +10,9 @@
 function outputModeration<TValue>(opts): OutputGuardrail<TValue>;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/llm-moderation.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/llm-moderation.ts#L84)
+Defined in: packages/security/src/guardrails/builtins/llm-moderation.ts:84
+
+**`Stable`**
 
 Construct an output-side moderation guardrail.
 
@@ -29,5 +31,3 @@ Construct an output-side moderation guardrail.
 ## Returns
 
 [`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;
-
-## Stable

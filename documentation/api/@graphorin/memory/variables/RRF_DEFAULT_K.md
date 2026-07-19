@@ -10,11 +10,11 @@
 const RRF_DEFAULT_K: 60 = 60;
 ```
 
-Defined in: [packages/memory/src/search/rrf.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L12)
+Defined in: packages/memory/src/search/rrf.ts:12
+
+**`Stable`**
 
 Industry-standard Reciprocal Rank Fusion constant. Lower `k` makes
 top-ranked items dominate; higher `k` smooths the contribution of
 lower-ranked items. `k = 60` is the value popularised by Cormack,
 Clarke, and Büttcher (2009) and is the framework default.
-
-## Stable

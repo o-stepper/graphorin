@@ -10,7 +10,9 @@
 function unregisterResolver(scheme): boolean;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/registry.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L92)
+Defined in: packages/security/src/secrets/resolvers/registry.ts:92
+
+**`Stable`**
 
 Remove a registered resolver. Returns `true` if a resolver was
 removed. Tests use this to isolate fixtures.
@@ -24,5 +26,3 @@ removed. Tests use this to isolate fixtures.
 ## Returns
 
 `boolean`
-
-## Stable

@@ -10,7 +10,9 @@
 function runGuardExplain(options): GuardExplainResult;
 ```
 
-Defined in: [packages/cli/src/commands/guard.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/guard.ts#L89)
+Defined in: packages/cli/src/commands/guard.ts:89
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/guard.ts:89](https://github.com/o-stepper
 ## Returns
 
 [`GuardExplainResult`](/api/@graphorin/cli/interfaces/GuardExplainResult.md)
-
-## Stable

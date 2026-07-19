@@ -6,18 +6,18 @@
 
 # Interface: PricingAutoRefreshConfig
 
-Defined in: [packages/pricing/src/config.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/config.ts#L15)
+Defined in: pricing/src/config.ts:15
+
+**`Stable`**
 
 Auto-refresh configuration. The `enabled` flag exists in the type
 for forward compatibility but is **enforced false** in v0.1 per the
 zero-default-telemetry policy: refreshing the snapshot makes an
 outbound HTTP call, so it must remain an explicit user action.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-enabled"></a> `enabled` | `readonly` | `false` | Always `false` in v0.1. Reserved for v0.2+. | [packages/pricing/src/config.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/config.ts#L17) |
-| <a id="property-intervalhours"></a> `intervalHours?` | `readonly` | `number` | Suggested cadence for v0.2+. Ignored at runtime in v0.1. | [packages/pricing/src/config.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/config.ts#L19) |
+| <a id="property-enabled"></a> `enabled` | `readonly` | `false` | Always `false` in v0.1. Reserved for v0.2+. | pricing/src/config.ts:17 |
+| <a id="property-intervalhours"></a> `intervalHours?` | `readonly` | `number` | Suggested cadence for v0.2+. Ignored at runtime in v0.1. | pricing/src/config.ts:19 |

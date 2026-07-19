@@ -6,31 +6,31 @@
 
 # Interface: GenAIAttributes
 
-Defined in: [packages/observability/src/gen-ai/types.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L117)
+Defined in: packages/observability/src/gen-ai/types.ts:117
+
+**`Stable`**
 
 Per-span attribute payload expected by [emitGenAIAttributes](/api/@graphorin/observability/functions/emitGenAIAttributes.md).
 The fields mirror the OpenTelemetry GenAI semantic conventions and
 are merged with the existing Graphorin-prefixed attributes - the
 `gen_ai.*` family is additive, never replacing.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L126) |
-| <a id="property-agentname"></a> `agentName?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L127) |
-| <a id="property-finishreasons"></a> `finishReasons?` | `readonly` | readonly `string`[] | [packages/observability/src/gen-ai/types.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L124) |
-| <a id="property-inputtokens"></a> `inputTokens?` | `readonly` | `number` | [packages/observability/src/gen-ai/types.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L122) |
-| <a id="property-operation"></a> `operation?` | `readonly` | [`GenAIOperationName`](/api/@graphorin/observability/type-aliases/GenAIOperationName.md) | [packages/observability/src/gen-ai/types.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L125) |
-| <a id="property-outputtokens"></a> `outputTokens?` | `readonly` | `number` | [packages/observability/src/gen-ai/types.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L123) |
-| <a id="property-requestmodel"></a> `requestModel?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L119) |
-| <a id="property-responseid"></a> `responseId?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L121) |
-| <a id="property-responsemodel"></a> `responseModel?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L120) |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L128) |
-| <a id="property-system"></a> `system?` | `readonly` | [`GenAISystem`](/api/@graphorin/observability/type-aliases/GenAISystem.md) | [packages/observability/src/gen-ai/types.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L118) |
-| <a id="property-toolcallid"></a> `toolCallId?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L131) |
-| <a id="property-tooldescription"></a> `toolDescription?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L132) |
-| <a id="property-toolname"></a> `toolName?` | `readonly` | `string` | [packages/observability/src/gen-ai/types.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L129) |
-| <a id="property-tooltype"></a> `toolType?` | `readonly` | [`GenAIToolType`](/api/@graphorin/observability/type-aliases/GenAIToolType.md) | [packages/observability/src/gen-ai/types.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L130) |
+| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:126 |
+| <a id="property-agentname"></a> `agentName?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:127 |
+| <a id="property-finishreasons"></a> `finishReasons?` | `readonly` | readonly `string`[] | packages/observability/src/gen-ai/types.ts:124 |
+| <a id="property-inputtokens"></a> `inputTokens?` | `readonly` | `number` | packages/observability/src/gen-ai/types.ts:122 |
+| <a id="property-operation"></a> `operation?` | `readonly` | [`GenAIOperationName`](/api/@graphorin/observability/type-aliases/GenAIOperationName.md) | packages/observability/src/gen-ai/types.ts:125 |
+| <a id="property-outputtokens"></a> `outputTokens?` | `readonly` | `number` | packages/observability/src/gen-ai/types.ts:123 |
+| <a id="property-requestmodel"></a> `requestModel?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:119 |
+| <a id="property-responseid"></a> `responseId?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:121 |
+| <a id="property-responsemodel"></a> `responseModel?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:120 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:128 |
+| <a id="property-system"></a> `system?` | `readonly` | [`GenAISystem`](/api/@graphorin/observability/type-aliases/GenAISystem.md) | packages/observability/src/gen-ai/types.ts:118 |
+| <a id="property-toolcallid"></a> `toolCallId?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:131 |
+| <a id="property-tooldescription"></a> `toolDescription?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:132 |
+| <a id="property-toolname"></a> `toolName?` | `readonly` | `string` | packages/observability/src/gen-ai/types.ts:129 |
+| <a id="property-tooltype"></a> `toolType?` | `readonly` | [`GenAIToolType`](/api/@graphorin/observability/type-aliases/GenAIToolType.md) | packages/observability/src/gen-ai/types.ts:130 |

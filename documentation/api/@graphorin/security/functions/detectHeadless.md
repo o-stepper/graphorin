@@ -13,7 +13,9 @@ function detectHeadless(): {
 };
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L144)
+Defined in: packages/security/src/secrets/factory.ts:144
+
+**`Stable`**
 
 Detect whether the host is "headless" - that is, no interactive
 terminal is attached and the process is likely running unattended.
@@ -31,7 +33,5 @@ decision.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `headless` | `boolean` | [packages/security/src/secrets/factory.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L144) |
-| `reasons` | readonly `string`[] | [packages/security/src/secrets/factory.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L144) |
-
-## Stable
+| `headless` | `boolean` | packages/security/src/secrets/factory.ts:144 |
+| `reasons` | readonly `string`[] | packages/security/src/secrets/factory.ts:144 |

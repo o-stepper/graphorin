@@ -10,7 +10,7 @@
 type PipelineFactory = (task, model, opts) => Promise<FeatureExtractor>;
 ```
 
-Defined in: [packages/embedder-transformersjs/src/index.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L100)
+Defined in: packages/embedder-transformersjs/src/index.ts:100
 
 **`Internal`**
 

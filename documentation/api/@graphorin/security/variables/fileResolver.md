@@ -10,7 +10,9 @@
 const fileResolver: SecretResolver;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/file.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/file.ts#L56)
+Defined in: packages/security/src/secrets/resolvers/file.ts:56
+
+**`Stable`**
 
 Resolver for the `file:` scheme. Reads a plaintext file and returns
 the trimmed content as a `SecretValue`.
@@ -21,5 +23,3 @@ mode (heuristic: any group/other read or write bits set). Set
 `?warnOnPermissions=0` in the URI to opt out - typical when reading
 Docker `*_FILE` mounts that intentionally use a tmpfs with a wider
 mode.
-
-## Stable

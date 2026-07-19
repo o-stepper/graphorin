@@ -10,7 +10,7 @@
 function _resetPipelineFactoryCacheForTesting(): void;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L165)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:165
 
 **`Internal`**
 

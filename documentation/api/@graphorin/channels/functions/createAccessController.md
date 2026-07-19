@@ -10,7 +10,9 @@
 function createAccessController(options): ChannelAccessController;
 ```
 
-Defined in: [packages/channels/src/access.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L155)
+Defined in: packages/channels/src/access.ts:155
+
+**`Stable`**
 
 Build a deterministic access controller. Throws
 [ChannelAccessConfigError](/api/@graphorin/channels/classes/ChannelAccessConfigError.md) when `'pairing'` lacks a store or
@@ -25,5 +27,3 @@ Build a deterministic access controller. Throws
 ## Returns
 
 [`ChannelAccessController`](/api/@graphorin/channels/interfaces/ChannelAccessController.md)
-
-## Stable

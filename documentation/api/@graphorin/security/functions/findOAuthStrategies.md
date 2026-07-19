@@ -10,7 +10,9 @@
 function findOAuthStrategies(args): readonly OAuthStrategy[];
 ```
 
-Defined in: [packages/security/src/oauth/strategies.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/strategies.ts#L35)
+Defined in: packages/security/src/oauth/strategies.ts:35
+
+**`Stable`**
 
 Find every strategy that matches the given server descriptor. The
 matching is `OR` - either the URL or the ID regex matching is
@@ -27,5 +29,3 @@ enough to enrol the strategy.
 ## Returns
 
 readonly [`OAuthStrategy`](/api/@graphorin/security/interfaces/OAuthStrategy.md)[]
-
-## Stable

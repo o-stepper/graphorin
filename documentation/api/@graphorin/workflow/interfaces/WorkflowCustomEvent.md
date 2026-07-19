@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
+**`Stable`**
+
 Application-defined event emitted from inside a workflow node via
 `ctx.emit(name, payload)`. The runtime never produces these on its own.
-
-## Stable
 
 ## Properties
 

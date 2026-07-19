@@ -186,6 +186,33 @@ function stripDistLineAnchors(text) {
   );
 }
 
+/**
+ * W-128 determinism (deep retest 2026-07-19 regression): typedoc's
+ * per-package runs (entryPointStrategy: packages + packageOptions) do
+ * NOT reliably inherit the root `disableGit: true`, so on a CI checkout
+ * they can emit `blob/<commit-sha>` source links where a local run
+ * emits `blob/main` (or a bare path). The SHA is per-commit, so the two
+ * environments never agree and the api-freshness gate flaps. Two passes
+ * make the output environment-independent:
+ *
+ *  1. pin EVERY repo blob URL to the `main` ref (SHA -> main), so a
+ *     committed dist/*.d.ts link is byte-identical regardless of which
+ *     commit ran typedoc;
+ *  2. collapse a `[path:line](blob/main/...#Lline)` source link whose
+ *     text is a bare `path:line` back to that text, matching the
+ *     disableGit output the committed reference already uses.
+ */
+function pinRepoBlobRefToMain(text) {
+  return text.replace(/(https:\/\/github\.com\/o-stepper\/graphorin\/blob\/)[^/)]+\//g, '$1main/');
+}
+
+function stripRepoBlobSourceLinks(text) {
+  return text.replace(
+    /\[([^\]]+?:\d+)\]\(https:\/\/github\.com\/o-stepper\/graphorin\/blob\/[^)]+\)/g,
+    '$1',
+  );
+}
+
 async function main() {
   try {
     await stat(apiRoot);
@@ -196,7 +223,9 @@ async function main() {
   let count = 0;
   for await (const file of walkMarkdown(apiRoot)) {
     const before = await readFile(file, 'utf8');
-    const after = rewriteLicenseLinks(stripDistLineAnchors(sanitise(before)));
+    const after = rewriteLicenseLinks(
+      stripRepoBlobSourceLinks(pinRepoBlobRefToMain(stripDistLineAnchors(sanitise(before)))),
+    );
     if (after !== before) {
       await writeFile(file, after, 'utf8');
       count += 1;

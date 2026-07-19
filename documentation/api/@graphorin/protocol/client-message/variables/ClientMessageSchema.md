@@ -125,11 +125,11 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
 }>]>;
 ```
 
-Defined in: [packages/protocol/src/client-message.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L130)
+Defined in: src/client-message.ts:130
+
+**`Stable`**
 
 Zod schema for every legal client → server frame. Use
 [ClientMessageSchema](/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md).safeParse() inside the server upgrade
 handler before dispatching to the corresponding subscription /
 cancel / ping handler.
-
-## Stable

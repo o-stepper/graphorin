@@ -13,7 +13,9 @@ function filter<T>(
 signal?): AsyncIterable<T>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L55)
+Defined in: packages/core/src/utils/streams.ts:55
+
+**`Stable`**
 
 Filter values produced by `source`. The predicate may be async.
 
@@ -34,5 +36,3 @@ Filter values produced by `source`. The predicate may be async.
 ## Returns
 
 `AsyncIterable`\&lt;`T`\&gt;
-
-## Stable

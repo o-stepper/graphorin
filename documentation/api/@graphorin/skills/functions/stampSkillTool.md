@@ -10,7 +10,9 @@
 function stampSkillTool<TInput, TOutput, TDeps>(tool, skill): StampedSkillTool<TInput, TOutput, TDeps>;
 ```
 
-Defined in: [packages/skills/src/registry/bridge.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/registry/bridge.ts#L53)
+Defined in: packages/skills/src/registry/bridge.ts:53
+
+**`Stable`**
 
 Stamp a skill-bundled tool with the metadata the
 `@graphorin/tools` registry expects:
@@ -46,5 +48,3 @@ registries cannot accidentally re-inherit a relaxed policy.
 ## Returns
 
 [`StampedSkillTool`](/api/@graphorin/skills/interfaces/StampedSkillTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function isRpcSuccess(message): message is { id: string | number; jsonrpc: "2.0"; result?: unknown; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:245](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L245)
+Defined in: src/server-message.ts:245
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:245](https://github.com/o-s
 ## Returns
 
 message is \{ id: string \| number; jsonrpc: "2.0"; result?: unknown; v: "1" \}
-
-## Stable

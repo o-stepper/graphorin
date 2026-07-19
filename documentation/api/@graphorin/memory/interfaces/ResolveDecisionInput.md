@@ -6,7 +6,7 @@
 
 # Interface: ResolveDecisionInput
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L73)
+Defined in: packages/memory/src/graph/entity-resolver.ts:73
 
 Inputs to [resolveEntityDecision](/api/@graphorin/memory/functions/resolveEntityDecision.md) (all provided by the caller).
 
@@ -14,9 +14,9 @@ Inputs to [resolveEntityDecision](/api/@graphorin/memory/functions/resolveEntity
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-adjudicatethreshold"></a> `adjudicateThreshold` | `readonly` | `number` | - | [packages/memory/src/graph/entity-resolver.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L80) |
-| <a id="property-candidates"></a> `candidates` | `readonly` | readonly [`ResolutionCandidate`](/api/@graphorin/memory/interfaces/ResolutionCandidate.md)[] | - | [packages/memory/src/graph/entity-resolver.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L78) |
-| <a id="property-mergethreshold"></a> `mergeThreshold` | `readonly` | `number` | - | [packages/memory/src/graph/entity-resolver.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L79) |
-| <a id="property-normalizedname"></a> `normalizedName` | `readonly` | `string` | - | [packages/memory/src/graph/entity-resolver.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L74) |
-| <a id="property-vector"></a> `vector?` | `readonly` | `Float32Array`\&lt;`ArrayBufferLike`\&gt; \| `null` | - | [packages/memory/src/graph/entity-resolver.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L75) |
-| <a id="property-vectorembedderid"></a> `vectorEmbedderId?` | `readonly` | `string` \| `null` | MST-11: the embedder that produced `vector` (gates cross-embedder cosine). | [packages/memory/src/graph/entity-resolver.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L77) |
+| <a id="property-adjudicatethreshold"></a> `adjudicateThreshold` | `readonly` | `number` | - | packages/memory/src/graph/entity-resolver.ts:80 |
+| <a id="property-candidates"></a> `candidates` | `readonly` | readonly [`ResolutionCandidate`](/api/@graphorin/memory/interfaces/ResolutionCandidate.md)[] | - | packages/memory/src/graph/entity-resolver.ts:78 |
+| <a id="property-mergethreshold"></a> `mergeThreshold` | `readonly` | `number` | - | packages/memory/src/graph/entity-resolver.ts:79 |
+| <a id="property-normalizedname"></a> `normalizedName` | `readonly` | `string` | - | packages/memory/src/graph/entity-resolver.ts:74 |
+| <a id="property-vector"></a> `vector?` | `readonly` | `Float32Array`\&lt;`ArrayBufferLike`\&gt; \| `null` | - | packages/memory/src/graph/entity-resolver.ts:75 |
+| <a id="property-vectorembedderid"></a> `vectorEmbedderId?` | `readonly` | `string` \| `null` | MST-11: the embedder that produced `vector` (gates cross-embedder cosine). | packages/memory/src/graph/entity-resolver.ts:77 |

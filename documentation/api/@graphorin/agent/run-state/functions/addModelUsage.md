@@ -13,7 +13,9 @@ function addModelUsage(
    delta): void;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:542](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L542)
+Defined in: packages/agent/src/run-state/index.ts:542
+
+**`Stable`**
 
 Append a per-model usage entry to [RunState.usageByModel](/api/@graphorin/core/interfaces/RunState.md#property-usagebymodel).
 Mutates the supplied state in place - used by the agent runtime's
@@ -31,5 +33,3 @@ should clone the state first.
 ## Returns
 
 `void`
-
-## Stable

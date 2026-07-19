@@ -10,7 +10,9 @@
 function isPongFrame(message): message is { kind: "pong"; nonce?: string; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L235)
+Defined in: src/server-message.ts:235
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/server-message.ts:235](https://github.com/o-s
 ## Returns
 
 `message is { kind: "pong"; nonce?: string; v: "1" }`
-
-## Stable

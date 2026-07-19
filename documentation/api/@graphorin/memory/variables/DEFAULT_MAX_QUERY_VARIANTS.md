@@ -10,6 +10,6 @@
 const DEFAULT_MAX_QUERY_VARIANTS: 5 = 5;
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L29)
+Defined in: packages/memory/src/search/query-transform.ts:29
 
 Default ceiling on reworded variants a provider-backed transformer requests.

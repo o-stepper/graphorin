@@ -10,7 +10,9 @@
 function registerDynamicClient(metadata, options): Promise<DynamicClientRegistrationResult>;
 ```
 
-Defined in: [packages/security/src/oauth/dynamic-client-registration.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L88)
+Defined in: packages/security/src/oauth/dynamic-client-registration.ts:88
+
+**`Stable`**
 
 Register a fresh OAuth client with the discovered authorization
 server using RFC 7591.
@@ -25,5 +27,3 @@ server using RFC 7591.
 ## Returns
 
 `Promise`\&lt;[`DynamicClientRegistrationResult`](/api/@graphorin/security/interfaces/DynamicClientRegistrationResult.md)\&gt;
-
-## Stable

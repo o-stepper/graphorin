@@ -10,7 +10,9 @@
 function createNoneSandbox(opts): SandboxImpl;
 ```
 
-Defined in: [packages/security/src/sandbox/none.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/none.ts#L63)
+Defined in: packages/security/src/sandbox/none.ts:63
+
+**`Stable`**
 
 Construct a `NoneSandbox` instance.
 
@@ -23,5 +25,3 @@ Construct a `NoneSandbox` instance.
 ## Returns
 
 [`SandboxImpl`](/api/@graphorin/security/interfaces/SandboxImpl.md)
-
-## Stable

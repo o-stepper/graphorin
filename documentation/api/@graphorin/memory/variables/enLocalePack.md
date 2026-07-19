@@ -10,9 +10,9 @@
 const enLocalePack: ContextLocalePack;
 ```
 
-Defined in: [packages/memory/src/context-engine/locale-packs/en.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/en.ts#L69)
+Defined in: packages/memory/src/context-engine/locale-packs/en.ts:69
+
+**`Stable`**
 
 Bundled English locale pack. The fallback surface for every other
 locale pack at compose time.
-
-## Stable

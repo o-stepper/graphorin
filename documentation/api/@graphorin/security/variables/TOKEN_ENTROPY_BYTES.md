@@ -10,6 +10,6 @@
 const TOKEN_ENTROPY_BYTES: 32 = 32;
 ```
 
-Defined in: [packages/security/src/auth/token-format.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L45)
+Defined in: packages/security/src/auth/token-format.ts:45
 
 Canonical entropy length in bytes. 32 bytes = 256 bits.

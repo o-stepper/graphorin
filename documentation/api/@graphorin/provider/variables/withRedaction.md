@@ -10,7 +10,9 @@
 const withRedaction: (opts) => ProviderMiddleware;
 ```
 
-Defined in: [packages/provider/src/middleware/with-redaction.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-redaction.ts#L120)
+Defined in: packages/provider/src/middleware/with-redaction.ts:120
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/provider/src/middleware/with-redaction.ts:120](https://git
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

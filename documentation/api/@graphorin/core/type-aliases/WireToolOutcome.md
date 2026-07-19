@@ -12,7 +12,9 @@ type WireToolOutcome<TOutput> =
   | ToolError;
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L121)
+Defined in: packages/core/src/utils/binary-json.ts:121
+
+**`Stable`**
 
 Wire twin of `ToolOutcome`.
 
@@ -21,5 +23,3 @@ Wire twin of `ToolOutcome`.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `unknown` |
-
-## Stable

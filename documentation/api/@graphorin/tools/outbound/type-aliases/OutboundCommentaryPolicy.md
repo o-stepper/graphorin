@@ -10,7 +10,9 @@
 type OutboundCommentaryPolicy = "wrap" | "strip" | "pass-through";
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L41)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:41
+
+**`Stable`**
 
 Operator-facing policy shared by all outbound commentary
 sanitizers.
@@ -21,5 +23,3 @@ sanitizers.
  - `'strip'` - removes the matched fragment entirely.
  - `'pass-through'` - disables the sanitization (operator opt-in
    for trusted deployments).
-
-## Stable

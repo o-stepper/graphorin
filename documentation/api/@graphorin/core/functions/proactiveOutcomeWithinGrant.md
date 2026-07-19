@@ -10,7 +10,9 @@
 function proactiveOutcomeWithinGrant(kind, grant): boolean;
 ```
 
-Defined in: [packages/core/src/types/proactive.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/proactive.ts#L59)
+Defined in: packages/core/src/types/proactive.ts:59
+
+**`Stable`**
 
 `true` when `kind` sits at or below `grant` on the ladder.
 Deterministic, pure - the C3 routing policy helper.
@@ -25,5 +27,3 @@ Deterministic, pure - the C3 routing policy helper.
 ## Returns
 
 `boolean`
-
-## Stable

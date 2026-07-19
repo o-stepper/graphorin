@@ -10,7 +10,9 @@
 function completedToolCallsFromState(state): readonly CompletedToolCall<unknown>[];
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:638](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L638)
+Defined in: packages/agent/src/run-state/index.ts:638
+
+**`Stable`**
 
 The "tools used" surface of a completed run. Cheap to compute
 from `RunState.steps`; surfaced as a stand-alone helper for
@@ -25,5 +27,3 @@ Phase 17 example apps and operator-facing dashboards.
 ## Returns
 
 readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]
-
-## Stable

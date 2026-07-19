@@ -10,7 +10,9 @@
 function createMcpResourceReader(opts): ResultReader;
 ```
 
-Defined in: [packages/mcp/src/client/mcp-resource-reader.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/mcp-resource-reader.ts#L55)
+Defined in: packages/mcp/src/client/mcp-resource-reader.ts:55
+
+**`Stable`**
 
 Build a [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md) that resolves MCP resource URIs through
 one or more connected [MCPClient](/api/@graphorin/mcp/interfaces/MCPClient.md)s.
@@ -24,5 +26,3 @@ one or more connected [MCPClient](/api/@graphorin/mcp/interfaces/MCPClient.md)s.
 ## Returns
 
 [`ResultReader`](/api/@graphorin/tools/interfaces/ResultReader.md)
-
-## Stable

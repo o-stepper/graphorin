@@ -12,6 +12,8 @@ type LocalProviderTrust = "loopback" | "private" | "public-tls" | "public-cleart
 
 Defined in: [packages/core/dist/contracts/local-provider-trust.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/local-provider-trust.d.ts)
 
+**`Stable`**
+
 Trust class assigned to a local-LLM provider based on the
 configured `baseUrl`. The classifier dispatcher lives in
 `@graphorin/provider/trust/classify-local-provider.ts`; the literal
@@ -31,5 +33,3 @@ Tier semantics:
 - `'public-tls'`       - public IP / hostname AND `https://`.
 - `'public-cleartext'` - public IP / hostname AND `http://`. Adapters
   refuse to start unless explicitly overridden.
-
-## Stable

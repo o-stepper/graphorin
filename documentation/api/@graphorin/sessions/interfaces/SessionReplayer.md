@@ -6,13 +6,13 @@
 
 # Interface: SessionReplayer
 
-Defined in: [packages/sessions/src/replay/replayer.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/replay/replayer.ts#L62)
+Defined in: packages/sessions/src/replay/replayer.ts:62
+
+**`Stable`**
 
 Convenience surface returned by [createSessionReplayer](/api/@graphorin/sessions/functions/createSessionReplayer.md). The
 replayer is async-iterable; the agent runtime drives it under
 `for await`.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ replayer is async-iterable; the agent runtime drives it under
 run(options): AsyncIterable<SessionReplayEvent>;
 ```
 
-Defined in: [packages/sessions/src/replay/replayer.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/replay/replayer.ts#L74)
+Defined in: packages/sessions/src/replay/replayer.ts:74
 
 Run the replay engine. The caller threads in:
  - `traceSource`: an iterable of `SpanRecord`s (from the

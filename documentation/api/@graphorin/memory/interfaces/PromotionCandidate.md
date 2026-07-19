@@ -6,7 +6,7 @@
 
 # Interface: PromotionCandidate
 
-Defined in: [packages/memory/src/consolidator/promotion.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L80)
+Defined in: packages/memory/src/consolidator/promotion.ts:80
 
 One candidate as fed by `listPromotionCandidates`.
 
@@ -14,6 +14,6 @@ One candidate as fed by `listPromotionCandidates`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-accesscount"></a> `accessCount` | `readonly` | `number` | [packages/memory/src/consolidator/promotion.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L82) |
-| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | [packages/memory/src/consolidator/promotion.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L81) |
-| <a id="property-uniquequerycount"></a> `uniqueQueryCount` | `readonly` | `number` | [packages/memory/src/consolidator/promotion.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L83) |
+| <a id="property-accesscount"></a> `accessCount` | `readonly` | `number` | packages/memory/src/consolidator/promotion.ts:82 |
+| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | packages/memory/src/consolidator/promotion.ts:81 |
+| <a id="property-uniquequerycount"></a> `uniqueQueryCount` | `readonly` | `number` | packages/memory/src/consolidator/promotion.ts:83 |

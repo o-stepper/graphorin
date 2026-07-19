@@ -22,7 +22,9 @@ function verifyAuditAgainstCheckpoint(
 }>;
 ```
 
-Defined in: [packages/security/src/audit/merkle.ts:432](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L432)
+Defined in: packages/security/src/audit/merkle.ts:432
+
+**`Stable`**
 
 Full anchored verification: the checkpoint's signature is valid
 against the pinned key AND the current log is an append-only
@@ -50,5 +52,3 @@ verified over the live database).
   `ok`: `false`;
   `reason`: `"bad-signature"` \| `"inconsistent-log"`;
 \}\>
-
-## Stable

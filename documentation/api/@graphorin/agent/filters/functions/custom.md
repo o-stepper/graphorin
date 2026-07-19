@@ -10,7 +10,9 @@
 function custom(fn, meta?): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:312](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L312)
+Defined in: packages/agent/src/filters/index.ts:312
+
+**`Stable`**
 
 Wrap a caller-supplied function as a [DescribedFilter](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) with
 the canonical `'custom'` descriptor.
@@ -25,5 +27,3 @@ the canonical `'custom'` descriptor.
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

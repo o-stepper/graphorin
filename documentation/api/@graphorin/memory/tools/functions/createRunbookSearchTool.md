@@ -10,7 +10,9 @@
 function createRunbookSearchTool(deps): Tool<RunbookSearchInput, RunbookSearchOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/runbook-tools.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/runbook-tools.ts#L73)
+Defined in: packages/memory/src/tools/runbook-tools.ts:73
+
+**`Stable`**
 
 `runbook_search` - find validated procedures matching a task
 description. Quarantined (unvalidated induced) procedures never
@@ -25,5 +27,3 @@ surface here: they must not drive actions until validated.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`RunbookSearchInput`, `RunbookSearchOutput`\&gt;
-
-## Stable

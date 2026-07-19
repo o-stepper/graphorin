@@ -10,7 +10,9 @@
 type AuditErrorSink = (err, entry) => void;
 ```
 
-Defined in: [packages/server/src/middleware/audit.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/audit.ts#L37)
+Defined in: packages/server/src/middleware/audit.ts:37
+
+**`Stable`**
 
 Optional telemetry sink. The default ignores errors; production
 deployments wire this into their structured logger.
@@ -25,5 +27,3 @@ deployments wire this into their structured logger.
 ## Returns
 
 `void`
-
-## Stable

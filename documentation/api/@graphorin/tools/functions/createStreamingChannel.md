@@ -10,7 +10,9 @@
 function createStreamingChannel(opts): StreamingChannel;
 ```
 
-Defined in: [packages/tools/src/streaming/channel.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L123)
+Defined in: packages/tools/src/streaming/channel.ts:123
+
+**`Stable`**
 
 Build a [StreamingChannel](/api/@graphorin/tools/interfaces/StreamingChannel.md) for one tool execution.
 
@@ -23,5 +25,3 @@ Build a [StreamingChannel](/api/@graphorin/tools/interfaces/StreamingChannel.md)
 ## Returns
 
 [`StreamingChannel`](/api/@graphorin/tools/interfaces/StreamingChannel.md)
-
-## Stable

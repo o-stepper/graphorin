@@ -10,7 +10,9 @@
 function cipherSelectionPragmas(cipher): readonly string[];
 ```
 
-Defined in: [packages/store-sqlite/src/encryption/index.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L38)
+Defined in: packages/store-sqlite/src/encryption/index.ts:38
+
+**`Stable`**
 
 The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
 on a freshly opened connection (CS-7). sqlite3mc defaults to
@@ -26,5 +28,3 @@ reads garbage - every keyed open must pin the cipher first.
 ## Returns
 
 readonly `string`[]
-
-## Stable

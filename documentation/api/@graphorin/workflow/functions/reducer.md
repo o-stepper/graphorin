@@ -12,6 +12,8 @@ function reducer<T>(reduce, opts?): Reducer<T>;
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Construct a `Reducer` channel.
 
 ## Type Parameters
@@ -31,5 +33,3 @@ Construct a `Reducer` channel.
 ## Returns
 
 [`Reducer`](/api/@graphorin/workflow/interfaces/Reducer.md)\&lt;`T`\&gt;
-
-## Stable

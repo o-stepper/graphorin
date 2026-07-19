@@ -10,7 +10,9 @@
 function createIdentityRouter(options): IdentityRouter;
 ```
 
-Defined in: [packages/channels/src/router.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L113)
+Defined in: packages/channels/src/router.ts:113
+
+**`Stable`**
 
 Build a deterministic identity router. Throws
 [ChannelRouteConfigError](/api/@graphorin/channels/classes/ChannelRouteConfigError.md) when the table is empty, contains a
@@ -25,5 +27,3 @@ row with an empty `agentId`, or lacks a catch-all default route.
 ## Returns
 
 [`IdentityRouter`](/api/@graphorin/channels/interfaces/IdentityRouter.md)
-
-## Stable

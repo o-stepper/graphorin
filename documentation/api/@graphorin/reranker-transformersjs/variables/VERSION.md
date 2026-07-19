@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/index.ts#L40)
+Defined in: packages/reranker-transformersjs/src/index.ts:40

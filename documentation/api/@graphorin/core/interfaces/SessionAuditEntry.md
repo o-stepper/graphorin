@@ -6,7 +6,9 @@
 
 # Interface: SessionAuditEntry
 
-Defined in: [packages/core/src/contracts/session-store.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L65)
+Defined in: packages/core/src/contracts/session-store.ts:65
+
+**`Stable`**
 
 Session lifecycle audit event. The `@graphorin/sessions` package
 appends one row per noteworthy lifecycle step (`created`, `closed`,
@@ -18,18 +20,16 @@ The `metadata` field is intentionally an open record - storage
 adapters serialize it as JSON. Callers should keep it small and
 never include secret values.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-action"></a> `action` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L68) |
-| <a id="property-actor"></a> `actor?` | `readonly` | \{ `id`: `string`; `kind`: `string`; `label?`: `string`; \} | [packages/core/src/contracts/session-store.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L70) |
-| `actor.id` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L72) |
-| `actor.kind` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L71) |
-| `actor.label?` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L73) |
-| <a id="property-at"></a> `at` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L69) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L66) |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/core/src/contracts/session-store.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L75) |
-| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L67) |
+| <a id="property-action"></a> `action` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:68 |
+| <a id="property-actor"></a> `actor?` | `readonly` | \{ `id`: `string`; `kind`: `string`; `label?`: `string`; \} | packages/core/src/contracts/session-store.ts:70 |
+| `actor.id` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:72 |
+| `actor.kind` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:71 |
+| `actor.label?` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:73 |
+| <a id="property-at"></a> `at` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:69 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:66 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/session-store.ts:75 |
+| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:67 |

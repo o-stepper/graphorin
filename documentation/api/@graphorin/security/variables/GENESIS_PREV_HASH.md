@@ -10,6 +10,6 @@
 const GENESIS_PREV_HASH: string;
 ```
 
-Defined in: [packages/security/src/audit/append.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/append.ts#L15)
+Defined in: packages/security/src/audit/append.ts:15
 
 Genesis prev-hash (64 zero hex chars).

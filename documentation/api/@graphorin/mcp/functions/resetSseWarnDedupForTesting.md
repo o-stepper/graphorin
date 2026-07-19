@@ -10,7 +10,7 @@
 function _resetSseWarnDedupForTesting(): void;
 ```
 
-Defined in: [packages/mcp/src/client/client.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/client.ts#L75)
+Defined in: packages/mcp/src/client/client.ts:75
 
 **`Experimental`**
 

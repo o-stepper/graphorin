@@ -6,21 +6,21 @@
 
 # Interface: AuditDatabase
 
-Defined in: [packages/store-sqlite/src/audit-db.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/audit-db.ts#L44)
+Defined in: packages/store-sqlite/src/audit-db.ts:44
+
+**`Stable`**
 
 Lightweight handle returned by [openAuditDatabase](/api/@graphorin/store-sqlite/functions/openAuditDatabase.md). The audit
 package (Phase 03) owns the schema; this module only opens the file
 with the cipher peer and applies WAL hardening so the consumer can
 focus on appending audit records.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-db"></a> `db` | `readonly` | [`BetterSqlite3Database`](/api/@graphorin/store-sqlite/connection/interfaces/BetterSqlite3Database.md) | [packages/store-sqlite/src/audit-db.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/audit-db.ts#L46) |
-| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/store-sqlite/src/audit-db.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/audit-db.ts#L45) |
+| <a id="property-db"></a> `db` | `readonly` | [`BetterSqlite3Database`](/api/@graphorin/store-sqlite/connection/interfaces/BetterSqlite3Database.md) | packages/store-sqlite/src/audit-db.ts:46 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/store-sqlite/src/audit-db.ts:45 |
 
 ## Methods
 
@@ -30,7 +30,7 @@ focus on appending audit records.
 close(): void;
 ```
 
-Defined in: [packages/store-sqlite/src/audit-db.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/audit-db.ts#L47)
+Defined in: packages/store-sqlite/src/audit-db.ts:47
 
 #### Returns
 

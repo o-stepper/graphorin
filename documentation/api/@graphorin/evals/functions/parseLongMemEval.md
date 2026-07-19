@@ -10,7 +10,9 @@
 function parseLongMemEval(text, abilities?): readonly Case<MemoryEvalInput, string, Readonly<Record<string, unknown>>>[];
 ```
 
-Defined in: [packages/evals/src/loaders/longmemeval.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/longmemeval.ts#L83)
+Defined in: packages/evals/src/loaders/longmemeval.ts:83
+
+**`Stable`**
 
 Pure parser. Exported so tests can exercise the mapping without
 touching the filesystem.
@@ -25,5 +27,3 @@ touching the filesystem.
 ## Returns
 
 readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<[`MemoryEvalInput`](/api/@graphorin/evals/interfaces/MemoryEvalInput.md), `string`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
-
-## Stable

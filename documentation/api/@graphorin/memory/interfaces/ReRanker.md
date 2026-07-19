@@ -6,7 +6,9 @@
 
 # Interface: ReRanker
 
-Defined in: [packages/memory/src/search/types.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/types.ts#L17)
+Defined in: packages/memory/src/search/types.ts:17
+
+**`Stable`**
 
 Pluggable reranker contract. Concrete implementations live in
 `@graphorin/memory/search` (the built-in `RRFReranker`) and the
@@ -19,13 +21,11 @@ Implementations MUST be pure (no I/O outside `signal`-aware
 dependencies) so the agent runtime can call them mid-stream without
 deadlocking the main loop.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable lowercase identifier surfaced on every span. | [packages/memory/src/search/types.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/types.ts#L19) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable lowercase identifier surfaced on every span. | packages/memory/src/search/types.ts:19 |
 
 ## Methods
 
@@ -38,7 +38,7 @@ rerank<TRecord>(
 options?): Promise<readonly MemoryHit<TRecord>[]>;
 ```
 
-Defined in: [packages/memory/src/search/types.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/types.ts#L25)
+Defined in: packages/memory/src/search/types.ts:25
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be

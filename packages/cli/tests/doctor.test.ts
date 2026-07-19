@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { runDoctor } from '../src/commands/doctor.js';
+import { runInit } from '../src/commands/init.js';
 
 async function fixtureDir(): Promise<string> {
   const dir = join(
@@ -111,4 +112,27 @@ describe('runDoctor', () => {
       expect(report.checks.some((c) => c.check.startsWith(home))).toBe(true);
     },
   );
+});
+
+describe('P2-1 (deep retest 2026-07-19) - config-driven doctor respects a disabled audit log', () => {
+  it('init --no-encrypted then doctor --all skips the audit-encryption check instead of failing', async () => {
+    const dir = await fixtureDir();
+    const init = await runInit({
+      cwd: dir,
+      format: 'json',
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      print: () => undefined,
+    });
+    const report = await runDoctor({
+      config: init.configPath,
+      all: true,
+      print: () => undefined,
+    });
+    const auditCheck = report.checks.find((c) => c.check === 'audit-db');
+    expect(auditCheck?.status).toBe('skip');
+    expect(auditCheck?.message).toContain('audit log disabled');
+    expect(auditCheck?.hint ?? '').not.toContain('Phase 05');
+  });
 });

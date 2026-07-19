@@ -10,7 +10,9 @@
 function createDeliveryCommentarySanitizer(config?): DeliveryCommentarySanitizer;
 ```
 
-Defined in: [packages/server/src/commentary/sanitizer.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L73)
+Defined in: packages/server/src/commentary/sanitizer.ts:73
+
+**`Stable`**
 
 Build a stateless delivery-layer sanitizer. Tests can swap the
 `sink` for an in-memory recorder; production wires the
@@ -25,5 +27,3 @@ Build a stateless delivery-layer sanitizer. Tests can swap the
 ## Returns
 
 [`DeliveryCommentarySanitizer`](/api/@graphorin/server/interfaces/DeliveryCommentarySanitizer.md)
-
-## Stable

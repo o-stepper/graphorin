@@ -6,17 +6,17 @@
 
 # Interface: MessageRef
 
-Defined in: [packages/core/src/contracts/memory-store.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L98)
+Defined in: packages/core/src/contracts/memory-store.ts:98
+
+**`Stable`**
 
 Reference returned by `SessionMemoryStore.push(...)`. Carries the
 persisted message id and a sequence number for ordering.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-messageid"></a> `messageId` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L99) |
-| <a id="property-persistedat"></a> `persistedAt` | `readonly` | `string` | [packages/core/src/contracts/memory-store.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L101) |
-| <a id="property-sequence"></a> `sequence` | `readonly` | `number` | [packages/core/src/contracts/memory-store.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L100) |
+| <a id="property-messageid"></a> `messageId` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:99 |
+| <a id="property-persistedat"></a> `persistedAt` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:101 |
+| <a id="property-sequence"></a> `sequence` | `readonly` | `number` | packages/core/src/contracts/memory-store.ts:100 |

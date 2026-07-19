@@ -194,3 +194,58 @@ describe('IP-5 - init output parses through the strict server schema', () => {
     expect(() => parseServerConfig(cfg)).not.toThrow();
   });
 });
+
+describe('P1-4 (deep retest 2026-07-19) - the consent tier is actionable, not decorative', () => {
+  it('next-steps print the tier and the exact createMemory enforcement snippet', async () => {
+    const dir = await fixtureDir();
+    const lines: string[] = [];
+    await runInit({
+      cwd: dir,
+      nonInteractive: true,
+      cloudConsent: 'public-and-internal',
+      encrypted: false,
+      print: (line) => {
+        lines.push(line);
+      },
+    });
+    const out = lines.join('\n');
+    expect(out).toContain("Enforce your cloud-consent tier ('public-and-internal')");
+    expect(out).toContain('cloudUploadConsent: true');
+    expect(out).toContain("acceptsSensitivity: ['public', 'internal']");
+  });
+
+  it('the .ts config embeds the same snippet as a comment; JSON relies on the printed steps', async () => {
+    const tsDir = await fixtureDir();
+    const tsLines: string[] = [];
+    const ts = await runInit({
+      cwd: tsDir,
+      nonInteractive: true,
+      cloudConsent: 'all-with-warnings',
+      encrypted: false,
+      format: 'ts',
+      print: (l) => {
+        tsLines.push(l);
+      },
+    });
+    const tsBody = await readFile(ts.configPath, 'utf8');
+    expect(tsBody).toContain("'all-with-warnings'");
+    expect(tsBody).toContain('cloudUploadConsent: true');
+    expect(tsBody).toContain("acceptsSensitivity: ['public', 'internal', 'secret']");
+
+    const jsonDir = await fixtureDir();
+    const jsonLines: string[] = [];
+    const json = await runInit({
+      cwd: jsonDir,
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      format: 'json',
+      print: (l) => {
+        jsonLines.push(l);
+      },
+    });
+    const jsonBody = await readFile(json.configPath, 'utf8');
+    expect(() => JSON.parse(jsonBody)).not.toThrow();
+    expect(jsonLines.join('\n')).toContain('fail-closed default');
+  });
+});

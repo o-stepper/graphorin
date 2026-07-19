@@ -6,14 +6,14 @@
 
 # Interface: PayloadSchemaLike\&lt;T\&gt;
 
-Defined in: [packages/core/src/channels/durable.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L156)
+Defined in: packages/core/src/channels/durable.ts:156
+
+**`Stable`**
 
 Structural schema slice `awaitExternal({ schema })` validates the
 resolved payload against. Matches zod v3 and v4 (and anything else
 exposing the same `safeParse`) without a zod dependency in core -
 the same structural stance as the tools-layer schema seam.
-
-## Stable
 
 ## Type Parameters
 
@@ -39,7 +39,7 @@ safeParse(value):
 };
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L157)
+Defined in: packages/core/src/channels/durable.ts:157
 
 #### Parameters
 

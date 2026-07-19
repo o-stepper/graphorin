@@ -89,6 +89,18 @@ describe('hardening/doctor', () => {
       const r = checkEncryption();
       expect(r[0]?.status).toBe('ok');
     });
+
+    it('skips when the supplied config disables the audit log (P2-1)', () => {
+      const r = checkEncryption({ auditEnabled: false });
+      expect(r[0]?.status).toBe('skip');
+      expect(r[0]?.message).toContain('audit log disabled');
+    });
+
+    it('auditEnabled true keeps the strict fail on a missing binding', () => {
+      const r = checkEncryption({ auditEnabled: true });
+      expect(r[0]?.status).toBe('fail');
+      expect(r[0]?.hint).not.toContain('Phase 05');
+    });
   });
 
   describe('checkSystemd', () => {

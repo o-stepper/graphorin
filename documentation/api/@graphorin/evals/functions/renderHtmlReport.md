@@ -10,7 +10,9 @@
 function renderHtmlReport<I, O>(report, options?): string;
 ```
 
-Defined in: [packages/evals/src/reporters/html.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/html.ts#L13)
+Defined in: packages/evals/src/reporters/html.ts:13
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -30,5 +32,3 @@ Defined in: [packages/evals/src/reporters/html.ts:13](https://github.com/o-stepp
 ## Returns
 
 `string`
-
-## Stable

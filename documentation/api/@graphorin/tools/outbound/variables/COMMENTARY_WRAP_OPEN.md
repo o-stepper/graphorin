@@ -10,10 +10,10 @@
 const COMMENTARY_WRAP_OPEN: "<<<commentary>>>" = '<<<commentary>>>';
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L77)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:77
+
+**`Stable`**
 
 Default wrap-envelope open delimiter shared by all outbound
 sanitizers, so a fragment wrapped at one boundary is recognized
 (and never re-wrapped) at every other boundary.
-
-## Stable

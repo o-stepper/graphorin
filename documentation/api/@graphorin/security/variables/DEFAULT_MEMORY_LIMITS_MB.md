@@ -10,10 +10,10 @@
 const DEFAULT_MEMORY_LIMITS_MB: Readonly<Record<SandboxKind, number>>;
 ```
 
-Defined in: [packages/security/src/sandbox/sandbox.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/sandbox.ts#L113)
+Defined in: packages/security/src/sandbox/sandbox.ts:113
+
+**`Stable`**
 
 Default per-tier memory limits (MB). The defaults follow the
 canonical sandbox tier table - `worker-threads` 256 MB; mandatory
 untrusted-skill tier 128 MB; `isolated-vm` 128 MB.
-
-## Stable

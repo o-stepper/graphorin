@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/observability/src/index.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/index.ts#L25)
+Defined in: packages/observability/src/index.ts:25

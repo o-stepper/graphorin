@@ -10,7 +10,9 @@
 function bySensitivity(args?): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L189)
+Defined in: packages/agent/src/filters/index.ts:189
+
+**`Stable`**
 
 Drop messages that carry the literal `[REDACTED:secret]` redaction
 token when `maxTier` sits below `'secret'`.
@@ -38,5 +40,3 @@ their own metadata.
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

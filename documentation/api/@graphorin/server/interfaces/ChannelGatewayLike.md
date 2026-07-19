@@ -6,13 +6,13 @@
 
 # Interface: ChannelGatewayLike
 
-Defined in: [packages/server/src/channels/daemon.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L39)
+Defined in: packages/server/src/channels/daemon.ts:39
+
+**`Stable`**
 
 Structural surface of a channel gateway
 (`createChannelGateway(...)` from `@graphorin/channels` satisfies
 it; the server never imports that package).
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ it; the server never imports that package).
 optional setActivityListener(listener): void;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L48)
+Defined in: packages/server/src/channels/daemon.ts:48
 
 A2 bridge seam: when present, the server registers a listener
 that records scheduler activity on every accepted inbound
@@ -46,7 +46,7 @@ message (idle-trigger debounce).
 start(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L40)
+Defined in: packages/server/src/channels/daemon.ts:40
 
 #### Returns
 
@@ -60,7 +60,7 @@ Defined in: [packages/server/src/channels/daemon.ts:40](https://github.com/o-ste
 status(): Promise<ChannelGatewayStatusLike>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L42)
+Defined in: packages/server/src/channels/daemon.ts:42
 
 #### Returns
 
@@ -74,7 +74,7 @@ Defined in: [packages/server/src/channels/daemon.ts:42](https://github.com/o-ste
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/server/src/channels/daemon.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/channels/daemon.ts#L41)
+Defined in: packages/server/src/channels/daemon.ts:41
 
 #### Returns
 

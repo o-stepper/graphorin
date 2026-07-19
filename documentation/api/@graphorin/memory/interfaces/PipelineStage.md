@@ -6,19 +6,19 @@
 
 # Interface: PipelineStage
 
-Defined in: [packages/memory/src/conflict/types.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L189)
+Defined in: packages/memory/src/conflict/types.ts:189
+
+**`Stable`**
 
 Stage interface every step implements. The orchestrator visits
 stages in declaration order and stops at the first non-`'continue'`
 outcome.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | [`ConflictStage`](/api/@graphorin/memory/type-aliases/ConflictStage.md) | [packages/memory/src/conflict/types.ts:190](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L190) |
+| <a id="property-id"></a> `id` | `readonly` | [`ConflictStage`](/api/@graphorin/memory/type-aliases/ConflictStage.md) | packages/memory/src/conflict/types.ts:190 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ outcome.
 evaluate(ctx): Promise<StageOutcome>;
 ```
 
-Defined in: [packages/memory/src/conflict/types.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L191)
+Defined in: packages/memory/src/conflict/types.ts:191
 
 #### Parameters
 

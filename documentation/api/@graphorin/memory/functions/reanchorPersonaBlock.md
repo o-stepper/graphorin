@@ -10,7 +10,9 @@
 function reanchorPersonaBlock(options?): NamedPostCompactionHook;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/hooks/reanchor-persona-block.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/reanchor-persona-block.ts#L18)
+Defined in: packages/memory/src/context-engine/compaction/hooks/reanchor-persona-block.ts:18
+
+**`Stable`**
 
 Build a `reanchorPersonaBlock` hook.
 
@@ -24,5 +26,3 @@ Build a `reanchorPersonaBlock` hook.
 ## Returns
 
 [`NamedPostCompactionHook`](/api/@graphorin/memory/interfaces/NamedPostCompactionHook.md)
-
-## Stable

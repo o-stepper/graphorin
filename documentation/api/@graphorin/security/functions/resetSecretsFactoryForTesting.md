@@ -10,7 +10,7 @@
 function _resetSecretsFactoryForTesting(): void;
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L130)
+Defined in: packages/security/src/secrets/factory.ts:130
 
 **`Experimental`**
 

@@ -10,7 +10,9 @@
 function createSqliteStore(options): Promise<GraphorinSqliteStore>;
 ```
 
-Defined in: [packages/store-sqlite/src/index.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/index.ts#L254)
+Defined in: packages/store-sqlite/src/index.ts:254
+
+**`Stable`**
 
 Open a SQLite-backed Graphorin store. The returned object exposes
 every contract implementation; call `init()` once before first use.
@@ -24,5 +26,3 @@ every contract implementation; call `init()` once before first use.
 ## Returns
 
 `Promise`\&lt;[`GraphorinSqliteStore`](/api/@graphorin/store-sqlite/interfaces/GraphorinSqliteStore.md)\&gt;
-
-## Stable

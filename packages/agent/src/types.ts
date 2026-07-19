@@ -582,8 +582,10 @@ export interface InboundTaintSeed {
  * The cost leg reads `Usage.cost`, which only exists when the provider
  * chain reports it (wire `withCostTracking` from `@graphorin/provider`
  * with a `@graphorin/pricing` snapshot). A cost ceiling without USD
- * cost data is UNENFORCED and WARNs once per run - use `maxTokens` for
- * a provider-independent ceiling.
+ * cost data is fail-closed by default: the run stops at the first
+ * between-step check (`onUnpriced: 'fail'`) instead of spending
+ * unmetered - see {@link RunBudget.onUnpriced} for the opt-out and
+ * `maxTokens` for a provider-independent ceiling.
  *
  * @stable
  */
@@ -606,6 +608,19 @@ export interface RunBudget {
    * graceful finalization (final checkpoint, `agent.end`) is skipped.
    */
   readonly onExceed?: 'stop' | 'throw';
+  /**
+   * What to do when `maxCostUsd` is set but the accumulated usage
+   * carries no USD cost data, so the ceiling cannot observe spend
+   * (deep retest 2026-07-19, P1-3). `'fail'` (default) is fail-closed:
+   * the run stops at the first between-step check in the `onExceed`
+   * shape (`'stop'` fails the run with `error.code: 'budget-unpriced'`;
+   * `'throw'` rejects with `AgentBudgetUnpricedError`) - a caller who
+   * set a cost cap must never keep spending unmetered. `'warn'`
+   * restores the pre-0.13 behaviour: one console WARN, ceiling
+   * unenforced. Wire `withCostTracking` with a pricing snapshot, or
+   * use `maxTokens` for a provider-independent ceiling.
+   */
+  readonly onUnpriced?: 'fail' | 'warn';
 }
 
 /**

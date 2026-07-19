@@ -16,7 +16,9 @@ function splitByWrapEnvelope(
 }[];
 ```
 
-Defined in: [packages/tools/src/outbound/commentary-patterns.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/outbound/commentary-patterns.ts#L158)
+Defined in: packages/tools/src/outbound/commentary-patterns.ts:158
+
+**`Stable`**
 
 Split a body into already-wrapped + plain segments so a sanitizer
 never re-scans inside an existing wrap envelope. This is the
@@ -38,5 +40,3 @@ readonly \{
   `kind`: `"wrapped"` \| `"plain"`;
   `text`: `string`;
 \}[]
-
-## Stable

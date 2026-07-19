@@ -10,7 +10,9 @@
 function outcomeToDelivery(outcome, identity): ProactiveDeliveryPayload;
 ```
 
-Defined in: [packages/proactive/src/ladder.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/ladder.ts#L59)
+Defined in: packages/proactive/src/ladder.ts:59
+
+**`Stable`**
 
 Route an outcome onto a channel delivery (C3): `notify` / `act` are
 plain text; `question` / `review` carry the HITL question block
@@ -27,5 +29,3 @@ outbound-sanitizes at its own boundary - this function only shapes.
 ## Returns
 
 [`ProactiveDeliveryPayload`](/api/@graphorin/proactive/interfaces/ProactiveDeliveryPayload.md)
-
-## Stable

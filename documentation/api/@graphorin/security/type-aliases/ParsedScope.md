@@ -23,10 +23,10 @@ type ParsedScope =
 };
 ```
 
-Defined in: [packages/security/src/auth/scope.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L24)
+Defined in: packages/security/src/auth/scope.ts:24
+
+**`Stable`**
 
 Result of `parseScope(...)`. The `kind` discriminator lets callers
 branch between two- and three-segment scopes without re-parsing the
 raw string.
-
-## Stable

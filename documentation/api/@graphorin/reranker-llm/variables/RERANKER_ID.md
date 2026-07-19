@@ -10,6 +10,6 @@
 const RERANKER_ID: "llm-judge";
 ```
 
-Defined in: [packages/reranker-llm/src/reranker.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L23)
+Defined in: src/reranker.ts:23
 
-## Stable
+**`Stable`**

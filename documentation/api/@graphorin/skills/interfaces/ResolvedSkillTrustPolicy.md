@@ -8,10 +8,10 @@
 
 Defined in: [packages/security/dist/supply-chain/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/supply-chain/types.d.ts)
 
+**`Stable`**
+
 Trust policy applied to an install request. Auto-derived from
 [SkillSource](/api/@graphorin/skills/type-aliases/SupplyChainSkillSource.md) and the optional operator override.
-
-## Stable
 
 ## Properties
 

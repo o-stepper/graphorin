@@ -10,7 +10,9 @@
 type ProviderMiddleware = (next) => Provider;
 ```
 
-Defined in: [packages/core/src/contracts/provider.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L315)
+Defined in: packages/core/src/contracts/provider.ts:315
+
+**`Stable`**
 
 Provider middleware: a function that wraps a `Provider` and returns a
 new `Provider` with extra behaviour (retry, fallback, redaction, …).
@@ -27,5 +29,3 @@ inside-out chain (innermost adapter → ... → outermost retry / observer).
 ## Returns
 
 [`Provider`](/api/@graphorin/core/interfaces/Provider.md)
-
-## Stable

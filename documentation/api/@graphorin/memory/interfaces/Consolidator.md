@@ -6,13 +6,13 @@
 
 # Interface: Consolidator
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L95)
+Defined in: packages/memory/src/consolidator/runtime.ts:95
+
+**`Stable`**
 
 Consolidator runtime surface returned by [createConsolidator](/api/@graphorin/memory/functions/createConsolidator.md).
 Compatible with the placeholder shape so the facade can swap the
 implementation without breaking consumers.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ implementation without breaking consumers.
 config(): ConsolidatorConfig;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L120)
+Defined in: packages/memory/src/consolidator/runtime.ts:120
 
 Active config - frozen snapshot.
 
@@ -38,7 +38,7 @@ Active config - frozen snapshot.
 drainDlq(scope): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L133)
+Defined in: packages/memory/src/consolidator/runtime.ts:133
 
 Drain DLQ rows whose `nextRetryAt` <= now.
 
@@ -62,7 +62,7 @@ fireNow(phase, scope?): Promise<
 | null>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L104)
+Defined in: packages/memory/src/consolidator/runtime.ts:104
 
 Manual trigger for the requested phase. Skips phase gating + the
 idle/cron scheduler so admins can flush the queue on demand.
@@ -88,7 +88,7 @@ idle/cron scheduler so admins can flush the queue on demand.
 isFree(): boolean;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L131)
+Defined in: packages/memory/src/consolidator/runtime.ts:131
 
 True when `tier === 'free'`.
 
@@ -106,7 +106,7 @@ notifyActivity(scope?): Promise<
 | null>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:149](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L149)
+Defined in: packages/memory/src/consolidator/runtime.ts:149
 
 Activity signal from the embedding runtime (item 7, A2): a turn
 finished / the transcript grew. Re-evaluates the `buffer:N`
@@ -142,7 +142,7 @@ from their own loop next to `scheduler.recordActivity()`.
 onPhaseFinished(listener): () => void;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L112)
+Defined in: packages/memory/src/consolidator/runtime.ts:112
 
 Subscribe to phase-finished notifications. Returns an unsubscribe.
 
@@ -164,7 +164,7 @@ Subscribe to phase-finished notifications. Returns an unsubscribe.
 pause(): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L108)
+Defined in: packages/memory/src/consolidator/runtime.ts:108
 
 Pause the consolidator until the next budget reset.
 
@@ -180,7 +180,7 @@ Pause the consolidator until the next budget reset.
 recordExternalSpend(tokens, costUsd?): void;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L118)
+Defined in: packages/memory/src/consolidator/runtime.ts:118
 
 Record memory-pipeline LLM spend that happened OUTSIDE a phase run
 (MCON-15 - e.g. workflow induction) so the daily ceilings cover it.
@@ -205,7 +205,7 @@ Counted under the deep-phase bucket.
 registerWithScheduler(scheduler): Promise<RegisterTriggersResult>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L129)
+Defined in: packages/memory/src/consolidator/runtime.ts:129
 
 Register this consolidator's cron / idle triggers with a
 `@graphorin/triggers` scheduler so they fire `trigger(...)`
@@ -232,7 +232,7 @@ this in `beforeStart`.
 resume(): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L110)
+Defined in: packages/memory/src/consolidator/runtime.ts:110
 
 Resume after `pause()`.
 
@@ -248,7 +248,7 @@ Resume after `pause()`.
 setTier(tier): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L106)
+Defined in: packages/memory/src/consolidator/runtime.ts:106
 
 Replace the active tier - recomputes ceilings + phase set.
 
@@ -270,7 +270,7 @@ Replace the active tier - recomputes ceilings + phase set.
 start(): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L96)
+Defined in: packages/memory/src/consolidator/runtime.ts:96
 
 #### Returns
 
@@ -284,7 +284,7 @@ Defined in: [packages/memory/src/consolidator/runtime.ts:96](https://github.com/
 status(): Promise<ConsolidatorStatus>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L99)
+Defined in: packages/memory/src/consolidator/runtime.ts:99
 
 #### Returns
 
@@ -298,7 +298,7 @@ Defined in: [packages/memory/src/consolidator/runtime.ts:99](https://github.com/
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L97)
+Defined in: packages/memory/src/consolidator/runtime.ts:97
 
 #### Returns
 
@@ -314,7 +314,7 @@ trigger(reason, scope): Promise<
 | null>;
 ```
 
-Defined in: [packages/memory/src/consolidator/runtime.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L98)
+Defined in: packages/memory/src/consolidator/runtime.ts:98
 
 #### Parameters
 

@@ -10,7 +10,9 @@
 function openInBrowser(url, signal?): Promise<void>;
 ```
 
-Defined in: [packages/security/src/oauth/browser.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/browser.ts#L47)
+Defined in: packages/security/src/oauth/browser.ts:47
+
+**`Stable`**
 
 Default cross-platform launcher. Falls back to printing the URL on
 platforms where `spawn` returns a non-zero exit code so headless
@@ -26,5 +28,3 @@ deployments still surface the URL to the operator.
 ## Returns
 
 `Promise`\&lt;`void`\&gt;
-
-## Stable

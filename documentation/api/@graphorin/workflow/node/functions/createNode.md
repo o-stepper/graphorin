@@ -10,7 +10,9 @@
 function createNode<TState>(opts): WorkflowNode<TState>;
 ```
 
-Defined in: [packages/workflow/src/node.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/node.ts#L24)
+Defined in: packages/workflow/src/node.ts:24
+
+**`Stable`**
 
 Construct a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). The wrapper exists to give the
 engine a stable shape and to keep `createWorkflow({...})` callers
@@ -36,5 +38,3 @@ execution policy (D1 / workflow-03): `timeoutMs` + `retry`.
 ## Returns
 
 [`WorkflowNode`](/api/@graphorin/workflow/interfaces/WorkflowNode.md)\&lt;`TState`\&gt;
-
-## Stable

@@ -6,14 +6,14 @@
 
 # Interface: MigrateCommandOptions
 
-Defined in: [packages/cli/src/commands/migrate.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L21)
+Defined in: packages/cli/src/commands/migrate.ts:21
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | [packages/cli/src/commands/migrate.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L22) |
-| <a id="property-print"></a> `print?` | `readonly` | (`line`) => `void` | [packages/cli/src/commands/migrate.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L24) |
-| <a id="property-target"></a> `target?` | `readonly` | `string` | [packages/cli/src/commands/migrate.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/migrate.ts#L23) |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | packages/cli/src/commands/migrate.ts:22 |
+| <a id="property-print"></a> `print?` | `readonly` | (`line`) => `void` | packages/cli/src/commands/migrate.ts:24 |
+| <a id="property-target"></a> `target?` | `readonly` | `string` | packages/cli/src/commands/migrate.ts:23 |

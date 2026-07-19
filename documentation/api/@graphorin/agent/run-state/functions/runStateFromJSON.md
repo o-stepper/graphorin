@@ -10,7 +10,7 @@
 function runStateFromJSON(serialized, options?): RunState;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:493](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L493)
+Defined in: packages/agent/src/run-state/index.ts:493
 
 Convenience JSON-string parser pairing with [runStateToJSON](/api/@graphorin/agent/run-state/functions/runStateToJSON.md).
 

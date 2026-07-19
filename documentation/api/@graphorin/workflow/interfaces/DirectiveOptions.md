@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts)
 
-Constructor parameters for `Directive`.
+**`Stable`**
 
-## Stable
+Constructor parameters for `Directive`.
 
 ## Type Parameters
 

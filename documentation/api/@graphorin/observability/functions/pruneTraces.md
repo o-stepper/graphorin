@@ -10,7 +10,9 @@
 function pruneTraces(opts): Promise<readonly string[]>;
 ```
 
-Defined in: [packages/observability/src/replay/log.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/log.ts#L58)
+Defined in: packages/observability/src/replay/log.ts:58
+
+**`Stable`**
 
 Remove every JSONL file that is older than the configured retention
 window. Returns the deleted files for caller-side accounting.
@@ -24,5 +26,3 @@ window. Returns the deleted files for caller-side accounting.
 ## Returns
 
 `Promise`\&lt;readonly `string`[]\&gt;
-
-## Stable

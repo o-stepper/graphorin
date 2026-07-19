@@ -14,9 +14,9 @@ type PrivacyDecisionReason =
   | "allowed";
 ```
 
-Defined in: [packages/memory/src/context-engine/privacy-filter.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L60)
+Defined in: packages/memory/src/context-engine/privacy-filter.ts:60
+
+**`Stable`**
 
 Reason the decision was made. Surfaced to the metadata block so
 operators can audit per-tier drops.
-
-## Stable

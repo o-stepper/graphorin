@@ -12,7 +12,9 @@ type ModerationProvider = (value) =>
   | ModerationDecision;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/llm-moderation.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/llm-moderation.ts#L46)
+Defined in: packages/security/src/guardrails/builtins/llm-moderation.ts:46
+
+**`Stable`**
 
 Provider callback. The runtime injects an async function that
 forwards the value to a moderation service and returns the
@@ -28,5 +30,3 @@ decision.
 
   \| `Promise`\&lt;[`ModerationDecision`](/api/@graphorin/security/interfaces/ModerationDecision.md)\&gt;
   \| [`ModerationDecision`](/api/@graphorin/security/interfaces/ModerationDecision.md)
-
-## Stable

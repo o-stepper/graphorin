@@ -6,13 +6,13 @@
 
 # Interface: SessionMemoryFacade
 
-Defined in: [packages/sessions/src/facade.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L84)
+Defined in: packages/sessions/src/facade.ts:84
+
+**`Stable`**
 
 Subset of the `Memory.session` surface this package consumes. Kept
 structural so callers can pass either the `Memory` facade from
 `@graphorin/memory` or any custom shim with the same shape.
-
-## Stable
 
 ## Methods
 
@@ -26,7 +26,7 @@ optional compact(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L107)
+Defined in: packages/sessions/src/facade.ts:107
 
 #### Parameters
 
@@ -54,7 +54,7 @@ optional flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L106)
+Defined in: packages/sessions/src/facade.ts:106
 
 #### Parameters
 
@@ -78,7 +78,7 @@ Defined in: [packages/sessions/src/facade.ts:106](https://github.com/o-stepper/g
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L90)
+Defined in: packages/sessions/src/facade.ts:90
 
 #### Parameters
 
@@ -99,7 +99,7 @@ Defined in: [packages/sessions/src/facade.ts:90](https://github.com/o-stepper/gr
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L97)
+Defined in: packages/sessions/src/facade.ts:97
 
 List messages with their persisted identity (RP-5): the stored message id,
 sequence, and `createdAt`. Optional - when absent, export falls back to
@@ -128,7 +128,7 @@ push(
 options?): Promise<MessageRef>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L85)
+Defined in: packages/sessions/src/facade.ts:85
 
 #### Parameters
 
@@ -153,7 +153,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: [packages/sessions/src/facade.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/facade.ts#L101)
+Defined in: packages/sessions/src/facade.ts:101
 
 #### Parameters
 

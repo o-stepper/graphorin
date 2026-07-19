@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
+**`Stable`**
+
 Metadata associated with a checkpoint write. Adapters store this in a
 sidecar table for efficient listing.
-
-## Stable
 
 ## Properties
 

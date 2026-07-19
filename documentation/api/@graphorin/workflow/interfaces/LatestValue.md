@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Overwrite-on-write. Multiple writes within the same execution step
 raise `MultiWriteError` (use `AnyValue` if collisions are acceptable).
-
-## Stable
 
 ## Type Parameters
 

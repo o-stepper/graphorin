@@ -10,9 +10,9 @@
 const TOOL_CASSETTE_BACKWARDS_COMPAT_MAJORS: 2 = 2;
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L34)
+Defined in: packages/sessions/src/cassette/types.ts:34
+
+**`Stable`**
 
 Reader compatibility band: the writer accepts the current MAJOR
 minus 0..N inclusive. v0.1 supports MAJOR `1` only.
-
-## Stable

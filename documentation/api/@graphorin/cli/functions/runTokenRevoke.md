@@ -12,7 +12,9 @@ function runTokenRevoke(options): Promise<
 | undefined>;
 ```
 
-Defined in: [packages/cli/src/commands/token.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L182)
+Defined in: packages/cli/src/commands/token.ts:182
+
+**`Stable`**
 
 Revoke a single token.
 
@@ -27,5 +29,3 @@ Revoke a single token.
 `Promise`\<
   \| [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)
   \| `undefined`\>
-
-## Stable

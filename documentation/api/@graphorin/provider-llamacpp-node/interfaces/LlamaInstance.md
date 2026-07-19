@@ -6,7 +6,7 @@
 
 # Interface: LlamaInstance
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L14)
+Defined in: src/runtime.ts:14
 
 **`Internal`**
 
@@ -20,7 +20,7 @@ Defined in: [packages/provider-llamacpp-node/src/runtime.ts:14](https://github.c
 loadModel(args): Promise<LlamaModelInstance>;
 ```
 
-Defined in: [packages/provider-llamacpp-node/src/runtime.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/runtime.ts#L15)
+Defined in: src/runtime.ts:15
 
 #### Parameters
 

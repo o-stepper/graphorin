@@ -10,7 +10,9 @@
 function promptInjectionHeuristics<TValue>(opts?): InputGuardrail<TValue>;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts#L65)
+Defined in: packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:65
+
+**`Stable`**
 
 Construct the heuristics input guardrail.
 
@@ -29,5 +31,3 @@ Construct the heuristics input guardrail.
 ## Returns
 
 [`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\&lt;`TValue`\&gt;
-
-## Stable

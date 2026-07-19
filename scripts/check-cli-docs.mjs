@@ -41,6 +41,7 @@
  * Exit codes: 0 ok · 1 drift · 2 invocation error.
  */
 
+import { realpathSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -518,7 +519,17 @@ function registerStorageCommands(program) {
   process.exit(bad > 0 ? 1 : 0);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) ===
+    (() => {
+      try {
+        return realpathSync(process.argv[1]);
+      } catch {
+        return process.argv[1];
+      }
+    })()
+) {
   if (process.argv.includes('--self-test')) selfTest();
   else await run();
 }

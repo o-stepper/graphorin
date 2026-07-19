@@ -16,7 +16,7 @@ import { createHash } from 'node:crypto';
 import type { ModelPrice, PricingSnapshot } from '../types.js';
 
 /** @internal - used for `lookupPrice` defaults. */
-export const SNAPSHOT_DATE = '2026-07-04';
+export const SNAPSHOT_DATE = '2026-07-19';
 
 const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
   // -----------------------------------------------------------------
@@ -110,6 +110,29 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     inputUsdPerToken: 0.05 / 1_000_000,
     outputUsdPerToken: 0.4 / 1_000_000,
     cachedReadUsdPerToken: 0.005 / 1_000_000,
+  },
+  // GPT-5.6 family (deep retest 2026-07-19, P1-3): standard tier,
+  // short-context rates from the official OpenAI pricing page.
+  {
+    provider: 'openai',
+    model: 'gpt-5.6-luna',
+    inputUsdPerToken: 1 / 1_000_000,
+    outputUsdPerToken: 6 / 1_000_000,
+    cachedReadUsdPerToken: 0.1 / 1_000_000,
+  },
+  {
+    provider: 'openai',
+    model: 'gpt-5.6-terra',
+    inputUsdPerToken: 2.5 / 1_000_000,
+    outputUsdPerToken: 15 / 1_000_000,
+    cachedReadUsdPerToken: 0.25 / 1_000_000,
+  },
+  {
+    provider: 'openai',
+    model: 'gpt-5.6-sol',
+    inputUsdPerToken: 5 / 1_000_000,
+    outputUsdPerToken: 30 / 1_000_000,
+    cachedReadUsdPerToken: 0.5 / 1_000_000,
   },
   {
     provider: 'openai',

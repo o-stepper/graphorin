@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
+**`Stable`**
+
 Serialized snapshot of workflow state, written after every execution
 step.
-
-## Stable
 
 ## Properties
 

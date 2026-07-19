@@ -6,7 +6,9 @@
 
 # Interface: GraphEntity
 
-Defined in: [packages/core/src/types/memory.ts:353](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L353)
+Defined in: packages/core/src/types/memory.ts:353
+
+**`Stable`**
 
 Canonical entity in the lightweight in-SQLite relation graph (P2-1).
 The entity resolver (`@graphorin/memory`) deduplicates the raw
@@ -27,16 +29,14 @@ baseline [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) contract 
 `GraphMemoryStoreExt` exported from `@graphorin/memory` (W-048).
 Adapters without it simply have no relation graph.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | - | [packages/core/src/types/memory.ts:367](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L367) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | [packages/core/src/types/memory.ts:354](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L354) |
-| <a id="property-mergedinto"></a> `mergedInto?` | `readonly` | `string` | Canonical pointer. `undefined` ⇒ this entity is itself a root. Otherwise it is the id of the surviving entity this one was merged into; single-level by construction, so `mergedInto ?? id` resolves the canonical id without a recursive walk. | [packages/core/src/types/memory.ts:366](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L366) |
-| <a id="property-name"></a> `name` | `readonly` | `string` | Display name as first observed (the surface form that minted it). | [packages/core/src/types/memory.ts:357](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L357) |
-| <a id="property-normalizedname"></a> `normalizedName` | `readonly` | `string` | Case/space-folded key used for lexical dedup + the canonical unique index. | [packages/core/src/types/memory.ts:359](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L359) |
-| <a id="property-updatedat"></a> `updatedAt?` | `readonly` | `string` | - | [packages/core/src/types/memory.ts:368](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L368) |
-| <a id="property-userid"></a> `userId` | `readonly` | `string` | - | [packages/core/src/types/memory.ts:355](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L355) |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | - | packages/core/src/types/memory.ts:367 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/core/src/types/memory.ts:354 |
+| <a id="property-mergedinto"></a> `mergedInto?` | `readonly` | `string` | Canonical pointer. `undefined` ⇒ this entity is itself a root. Otherwise it is the id of the surviving entity this one was merged into; single-level by construction, so `mergedInto ?? id` resolves the canonical id without a recursive walk. | packages/core/src/types/memory.ts:366 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | Display name as first observed (the surface form that minted it). | packages/core/src/types/memory.ts:357 |
+| <a id="property-normalizedname"></a> `normalizedName` | `readonly` | `string` | Case/space-folded key used for lexical dedup + the canonical unique index. | packages/core/src/types/memory.ts:359 |
+| <a id="property-updatedat"></a> `updatedAt?` | `readonly` | `string` | - | packages/core/src/types/memory.ts:368 |
+| <a id="property-userid"></a> `userId` | `readonly` | `string` | - | packages/core/src/types/memory.ts:355 |

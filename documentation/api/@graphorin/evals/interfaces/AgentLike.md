@@ -6,13 +6,13 @@
 
 # Interface: AgentLike\&lt;I, O\&gt;
 
-Defined in: [packages/evals/src/types.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L31)
+Defined in: packages/evals/src/types.ts:31
+
+**`Stable`**
 
 Agent shape consumed by the runner. Anything with a `run(input)`
 method satisfies the contract - the framework's own `Agent` type
 matches by structural typing.
-
-## Stable
 
 ## Type Parameters
 
@@ -29,7 +29,7 @@ matches by structural typing.
 run(input, ctx?): Promise<O>;
 ```
 
-Defined in: [packages/evals/src/types.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/types.ts#L32)
+Defined in: packages/evals/src/types.ts:32
 
 #### Parameters
 

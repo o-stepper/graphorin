@@ -10,7 +10,9 @@
 function normalizeForMatching(text): string;
 ```
 
-Defined in: [packages/security/src/guardrails/normalize.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/normalize.ts#L25)
+Defined in: packages/security/src/guardrails/normalize.ts:25
+
+**`Stable`**
 
 Fold text to a match-friendly form: NFKC (collapses fullwidth /
 compatibility homoglyphs), strip zero-width characters, lowercase.
@@ -26,5 +28,3 @@ alphanumeric-only fold) so word-boundary regexes keep working.
 ## Returns
 
 `string`
-
-## Stable

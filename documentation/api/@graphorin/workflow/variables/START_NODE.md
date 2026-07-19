@@ -10,10 +10,10 @@
 const START_NODE: "__start__";
 ```
 
-Defined in: [packages/workflow/src/types.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L26)
+Defined in: packages/workflow/src/types.ts:26
+
+**`Stable`**
 
 Sentinel name reserved for the implicit start node. Edges originate
 from `__start__` and the engine creates the bootstrap task that
 applies the supplied input to the first user-defined node.
-
-## Stable

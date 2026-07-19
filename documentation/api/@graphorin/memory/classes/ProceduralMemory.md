@@ -6,7 +6,9 @@
 
 # Class: ProceduralMemory
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L101)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:101
+
+**`Stable`**
 
 `ProceduralMemory` - standing orders activated when the agent's
 current context matches the rule's predicate. The activation rules
@@ -19,8 +21,6 @@ not drive actions until validated). Quarantined procedures are excluded
 from [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate) but remain visible to
 [ProceduralMemory.list](/api/@graphorin/memory/classes/ProceduralMemory.md#list).
 
-## Stable
-
 ## Constructors
 
 ### Constructor
@@ -29,7 +29,7 @@ from [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory
 new ProceduralMemory(args): ProceduralMemory;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:112](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L112)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:112
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: [packages/memory/src/tiers/procedural-memory.ts:112](https://github.
 activate(scope, context?): Promise<readonly Rule[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:334](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L334)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:334
 
 Return the rules active under `context`. Rules without a
 `condition` are always active; the bundled predicate vocabulary
@@ -84,7 +84,7 @@ feeds the system prompt - never surfaces it.
 define(scope, input): Promise<Rule>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:192](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L192)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:192
 
 Persist a rule. Returns the stored record.
 
@@ -110,7 +110,7 @@ induce(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L235)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:235
 
 Induce a reusable procedure (P2-2) from a successful agent trajectory
 and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
@@ -143,7 +143,7 @@ induceFromRun(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:293](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L293)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:293
 
 Convenience over [induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce): distil the [Trajectory](/api/@graphorin/memory/interfaces/Trajectory.md) from a
 completed [RunState](/api/@graphorin/core/interfaces/RunState.md) (the agent's already-emitted run state) and
@@ -169,7 +169,7 @@ induce a procedure. The success signal is `status === 'completed'`.
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L315)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:315
 
 List every active (non-deleted) rule for the supplied scope.
 
@@ -198,7 +198,9 @@ recordOutcome(
 }>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L142)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:142
+
+**`Stable`**
 
 Record the outcome of one demonstrated reuse of a procedure
 (MCON-2 part 4). A success increments the rule's persistent
@@ -229,8 +231,6 @@ Callers decide what "success" means - typically
   `successCount`: `number`;
 \}\>
 
-#### Stable
-
 ***
 
 ### remove()
@@ -242,7 +242,7 @@ remove(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:302](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L302)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:302
 
 Soft-delete a rule.
 
@@ -269,7 +269,7 @@ search(
 opts?): Promise<readonly MemoryHit<Rule>[]>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:360](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L360)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:360
 
 Runbook content search (D3): "find the procedure for this task" -
 lexical recall over rule text, as opposed to predicate
@@ -312,7 +312,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/tiers/procedural-memory.ts:421](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/procedural-memory.ts#L421)
+Defined in: packages/memory/src/tiers/procedural-memory.ts:421
 
 Promote a quarantined (induced) procedure into `activate()` (MCON-2).
 Mirrors [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict

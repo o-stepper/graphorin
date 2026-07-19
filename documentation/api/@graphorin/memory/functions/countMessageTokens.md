@@ -10,7 +10,9 @@
 function countMessageTokens(messages, counter): Promise<number>;
 ```
 
-Defined in: [packages/memory/src/context-engine/token-counter.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L97)
+Defined in: packages/memory/src/context-engine/token-counter.ts:97
+
+**`Stable`**
 
 Count tokens across a message list using a [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md)
 (or the heuristic fallback). Used by the trigger-evaluation hot
@@ -27,5 +29,3 @@ step.
 ## Returns
 
 `Promise`\&lt;`number`\&gt;
-
-## Stable

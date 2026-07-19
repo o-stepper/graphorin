@@ -6,13 +6,13 @@
 
 # Interface: SchedulerLike
 
-Defined in: [packages/memory/src/consolidator/scheduler.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/scheduler.ts#L50)
+Defined in: packages/memory/src/consolidator/scheduler.ts:50
+
+**`Stable`**
 
 Subset of the `@graphorin/triggers` Scheduler surface the bridge
 needs. Defined structurally so consumers can inject mocks in
 tests without taking the package dependency.
-
-## Stable
 
 ## Methods
 
@@ -22,7 +22,7 @@ tests without taking the package dependency.
 register(declaration): Promise<unknown>;
 ```
 
-Defined in: [packages/memory/src/consolidator/scheduler.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/scheduler.ts#L51)
+Defined in: packages/memory/src/consolidator/scheduler.ts:51
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/memory/src/consolidator/scheduler.ts:51](https://github.co
 optional unregister(id): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/consolidator/scheduler.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/scheduler.ts#L52)
+Defined in: packages/memory/src/consolidator/scheduler.ts:52
 
 #### Parameters
 

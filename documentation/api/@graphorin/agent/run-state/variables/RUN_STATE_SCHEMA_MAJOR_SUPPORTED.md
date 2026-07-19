@@ -10,8 +10,8 @@
 const RUN_STATE_SCHEMA_MAJOR_SUPPORTED: 1 = 1;
 ```
 
-Defined in: [packages/agent/src/run-state/index.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L50)
+Defined in: packages/agent/src/run-state/index.ts:50
+
+**`Stable`**
 
 Reader-supported schema id range. Major version 1 only for v0.1.
-
-## Stable

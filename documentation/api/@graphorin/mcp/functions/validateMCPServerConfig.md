@@ -10,7 +10,9 @@
 function validateMCPServerConfig(opts): void;
 ```
 
-Defined in: [packages/mcp/src/helpers/validate-config.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/helpers/validate-config.ts#L22)
+Defined in: packages/mcp/src/helpers/validate-config.ts:22
+
+**`Stable`**
 
 Throws [MCPInvalidConfigError](/api/@graphorin/mcp/errors/classes/MCPInvalidConfigError.md) on invalid configuration.
 
@@ -25,5 +27,3 @@ Throws [MCPInvalidConfigError](/api/@graphorin/mcp/errors/classes/MCPInvalidConf
 ## Returns
 
 `void`
-
-## Stable

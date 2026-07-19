@@ -10,7 +10,9 @@
 function withSignal<T>(source, signal?): AsyncIterable<T>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L191)
+Defined in: packages/core/src/utils/streams.ts:191
+
+**`Stable`**
 
 Wrap `source` with abort-signal propagation: when `signal` aborts the
 underlying iterator's `return()` is called and the loop exits cleanly.
@@ -31,5 +33,3 @@ underlying iterator's `return()` is called and the loop exits cleanly.
 ## Returns
 
 `AsyncIterable`\&lt;`T`\&gt;
-
-## Stable

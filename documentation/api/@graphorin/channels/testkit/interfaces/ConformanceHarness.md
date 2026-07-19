@@ -6,14 +6,14 @@
 
 # Interface: ConformanceHarness
 
-Defined in: [packages/channels/src/testkit/conformance.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L50)
+Defined in: packages/channels/src/testkit/conformance.ts:50
+
+**`Stable`**
 
 Hooks the suite uses to drive the adapter under test. `sendInbound`
 must make the adapter produce ONE inbound message (for a real
 vendor adapter: through the vendor fake; the loopback adapter's
 `inject` satisfies it directly).
-
-## Stable
 
 ## Methods
 
@@ -23,7 +23,7 @@ vendor adapter: through the vendor fake; the loopback adapter's
 optional failNextDeliver(adapter): void;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L64)
+Defined in: packages/channels/src/testkit/conformance.ts:64
 
 Optional: make the NEXT `deliver` on `adapter` fail, so the
 typed-error contract can be exercised. Omit if the adapter
@@ -47,7 +47,7 @@ cannot simulate failures; the corresponding test is skipped.
 makeAdapter(): ChannelAdapter;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L52)
+Defined in: packages/channels/src/testkit/conformance.ts:52
 
 Fresh adapter instance per test.
 
@@ -63,7 +63,7 @@ Fresh adapter instance per test.
 sendInbound(adapter, text): Promise<InboundAcceptance>;
 ```
 
-Defined in: [packages/channels/src/testkit/conformance.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/conformance.ts#L58)
+Defined in: packages/channels/src/testkit/conformance.ts:58
 
 Cause `adapter` (already started) to emit one inbound message
 with the given text; resolves with the acceptance the adapter

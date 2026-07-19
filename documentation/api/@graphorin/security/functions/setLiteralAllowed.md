@@ -10,7 +10,9 @@
 function setLiteralAllowed(allowed): void;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/literal.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L23)
+Defined in: packages/security/src/secrets/resolvers/literal.ts:23
+
+**`Stable`**
 
 Programmatic gate - set from `secrets.allowLiteral: true` in user
 config. Must be combined with the env gate to actually unlock the
@@ -25,5 +27,3 @@ config. Must be combined with the env gate to actually unlock the
 ## Returns
 
 `void`
-
-## Stable

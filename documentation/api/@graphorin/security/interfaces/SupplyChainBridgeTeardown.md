@@ -6,17 +6,19 @@
 
 # Interface: SupplyChainBridgeTeardown()
 
-Defined in: [packages/security/src/audit/supply-chain-bridge.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/supply-chain-bridge.ts#L29)
+Defined in: packages/security/src/audit/supply-chain-bridge.ts:29
+
+**`Stable`**
 
 Teardown function returned by [bridgeSupplyChainToAudit](/api/@graphorin/security/functions/bridgeSupplyChainToAudit.md).
-
-## Stable
 
 ```ts
 SupplyChainBridgeTeardown(): void;
 ```
 
-Defined in: [packages/security/src/audit/supply-chain-bridge.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/supply-chain-bridge.ts#L30)
+Defined in: packages/security/src/audit/supply-chain-bridge.ts:30
+
+**`Stable`**
 
 Teardown function returned by [bridgeSupplyChainToAudit](/api/@graphorin/security/functions/bridgeSupplyChainToAudit.md).
 
@@ -24,10 +26,8 @@ Teardown function returned by [bridgeSupplyChainToAudit](/api/@graphorin/securit
 
 `void`
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | [packages/security/src/audit/supply-chain-bridge.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/supply-chain-bridge.ts#L31) |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/supply-chain-bridge.ts:31 |

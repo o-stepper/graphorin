@@ -12,7 +12,9 @@ function runInjectionClassifier(classifier, input): Promise<
 | null>;
 ```
 
-Defined in: [packages/security/src/inspect/injection-classifier.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/inspect/injection-classifier.ts#L64)
+Defined in: packages/security/src/inspect/injection-classifier.ts:64
+
+**`Stable`**
 
 Resilient invocation helper: `undefined` classifier, a rejected
 promise or a thrown error all yield `null` - the calling surface
@@ -31,5 +33,3 @@ way framework surfaces consult a classifier.
 `Promise`\<
   \| [`InjectionClassification`](/api/@graphorin/security/interfaces/InjectionClassification.md)
   \| `null`\>
-
-## Stable

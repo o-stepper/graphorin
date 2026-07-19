@@ -19,7 +19,7 @@ type OutboundCommentaryReason =
 
 Defined in: [packages/tools/dist/outbound/commentary-patterns.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/tools/dist/outbound/commentary-patterns.d.ts)
 
+**`Stable`**
+
 Stable label for each detection pattern. Surfaced in audit rows;
 the counter label cardinality is bounded.
-
-## Stable

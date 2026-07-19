@@ -12,7 +12,9 @@ function createExtendedHealthRoutes(options): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/health/routes.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/routes.ts#L42)
+Defined in: packages/server/src/health/routes.ts:42
+
+**`Stable`**
 
 Public health route (anonymous; mounted before auth middleware).
 Returns the rollup + per-check breakdown; HTTP 200 even when the
@@ -30,5 +32,3 @@ degradations. Only `'failing'` short-circuits with 503.
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

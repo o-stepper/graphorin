@@ -26,10 +26,10 @@ const CONSOLIDATOR_TIER_DEFAULTS: Readonly<Record<ConsolidatorTier, {
 }>>;
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:568](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L568)
+Defined in: packages/memory/src/consolidator/types.ts:568
+
+**`Stable`**
 
 Tier preset table. The defaults follow ADR-038 §4 - `'free'`
 disables every LLM phase and pins zero ceilings, the upper tiers
 widen the budget envelope progressively.
-
-## Stable

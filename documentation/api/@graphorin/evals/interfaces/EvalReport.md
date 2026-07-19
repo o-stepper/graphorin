@@ -8,9 +8,9 @@
 
 Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
-Final report shape.
+**`Stable`**
 
-## Stable
+Final report shape.
 
 ## Type Parameters
 

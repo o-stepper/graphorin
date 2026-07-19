@@ -10,7 +10,9 @@
 function createCodeSearchTool(opts): Tool<CodeSearchInput, string>;
 ```
 
-Defined in: [packages/tools/src/code-mode/meta-tools.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L93)
+Defined in: packages/tools/src/code-mode/meta-tools.ts:93
+
+**`Stable`**
 
 Build the `code_search` meta-tool. Returns matching `tools.<name>(…)`
 signatures as text (eager substring match + the deferred pool).
@@ -24,5 +26,3 @@ signatures as text (eager substring match + the deferred pool).
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`CodeSearchInput`, `string`\&gt;
-
-## Stable

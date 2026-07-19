@@ -45,7 +45,9 @@ type CollisionResolution =
 };
 ```
 
-Defined in: [packages/tools/src/registry/types.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L45)
+Defined in: packages/tools/src/registry/types.ts:45
+
+**`Stable`**
 
 Audit row produced for every collision the registry resolves. The
 dispatcher writes one record per `(toolName, action)` pair; the
@@ -124,9 +126,7 @@ records so the data path stays single-source.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `action` | `"suppressed"` | W-116: an auto-prefix loser whose rename was impossible (the residual case after the fallback namespace + truncation - e.g. a pathological future source shape). The loser is dropped from the catalogue, but never silently: this record, a `tool:collision:suppressed` audit row and the `tool.collision.suppressed.total` counter all mark it. | [packages/tools/src/registry/types.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L90) |
-| `losers` | `ReadonlyArray`\&lt;[`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md)\&gt; | - | [packages/tools/src/registry/types.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L81) |
-| `toolName` | `string` | - | [packages/tools/src/registry/types.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L79) |
-| `winner` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | [packages/tools/src/registry/types.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L80) |
-
-## Stable
+| `action` | `"suppressed"` | W-116: an auto-prefix loser whose rename was impossible (the residual case after the fallback namespace + truncation - e.g. a pathological future source shape). The loser is dropped from the catalogue, but never silently: this record, a `tool:collision:suppressed` audit row and the `tool.collision.suppressed.total` counter all mark it. | packages/tools/src/registry/types.ts:90 |
+| `losers` | `ReadonlyArray`\&lt;[`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md)\&gt; | - | packages/tools/src/registry/types.ts:81 |
+| `toolName` | `string` | - | packages/tools/src/registry/types.ts:79 |
+| `winner` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/tools/src/registry/types.ts:80 |

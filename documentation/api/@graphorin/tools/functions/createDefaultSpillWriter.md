@@ -10,7 +10,9 @@
 function createDefaultSpillWriter(options?): SpillWriter;
 ```
 
-Defined in: [packages/tools/src/result/spill.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/result/spill.ts#L61)
+Defined in: packages/tools/src/result/spill.ts:61
+
+**`Stable`**
 
 Build the default spill writer - writes the un-truncated body to
 `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
@@ -34,5 +36,3 @@ Operators that need a sandbox-aware path inject their own writer via
 ## Returns
 
 `SpillWriter`
-
-## Stable

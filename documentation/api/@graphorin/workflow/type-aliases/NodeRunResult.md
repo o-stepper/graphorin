@@ -16,7 +16,9 @@ type NodeRunResult<TState> =
 | Partial<TState>>;
 ```
 
-Defined in: [packages/workflow/src/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L221)
+Defined in: packages/workflow/src/types.ts:221
+
+**`Stable`**
 
 Permissible return shapes from a node's `run(...)` callback.
 
@@ -32,5 +34,3 @@ Permissible return shapes from a node's `run(...)` callback.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
-
-## Stable

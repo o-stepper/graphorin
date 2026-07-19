@@ -10,7 +10,9 @@
 function runStorageStatus(options?): Promise<StorageStatusResult>;
 ```
 
-Defined in: [packages/cli/src/commands/storage.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L68)
+Defined in: packages/cli/src/commands/storage.ts:68
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/storage.ts:68](https://github.com/o-stepp
 ## Returns
 
 `Promise`\&lt;[`StorageStatusResult`](/api/@graphorin/cli/interfaces/StorageStatusResult.md)\&gt;
-
-## Stable

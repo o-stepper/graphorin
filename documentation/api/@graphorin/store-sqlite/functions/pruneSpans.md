@@ -10,7 +10,9 @@
 function pruneSpans(conn, opts): number;
 ```
 
-Defined in: [packages/store-sqlite/src/span-store.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/span-store.ts#L137)
+Defined in: packages/store-sqlite/src/span-store.ts:137
+
+**`Stable`**
 
 Age-based span retention (W-008): delete every span that FINISHED
 before the cutoff, including rows with `session_id IS NULL` (not
@@ -32,5 +34,3 @@ table scan. Returns the number of rows deleted.
 ## Returns
 
 `number`
-
-## Stable

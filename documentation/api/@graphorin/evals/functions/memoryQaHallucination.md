@@ -10,7 +10,9 @@
 function memoryQaHallucination(options): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/qa.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/qa.ts#L41)
+Defined in: packages/evals/src/scorers/memory/qa.ts:41
+
+**`Stable`**
 
 Build the QA hallucination judge. Score `maxScore` = fully grounded
 (or a correct abstention); score `0` = fabricated memory content.
@@ -24,5 +26,3 @@ Build the QA hallucination judge. Score `maxScore` = fully grounded
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;[`MemoryOperationsEvalInput`](/api/@graphorin/evals/interfaces/MemoryOperationsEvalInput.md), [`MemoryOperationsObservation`](/api/@graphorin/evals/interfaces/MemoryOperationsObservation.md)\&gt;
-
-## Stable

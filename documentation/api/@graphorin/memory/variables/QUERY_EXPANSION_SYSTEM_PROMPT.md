@@ -10,7 +10,7 @@
 const QUERY_EXPANSION_SYSTEM_PROMPT: string;
 ```
 
-Defined in: [packages/memory/src/search/query-transform.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L83)
+Defined in: packages/memory/src/search/query-transform.ts:83
 
 **`Internal`**
 

@@ -12,7 +12,9 @@ type ChannelInboundHandler = (context) => Promise<
 | undefined>;
 ```
 
-Defined in: [packages/channels/src/gateway.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/gateway.ts#L69)
+Defined in: packages/channels/src/gateway.ts:69
+
+**`Stable`**
 
 The application seam: invoked once per authorized inbound message,
 typically running an agent for `route.agentId` /
@@ -31,5 +33,3 @@ warned), never fatal to the gateway.
 `Promise`\<
   \| [`ChannelReply`](/api/@graphorin/channels/interfaces/ChannelReply.md)
   \| `undefined`\>
-
-## Stable

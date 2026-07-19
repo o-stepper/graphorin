@@ -6,9 +6,9 @@
 
 # Interface: McpApi
 
-Defined in: [packages/server/src/routes/mcp.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L21)
+Defined in: packages/server/src/routes/mcp.ts:21
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -18,7 +18,7 @@ Defined in: [packages/server/src/routes/mcp.ts:21](https://github.com/o-stepper/
 list(): Promise<readonly unknown[]>;
 ```
 
-Defined in: [packages/server/src/routes/mcp.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L22)
+Defined in: packages/server/src/routes/mcp.ts:22
 
 #### Returns
 
@@ -32,7 +32,7 @@ Defined in: [packages/server/src/routes/mcp.ts:22](https://github.com/o-stepper/
 register(input): Promise<unknown>;
 ```
 
-Defined in: [packages/server/src/routes/mcp.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L23)
+Defined in: packages/server/src/routes/mcp.ts:23
 
 #### Parameters
 
@@ -55,7 +55,7 @@ Defined in: [packages/server/src/routes/mcp.ts:23](https://github.com/o-stepper/
 remove(id): Promise<boolean>;
 ```
 
-Defined in: [packages/server/src/routes/mcp.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L28)
+Defined in: packages/server/src/routes/mcp.ts:28
 
 #### Parameters
 

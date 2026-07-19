@@ -6,7 +6,9 @@
 
 # Interface: SecretsBridgeTeardown()
 
-Defined in: [packages/security/src/audit/secrets-bridge.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L45)
+Defined in: packages/security/src/audit/secrets-bridge.ts:45
+
+**`Stable`**
 
 Teardown function returned by `bridgeSecretsToAudit(...)`.
 
@@ -15,13 +17,13 @@ once every queued audit-log write has settled so test suites and
 graceful-shutdown paths can wait for the bridge to finish before
 closing the audit database.
 
-## Stable
-
 ```ts
 SecretsBridgeTeardown(): void;
 ```
 
-Defined in: [packages/security/src/audit/secrets-bridge.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L46)
+Defined in: packages/security/src/audit/secrets-bridge.ts:46
+
+**`Stable`**
 
 Teardown function returned by `bridgeSecretsToAudit(...)`.
 
@@ -34,10 +36,8 @@ closing the audit database.
 
 `void`
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | [packages/security/src/audit/secrets-bridge.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L47) |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/secrets-bridge.ts:47 |

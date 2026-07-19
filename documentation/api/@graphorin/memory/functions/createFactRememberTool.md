@@ -10,7 +10,9 @@
 function createFactRememberTool(deps): Tool<FactRememberInput, FactRememberOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/fact-tools.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L232)
+Defined in: packages/memory/src/tools/fact-tools.ts:232
+
+**`Stable`**
 
 `fact_remember` - persist a single semantic fact. The minimum-viable
 pipeline writes the fact straight through with MD5 deduplication;
@@ -25,5 +27,3 @@ Phase 10b extends the body with the multi-stage conflict resolution.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactRememberInput`, `FactRememberOutput`\&gt;
-
-## Stable

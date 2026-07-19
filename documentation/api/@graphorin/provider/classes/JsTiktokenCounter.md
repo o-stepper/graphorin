@@ -6,13 +6,13 @@
 
 # Class: JsTiktokenCounter
 
-Defined in: [packages/provider/src/counters/js-tiktoken.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L75)
+Defined in: packages/provider/src/counters/js-tiktoken.ts:75
+
+**`Stable`**
 
 Counter that delegates to the `js-tiktoken` package. Caches the
 dynamically-loaded module per process; tests use `moduleOverride`
 to supply a fixture-shaped substitute.
-
-## Stable
 
 ## Implements
 
@@ -26,7 +26,7 @@ to supply a fixture-shaped substitute.
 new JsTiktokenCounter(options?): JsTiktokenCounter;
 ```
 
-Defined in: [packages/provider/src/counters/js-tiktoken.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L83)
+Defined in: packages/provider/src/counters/js-tiktoken.ts:83
 
 #### Parameters
 
@@ -42,8 +42,8 @@ Defined in: [packages/provider/src/counters/js-tiktoken.ts:83](https://github.co
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/provider/src/counters/js-tiktoken.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L76) |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/provider/src/counters/js-tiktoken.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L77) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/js-tiktoken.ts:76 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/js-tiktoken.ts:77 |
 
 ## Methods
 
@@ -53,7 +53,7 @@ Defined in: [packages/provider/src/counters/js-tiktoken.ts:83](https://github.co
 count(messages): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/js-tiktoken.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L91)
+Defined in: packages/provider/src/counters/js-tiktoken.ts:91
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -79,7 +79,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/js-tiktoken.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L101)
+Defined in: packages/provider/src/counters/js-tiktoken.ts:101
 
 Count tokens in a raw text string.
 

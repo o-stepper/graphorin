@@ -12,7 +12,9 @@ function createMetricsRoutes(options): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/health/routes.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/routes.ts#L132)
+Defined in: packages/server/src/health/routes.ts:132
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/health/routes.ts:132](https://github.com/o-step
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

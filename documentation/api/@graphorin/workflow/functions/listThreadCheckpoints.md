@@ -13,7 +13,9 @@ function listThreadCheckpoints(
 threadId): Promise<readonly ThreadCheckpointSummary[]>;
 ```
 
-Defined in: [packages/workflow/src/inspect.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/inspect.ts#L93)
+Defined in: packages/workflow/src/inspect.ts:93
+
+**`Stable`**
 
 List every persisted checkpoint of `threadId` under workflow
 `workflowName`, newest first as the store yields them, summarised
@@ -30,5 +32,3 @@ for operator display (id, parent, step, status, node).
 ## Returns
 
 `Promise`\&lt;readonly [`ThreadCheckpointSummary`](/api/@graphorin/workflow/interfaces/ThreadCheckpointSummary.md)[]\&gt;
-
-## Stable

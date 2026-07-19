@@ -12,7 +12,9 @@ function createScopeMiddleware(requirement): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: [packages/server/src/middleware/scope.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/scope.ts#L35)
+Defined in: packages/server/src/middleware/scope.ts:35
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/server/src/middleware/scope.ts:35](https://github.com/o-st
 `MiddlewareHandler`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

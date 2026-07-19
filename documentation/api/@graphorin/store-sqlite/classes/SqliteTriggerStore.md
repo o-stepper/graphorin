@@ -6,7 +6,9 @@
 
 # Class: SqliteTriggerStore
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L18)
+Defined in: packages/store-sqlite/src/trigger-store.ts:18
+
+**`Stable`**
 
 Default `TriggerStore` implementation. Backs the `@graphorin/triggers`
 scheduler with persistent rows so cron / interval / idle / event
@@ -18,8 +20,6 @@ concurrency matrix). `recordFire` still carries a monotonic
 wall-clock fence as best-effort defense in depth for that
 unsupported case - a duplicate fixation with the same-or-earlier
 `firedAt` is a no-op instead of rewinding trigger state.
-
-## Stable
 
 ## Implements
 
@@ -33,7 +33,7 @@ unsupported case - a duplicate fixation with the same-or-earlier
 new SqliteTriggerStore(conn): SqliteTriggerStore;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L20)
+Defined in: packages/store-sqlite/src/trigger-store.ts:20
 
 #### Parameters
 
@@ -55,7 +55,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L50)
+Defined in: packages/store-sqlite/src/trigger-store.ts:50
 
 #### Parameters
 
@@ -81,7 +81,7 @@ Defined in: [packages/store-sqlite/src/trigger-store.ts:50](https://github.com/o
 list(): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L55)
+Defined in: packages/store-sqlite/src/trigger-store.ts:55
 
 #### Returns
 
@@ -102,7 +102,7 @@ recordFire(
 nextFireAt?): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L75)
+Defined in: packages/store-sqlite/src/trigger-store.ts:75
 
 Persist a fire. W-133: the update carries a monotonic fence -
 a call whose `firedAt` is not strictly later than the stored
@@ -138,7 +138,7 @@ timestamp, so supported behaviour is unchanged.
 remove(id): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L60)
+Defined in: packages/store-sqlite/src/trigger-store.ts:60
 
 #### Parameters
 
@@ -162,7 +162,7 @@ Defined in: [packages/store-sqlite/src/trigger-store.ts:60](https://github.com/o
 upsert(state): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/trigger-store.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/trigger-store.ts#L24)
+Defined in: packages/store-sqlite/src/trigger-store.ts:24
 
 #### Parameters
 

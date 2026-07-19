@@ -12,8 +12,8 @@ const PAUSE_SIGNAL_BRAND: unique symbol;
 
 Defined in: [packages/core/dist/channels/pause.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/pause.d.ts)
 
+**`Stable`**
+
 Brand attached to the signal thrown by `pause(value)` so that the
 workflow runtime can recognise it across realms (Worker threads,
 sandboxes, …) without `instanceof`.
-
-## Stable

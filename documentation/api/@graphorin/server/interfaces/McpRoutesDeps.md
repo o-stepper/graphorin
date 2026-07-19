@@ -6,12 +6,12 @@
 
 # Interface: McpRoutesDeps
 
-Defined in: [packages/server/src/routes/mcp.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L42)
+Defined in: packages/server/src/routes/mcp.ts:42
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-mcp"></a> `mcp` | `readonly` | [`McpApi`](/api/@graphorin/server/interfaces/McpApi.md) | [packages/server/src/routes/mcp.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/mcp.ts#L43) |
+| <a id="property-mcp"></a> `mcp` | `readonly` | [`McpApi`](/api/@graphorin/server/interfaces/McpApi.md) | packages/server/src/routes/mcp.ts:43 |

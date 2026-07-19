@@ -10,7 +10,9 @@
 function computeAuditHash(entry): string;
 ```
 
-Defined in: [packages/security/src/audit/append.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/append.ts#L41)
+Defined in: packages/security/src/audit/append.ts:41
+
+**`Stable`**
 
 Compute the SHA-256 chain hash for an entry. Exposed for tests and
 for tooling that wants to recompute hashes outside the verifier.
@@ -24,5 +26,3 @@ for tooling that wants to recompute hashes outside the verifier.
 ## Returns
 
 `string`
-
-## Stable

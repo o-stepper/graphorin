@@ -10,7 +10,9 @@
 function isApprovalPauseValue(value): value is ApprovalPauseValue;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L110)
+Defined in: packages/core/src/channels/durable.ts:110
+
+**`Stable`**
 
 Type guard for [ApprovalPauseValue](/api/@graphorin/core/interfaces/ApprovalPauseValue.md).
 
@@ -23,5 +25,3 @@ Type guard for [ApprovalPauseValue](/api/@graphorin/core/interfaces/ApprovalPaus
 ## Returns
 
 `value is ApprovalPauseValue`
-
-## Stable

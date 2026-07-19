@@ -13,7 +13,9 @@ function shouldPromote(
    nowMs): boolean;
 ```
 
-Defined in: [packages/memory/src/consolidator/promotion.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/promotion.ts#L92)
+Defined in: packages/memory/src/consolidator/promotion.ts:92
+
+**`Stable`**
 
 The pure verdict: does this candidate clear every threshold at
 `nowMs`? No I/O, no clock reads.
@@ -29,5 +31,3 @@ The pure verdict: does this candidate clear every threshold at
 ## Returns
 
 `boolean`
-
-## Stable

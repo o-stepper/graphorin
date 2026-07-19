@@ -10,7 +10,9 @@
 function parseServerConfig(input): ServerConfigSpec;
 ```
 
-Defined in: [packages/server/src/config.ts:482](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/config.ts#L482)
+Defined in: packages/server/src/config.ts:482
+
+**`Stable`**
 
 Parse + validate user input. Returns a strongly-typed
 [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md); throws [ConfigInvalidError](/api/@graphorin/server/errors/classes/ConfigInvalidError.md) on
@@ -25,5 +27,3 @@ any invalid field with a flattened issue list.
 ## Returns
 
 [`ServerConfigSpec`](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md)
-
-## Stable

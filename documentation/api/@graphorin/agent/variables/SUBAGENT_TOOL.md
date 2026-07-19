@@ -10,7 +10,7 @@
 const SUBAGENT_TOOL: unique symbol;
 ```
 
-Defined in: [packages/agent/src/runtime/agent-to-tool.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L79)
+Defined in: packages/agent/src/runtime/agent-to-tool.ts:79
 
 W-001: well-known marker on every `toTool()` tool object. The
 graphorin tool-call walk detects it and executes the sub-agent

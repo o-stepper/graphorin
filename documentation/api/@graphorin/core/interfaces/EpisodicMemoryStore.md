@@ -6,9 +6,9 @@
 
 # Interface: EpisodicMemoryStore
 
-Defined in: [packages/core/src/contracts/memory-store.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L175)
+Defined in: packages/core/src/contracts/memory-store.ts:175
 
-## Stable
+**`Stable`**
 
 ## Extended by
 
@@ -22,7 +22,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:175](https://github.com
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L181)
+Defined in: packages/core/src/contracts/memory-store.ts:181
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:181](https://github.com
 put(episode): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L176)
+Defined in: packages/core/src/contracts/memory-store.ts:176
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: [packages/core/src/contracts/memory-store.ts:176](https://github.com
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: [packages/core/src/contracts/memory-store.ts:177](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L177)
+Defined in: packages/core/src/contracts/memory-store.ts:177
 
 #### Parameters
 

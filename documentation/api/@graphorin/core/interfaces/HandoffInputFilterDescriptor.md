@@ -6,7 +6,9 @@
 
 # Interface: HandoffInputFilterDescriptor
 
-Defined in: [packages/core/src/types/handoff.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/handoff.ts#L54)
+Defined in: packages/core/src/types/handoff.ts:54
+
+**`Stable`**
 
 Stable, serializable description of the input filter applied to a
 handoff. Persisted alongside `HandoffRecord` and round-tripped through
@@ -22,11 +24,9 @@ carries kind-specific data (for example `{ n: 10 }` for `'last-n'`,
 for `'compose'`). New kinds may be added freely; consumers must not
 assume an exhaustive switch.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | [packages/core/src/types/handoff.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/handoff.ts#L55) |
-| <a id="property-meta"></a> `meta?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/core/src/types/handoff.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/handoff.ts#L56) |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | packages/core/src/types/handoff.ts:55 |
+| <a id="property-meta"></a> `meta?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/types/handoff.ts:56 |

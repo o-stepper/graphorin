@@ -12,7 +12,9 @@ function runSecretsSet(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L139)
+Defined in: packages/cli/src/commands/secrets.ts:139
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/secrets.ts:139](https://github.com/o-step
 `Promise`\<\{
   `ok`: `true`;
 \}\>
-
-## Stable

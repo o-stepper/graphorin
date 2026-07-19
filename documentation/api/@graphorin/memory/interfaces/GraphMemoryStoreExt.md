@@ -6,7 +6,9 @@
 
 # Interface: GraphMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:873](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L873)
+Defined in: packages/memory/src/internal/storage-adapter.ts:873
+
+**`Stable`**
 
 Optional storage extension for the lightweight in-SQLite relation
 graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
@@ -18,8 +20,6 @@ persistence + the recursive-CTE traversal.
 Adapters that opt out leave the property undefined; entity resolution
 on write degrades to a no-op and `search({ expandHops })` skips
 expansion. The default `@graphorin/store-sqlite` adapter implements it.
-
-## Stable
 
 ## Methods
 
@@ -35,7 +35,7 @@ optional expandActivation(
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:924](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L924)
+Defined in: packages/memory/src/internal/storage-adapter.ts:924
 
 PPR-lite graded expansion (D5): like [expandOneHop](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#expandonehop) but returns
 each neighbour with its minimum hop `depth` from the seeds, so the
@@ -68,7 +68,7 @@ expandOneHop(
 opts?): Promise<readonly Fact[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:913](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L913)
+Defined in: packages/memory/src/internal/storage-adapter.ts:913
 
 Expand seed facts to neighbours sharing a canonical entity (one-hop CTE).
 
@@ -95,7 +95,7 @@ optional factsForEntityName(
 opts?): Promise<readonly Fact[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:934](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L934)
+Defined in: packages/memory/src/internal/storage-adapter.ts:934
 
 Exact entity-match retriever (D5): facts linked to the canonical
 entity for `normalizedName`. Optional. Powers a precise
@@ -121,7 +121,7 @@ entity for `normalizedName`. Optional. Powers a precise
 optional findEntityByNormalizedName(scope, normalizedName): Promise<EntityWithEmbedding | null>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:890](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L890)
+Defined in: packages/memory/src/internal/storage-adapter.ts:890
 
 Uncapped indexed lookup of the canonical root for an exact normalized
 name. Lets the resolver dedup an exact alias of an arbitrarily-old
@@ -148,7 +148,7 @@ it fall back to the capped lexical scan inside `resolveEntityDecision`.
 getEntity(scope, id): Promise<GraphEntity | null>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:895](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L895)
+Defined in: packages/memory/src/internal/storage-adapter.ts:895
 
 Lookup one entity by id (any merge state).
 
@@ -174,7 +174,7 @@ linkFactEntity(
 role): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:877](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L877)
+Defined in: packages/memory/src/internal/storage-adapter.ts:877
 
 Link a fact's subject / object to a canonical entity (idempotent).
 
@@ -198,7 +198,7 @@ Link a fact's subject / object to a canonical entity (idempotent).
 listEntities(scope, opts?): Promise<readonly EntityWithEmbedding[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:879](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L879)
+Defined in: packages/memory/src/internal/storage-adapter.ts:879
 
 Candidate entities for the resolver (roots only unless `includeMerged`).
 
@@ -223,7 +223,7 @@ Candidate entities for the resolver (roots only unless `includeMerged`).
 listMerges(scope, opts?): Promise<readonly EntityMergeRecord[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:908](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L908)
+Defined in: packages/memory/src/internal/storage-adapter.ts:908
 
 The append-only merge / unmerge ledger, newest first.
 
@@ -251,7 +251,7 @@ mergeEntities(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:899](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L899)
+Defined in: packages/memory/src/internal/storage-adapter.ts:899
 
 Merge `fromId` into `intoId`'s root; auditable + reversible.
 
@@ -276,7 +276,7 @@ Merge `fromId` into `intoId`'s root; auditable + reversible.
 resolveCanonical(scope, id): Promise<string>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:897](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L897)
+Defined in: packages/memory/src/internal/storage-adapter.ts:897
 
 Follow `mergedInto` to the canonical root id.
 
@@ -302,7 +302,7 @@ unmergeEntity(
 reason?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:906](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L906)
+Defined in: packages/memory/src/internal/storage-adapter.ts:906
 
 Reverse a merge: make `id` a root again + record an audit row.
 
@@ -326,7 +326,7 @@ Reverse a merge: make `id` a root again + record an audit row.
 upsertEntity(scope, input): Promise<string>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:875](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L875)
+Defined in: packages/memory/src/internal/storage-adapter.ts:875
 
 Find-or-create the canonical (root) entity for the normalized name.
 

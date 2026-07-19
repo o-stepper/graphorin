@@ -10,7 +10,9 @@
 function argumentValidity<I>(options): Scorer<I, Trajectory>;
 ```
 
-Defined in: [packages/evals/src/scorers/trajectory/argument-validity.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/argument-validity.ts#L27)
+Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:27
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/evals/src/scorers/trajectory/argument-validity.ts:27](http
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\&gt;
-
-## Stable

@@ -10,6 +10,6 @@
 type MetricKind = "counter" | "gauge" | "summary";
 ```
 
-Defined in: [packages/server/src/metrics/registry.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/metrics/registry.ts#L17)
+Defined in: packages/server/src/metrics/registry.ts:17
 
-## Stable
+**`Stable`**

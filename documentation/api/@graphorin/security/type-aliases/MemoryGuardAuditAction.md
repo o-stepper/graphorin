@@ -17,7 +17,9 @@ type MemoryGuardAuditAction =
   | "memory:guard:exceeded-budget";
 ```
 
-Defined in: [packages/security/src/guard/audit-emitter.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L34)
+Defined in: packages/security/src/guard/audit-emitter.ts:34
+
+**`Stable`**
 
 Discriminator for `MemoryGuardAuditEvent` variants. The audit log
 stores the values verbatim under the canonical
@@ -34,5 +36,3 @@ Two layers of action names coexist by design:
    discriminator (`snapshot`, `verified`, `mismatch`,
    `rolled-back`, `exceeded-budget`) for telemetry consumers that
    want to filter by outcome without re-reading the metadata.
-
-## Stable

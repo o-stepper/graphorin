@@ -10,9 +10,9 @@
 const onePasswordResolver: SecretResolver;
 ```
 
-Defined in: [packages/secret-1password/src/resolver.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/resolver.ts#L120)
+Defined in: packages/secret-1password/src/resolver.ts:120
+
+**`Stable`**
 
 Cache the default-options resolver so callers that just want the
 happy-path behaviour can use a constant export.
-
-## Stable

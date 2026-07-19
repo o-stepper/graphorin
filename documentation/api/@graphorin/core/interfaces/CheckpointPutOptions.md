@@ -6,7 +6,9 @@
 
 # Interface: CheckpointPutOptions
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L119)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:119
+
+**`Stable`**
 
 Optional atomicity contract for [CheckpointStore.put](/api/@graphorin/core/interfaces/CheckpointStore.md#put) (D1 /
 workflow-01). When `expectedLatestId` is supplied, the store MUST
@@ -18,10 +20,8 @@ no checkpoint for this thread yet"; `undefined` (or a store that
 ignores the argument) preserves the unguarded legacy behaviour, which
 the engine backstops with its own pre-check.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | [packages/core/src/contracts/checkpoint-store.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L120) |
+| <a id="property-expectedlatestid"></a> `expectedLatestId?` | `readonly` | `string` \| `null` | packages/core/src/contracts/checkpoint-store.ts:120 |

@@ -13,7 +13,9 @@ function mapStream<T, U>(
 signal?): AsyncIterable<U>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L39)
+Defined in: packages/core/src/utils/streams.ts:39
+
+**`Stable`**
 
 Map every value of an async iterable. The mapper may be async.
 Cancellation via `signal` is honored.
@@ -36,5 +38,3 @@ Cancellation via `signal` is honored.
 ## Returns
 
 `AsyncIterable`\&lt;`U`\&gt;
-
-## Stable

@@ -10,10 +10,10 @@
 const DEFAULT_RESERVED_FOR_COMPACTION: 8192 = 8192;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/thresholds.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/thresholds.ts#L29)
+Defined in: packages/memory/src/context-engine/compaction/thresholds.ts:29
+
+**`Stable`**
 
 Reserved tokens for the compaction summarizer call so the
 summarizer fits without re-triggering. Mirrors the suggested
 DEC-162 default.
-
-## Stable

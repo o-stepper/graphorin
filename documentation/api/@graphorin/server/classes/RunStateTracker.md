@@ -6,14 +6,14 @@
 
 # Class: RunStateTracker
 
-Defined in: [packages/server/src/runtime/run-state.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L198)
+Defined in: packages/server/src/runtime/run-state.ts:198
+
+**`Stable`**
 
 Pluggable tracker. Bookkeeping is in-memory; wire
 [RunStateTracker.setSuspendedRunPersistence](/api/@graphorin/server/classes/RunStateTracker.md#setsuspendedrunpersistence) to make suspended
 runs durable across process restarts (the standalone server does, on
 top of `store.suspendedRuns`).
-
-## Stable
 
 ## Constructors
 
@@ -23,7 +23,7 @@ top of `store.suspendedRuns`).
 new RunStateTracker(options?): RunStateTracker;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L205)
+Defined in: packages/server/src/runtime/run-state.ts:205
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: [packages/server/src/runtime/run-state.ts:205](https://github.com/o-
 abort(runId, reason?): boolean;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:393](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L393)
+Defined in: packages/server/src/runtime/run-state.ts:393
 
 Cancel a run via its `AbortController`.
 
@@ -68,7 +68,7 @@ Cancel a run via its `AbortController`.
 abortAll(reason?): number;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:505](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L505)
+Defined in: packages/server/src/runtime/run-state.ts:505
 
 Cancel every in-flight run. Used during graceful shutdown.
 
@@ -90,7 +90,7 @@ Cancel every in-flight run. Used during graceful shutdown.
 abortPending(reason?): number;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:469](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L469)
+Defined in: packages/server/src/runtime/run-state.ts:469
 
 Drop every reserved-but-not-yet-started run. Called by the
 server lifecycle at the start of `stop()` so the drain only
@@ -117,7 +117,7 @@ complete(
    err?): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:319](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L319)
+Defined in: packages/server/src/runtime/run-state.ts:319
 
 Mark a run as terminal.
 
@@ -141,7 +141,7 @@ Mark a run as terminal.
 declare(runId, descriptor): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:281](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L281)
+Defined in: packages/server/src/runtime/run-state.ts:281
 
 Reserve a run id without taking ownership of an AbortSignal.
 
@@ -164,7 +164,7 @@ Reserve a run id without taking ownership of an AbortSignal.
 inflightCount(): number;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:442](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L442)
+Defined in: packages/server/src/runtime/run-state.ts:442
 
 Number of runs currently in `pending` or `running`. Useful for
 snapshots / metrics. Note that `pending` runs hold a reservation
@@ -183,7 +183,7 @@ the drain-blocking subset.
 prune(olderThan): number;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:484](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L484)
+Defined in: packages/server/src/runtime/run-state.ts:484
 
 Drop terminal records older than `olderThan`.
 
@@ -208,7 +208,7 @@ registerSuspended(
    state): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:372](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L372)
+Defined in: packages/server/src/runtime/run-state.ts:372
 
 C3: register an EXTERNALLY-suspended run (e.g. a proactive fire
 that ran in-process, outside the REST surface) so the messenger's
@@ -236,7 +236,7 @@ server-side).
 runningCount(): number;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:456](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L456)
+Defined in: packages/server/src/runtime/run-state.ts:456
 
 Number of runs with active work in progress (`running`). The
 lifecycle drain blocks on this counter only - pending runs are a
@@ -255,7 +255,7 @@ aborted immediately when SIGTERM arrives.
 setActivityListener(listener): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L229)
+Defined in: packages/server/src/runtime/run-state.ts:229
 
 A2 (item 7): register the server-side activity listener. The
 tracker is the single choke point every REST/WS run passes
@@ -283,7 +283,7 @@ so a bridge failure can never break run tracking.
 setSuspendedRunPersistence(hooks): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:246](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L246)
+Defined in: packages/server/src/runtime/run-state.ts:246
 
 Register the suspended-run persistence delegate (one slot -
 `createServer` owns it). Exceptions are swallowed so a durability
@@ -309,7 +309,7 @@ snapshot(runId):
   | undefined;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:414](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L414)
+Defined in: packages/server/src/runtime/run-state.ts:414
 
 Read-only snapshot, safe to JSON.stringify.
 
@@ -332,7 +332,7 @@ Read-only snapshot, safe to JSON.stringify.
 start(runId, descriptor): RunHandle;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:294](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L294)
+Defined in: packages/server/src/runtime/run-state.ts:294
 
 Promote a previously-declared run to `running` (or declare it).
 
@@ -355,7 +355,7 @@ Promote a previously-declared run to `running` (or declare it).
 suspend(runId, state): void;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:356](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L356)
+Defined in: packages/server/src/runtime/run-state.ts:356
 
 C3/W-119: park a run whose agent suspended on durable HITL. The
 tracker retains the resumable `RunState` (opaque) so the REST
@@ -382,7 +382,7 @@ metric - the run is not over.
 suspendedStateOf(runId): unknown;
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:388](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L388)
+Defined in: packages/server/src/runtime/run-state.ts:388
 
 Peek the retained suspended state (C3). `undefined` when none.
 

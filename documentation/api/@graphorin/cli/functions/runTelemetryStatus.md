@@ -10,7 +10,9 @@
 function runTelemetryStatus(options?): TelemetryStatusResult;
 ```
 
-Defined in: [packages/cli/src/commands/telemetry.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L50)
+Defined in: packages/cli/src/commands/telemetry.ts:50
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/telemetry.ts:50](https://github.com/o-ste
 ## Returns
 
 [`TelemetryStatusResult`](/api/@graphorin/cli/interfaces/TelemetryStatusResult.md)
-
-## Stable

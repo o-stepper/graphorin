@@ -16,10 +16,10 @@ type SandboxKind =
 };
 ```
 
-Defined in: [packages/security/src/sandbox/sandbox.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/sandbox.ts#L33)
+Defined in: packages/security/src/sandbox/sandbox.ts:33
+
+**`Stable`**
 
 Discriminator for the four built-in sandbox kinds. Custom adapters
 may register additional kinds by declaring `(string & {})` literals
 in user code.
-
-## Stable

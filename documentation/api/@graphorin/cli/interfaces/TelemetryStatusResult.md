@@ -6,14 +6,14 @@
 
 # Interface: TelemetryStatusResult
 
-Defined in: [packages/cli/src/commands/telemetry.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L35)
+Defined in: packages/cli/src/commands/telemetry.ts:35
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-enabled"></a> `enabled` | `readonly` | `false` | [packages/cli/src/commands/telemetry.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L36) |
-| <a id="property-policy"></a> `policy` | `readonly` | `"zero-default"` | [packages/cli/src/commands/telemetry.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L37) |
-| <a id="property-reference"></a> `reference` | `readonly` | `string` | [packages/cli/src/commands/telemetry.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L38) |
+| <a id="property-enabled"></a> `enabled` | `readonly` | `false` | packages/cli/src/commands/telemetry.ts:36 |
+| <a id="property-policy"></a> `policy` | `readonly` | `"zero-default"` | packages/cli/src/commands/telemetry.ts:37 |
+| <a id="property-reference"></a> `reference` | `readonly` | `string` | packages/cli/src/commands/telemetry.ts:38 |

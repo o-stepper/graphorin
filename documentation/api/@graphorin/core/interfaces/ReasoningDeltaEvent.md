@@ -6,13 +6,13 @@
 
 # Interface: ReasoningDeltaEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L115)
+Defined in: packages/core/src/types/agent-event.ts:115
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-delta"></a> `delta` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L117) |
-| <a id="property-type"></a> `type` | `readonly` | `"reasoning.delta"` | [packages/core/src/types/agent-event.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L116) |
+| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:117 |
+| <a id="property-type"></a> `type` | `readonly` | `"reasoning.delta"` | packages/core/src/types/agent-event.ts:116 |

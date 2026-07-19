@@ -6,11 +6,11 @@
 
 # Class: EmbeddingMetaRepository
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L84)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:84
+
+**`Stable`**
 
 Registry repository: one instance per `SqliteConnection`.
-
-## Stable
 
 ## Constructors
 
@@ -20,7 +20,7 @@ Registry repository: one instance per `SqliteConnection`.
 new EmbeddingMetaRepository(conn, policy?): EmbeddingMetaRepository;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L89)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:89
 
 #### Parameters
 
@@ -41,7 +41,7 @@ Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:89](https://github
 assertKnown(id): void;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:242](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L242)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:242
 
 Verify that the given `embedder_id` is registered. Used at every
 write boundary so unknown ids fail fast.
@@ -66,7 +66,7 @@ get(id):
   | null;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L95)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:95
 
 Read-through cache lookup.
 
@@ -89,7 +89,7 @@ Read-through cache lookup.
 listActive(): readonly EmbeddingMetaRow[];
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L117)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:117
 
 Snapshot of every active (non-retired) embedder.
 
@@ -105,7 +105,7 @@ readonly [`EmbeddingMetaRow`](/api/@graphorin/store-sqlite/interfaces/EmbeddingM
 listAll(): readonly EmbeddingMetaRow[];
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L109)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:109
 
 Snapshot of every registered embedder.
 
@@ -121,7 +121,7 @@ readonly [`EmbeddingMetaRow`](/api/@graphorin/store-sqlite/interfaces/EmbeddingM
 registerOrReturn(input): EmbeddingMetaRow;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L126)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:126
 
 Idempotent registration. Returns the existing row if one already
 matches `(id, configHash)`; rejects the call if `lock-on-first` is
@@ -145,7 +145,7 @@ in effect and a different active embedder is already registered.
 retire(id, retiredAt?): void;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:233](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L233)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:233
 
 Mark an embedder retired. Read-only after retirement.
 

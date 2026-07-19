@@ -6,7 +6,7 @@
 
 # Interface: NormaliseOutcome\&lt;TInput, TOutput, TDeps\&gt;
 
-Defined in: [packages/tools/src/registry/normalize.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L63)
+Defined in: packages/tools/src/registry/normalize.ts:63
 
 Outcome of `normaliseTool(...)`. Carries the resolved record AND
 the WARN flags the registry layer surfaces through audit events +
@@ -24,6 +24,6 @@ counter increments.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-deferreddefaultapplied"></a> `deferredDefaultApplied` | `readonly` | `boolean` | [packages/tools/src/registry/normalize.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L66) |
-| <a id="property-resolved"></a> `resolved` | `readonly` | [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; | [packages/tools/src/registry/normalize.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L64) |
-| <a id="property-warnings"></a> `warnings` | `readonly` | readonly [`NormaliseWarning`](/api/@graphorin/tools/type-aliases/NormaliseWarning.md)[] | [packages/tools/src/registry/normalize.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L65) |
+| <a id="property-deferreddefaultapplied"></a> `deferredDefaultApplied` | `readonly` | `boolean` | packages/tools/src/registry/normalize.ts:66 |
+| <a id="property-resolved"></a> `resolved` | `readonly` | [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; | packages/tools/src/registry/normalize.ts:64 |
+| <a id="property-warnings"></a> `warnings` | `readonly` | readonly [`NormaliseWarning`](/api/@graphorin/tools/type-aliases/NormaliseWarning.md)[] | packages/tools/src/registry/normalize.ts:65 |

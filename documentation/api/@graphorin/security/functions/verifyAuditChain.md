@@ -10,7 +10,9 @@
 function verifyAuditChain(db, bounds?): Promise<AuditChainVerifyResult>;
 ```
 
-Defined in: [packages/security/src/audit/verify-chain.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/verify-chain.ts#L20)
+Defined in: packages/security/src/audit/verify-chain.ts:20
+
+**`Stable`**
 
 Walk the audit chain inside the supplied bounds and return the
 first divergent link (if any) plus the entry count traversed. The
@@ -29,5 +31,3 @@ field.
 ## Returns
 
 `Promise`\&lt;[`AuditChainVerifyResult`](/api/@graphorin/security/type-aliases/AuditChainVerifyResult.md)\&gt;
-
-## Stable

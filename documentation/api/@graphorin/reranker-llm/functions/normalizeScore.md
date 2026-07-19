@@ -13,7 +13,9 @@ function normalizeScore(
    fallback): number;
 ```
 
-Defined in: [packages/reranker-llm/src/reranker.ts:336](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L336)
+Defined in: src/reranker.ts:336
+
+**`Stable`**
 
 Normalise a raw integer score into `[0, 1]`. Rejects out-of-range
 inputs by clamping; returns the configured fallback when the input
@@ -30,5 +32,3 @@ is `null` (parse failed upstream).
 ## Returns
 
 `number`
-
-## Stable

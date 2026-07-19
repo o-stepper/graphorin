@@ -10,7 +10,9 @@
 function stripToolCalls(): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:260](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L260)
+Defined in: packages/agent/src/filters/index.ts:260
+
+**`Stable`**
 
 Drop every assistant `toolCalls` array AND every `tool` message.
 Useful when a sub-agent should only see the textual conversation.
@@ -18,5 +20,3 @@ Useful when a sub-agent should only see the textual conversation.
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

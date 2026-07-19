@@ -10,7 +10,9 @@
 function defaultHandoffFilter(): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:326](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L326)
+Defined in: packages/agent/src/filters/index.ts:326
+
+**`Stable`**
 
 The canonical default applied by the agent runtime to every
 `Agent.toTool(...)` and `handoff(...)` invocation when the caller
@@ -19,5 +21,3 @@ does not supply an explicit filter.
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

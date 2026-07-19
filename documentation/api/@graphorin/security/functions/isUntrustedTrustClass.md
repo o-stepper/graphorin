@@ -10,7 +10,9 @@
 function isUntrustedTrustClass(trustClass): boolean;
 ```
 
-Defined in: [packages/security/src/dataflow/derive.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/derive.ts#L34)
+Defined in: packages/security/src/dataflow/derive.ts:34
+
+**`Stable`**
 
 Whether a tool trust class is an UNTRUSTED-content source (W-101).
 The single definition shared by the taint engine
@@ -26,5 +28,3 @@ the two layers must never disagree about what "untrusted" means.
 ## Returns
 
 `boolean`
-
-## Stable

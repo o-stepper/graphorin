@@ -10,7 +10,9 @@
 function regexMatch<I>(options): Scorer<I, unknown>;
 ```
 
-Defined in: [packages/evals/src/scorers/code/regex.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/regex.ts#L18)
+Defined in: packages/evals/src/scorers/code/regex.ts:18
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/evals/src/scorers/code/regex.ts:18](https://github.com/o-s
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `unknown`\&gt;
-
-## Stable

@@ -10,6 +10,6 @@
 const DEFAULT_ADJUDICATE_THRESHOLD: 0.82 = 0.82;
 ```
 
-Defined in: [packages/memory/src/graph/entity-resolver.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L38)
+Defined in: packages/memory/src/graph/entity-resolver.ts:38
 
 Cosine in `[this, merge)` is *ambiguous* - adjudicate or mint new.

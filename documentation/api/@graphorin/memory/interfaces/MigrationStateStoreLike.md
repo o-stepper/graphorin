@@ -6,14 +6,14 @@
 
 # Interface: MigrationStateStoreLike
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L60)
+Defined in: packages/memory/src/migration/embedder-migration.ts:60
+
+**`Stable`**
 
 Structural view of the persisted `migration_state` cursor store
 (wave-D D5 / MST-12). The default implementation is
 `@graphorin/store-sqlite`'s `store.embedderMigration.state`; declared
 structurally here so this package never imports the storage package.
-
-## Stable
 
 ## Methods
 
@@ -23,7 +23,7 @@ structurally here so this package never imports the storage package.
 create(state): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L69)
+Defined in: packages/memory/src/migration/embedder-migration.ts:69
 
 #### Parameters
 
@@ -54,7 +54,7 @@ findResumable(sourceEmbedder, targetEmbedder): Promise<
 | null>;
 ```
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L61)
+Defined in: packages/memory/src/migration/embedder-migration.ts:61
 
 #### Parameters
 
@@ -81,7 +81,7 @@ Defined in: [packages/memory/src/migration/embedder-migration.ts:61](https://git
 update(id, patch): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L76)
+Defined in: packages/memory/src/migration/embedder-migration.ts:76
 
 #### Parameters
 

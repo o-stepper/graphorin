@@ -10,7 +10,7 @@
 function mcpAuthListSessions(storage, options?): Promise<readonly OAuthSessionMetadata[]>;
 ```
 
-Defined in: [packages/mcp/src/oauth/library.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L34)
+Defined in: packages/mcp/src/oauth/library.ts:34
 
 Drive `graphorin auth list --mcp`.
 

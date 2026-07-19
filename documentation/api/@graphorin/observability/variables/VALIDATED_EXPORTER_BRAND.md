@@ -10,10 +10,10 @@
 const VALIDATED_EXPORTER_BRAND: unique symbol;
 ```
 
-Defined in: [packages/observability/src/exporters/types.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L16)
+Defined in: packages/observability/src/exporters/types.ts:16
+
+**`Stable`**
 
 Discriminator marker - every exporter that has been wrapped via
 `withValidation(...)` is branded with this symbol so the tracer can
 fail-fast at startup when a raw exporter is registered.
-
-## Stable

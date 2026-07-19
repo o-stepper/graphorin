@@ -10,7 +10,9 @@
 function rekeyTokens(options): Promise<ReadonlyMap<string, CreatedToken>>;
 ```
 
-Defined in: [packages/security/src/auth/crud.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L221)
+Defined in: packages/security/src/auth/crud.ts:221
+
+**`Stable`**
 
 Re-issue every active token. Used after a known compromise: the
 previous tokens are revoked and replaced with fresh raw values
@@ -33,5 +35,3 @@ route the rotated raws back to the right user.
 ## Returns
 
 `Promise`\<`ReadonlyMap`\&lt;`string`, [`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\&gt;\>
-
-## Stable

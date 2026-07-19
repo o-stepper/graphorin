@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
-Barrier - completes when every writer in `from` has produced a value.
+**`Stable`**
 
-## Stable
+Barrier - completes when every writer in `from` has produced a value.
 
 ## Type Parameters
 

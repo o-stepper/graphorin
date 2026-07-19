@@ -10,7 +10,7 @@
 function _resetSecretsAuditListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/secrets/audit-emitter.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L98)
+Defined in: packages/security/src/secrets/audit-emitter.ts:98
 
 **`Experimental`**
 

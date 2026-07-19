@@ -10,7 +10,9 @@
 function applyInboundSanitizationWithClassifier(opts): Promise<SanitizationOutcome>;
 ```
 
-Defined in: [packages/tools/src/inbound/sanitize.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/inbound/sanitize.ts#L251)
+Defined in: packages/tools/src/inbound/sanitize.ts:251
+
+**`Stable`**
 
 Async variant of [applyInboundSanitization](/api/@graphorin/tools/functions/applyInboundSanitization.md) that additionally
 consults an optional [InjectionClassifier](/api/@graphorin/tools/interfaces/InjectionClassifier.md) (B4 seam, default
@@ -25,5 +27,3 @@ off). Identical to the sync pass when no classifier is supplied.
 ## Returns
 
 `Promise`\&lt;[`SanitizationOutcome`](/api/@graphorin/tools/interfaces/SanitizationOutcome.md)\&gt;
-
-## Stable

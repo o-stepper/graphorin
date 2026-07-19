@@ -8,13 +8,13 @@
 
 Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
 
+**`Stable`**
+
 Per-call context handed to every guardrail. The runtime injects
 the structured logger, optional locale hint, and any additional
 fields a guardrail may want to read. The shape is intentionally
 tiny so guardrails are easy to test without booting the full
 runtime.
-
-## Stable
 
 ## Properties
 

@@ -25,7 +25,9 @@ type MergeStrategy<TOutput> =
 };
 ```
 
-Defined in: [packages/agent/src/fanout/index.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fanout/index.ts#L56)
+Defined in: packages/agent/src/fanout/index.ts:56
+
+**`Stable`**
 
 Built-in merge-strategy taxonomy.
 
@@ -34,5 +36,3 @@ Built-in merge-strategy taxonomy.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `unknown` |
-
-## Stable

@@ -20,9 +20,9 @@ type MCPElicitationResult =
 };
 ```
 
-Defined in: [packages/mcp/src/client/types.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/types.ts#L124)
+Defined in: packages/mcp/src/client/types.ts:124
+
+**`Stable`**
 
 Operator response to an [MCPElicitationRequest](/api/@graphorin/mcp/interfaces/MCPElicitationRequest.md). `accept` returns
 the collected flat values; `decline`/`cancel` carry no content.
-
-## Stable

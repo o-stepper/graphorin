@@ -8,11 +8,11 @@
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
+**`Stable`**
+
 Per-task pending write. Captured when a task in an execution step
 succeeds while a sibling task fails: the next resume attempt skips the
 already-completed work.
-
-## Stable
 
 ## Properties
 

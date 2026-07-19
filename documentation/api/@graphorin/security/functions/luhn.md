@@ -10,7 +10,9 @@
 function luhn(value): boolean;
 ```
 
-Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L227)
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:227
+
+**`Stable`**
 
 Luhn checksum for credit-card validation.
 
@@ -23,5 +25,3 @@ Luhn checksum for credit-card validation.
 ## Returns
 
 `boolean`
-
-## Stable

@@ -10,8 +10,8 @@
 type ConsolidatorPhase = "light" | "standard" | "deep";
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L141)
+Defined in: packages/memory/src/consolidator/types.ts:141
+
+**`Stable`**
 
 Phase identifier used by the runtime + audit rows.
-
-## Stable

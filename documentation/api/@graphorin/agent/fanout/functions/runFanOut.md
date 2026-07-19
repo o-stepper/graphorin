@@ -10,7 +10,9 @@
 function runFanOut<TOutput>(opts): Promise<FanOutResult<TOutput>>;
 ```
 
-Defined in: [packages/agent/src/fanout/index.ts:361](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fanout/index.ts#L361)
+Defined in: packages/agent/src/fanout/index.ts:361
+
+**`Stable`**
 
 Run a fan-out and produce the aggregate [FanOutResult](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md).
 Pure with respect to side effects - the runtime emits events /
@@ -31,5 +33,3 @@ audit rows / counter increments via the supplied `emit` callback.
 ## Returns
 
 `Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TOutput`\&gt;\>
-
-## Stable

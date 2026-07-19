@@ -6,7 +6,9 @@
 
 # Class: SqliteSessionStore
 
-Defined in: [packages/store-sqlite/src/session-store.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L29)
+Defined in: packages/store-sqlite/src/session-store.ts:29
+
+**`Stable`**
 
 Default `SessionStore` implementation. Owns:
   - `sessions` rows.
@@ -17,8 +19,6 @@ Default `SessionStore` implementation. Owns:
 
 Per `DEC-147`, the actual `session_messages` rows live in
 `@graphorin/store-sqlite`'s `MemoryStore` (single source of truth).
-
-## Stable
 
 ## Implements
 
@@ -32,7 +32,7 @@ Per `DEC-147`, the actual `session_messages` rows live in
 new SqliteSessionStore(conn): SqliteSessionStore;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L31)
+Defined in: packages/store-sqlite/src/session-store.ts:31
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:31](https://github.com/o
 appendAuditEntry(entry): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:203](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L203)
+Defined in: packages/store-sqlite/src/session-store.ts:203
 
 Append a session-lifecycle audit row.
 
@@ -78,7 +78,7 @@ Append a session-lifecycle audit row.
 appendHandoff(sessionId, record): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L135)
+Defined in: packages/store-sqlite/src/session-store.ts:135
 
 #### Parameters
 
@@ -103,7 +103,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:135](https://github.com/
 attachWorkflowRun(run): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:168](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L168)
+Defined in: packages/store-sqlite/src/session-store.ts:168
 
 #### Parameters
 
@@ -127,7 +127,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:168](https://github.com/
 closeSession(sessionId, closedAt): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L90)
+Defined in: packages/store-sqlite/src/session-store.ts:90
 
 #### Parameters
 
@@ -152,7 +152,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:90](https://github.com/o
 createSession(metadata): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L35)
+Defined in: packages/store-sqlite/src/session-store.ts:35
 
 #### Parameters
 
@@ -176,7 +176,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:35](https://github.com/o
 deleteAgent(agentId): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L117)
+Defined in: packages/store-sqlite/src/session-store.ts:117
 
 Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
@@ -202,7 +202,7 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:238](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L238)
+Defined in: packages/store-sqlite/src/session-store.ts:238
 
 RP-6: hard-delete a session + its handoffs / workflow runs / audit rows.
 
@@ -230,7 +230,7 @@ getSession(sessionId): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L52)
+Defined in: packages/store-sqlite/src/session-store.ts:52
 
 #### Parameters
 
@@ -256,7 +256,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:52](https://github.com/o
 listAgents(): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L128)
+Defined in: packages/store-sqlite/src/session-store.ts:128
 
 List all known agents (including retired ones).
 
@@ -276,7 +276,7 @@ List all known agents (including retired ones).
 listAuditEntries(sessionId, opts?): Promise<readonly SessionAuditEntry[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:220](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L220)
+Defined in: packages/store-sqlite/src/session-store.ts:220
 
 List recent audit rows for a session, newest-first.
 
@@ -304,7 +304,7 @@ List recent audit rows for a session, newest-first.
 listHandoffs(sessionId): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L160)
+Defined in: packages/store-sqlite/src/session-store.ts:160
 
 #### Parameters
 
@@ -328,7 +328,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:160](https://github.com/
 listSessions(scope): Promise<readonly SessionMetadata[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L57)
+Defined in: packages/store-sqlite/src/session-store.ts:57
 
 #### Parameters
 
@@ -352,7 +352,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:57](https://github.com/o
 listWorkflowRuns(sessionId): Promise<readonly SessionWorkflowRun[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L187)
+Defined in: packages/store-sqlite/src/session-store.ts:187
 
 #### Parameters
 
@@ -376,7 +376,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:187](https://github.com/
 pruneAuditEntries(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L232)
+Defined in: packages/store-sqlite/src/session-store.ts:232
 
 Delete audit rows older than the supplied epoch ms.
 
@@ -402,7 +402,7 @@ Delete audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:245](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L245)
+Defined in: packages/store-sqlite/src/session-store.ts:245
 
 RP-6: retention sweep - delete every session matching the policy.
 
@@ -430,7 +430,7 @@ RP-6: retention sweep - delete every session matching the policy.
 registerAgent(entry): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L97)
+Defined in: packages/store-sqlite/src/session-store.ts:97
 
 #### Parameters
 
@@ -456,7 +456,7 @@ resolveAgent(agentId): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L121)
+Defined in: packages/store-sqlite/src/session-store.ts:121
 
 #### Parameters
 
@@ -482,7 +482,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:121](https://github.com/
 retireAgent(agentId, retiredAt): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L110)
+Defined in: packages/store-sqlite/src/session-store.ts:110
 
 #### Parameters
 
@@ -507,7 +507,7 @@ Defined in: [packages/store-sqlite/src/session-store.ts:110](https://github.com/
 updateSession(sessionId, patch): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L73)
+Defined in: packages/store-sqlite/src/session-store.ts:73
 
 #### Parameters
 
@@ -536,7 +536,7 @@ updateWorkflowRunStatus(
 status): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/session-store.ts:175](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L175)
+Defined in: packages/store-sqlite/src/session-store.ts:175
 
 Update the status of a workflow attachment.
 

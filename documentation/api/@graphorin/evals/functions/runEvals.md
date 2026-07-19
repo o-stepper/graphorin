@@ -10,7 +10,9 @@
 function runEvals<I, O>(opts): Promise<EvalReport<I, O>>;
 ```
 
-Defined in: [packages/evals/src/runner.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/runner.ts#L53)
+Defined in: packages/evals/src/runner.ts:53
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -28,5 +30,3 @@ Defined in: [packages/evals/src/runner.ts:53](https://github.com/o-stepper/graph
 ## Returns
 
 `Promise`\<[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
-
-## Stable

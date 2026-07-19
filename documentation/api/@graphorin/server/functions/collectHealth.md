@@ -10,7 +10,9 @@
 function collectHealth(options): Promise<HealthSummary>;
 ```
 
-Defined in: [packages/server/src/health/checks.ts:187](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L187)
+Defined in: packages/server/src/health/checks.ts:187
+
+**`Stable`**
 
 Build the aggregate health summary from runtime probes.
 
@@ -23,5 +25,3 @@ Build the aggregate health summary from runtime probes.
 ## Returns
 
 `Promise`\&lt;[`HealthSummary`](/api/@graphorin/server/interfaces/HealthSummary.md)\&gt;
-
-## Stable

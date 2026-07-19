@@ -10,12 +10,12 @@
 function newSpanId(): string;
 ```
 
-Defined in: [packages/observability/src/tracer/ids.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/ids.ts#L25)
+Defined in: packages/observability/src/tracer/ids.ts:25
+
+**`Stable`**
 
 Generate a 16-hex-character (8-byte) span id.
 
 ## Returns
 
 `string`
-
-## Stable

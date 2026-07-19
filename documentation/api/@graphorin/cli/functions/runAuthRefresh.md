@@ -10,7 +10,9 @@
 function runAuthRefresh(options): Promise<OAuthSession>;
 ```
 
-Defined in: [packages/cli/src/commands/auth.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L147)
+Defined in: packages/cli/src/commands/auth.ts:147
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/auth.ts:147](https://github.com/o-stepper
 ## Returns
 
 `Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
-
-## Stable

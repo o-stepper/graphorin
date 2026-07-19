@@ -12,9 +12,9 @@ type TransportPreference =
   | "auto";
 ```
 
-Defined in: [packages/client/src/graphorin-client.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/graphorin-client.ts#L106)
+Defined in: packages/client/src/graphorin-client.ts:106
+
+**`Stable`**
 
 Transport selector. `'auto'` (default) attempts a WebSocket
 handshake first and falls back to SSE on failure.
-
-## Stable

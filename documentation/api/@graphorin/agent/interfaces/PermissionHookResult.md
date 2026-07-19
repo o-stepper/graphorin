@@ -8,9 +8,9 @@
 
 Defined in: [packages/tools/dist/executor/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/tools/dist/executor/types.d.ts)
 
-E1: verdict returned by a [PermissionHook](/api/@graphorin/agent/type-aliases/PermissionHook.md).
+**`Stable`**
 
-## Stable
+E1: verdict returned by a [PermissionHook](/api/@graphorin/agent/type-aliases/PermissionHook.md).
 
 ## Properties
 

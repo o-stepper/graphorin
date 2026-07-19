@@ -10,7 +10,9 @@
 function createApiBoundaryGuard(opts): MemoryModificationGuard;
 ```
 
-Defined in: [packages/security/src/guard/api-boundary-guard.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/api-boundary-guard.ts#L52)
+Defined in: packages/security/src/guard/api-boundary-guard.ts:52
+
+**`Stable`**
 
 Construct an `API_BOUNDARY_GUARD`.
 
@@ -23,5 +25,3 @@ Construct an `API_BOUNDARY_GUARD`.
 ## Returns
 
 [`MemoryModificationGuard`](/api/@graphorin/security/interfaces/MemoryModificationGuard.md)
-
-## Stable

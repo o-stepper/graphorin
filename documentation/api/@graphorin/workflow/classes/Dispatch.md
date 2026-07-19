@@ -8,6 +8,8 @@
 
 Defined in: [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts)
 
+**`Stable`**
+
 Workflow dynamic-task primitive. A node returns one or more
 `Dispatch(nodeName, args)` values to schedule additional tasks in the
 next execution step.
@@ -15,8 +17,6 @@ next execution step.
 The class is intentionally tiny - the engine inspects only the public
 `nodeName` and `args` fields. The shape is **Graphorin's own design**
 (the name `Dispatch` is part of the public API).
-
-## Stable
 
 ## Type Parameters
 

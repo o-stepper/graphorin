@@ -10,7 +10,9 @@
 type TriggerCallback = (payload?) => void | Promise<void>;
 ```
 
-Defined in: [packages/triggers/src/index.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L123)
+Defined in: packages/triggers/src/index.ts:123
+
+**`Stable`**
 
 Trigger callback. Receives an optional `payload` for `event`
 triggers; for cron / interval / idle triggers `payload` is
@@ -25,5 +27,3 @@ triggers; for cron / interval / idle triggers `payload` is
 ## Returns
 
 `void` \| `Promise`\&lt;`void`\&gt;
-
-## Stable

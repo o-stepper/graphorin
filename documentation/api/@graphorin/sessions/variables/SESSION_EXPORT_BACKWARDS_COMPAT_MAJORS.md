@@ -10,12 +10,12 @@
 const SESSION_EXPORT_BACKWARDS_COMPAT_MAJORS: 2 = 2;
 ```
 
-Defined in: [packages/sessions/src/export/types.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L42)
+Defined in: packages/sessions/src/export/types.ts:42
+
+**`Stable`**
 
 Reader compatibility band: the writer accepts the current MAJOR
 minus 0..N inclusive, where N is set by this constant. v0.1 only
 emits MAJOR `1` (there is no prior schema), but the value is `2` so
 the import path honours the N-2 backwards-compat discipline once
 `2.x` and `3.x` writers exist.
-
-## Stable

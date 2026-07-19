@@ -10,7 +10,7 @@
 const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number>;
 ```
 
-Defined in: [packages/embedder-ollama/src/index.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L105)
+Defined in: packages/embedder-ollama/src/index.ts:105
 
 Model -> output-dimension hints used to seed the canonical id before the
 first `embed()` resolves the real width from a response. Only single-width

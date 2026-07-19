@@ -12,7 +12,9 @@ function asGraphorinSpan<T>(span):
   | null;
 ```
 
-Defined in: [packages/observability/src/tracer/tracer.ts:322](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L322)
+Defined in: packages/observability/src/tracer/tracer.ts:322
+
+**`Stable`**
 
 Returns the underlying [GraphorinSpan](/api/@graphorin/observability/interfaces/GraphorinSpan.md) when `span` is a Graphorin
 span. Useful when callers want to reach the per-attribute sensitivity
@@ -34,5 +36,3 @@ helper from a generic `AISpan<T>`.
 
   \| [`GraphorinSpan`](/api/@graphorin/observability/interfaces/GraphorinSpan.md)\&lt;`T`\&gt;
   \| `null`
-
-## Stable

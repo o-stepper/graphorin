@@ -12,7 +12,7 @@ function parseInducedProcedure(text):
   | null;
 ```
 
-Defined in: [packages/memory/src/consolidator/phases/induce.ts:178](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L178)
+Defined in: packages/memory/src/consolidator/phases/induce.ts:178
 
 **`Internal`**
 

@@ -10,7 +10,9 @@
 function classifyTool(tool, patterns?): MemoryGuardTier;
 ```
 
-Defined in: [packages/security/src/guard/classifier.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/classifier.ts#L63)
+Defined in: packages/security/src/guard/classifier.ts:63
+
+**`Stable`**
 
 Classify a tool. Pure function - never inspects runtime state.
 
@@ -30,5 +32,3 @@ Precedence (top wins):
 ## Returns
 
 [`MemoryGuardTier`](/api/@graphorin/security/type-aliases/MemoryGuardTier.md)
-
-## Stable

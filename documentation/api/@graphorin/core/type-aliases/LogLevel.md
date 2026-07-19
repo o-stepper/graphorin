@@ -10,10 +10,10 @@
 type LogLevel = "trace" | "debug" | "info" | "warn" | "error";
 ```
 
-Defined in: [packages/core/src/contracts/logger.ts:8](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L8)
+Defined in: packages/core/src/contracts/logger.ts:8
+
+**`Stable`**
 
 Severity levels supported by the project logger. Mirrors the canonical
 `trace < debug < info < warn < error` hierarchy used by every common
 structured logger.
-
-## Stable

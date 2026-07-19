@@ -265,3 +265,20 @@ describe('W-045 - Cost.amount units pin (whole dollars, never minor units)', () 
     expect(cost?.amount).toBeCloseTo(0.005, 10);
   });
 });
+
+describe('deep retest 2026-07-19 P1-3 - GPT-5.6 family is priced', () => {
+  it('resolves luna/terra/sol at the official standard short-context rates', () => {
+    const luna = lookupPrice({ provider: 'openai', model: 'gpt-5.6-luna' });
+    expect(luna?.inputUsdPerToken).toBeCloseTo(1 / 1_000_000, 12);
+    expect(luna?.outputUsdPerToken).toBeCloseTo(6 / 1_000_000, 12);
+    expect(luna?.cachedReadUsdPerToken).toBeCloseTo(0.1 / 1_000_000, 12);
+
+    const terra = lookupPrice({ provider: 'openai', model: 'gpt-5.6-terra' });
+    expect(terra?.inputUsdPerToken).toBeCloseTo(2.5 / 1_000_000, 12);
+    expect(terra?.outputUsdPerToken).toBeCloseTo(15 / 1_000_000, 12);
+
+    const sol = lookupPrice({ provider: 'openai', model: 'gpt-5.6-sol' });
+    expect(sol?.inputUsdPerToken).toBeCloseTo(5 / 1_000_000, 12);
+    expect(sol?.outputUsdPerToken).toBeCloseTo(30 / 1_000_000, 12);
+  });
+});

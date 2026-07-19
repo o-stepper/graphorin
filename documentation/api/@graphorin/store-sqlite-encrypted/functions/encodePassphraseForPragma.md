@@ -10,7 +10,9 @@
 function encodePassphraseForPragma(value): string;
 ```
 
-Defined in: [packages/store-sqlite-encrypted/src/cipher-config.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/cipher-config.ts#L69)
+Defined in: packages/store-sqlite-encrypted/src/cipher-config.ts:69
+
+**`Stable`**
 
 SQL-literal-encodes a passphrase for use as the right-hand side of
 `PRAGMA key = ...`.
@@ -32,5 +34,3 @@ accidentally open an unencrypted DB with an empty key.
 ## Returns
 
 `string`
-
-## Stable

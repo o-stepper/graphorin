@@ -12,6 +12,8 @@ function listAggregate<T>(opts?): ListAggregate<T>;
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Construct a `ListAggregate` channel.
 
 ## Type Parameters
@@ -30,5 +32,3 @@ Construct a `ListAggregate` channel.
 ## Returns
 
 [`ListAggregate`](/api/@graphorin/workflow/interfaces/ListAggregate.md)\&lt;`T`\&gt;
-
-## Stable

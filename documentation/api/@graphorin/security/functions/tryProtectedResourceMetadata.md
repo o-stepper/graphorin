@@ -12,7 +12,9 @@ function tryProtectedResourceMetadata(resourceUrl, signal?): Promise<
 | undefined>;
 ```
 
-Defined in: [packages/security/src/oauth/discovery.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/discovery.ts#L118)
+Defined in: packages/security/src/oauth/discovery.ts:118
+
+**`Stable`**
 
 Try to resolve protected-resource metadata (RFC 9728). Returns
 `undefined` when the resource does not advertise the document.
@@ -29,5 +31,3 @@ Try to resolve protected-resource metadata (RFC 9728). Returns
 `Promise`\<
   \| [`ProtectedResourceMetadata`](/api/@graphorin/security/interfaces/ProtectedResourceMetadata.md)
   \| `undefined`\>
-
-## Stable

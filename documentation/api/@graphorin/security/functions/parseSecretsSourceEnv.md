@@ -15,7 +15,9 @@ function parseSecretsSourceEnv(raw):
   | undefined;
 ```
 
-Defined in: [packages/security/src/secrets/factory.ts:266](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L266)
+Defined in: packages/security/src/secrets/factory.ts:266
+
+**`Stable`**
 
 Parse the `GRAPHORIN_SECRETS_SOURCE` env value (per the documented
 `--secrets-source` flag policy). Accepts a single store kind
@@ -36,5 +38,3 @@ a comma-separated chain (e.g. `'keyring,encrypted-file'`). Returns
   `kind`: [`SecretsStoreKind`](/api/@graphorin/security/type-aliases/SecretsStoreKind.md);
 \}
   \| `undefined`
-
-## Stable

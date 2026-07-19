@@ -12,6 +12,8 @@ function awaitExternal<TResume>(name, options?): TResume;
 
 Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
+**`Stable`**
+
 Suspend on a named durable promise. The thread stays suspended (and
 survives restarts) until an external caller resolves it via
 `workflow.resolveAwakeable(threadId, name, value)`; that `value` is
@@ -35,5 +37,3 @@ semantics.
 ## Returns
 
 `TResume`
-
-## Stable

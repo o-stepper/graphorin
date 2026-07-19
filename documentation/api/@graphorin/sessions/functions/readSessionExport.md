@@ -10,7 +10,9 @@
 function readSessionExport(body, options?): SessionExportReadResult;
 ```
 
-Defined in: [packages/sessions/src/export/reader.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/reader.ts#L100)
+Defined in: packages/sessions/src/export/reader.ts:100
+
+**`Stable`**
 
 Parse a string body. The body must be a single block of JSONL with
 a `kind: 'meta'` first line and a `kind: 'footer'` last line.
@@ -25,5 +27,3 @@ a `kind: 'meta'` first line and a `kind: 'footer'` last line.
 ## Returns
 
 [`SessionExportReadResult`](/api/@graphorin/sessions/interfaces/SessionExportReadResult.md)
-
-## Stable

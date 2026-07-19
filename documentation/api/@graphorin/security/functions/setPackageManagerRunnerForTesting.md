@@ -12,7 +12,7 @@ function _setPackageManagerRunnerForTesting(runner):
   | null;
 ```
 
-Defined in: [packages/security/src/supply-chain/package-manager.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L53)
+Defined in: packages/security/src/supply-chain/package-manager.ts:53
 
 **`Experimental`**
 

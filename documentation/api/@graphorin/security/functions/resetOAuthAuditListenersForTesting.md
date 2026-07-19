@@ -10,7 +10,7 @@
 function _resetOAuthAuditListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/oauth/audit-emitter.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/audit-emitter.ts#L102)
+Defined in: packages/security/src/oauth/audit-emitter.ts:102
 
 **`Experimental`**
 

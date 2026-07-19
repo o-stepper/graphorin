@@ -18,6 +18,6 @@ type LintFindingKind =
   | "parameter-numeric-suffix";
 ```
 
-Defined in: [packages/eslint-plugin/src/tool-discovery.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L99)
+Defined in: src/tool-discovery.ts:99
 
-## Stable
+**`Stable`**

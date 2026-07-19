@@ -10,7 +10,7 @@
 function getHistogramForTesting(name, labels?): readonly number[];
 ```
 
-Defined in: [packages/tools/src/audit/counters.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L170)
+Defined in: packages/tools/src/audit/counters.ts:170
 
 **`Experimental`**
 

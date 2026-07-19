@@ -10,7 +10,7 @@
 function encodeBasicAuth(clientId, clientSecret): string;
 ```
 
-Defined in: [packages/security/src/oauth/token-endpoint.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/token-endpoint.ts#L120)
+Defined in: packages/security/src/oauth/token-endpoint.ts:120
 
 **`Internal`**
 

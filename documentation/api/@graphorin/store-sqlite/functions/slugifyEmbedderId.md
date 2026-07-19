@@ -10,7 +10,9 @@
 function slugifyEmbedderId(id): string;
 ```
 
-Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L315)
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:315
+
+**`Stable`**
 
 Translates an `embedder_id` like `'transformersjs:Xenova/multilingual-e5-base@768'`
 into a SQL-safe slug used in vec0 table names. Letters / digits stay,
@@ -25,5 +27,3 @@ everything else becomes `_`.
 ## Returns
 
 `string`
-
-## Stable

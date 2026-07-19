@@ -10,7 +10,9 @@
 function computePkceChallenge(verifier): string;
 ```
 
-Defined in: [packages/security/src/oauth/pkce.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/pkce.ts#L46)
+Defined in: packages/security/src/oauth/pkce.ts:46
+
+**`Stable`**
 
 Compute the SHA-256 challenge for a verifier (S256 method).
 
@@ -23,5 +25,3 @@ Compute the SHA-256 challenge for a verifier (S256 method).
 ## Returns
 
 `string`
-
-## Stable

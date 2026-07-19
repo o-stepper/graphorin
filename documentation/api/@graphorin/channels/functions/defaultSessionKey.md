@@ -10,7 +10,9 @@
 function defaultSessionKey(identity): string;
 ```
 
-Defined in: [packages/channels/src/router.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L89)
+Defined in: packages/channels/src/router.ts:89
+
+**`Stable`**
 
 Derive the default per-peer session key. Exposed so applications
 and the docs agree on the exact shape.
@@ -24,5 +26,3 @@ and the docs agree on the exact shape.
 ## Returns
 
 `string`
-
-## Stable

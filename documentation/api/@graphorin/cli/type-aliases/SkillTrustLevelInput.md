@@ -10,6 +10,6 @@
 type SkillTrustLevelInput = "trusted" | "trusted-with-scripts" | "untrusted";
 ```
 
-Defined in: [packages/cli/src/commands/skills.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L49)
+Defined in: packages/cli/src/commands/skills.ts:49
 
-## Stable
+**`Stable`**

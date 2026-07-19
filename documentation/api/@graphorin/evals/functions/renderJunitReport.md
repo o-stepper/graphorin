@@ -10,7 +10,9 @@
 function renderJunitReport<I, O>(report, options?): string;
 ```
 
-Defined in: [packages/evals/src/reporters/junit.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/junit.ts#L13)
+Defined in: packages/evals/src/reporters/junit.ts:13
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -30,5 +32,3 @@ Defined in: [packages/evals/src/reporters/junit.ts:13](https://github.com/o-step
 ## Returns
 
 `string`
-
-## Stable

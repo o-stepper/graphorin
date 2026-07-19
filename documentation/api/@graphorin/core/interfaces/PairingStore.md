@@ -6,14 +6,14 @@
 
 # Interface: PairingStore
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L52)
+Defined in: packages/core/src/contracts/pairing-store.ts:52
+
+**`Stable`**
 
 Pluggable persistent storage for channel pairing. Expiry POLICY
 lives in the access controller (`@graphorin/channels`), which
 injects its clock; the store only filters by the timestamps it is
 handed so behavior stays deterministic under test.
-
-## Stable
 
 ## Methods
 
@@ -23,7 +23,7 @@ handed so behavior stays deterministic under test.
 addPairedPeer(peer): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L62)
+Defined in: packages/core/src/contracts/pairing-store.ts:62
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: [packages/core/src/contracts/pairing-store.ts:62](https://github.com
 countPendingRequests(channelId, nowIso): Promise<number>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L59)
+Defined in: packages/core/src/contracts/pairing-store.ts:59
 
 Count pending requests on a channel whose `expiresAt` is after `nowIso`.
 
@@ -66,7 +66,7 @@ Count pending requests on a channel whose `expiresAt` is after `nowIso`.
 deleteRequest(channelId, code): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L57)
+Defined in: packages/core/src/contracts/pairing-store.ts:57
 
 #### Parameters
 
@@ -89,7 +89,7 @@ findRequestByCode(channelId, code): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L56)
+Defined in: packages/core/src/contracts/pairing-store.ts:56
 
 #### Parameters
 
@@ -114,7 +114,7 @@ findRequestByPeer(peer): Promise<
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L55)
+Defined in: packages/core/src/contracts/pairing-store.ts:55
 
 #### Parameters
 
@@ -136,7 +136,7 @@ Defined in: [packages/core/src/contracts/pairing-store.ts:55](https://github.com
 isPaired(peer): Promise<boolean>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L63)
+Defined in: packages/core/src/contracts/pairing-store.ts:63
 
 #### Parameters
 
@@ -156,7 +156,7 @@ Defined in: [packages/core/src/contracts/pairing-store.ts:63](https://github.com
 listPairedPeers(channelId?): Promise<readonly PairedPeerRecord[]>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L65)
+Defined in: packages/core/src/contracts/pairing-store.ts:65
 
 #### Parameters
 
@@ -176,7 +176,7 @@ Defined in: [packages/core/src/contracts/pairing-store.ts:65](https://github.com
 pruneExpiredRequests(nowIso): Promise<number>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L61)
+Defined in: packages/core/src/contracts/pairing-store.ts:61
 
 Delete requests whose `expiresAt` is at or before `nowIso`; returns the number removed.
 
@@ -198,7 +198,7 @@ Delete requests whose `expiresAt` is at or before `nowIso`; returns the number r
 removePairedPeer(peer): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L64)
+Defined in: packages/core/src/contracts/pairing-store.ts:64
 
 #### Parameters
 
@@ -218,7 +218,7 @@ Defined in: [packages/core/src/contracts/pairing-store.ts:64](https://github.com
 upsertRequest(request): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/pairing-store.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/pairing-store.ts#L54)
+Defined in: packages/core/src/contracts/pairing-store.ts:54
 
 Insert or replace the (single) pending request for the peer.
 

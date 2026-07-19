@@ -6,7 +6,9 @@
 
 # Interface: DeliveryQuestion
 
-Defined in: [packages/channels/src/spi.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L148)
+Defined in: packages/channels/src/spi.ts:148
+
+**`Stable`**
 
 An interactive question rendered on the channel (HITL surface).
 `ref` is the opaque resolve reference the application posts back
@@ -15,12 +17,10 @@ to the framework: either a serialized workflow awakeable address
 approval id. Rendering (buttons, quick replies, plain text) is the
 adapter's choice.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-options"></a> `options` | `readonly` | readonly \{ `label`: `string`; `value`: `string`; \}[] | [packages/channels/src/spi.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L150) |
-| <a id="property-prompt"></a> `prompt` | `readonly` | `string` | [packages/channels/src/spi.ts:149](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L149) |
-| <a id="property-ref"></a> `ref` | `readonly` | `string` | [packages/channels/src/spi.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/spi.ts#L151) |
+| <a id="property-options"></a> `options` | `readonly` | readonly \{ `label`: `string`; `value`: `string`; \}[] | packages/channels/src/spi.ts:150 |
+| <a id="property-prompt"></a> `prompt` | `readonly` | `string` | packages/channels/src/spi.ts:149 |
+| <a id="property-ref"></a> `ref` | `readonly` | `string` | packages/channels/src/spi.ts:151 |

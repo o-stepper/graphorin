@@ -10,7 +10,9 @@
 function listTokens(tokenStore, opts?): Promise<readonly TokenMetadata[]>;
 ```
 
-Defined in: [packages/security/src/auth/crud.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L120)
+Defined in: packages/security/src/auth/crud.ts:120
+
+**`Stable`**
 
 List token metadata. Never returns the raw token or the HMAC hash;
 the hash is hex on-disk only and would otherwise be a small offline
@@ -28,5 +30,3 @@ compromised.
 ## Returns
 
 `Promise`\&lt;readonly [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)[]\&gt;
-
-## Stable

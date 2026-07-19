@@ -6,14 +6,14 @@
 
 # Interface: VerifyContext
 
-Defined in: [packages/security/src/auth/verify.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L127)
+Defined in: packages/security/src/auth/verify.ts:127
+
+**`Stable`**
 
 Optional context surfaced to the verify pipeline.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-ip"></a> `ip?` | `readonly` | `string` | Caller IP address (or pseudonymous hash). Used by the per-IP rate limit. | [packages/security/src/auth/verify.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L129) |
+| <a id="property-ip"></a> `ip?` | `readonly` | `string` | Caller IP address (or pseudonymous hash). Used by the per-IP rate limit. | packages/security/src/auth/verify.ts:129 |

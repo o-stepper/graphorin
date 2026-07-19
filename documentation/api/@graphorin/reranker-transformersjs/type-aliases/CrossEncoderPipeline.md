@@ -12,7 +12,7 @@ type CrossEncoderPipeline = (pairs, options?) => Promise<
 | ReadonlyArray<ReadonlyArray<ClassifierResult>>>;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L55)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:55
 
 **`Internal`**
 

@@ -10,7 +10,9 @@
 function createReplay(opts?): Replay;
 ```
 
-Defined in: [packages/observability/src/replay/replay.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/replay.ts#L48)
+Defined in: packages/observability/src/replay/replay.ts:48
+
+**`Stable`**
 
 Build a replay primitive. The returned object exposes a single
 `run(...)` async iterator that yields [ReplayEvent](/api/@graphorin/observability/type-aliases/ReplayEvent.md) records.
@@ -29,5 +31,3 @@ audit log entry on every invocation.
 ## Returns
 
 [`Replay`](/api/@graphorin/observability/interfaces/Replay.md)
-
-## Stable

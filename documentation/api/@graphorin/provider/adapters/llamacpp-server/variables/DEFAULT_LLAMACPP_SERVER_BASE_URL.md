@@ -10,8 +10,8 @@
 const DEFAULT_LLAMACPP_SERVER_BASE_URL: "http://127.0.0.1:8080" = 'http://127.0.0.1:8080';
 ```
 
-Defined in: [packages/provider/src/adapters/llamacpp-server.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/llamacpp-server.ts#L24)
+Defined in: packages/provider/src/adapters/llamacpp-server.ts:24
+
+**`Stable`**
 
 Default port used by the upstream `llama-server` binary.
-
-## Stable

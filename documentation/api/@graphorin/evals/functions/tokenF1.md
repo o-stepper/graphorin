@@ -10,7 +10,9 @@
 function tokenF1(a, b): number;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/util.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/util.ts#L39)
+Defined in: packages/evals/src/scorers/memory/util.ts:39
+
+**`Stable`**
 
 Token-set F1 between two texts in `[0, 1]`.
 
@@ -24,5 +26,3 @@ Token-set F1 between two texts in `[0, 1]`.
 ## Returns
 
 `number`
-
-## Stable

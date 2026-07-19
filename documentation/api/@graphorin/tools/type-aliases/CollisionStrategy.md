@@ -10,7 +10,9 @@
 type CollisionStrategy = "auto-prefix" | "priority" | "manual";
 ```
 
-Defined in: [packages/tools/src/registry/types.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L23)
+Defined in: packages/tools/src/registry/types.ts:23
+
+**`Stable`**
 
 Strategy for resolving cross-source tool-name collisions.
 
@@ -22,5 +24,3 @@ Strategy for resolving cross-source tool-name collisions.
 - `'manual'`                - refuse to register the loser; throw
   [ToolCollisionError](/api/@graphorin/tools/errors/classes/ToolCollisionError.md) with a structured payload so the
   operator can configure either renaming or filtering.
-
-## Stable

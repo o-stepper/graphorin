@@ -10,7 +10,9 @@
 type ReasoningRetention = "strip" | "pass-through-claude" | "pass-through-all";
 ```
 
-Defined in: [packages/core/src/contracts/reasoning-retention.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/reasoning-retention.ts#L23)
+Defined in: packages/core/src/contracts/reasoning-retention.ts:23
+
+**`Stable`**
 
 How a provider treats reasoning content across consecutive
 `provider.stream(...)` calls of the same agent + same model + same
@@ -30,5 +32,3 @@ in the provider layer:
    `@graphorin/sessions` handoff filters.
 3. **Prompt-cache key calculation** - reasoning blocks are excluded
    from cache-key hashes but included in outbound transmission.
-
-## Stable

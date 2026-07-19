@@ -10,7 +10,9 @@
 function closeCodeFor(reason): number;
 ```
 
-Defined in: [packages/protocol/src/close-codes.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/close-codes.ts#L47)
+Defined in: src/close-codes.ts:47
+
+**`Stable`**
 
 Return the numeric close code for a Graphorin reason discriminator.
 
@@ -23,5 +25,3 @@ Return the numeric close code for a Graphorin reason discriminator.
 ## Returns
 
 `number`
-
-## Stable

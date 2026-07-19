@@ -10,7 +10,9 @@
 type VaultAdapter = (ref, ctx) => Promise<SecretValue>;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/vault.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/vault.ts#L17)
+Defined in: packages/security/src/secrets/resolvers/vault.ts:17
+
+**`Stable`**
 
 Concrete adapter signature plugged into `setVaultAdapter(...)`. The
 built-in resolver only ships the **pattern** - a real Vault adapter
@@ -26,5 +28,3 @@ lives in the optional `@graphorin/secret-vault` package (post-MVP).
 ## Returns
 
 `Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;
-
-## Stable

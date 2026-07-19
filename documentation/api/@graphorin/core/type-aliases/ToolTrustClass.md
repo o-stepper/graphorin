@@ -17,11 +17,11 @@ type ToolTrustClass =
   | "channel-inbound";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L111)
+Defined in: packages/core/src/types/tool.ts:111
+
+**`Stable`**
 
 Trust class assigned to a registered tool. The class is computed at
 registration time from the registration source and the declared
 sandbox policy; downstream layers (sanitization, audit) read the
 class to pick the right default policy.
-
-## Stable

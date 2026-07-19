@@ -10,7 +10,9 @@
 function createHeartbeat<TDeps>(options): Heartbeat;
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L208)
+Defined in: packages/proactive/src/heartbeat.ts:208
+
+**`Stable`**
 
 Build a [Heartbeat](/api/@graphorin/proactive/interfaces/Heartbeat.md).
 
@@ -29,5 +31,3 @@ Build a [Heartbeat](/api/@graphorin/proactive/interfaces/Heartbeat.md).
 ## Returns
 
 [`Heartbeat`](/api/@graphorin/proactive/interfaces/Heartbeat.md)
-
-## Stable

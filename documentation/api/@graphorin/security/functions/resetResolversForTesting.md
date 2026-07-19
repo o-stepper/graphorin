@@ -10,7 +10,7 @@
 function _resetResolversForTesting(): void;
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/registry.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/registry.ts#L102)
+Defined in: packages/security/src/secrets/resolvers/registry.ts:102
 
 **`Experimental`**
 

@@ -18,7 +18,9 @@ type ValidationResult<T> =
 };
 ```
 
-Defined in: [packages/core/src/utils/validation.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L49)
+Defined in: packages/core/src/utils/validation.ts:49
+
+**`Stable`**
 
 Validate `data` against `schema` and return a `Result` instead of
 throwing. Use this in code paths where you want explicit
@@ -29,5 +31,3 @@ pattern-matching over success / failure.
 | Type Parameter |
 | ------ |
 | `T` |
-
-## Stable

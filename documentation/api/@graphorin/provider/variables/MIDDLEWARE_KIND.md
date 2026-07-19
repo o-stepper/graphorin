@@ -10,10 +10,10 @@
 const MIDDLEWARE_KIND: unique symbol;
 ```
 
-Defined in: [packages/provider/src/middleware/compose.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L24)
+Defined in: packages/provider/src/middleware/compose.ts:24
+
+**`Stable`**
 
 Symbol attached to every middleware-produced provider so the
 composer can detect and validate the chain. The symbol is opaque
 and cross-realm safe via `Symbol.for`.
-
-## Stable

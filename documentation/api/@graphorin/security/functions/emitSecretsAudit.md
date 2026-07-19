@@ -10,7 +10,9 @@
 function emitSecretsAudit(event): void;
 ```
 
-Defined in: [packages/security/src/secrets/audit-emitter.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L109)
+Defined in: packages/security/src/secrets/audit-emitter.ts:109
+
+**`Stable`**
 
 Emit an event to every subscriber. Listeners that throw are
 isolated - a faulty listener never tears down the secret access
@@ -25,5 +27,3 @@ path.
 ## Returns
 
 `void`
-
-## Stable

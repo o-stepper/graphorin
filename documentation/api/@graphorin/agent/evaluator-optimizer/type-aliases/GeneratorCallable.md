@@ -10,7 +10,9 @@
 type GeneratorCallable<TOutput> = (input, priorCritique, iteration) => Promise<TOutput>;
 ```
 
-Defined in: [packages/agent/src/evaluator-optimizer/index.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L47)
+Defined in: packages/agent/src/evaluator-optimizer/index.ts:47
+
+**`Stable`**
 
 Generator callable shape. Receives the original user input plus
 the previous iteration's critique (or `undefined` on the first
@@ -33,5 +35,3 @@ iteration) and returns the new candidate output.
 ## Returns
 
 `Promise`\&lt;`TOutput`\&gt;
-
-## Stable

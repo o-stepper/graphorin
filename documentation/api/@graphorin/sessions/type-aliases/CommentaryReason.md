@@ -17,9 +17,9 @@ type CommentaryReason =
   | "agent.model.fellback-event-signature";
 ```
 
-Defined in: [packages/sessions/src/commentary/types.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/types.ts#L41)
+Defined in: packages/sessions/src/commentary/types.ts:41
+
+**`Stable`**
 
 Stable label for each detection pattern. Surfaced in the audit row +
 the counter label cardinality is bounded.
-
-## Stable

@@ -10,4 +10,4 @@
 const INDUCTION_SYSTEM_PROMPT: string;
 ```
 
-Defined in: [packages/memory/src/consolidator/phases/induce.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L120)
+Defined in: packages/memory/src/consolidator/phases/induce.ts:120

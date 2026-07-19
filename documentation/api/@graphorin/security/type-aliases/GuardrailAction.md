@@ -10,7 +10,9 @@
 type GuardrailAction = "block" | "warn" | "rewrite";
 ```
 
-Defined in: [packages/security/src/guardrails/types.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L33)
+Defined in: packages/security/src/guardrails/types.ts:33
+
+**`Stable`**
 
 Action requested by a failing guardrail.
 
@@ -20,5 +22,3 @@ Action requested by a failing guardrail.
   suitable for telemetry-only rules.
 - `'rewrite'` - the runtime substitutes the supplied `rewrite`
   value before continuing (e.g. PII redaction with a masked output).
-
-## Stable

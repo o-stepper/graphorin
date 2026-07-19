@@ -6,12 +6,12 @@
 
 # Interface: TriggersRoutesDeps
 
-Defined in: [packages/server/src/triggers/routes.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/routes.ts#L36)
+Defined in: packages/server/src/triggers/routes.ts:36
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | [packages/server/src/triggers/routes.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/routes.ts#L37) |
+| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | packages/server/src/triggers/routes.ts:37 |

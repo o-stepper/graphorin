@@ -26,8 +26,8 @@ type SandboxCode =
 
 Defined in: [packages/core/dist/contracts/sandbox.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts)
 
+**`Stable`**
+
 Description of the code to run in the sandbox. Either a JS source
 string, a path to a JS file, or a fully-qualified handler reference
 resolved by the sandbox implementation.
-
-## Stable

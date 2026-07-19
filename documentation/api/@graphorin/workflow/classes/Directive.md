@@ -8,6 +8,8 @@
 
 Defined in: [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts)
 
+**`Stable`**
+
 Workflow control-flow primitive: a single value handed to
 `Workflow.resume(threadId, directive?)` (or returned from a node's
 `pause(...)` resolution) carrying any combination of:
@@ -23,8 +25,6 @@ Workflow control-flow primitive: a single value handed to
 
 The shape is **Graphorin's own design** (the name `Directive` is part
 of the public API).
-
-## Stable
 
 ## Type Parameters
 

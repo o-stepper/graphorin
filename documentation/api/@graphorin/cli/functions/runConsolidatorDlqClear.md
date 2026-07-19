@@ -10,7 +10,9 @@
 function runConsolidatorDlqClear(options?): Promise<ConsolidatorDlqClearResult>;
 ```
 
-Defined in: [packages/cli/src/commands/consolidator.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L315)
+Defined in: packages/cli/src/commands/consolidator.ts:315
+
+**`Stable`**
 
 W-065: clear dead-letter batches. Defaults are conservative:
 exhausted-only, all users, no age bound. The batch payload (message
@@ -25,5 +27,3 @@ ids) is lost on delete - that is the explicit point of the command.
 ## Returns
 
 `Promise`\&lt;[`ConsolidatorDlqClearResult`](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearResult.md)\&gt;
-
-## Stable

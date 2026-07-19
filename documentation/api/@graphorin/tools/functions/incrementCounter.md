@@ -13,7 +13,9 @@ function incrementCounter(
    by?): void;
 ```
 
-Defined in: [packages/tools/src/audit/counters.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L58)
+Defined in: packages/tools/src/audit/counters.ts:58
+
+**`Stable`**
 
 Increment a counter (or initialise to `1`). Multi-label invocations
 are keyed by sorted label name + value pairs to keep the snapshot
@@ -30,5 +32,3 @@ deterministic.
 ## Returns
 
 `void`
-
-## Stable

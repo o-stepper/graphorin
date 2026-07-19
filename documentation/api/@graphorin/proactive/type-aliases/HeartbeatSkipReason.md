@@ -16,8 +16,8 @@ type HeartbeatSkipReason =
   | "below-min-length";
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L75)
+Defined in: packages/proactive/src/heartbeat.ts:75
+
+**`Stable`**
 
 Why a fire produced no outcome.
-
-## Stable

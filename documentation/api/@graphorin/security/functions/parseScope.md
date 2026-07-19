@@ -10,7 +10,9 @@
 function parseScope(input): ParsedScope;
 ```
 
-Defined in: [packages/security/src/auth/scope.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L49)
+Defined in: packages/security/src/auth/scope.ts:49
+
+**`Stable`**
 
 Parse a single scope string. Throws `ScopeParseError` for any input
 that does not match the canonical grammar; never silently coerces.
@@ -24,5 +26,3 @@ that does not match the canonical grammar; never silently coerces.
 ## Returns
 
 [`ParsedScope`](/api/@graphorin/security/type-aliases/ParsedScope.md)
-
-## Stable

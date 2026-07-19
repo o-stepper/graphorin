@@ -13,7 +13,9 @@ type MCPTransportConfig =
   | SseTransportConfig;
 ```
 
-Defined in: [packages/mcp/src/transport/types.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/transport/types.ts#L24)
+Defined in: packages/mcp/src/transport/types.ts:24
+
+**`Stable`**
 
 Transport descriptors accepted by [createMCPClient](/api/@graphorin/mcp/functions/createMCPClient.md).
 
@@ -34,5 +36,3 @@ The discriminated union mirrors the three transports the
   streamable HTTP transport. The runtime emits one WARN-per-process
   on transport selection; the transport is not eligible for the
   resumable-session features.
-
-## Stable

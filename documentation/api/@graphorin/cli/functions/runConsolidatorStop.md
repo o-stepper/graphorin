@@ -13,7 +13,9 @@ function runConsolidatorStop(options?): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/consolidator.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L173)
+Defined in: packages/cli/src/commands/consolidator.ts:173
+
+**`Stable`**
 
 ## Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/cli/src/commands/consolidator.ts:173](https://github.com/o
   `stopped`: `false`;
   `unsupported`: `true`;
 \}\>
-
-## Stable

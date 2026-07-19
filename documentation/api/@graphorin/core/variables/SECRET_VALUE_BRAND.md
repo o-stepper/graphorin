@@ -10,11 +10,11 @@
 const SECRET_VALUE_BRAND: unique symbol;
 ```
 
-Defined in: [packages/core/src/contracts/secret-value.ts:9](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/secret-value.ts#L9)
+Defined in: packages/core/src/contracts/secret-value.ts:9
+
+**`Stable`**
 
 Cross-realm symbol used to brand `SecretValue` instances. Implementations
 (e.g. the wrapper class shipped from `@graphorin/security`) attach this
 symbol so that `isSecretValue(...)` works across realms (Worker threads,
 sandboxes, etc.).
-
-## Stable

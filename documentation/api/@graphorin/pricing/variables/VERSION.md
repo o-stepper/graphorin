@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: [packages/pricing/src/index.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/index.ts#L31)
+Defined in: pricing/src/index.ts:31

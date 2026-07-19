@@ -10,7 +10,9 @@
 function onOAuthAudit(listener): () => void;
 ```
 
-Defined in: [packages/security/src/oauth/audit-emitter.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/audit-emitter.ts#L72)
+Defined in: packages/security/src/oauth/audit-emitter.ts:72
+
+**`Stable`**
 
 Subscribe to OAuth-subsystem audit events. The audit-log subsystem
 registers exactly one listener that forwards each event to the
@@ -25,5 +27,3 @@ audit database.
 ## Returns
 
 () => `void`
-
-## Stable

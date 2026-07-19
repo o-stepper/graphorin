@@ -6,13 +6,13 @@
 
 # Interface: TextDeltaEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L103)
+Defined in: packages/core/src/types/agent-event.ts:103
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-delta"></a> `delta` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L105) |
-| <a id="property-type"></a> `type` | `readonly` | `"text.delta"` | [packages/core/src/types/agent-event.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L104) |
+| <a id="property-delta"></a> `delta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:105 |
+| <a id="property-type"></a> `type` | `readonly` | `"text.delta"` | packages/core/src/types/agent-event.ts:104 |

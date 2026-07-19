@@ -10,8 +10,8 @@
 type MessageRole = "system" | "user" | "assistant" | "tool";
 ```
 
-Defined in: [packages/core/src/types/message.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L127)
+Defined in: packages/core/src/types/message.ts:127
+
+**`Stable`**
 
 Logical role of a message in a conversation.
-
-## Stable

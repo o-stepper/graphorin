@@ -6,14 +6,14 @@
 
 # Interface: LocaleResolverLogger
 
-Defined in: [packages/memory/src/context-engine/locale-packs/resolver.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/resolver.ts#L43)
+Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:43
+
+**`Stable`**
 
 Logger surface accepted by [resolveLocalePack](/api/@graphorin/memory/functions/resolveLocalePack.md). Every other
 surface in the codebase already accepts `Logger | undefined`; this
 one mirrors that contract without taking the heavier
 `@graphorin/core` `Logger` import directly.
-
-## Stable
 
 ## Methods
 
@@ -23,7 +23,7 @@ one mirrors that contract without taking the heavier
 warn(message, attrs?): void;
 ```
 
-Defined in: [packages/memory/src/context-engine/locale-packs/resolver.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/resolver.ts#L44)
+Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:44
 
 #### Parameters
 

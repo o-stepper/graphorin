@@ -10,7 +10,9 @@
 function fromWireAgentEvent<TOutput>(ev): AgentEvent<TOutput>;
 ```
 
-Defined in: [packages/core/src/types/agent-event-wire.ts:166](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L166)
+Defined in: packages/core/src/types/agent-event-wire.ts:166
+
+**`Stable`**
 
 Inverse of [toWireAgentEvent](/api/@graphorin/core/functions/toWireAgentEvent.md): decode base64 envelopes back
 into `Uint8Array` / `URL` instances. Exposed for `@graphorin/client`
@@ -31,5 +33,3 @@ consumers that want runtime types back after `JSON.parse`.
 ## Returns
 
 [`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\&lt;`TOutput`\&gt;
-
-## Stable

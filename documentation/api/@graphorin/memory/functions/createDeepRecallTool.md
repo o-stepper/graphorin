@@ -10,7 +10,9 @@
 function createDeepRecallTool(deps): Tool<DeepRecallInput, DeepRecallOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/recall-tools.ts:252](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/recall-tools.ts#L252)
+Defined in: packages/memory/src/tools/recall-tools.ts:252
+
+**`Stable`**
 
 `deep_recall` - gated, multi-pass ("deep") recall over the user's
 factual memory for HARD questions (P2-4). A local difficulty gate keeps
@@ -32,5 +34,3 @@ pass, so prefer the cheaper `fact_search` for ordinary lookups.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`DeepRecallInput`, `DeepRecallOutput`\&gt;
-
-## Stable

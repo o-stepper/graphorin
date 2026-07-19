@@ -8,11 +8,11 @@
 
 Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
 
+**`Stable`**
+
 Definition of a single guardrail. The `kind` discriminator lets
 downstream code tell input from output guardrails without juggling
 separate registries.
-
-## Stable
 
 ## Type Parameters
 

@@ -10,7 +10,9 @@
 function tokenF1Matcher(minTokenF1?): MemoryPointMatcher;
 ```
 
-Defined in: [packages/evals/src/scorers/memory/util.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/memory/util.ts#L57)
+Defined in: packages/evals/src/scorers/memory/util.ts:57
+
+**`Stable`**
 
 Build the default matcher: token-set F1 at or above `minTokenF1`
 (default `0.5`).
@@ -24,5 +26,3 @@ Build the default matcher: token-set F1 at or above `minTokenF1`
 ## Returns
 
 [`MemoryPointMatcher`](/api/@graphorin/evals/type-aliases/MemoryPointMatcher.md)
-
-## Stable

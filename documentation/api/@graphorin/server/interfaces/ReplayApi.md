@@ -6,9 +6,9 @@
 
 # Interface: ReplayApi
 
-Defined in: [packages/server/src/replay/routes.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/replay/routes.ts#L35)
+Defined in: packages/server/src/replay/routes.ts:35
 
-## Stable
+**`Stable`**
 
 ## Methods
 
@@ -18,7 +18,7 @@ Defined in: [packages/server/src/replay/routes.ts:35](https://github.com/o-stepp
 loadRunReplay(input): Promise<ReplayResponse>;
 ```
 
-Defined in: [packages/server/src/replay/routes.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/replay/routes.ts#L36)
+Defined in: packages/server/src/replay/routes.ts:36
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: [packages/server/src/replay/routes.ts:36](https://github.com/o-stepp
 loadSessionReplay(input): Promise<ReplayResponse>;
 ```
 
-Defined in: [packages/server/src/replay/routes.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/replay/routes.ts#L42)
+Defined in: packages/server/src/replay/routes.ts:42
 
 #### Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: FitFusionCase\&lt;TRecord\&gt;
 
-Defined in: [packages/memory/src/search/fit-weights.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L22)
+Defined in: packages/memory/src/search/fit-weights.ts:22
 
 One labelled query: per-kind candidate lists + the relevant ids.
 
@@ -20,6 +20,6 @@ One labelled query: per-kind candidate lists + the relevant ids.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-fts"></a> `fts` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[] | FTS candidate list, best-first (as the store returns it). | [packages/memory/src/search/fit-weights.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L24) |
-| <a id="property-relevantids"></a> `relevantIds` | `readonly` | readonly `string`[] | Ids judged relevant for this query (binary gain). | [packages/memory/src/search/fit-weights.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L28) |
-| <a id="property-vector"></a> `vector` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[] | Vector candidate list, best-first. | [packages/memory/src/search/fit-weights.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/fit-weights.ts#L26) |
+| <a id="property-fts"></a> `fts` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[] | FTS candidate list, best-first (as the store returns it). | packages/memory/src/search/fit-weights.ts:24 |
+| <a id="property-relevantids"></a> `relevantIds` | `readonly` | readonly `string`[] | Ids judged relevant for this query (binary gain). | packages/memory/src/search/fit-weights.ts:28 |
+| <a id="property-vector"></a> `vector` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[] | Vector candidate list, best-first. | packages/memory/src/search/fit-weights.ts:26 |

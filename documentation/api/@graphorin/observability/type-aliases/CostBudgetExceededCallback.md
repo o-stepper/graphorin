@@ -10,7 +10,9 @@
 type CostBudgetExceededCallback = (event) => void;
 ```
 
-Defined in: [packages/observability/src/cost/types.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/types.ts#L111)
+Defined in: packages/observability/src/cost/types.ts:111
+
+**`Stable`**
 
 Callback invoked when an aggregation scope crosses its configured
 budget. The handler receives a sanitized payload - the secret-free
@@ -30,5 +32,3 @@ scope id + the breached numbers.
 ## Returns
 
 `void`
-
-## Stable

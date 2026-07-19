@@ -6,17 +6,17 @@
 
 # Interface: Heartbeat
 
-Defined in: [packages/proactive/src/heartbeat.ts:186](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L186)
+Defined in: packages/proactive/src/heartbeat.ts:186
+
+**`Stable`**
 
 The heartbeat handle.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | The registered trigger id. | [packages/proactive/src/heartbeat.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L195) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | The registered trigger id. | packages/proactive/src/heartbeat.ts:195 |
 
 ## Methods
 
@@ -26,7 +26,7 @@ The heartbeat handle.
 beat(): Promise<HeartbeatBeatResult>;
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:192](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L192)
+Defined in: packages/proactive/src/heartbeat.ts:192
 
 Fire one beat now (also the trigger callback).
 
@@ -42,7 +42,7 @@ Fire one beat now (also the trigger callback).
 start(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:188](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L188)
+Defined in: packages/proactive/src/heartbeat.ts:188
 
 Register the schedule on the scheduler. Idempotent.
 
@@ -58,7 +58,7 @@ Register the schedule on the scheduler. Idempotent.
 status(): HeartbeatStatus;
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L193)
+Defined in: packages/proactive/src/heartbeat.ts:193
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: [packages/proactive/src/heartbeat.ts:193](https://github.com/o-stepp
 stop(): Promise<void>;
 ```
 
-Defined in: [packages/proactive/src/heartbeat.ts:190](https://github.com/o-stepper/graphorin/blob/main/packages/proactive/src/heartbeat.ts#L190)
+Defined in: packages/proactive/src/heartbeat.ts:190
 
 Unregister the schedule and cancel a pending deferral.
 

@@ -159,11 +159,24 @@ export function checkSecrets(): CheckResult[] {
  * Verify that an encrypted-SQLite binding is registered for the
  * audit log. The framework refuses to open the audit log without an
  * encrypted binding, so the doctor surfaces the missing binding as
- * `'fail'`.
+ * `'fail'` - unless the supplied config has the audit log DISABLED, in
+ * which case the binding is not required and the check reports `'skip'`
+ * (deep retest 2026-07-19, P2-1: a fresh `init --no-encrypted` +
+ * `doctor --all` must not fail on a subsystem the config turned off).
  *
  * @stable
  */
-export function checkEncryption(): CheckResult[] {
+export function checkEncryption(options: { readonly auditEnabled?: boolean } = {}): CheckResult[] {
+  if (options.auditEnabled === false) {
+    return [
+      {
+        check: 'audit-db',
+        status: 'skip',
+        message: 'audit log disabled in the supplied config - encrypted binding not required',
+        hint: 'Enable audit.enabled and install the SQLite cipher peer when you want the tamper-evident audit chain.',
+      },
+    ];
+  }
   const bindings = listAuditDbBindings();
   if (bindings.length === 0) {
     return [
@@ -171,7 +184,7 @@ export function checkEncryption(): CheckResult[] {
         check: 'audit-db',
         status: 'fail',
         message: 'no encrypted-SQLite binding registered for the audit log',
-        hint: 'Install the SQLite cipher peer dependency and register a binding via registerAuditDbBinding(...). The framework default ships from @graphorin/store-sqlite (Phase 05).',
+        hint: 'Install the SQLite cipher peer dependency and register a binding via registerAuditDbBinding(...). The framework default ships from @graphorin/store-sqlite.',
       },
     ];
   }

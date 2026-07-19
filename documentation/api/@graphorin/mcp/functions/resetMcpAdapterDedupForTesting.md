@@ -10,7 +10,7 @@
 function _resetMcpAdapterDedupForTesting(): void;
 ```
 
-Defined in: [packages/mcp/src/client/to-tools.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/client/to-tools.ts#L53)
+Defined in: packages/mcp/src/client/to-tools.ts:53
 
 **`Experimental`**
 

@@ -15,7 +15,7 @@ type DcrFetcher = (url, init) => Promise<{
 }>;
 ```
 
-Defined in: [packages/security/src/oauth/dynamic-client-registration.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L20)
+Defined in: packages/security/src/oauth/dynamic-client-registration.ts:20
 
 Strategy hook used by tests to inject a synthetic registration response.
 

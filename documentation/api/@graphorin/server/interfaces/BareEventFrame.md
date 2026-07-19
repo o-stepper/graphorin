@@ -6,17 +6,17 @@
 
 # Interface: BareEventFrame
 
-Defined in: [packages/server/src/ws/dispatcher.ts:199](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L199)
+Defined in: packages/server/src/ws/dispatcher.ts:199
+
+**`Stable`**
 
 Frame argument accepted by [WsDispatcher.emit](/api/@graphorin/server/interfaces/WsDispatcher.md#emit). The
 dispatcher fills in `subscriptionId`, `subject`, and `eventId`.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-eventid"></a> `eventId?` | `readonly` | `string` | [packages/server/src/ws/dispatcher.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L202) |
-| <a id="property-payload"></a> `payload` | `readonly` | `unknown` | [packages/server/src/ws/dispatcher.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L201) |
-| <a id="property-type"></a> `type` | `readonly` | `string` | [packages/server/src/ws/dispatcher.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L200) |
+| <a id="property-eventid"></a> `eventId?` | `readonly` | `string` | packages/server/src/ws/dispatcher.ts:202 |
+| <a id="property-payload"></a> `payload` | `readonly` | `unknown` | packages/server/src/ws/dispatcher.ts:201 |
+| <a id="property-type"></a> `type` | `readonly` | `string` | packages/server/src/ws/dispatcher.ts:200 |

@@ -10,7 +10,9 @@
 function createLoopbackAdapter(options?): LoopbackAdapter;
 ```
 
-Defined in: [packages/channels/src/testkit/loopback-adapter.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/testkit/loopback-adapter.ts#L53)
+Defined in: packages/channels/src/testkit/loopback-adapter.ts:53
+
+**`Stable`**
 
 Build a loopback adapter for tests and prototypes.
 
@@ -23,5 +25,3 @@ Build a loopback adapter for tests and prototypes.
 ## Returns
 
 [`LoopbackAdapter`](/api/@graphorin/channels/testkit/interfaces/LoopbackAdapter.md)
-
-## Stable

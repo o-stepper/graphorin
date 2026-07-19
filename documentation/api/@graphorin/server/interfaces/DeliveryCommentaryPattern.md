@@ -6,7 +6,9 @@
 
 # Interface: DeliveryCommentaryPattern
 
-Defined in: [packages/server/src/commentary/types.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L68)
+Defined in: packages/server/src/commentary/types.ts:68
+
+**`Stable`**
 
 Single pattern entry in the [DEFAULT\_DELIVERY\_COMMENTARY\_PATTERNS](/api/@graphorin/server/variables/DEFAULT_DELIVERY_COMMENTARY_PATTERNS.md)
 catalogue. The `regex` is matched against the JSON payload of the
@@ -14,12 +16,10 @@ catalogue. The `regex` is matched against the JSON payload of the
 want to match against the wire-format string instead can supply
 their own catalogue.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description` | `readonly` | `string` | [packages/server/src/commentary/types.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L71) |
-| <a id="property-reason"></a> `reason` | `readonly` | [`DeliveryCommentaryReason`](/api/@graphorin/server/type-aliases/DeliveryCommentaryReason.md) | [packages/server/src/commentary/types.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L69) |
-| <a id="property-regex"></a> `regex` | `readonly` | `RegExp` | [packages/server/src/commentary/types.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L70) |
+| <a id="property-description"></a> `description` | `readonly` | `string` | packages/server/src/commentary/types.ts:71 |
+| <a id="property-reason"></a> `reason` | `readonly` | [`DeliveryCommentaryReason`](/api/@graphorin/server/type-aliases/DeliveryCommentaryReason.md) | packages/server/src/commentary/types.ts:69 |
+| <a id="property-regex"></a> `regex` | `readonly` | `RegExp` | packages/server/src/commentary/types.ts:70 |

@@ -10,7 +10,9 @@
 function bridgeCommentaryToAudit(db, onWriteError?): CommentaryAuditSink;
 ```
 
-Defined in: [packages/server/src/commentary/audit-bridge.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L72)
+Defined in: packages/server/src/commentary/audit-bridge.ts:72
+
+**`Stable`**
 
 Build a commentary sink that appends each sanitization decision to the audit
 log. Writes serialise through `appendAudit` so concurrent decisions never
@@ -27,5 +29,3 @@ race on `seq`; a failed write is isolated from the wire - `onWriteError`
 ## Returns
 
 [`CommentaryAuditSink`](/api/@graphorin/server/commentary/interfaces/CommentaryAuditSink.md)
-
-## Stable

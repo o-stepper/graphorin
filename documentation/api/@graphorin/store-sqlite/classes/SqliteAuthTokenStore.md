@@ -6,13 +6,13 @@
 
 # Class: SqliteAuthTokenStore
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L11)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:11
+
+**`Stable`**
 
 Default `AuthTokenStore` implementation. Persists HMAC-SHA256 hashes
 of issued server tokens (DEC-122 / ADR-027). Raw tokens are never
 persisted - the runtime carries them via `SecretValue`.
-
-## Stable
 
 ## Implements
 
@@ -26,7 +26,7 @@ persisted - the runtime carries them via `SecretValue`.
 new SqliteAuthTokenStore(conn): SqliteAuthTokenStore;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L13)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:13
 
 #### Parameters
 
@@ -48,7 +48,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L35)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:35
 
 #### Parameters
 
@@ -76,7 +76,7 @@ getByHash(hashHex): Promise<
 | null>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L40)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:40
 
 Indexed lookup by HMAC hash (SPL-19). When present, the verifier
 uses it on cache-miss instead of walking `list()` - O(1) instead of
@@ -106,7 +106,7 @@ an O(n) full-table scan per verification.
 list(): Promise<readonly AuthTokenRecord[]>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L49)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:49
 
 #### Returns
 
@@ -124,7 +124,7 @@ Defined in: [packages/store-sqlite/src/auth-token-store.ts:49](https://github.co
 put(record): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L17)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:17
 
 #### Parameters
 
@@ -148,7 +148,7 @@ Defined in: [packages/store-sqlite/src/auth-token-store.ts:17](https://github.co
 recordUse(id, usedAt): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L61)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:61
 
 #### Parameters
 
@@ -173,7 +173,7 @@ Defined in: [packages/store-sqlite/src/auth-token-store.ts:61](https://github.co
 revoke(id, revokedAt): Promise<void>;
 ```
 
-Defined in: [packages/store-sqlite/src/auth-token-store.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/auth-token-store.ts#L54)
+Defined in: packages/store-sqlite/src/auth-token-store.ts:54
 
 #### Parameters
 

@@ -23,11 +23,11 @@ const RPC_ERROR_CODES: Readonly<{
 }>;
 ```
 
-Defined in: [packages/protocol/src/server-message.ts:262](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L262)
+Defined in: src/server-message.ts:262
+
+**`Stable`**
 
 Stable JSON-RPC error code catalogue used by the server when
 surfacing routine failures (per JSON-RPC 2.0 § 5.1 + Graphorin
 extensions). Application-level errors use codes in the
 implementation-defined range (`-32000` … `-32099`).
-
-## Stable

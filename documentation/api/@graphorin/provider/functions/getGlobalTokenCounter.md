@@ -12,7 +12,9 @@ function getGlobalTokenCounter():
   | null;
 ```
 
-Defined in: [packages/provider/src/counters/global.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/global.ts#L28)
+Defined in: packages/provider/src/counters/global.ts:28
+
+**`Stable`**
 
 Read the process-global counter, or `null` if unset.
 
@@ -20,5 +22,3 @@ Read the process-global counter, or `null` if unset.
 
   \| [`TokenCounter`](/api/@graphorin/core/interfaces/TokenCounter.md)
   \| `null`
-
-## Stable

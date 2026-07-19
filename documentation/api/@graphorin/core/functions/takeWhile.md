@@ -13,7 +13,9 @@ function takeWhile<T>(
 signal?): AsyncIterable<T>;
 ```
 
-Defined in: [packages/core/src/utils/streams.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/streams.ts#L90)
+Defined in: packages/core/src/utils/streams.ts:90
+
+**`Stable`**
 
 Take items as long as `pred` returns truthy. The first item for which
 `pred` returns falsy ends the stream.
@@ -35,5 +37,3 @@ Take items as long as `pred` returns truthy. The first item for which
 ## Returns
 
 `AsyncIterable`\&lt;`T`\&gt;
-
-## Stable

@@ -12,7 +12,9 @@ function runTriggersDisable(options): Promise<
 | null>;
 ```
 
-Defined in: [packages/cli/src/commands/triggers.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L156)
+Defined in: packages/cli/src/commands/triggers.ts:156
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/triggers.ts:156](https://github.com/o-ste
 `Promise`\<
   \| [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)
   \| `null`\>
-
-## Stable

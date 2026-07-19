@@ -19,7 +19,7 @@ type WireAgentEvent<TOutput> =
 | WireAgentEndEvent<TOutput>;
 ```
 
-Defined in: [packages/core/src/types/agent-event-wire.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event-wire.ts#L85)
+Defined in: packages/core/src/types/agent-event-wire.ts:85
 
 ## Type Parameters
 

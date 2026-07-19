@@ -10,8 +10,8 @@
 type ProtocolEscapePolicy = "strict" | "replace" | "reject";
 ```
 
-Defined in: [packages/agent/src/lateral-leak/protocol-guard.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/protocol-guard.ts#L37)
+Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:37
+
+**`Stable`**
 
 Per-boundary escape policy.
-
-## Stable

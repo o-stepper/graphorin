@@ -10,7 +10,9 @@
 function createFactValidateTool(deps): Tool<FactValidateInput, FactValidateOutput>;
 ```
 
-Defined in: [packages/memory/src/tools/fact-tools.ts:448](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L448)
+Defined in: packages/memory/src/tools/fact-tools.ts:448
+
+**`Stable`**
 
 `fact_validate` - promote a quarantined fact to active (P1-4). The
 validation path that admits a synthesized (consolidator / reflection)
@@ -41,5 +43,3 @@ approved.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactValidateInput`, `FactValidateOutput`\&gt;
-
-## Stable

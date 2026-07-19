@@ -61,7 +61,9 @@ type ProviderEvent =
 };
 ```
 
-Defined in: [packages/core/src/contracts/provider.ts:172](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L172)
+Defined in: packages/core/src/contracts/provider.ts:172
+
+**`Stable`**
 
 Streamed provider event. Shape matches the wire-stable subset of the
 provider event union - adapters hide vendor specifics.
@@ -209,5 +211,3 @@ Adapters without such a payload simply omit the field.
   type: "error";
 }
 ```
-
-## Stable

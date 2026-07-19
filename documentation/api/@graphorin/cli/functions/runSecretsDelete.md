@@ -12,7 +12,9 @@ function runSecretsDelete(options): Promise<{
 }>;
 ```
 
-Defined in: [packages/cli/src/commands/secrets.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L179)
+Defined in: packages/cli/src/commands/secrets.ts:179
+
+**`Stable`**
 
 ## Parameters
 
@@ -25,5 +27,3 @@ Defined in: [packages/cli/src/commands/secrets.ts:179](https://github.com/o-step
 `Promise`\<\{
   `ok`: `true`;
 \}\>
-
-## Stable

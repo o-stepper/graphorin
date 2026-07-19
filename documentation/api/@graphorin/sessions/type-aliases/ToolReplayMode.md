@@ -10,8 +10,8 @@
 type ToolReplayMode = "auto" | "live" | "recorded" | "mixed";
 ```
 
-Defined in: [packages/sessions/src/cassette/types.ts:237](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L237)
+Defined in: packages/sessions/src/cassette/types.ts:237
+
+**`Stable`**
 
 High-level orchestration mode for the cassette replay engine.
-
-## Stable

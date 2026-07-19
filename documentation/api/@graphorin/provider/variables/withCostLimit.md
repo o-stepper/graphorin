@@ -10,7 +10,9 @@
 const withCostLimit: (opts) => ProviderMiddleware;
 ```
 
-Defined in: [packages/provider/src/middleware/with-cost-limit.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-cost-limit.ts#L49)
+Defined in: packages/provider/src/middleware/with-cost-limit.ts:49
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/provider/src/middleware/with-cost-limit.ts:49](https://git
 ## Returns
 
 [`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)
-
-## Stable

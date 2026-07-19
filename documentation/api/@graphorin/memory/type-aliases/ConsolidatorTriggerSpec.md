@@ -16,10 +16,10 @@ type ConsolidatorTriggerSpec =
   | `buffer:${number}`;
 ```
 
-Defined in: [packages/memory/src/consolidator/types.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/types.ts#L65)
+Defined in: packages/memory/src/consolidator/types.ts:65
+
+**`Stable`**
 
 Trigger discriminator. The `'turn:N'` and `'idle:Xm'` variants are
 the production defaults per DEC-133. `'cron:EXPR'`, `'event:NAME'`
 and `'budget:N'` are opt-in.
-
-## Stable

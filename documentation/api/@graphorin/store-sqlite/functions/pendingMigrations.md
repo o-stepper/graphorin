@@ -10,7 +10,9 @@
 function pendingMigrations(conn): readonly Migration[];
 ```
 
-Defined in: [packages/store-sqlite/src/migrations/runner.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/migrations/runner.ts#L118)
+Defined in: packages/store-sqlite/src/migrations/runner.ts:118
+
+**`Stable`**
 
 The migrations bundled with this build that are NOT recorded as
 applied in the supplied database (W-068). Read-only: when the
@@ -27,5 +29,3 @@ file is NOT marked by creating the table.
 ## Returns
 
 readonly [`Migration`](/api/@graphorin/store-sqlite/interfaces/Migration.md)[]
-
-## Stable

@@ -10,7 +10,9 @@
 function isCancelledNotification(message): message is { jsonrpc: "2.0"; method: "notifications/cancelled"; params: { requestId: string }; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/client-message.ts:196](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L196)
+Defined in: src/client-message.ts:196
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/client-message.ts:196](https://github.com/o-s
 ## Returns
 
 `message is { jsonrpc: "2.0"; method: "notifications/cancelled"; params: { requestId: string }; v: "1" }`
-
-## Stable

@@ -6,19 +6,19 @@
 
 # Interface: AgentCancellingEvent
 
-Defined in: [packages/core/src/types/agent-event.ts:361](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L361)
+Defined in: packages/core/src/types/agent-event.ts:361
+
+**`Stable`**
 
 Emitted at the moment `agent.abort({ ... })` is called, before any
 pending tool / provider calls have terminated. Subscribers use this
 to render "cancelling..." UI before the run actually winds down.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | `boolean` | [packages/core/src/types/agent-event.ts:364](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L364) |
-| <a id="property-onpendingapprovals"></a> `onPendingApprovals` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | [packages/core/src/types/agent-event.ts:365](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L365) |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L363) |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.cancelling"` | [packages/core/src/types/agent-event.ts:362](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L362) |
+| <a id="property-drain"></a> `drain` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:364 |
+| <a id="property-onpendingapprovals"></a> `onPendingApprovals` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | packages/core/src/types/agent-event.ts:365 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:363 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.cancelling"` | packages/core/src/types/agent-event.ts:362 |

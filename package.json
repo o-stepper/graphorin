@@ -34,7 +34,8 @@
     "check-phantom-deps": "node ./scripts/check-phantom-deps.mjs",
     "check-character-rules": "node ./scripts/check-character-rules.mjs",
     "check-api-report": "node ./scripts/check-api-report.mjs",
-    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test && node ./documentation/scripts/build-benchmark-results.mjs --self-test",
+    "check-entry-guards": "node ./scripts/check-entry-guards.mjs",
+    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test && node ./documentation/scripts/build-benchmark-results.mjs --self-test && node ./scripts/check-entry-guards.mjs --self-test",
     "bump-version": "node ./scripts/bump-version.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "smoke-consumer": "node ./scripts/smoke-consumer.mjs",
@@ -92,7 +93,8 @@
       "tar@>=7.0.0 <7.5.16": ">=7.5.16 <8",
       "js-yaml@>=4.0.0 <4.2.0": ">=4.2.0 <5",
       "js-yaml@<3.15.0": ">=3.15.0 <4",
-      "brace-expansion@>=5.0.0 <5.0.6": ">=5.0.6 <6"
+      "brace-expansion@>=5.0.0 <5.0.6": ">=5.0.6 <6",
+      "adm-zip@<0.6.0": ">=0.6.0 <1"
     }
   }
 }

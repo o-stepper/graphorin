@@ -22,10 +22,10 @@ type MCPErrorKind =
   | "transport-resumable-not-supported";
 ```
 
-Defined in: [packages/mcp/src/errors/index.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/errors/index.ts#L20)
+Defined in: packages/mcp/src/errors/index.ts:20
+
+**`Stable`**
 
 Discriminator union for every error class produced by
 `@graphorin/mcp`. New kinds extend this union; never throw plain
 `Error` from framework code.
-
-## Stable

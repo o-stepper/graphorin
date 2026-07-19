@@ -10,7 +10,9 @@
 type PermissionEffect = "allow" | "deny" | "ask" | "defer";
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L70)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:70
+
+**`Stable`**
 
 Four-value permission vocabulary (E1 / item 11):
 
@@ -24,5 +26,3 @@ Four-value permission vocabulary (E1 / item 11):
   auto-denies; like `'ask'`, honoured only by a suspending surface.
 
 Priority when several rules match: `deny > defer > ask > allow`.
-
-## Stable

@@ -10,7 +10,9 @@
 function applyReasoningPolicy(input): readonly Message[];
 ```
 
-Defined in: [packages/provider/src/reasoning/apply-policy.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/reasoning/apply-policy.ts#L43)
+Defined in: packages/provider/src/reasoning/apply-policy.ts:43
+
+**`Stable`**
 
 Apply the resolved retention policy to the provided messages.
 
@@ -23,5 +25,3 @@ Apply the resolved retention policy to the provided messages.
 ## Returns
 
 readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]
-
-## Stable

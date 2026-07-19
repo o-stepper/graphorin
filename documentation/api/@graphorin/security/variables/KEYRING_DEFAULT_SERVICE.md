@@ -10,12 +10,12 @@
 const KEYRING_DEFAULT_SERVICE: "graphorin" = 'graphorin';
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/keyring.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/keyring.ts#L16)
+Defined in: packages/security/src/secrets/resolvers/keyring.ts:16
+
+**`Stable`**
 
 Service prefix used for every keyring entry written by the framework.
 Picking a stable prefix makes it possible for users to inspect the
 OS keychain (Keychain Access on macOS, Credential Manager on
 Windows, `seahorse` / `gnome-keyring` on Linux) and easily filter
 Graphorin-owned credentials.
-
-## Stable

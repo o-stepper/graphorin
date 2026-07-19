@@ -10,7 +10,7 @@
 type TokenEndpointFetcher = (url, init) => Promise<TokenEndpointResponse>;
 ```
 
-Defined in: [packages/security/src/oauth/token-endpoint.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/token-endpoint.ts#L15)
+Defined in: packages/security/src/oauth/token-endpoint.ts:15
 
 Strategy hook used by tests to inject synthetic token responses.
 

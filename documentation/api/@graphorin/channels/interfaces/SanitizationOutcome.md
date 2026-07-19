@@ -8,9 +8,9 @@
 
 Defined in: [packages/tools/dist/inbound/sanitize.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/tools/dist/inbound/sanitize.d.ts)
 
-Outcome of [applyInboundSanitization](/api/@graphorin/tools/functions/applyInboundSanitization.md).
+**`Stable`**
 
-## Stable
+Outcome of [applyInboundSanitization](/api/@graphorin/tools/functions/applyInboundSanitization.md).
 
 ## Properties
 

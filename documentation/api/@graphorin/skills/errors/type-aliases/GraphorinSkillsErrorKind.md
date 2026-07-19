@@ -18,6 +18,6 @@ type GraphorinSkillsErrorKind =
   | "slash:parse";
 ```
 
-Defined in: [packages/skills/src/errors/index.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/errors/index.ts#L154)
+Defined in: packages/skills/src/errors/index.ts:154
 
 Convenience union - every `kind` discriminator the package may emit.

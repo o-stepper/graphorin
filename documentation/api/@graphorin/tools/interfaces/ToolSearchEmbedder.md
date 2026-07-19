@@ -6,15 +6,15 @@
 
 # Interface: ToolSearchEmbedder
 
-Defined in: [packages/tools/src/registry/types.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L119)
+Defined in: packages/tools/src/registry/types.ts:119
+
+**`Stable`**
 
 Pluggable embedder hook used by the semantic stage of
 [ToolRegistry.searchDeferred](/api/@graphorin/tools/interfaces/ToolRegistry.md#searchdeferred). The agent runtime supplies an
 implementation backed by the configured embedder (default per the
 memory subsystem); the registry falls through to the BM25 stage if
 the hook is undefined OR returns `null` for a given query.
-
-## Stable
 
 ## Methods
 
@@ -24,7 +24,7 @@ the hook is undefined OR returns `null` for a given query.
 dim(): number;
 ```
 
-Defined in: [packages/tools/src/registry/types.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L123)
+Defined in: packages/tools/src/registry/types.ts:123
 
 Output dimensionality.
 
@@ -40,7 +40,7 @@ Output dimensionality.
 embed(texts, signal?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: [packages/tools/src/registry/types.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L125)
+Defined in: packages/tools/src/registry/types.ts:125
 
 Embed a batch of strings.
 
@@ -63,7 +63,7 @@ Embed a batch of strings.
 id(): string;
 ```
 
-Defined in: [packages/tools/src/registry/types.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/types.ts#L121)
+Defined in: packages/tools/src/registry/types.ts:121
 
 Stable identifier surfaced through the cache key.
 

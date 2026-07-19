@@ -10,12 +10,12 @@
 function generateAesSalt(): Uint8Array;
 ```
 
-Defined in: [packages/security/src/hardening/crypto.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/crypto.ts#L48)
+Defined in: packages/security/src/hardening/crypto.ts:48
+
+**`Stable`**
 
 Generate a 16-byte salt suitable for AES-256-GCM key derivation.
 
 ## Returns
 
 `Uint8Array`
-
-## Stable

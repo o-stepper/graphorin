@@ -13,7 +13,9 @@ type NextBatchHook = (args) => Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/migration/embedder-migration.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L137)
+Defined in: packages/memory/src/migration/embedder-migration.ts:137
+
+**`Stable`**
 
 Per-batch loader. Returns up to `batchSize` rows for the supplied
 `kind` whose `embedder_id` is the source embedder. Returning an
@@ -36,5 +38,3 @@ empty array signals end-of-stream.
   `nextCursor`: `string` \| `null`;
   `rows`: `ReadonlyArray`\&lt;[`MigrationRow`](/api/@graphorin/memory/interfaces/MigrationRow.md)\&gt;;
 \}\>
-
-## Stable

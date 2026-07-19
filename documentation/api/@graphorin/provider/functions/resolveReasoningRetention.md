@@ -10,7 +10,9 @@
 function resolveReasoningRetention(input): ReasoningRetention;
 ```
 
-Defined in: [packages/provider/src/reasoning/retention.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/reasoning/retention.ts#L55)
+Defined in: packages/provider/src/reasoning/retention.ts:55
+
+**`Stable`**
 
 Resolve the effective [ReasoningRetention](/api/@graphorin/core/type-aliases/ReasoningRetention.md) value for a single
 request. The resolution is precedence-driven:
@@ -29,5 +31,3 @@ request. The resolution is precedence-driven:
 ## Returns
 
 [`ReasoningRetention`](/api/@graphorin/core/type-aliases/ReasoningRetention.md)
-
-## Stable

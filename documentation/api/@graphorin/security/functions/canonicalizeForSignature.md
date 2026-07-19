@@ -13,7 +13,9 @@ function canonicalizeForSignature(skillMd): {
 };
 ```
 
-Defined in: [packages/security/src/supply-chain/frontmatter.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L159)
+Defined in: packages/security/src/supply-chain/frontmatter.ts:159
+
+**`Stable`**
 
 Compute the canonical bytes used for ed25519 signing / verification.
 The algorithm:
@@ -40,7 +42,5 @@ The algorithm:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `bytes` | `Uint8Array` | [packages/security/src/supply-chain/frontmatter.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L160) |
-| `canonicalText` | `string` | [packages/security/src/supply-chain/frontmatter.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/frontmatter.ts#L161) |
-
-## Stable
+| `bytes` | `Uint8Array` | packages/security/src/supply-chain/frontmatter.ts:160 |
+| `canonicalText` | `string` | packages/security/src/supply-chain/frontmatter.ts:161 |

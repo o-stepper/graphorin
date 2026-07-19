@@ -10,7 +10,9 @@
 function setGlobalTokenCounter(counter): void;
 ```
 
-Defined in: [packages/provider/src/counters/global.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/global.ts#L19)
+Defined in: packages/provider/src/counters/global.ts:19
+
+**`Stable`**
 
 Set the process-global counter. Called once at startup by user
 code; passing `null` clears the slot.
@@ -24,5 +26,3 @@ code; passing `null` clears the slot.
 ## Returns
 
 `void`
-
-## Stable

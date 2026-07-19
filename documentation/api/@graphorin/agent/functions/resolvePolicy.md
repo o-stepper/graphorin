@@ -10,7 +10,9 @@
 function resolvePolicy(boundary, cfg?): ProtocolEscapePolicy;
 ```
 
-Defined in: [packages/agent/src/lateral-leak/protocol-guard.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/protocol-guard.ts#L60)
+Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:60
+
+**`Stable`**
 
 Resolved policy lookup. Pure function - no side effects.
 
@@ -24,5 +26,3 @@ Resolved policy lookup. Pure function - no side effects.
 ## Returns
 
 [`ProtocolEscapePolicy`](/api/@graphorin/agent/type-aliases/ProtocolEscapePolicy.md)
-
-## Stable

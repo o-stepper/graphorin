@@ -10,7 +10,9 @@
 function stripReasoning(): DescribedFilter;
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L215)
+Defined in: packages/agent/src/filters/index.ts:215
+
+**`Stable`**
 
 Strip every `ReasoningContent` part from each message. Always
 applied at the handoff boundary (the `compose(...)` helper appends
@@ -19,5 +21,3 @@ this filter automatically).
 ## Returns
 
 [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md)
-
-## Stable

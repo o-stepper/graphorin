@@ -10,7 +10,9 @@
 function isRunCancelRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "run.cancel"; params: { drain?: boolean; onPendingApprovals?: "deny" | "preserve"; reason?: string; runId: string }; v: "1" };
 ```
 
-Defined in: [packages/protocol/src/client-message.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/client-message.ts#L184)
+Defined in: src/client-message.ts:184
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/protocol/src/client-message.ts:184](https://github.com/o-s
 ## Returns
 
 message is \{ id: string \| number; jsonrpc: "2.0"; method: "run.cancel"; params: \{ drain?: boolean; onPendingApprovals?: "deny" \| "preserve"; reason?: string; runId: string \}; v: "1" \}
-
-## Stable

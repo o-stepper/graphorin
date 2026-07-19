@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/contracts/sandbox.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts)
 
-Per-call sandbox options.
+**`Stable`**
 
-## Stable
+Per-call sandbox options.
 
 ## Type Parameters
 

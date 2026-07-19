@@ -25,9 +25,9 @@ type CreateGuardOptions =
 } & StrictFullGuardOptions;
 ```
 
-Defined in: [packages/security/src/guard/factory.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/factory.ts#L20)
+Defined in: packages/security/src/guard/factory.ts:20
+
+**`Stable`**
 
 Tier-tagged options union. `'memory-aware'` requires the call-path
 recorder; the other tiers only take optional metadata.
-
-## Stable

@@ -10,7 +10,9 @@
 function isToolDeniedByName(policy, toolName): NameDenialDecision;
 ```
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:225](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L225)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:225
+
+**`Stable`**
 
 Name-level deny check (E1 deny-by-name): does a PREDICATE-FREE
 `deny`/`forbid` rule match this tool name? Used at advertise time -
@@ -30,5 +32,3 @@ deterministic for a given policy + name.
 ## Returns
 
 [`NameDenialDecision`](/api/@graphorin/security/type-aliases/NameDenialDecision.md)
-
-## Stable

@@ -6,17 +6,17 @@
 
 # Interface: IdentityRouter
 
-Defined in: [packages/channels/src/router.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L63)
+Defined in: packages/channels/src/router.ts:63
+
+**`Stable`**
 
 Deterministic router over the route table.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-routes"></a> `routes` | `readonly` | readonly [`ChannelRoute`](/api/@graphorin/channels/interfaces/ChannelRoute.md)[] | [packages/channels/src/router.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L66) |
+| <a id="property-routes"></a> `routes` | `readonly` | readonly [`ChannelRoute`](/api/@graphorin/channels/interfaces/ChannelRoute.md)[] | packages/channels/src/router.ts:66 |
 
 ## Methods
 
@@ -26,7 +26,7 @@ Deterministic router over the route table.
 resolve(identity): ResolvedChannelRoute;
 ```
 
-Defined in: [packages/channels/src/router.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/router.ts#L65)
+Defined in: packages/channels/src/router.ts:65
 
 Total function: always resolves (the default route guarantees a match).
 

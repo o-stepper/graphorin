@@ -10,8 +10,8 @@
 type GenAIMessageRole = "system" | "user" | "assistant" | "tool";
 ```
 
-Defined in: [packages/observability/src/gen-ai/types.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L89)
+Defined in: packages/observability/src/gen-ai/types.ts:89
+
+**`Stable`**
 
 Per-message event type used by [emitGenAIMessageEvents](/api/@graphorin/observability/functions/emitGenAIMessageEvents.md).
-
-## Stable

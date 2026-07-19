@@ -13,7 +13,9 @@ function normaliseTool<TInput, TOutput, TDeps>(
 opts?): NormaliseOutcome<TInput, TOutput, TDeps>;
 ```
 
-Defined in: [packages/tools/src/registry/normalize.ts:123](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L123)
+Defined in: packages/tools/src/registry/normalize.ts:123
+
+**`Stable`**
 
 Normalise a tool registration. Throws on programming errors
 (invalid examples, invalid `preferredModel`, invalid
@@ -39,5 +41,3 @@ conservative-default branches.
 ## Returns
 
 [`NormaliseOutcome`](/api/@graphorin/tools/interfaces/NormaliseOutcome.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
-
-## Stable

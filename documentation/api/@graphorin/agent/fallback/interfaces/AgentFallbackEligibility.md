@@ -6,15 +6,15 @@
 
 # Interface: AgentFallbackEligibility
 
-Defined in: [packages/agent/src/fallback/index.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L53)
+Defined in: packages/agent/src/fallback/index.ts:53
+
+**`Stable`**
 
 Outcome of [isAgentFallbackEligible](/api/@graphorin/agent/fallback/functions/isAgentFallbackEligible.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-eligible"></a> `eligible` | `readonly` | `boolean` | [packages/agent/src/fallback/index.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L54) |
-| <a id="property-reason"></a> `reason?` | `readonly` | [`AgentFallbackReason`](/api/@graphorin/agent/fallback/type-aliases/AgentFallbackReason.md) | [packages/agent/src/fallback/index.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L55) |
+| <a id="property-eligible"></a> `eligible` | `readonly` | `boolean` | packages/agent/src/fallback/index.ts:54 |
+| <a id="property-reason"></a> `reason?` | `readonly` | [`AgentFallbackReason`](/api/@graphorin/agent/fallback/type-aliases/AgentFallbackReason.md) | packages/agent/src/fallback/index.ts:55 |

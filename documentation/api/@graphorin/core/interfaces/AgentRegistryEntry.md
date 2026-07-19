@@ -6,21 +6,21 @@
 
 # Interface: AgentRegistryEntry
 
-Defined in: [packages/core/src/contracts/session-store.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L30)
+Defined in: packages/core/src/contracts/session-store.ts:30
+
+**`Stable`**
 
 Agent registry entry. Captures stable metadata about every agent that
 ever produced a message - so JSONL exports / replays can resolve a
 `Message.agentId` to a human-readable name even after the agent was
 renamed or retired.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-displayname"></a> `displayName` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L32) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L31) |
-| <a id="property-registeredat"></a> `registeredAt` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L33) |
-| <a id="property-retiredat"></a> `retiredAt?` | `readonly` | `string` | [packages/core/src/contracts/session-store.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L34) |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | [packages/core/src/contracts/session-store.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L35) |
+| <a id="property-displayname"></a> `displayName` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:32 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:31 |
+| <a id="property-registeredat"></a> `registeredAt` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:33 |
+| <a id="property-retiredat"></a> `retiredAt?` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:34 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/core/src/contracts/session-store.ts:35 |

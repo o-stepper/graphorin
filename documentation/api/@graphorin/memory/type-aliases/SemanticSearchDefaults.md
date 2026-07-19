@@ -18,7 +18,9 @@ type SemanticSearchDefaults = Pick<FactSearchOptions,
 | "candidateTopK">;
 ```
 
-Defined in: [packages/memory/src/tiers/semantic-memory.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/semantic-memory.ts#L148)
+Defined in: packages/memory/src/tiers/semantic-memory.ts:148
+
+**`Stable`**
 
 Search options an operator may default at construction time via
 `createMemory({ searchDefaults })` (W-086) - the advanced-retrieval
@@ -29,5 +31,3 @@ trust-sensitive predicates (`includeQuarantined`, `includeSuperseded`,
 `trustWeighting`, `owner`): configuration must not be able to silently
 weaken trust gates for every caller. Per-call options always win
 key-by-key.
-
-## Stable

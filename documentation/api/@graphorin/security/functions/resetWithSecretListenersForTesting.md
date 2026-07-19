@@ -10,7 +10,7 @@
 function _resetWithSecretListenersForTesting(): void;
 ```
 
-Defined in: [packages/security/src/secrets/acl.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L165)
+Defined in: packages/security/src/secrets/acl.ts:165
 
 **`Experimental`**
 

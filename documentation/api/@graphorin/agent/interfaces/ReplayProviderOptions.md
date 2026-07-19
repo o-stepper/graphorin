@@ -6,7 +6,7 @@
 
 # Interface: ReplayProviderOptions
 
-Defined in: [packages/agent/src/testing/replay-provider.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/testing/replay-provider.ts#L27)
+Defined in: packages/agent/src/testing/replay-provider.ts:27
 
 Options for [createReplayProvider](/api/@graphorin/agent/functions/createReplayProvider.md).
 
@@ -14,4 +14,4 @@ Options for [createReplayProvider](/api/@graphorin/agent/functions/createReplayP
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Provider name for spans/logs. Default `'replay'`. | [packages/agent/src/testing/replay-provider.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/testing/replay-provider.ts#L29) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Provider name for spans/logs. Default `'replay'`. | packages/agent/src/testing/replay-provider.ts:29 |

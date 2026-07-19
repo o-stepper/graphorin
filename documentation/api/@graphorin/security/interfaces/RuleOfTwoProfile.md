@@ -6,19 +6,19 @@
 
 # Interface: RuleOfTwoProfile
 
-Defined in: [packages/security/src/policy/tool-argument-policy.ts:249](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L249)
+Defined in: packages/security/src/policy/tool-argument-policy.ts:249
+
+**`Stable`**
 
 Capability profile for the Rule-of-Two preset. Declares which of the
 three trifecta legs the agent is permitted to hold this session. The
 dangerous configuration is holding all three; a well-formed profile
 drops at least one.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-externalsideeffects"></a> `externalSideEffects` | `readonly` | `boolean` | May the agent take external side effects (write / send / deploy)? | [packages/security/src/policy/tool-argument-policy.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L255) |
-| <a id="property-sensitivedata"></a> `sensitiveData` | `readonly` | `boolean` | May the agent read sensitive data (secrets / PII)? | [packages/security/src/policy/tool-argument-policy.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L253) |
-| <a id="property-untrustedinput"></a> `untrustedInput` | `readonly` | `boolean` | May the agent ingest untrusted input (web / MCP / untrusted skills)? | [packages/security/src/policy/tool-argument-policy.ts:251](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/policy/tool-argument-policy.ts#L251) |
+| <a id="property-externalsideeffects"></a> `externalSideEffects` | `readonly` | `boolean` | May the agent take external side effects (write / send / deploy)? | packages/security/src/policy/tool-argument-policy.ts:255 |
+| <a id="property-sensitivedata"></a> `sensitiveData` | `readonly` | `boolean` | May the agent read sensitive data (secrets / PII)? | packages/security/src/policy/tool-argument-policy.ts:253 |
+| <a id="property-untrustedinput"></a> `untrustedInput` | `readonly` | `boolean` | May the agent ingest untrusted input (web / MCP / untrusted skills)? | packages/security/src/policy/tool-argument-policy.ts:251 |

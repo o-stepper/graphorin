@@ -6,19 +6,19 @@
 
 # Interface: DeliveryCommentarySanitizer
 
-Defined in: [packages/server/src/commentary/sanitizer.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L49)
+Defined in: packages/server/src/commentary/sanitizer.ts:49
+
+**`Stable`**
 
 Public surface returned by [createDeliveryCommentarySanitizer](/api/@graphorin/server/functions/createDeliveryCommentarySanitizer.md).
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | [packages/server/src/commentary/sanitizer.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L51) |
-| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | [packages/server/src/commentary/sanitizer.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L52) |
-| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | [packages/server/src/commentary/sanitizer.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L50) |
+| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | packages/server/src/commentary/sanitizer.ts:51 |
+| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | packages/server/src/commentary/sanitizer.ts:52 |
+| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | packages/server/src/commentary/sanitizer.ts:50 |
 
 ## Methods
 
@@ -36,7 +36,7 @@ sanitize(frame, transport): {
 };
 ```
 
-Defined in: [packages/server/src/commentary/sanitizer.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L63)
+Defined in: packages/server/src/commentary/sanitizer.ts:63
 
 Sanitize the payload of a single `event` frame. Returns the
 (possibly-replaced) frame; emits an audit decision via the

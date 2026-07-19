@@ -10,7 +10,9 @@
 function runBridgedSource(opts): Promise<BridgedSourceResult>;
 ```
 
-Defined in: [packages/security/src/sandbox/bridged-source.ts:301](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/bridged-source.ts#L301)
+Defined in: packages/security/src/sandbox/bridged-source.ts:301
+
+**`Stable`**
 
 Run model-written source in a worker, bridging `tools.<name>(args)`
 calls back to the host. See the module docstring for the isolation
@@ -25,5 +27,3 @@ contract.
 ## Returns
 
 `Promise`\&lt;[`BridgedSourceResult`](/api/@graphorin/security/type-aliases/BridgedSourceResult.md)\&gt;
-
-## Stable

@@ -10,7 +10,9 @@
 function sampleStddev(values): number;
 ```
 
-Defined in: [packages/evals/src/stats.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L42)
+Defined in: packages/evals/src/stats.ts:42
+
+**`Stable`**
 
 Sample standard deviation (n-1 denominator); `0` for n < 2.
 
@@ -23,5 +25,3 @@ Sample standard deviation (n-1 denominator); `0` for n < 2.
 ## Returns
 
 `number`
-
-## Stable

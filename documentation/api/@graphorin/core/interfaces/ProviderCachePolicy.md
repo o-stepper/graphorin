@@ -6,7 +6,9 @@
 
 # Interface: ProviderCachePolicy
 
-Defined in: [packages/core/src/contracts/provider.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L82)
+Defined in: packages/core/src/contracts/provider.ts:82
+
+**`Stable`**
 
 Opt-in prompt-cache breakpoint policy (core-provider-02).
 
@@ -18,11 +20,9 @@ prefix are written once and read at ~0.1x input price on subsequent
 steps. Providers with automatic caching (OpenAI) or no cache concept
 ignore the policy. `ttl` maps to Anthropic's extended cache TTL.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-breakpoints"></a> `breakpoints` | `readonly` | `"none"` \| `"auto"` | [packages/core/src/contracts/provider.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L83) |
-| <a id="property-ttl"></a> `ttl?` | `readonly` | `"5m"` \| `"1h"` | [packages/core/src/contracts/provider.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L84) |
+| <a id="property-breakpoints"></a> `breakpoints` | `readonly` | `"none"` \| `"auto"` | packages/core/src/contracts/provider.ts:83 |
+| <a id="property-ttl"></a> `ttl?` | `readonly` | `"5m"` \| `"1h"` | packages/core/src/contracts/provider.ts:84 |

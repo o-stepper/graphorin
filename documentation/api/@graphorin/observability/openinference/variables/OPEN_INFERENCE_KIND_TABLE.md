@@ -10,9 +10,9 @@
 const OPEN_INFERENCE_KIND_TABLE: readonly readonly [SpanType, OpenInferenceSpanKind][] = KIND_TABLE;
 ```
 
-Defined in: [packages/observability/src/openinference/index.ts:143](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/openinference/index.ts#L143)
+Defined in: packages/observability/src/openinference/index.ts:143
+
+**`Stable`**
 
 Full canonical span-to-kind table - exposed for tooling and tests
 that need to introspect the mapping.
-
-## Stable

@@ -15,7 +15,9 @@ function pickTopTierAcrossTools(hints):
   | undefined;
 ```
 
-Defined in: [packages/agent/src/preferred-model/index.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/preferred-model/index.ts#L96)
+Defined in: packages/agent/src/preferred-model/index.ts:96
+
+**`Stable`**
 
 Pick the highest-cost tier across the supplied per-tool hints.
 Explicit `ModelSpec` entries are treated as the highest tier
@@ -38,5 +40,3 @@ Returns the picked hint together with the original `ModelSpec`
   `spec?`: [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md);
 \}
   \| `undefined`
-
-## Stable

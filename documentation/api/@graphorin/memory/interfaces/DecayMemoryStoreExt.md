@@ -6,7 +6,9 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:626](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L626)
+Defined in: packages/memory/src/internal/storage-adapter.ts:626
+
+**`Stable`**
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -14,8 +16,6 @@ archives facts whose retention curve falls below the configured
 threshold. Adapters that do not maintain decay columns may omit
 the surface entirely - the light phase skips the archive step
 with an INFO log.
-
-## Stable
 
 ## Methods
 
@@ -28,7 +28,7 @@ archiveFact(
 scope?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:671](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L671)
+Defined in: packages/memory/src/internal/storage-adapter.ts:671
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -58,7 +58,7 @@ optional listDecaySignals(ids): Promise<readonly {
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:693](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L693)
+Defined in: packages/memory/src/internal/storage-adapter.ts:693
 
 Narrow decay-column read for exactly the given fact ids (MRET-8) -
 powers per-search decay re-ranking without the old O(scope)
@@ -102,7 +102,7 @@ listForDecay(
 }[]>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:641](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L641)
+Defined in: packages/memory/src/internal/storage-adapter.ts:641
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
@@ -153,7 +153,7 @@ optional markAccessed(
 queryHash?): Promise<void>;
 ```
 
-Defined in: [packages/memory/src/internal/storage-adapter.ts:681](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L681)
+Defined in: packages/memory/src/internal/storage-adapter.ts:681
 
 Record a retrieval access for the given facts (MRET-7): stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).

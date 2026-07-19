@@ -6,13 +6,13 @@
 
 # Interface: AuditExportResult
 
-Defined in: [packages/cli/src/commands/audit.ts:181](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L181)
+Defined in: packages/cli/src/commands/audit.ts:181
 
-## Stable
+**`Stable`**
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-path"></a> `path` | `readonly` | `string` | [packages/cli/src/commands/audit.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L182) |
-| <a id="property-rows"></a> `rows` | `readonly` | `number` | [packages/cli/src/commands/audit.ts:183](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L183) |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/cli/src/commands/audit.ts:182 |
+| <a id="property-rows"></a> `rows` | `readonly` | `number` | packages/cli/src/commands/audit.ts:183 |

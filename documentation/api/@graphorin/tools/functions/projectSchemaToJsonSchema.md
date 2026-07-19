@@ -12,7 +12,9 @@ function projectSchemaToJsonSchema(raw, opts?):
   | undefined;
 ```
 
-Defined in: [packages/tools/src/schema/to-json-schema.ts:804](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L804)
+Defined in: packages/tools/src/schema/to-json-schema.ts:804
+
+**`Stable`**
 
 Project a tool's declared `inputSchema` / `outputSchema` - whatever the
 author supplied - onto a JSON Schema record fit for a provider wire
@@ -38,5 +40,3 @@ body or a code-mode signature. Resolution order:
 
   \| [`JsonSchemaRecord`](/api/@graphorin/tools/type-aliases/JsonSchemaRecord.md)
   \| `undefined`
-
-## Stable

@@ -10,8 +10,8 @@
 type LocaleTag = string;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/model-selection.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/model-selection.ts#L21)
+Defined in: packages/reranker-transformersjs/src/model-selection.ts:21
+
+**`Stable`**
 
 BCP 47 locale tag (e.g. `'en'`, `'en-GB'`, `'pt-BR'`, `'zh-Hans-CN'`).
-
-## Stable

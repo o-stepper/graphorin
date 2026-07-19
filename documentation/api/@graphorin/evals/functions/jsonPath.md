@@ -10,7 +10,9 @@
 function jsonPath<I>(options): Scorer<I, unknown>;
 ```
 
-Defined in: [packages/evals/src/scorers/code/json-path.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L22)
+Defined in: packages/evals/src/scorers/code/json-path.ts:22
+
+**`Stable`**
 
 ## Type Parameters
 
@@ -27,5 +29,3 @@ Defined in: [packages/evals/src/scorers/code/json-path.ts:22](https://github.com
 ## Returns
 
 [`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `unknown`\&gt;
-
-## Stable

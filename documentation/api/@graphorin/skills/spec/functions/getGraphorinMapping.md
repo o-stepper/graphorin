@@ -12,7 +12,9 @@ function getGraphorinMapping(field):
   | undefined;
 ```
 
-Defined in: [packages/skills/src/spec/index.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L125)
+Defined in: packages/skills/src/spec/index.ts:125
+
+**`Stable`**
 
 Resolve the mapping entry for a `graphorin-*` field. Returns
 `undefined` if the field is not known to the snapshot.
@@ -27,5 +29,3 @@ Resolve the mapping entry for a `graphorin-*` field. Returns
 
   \| [`GraphorinMappingEntry`](/api/@graphorin/skills/spec/interfaces/GraphorinMappingEntry.md)
   \| `undefined`
-
-## Stable

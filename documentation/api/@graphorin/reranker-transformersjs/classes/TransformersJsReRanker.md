@@ -6,12 +6,12 @@
 
 # Class: TransformersJsReRanker\&lt;TRecord\&gt;
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L103)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:103
+
+**`Stable`**
 
 `ReRanker` implementation. Matches the contract from
 `@graphorin/memory/search`.
-
-## Stable
 
 ## Type Parameters
 
@@ -31,7 +31,7 @@ Defined in: [packages/reranker-transformersjs/src/reranker.ts:103](https://githu
 new TransformersJsReRanker<TRecord>(options): TransformersJsReRanker<TRecord>;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L125)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:125
 
 #### Parameters
 
@@ -47,12 +47,12 @@ Defined in: [packages/reranker-transformersjs/src/reranker.ts:125](https://githu
 
 | Property | Modifier | Type | Default value | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | [packages/reranker-transformersjs/src/reranker.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L110) |
-| <a id="property-dtype"></a> `dtype` | `readonly` | [`RerankerDtype`](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md) | `undefined` | - | [packages/reranker-transformersjs/src/reranker.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L109) |
-| <a id="property-id"></a> `id` | `readonly` | `"transformersjs-cross-encoder"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | [packages/reranker-transformersjs/src/reranker.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L106) |
-| <a id="property-idleevictionms"></a> `idleEvictionMs` | `readonly` | `number` \| `undefined` | `undefined` | - | [packages/reranker-transformersjs/src/reranker.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L111) |
-| <a id="property-locale"></a> `locale` | `readonly` | `string` | `undefined` | - | [packages/reranker-transformersjs/src/reranker.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L108) |
-| <a id="property-model"></a> `model` | `readonly` | `string` | `undefined` | - | [packages/reranker-transformersjs/src/reranker.ts:107](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L107) |
+| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | packages/reranker-transformersjs/src/reranker.ts:110 |
+| <a id="property-dtype"></a> `dtype` | `readonly` | [`RerankerDtype`](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md) | `undefined` | - | packages/reranker-transformersjs/src/reranker.ts:109 |
+| <a id="property-id"></a> `id` | `readonly` | `"transformersjs-cross-encoder"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | packages/reranker-transformersjs/src/reranker.ts:106 |
+| <a id="property-idleevictionms"></a> `idleEvictionMs` | `readonly` | `number` \| `undefined` | `undefined` | - | packages/reranker-transformersjs/src/reranker.ts:111 |
+| <a id="property-locale"></a> `locale` | `readonly` | `string` | `undefined` | - | packages/reranker-transformersjs/src/reranker.ts:108 |
+| <a id="property-model"></a> `model` | `readonly` | `string` | `undefined` | - | packages/reranker-transformersjs/src/reranker.ts:107 |
 
 ## Accessors
 
@@ -64,12 +64,12 @@ Defined in: [packages/reranker-transformersjs/src/reranker.ts:125](https://githu
 get invocationCount(): number;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L153)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:153
+
+**`Stable`**
 
 Number of `rerank(...)` invocations since construction. Surfaced
 for observability + the test suite.
-
-##### Stable
 
 ##### Returns
 
@@ -85,12 +85,12 @@ for observability + the test suite.
 get pipelineLoaded(): boolean;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:163](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L163)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:163
+
+**`Stable`**
 
 Whether the underlying ONNX model is currently loaded in
 memory. Surfaced for the idle-eviction integration test.
-
-##### Stable
 
 ##### Returns
 
@@ -107,7 +107,7 @@ rerank<TInputRecord>(
 options?): Promise<readonly MemoryHit<TInputRecord>[]>;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L182)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:182
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be
@@ -143,7 +143,9 @@ sorted by `score` descending.
 unload(): void;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L173)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:173
+
+**`Stable`**
 
 Drop the loaded model. Equivalent to letting the idle-eviction
 timer fire. Idempotent.
@@ -151,5 +153,3 @@ timer fire. Idempotent.
 #### Returns
 
 `void`
-
-#### Stable

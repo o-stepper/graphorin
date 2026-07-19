@@ -10,7 +10,9 @@
 function defineBm25Index(docs, opts?): (query, k?) => Bm25Match[];
 ```
 
-Defined in: [packages/tools/src/registry/bm25.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/bm25.ts#L100)
+Defined in: packages/tools/src/registry/bm25.ts:100
+
+**`Stable`**
 
 Build a BM25 query function over `docs`. The returned function
 runs in `O(query tokens × matching docs)` per invocation - bounded
@@ -26,5 +28,3 @@ by the registry size.
 ## Returns
 
 (`query`, `k?`) => [`Bm25Match`](/api/@graphorin/tools/interfaces/Bm25Match.md)[]
-
-## Stable

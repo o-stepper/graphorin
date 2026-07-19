@@ -10,7 +10,9 @@
 function toResultEnvelope<TOutput>(opts): ResultEnvelope<TOutput>;
 ```
 
-Defined in: [packages/tools/src/result/envelope.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/result/envelope.ts#L43)
+Defined in: packages/tools/src/result/envelope.ts:43
+
+**`Stable`**
 
 Convert a raw `execute(...)` return value into a canonical
 [ResultEnvelope](/api/@graphorin/tools/interfaces/ResultEnvelope.md). Streaming-hint tools that returned `void`
@@ -33,5 +35,3 @@ use the `chunks` parameter to materialise the assembled body.
 ## Returns
 
 [`ResultEnvelope`](/api/@graphorin/tools/interfaces/ResultEnvelope.md)\&lt;`TOutput`\&gt;
-
-## Stable

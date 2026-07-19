@@ -13,7 +13,9 @@ function detectRegressions<I, O>(
 options?): RegressionReport<I, O>;
 ```
 
-Defined in: [packages/evals/src/regression.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/regression.ts#L45)
+Defined in: packages/evals/src/regression.ts:45
+
+**`Stable`**
 
 Detect regressions between `current` and `baseline` reports.
 
@@ -35,5 +37,3 @@ Detect regressions between `current` and `baseline` reports.
 ## Returns
 
 [`RegressionReport`](/api/@graphorin/evals/interfaces/RegressionReport.md)\&lt;`I`, `O`\&gt;
-
-## Stable

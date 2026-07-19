@@ -8,11 +8,11 @@
 
 Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
+**`Stable`**
+
 Workflow paused - for HITL approvals or programmatic `pause(value)`
 calls. Carries the value passed to `pause(...)` so the caller can
 choose how to surface the prompt to the user.
-
-## Stable
 
 ## Type Parameters
 

@@ -10,7 +10,9 @@
 function vercelAdapter(model, options?): Provider;
 ```
 
-Defined in: [packages/provider/src/adapters/vercel.ts:189](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/vercel.ts#L189)
+Defined in: packages/provider/src/adapters/vercel.ts:189
+
+**`Stable`**
 
 Wrap a Vercel AI SDK language-model value in a Graphorin
 [Provider](/api/@graphorin/core/interfaces/Provider.md). Outbound requests are converted onto the AI SDK
@@ -35,5 +37,3 @@ the inferred value via `options.capabilities.reasoningContract`.
 ## Returns
 
 [`Provider`](/api/@graphorin/core/interfaces/Provider.md)
-
-## Stable

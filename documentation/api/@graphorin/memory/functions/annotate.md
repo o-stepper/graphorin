@@ -10,7 +10,9 @@
 function annotate(origin, inboundTrust): ContentAnnotation;
 ```
 
-Defined in: [packages/memory/src/context-engine/annotations.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L125)
+Defined in: packages/memory/src/context-engine/annotations.ts:125
+
+**`Stable`**
 
 Build an annotation, enforcing the rule that
 non-tool-result origins always carry `inboundTrust: 'n/a'`. A
@@ -28,5 +30,3 @@ here so callers cannot accidentally violate it).
 ## Returns
 
 [`ContentAnnotation`](/api/@graphorin/memory/interfaces/ContentAnnotation.md)
-
-## Stable

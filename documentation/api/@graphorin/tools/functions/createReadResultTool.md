@@ -10,7 +10,9 @@
 function createReadResultTool(opts): Tool<ReadResultInput, ReadResultOutput>;
 ```
 
-Defined in: [packages/tools/src/built-in/read-result.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/built-in/read-result.ts#L108)
+Defined in: packages/tools/src/built-in/read-result.ts:108
+
+**`Stable`**
 
 Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md).
 
@@ -23,5 +25,3 @@ Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/to
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ReadResultInput`, `ReadResultOutput`\&gt;
-
-## Stable

@@ -6,16 +6,16 @@
 
 # Interface: EvaluatorOutcome
 
-Defined in: [packages/agent/src/evaluator-optimizer/index.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L34)
+Defined in: packages/agent/src/evaluator-optimizer/index.ts:34
+
+**`Stable`**
 
 Per-iteration evaluation outcome returned by the Evaluator.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-critique"></a> `critique` | `readonly` | `string` | [packages/agent/src/evaluator-optimizer/index.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L37) |
-| <a id="property-pass"></a> `pass` | `readonly` | `boolean` | [packages/agent/src/evaluator-optimizer/index.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L36) |
-| <a id="property-score"></a> `score` | `readonly` | `number` | [packages/agent/src/evaluator-optimizer/index.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L35) |
+| <a id="property-critique"></a> `critique` | `readonly` | `string` | packages/agent/src/evaluator-optimizer/index.ts:37 |
+| <a id="property-pass"></a> `pass` | `readonly` | `boolean` | packages/agent/src/evaluator-optimizer/index.ts:36 |
+| <a id="property-score"></a> `score` | `readonly` | `number` | packages/agent/src/evaluator-optimizer/index.ts:35 |

@@ -10,7 +10,9 @@
 function runPricingStatus(options?): PricingStatusResult;
 ```
 
-Defined in: [packages/cli/src/commands/pricing.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L58)
+Defined in: packages/cli/src/commands/pricing.ts:58
+
+**`Stable`**
 
 ## Parameters
 
@@ -21,5 +23,3 @@ Defined in: [packages/cli/src/commands/pricing.ts:58](https://github.com/o-stepp
 ## Returns
 
 [`PricingStatusResult`](/api/@graphorin/cli/interfaces/PricingStatusResult.md)
-
-## Stable

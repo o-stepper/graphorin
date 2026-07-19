@@ -10,7 +10,9 @@
 function listAggregate<T>(opts?): ListAggregate<T>;
 ```
 
-Defined in: [packages/core/src/channels/channels.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L160)
+Defined in: packages/core/src/channels/channels.ts:160
+
+**`Stable`**
 
 Construct a `ListAggregate` channel.
 
@@ -30,5 +32,3 @@ Construct a `ListAggregate` channel.
 ## Returns
 
 [`ListAggregate`](/api/@graphorin/core/interfaces/ListAggregate.md)\&lt;`T`\&gt;
-
-## Stable

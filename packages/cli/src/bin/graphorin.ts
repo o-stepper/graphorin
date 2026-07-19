@@ -200,7 +200,9 @@ function registerLifecycleCommands(program: Command): void {
     .option('--non-interactive', 'Accept defaults / env vars without prompting.', false)
     .option(
       '--cloud-consent <tier>',
-      'Cloud-upload consent tier: public-only | public-and-internal | all-with-warnings.',
+      'Cloud-upload consent tier: public-only | public-and-internal | all-with-warnings. ' +
+        'Records the choice and prints the exact createMemory privacy snippet that enforces ' +
+        'it (memory is composed in code, not by the server config).',
     )
     .option('--encrypted', 'Enable storage encryption opt-in.')
     .option('--no-encrypted', 'Disable storage encryption opt-in.')

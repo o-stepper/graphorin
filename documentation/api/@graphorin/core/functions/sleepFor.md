@@ -10,7 +10,9 @@
 function sleepFor(ms): void;
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L141)
+Defined in: packages/core/src/channels/durable.ts:141
+
+**`Stable`**
 
 Durably sleep for a relative duration (sugar over [sleepUntil](/api/@graphorin/core/functions/sleepUntil.md)).
 
@@ -23,5 +25,3 @@ Durably sleep for a relative duration (sugar over [sleepUntil](/api/@graphorin/c
 ## Returns
 
 `void`
-
-## Stable

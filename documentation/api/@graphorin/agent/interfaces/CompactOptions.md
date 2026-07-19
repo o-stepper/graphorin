@@ -6,15 +6,15 @@
 
 # Interface: CompactOptions
 
-Defined in: [packages/agent/src/types.ts:765](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L765)
+Defined in: packages/agent/src/types.ts:780
+
+**`Stable`**
 
 `agent.compact({...})` options.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | [packages/agent/src/types.ts:767](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L767) |
-| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | [packages/agent/src/types.ts:766](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L766) |
+| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:782 |
+| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:781 |

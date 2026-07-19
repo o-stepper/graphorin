@@ -6,7 +6,7 @@
 
 # Interface: Bm25Document
 
-Defined in: [packages/tools/src/registry/bm25.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/bm25.ts#L66)
+Defined in: packages/tools/src/registry/bm25.ts:66
 
 A single document the index knows about.
 
@@ -14,5 +14,5 @@ A single document the index knows about.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/tools/src/registry/bm25.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/bm25.ts#L67) |
-| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/tools/src/registry/bm25.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/bm25.ts#L68) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/tools/src/registry/bm25.ts:67 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/tools/src/registry/bm25.ts:68 |

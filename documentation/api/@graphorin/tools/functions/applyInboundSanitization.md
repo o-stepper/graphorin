@@ -10,7 +10,9 @@
 function applyInboundSanitization(opts): SanitizationOutcome;
 ```
 
-Defined in: [packages/tools/src/inbound/sanitize.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/inbound/sanitize.ts#L99)
+Defined in: packages/tools/src/inbound/sanitize.ts:99
+
+**`Stable`**
 
 Apply the per-policy inbound sanitization.
 
@@ -55,5 +57,3 @@ into a tool failure - which is why it stays opt-in.
 ## Returns
 
 [`SanitizationOutcome`](/api/@graphorin/tools/interfaces/SanitizationOutcome.md)
-
-## Stable

@@ -6,7 +6,7 @@
 
 # Interface: SubAgentFoldTaint
 
-Defined in: [packages/agent/src/runtime/agent-to-tool.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L82)
+Defined in: packages/agent/src/runtime/agent-to-tool.ts:82
 
 Child taint flags carried across the toTool fold (D2).
 
@@ -14,6 +14,6 @@ Child taint flags carried across the toTool fold (D2).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-sensitive"></a> `sensitive?` | `readonly` | `boolean` | [packages/agent/src/runtime/agent-to-tool.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L84) |
-| <a id="property-sourcekind"></a> `sourceKind?` | `readonly` | `string` | [packages/agent/src/runtime/agent-to-tool.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L85) |
-| <a id="property-untrusted"></a> `untrusted?` | `readonly` | `boolean` | [packages/agent/src/runtime/agent-to-tool.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L83) |
+| <a id="property-sensitive"></a> `sensitive?` | `readonly` | `boolean` | packages/agent/src/runtime/agent-to-tool.ts:84 |
+| <a id="property-sourcekind"></a> `sourceKind?` | `readonly` | `string` | packages/agent/src/runtime/agent-to-tool.ts:85 |
+| <a id="property-untrusted"></a> `untrusted?` | `readonly` | `boolean` | packages/agent/src/runtime/agent-to-tool.ts:83 |

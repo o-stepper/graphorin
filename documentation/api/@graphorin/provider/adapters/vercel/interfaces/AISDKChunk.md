@@ -6,7 +6,9 @@
 
 # Interface: AISDKChunk
 
-Defined in: [packages/provider/src/adapters/vercel.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/vercel.ts#L84)
+Defined in: packages/provider/src/adapters/vercel.ts:84
+
+**`Stable`**
 
 Loose chunk shape emitted by the AI SDK's `streamText`. The shape is
 intentionally permissive - we accept anything that carries the
@@ -16,8 +18,6 @@ of additive AI SDK schema changes.
 The fields we read are normalized in the adapter via narrow helper
 functions, so we deliberately type each as `unknown` and gate
 access behind `typeof` checks at runtime.
-
-## Stable
 
 ## Indexable
 
@@ -29,4 +29,4 @@ access behind `typeof` checks at runtime.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-type"></a> `type` | `readonly` | `string` | [packages/provider/src/adapters/vercel.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/vercel.ts#L85) |
+| <a id="property-type"></a> `type` | `readonly` | `string` | packages/provider/src/adapters/vercel.ts:85 |

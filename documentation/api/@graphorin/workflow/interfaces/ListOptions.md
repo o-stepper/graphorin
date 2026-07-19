@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
-Optional listing range for `CheckpointStore.list(...)`.
+**`Stable`**
 
-## Stable
+Optional listing range for `CheckpointStore.list(...)`.
 
 ## Properties
 

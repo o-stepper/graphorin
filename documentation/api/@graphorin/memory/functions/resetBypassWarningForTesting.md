@@ -10,7 +10,7 @@
 function _resetBypassWarningForTesting(): void;
 ```
 
-Defined in: [packages/memory/src/conflict/pipeline.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/pipeline.ts#L37)
+Defined in: packages/memory/src/conflict/pipeline.ts:37
 
 **`Internal`**
 

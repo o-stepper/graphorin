@@ -23,7 +23,9 @@ type ChannelAccessDecision =
 };
 ```
 
-Defined in: [packages/channels/src/access.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/channels/src/access.ts#L78)
+Defined in: packages/channels/src/access.ts:78
+
+**`Stable`**
 
 Outcome of an access check.
 
@@ -33,5 +35,3 @@ Outcome of an access check.
    (new or still-pending) pairing code. `issued` is true only when
    THIS check created the code - render the challenge to the peer
    once, not on every message.
-
-## Stable

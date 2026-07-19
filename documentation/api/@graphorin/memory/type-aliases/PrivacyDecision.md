@@ -10,8 +10,8 @@
 type PrivacyDecision = "pass" | "drop";
 ```
 
-Defined in: [packages/memory/src/context-engine/privacy-filter.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/privacy-filter.ts#L52)
+Defined in: packages/memory/src/context-engine/privacy-filter.ts:52
+
+**`Stable`**
 
 Output of [decide](/api/@graphorin/memory/functions/privacyDecide.md) for a single record.
-
-## Stable

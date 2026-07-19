@@ -23,10 +23,10 @@ type RunDescriptor =
 };
 ```
 
-Defined in: [packages/server/src/runtime/run-state.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L101)
+Defined in: packages/server/src/runtime/run-state.ts:101
+
+**`Stable`**
 
 Bookkeeping descriptor recorded at run start. Either an agent run
 (with `agentId`) or a workflow run (with `workflowId` + optional
 `threadId`).
-
-## Stable

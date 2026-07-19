@@ -10,7 +10,9 @@
 function assertNever(value, message?): never;
 ```
 
-Defined in: [packages/core/src/utils/assert-never.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/assert-never.ts#L22)
+Defined in: packages/core/src/utils/assert-never.ts:22
+
+**`Stable`**
 
 Exhaustiveness helper. Place at the end of a `switch (...)` over a
 discriminated union: TypeScript narrows the operand to `never` if
@@ -41,5 +43,3 @@ function describe(event: AgentEvent): string {
   }
 }
 ```
-
-## Stable

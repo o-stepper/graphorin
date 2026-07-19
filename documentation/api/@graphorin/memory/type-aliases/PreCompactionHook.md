@@ -10,7 +10,9 @@
 type PreCompactionHook = (ctx) => Promise<void>;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L250)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:250
+
+**`Stable`**
 
 Pre-compaction hook signature (wave-D D4). Side-effect only - a
 pre-hook cannot alter what gets compacted; a throwing hook is
@@ -25,5 +27,3 @@ recorded in `hookFailures` and never blocks the compaction.
 ## Returns
 
 `Promise`\&lt;`void`\&gt;
-
-## Stable

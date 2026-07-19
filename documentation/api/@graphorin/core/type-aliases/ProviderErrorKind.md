@@ -18,6 +18,6 @@ type ProviderErrorKind =
   | "unknown";
 ```
 
-Defined in: [packages/core/src/contracts/provider.ts:236](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L236)
+Defined in: packages/core/src/contracts/provider.ts:236
 
-## Stable
+**`Stable`**

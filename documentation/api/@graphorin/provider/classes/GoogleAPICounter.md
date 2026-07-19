@@ -6,9 +6,9 @@
 
 # Class: GoogleAPICounter
 
-Defined in: [packages/provider/src/counters/google.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L28)
+Defined in: packages/provider/src/counters/google.ts:28
 
-## Stable
+**`Stable`**
 
 ## Implements
 
@@ -22,7 +22,7 @@ Defined in: [packages/provider/src/counters/google.ts:28](https://github.com/o-s
 new GoogleAPICounter(options): GoogleAPICounter;
 ```
 
-Defined in: [packages/provider/src/counters/google.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L33)
+Defined in: packages/provider/src/counters/google.ts:33
 
 #### Parameters
 
@@ -38,8 +38,8 @@ Defined in: [packages/provider/src/counters/google.ts:33](https://github.com/o-s
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/provider/src/counters/google.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L29) |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/provider/src/counters/google.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L30) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/google.ts:29 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/google.ts:30 |
 
 ## Methods
 
@@ -49,7 +49,7 @@ Defined in: [packages/provider/src/counters/google.ts:33](https://github.com/o-s
 count(messages): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/google.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L39)
+Defined in: packages/provider/src/counters/google.ts:39
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -75,7 +75,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: [packages/provider/src/counters/google.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L43)
+Defined in: packages/provider/src/counters/google.ts:43
 
 Count tokens in a raw text string.
 

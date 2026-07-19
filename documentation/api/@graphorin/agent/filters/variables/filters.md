@@ -22,7 +22,7 @@ const filters: {
 };
 ```
 
-Defined in: [packages/agent/src/filters/index.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L340)
+Defined in: packages/agent/src/filters/index.ts:340
 
 Aggregate module export.
 
@@ -30,14 +30,14 @@ Aggregate module export.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-bysensitivity"></a> `bySensitivity()` | (`args`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:345](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L345) |
-| <a id="property-compose"></a> `compose()` | (...`filters`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:349](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L349) |
-| <a id="property-custom"></a> `custom()` | (`fn`, `meta?`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:350](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L350) |
-| <a id="property-defaulthandofffilter"></a> `defaultHandoffFilter()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:351](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L351) |
-| <a id="property-full"></a> `full()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:343](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L343) |
-| <a id="property-lastn"></a> `lastN()` | (`n`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:341](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L341) |
-| <a id="property-lastuser"></a> `lastUser()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:342](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L342) |
-| <a id="property-stripreasoning"></a> `stripReasoning()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:346](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L346) |
-| <a id="property-stripsensitiveoutputs"></a> `stripSensitiveOutputs()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:347](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L347) |
-| <a id="property-striptoolcalls"></a> `stripToolCalls()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:348](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L348) |
-| <a id="property-summary"></a> `summary()` | (`text`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | [packages/agent/src/filters/index.ts:344](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L344) |
+| <a id="property-bysensitivity"></a> `bySensitivity()` | (`args`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:345 |
+| <a id="property-compose"></a> `compose()` | (...`filters`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:349 |
+| <a id="property-custom"></a> `custom()` | (`fn`, `meta?`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:350 |
+| <a id="property-defaulthandofffilter"></a> `defaultHandoffFilter()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:351 |
+| <a id="property-full"></a> `full()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:343 |
+| <a id="property-lastn"></a> `lastN()` | (`n`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:341 |
+| <a id="property-lastuser"></a> `lastUser()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:342 |
+| <a id="property-stripreasoning"></a> `stripReasoning()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:346 |
+| <a id="property-stripsensitiveoutputs"></a> `stripSensitiveOutputs()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:347 |
+| <a id="property-striptoolcalls"></a> `stripToolCalls()` | () => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:348 |
+| <a id="property-summary"></a> `summary()` | (`text`) => [`DescribedFilter`](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) | packages/agent/src/filters/index.ts:344 |

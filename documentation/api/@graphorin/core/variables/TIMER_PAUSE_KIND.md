@@ -10,6 +10,6 @@
 const TIMER_PAUSE_KIND: "graphorin.timer";
 ```
 
-Defined in: [packages/core/src/channels/durable.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/durable.ts#L31)
+Defined in: packages/core/src/channels/durable.ts:31
 
 Reserved pause-value kind for durable timers (D1).

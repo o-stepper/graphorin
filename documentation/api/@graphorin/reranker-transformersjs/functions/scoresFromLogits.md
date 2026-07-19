@@ -14,7 +14,7 @@ function scoresFromLogits(
    pairCount): number[];
 ```
 
-Defined in: [packages/reranker-transformersjs/src/cross-encoder.ts:303](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/cross-encoder.ts#L303)
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:303
 
 **`Internal`**
 

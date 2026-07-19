@@ -24,6 +24,8 @@ type WorkflowEvent<TState> =
 
 Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
+**`Stable`**
+
 Discriminated union of every event produced by `Workflow.execute(...)`
 and `Workflow.resume(...)`.
 
@@ -35,5 +37,3 @@ the workflow's typed state shape.
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TState` | `unknown` |
-
-## Stable

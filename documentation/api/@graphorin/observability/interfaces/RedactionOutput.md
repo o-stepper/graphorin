@@ -8,11 +8,11 @@
 
 Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
+**`Stable`**
+
 Result of `RedactionValidator.validate(...)` - either the sanitized
 payload (possibly equal to the input) or `null` if the value must be
 dropped entirely.
-
-## Stable
 
 ## Properties
 

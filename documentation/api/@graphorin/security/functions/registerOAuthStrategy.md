@@ -10,7 +10,9 @@
 function registerOAuthStrategy(strategy): () => void;
 ```
 
-Defined in: [packages/security/src/oauth/strategies.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/strategies.ts#L20)
+Defined in: packages/security/src/oauth/strategies.ts:20
+
+**`Stable`**
 
 Register a strategy. Returns an unsubscribe function so tests can
 tear the registration down.
@@ -24,5 +26,3 @@ tear the registration down.
 ## Returns
 
 () => `void`
-
-## Stable

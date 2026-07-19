@@ -6,19 +6,19 @@
 
 # Interface: RunStepProviderResponse
 
-Defined in: [packages/core/src/types/run.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L49)
+Defined in: packages/core/src/types/run.ts:49
+
+**`Stable`**
 
 Journaled model response for one step (C3, opt-in via the agent's
 `recordProviderResponses`). Captures the RAW model output - the text
 before any lateral-leak block replaced it in the transcript - so a
 replay reproduces the original run faithfully.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | [packages/core/src/types/run.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L50) |
-| <a id="property-text"></a> `text?` | `readonly` | `string` | [packages/core/src/types/run.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L51) |
-| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | [packages/core/src/types/run.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L52) |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/types/run.ts:50 |
+| <a id="property-text"></a> `text?` | `readonly` | `string` | packages/core/src/types/run.ts:51 |
+| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | packages/core/src/types/run.ts:52 |

@@ -10,7 +10,9 @@
 function pickRerankerModel(locale): string;
 ```
 
-Defined in: [packages/reranker-transformersjs/src/model-selection.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/model-selection.ts#L35)
+Defined in: packages/reranker-transformersjs/src/model-selection.ts:35
+
+**`Stable`**
 
 Pick a reranker model from the agent locale. Pure function so callers
 (and tests) can pre-resolve the choice without constructing the
@@ -25,5 +27,3 @@ reranker.
 ## Returns
 
 `string`
-
-## Stable

@@ -14,7 +14,9 @@ function createBufferSink(): {
 };
 ```
 
-Defined in: [packages/sessions/src/export/writer.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L227)
+Defined in: packages/sessions/src/export/writer.ts:227
+
+**`Stable`**
 
 Convenience: a sink that buffers every line into a `string[]`. Used
 by tests + the simple in-memory export path.
@@ -31,8 +33,6 @@ by tests + the simple in-memory export path.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `lines` | `string`[] | [packages/sessions/src/export/writer.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L229) |
-| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | [packages/sessions/src/export/writer.ts:228](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L228) |
-| `toString()` | () => `string` | [packages/sessions/src/export/writer.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L230) |
-
-## Stable
+| `lines` | `string`[] | packages/sessions/src/export/writer.ts:229 |
+| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | packages/sessions/src/export/writer.ts:228 |
+| `toString()` | () => `string` | packages/sessions/src/export/writer.ts:230 |

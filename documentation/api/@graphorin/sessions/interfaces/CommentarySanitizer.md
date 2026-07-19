@@ -6,20 +6,20 @@
 
 # Interface: CommentarySanitizer
 
-Defined in: [packages/sessions/src/commentary/sanitizer.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L75)
+Defined in: packages/sessions/src/commentary/sanitizer.ts:75
+
+**`Stable`**
 
 Stateless, deterministic sanitizer. The methods are async-friendly
 but synchronous on the inside; the API is structured this way so
 future revisions can move the regex pass into a worker pool.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`CommentaryPattern`](/api/@graphorin/sessions/interfaces/CommentaryPattern.md)[] | [packages/sessions/src/commentary/sanitizer.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L77) |
-| <a id="property-policy"></a> `policy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | [packages/sessions/src/commentary/sanitizer.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L76) |
+| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`CommentaryPattern`](/api/@graphorin/sessions/interfaces/CommentaryPattern.md)[] | packages/sessions/src/commentary/sanitizer.ts:77 |
+| <a id="property-policy"></a> `policy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | packages/sessions/src/commentary/sanitizer.ts:76 |
 
 ## Methods
 
@@ -32,7 +32,7 @@ sanitizeMessage(message, boundary): {
 };
 ```
 
-Defined in: [packages/sessions/src/commentary/sanitizer.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L89)
+Defined in: packages/sessions/src/commentary/sanitizer.ts:89
 
 Sanitize every `MessageContent` part on a `Message`. Returns the
 (possibly unchanged) message plus per-part decisions in source
@@ -57,8 +57,8 @@ plain string with no commentary potential).
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `decisions` | readonly [`CommentarySanitizationDecision`](/api/@graphorin/sessions/interfaces/CommentarySanitizationDecision.md)[] | [packages/sessions/src/commentary/sanitizer.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L94) |
-| `message` | [`Message`](/api/@graphorin/core/type-aliases/Message.md) | [packages/sessions/src/commentary/sanitizer.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L93) |
+| `decisions` | readonly [`CommentarySanitizationDecision`](/api/@graphorin/sessions/interfaces/CommentarySanitizationDecision.md)[] | packages/sessions/src/commentary/sanitizer.ts:94 |
+| `message` | [`Message`](/api/@graphorin/core/type-aliases/Message.md) | packages/sessions/src/commentary/sanitizer.ts:93 |
 
 ***
 
@@ -68,7 +68,7 @@ plain string with no commentary potential).
 sanitizePart(part, boundary): CommentarySanitizationResult;
 ```
 
-Defined in: [packages/sessions/src/commentary/sanitizer.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/sanitizer.ts#L82)
+Defined in: packages/sessions/src/commentary/sanitizer.ts:82
 
 Sanitize a single `MessageContent` part. Returns the (possibly
 unchanged) part plus the audit-level decision.

@@ -10,7 +10,9 @@
 function groupAndExtract<I, O>(text, options): Dataset<I, O>;
 ```
 
-Defined in: [packages/evals/src/loaders/from-traces.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L48)
+Defined in: packages/evals/src/loaders/from-traces.ts:48
+
+**`Stable`**
 
 Pure parser for the trace JSONL format. Exported so tests can
 exercise the extraction without touching the filesystem.
@@ -32,5 +34,3 @@ exercise the extraction without touching the filesystem.
 ## Returns
 
 [`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\&lt;`I`, `O`\&gt;
-
-## Stable

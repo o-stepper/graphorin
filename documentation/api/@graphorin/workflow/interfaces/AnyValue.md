@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Overwrite-on-write - collisions are silently allowed (last-write-wins
 semantics within a step).
-
-## Stable
 
 ## Type Parameters
 

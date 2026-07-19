@@ -10,6 +10,6 @@
 type HealthStatus = "ok" | "warn" | "fail";
 ```
 
-Defined in: [packages/server/src/health/checks.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L30)
+Defined in: packages/server/src/health/checks.ts:30
 
-## Stable
+**`Stable`**

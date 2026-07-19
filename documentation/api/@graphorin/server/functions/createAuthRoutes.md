@@ -12,7 +12,9 @@ function createAuthRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: [packages/server/src/routes/auth.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/routes/auth.ts#L39)
+Defined in: packages/server/src/routes/auth.ts:39
+
+**`Stable`**
 
 Build the auth router. The router is mounted at the same base path
 as the rest of the REST surface (defaults to `/v1`).
@@ -28,5 +30,3 @@ as the rest of the REST surface (defaults to `/v1`).
 `Hono`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

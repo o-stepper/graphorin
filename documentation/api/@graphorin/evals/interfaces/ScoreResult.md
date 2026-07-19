@@ -8,9 +8,9 @@
 
 Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
-Output of [Scorer.score](/api/@graphorin/evals/interfaces/Scorer.md#score).
+**`Stable`**
 
-## Stable
+Output of [Scorer.score](/api/@graphorin/evals/interfaces/Scorer.md#score).
 
 ## Properties
 

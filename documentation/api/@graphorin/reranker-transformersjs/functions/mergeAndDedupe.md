@@ -10,7 +10,9 @@
 function mergeAndDedupe<TRecord>(lists): readonly MergedEntry<TRecord>[];
 ```
 
-Defined in: [packages/reranker-transformersjs/src/reranker.ts:300](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L300)
+Defined in: packages/reranker-transformersjs/src/reranker.ts:300
+
+**`Stable`**
 
 Merge the per-source lists into a single deduplicated array,
 preserving the **highest** initial score per record id and the
@@ -32,5 +34,3 @@ exported for the unit test fixture.
 ## Returns
 
 readonly `MergedEntry`\&lt;`TRecord`\&gt;[]
-
-## Stable

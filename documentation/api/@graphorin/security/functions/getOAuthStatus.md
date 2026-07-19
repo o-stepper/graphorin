@@ -10,7 +10,9 @@
 function getOAuthStatus(storage, options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: [packages/security/src/oauth/library.ts:248](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/library.ts#L248)
+Defined in: packages/security/src/oauth/library.ts:248
+
+**`Stable`**
 
 Build the snapshot returned by `graphorin auth status` (Phase 15).
 
@@ -25,5 +27,3 @@ Build the snapshot returned by `graphorin auth status` (Phase 15).
 ## Returns
 
 `Promise`\&lt;[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\&gt;
-
-## Stable

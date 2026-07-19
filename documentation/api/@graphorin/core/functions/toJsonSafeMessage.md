@@ -10,7 +10,9 @@
 function toJsonSafeMessage(message): WireMessage;
 ```
 
-Defined in: [packages/core/src/utils/binary-json.ts:322](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L322)
+Defined in: packages/core/src/utils/binary-json.ts:322
+
+**`Stable`**
 
 Project a [Message](/api/@graphorin/core/type-aliases/Message.md) into its JSON-safe wire form. Idempotent:
 projecting an already-wire message returns an equivalent value.
@@ -24,5 +26,3 @@ projecting an already-wire message returns an equivalent value.
 ## Returns
 
 [`WireMessage`](/api/@graphorin/core/type-aliases/WireMessage.md)
-
-## Stable

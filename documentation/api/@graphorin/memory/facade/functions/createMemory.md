@@ -10,7 +10,9 @@
 function createMemory(options): Memory;
 ```
 
-Defined in: [packages/memory/src/facade.ts:421](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/facade.ts#L421)
+Defined in: packages/memory/src/facade.ts:421
+
+**`Stable`**
 
 Wire every memory subsystem in one call. Returns the typed
 `Memory` facade ready to be passed into `createAgent({...})`.
@@ -24,5 +26,3 @@ Wire every memory subsystem in one call. Returns the typed
 ## Returns
 
 [`Memory`](/api/@graphorin/memory/interfaces/Memory.md)
-
-## Stable

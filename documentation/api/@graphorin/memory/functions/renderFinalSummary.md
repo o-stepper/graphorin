@@ -10,7 +10,9 @@
 function renderFinalSummary(input): string;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L191)
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:191
+
+**`Stable`**
 
 Render the produced summary into the final text the harness commits
 to the in-flight buffer. The LLM-produced sections come from
@@ -30,5 +32,3 @@ preserved recent turns and the `metadata` block.
 ## Returns
 
 `string`
-
-## Stable

@@ -8,10 +8,10 @@
 
 Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
+**`Stable`**
+
 Append-only queue. Used for dynamic task creation via `Dispatch(...)`
 and for application-defined event streams.
-
-## Stable
 
 ## Type Parameters
 

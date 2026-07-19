@@ -10,7 +10,9 @@
 type RecoveryHint = "retry_later" | "check_input" | "try_alternative" | "report_to_user";
 ```
 
-Defined in: [packages/core/src/types/tool.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L255)
+Defined in: packages/core/src/types/tool.ts:255
+
+**`Stable`**
 
 Model-facing recovery guidance attached to a [ToolError](/api/@graphorin/core/interfaces/ToolError.md) (C3).
 Practitioner evidence converges on these two fields being what changes
@@ -24,5 +26,3 @@ model behaviour after a failure:
                          try a different tool or strategy.
 - `'report_to_user'`   - a policy/authorization stop; do not retry,
                          surface the situation instead.
-
-## Stable

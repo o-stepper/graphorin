@@ -6,7 +6,9 @@
 
 # Interface: EvalScorer\&lt;TInput, TOutput\&gt;
 
-Defined in: [packages/core/src/contracts/eval-scorer.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L14)
+Defined in: packages/core/src/contracts/eval-scorer.ts:14
+
+**`Stable`**
 
 Pluggable evaluation scorer. Generic over the input / output types
 carried by the eval dataset. Concrete implementations live in the
@@ -17,8 +19,6 @@ here so that:
   type-check against it.
 - Custom application-level scorers can be defined without taking an
   evals dependency.
-
-## Stable
 
 ## Type Parameters
 
@@ -31,8 +31,8 @@ here so that:
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | [packages/core/src/contracts/eval-scorer.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L16) |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/core/src/contracts/eval-scorer.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L15) |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/core/src/contracts/eval-scorer.ts:16 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/eval-scorer.ts:15 |
 
 ## Methods
 
@@ -42,7 +42,7 @@ here so that:
 score(sample): Promise<EvalScore>;
 ```
 
-Defined in: [packages/core/src/contracts/eval-scorer.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L17)
+Defined in: packages/core/src/contracts/eval-scorer.ts:17
 
 #### Parameters
 

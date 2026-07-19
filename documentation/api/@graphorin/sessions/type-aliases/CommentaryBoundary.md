@@ -10,8 +10,8 @@
 type CommentaryBoundary = "session-push" | "session-list" | "session-export" | "session-replay";
 ```
 
-Defined in: [packages/sessions/src/commentary/types.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/commentary/types.ts#L29)
+Defined in: packages/sessions/src/commentary/types.ts:29
+
+**`Stable`**
 
 The four boundaries the sanitizer fires at.
-
-## Stable

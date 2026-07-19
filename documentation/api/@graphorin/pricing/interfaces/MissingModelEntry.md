@@ -6,16 +6,16 @@
 
 # Interface: MissingModelEntry
 
-Defined in: [packages/pricing/src/missing.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/missing.ts#L23)
+Defined in: pricing/src/missing.ts:23
+
+**`Stable`**
 
 Single missing-model row.
-
-## Stable
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-count"></a> `count` | `readonly` | `number` | [packages/pricing/src/missing.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/missing.ts#L26) |
-| <a id="property-model"></a> `model` | `readonly` | `string` | [packages/pricing/src/missing.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/missing.ts#L25) |
-| <a id="property-provider"></a> `provider` | `readonly` | `string` | [packages/pricing/src/missing.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/missing.ts#L24) |
+| <a id="property-count"></a> `count` | `readonly` | `number` | pricing/src/missing.ts:26 |
+| <a id="property-model"></a> `model` | `readonly` | `string` | pricing/src/missing.ts:25 |
+| <a id="property-provider"></a> `provider` | `readonly` | `string` | pricing/src/missing.ts:24 |

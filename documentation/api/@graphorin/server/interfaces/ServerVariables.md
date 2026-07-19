@@ -6,12 +6,12 @@
 
 # Interface: ServerVariables
 
-Defined in: [packages/server/src/internal/context.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/internal/context.ts#L74)
+Defined in: packages/server/src/internal/context.ts:74
+
+**`Stable`**
 
 Hono variable map. Exported so consumers can type their own
 middleware against the same surface.
-
-## Stable
 
 ## Extends
 
@@ -27,5 +27,5 @@ middleware against the same surface.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | [`ServerRequestState`](/api/@graphorin/server/interfaces/ServerRequestState.md) | [packages/server/src/internal/context.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/internal/context.ts#L75) |
-| <a id="property-token"></a> `token?` | `readonly` | [`RequestToken`](/api/@graphorin/server/interfaces/RequestToken.md) | [packages/server/src/internal/context.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/internal/context.ts#L76) |
+| <a id="property-state"></a> `state` | `readonly` | [`ServerRequestState`](/api/@graphorin/server/interfaces/ServerRequestState.md) | packages/server/src/internal/context.ts:75 |
+| <a id="property-token"></a> `token?` | `readonly` | [`RequestToken`](/api/@graphorin/server/interfaces/RequestToken.md) | packages/server/src/internal/context.ts:76 |

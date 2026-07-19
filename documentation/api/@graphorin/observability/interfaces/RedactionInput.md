@@ -8,9 +8,9 @@
 
 Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
-Input handed to `RedactionValidator.validate(...)`.
+**`Stable`**
 
-## Stable
+Input handed to `RedactionValidator.validate(...)`.
 
 ## Properties
 

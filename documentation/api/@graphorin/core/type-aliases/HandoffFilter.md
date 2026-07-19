@@ -10,7 +10,9 @@
 type HandoffFilter = (history) => readonly Message[];
 ```
 
-Defined in: [packages/core/src/types/handoff.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/handoff.ts#L16)
+Defined in: packages/core/src/types/handoff.ts:16
+
+**`Stable`**
 
 Filter applied to the parent's message history when handing off control
 to a target agent. Implementations live in `@graphorin/agent` (e.g.
@@ -31,5 +33,3 @@ history and return a fresh array.
 ## Returns
 
 readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]
-
-## Stable

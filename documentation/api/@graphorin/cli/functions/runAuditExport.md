@@ -10,7 +10,9 @@
 function runAuditExport(options): Promise<AuditExportResult>;
 ```
 
-Defined in: [packages/cli/src/commands/audit.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/audit.ts#L191)
+Defined in: packages/cli/src/commands/audit.ts:191
+
+**`Stable`**
 
 `graphorin audit export --to <file>` - stream every entry as JSONL.
 
@@ -23,5 +25,3 @@ Defined in: [packages/cli/src/commands/audit.ts:191](https://github.com/o-steppe
 ## Returns
 
 `Promise`\&lt;[`AuditExportResult`](/api/@graphorin/cli/interfaces/AuditExportResult.md)\&gt;
-
-## Stable

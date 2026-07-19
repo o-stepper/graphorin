@@ -6,7 +6,9 @@
 
 # Interface: CompactionSummarizer
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:302](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L302)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:302
+
+**`Stable`**
 
 Summarizer adapter - accepts a prompt and returns the produced
 summary. The Phase 06 `Provider` adapters implement this
@@ -14,13 +16,11 @@ signature; tests pass a deterministic stub. The summarizer
 adapter is intentionally narrow so the compaction subsystem
 does not take the heavier `Provider` dependency directly.
 
-## Stable
-
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | [packages/memory/src/context-engine/compaction/types.ts:314](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L314) |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:314 |
 
 ## Methods
 
@@ -33,7 +33,7 @@ summarize(input): Promise<{
 }>;
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/types.ts:308](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/types.ts#L308)
+Defined in: packages/memory/src/context-engine/compaction/types.ts:308
 
 Produce a summary text for the supplied prompt. The prompt is
 built by the compactor using the configured section template;

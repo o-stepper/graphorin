@@ -25,8 +25,8 @@ type SessionErrorCode =
   | "invalid-commentary-policy";
 ```
 
-Defined in: [packages/sessions/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/errors/index.ts#L16)
+Defined in: packages/sessions/src/errors/index.ts:16
+
+**`Stable`**
 
 Stable code discriminator surfaced on every [SessionError](/api/@graphorin/sessions/errors/classes/SessionError.md).
-
-## Stable

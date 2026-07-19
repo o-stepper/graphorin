@@ -6,13 +6,13 @@
 
 # Interface: GraphorinSpan\&lt;T\&gt;
 
-Defined in: [packages/observability/src/tracer/span.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/span.ts#L39)
+Defined in: packages/observability/src/tracer/span.ts:39
+
+**`Stable`**
 
 The internal span carries the convenience `setAttribute(...)` method
 exposed by the tracer surface (per-attribute sensitivity tagging) on
 top of the standard [AISpan](/api/@graphorin/core/interfaces/AISpan.md) contract.
-
-## Stable
 
 ## Extends
 
@@ -125,7 +125,7 @@ setAttribute(
    opts?): void;
 ```
 
-Defined in: [packages/observability/src/tracer/span.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/span.ts#L40)
+Defined in: packages/observability/src/tracer/span.ts:40
 
 #### Parameters
 

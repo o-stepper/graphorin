@@ -6,12 +6,12 @@
 
 # Interface: CheckpointStore
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L153)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:153
+
+**`Stable`**
 
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
-
-## Stable
 
 ## Extended by
 
@@ -25,7 +25,7 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L184)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:184
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -55,7 +55,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L170)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:170
 
 #### Parameters
 
@@ -82,7 +82,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L176)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:176
 
 #### Parameters
 
@@ -107,7 +107,7 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L195)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:195
 
 W-032: enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
@@ -146,7 +146,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L154)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:154
 
 #### Parameters
 
@@ -175,7 +175,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: [packages/core/src/contracts/checkpoint-store.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L162)
+Defined in: packages/core/src/contracts/checkpoint-store.ts:162
 
 #### Parameters
 

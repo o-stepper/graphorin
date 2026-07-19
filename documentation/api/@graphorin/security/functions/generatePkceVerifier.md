@@ -10,7 +10,9 @@
 function generatePkceVerifier(byteLength?): string;
 ```
 
-Defined in: [packages/security/src/oauth/pkce.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/pkce.ts#L32)
+Defined in: packages/security/src/oauth/pkce.ts:32
+
+**`Stable`**
 
 Generate a cryptographically random PKCE code verifier. The output
 is URL-safe base64 (43-128 chars per the spec).
@@ -24,5 +26,3 @@ is URL-safe base64 (43-128 chars per the spec).
 ## Returns
 
 `string`
-
-## Stable

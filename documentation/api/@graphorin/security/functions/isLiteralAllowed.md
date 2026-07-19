@@ -13,7 +13,9 @@ function isLiteralAllowed(): {
 };
 ```
 
-Defined in: [packages/security/src/secrets/resolvers/literal.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L33)
+Defined in: packages/security/src/secrets/resolvers/literal.ts:33
+
+**`Stable`**
 
 Whether the `literal:` scheme is currently active. Used by the
 factory's status reporter and by the resolver itself.
@@ -29,7 +31,5 @@ factory's status reporter and by the resolver itself.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `allowed` | `boolean` | [packages/security/src/secrets/resolvers/literal.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L34) |
-| `reasons` | readonly `string`[] | [packages/security/src/secrets/resolvers/literal.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L35) |
-
-## Stable
+| `allowed` | `boolean` | packages/security/src/secrets/resolvers/literal.ts:34 |
+| `reasons` | readonly `string`[] | packages/security/src/secrets/resolvers/literal.ts:35 |

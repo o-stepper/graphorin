@@ -10,7 +10,7 @@
 const MAX_ITERATIONS_CEILING: 5 = 5;
 ```
 
-Defined in: [packages/memory/src/search/iterative.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L46)
+Defined in: packages/memory/src/search/iterative.ts:46
 
 Absolute clamp on total retrieval passes, applied regardless of the
 caller's `maxIterations` - a latency guardrail so a mis-configured

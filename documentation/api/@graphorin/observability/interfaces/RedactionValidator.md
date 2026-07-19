@@ -8,6 +8,8 @@
 
 Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
+**`Stable`**
+
 Wraps every observability exporter (OTLP, console, JSONL replay log,
 …) and refuses to forward attributes that exceed the configured
 sensitivity floor or that contain matched secret / PII patterns.
@@ -16,8 +18,6 @@ Concrete patterns and the default policy live in
 `@graphorin/observability`; the interface lives here so every package
 (server, agent, workflow, …) can require a `RedactionValidator` in its
 config without taking an observability dependency.
-
-## Stable
 
 ## Extended by
 

@@ -10,9 +10,9 @@
 const COMPACTION_SUMMARY_MARKER: "<graphorin_compaction_summary";
 ```
 
-Defined in: [packages/memory/src/context-engine/compaction/templates/marker.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/marker.ts#L33)
+Defined in: packages/memory/src/context-engine/compaction/templates/marker.ts:33
+
+**`Stable`**
 
 Detection prefix - the opening tag WITHOUT the trailing `>` so a
 `startsWith` scan also matches any future attribute-carrying variant.
-
-## Stable

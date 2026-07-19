@@ -12,7 +12,9 @@ function createCsrfMiddleware(config): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: [packages/server/src/middleware/csrf.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/csrf.ts#L23)
+Defined in: packages/server/src/middleware/csrf.ts:23
+
+**`Stable`**
 
 ## Parameters
 
@@ -29,5 +31,3 @@ Defined in: [packages/server/src/middleware/csrf.ts:23](https://github.com/o-ste
 `MiddlewareHandler`\<\{
   `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md);
 \}\>
-
-## Stable

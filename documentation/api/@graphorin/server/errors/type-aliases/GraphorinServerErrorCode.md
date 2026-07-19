@@ -37,10 +37,10 @@ type GraphorinServerErrorCode =
   | "lifecycle-not-started";
 ```
 
-Defined in: [packages/server/src/errors/index.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/errors/index.ts#L18)
+Defined in: packages/server/src/errors/index.ts:18
+
+**`Stable`**
 
 Stable string discriminator for [GraphorinServerError](/api/@graphorin/server/errors/classes/GraphorinServerError.md). Each
 value maps to a single failure scenario; never reuse a value for a
 different cause.
-
-## Stable

@@ -15,7 +15,9 @@ function revokeToken(
 | undefined>;
 ```
 
-Defined in: [packages/security/src/auth/crud.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L137)
+Defined in: packages/security/src/auth/crud.ts:137
+
+**`Stable`**
 
 Soft-revoke a token. Returns the updated record or `undefined` if
 the token is unknown. The store is responsible for setting the
@@ -37,5 +39,3 @@ the token is unknown. The store is responsible for setting the
 `Promise`\<
   \| [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)
   \| `undefined`\>
-
-## Stable

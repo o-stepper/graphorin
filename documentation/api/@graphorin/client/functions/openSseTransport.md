@@ -10,7 +10,9 @@
 function openSseTransport(options, listeners): Promise<Transport>;
 ```
 
-Defined in: [packages/client/src/transport/sse.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/sse.ts#L31)
+Defined in: packages/client/src/transport/sse.ts:31
+
+**`Stable`**
 
 Open an SSE transport. Resolves once the server answers with a
 streaming response; rejects with a typed
@@ -26,5 +28,3 @@ streaming response; rejects with a typed
 ## Returns
 
 `Promise`\&lt;[`Transport`](/api/@graphorin/client/interfaces/Transport.md)\&gt;
-
-## Stable

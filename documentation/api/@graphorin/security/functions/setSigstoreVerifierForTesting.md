@@ -10,7 +10,7 @@
 function _setSigstoreVerifierForTesting(verifier): void;
 ```
 
-Defined in: [packages/security/src/supply-chain/signature.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/signature.ts#L64)
+Defined in: packages/security/src/supply-chain/signature.ts:64
 
 **`Experimental`**
 

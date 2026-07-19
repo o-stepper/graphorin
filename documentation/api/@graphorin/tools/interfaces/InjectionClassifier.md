@@ -8,9 +8,9 @@
 
 Defined in: [packages/security/dist/inspect/injection-classifier.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/inspect/injection-classifier.d.ts)
 
-The pluggable classifier contract.
+**`Stable`**
 
-## Stable
+The pluggable classifier contract.
 
 ## Properties
 
