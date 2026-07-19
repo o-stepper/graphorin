@@ -6,7 +6,7 @@
 
 # Interface: CompactOptions
 
-Defined in: packages/agent/src/types.ts:779
+Defined in: packages/agent/src/types.ts:787
 
 **`Stable`**
 
@@ -16,5 +16,5 @@ Defined in: packages/agent/src/types.ts:779
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:781 |
-| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:780 |
+| <a id="property-preserverecentturns"></a> `preserveRecentTurns?` | `readonly` | `number` | packages/agent/src/types.ts:789 |
+| <a id="property-source"></a> `source?` | `readonly` | `"manual"` \| `"pre-step"` | packages/agent/src/types.ts:788 |

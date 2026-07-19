@@ -6,7 +6,7 @@
 
 # Interface: ToolApprovalRequestedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:212
+Defined in: packages/core/src/types/agent-event.ts:236
 
 **`Stable`**
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:212
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-mode"></a> `mode?` | `readonly` | `"ask"` \| `"defer"` | Which permission verdict parked the approval (`'ask'` | `'defer'`); absent for plain `needsApproval` gates. Mirrors `ToolApproval.mode` so a subscriber can route deferred approvals without re-reading the run state. | packages/core/src/types/agent-event.ts:222 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/core/src/types/agent-event.ts:215 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/types/agent-event.ts:214 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.requested"` | - | packages/core/src/types/agent-event.ts:213 |
+| <a id="property-mode"></a> `mode?` | `readonly` | `"ask"` \| `"defer"` | Which permission verdict parked the approval (`'ask'` | `'defer'`); absent for plain `needsApproval` gates. Mirrors `ToolApproval.mode` so a subscriber can route deferred approvals without re-reading the run state. | packages/core/src/types/agent-event.ts:246 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/core/src/types/agent-event.ts:239 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/types/agent-event.ts:238 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.requested"` | - | packages/core/src/types/agent-event.ts:237 |

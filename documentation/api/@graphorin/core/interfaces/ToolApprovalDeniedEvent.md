@@ -6,7 +6,7 @@
 
 # Interface: ToolApprovalDeniedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:232
+Defined in: packages/core/src/types/agent-event.ts:256
 
 **`Stable`**
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:232
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:235 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:234 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.denied"` | packages/core/src/types/agent-event.ts:233 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:259 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:258 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.denied"` | packages/core/src/types/agent-event.ts:257 |

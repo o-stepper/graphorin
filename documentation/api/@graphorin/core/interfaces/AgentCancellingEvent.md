@@ -6,7 +6,7 @@
 
 # Interface: AgentCancellingEvent
 
-Defined in: packages/core/src/types/agent-event.ts:361
+Defined in: packages/core/src/types/agent-event.ts:385
 
 **`Stable`**
 
@@ -18,7 +18,7 @@ to render "cancelling..." UI before the run actually winds down.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:364 |
-| <a id="property-onpendingapprovals"></a> `onPendingApprovals` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | packages/core/src/types/agent-event.ts:365 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:363 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.cancelling"` | packages/core/src/types/agent-event.ts:362 |
+| <a id="property-drain"></a> `drain` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:388 |
+| <a id="property-onpendingapprovals"></a> `onPendingApprovals` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | packages/core/src/types/agent-event.ts:389 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:387 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.cancelling"` | packages/core/src/types/agent-event.ts:386 |

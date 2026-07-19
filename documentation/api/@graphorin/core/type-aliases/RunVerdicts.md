@@ -10,7 +10,7 @@
 type RunVerdicts = Record<string, RunTurnVerdict>;
 ```
 
-Defined in: packages/core/src/types/run.ts:264
+Defined in: packages/core/src/types/run.ts:272
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 type RunStatus = "running" | "completed" | "failed" | "aborted" | "awaiting_approval";
 ```
 
-Defined in: packages/core/src/types/run.ts:14
+Defined in: packages/core/src/types/run.ts:15
 
 **`Stable`**
 

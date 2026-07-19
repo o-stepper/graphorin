@@ -6,7 +6,7 @@
 
 # Interface: SkillsRegistryLike
 
-Defined in: packages/agent/src/types.ts:125
+Defined in: packages/agent/src/types.ts:133
 
 **`Stable`**
 
@@ -23,7 +23,7 @@ surface.
 optional list(): readonly unknown[];
 ```
 
-Defined in: packages/agent/src/types.ts:126
+Defined in: packages/agent/src/types.ts:134
 
 #### Returns
 

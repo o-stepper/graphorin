@@ -6,7 +6,7 @@
 
 # Interface: RunTurnVerdict
 
-Defined in: packages/core/src/types/run.ts:244
+Defined in: packages/core/src/types/run.ts:252
 
 **`Stable`**
 
@@ -18,6 +18,6 @@ every gate untouched.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-dataflowflags"></a> `dataflowFlags?` | `readonly` | readonly `string`[] | Data-flow policy findings attached to this turn (e.g. flagged sink flows). Bounded descriptive labels, never content. | packages/core/src/types/run.ts:253 |
-| <a id="property-guardrail"></a> `guardrail?` | `readonly` | `"block"` \| `"rewrite"` | An input/output guardrail blocked or rewrote this turn. | packages/core/src/types/run.ts:246 |
-| <a id="property-lateralleak"></a> `lateralLeak?` | `readonly` | `boolean` | The lateral-leak defense withheld this assistant turn. | packages/core/src/types/run.ts:248 |
+| <a id="property-dataflowflags"></a> `dataflowFlags?` | `readonly` | readonly `string`[] | Data-flow policy findings attached to this turn (e.g. flagged sink flows). Bounded descriptive labels, never content. | packages/core/src/types/run.ts:261 |
+| <a id="property-guardrail"></a> `guardrail?` | `readonly` | `"block"` \| `"rewrite"` | An input/output guardrail blocked or rewrote this turn. | packages/core/src/types/run.ts:254 |
+| <a id="property-lateralleak"></a> `lateralLeak?` | `readonly` | `boolean` | The lateral-leak defense withheld this assistant turn. | packages/core/src/types/run.ts:256 |

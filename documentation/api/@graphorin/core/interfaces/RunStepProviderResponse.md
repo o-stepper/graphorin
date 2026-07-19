@@ -6,7 +6,7 @@
 
 # Interface: RunStepProviderResponse
 
-Defined in: packages/core/src/types/run.ts:49
+Defined in: packages/core/src/types/run.ts:57
 
 **`Stable`**
 
@@ -19,6 +19,6 @@ replay reproduces the original run faithfully.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/types/run.ts:50 |
-| <a id="property-text"></a> `text?` | `readonly` | `string` | packages/core/src/types/run.ts:51 |
-| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | packages/core/src/types/run.ts:52 |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/types/run.ts:58 |
+| <a id="property-text"></a> `text?` | `readonly` | `string` | packages/core/src/types/run.ts:59 |
+| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | packages/core/src/types/run.ts:60 |

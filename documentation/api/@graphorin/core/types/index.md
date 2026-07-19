@@ -676,6 +676,12 @@ Re-exports [ToolCallEndEvent](/api/@graphorin/core/interfaces/ToolCallEndEvent.m
 
 ***
 
+### ToolCallIncompleteEvent
+
+Re-exports [ToolCallIncompleteEvent](/api/@graphorin/core/interfaces/ToolCallIncompleteEvent.md)
+
+***
+
 ### ToolCallStartEvent
 
 Re-exports [ToolCallStartEvent](/api/@graphorin/core/interfaces/ToolCallStartEvent.md)

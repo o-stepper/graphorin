@@ -17,7 +17,7 @@ type VerifierResult =
 };
 ```
 
-Defined in: packages/agent/src/types.ts:480
+Defined in: packages/agent/src/types.ts:488
 
 **`Stable`**
 

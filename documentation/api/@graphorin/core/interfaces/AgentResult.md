@@ -6,7 +6,7 @@
 
 # Interface: AgentResult\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event.ts:572
+Defined in: packages/core/src/types/agent-event.ts:596
 
 **`Stable`**
 
@@ -29,9 +29,9 @@ run resolves with `status: 'awaiting_approval'` and a resumable
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error?` | `readonly` | [`RunError`](/api/@graphorin/core/interfaces/RunError.md) | Populated when the run failed; mirrors `RunState.error`. | packages/core/src/types/agent-event.ts:578 |
-| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/types/agent-event.ts:573 |
-| <a id="property-state"></a> `state` | `readonly` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) | The run's final state. Resumable when `status === 'awaiting_approval'` - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally round-tripped through `runStateToJSON`/`runStateFromJSON` for durability). Treat as an immutable snapshot. | packages/core/src/types/agent-event.ts:591 |
-| <a id="property-status"></a> `status` | `readonly` | [`RunStatus`](/api/@graphorin/core/type-aliases/RunStatus.md) | Terminal status of this run-loop invocation. | packages/core/src/types/agent-event.ts:576 |
-| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | - | packages/core/src/types/agent-event.ts:574 |
-| <a id="property-verdicts"></a> `verdicts?` | `readonly` | [`RunVerdicts`](/api/@graphorin/core/type-aliases/RunVerdicts.md) | The run's per-turn security verdicts (mirrors `state.verdicts`). Surfaced directly so callers can apply them at the `Session.push` boundary without digging into the state. | packages/core/src/types/agent-event.ts:584 |
+| <a id="property-error"></a> `error?` | `readonly` | [`RunError`](/api/@graphorin/core/interfaces/RunError.md) | Populated when the run failed; mirrors `RunState.error`. | packages/core/src/types/agent-event.ts:602 |
+| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/types/agent-event.ts:597 |
+| <a id="property-state"></a> `state` | `readonly` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) | The run's final state. Resumable when `status === 'awaiting_approval'` - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally round-tripped through `runStateToJSON`/`runStateFromJSON` for durability). Treat as an immutable snapshot. | packages/core/src/types/agent-event.ts:615 |
+| <a id="property-status"></a> `status` | `readonly` | [`RunStatus`](/api/@graphorin/core/type-aliases/RunStatus.md) | Terminal status of this run-loop invocation. | packages/core/src/types/agent-event.ts:600 |
+| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | - | packages/core/src/types/agent-event.ts:598 |
+| <a id="property-verdicts"></a> `verdicts?` | `readonly` | [`RunVerdicts`](/api/@graphorin/core/type-aliases/RunVerdicts.md) | The run's per-turn security verdicts (mirrors `state.verdicts`). Surfaced directly so callers can apply them at the `Session.push` boundary without digging into the state. | packages/core/src/types/agent-event.ts:608 |
