@@ -315,6 +315,12 @@ describe('shellQuotePath', () => {
       expect(shellQuotePath('C:\\space dir\\config.json')).toBe('"C:\\space dir\\config.json"');
       expect(shellQuotePath("C:\\it's here\\config.json")).toBe('"C:\\it\'s here\\config.json"');
       expect(shellQuotePath('')).toBe('""');
+      // MSVCRT argv rules: a trailing backslash run doubles so it cannot
+      // swallow the closing quote, and backslashes before an embedded
+      // quote double ahead of the escaped quote.
+      expect(shellQuotePath('C:\\space dir\\')).toBe('"C:\\space dir\\\\"');
+      expect(shellQuotePath('C:\\we"ird')).toBe('"C:\\we\\"ird"');
+      expect(shellQuotePath('C:\\x\\"y z')).toBe('"C:\\x\\\\\\"y z"');
     },
   );
 });

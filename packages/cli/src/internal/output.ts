@@ -142,15 +142,20 @@ const WIN_SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^\\]+$/;
  * truncated at the first space when pasted literally. Paths made of
  * safe characters pass through untouched. Quoting is per platform
  * family: POSIX shells get single quotes with embedded single quotes
- * escaped as `'\''`; Windows gets double quotes (the form both cmd and
- * PowerShell accept - single quotes are literal characters to cmd).
+ * escaped as `'\''` (a backslash is literal inside POSIX single
+ * quotes); Windows gets double quotes (the form both cmd and
+ * PowerShell accept - single quotes are literal characters to cmd)
+ * with the MSVCRT argv rules applied: any run of backslashes
+ * immediately before a double quote or the closing quote is doubled,
+ * so a trailing path separator cannot swallow the closing quote.
  *
  * @internal
  */
 export function shellQuotePath(path: string): string {
   if (process.platform === 'win32') {
     if (path.length > 0 && WIN_SHELL_SAFE_PATH.test(path)) return path;
-    return `"${path.replace(/"/g, '\\"')}"`;
+    const escaped = path.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/, '$1$1');
+    return `"${escaped}"`;
   }
   if (path.length > 0 && SHELL_SAFE_PATH.test(path)) return path;
   return `'${path.replace(/'/g, `'\\''`)}'`;
