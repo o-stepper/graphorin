@@ -1,7 +1,8 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "stream",
-  "globalDependencies": ["tsconfig.base.json", ".npmrc", "biome.json", "vitest.workspace.ts"],
+  "globalDependencies": ["tsconfig.base.json", ".npmrc", "biome.json", "vitest.config.ts"],
+  "globalEnv": ["GRAPHORIN_COVERAGE"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
