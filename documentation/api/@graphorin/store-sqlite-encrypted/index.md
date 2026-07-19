@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.12.1**](../../index.md)
+[**Graphorin API reference v0.13.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > encrypt / rekey / integrity-check runners that back the `graphorin storage`
 > CLI subcommand group.
 >
-> Project Graphorin · v0.12.1 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.12.1 (optional sub-pack)
+- **Published:** v0.13.0 (optional sub-pack)
 - **Default cipher:** `sqlcipher` (SQLCipher v4 compatible, `legacy=4`)
 - **Defaults:** encryption-at-rest is **OFF by default**. Opt in through
   `graphorin init --encrypted`.
@@ -165,7 +165,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.12.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

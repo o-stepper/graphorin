@@ -1,5 +1,14 @@
 # @graphorin/sessions
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/tools@0.13.0
+  - @graphorin/core@0.13.0
+  - @graphorin/observability@0.13.0
+
 ## 0.12.1
 
 ### Patch Changes

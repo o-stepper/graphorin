@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/provider",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "Vendor-neutral LLM provider layer for the Graphorin framework. Ships the canonical Provider interface, the Vercel AI SDK adapter (default cloud path), three local-LLM adapters (direct Ollama HTTP, llama-server HTTP, and a generic OpenAI-compatible adapter for LMStudio / LocalAI / vLLM / Together-style endpoints), the shared LocalProviderTrust classifier (loopback / private / public-tls / public-cleartext), the canonical-order middleware composer (withTracing / withRetry / withRateLimit / withCostLimit / withCostTracking / withFallback / withRedaction), the pluggable TokenCounter dispatcher (js-tiktoken default plus per-vendor native counters and a heuristic fallback), the per-provider model-tier auto-classifier (fast / balanced / smart), and the production startup hook that fails fast when withRedaction is missing.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

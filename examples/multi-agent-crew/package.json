@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-multi-agent-crew",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "private": true,
   "description": "Multi-agent crew acceptance demo for the Graphorin framework. Supervisor + two specialised worker agents covering JSONL export with kind:agent + kind:handoff records, per-agent attribution via session.list({ agentId }), session.replay() registry reconstruction with placeholder support, sub-agent secrets isolation, and lastN(10) + stripReasoning input-filter defaults. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

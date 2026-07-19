@@ -1,5 +1,13 @@
 # @graphorin/reranker-transformersjs
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/memory@0.13.0
+  - @graphorin/core@0.13.0
+
 ## 0.12.1
 
 ### Patch Changes

@@ -28,7 +28,7 @@ pnpm --filter ./examples/background-consolidator dev
 Expected output:
 
 ```
-graphorin v0.12.1 background-consolidator - recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=2, standardPhases=1, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
+graphorin v0.13.0 background-consolidator - recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=2, standardPhases=1, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
 ```
 
 The dev script boots the app against `:memory:` SQLite, drives one cycle through `runConsolidatorCycle({ ... })`, prints the consolidator status, and exits cleanly. The counts are deterministic: four turns are driven, but the `tier: 'cheap'` budget envelope enforces a 60-second cooldown between paid phases, so only the first turn's light+standard pass runs inside the cycle plus one more light pass from the scheduler fire - `lightPhases=2, standardPhases=1`, the later turns' phases are deferred by design.
@@ -318,4 +318,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.12.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

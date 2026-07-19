@@ -1,5 +1,17 @@
 # @graphorin/server
 
+## 0.13.0
+
+### Patch Changes
+
+- Updated dependencies [[`8da43b7`](https://github.com/o-stepper/graphorin/commit/8da43b775eb5e53ef00e2ed3933aeef00d033034)]:
+  - @graphorin/security@0.13.0
+  - @graphorin/tools@0.13.0
+  - @graphorin/core@0.13.0
+  - @graphorin/protocol@0.13.0
+  - @graphorin/store-sqlite@0.13.0
+  - @graphorin/triggers@0.13.0
+
 ## 0.12.1
 
 ### Patch Changes

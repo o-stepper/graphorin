@@ -52,6 +52,41 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.12.1 -> 0.13.0
+
+0.13.0 closes the 2026-07-19 external deep retest. One deliberate
+breaking default; the rest is additive:
+
+- **BREAKING: an unpriced cost ceiling now stops the run.** With
+  `RunBudget.maxCostUsd` set and usage that carries no USD cost data,
+  the run used to log one WARN and keep spending unmetered. It now
+  fails at the first between-step check: the `'stop'` shape resolves
+  with `status: 'failed'` and `error.code: 'budget-unpriced'`, and
+  `onExceed: 'throw'` rejects with the new `AgentBudgetUnpricedError`.
+  Pick one: wire `withCostTracking` (`@graphorin/provider`) with a
+  `@graphorin/pricing` snapshot so the ceiling observes spend, switch
+  to the provider-independent `maxTokens`, or restore the old
+  behaviour explicitly with `RunBudget.onUnpriced: 'warn'`. Proactive
+  heartbeats/cron tasks that set `profile.budgetUsd` against an
+  unpriced provider are affected the same way - fail-closed is exactly
+  what a proactive budget wants.
+- **GPT-5.6 is priced.** `gpt-5.6-luna` / `-terra` / `-sol` resolve in
+  the bundled snapshot at official standard rates, so `maxCostUsd`
+  enforces against the current OpenAI line out of the box.
+- **`graphorin init` prints an enforcement snippet.** The
+  `--cloud-consent` tier now arrives as the exact
+  `createMemory({ contextEngine: { privacy } })` code (next-steps step
+  5 and a `.ts`-config comment). Scripts parsing init's stderr will see
+  the extra lines.
+- **`graphorin doctor --all` respects a disabled audit log.** With a
+  `--config` whose `audit.enabled` is `false`, the audit-encryption
+  check reports `skip` instead of a false `fail` - automation that
+  keyed on that failure exit will see a clean run now.
+- Local checkouts in paths containing a space: benchmark runners and
+  doc gates actually execute there now (they used to no-op silently
+  with exit 0); the new `check-entry-guards` gate forbids the broken
+  idiom repo-wide.
+
 ### 0.12.0 -> 0.12.1
 
 One patch, one observable behavior change:

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-slack-bot-integration",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "private": true,
   "description": "Slack bot integration demo for the Graphorin framework. Server-mode example that converts Slack webhook events into agent runs, streams replies back over WebSocket, and demonstrates durable HITL approvals across server restarts plus token-based HMAC + pepper auth. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
