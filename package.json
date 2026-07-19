@@ -27,6 +27,7 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rimraf node_modules .turbo",
     "check-no-network": "node ./scripts/check-no-network.mjs",
+    "check-api-wording": "node ./scripts/check-api-wording.mjs",
     "check-doc-snippets": "node ./scripts/check-doc-snippets.mjs",
     "check-cli-docs": "node ./scripts/check-cli-docs.mjs",
     "check-example-docs": "node ./scripts/check-example-docs.mjs",
@@ -35,7 +36,7 @@
     "check-character-rules": "node ./scripts/check-character-rules.mjs",
     "check-api-report": "node ./scripts/check-api-report.mjs",
     "check-entry-guards": "node ./scripts/check-entry-guards.mjs",
-    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test && node ./documentation/scripts/build-benchmark-results.mjs --self-test && node ./scripts/check-entry-guards.mjs --self-test",
+    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test && node ./documentation/scripts/build-benchmark-results.mjs --self-test && node ./scripts/check-entry-guards.mjs --self-test && node ./scripts/check-api-wording.mjs --self-test",
     "bump-version": "node ./scripts/bump-version.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "smoke-consumer": "node ./scripts/smoke-consumer.mjs",
@@ -59,14 +60,14 @@
     "@changesets/cli": "^2.27.10",
     "@microsoft/api-extractor": "^7.58.9",
     "@types/node": "^22.10.0",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.10",
     "publint": "0.3.21",
     "rimraf": "^6.0.1",
     "tsdown": "^0.16.0",
     "tsx": "^4.20.0",
     "turbo": "^2.9.14",
     "typescript": "^5.7.0",
-    "vitest": "^3.2.6"
+    "vitest": "^4.1.10"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

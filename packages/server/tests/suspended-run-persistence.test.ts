@@ -15,20 +15,23 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { AgentRegistry } from '../src/registry/index.js';
+import type { RunDescriptor } from '../src/runtime/run-state.js';
 import { RunStateTracker } from '../src/runtime/run-state.js';
 import { createSuspendedRunPersistence } from '../src/runtime/suspended-run-persistence.js';
 
-function trackerWith(hooks: {
-  suspended?: ReturnType<typeof vi.fn>;
-  settled?: ReturnType<typeof vi.fn>;
-}): {
+type SuspendedMock = Mock<(runId: string, descriptor: RunDescriptor, state: unknown) => void>;
+type SettledMock = Mock<(runId: string) => void>;
+
+function trackerWith(hooks: { suspended?: SuspendedMock; settled?: SettledMock }): {
   runs: RunStateTracker;
-  suspended: ReturnType<typeof vi.fn>;
-  settled: ReturnType<typeof vi.fn>;
+  suspended: SuspendedMock;
+  settled: SettledMock;
 } {
-  const suspended = hooks.suspended ?? vi.fn();
-  const settled = hooks.settled ?? vi.fn();
+  const suspended =
+    hooks.suspended ?? vi.fn<(runId: string, descriptor: RunDescriptor, state: unknown) => void>();
+  const settled = hooks.settled ?? vi.fn<(runId: string) => void>();
   const runs = new RunStateTracker({ now: () => 1_000 });
   runs.setSuspendedRunPersistence({ suspended, settled });
   return { runs, suspended, settled };
