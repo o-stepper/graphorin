@@ -126,6 +126,28 @@ export function statusMarker(status: 'ok' | 'warn' | 'fail' | 'skip' | 'info'): 
 }
 
 /**
+ * Characters safe to leave unquoted in a copy/paste shell hint. Keeps
+ * ordinary absolute paths pretty; anything else (spaces, quotes, `$`,
+ * glob characters) gets the POSIX single-quote treatment.
+ */
+const SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^]+$/;
+
+/**
+ * Quote a filesystem path for a copy/paste-able shell hint. Paths made
+ * of safe characters pass through untouched; everything else is
+ * single-quoted with embedded single quotes escaped as `'\''` (the
+ * POSIX idiom), so `graphorin migrate --config <path>` survives paths
+ * with spaces or apostrophes - the unquoted hint `graphorin init` used
+ * to print truncated at the first space when pasted literally.
+ *
+ * @internal
+ */
+export function shellQuotePath(path: string): string {
+  if (path.length > 0 && SHELL_SAFE_PATH.test(path)) return path;
+  return `'${path.replace(/'/g, `'\\''`)}'`;
+}
+
+/**
  * Standardised `[graphorin/cli] <message>` prefix every human-format
  * line carries. Centralised so every command renders the same brand.
  *

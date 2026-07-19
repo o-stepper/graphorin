@@ -28,6 +28,7 @@ import process from 'node:process';
 
 import { generatePepper } from '@graphorin/security';
 
+import { shellQuotePath } from '../internal/output.js';
 import { confirm, select } from '../internal/prompts.js';
 
 /**
@@ -105,11 +106,13 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   print(
     `  1. Persist the pepper WITHOUT argv: printf '%s' '<hex-from-above>' | graphorin secrets set graphorin_server_pepper --from-stdin`,
   );
-  print(`  2. Run \`graphorin migrate --config ${target}\` to apply storage migrations.`);
+  print(
+    `  2. Run \`graphorin migrate --config ${shellQuotePath(target)}\` to apply storage migrations.`,
+  );
   print(
     '  3. Mint your admin token: graphorin token create --label bootstrap --scopes <scopes> (the raw token is shown ONCE).',
   );
-  print(`  4. Run \`graphorin start --config ${target}\` to launch the server.`);
+  print(`  4. Run \`graphorin start --config ${shellQuotePath(target)}\` to launch the server.`);
   // P1-4 (deep retest 2026-07-19): the consent tier is a MEMORY-side
   // setting - the server config cannot enforce it, so hand the operator
   // the exact code instead of a decorative option.
