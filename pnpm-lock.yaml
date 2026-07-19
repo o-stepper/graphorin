@@ -23,6 +23,7 @@ overrides:
   js-yaml@>=4.0.0 <4.2.0: '>=4.2.0 <5'
   js-yaml@<3.15.0: '>=3.15.0 <4'
   brace-expansion@>=5.0.0 <5.0.6: '>=5.0.6 <6'
+  adm-zip@<0.6.0: '>=0.6.0 <1'
 
 importers:
 
@@ -3230,9 +3231,9 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  adm-zip@0.5.17:
-    resolution: {integrity: sha512-+Ut8d9LLqwEvHHJl1+PIHqoyDxFgVN847JTVM3Izi3xHDWPE4UtzzXysMZQs64DMcrJfBeS/uoEP4AD3HQHnQQ==}
-    engines: {node: '>=12.0'}
+  adm-zip@0.6.0:
+    resolution: {integrity: sha512-XleryMhbuksdKtofnWZ9Sk+4CUTbms4Mb/EU32SZwToAyZ5RgVos/ki8n+yr0LWHOGKuakbXTuuYNHLQjhddgg==}
+    engines: {node: '>=14.0'}
 
   ai@7.0.15:
     resolution: {integrity: sha512-7406MUy9O5sIhwOgxEWuoj+td3XUGgG96SBt6pmBU4t4sQ2fpnDx5UnHaXT2HUTXl5GorbWz/MfCrSPRz0QJqw==}
@@ -7878,7 +7879,7 @@ snapshots:
 
   acorn@8.16.0: {}
 
-  adm-zip@0.5.17: {}
+  adm-zip@0.6.0: {}
 
   ai@7.0.15(zod@3.25.76):
     dependencies:
@@ -9707,7 +9708,7 @@ snapshots:
 
   onnxruntime-node@1.24.3:
     dependencies:
-      adm-zip: 0.5.17
+      adm-zip: 0.6.0
       global-agent: 3.0.0
       onnxruntime-common: 1.24.3
 
