@@ -1,5 +1,24 @@
 # @graphorin/cli
 
+## 0.13.2
+
+### Patch Changes
+
+- [#213](https://github.com/o-stepper/graphorin/pull/213) [`bba9048`](https://github.com/o-stepper/graphorin/commit/bba9048043fe97ce623079700f0e93b4b7705425) Thanks [@o-stepper](https://github.com/o-stepper)! - `graphorin init` next-step hints (`graphorin migrate --config ...` / `graphorin start --config ...`) now shell-quote the config path, so pasting them literally works from directories with spaces or apostrophes instead of failing with "config file not found" at the truncated path. Quoting is per platform family (POSIX single quotes with the `'\''` idiom; double quotes on Windows, where the backslash path separator itself stays unquoted); ordinary paths pass through untouched.
+
+- Updated dependencies [[`bba9048`](https://github.com/o-stepper/graphorin/commit/bba9048043fe97ce623079700f0e93b4b7705425)]:
+  - @graphorin/core@0.13.2
+  - @graphorin/memory@0.13.2
+  - @graphorin/pricing@0.13.2
+  - @graphorin/provider@0.13.2
+  - @graphorin/security@0.13.2
+  - @graphorin/server@0.13.2
+  - @graphorin/sessions@0.13.2
+  - @graphorin/skills@0.13.2
+  - @graphorin/store-sqlite@0.13.2
+  - @graphorin/workflow@0.13.2
+  - @graphorin/eslint-plugin@0.13.2
+
 ## 0.13.1
 
 ### Patch Changes

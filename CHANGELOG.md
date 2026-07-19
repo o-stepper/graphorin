@@ -14,6 +14,58 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.2 - 2026-07-19
+
+The **honest-status patch** (PR #213): remediation of the fourth
+external deep retest, which re-audited the released 0.13.1. No
+breaking changes.
+
+### Agent runtime - truncated tool calls are failures, not successes (`@graphorin/agent`, `@graphorin/core`)
+
+- A provider stream that finishes while a tool call is still streaming
+  its argument JSON (typically `finishReason: 'length'` at the
+  output-token ceiling) no longer completes the run with the call
+  silently dropped. The run now fails with
+  `error.code: 'incomplete-tool-call'`, so a never-executed side
+  effect (a memory write, a message send) can never read as success.
+- New terminal `tool.call.incomplete` event per cut call
+  (`toolCallId`, `toolName`, `finishReason`, accumulated `argsPrefix`;
+  additive `AgentEvent` variant, forwarded under the `'lifecycle'`
+  sub-agent policy). No `tool.call.end` or `tool.execute.*` events
+  follow for that call, and there is deliberately no automatic retry:
+  a fallback provider would hit the same ceiling, and re-running a
+  side-effecting step needs the caller's idempotency decision.
+- The truncated call's token usage is still recorded on the failed
+  state, and a `'length'` finish with no pending tool call still
+  completes (the text is simply truncated) - observable via the new
+  optional `RunStep.finishReason` field.
+- `prepareStep`'s `maxTokens` docblock and the agent-runtime guide now
+  spell out the output-ceiling contract (256 tokens is a safe floor
+  for small schema-driven tools).
+
+### CLI - copy/paste-safe `init` hints (`@graphorin/cli`)
+
+- `graphorin init` next-step hints (`graphorin migrate --config ...` /
+  `graphorin start --config ...`) shell-quote the config path, so
+  pasting them literally works from directories with spaces or
+  apostrophes instead of failing at the truncated path. Quoting is per
+  platform family: POSIX single quotes with the `'\''` idiom; Windows
+  double quotes under the MSVCRT argv rules (backslash runs double
+  before a quote or the end), implemented as a linear scan. Ordinary
+  paths pass through untouched.
+
+### Infrastructure (not npm-published)
+
+- Docs-build purity gate: `pnpm docs:build` must leave the tree clean.
+  The root-synced changelog page missed the 0.13.1 section at release
+  time; the sync is committed, the generator's final newline is
+  byte-stable, the sync runs inside `pnpm run version`, and docs CI
+  fails on any committed file a build changes.
+- The HaluMem CI stub summary leads with `status=UNSCORED` so an
+  infrastructure smoke can no longer read as a memory-quality result.
+
+---
+
 ## 0.13.1 - 2026-07-19
 
 The **honest-docs patch** (PR #209): remediation of the third external

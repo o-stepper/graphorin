@@ -52,6 +52,28 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.1 -> 0.13.2
+
+A patch release; nothing to migrate, but one behavioural correction is
+worth checking against your error handling:
+
+- **Truncated tool calls now fail the run.** A provider stream cut at
+  the output-token ceiling (`finishReason: 'length'`) while a tool
+  call was still streaming its arguments used to end as
+  `status: 'completed'` with an empty output and the call silently
+  dropped. Such runs now end `status: 'failed'` with
+  `error.code: 'incomplete-tool-call'`, preceded by a terminal
+  `tool.call.incomplete` event per cut call. If your code treated that
+  empty `completed` as success, it was reporting success for a side
+  effect that never executed - handle the new failure (usually: raise
+  `maxTokens`; 256+ is a safe floor for small schema-driven tools).
+  Event subscribers with exhaustive `AgentEvent` switches gain the new
+  `tool.call.incomplete` variant; states persisted by newer versions
+  may carry the additive optional `RunStep.finishReason` field.
+- `graphorin init` next-step hints are now shell-quoted; scripts that
+  parsed the raw path out of those lines (unlikely) should read the
+  quoted form.
+
 ### 0.13.0 -> 0.13.1
 
 A patch release; nothing to migrate.

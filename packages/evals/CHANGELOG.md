@@ -1,5 +1,13 @@
 # @graphorin/evals
 
+## 0.13.2
+
+### Patch Changes
+
+- Updated dependencies [[`bba9048`](https://github.com/o-stepper/graphorin/commit/bba9048043fe97ce623079700f0e93b4b7705425)]:
+  - @graphorin/core@0.13.2
+  - @graphorin/observability@0.13.2
+
 ## 0.13.1
 
 ### Patch Changes
