@@ -52,6 +52,22 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.0 -> 0.13.1
+
+A patch release; nothing to migrate.
+
+- **Cost estimates for GPT-5.6 may rise.** Cache-write tokens are now
+  billed at the official 1.25x-input premium instead of falling back
+  to the input rate, and bare `gpt-5.6` resolves at `gpt-5.6-sol`
+  rates. If a `RunBudget.maxCostUsd` was tuned against the old
+  under-counted estimates for cache-heavy GPT-5.6 workloads, it trips
+  slightly earlier now - the new numbers match what OpenAI actually
+  charges.
+- Everything else is documentation and tooling: the API reference and
+  guides no longer cite internal ticket ids, the quickstart
+  demonstrates persist + cold reopen + recall end to end, and the docs
+  site ships a far smaller client search index.
+
 ### 0.12.1 -> 0.13.0
 
 0.13.0 ships one deliberate breaking default; the rest is additive:

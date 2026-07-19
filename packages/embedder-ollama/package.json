@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/embedder-ollama",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "First-class opt-in alternative to @graphorin/embedder-transformersjs for the Graphorin framework. Wraps the local Ollama HTTP API to produce dense embeddings via models such as `nomic-embed-text` (768-dim, multilingual default), `mxbai-embed-large` (1024-dim), `snowflake-arctic-embed` (1024-dim), and `bge-m3` (1024-dim). Implements the `EmbedderProvider` contract with a deterministic configHash that includes the model digest reported by `POST /api/show`, so a model upgrade in the same Ollama instance produces a different embedder_id and the multi-table per-embedder vec0 layout in `@graphorin/store-sqlite` triggers a clean migration path.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

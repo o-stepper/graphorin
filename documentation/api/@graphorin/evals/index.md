@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.13.0**](../../index.md)
+[**Graphorin API reference v0.13.1**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > bounded concurrency, and regression detection that compares the
 > current run against a stored baseline.
 >
-> Project Graphorin · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.13.1 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.13.0 (optional sub-pack; the full orchestrator is
+- **Published:** v0.13.1 (optional sub-pack; the full orchestrator is
   decoupled from `@graphorin/observability` per RB-17 / DEC-152).
 
 ---
@@ -202,7 +202,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.13.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
