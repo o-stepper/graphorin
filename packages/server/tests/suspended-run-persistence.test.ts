@@ -14,8 +14,8 @@
  *    warns (once per agent) when no codec exists.
  */
 
-import { describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { AgentRegistry } from '../src/registry/index.js';
 import type { RunDescriptor } from '../src/runtime/run-state.js';
 import { RunStateTracker } from '../src/runtime/run-state.js';
