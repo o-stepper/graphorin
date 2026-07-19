@@ -154,7 +154,25 @@ const WIN_SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^\\]+$/;
 export function shellQuotePath(path: string): string {
   if (process.platform === 'win32') {
     if (path.length > 0 && WIN_SHELL_SAFE_PATH.test(path)) return path;
-    const escaped = path.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/, '$1$1');
+    // Single linear scan instead of the obvious backslash-run regexes,
+    // which backtrack polynomially on long runs (CodeQL
+    // js/polynomial-redos): backslashes double before an embedded
+    // quote (which itself escapes) and at the end of the string.
+    let escaped = '';
+    let backslashes = 0;
+    for (const ch of path) {
+      if (ch === '\\') {
+        backslashes += 1;
+        continue;
+      }
+      if (ch === '"') {
+        escaped += `${'\\'.repeat(backslashes * 2 + 1)}"`;
+      } else {
+        escaped += `${'\\'.repeat(backslashes)}${ch}`;
+      }
+      backslashes = 0;
+    }
+    escaped += '\\'.repeat(backslashes * 2);
     return `"${escaped}"`;
   }
   if (path.length > 0 && SHELL_SAFE_PATH.test(path)) return path;
