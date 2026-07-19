@@ -25,6 +25,45 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.1 - 2026-07-19
+
+The **honest-docs patch** (PR #209): remediation of the third external
+deep retest, which re-audited 0.13.0. No breaking changes.
+
+### Pricing - GPT-5.6 cache-write premium + alias (`@graphorin/pricing`)
+
+- The three GPT-5.6 snapshot entries now carry `cacheWriteUsdPerToken`
+  (the official 1.25x-input premium: $1.25 / $3.125 / $6.25 per 1M
+  tokens for luna / terra / sol). Cache-write tokens were previously
+  billed at the cheaper input rate, under-counting that leg by 20%;
+  estimates for cache-heavy GPT-5.6 workloads rise to the true cost,
+  pinned to the official four-leg formula by a fixture test.
+- Bare `gpt-5.6` resolves as a snapshot entry priced at sol rates (the
+  OpenAI API routes the alias to `gpt-5.6-sol`) instead of
+  `lookupPrice` returning `null` and the CLI exiting non-zero.
+
+### Documentation - ticket-free public docs (all packages)
+
+- Roughly 1100 TSDoc sites across 28 packages, the guide pages, five
+  package READMEs and two runtime strings no longer cite internal
+  audit/work-item ids; the generated API reference went from 522 label
+  hits to 0 across 3187 pages, and a new `check-api-wording` CI gate
+  keeps it that way.
+- The quickstart hello-world now performs everything it promises:
+  stream, persist a fact, close the store, reopen cold, recall the
+  fact - and a consumer smoke twin proves the same flow against the
+  published packages with a real cross-process restart.
+- The generated API reference is excluded from the client-side search
+  index: the shipped index chunk drops from 6.8 MiB to 729 KiB, with a
+  2 MiB budget gate.
+
+### Infrastructure
+
+- vitest 4.1.10 across the workspace: fixes v8 coverage collapsing in
+  checkout paths that contain a space (18.87% vs 79.74% lines on
+  identical code under vitest 3.2.x), with a CI step running one
+  package's coverage from a spaced copy so the class stays pinned.
+
 ## 0.13.0 - 2026-07-19
 
 The **fail-closed budget release** (PR #206): the response to the
@@ -1230,4 +1269,3 @@ persists facts to local SQLite via local `transformers.js` embeddings,
 survives process restart for HITL approvals when run via
 `graphorin start`, and emits OpenTelemetry spans (file or console
 exporter). The example lives in `examples/personal-assistant-cli/`.
-

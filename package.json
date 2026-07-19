@@ -50,7 +50,7 @@
     "check-licenses": "node ./scripts/check-licenses.mjs",
     "check-anthropic-spec": "node ./scripts/check-anthropic-spec.mjs",
     "changeset": "changeset",
-    "version": "changeset version && node scripts/bump-version.mjs --sync && pnpm install --lockfile-only --no-frozen-lockfile",
+    "version": "changeset version && node scripts/bump-version.mjs --sync && node documentation/scripts/sync-root-docs.mjs && pnpm install --lockfile-only --no-frozen-lockfile",
     "release": "turbo run build && changeset publish"
   },
   "devDependencies": {

@@ -164,10 +164,12 @@ async function syncOne({ from, to, title, description }) {
   ].filter((line) => typeof line === 'string');
   const frontmatter = frontmatterLines.join('\n');
   const body = stripTrailingFooter(stripFirstH1(rewriteLinks(source)));
-  const finalBody = `${frontmatter}\n\n${banner}\n\n# ${title}\n\n${body}`.replace(
-    /\n{3,}/g,
-    '\n\n',
-  );
+  // Byte-stable output: exactly one trailing newline regardless of how
+  // the source file ends (deep-retest 0.13.1 P2 - a drifting final
+  // blank line makes the docs purity gate flap).
+  const finalBody = `${frontmatter}\n\n${banner}\n\n# ${title}\n\n${body}`
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\n*$/, '\n');
   await mkdir(dirname(targetPath), { recursive: true });
   await writeFile(targetPath, finalBody, 'utf8');
   console.log(`[graphorin/docs] sync-root-docs: wrote ${to}`);

@@ -96,6 +96,22 @@ jobs:
             exit 1
           fi
 
+      # Deep-retest 0.13.1 P2: build:site rewrites the root-synced pages
+      # (documentation/reference/changelog.md and contributing/*) from
+      # their repository-root sources on every build. When a release
+      # edits /CHANGELOG.md without re-running the sync, the committed
+      # page goes stale: local builds dirty the tree and the deployed
+      # site diverges from git. The api/ and benchmark freshness gates
+      # above have their own diagnostics; this is the catch-all for
+      # every other tracked file the build may touch.
+      - name: Docs tree purity (build must not change committed files)
+        run: |
+          if ! git diff --exit-code --stat -- documentation; then
+            git diff -- documentation | head -100
+            echo "::error title=docs build changed committed files::A generated page is stale (usually the root-synced changelog). Run: node documentation/scripts/sync-root-docs.mjs and commit the result."
+            exit 1
+          fi
+
       # The public API reference must describe behaviour, not internal
       # planning artifacts: audit/work-item ids ("deep retest P1-3",
       # "W-135", wave letters) leaked into published pages once (0.13.0
