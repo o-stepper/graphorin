@@ -266,7 +266,10 @@ describe('deep-retest 0.13.1 P3 - copy/paste-safe next-step hints', () => {
       },
     });
     const joined = lines.join('\n');
-    const quoted = `'${result.configPath.replace(/'/g, `'\\''`)}'`;
+    // Platform-family quoting: POSIX single quotes, Windows double
+    // quotes. Either way the spaced path MUST come out quoted.
+    const quoted = shellQuotePath(result.configPath);
+    expect(quoted).not.toBe(result.configPath);
     expect(joined).toContain(`graphorin migrate --config ${quoted}`);
     expect(joined).toContain(`graphorin start --config ${quoted}`);
     // The raw, unquoted path must not appear inside a command hint - a
@@ -291,12 +294,27 @@ describe('deep-retest 0.13.1 P3 - copy/paste-safe next-step hints', () => {
 });
 
 describe('shellQuotePath', () => {
-  it('passes safe paths through and single-quotes the rest', () => {
-    expect(shellQuotePath('/opt/graphorin/graphorin.config.ts')).toBe(
-      '/opt/graphorin/graphorin.config.ts',
-    );
-    expect(shellQuotePath('/tmp/space dir/config.json')).toBe("'/tmp/space dir/config.json'");
-    expect(shellQuotePath("/tmp/it's here/config.json")).toBe("'/tmp/it'\\''s here/config.json'");
-    expect(shellQuotePath('')).toBe("''");
-  });
+  it.skipIf(process.platform === 'win32')(
+    'POSIX: passes safe paths through and single-quotes the rest',
+    () => {
+      expect(shellQuotePath('/opt/graphorin/graphorin.config.ts')).toBe(
+        '/opt/graphorin/graphorin.config.ts',
+      );
+      expect(shellQuotePath('/tmp/space dir/config.json')).toBe("'/tmp/space dir/config.json'");
+      expect(shellQuotePath("/tmp/it's here/config.json")).toBe("'/tmp/it'\\''s here/config.json'");
+      expect(shellQuotePath('')).toBe("''");
+    },
+  );
+
+  it.runIf(process.platform === 'win32')(
+    'Windows: backslash paths stay unquoted; spaced paths get double quotes',
+    () => {
+      expect(shellQuotePath('C:\\Users\\dev\\graphorin.config.ts')).toBe(
+        'C:\\Users\\dev\\graphorin.config.ts',
+      );
+      expect(shellQuotePath('C:\\space dir\\config.json')).toBe('"C:\\space dir\\config.json"');
+      expect(shellQuotePath("C:\\it's here\\config.json")).toBe('"C:\\it\'s here\\config.json"');
+      expect(shellQuotePath('')).toBe('""');
+    },
+  );
 });

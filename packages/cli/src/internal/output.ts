@@ -128,21 +128,30 @@ export function statusMarker(status: 'ok' | 'warn' | 'fail' | 'skip' | 'info'): 
 /**
  * Characters safe to leave unquoted in a copy/paste shell hint. Keeps
  * ordinary absolute paths pretty; anything else (spaces, quotes, `$`,
- * glob characters) gets the POSIX single-quote treatment.
+ * glob characters) gets quoted. On Windows the backslash is a path
+ * separator, not an escape - every absolute path carries it, so it
+ * belongs in the safe set there.
  */
 const SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^]+$/;
+const WIN_SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^\\]+$/;
 
 /**
- * Quote a filesystem path for a copy/paste-able shell hint. Paths made
- * of safe characters pass through untouched; everything else is
- * single-quoted with embedded single quotes escaped as `'\''` (the
- * POSIX idiom), so `graphorin migrate --config <path>` survives paths
- * with spaces or apostrophes - the unquoted hint `graphorin init` used
- * to print truncated at the first space when pasted literally.
+ * Quote a filesystem path for a copy/paste-able shell hint, so
+ * `graphorin migrate --config <path>` survives paths with spaces or
+ * apostrophes - the unquoted hint `graphorin init` used to print
+ * truncated at the first space when pasted literally. Paths made of
+ * safe characters pass through untouched. Quoting is per platform
+ * family: POSIX shells get single quotes with embedded single quotes
+ * escaped as `'\''`; Windows gets double quotes (the form both cmd and
+ * PowerShell accept - single quotes are literal characters to cmd).
  *
  * @internal
  */
 export function shellQuotePath(path: string): string {
+  if (process.platform === 'win32') {
+    if (path.length > 0 && WIN_SHELL_SAFE_PATH.test(path)) return path;
+    return `"${path.replace(/"/g, '\\"')}"`;
+  }
   if (path.length > 0 && SHELL_SAFE_PATH.test(path)) return path;
   return `'${path.replace(/'/g, `'\\''`)}'`;
 }
