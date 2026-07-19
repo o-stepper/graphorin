@@ -79,13 +79,21 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
-      # The 30s default-timeout override retires the wall-clock flake
-      # class on shared runners: five different tests blew the 5s vitest
-      # default on degraded runner days (sqlite setup, Argon2id KDF,
-      # server app wiring), each a slow-I/O or CPU-starvation artifact,
-      # never a hang. Local runs keep the strict 5s default; explicit
-      # per-test/per-suite timeouts still take precedence over this
-      # CLI-level default.
+      # Timeouts here are HANG detectors, not performance gates - they
+      # only bite when a test genuinely stalls, so generous CI bounds
+      # cost nothing on the happy path. History of the wall-clock flake
+      # class on shared runners (sqlite store open + 38 migrations,
+      # Argon2id KDF, server app wiring under CPU starvation - slow I/O,
+      # never a hang): 30s test override added after five 5s blows; the
+      # 0.11.0 scheduler flake needed hook bounds too (vitest bounds
+      # hooks SEPARATELY, and a CLI --testTimeout never touches them -
+      # the 10s hook default was live in CI this whole time); third
+      # occurrence 2026-07-19 blew BOTH windows on the 0.13.0 release PR
+      # (health-checks WAL-clamp: 30s test + 10s hook). 120s/120s
+      # retires the class instead of per-file whack-a-mole. NOTE: vitest
+      # CLI options OVERRIDE per-package vitest.config values, so these
+      # flags are the single source of truth in CI; local runs keep the
+      # strict 5s/10s defaults.
       # Invoked through `turbo run ... --` directly and pinned to bash:
       # the windows runner's default pwsh strips the bare `--` separator
       # when spawning native commands, so turbo saw --testTimeout as its
@@ -93,7 +101,7 @@ jobs:
       # every runner OS.
       - name: Test
         shell: bash
-        run: pnpm exec turbo run test -- --testTimeout=30000
+        run: pnpm exec turbo run test -- --testTimeout=120000 --hookTimeout=120000
 
       - name: Build
         run: pnpm build
@@ -199,7 +207,9 @@ jobs:
         shell: bash
         env:
           GRAPHORIN_COVERAGE: '1'
-        run: pnpm exec turbo run test -- --coverage --testTimeout=30000
+        # Same hang-detector bounds as the matrix Test step (see its
+        # comment) - V8 instrumentation makes everything slower still.
+        run: pnpm exec turbo run test -- --coverage --testTimeout=120000 --hookTimeout=120000
 
   examples-smoke:
     name: Examples smoke (stub recipe)
