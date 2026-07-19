@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-dialogue-smoke",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "private": true,
   "description": "Lightweight dialogue smoke test for the Graphorin framework. Seeds a few fixed user/assistant turns, persists a salient fact to semantic memory, and asserts hybrid search (FTS-only without an embedder) recovers it. This is a wiring smoke check, NOT the published DialSim benchmark (arXiv:2406.13144). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
