@@ -104,6 +104,13 @@ console.log(
   `[bump-version] v${target}: ${manifestsChanged} manifest(s) + ${sitesChanged} text file(s) updated` +
     `${peerFloorsChanged > 0 ? ` + ${peerFloorsChanged} peer-floor manifest(s) rewritten to >=${targetMinor}.0` : ''}.`,
 );
+if (peerFloorsChanged > 0) {
+  console.log(
+    '[bump-version] peer floors moved - pnpm-lock.yaml is refreshed by the version ' +
+      "script's trailing `pnpm install --lockfile-only` step (a stale lockfile turned " +
+      'the 0.13.0 version-PR red on every leg in 15s; do not drop that step).',
+  );
+}
 console.log('[bump-version] manual follow-ups the script cannot decide for you:');
 console.log(
   '  - root CHANGELOG.md: write the release section (changesets only writes per-package logs)',
