@@ -81,6 +81,26 @@ describe('piiDetection', () => {
     expect((await g.check('1234 5678 9012 3456', ctx)).ok).toBe(true);
   });
 
+  it('leaves serialized numbers alone (decimal boundary + network prefix)', async () => {
+    const g = guardrails.piiDetection<string>();
+    // Float fraction - Luhn-invalid and Luhn-valid variants both survive.
+    expect((await g.check('{"score":0.01639344262295082}', ctx)).ok).toBe(true);
+    expect((await g.check('{"p":0.4111111111111111}', ctx)).ok).toBe(true);
+    // Integer part of a decimal (4111111111119 alone is Luhn-valid).
+    expect((await g.check('total 4111111111119.75', ctx)).ok).toBe(true);
+    // Luhn-valid snowflake-style id: leading digit 1 is not a card network.
+    expect((await g.check('id 1240000000000000001', ctx)).ok).toBe(true);
+    // Epoch-ms timestamp.
+    expect((await g.check('at 1752897600000 exactly', ctx)).ok).toBe(true);
+  });
+
+  it('still detects standalone US phone numbers after the boundary tightening', async () => {
+    const g = guardrails.piiDetection<string>();
+    expect((await g.check('call (415) 555-1212 now', ctx)).ok).toBe(false);
+    expect((await g.check('call +1 415-555-1212', ctx)).ok).toBe(false);
+    expect((await g.check('digits 4155551212', ctx)).ok).toBe(false);
+  });
+
   it("supports action: 'block'", async () => {
     const g = guardrails.piiDetection<string>({ action: 'block' });
     const result = await g.check('Email me at hello@example.com', ctx);

@@ -1,7 +1,8 @@
 /**
  * `piiDetection` - block / rewrite when the value contains common PII
- * patterns. The default catalogue covers email, credit card (Luhn),
- * IBAN, US SSN, US phone, and Bitcoin address shapes; it is not
+ * patterns. The default catalogue covers email, credit card (Luhn +
+ * major-network leading digit), IBAN, US SSN, US phone, and Bitcoin
+ * address shapes; it is not
  * exhaustive and is intentionally English-locale-friendly. The
  * outbound `withRedaction` provider middleware (Phase 06) covers the
  * "no sensitive values in non-local LLM prompts" half of the same
@@ -53,12 +54,17 @@ export const DEFAULT_PII_PATTERNS: ReadonlyArray<PiiPattern> = Object.freeze([
   }),
   Object.freeze({
     kind: 'us-phone',
-    pattern: /(?:\+?1[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/g,
+    // The lookarounds pin the match to a standalone number: a 10-digit
+    // window inside a longer digit run (epoch timestamp, snowflake id)
+    // or next to a decimal point is not a phone number.
+    pattern: /(?<![\d.])(?:\+?1[\s-]?)?\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}(?!\.?\d)/g,
   }),
   Object.freeze({
     kind: 'credit-card',
-    pattern: /\b(?:\d[ -]?){13,19}\b/g,
-    validate: luhn,
+    // Lookarounds skip decimal-adjacent digit runs (`0.01639344262295082`,
+    // `4111111111119.75`) so serialized floats survive redaction intact.
+    pattern: /\b(?<!\.)(?:\d[ -]?){13,19}\b(?!\.\d)/g,
+    validate: likelyPan,
   }),
   Object.freeze({
     kind: 'iban',
@@ -217,6 +223,21 @@ export function piiDetection<TValue = unknown>(
   return stage === 'input'
     ? (defineInputGuardrail<TValue>(spec) as InputGuardrail<TValue>)
     : (defineOutputGuardrail<TValue>(spec) as OutputGuardrail<TValue>);
+}
+
+/**
+ * Default `credit-card` validator: Luhn checksum + a major-network leading
+ * digit (2 = Mir / Mastercard 2-series, 3 = JCB / Amex / Diners, 4 = Visa,
+ * 5 = Mastercard / Maestro, 6 = Discover / UnionPay / RuPay). Runs leading
+ * with 0 / 1 / 7 / 8 / 9 - epoch timestamps, snowflake ids, most order
+ * numbers - are never treated as PANs; deployments handling the rare
+ * exceptions (UATP `1...`, petroleum `7...`, RuPay `81/82`, Troy `9792`)
+ * should register a custom pattern via `extraPatterns`.
+ */
+function likelyPan(value: string): boolean {
+  const lead = value.charCodeAt(0) - 48; // pattern matches start with a digit
+  if (lead < 2 || lead > 6) return false;
+  return luhn(value);
 }
 
 /**

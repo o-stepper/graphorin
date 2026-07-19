@@ -10,7 +10,7 @@
 const OPT_IN_PATTERNS: readonly RedactionPattern[];
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:231
+Defined in: packages/observability/src/redaction/patterns.ts:240
 
 **`Stable`**
 

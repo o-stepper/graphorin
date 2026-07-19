@@ -110,7 +110,14 @@ const FIXTURES: ReadonlyArray<Fixture> = [
   {
     name: 'creditcard',
     positives: ['card 4111 1111 1111 1111', 'visa: 4111-1111-1111-1111'],
-    negatives: ['only 12 digits 123456789012'],
+    negatives: [
+      'only 12 digits 123456789012',
+      // Decimal-adjacent runs are refused at the regex level so serialized
+      // floats survive even when their digits happen to be Luhn-valid.
+      '{"score":0.01639344262295082}',
+      'p=0.4111111111111111',
+      'total 4111111111119.75',
+    ],
   },
   {
     name: 'us-ssn',
@@ -160,5 +167,26 @@ describe('@graphorin/observability/redaction - every default-on pattern has fixt
     const defaults = new Set<string>();
     for (const p of BUILT_IN_PATTERNS as readonly RedactionPattern[]) defaults.add(p.name);
     expect([...defaults].sort()).toEqual([...fixtured].sort());
+  });
+});
+
+describe('@graphorin/observability/redaction - creditcard verify (Luhn + network prefix)', () => {
+  const creditcard = BUILT_IN_PATTERNS.find((p) => p.name === 'creditcard');
+
+  it('accepts major-network PANs (leading digit 2-6)', () => {
+    expect(creditcard?.verify?.('4111111111111111')).toBe(true);
+    expect(creditcard?.verify?.('5500 0000 0000 0004')).toBe(true);
+    expect(creditcard?.verify?.('2221000000000009')).toBe(true);
+  });
+
+  it('rejects Luhn-valid runs outside the major-network leading digits', () => {
+    // Snowflake-style id (leading 1) and petroleum-range run (leading 7):
+    // both pass Luhn but are not consumer PANs.
+    expect(creditcard?.verify?.('1240000000000000001')).toBe(false);
+    expect(creditcard?.verify?.('7700000000000008')).toBe(false);
+  });
+
+  it('rejects Luhn-invalid runs regardless of prefix', () => {
+    expect(creditcard?.verify?.('4111111111111112')).toBe(false);
   });
 });
