@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/reranker-llm",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "LLM-as-reranker adapter for the Graphorin framework. Asks the configured `Provider` to score `(query, passage)` pairs against an English (default, locale-agnostic + translatable) scoring prompt; runs scoring in parallel batches via `Promise.all()`. Defaults: `temperature: 0` (deterministic), batch size 5, score scale 0-10. Pluggable `scoringPrompt` for locale-specific phrasing. Implements the `ReRanker` contract from `@graphorin/memory/search`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
