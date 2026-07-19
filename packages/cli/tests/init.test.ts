@@ -294,33 +294,42 @@ describe('deep-retest 0.13.1 P3 - copy/paste-safe next-step hints', () => {
 });
 
 describe('shellQuotePath', () => {
-  it.skipIf(process.platform === 'win32')(
-    'POSIX: passes safe paths through and single-quotes the rest',
-    () => {
-      expect(shellQuotePath('/opt/graphorin/graphorin.config.ts')).toBe(
-        '/opt/graphorin/graphorin.config.ts',
-      );
-      expect(shellQuotePath('/tmp/space dir/config.json')).toBe("'/tmp/space dir/config.json'");
-      expect(shellQuotePath("/tmp/it's here/config.json")).toBe("'/tmp/it'\\''s here/config.json'");
-      expect(shellQuotePath('')).toBe("''");
-    },
-  );
+  // The explicit platform argument is the test seam: both branches run
+  // on every OS, so the linux coverage leg exercises the win32 scan too.
+  it('POSIX: passes safe paths through and single-quotes the rest', () => {
+    expect(shellQuotePath('/opt/graphorin/graphorin.config.ts', 'linux')).toBe(
+      '/opt/graphorin/graphorin.config.ts',
+    );
+    expect(shellQuotePath('/tmp/space dir/config.json', 'linux')).toBe(
+      "'/tmp/space dir/config.json'",
+    );
+    expect(shellQuotePath("/tmp/it's here/config.json", 'darwin')).toBe(
+      "'/tmp/it'\\''s here/config.json'",
+    );
+    expect(shellQuotePath('', 'linux')).toBe("''");
+  });
 
-  it.runIf(process.platform === 'win32')(
-    'Windows: backslash paths stay unquoted; spaced paths get double quotes',
-    () => {
-      expect(shellQuotePath('C:\\Users\\dev\\graphorin.config.ts')).toBe(
-        'C:\\Users\\dev\\graphorin.config.ts',
-      );
-      expect(shellQuotePath('C:\\space dir\\config.json')).toBe('"C:\\space dir\\config.json"');
-      expect(shellQuotePath("C:\\it's here\\config.json")).toBe('"C:\\it\'s here\\config.json"');
-      expect(shellQuotePath('')).toBe('""');
-      // MSVCRT argv rules: a trailing backslash run doubles so it cannot
-      // swallow the closing quote, and backslashes before an embedded
-      // quote double ahead of the escaped quote.
-      expect(shellQuotePath('C:\\space dir\\')).toBe('"C:\\space dir\\\\"');
-      expect(shellQuotePath('C:\\we"ird')).toBe('"C:\\we\\"ird"');
-      expect(shellQuotePath('C:\\x\\"y z')).toBe('"C:\\x\\\\\\"y z"');
-    },
-  );
+  it('Windows: backslash paths stay unquoted; spaced paths get double quotes', () => {
+    expect(shellQuotePath('C:\\Users\\dev\\graphorin.config.ts', 'win32')).toBe(
+      'C:\\Users\\dev\\graphorin.config.ts',
+    );
+    expect(shellQuotePath('C:\\space dir\\config.json', 'win32')).toBe(
+      '"C:\\space dir\\config.json"',
+    );
+    expect(shellQuotePath("C:\\it's here\\config.json", 'win32')).toBe(
+      '"C:\\it\'s here\\config.json"',
+    );
+    expect(shellQuotePath('', 'win32')).toBe('""');
+    // MSVCRT argv rules: a trailing backslash run doubles so it cannot
+    // swallow the closing quote, and backslashes before an embedded
+    // quote double ahead of the escaped quote.
+    expect(shellQuotePath('C:\\space dir\\', 'win32')).toBe('"C:\\space dir\\\\"');
+    expect(shellQuotePath('C:\\we"ird', 'win32')).toBe('"C:\\we\\"ird"');
+    expect(shellQuotePath('C:\\x\\"y z', 'win32')).toBe('"C:\\x\\\\\\"y z"');
+  });
+
+  it('defaults to the ambient platform', () => {
+    const ambient = shellQuotePath('/plain/path.json');
+    expect(ambient).toBe(shellQuotePath('/plain/path.json', process.platform));
+  });
 });

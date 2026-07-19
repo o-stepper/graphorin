@@ -149,10 +149,13 @@ const WIN_SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^\\]+$/;
  * immediately before a double quote or the closing quote is doubled,
  * so a trailing path separator cannot swallow the closing quote.
  *
+ * The `platform` parameter exists as a test seam (the win32 branch is
+ * exercised from every OS); production callers use the default.
+ *
  * @internal
  */
-export function shellQuotePath(path: string): string {
-  if (process.platform === 'win32') {
+export function shellQuotePath(path: string, platform: NodeJS.Platform = process.platform): string {
+  if (platform === 'win32') {
     if (path.length > 0 && WIN_SHELL_SAFE_PATH.test(path)) return path;
     // Single linear scan instead of the obvious backslash-run regexes,
     // which backtrack polynomially on long runs (CodeQL
