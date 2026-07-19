@@ -6,7 +6,7 @@
 
 # Interface: DirectiveOptions\&lt;TUpdate, TResume\&gt;
 
-Defined in: packages/core/dist/channels/directive.d.ts:32
+Defined in: [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts)
 
 **`Stable`**
 
@@ -23,6 +23,6 @@ Constructor parameters for `Directive`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-goto"></a> `goto?` | `readonly` | `string` | packages/core/dist/channels/directive.d.ts:33 |
-| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | packages/core/dist/channels/directive.d.ts:34 |
-| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | packages/core/dist/channels/directive.d.ts:35 |
+| <a id="property-goto"></a> `goto?` | `readonly` | `string` | [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts) |
+| <a id="property-resume"></a> `resume?` | `readonly` | `TResume` | [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts) |
+| <a id="property-update"></a> `update?` | `readonly` | `TUpdate` | [packages/core/dist/channels/directive.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/directive.d.ts) |

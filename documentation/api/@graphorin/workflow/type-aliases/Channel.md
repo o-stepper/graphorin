@@ -17,7 +17,7 @@ type Channel<T> =
 | Ephemeral<T>;
 ```
 
-Defined in: packages/core/dist/channels/channels.d.ts:24
+Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
 **`Stable`**
 

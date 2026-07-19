@@ -10,7 +10,7 @@
 type EncryptionCipher = "sqlcipher" | "chacha20" | "aes256cbc" | "aes128cbc" | "rc4";
 ```
 
-Defined in: packages/store-sqlite/dist/encryption/index.d.ts:14
+Defined in: [packages/store-sqlite/dist/encryption/index.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/dist/encryption/index.d.ts)
 
 **`Stable`**
 

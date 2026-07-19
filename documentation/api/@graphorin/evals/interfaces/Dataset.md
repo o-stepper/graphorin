@@ -6,7 +6,7 @@
 
 # Interface: Dataset\&lt;I, O, M\&gt;
 
-Defined in: packages/observability/dist/eval/types.d.ts:23
+Defined in: [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts)
 
 **`Stable`**
 
@@ -22,8 +22,8 @@ Defined in: packages/observability/dist/eval/types.d.ts:23
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cases"></a> `cases` | `readonly` | readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`I`, `O`, `M`\&gt;[] | packages/observability/dist/eval/types.d.ts:24 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | \{ `createdAt?`: `Date`; `description?`: `string`; `name?`: `string`; \} | packages/observability/dist/eval/types.d.ts:25 |
-| `metadata.createdAt?` | `readonly` | `Date` | packages/observability/dist/eval/types.d.ts:28 |
-| `metadata.description?` | `readonly` | `string` | packages/observability/dist/eval/types.d.ts:27 |
-| `metadata.name?` | `readonly` | `string` | packages/observability/dist/eval/types.d.ts:26 |
+| <a id="property-cases"></a> `cases` | `readonly` | readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`I`, `O`, `M`\&gt;[] | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | \{ `createdAt?`: `Date`; `description?`: `string`; `name?`: `string`; \} | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| `metadata.createdAt?` | `readonly` | `Date` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| `metadata.description?` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |
+| `metadata.name?` | `readonly` | `string` | [packages/observability/dist/eval/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/observability/dist/eval/types.d.ts) |

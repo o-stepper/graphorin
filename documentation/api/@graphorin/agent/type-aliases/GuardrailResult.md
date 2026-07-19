@@ -20,7 +20,7 @@ type GuardrailResult<TValue> =
 };
 ```
 
-Defined in: packages/security/dist/guardrails/types.d.ts:59
+Defined in: [packages/security/dist/guardrails/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/guardrails/types.d.ts)
 
 **`Stable`**
 

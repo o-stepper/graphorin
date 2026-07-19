@@ -6,7 +6,7 @@
 
 # Interface: RedactionValidator
 
-Defined in: packages/core/dist/contracts/redaction-validator.d.ts:17
+Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
 **`Stable`**
 
@@ -27,8 +27,8 @@ config without taking an observability dependency.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | packages/core/dist/contracts/redaction-validator.d.ts:19 |
-| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | packages/core/dist/contracts/redaction-validator.d.ts:21 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
+| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts) |
 
 ## Methods
 
@@ -40,7 +40,7 @@ validate(input):
   | null;
 ```
 
-Defined in: packages/core/dist/contracts/redaction-validator.d.ts:26
+Defined in: [packages/core/dist/contracts/redaction-validator.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/redaction-validator.d.ts)
 
 Validate (and optionally rewrite) an attribute payload. Returns the
 sanitized value or `null` if the entire record must be dropped.

@@ -10,7 +10,7 @@
 function pause<TValue, TResume>(value): TResume;
 ```
 
-Defined in: packages/core/dist/channels/pause.d.ts:120
+Defined in: [packages/core/dist/channels/pause.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/pause.d.ts)
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 const PAUSE_SIGNAL_BRAND: unique symbol;
 ```
 
-Defined in: packages/core/dist/channels/pause.d.ts:9
+Defined in: [packages/core/dist/channels/pause.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/pause.d.ts)
 
 **`Stable`**
 

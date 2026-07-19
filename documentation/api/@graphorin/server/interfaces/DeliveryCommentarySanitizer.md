@@ -77,10 +77,10 @@ The frame is returned unchanged when:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `eventId` | `string` | packages/protocol/dist/server-message.d.ts:113 |
-| `kind` | `"event"` | packages/protocol/dist/server-message.d.ts:110 |
-| `payload?` | `unknown` | packages/protocol/dist/server-message.d.ts:114 |
-| `subject` | `string` | packages/protocol/dist/server-message.d.ts:112 |
-| `subscriptionId` | `string` | packages/protocol/dist/server-message.d.ts:111 |
-| `type` | `string` | packages/protocol/dist/server-message.d.ts:109 |
-| `v` | `"1"` | packages/protocol/dist/server-message.d.ts:108 |
+| `eventId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `kind` | `"event"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `payload?` | `unknown` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `subject` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `subscriptionId` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `type` | `string` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |
+| `v` | `"1"` | [packages/protocol/dist/server-message.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts) |

@@ -13,7 +13,7 @@ function requestApproval<TDecision>(
    options?): TDecision;
 ```
 
-Defined in: packages/core/dist/channels/durable.d.ts:196
+Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 type CheckpointId = string;
 ```
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:9
+Defined in: [packages/core/dist/contracts/checkpoint-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/checkpoint-store.d.ts)
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 type SkillTrustLevel = "trusted" | "trusted-with-scripts" | "untrusted";
 ```
 
-Defined in: packages/security/dist/supply-chain/types.d.ts:24
+Defined in: [packages/security/dist/supply-chain/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/security/dist/supply-chain/types.d.ts)
 
 **`Stable`**
 

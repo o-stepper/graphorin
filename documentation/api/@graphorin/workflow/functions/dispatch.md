@@ -10,7 +10,7 @@
 function dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: packages/core/dist/channels/dispatch.d.ts:31
+Defined in: [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts)
 
 **`Stable`**
 

@@ -6,7 +6,7 @@
 
 # Interface: WorkflowStepEndEvent\&lt;TState\&gt;
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:25
+Defined in: [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts)
 
 **`Stable`**
 
@@ -20,6 +20,6 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:25
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:28 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:27 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.step.end"` | packages/core/dist/types/workflow-event.d.ts:26 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.step.end"` | [packages/core/dist/types/workflow-event.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts) |

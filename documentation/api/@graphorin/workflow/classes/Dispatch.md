@@ -6,7 +6,7 @@
 
 # Class: Dispatch\&lt;TArgs\&gt;
 
-Defined in: packages/core/dist/channels/dispatch.d.ts:13
+Defined in: [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts)
 
 **`Stable`**
 
@@ -32,7 +32,7 @@ The class is intentionally tiny - the engine inspects only the public
 new Dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: packages/core/dist/channels/dispatch.d.ts:24
+Defined in: [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts)
 
 #### Parameters
 
@@ -49,6 +49,6 @@ Defined in: packages/core/dist/channels/dispatch.d.ts:24
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-__graphorindispatch"></a> `__graphorinDispatch` | `readonly` | `true` | Cross-realm brand (workflow-13): the engine's structural fallback requires this marker so a plain state object that happens to carry `nodeName` + `args` keys is treated as channel WRITES, never silently swallowed as a dispatch. A plain own property (not a symbol) so it survives `structuredClone` across worker boundaries. | packages/core/dist/channels/dispatch.d.ts:21 |
-| <a id="property-args"></a> `args` | `readonly` | `TArgs` | - | packages/core/dist/channels/dispatch.d.ts:23 |
-| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | - | packages/core/dist/channels/dispatch.d.ts:22 |
+| <a id="property-__graphorindispatch"></a> `__graphorinDispatch` | `readonly` | `true` | Cross-realm brand (workflow-13): the engine's structural fallback requires this marker so a plain state object that happens to carry `nodeName` + `args` keys is treated as channel WRITES, never silently swallowed as a dispatch. A plain own property (not a symbol) so it survives `structuredClone` across worker boundaries. | [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts) |
+| <a id="property-args"></a> `args` | `readonly` | `TArgs` | - | [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts) |
+| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | - | [packages/core/dist/channels/dispatch.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/dispatch.d.ts) |

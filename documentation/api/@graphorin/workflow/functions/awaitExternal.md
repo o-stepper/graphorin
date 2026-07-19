@@ -10,7 +10,7 @@
 function awaitExternal<TResume>(name, options?): TResume;
 ```
 
-Defined in: packages/core/dist/channels/durable.d.ts:168
+Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
 **`Stable`**
 

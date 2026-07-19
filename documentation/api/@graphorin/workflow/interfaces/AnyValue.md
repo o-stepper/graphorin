@@ -6,7 +6,7 @@
 
 # Interface: AnyValue\&lt;T\&gt;
 
-Defined in: packages/core/dist/channels/channels.d.ts:41
+Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
 **`Stable`**
 
@@ -23,5 +23,5 @@ semantics within a step).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | `T` | packages/core/dist/channels/channels.d.ts:43 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"any-value"` | packages/core/dist/channels/channels.d.ts:42 |
+| <a id="property-default"></a> `default?` | `readonly` | `T` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"any-value"` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |

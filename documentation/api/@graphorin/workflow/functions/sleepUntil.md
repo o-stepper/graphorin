@@ -10,7 +10,7 @@
 function sleepUntil(at): void;
 ```
 
-Defined in: packages/core/dist/channels/durable.d.ts:95
+Defined in: [packages/core/dist/channels/durable.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts)
 
 **`Stable`**
 

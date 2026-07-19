@@ -6,7 +6,7 @@
 
 # Interface: Stream\&lt;T\&gt;
 
-Defined in: packages/core/dist/channels/channels.d.ts:72
+Defined in: [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts)
 
 **`Stable`**
 
@@ -23,6 +23,6 @@ and for application-defined event streams.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | readonly `T`[] | packages/core/dist/channels/channels.d.ts:75 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"stream"` | packages/core/dist/channels/channels.d.ts:73 |
-| <a id="property-unique"></a> `unique?` | `readonly` | `boolean` | packages/core/dist/channels/channels.d.ts:74 |
+| <a id="property-default"></a> `default?` | `readonly` | readonly `T`[] | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"stream"` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |
+| <a id="property-unique"></a> `unique?` | `readonly` | `boolean` | [packages/core/dist/channels/channels.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts) |

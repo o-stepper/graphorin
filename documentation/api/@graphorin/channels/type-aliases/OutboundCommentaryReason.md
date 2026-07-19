@@ -17,7 +17,7 @@ type OutboundCommentaryReason =
   | "agent.model.fellback-event-signature";
 ```
 
-Defined in: packages/tools/dist/outbound/commentary-patterns.d.ts:46
+Defined in: [packages/tools/dist/outbound/commentary-patterns.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/tools/dist/outbound/commentary-patterns.d.ts)
 
 **`Stable`**
 

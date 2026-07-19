@@ -12,7 +12,7 @@ type PermissionHook = (input) =>
 | Promise<PermissionHookResult>;
 ```
 
-Defined in: packages/tools/dist/executor/types.d.ts:391
+Defined in: [packages/tools/dist/executor/types.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/tools/dist/executor/types.d.ts)
 
 **`Stable`**
 
