@@ -369,6 +369,36 @@ describe('vercelAdapter - AI SDK v7 shapes (PS-6)', () => {
     specificationVersion: 'v2',
   };
 
+  it("v7 stream cut by the output ceiling: finish 'length' mid tool input, no tool-call-end", async () => {
+    // Deep-retest 0.13.1 P1 contract: when the AI SDK stream ends with
+    // finishReason 'length' before the tool call's `tool-call` chunk,
+    // the adapter must surface exactly what happened - start + deltas +
+    // finish('length') and NO synthetic tool-call-end - so the agent
+    // loop can fail the step as 'incomplete-tool-call'.
+    const provider = vercelAdapter(V7_MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [
+          { type: 'tool-input-start', id: 'c8', toolName: 'remember' },
+          { type: 'tool-input-delta', id: 'c8', delta: '{"text":"unfinis' },
+          {
+            type: 'finish',
+            finishReason: 'length',
+            totalUsage: { inputTokens: 9, outputTokens: 8, totalTokens: 17 },
+          },
+        ],
+      }),
+    });
+    const events = await collect(provider.stream(REQ));
+    const types = events.map((e) => e.type);
+    expect(types).toContain('tool-call-start');
+    expect(types).toContain('tool-call-input-delta');
+    expect(types).not.toContain('tool-call-end');
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.finishReason).toBe('length');
+    expect(finish.usage.totalTokens).toBe(17);
+  });
+
   it('streams v7 tool-input-start/tool-input-delta/tool-call (id + input fields)', async () => {
     const provider = vercelAdapter(V7_MODEL, {
       runtimeOverrides: makeOverrides({

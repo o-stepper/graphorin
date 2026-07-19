@@ -103,6 +103,14 @@ export interface PrepareStepOverrides<TDeps = unknown> {
   readonly tools?: ReadonlyArray<AnyTool<TDeps>>;
   readonly toolChoice?: ToolChoice;
   readonly temperature?: number;
+  /**
+   * OUTPUT-token ceiling for the next provider call - not a context
+   * or run budget. A ceiling too small for a tool call's argument
+   * JSON cuts the stream mid-call (`finishReason: 'length'`) and the
+   * run fails with `'incomplete-tool-call'`. Leave headroom for
+   * schema-driven tools with optional fields (256+ tokens is a safe
+   * floor for small ones).
+   */
   readonly maxTokens?: number;
 }
 

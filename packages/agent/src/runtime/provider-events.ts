@@ -10,6 +10,7 @@
 
 import type {
   AgentEvent,
+  FinishReason,
   ModelSpec,
   Provider,
   ProviderError,
@@ -72,6 +73,13 @@ export interface ProviderEventOutcome {
   readonly providerError?: ProviderError;
   readonly usage?: Usage;
   readonly finished?: boolean;
+  /**
+   * Why the provider call ended, carried off the `'finish'` event. The
+   * run loop reads it to fail a step whose stream ended (`'length'`)
+   * with a tool call still streaming its arguments, instead of
+   * completing with the call silently dropped.
+   */
+  readonly finishReason?: FinishReason;
 }
 
 export interface ProviderEventCollector {
@@ -163,7 +171,7 @@ export function handleProviderEvent(
         },
       };
     case 'finish':
-      return { usage: ev.usage, finished: true };
+      return { usage: ev.usage, finished: true, finishReason: ev.finishReason };
     case 'error':
       return { providerError: ev.error };
     default: {

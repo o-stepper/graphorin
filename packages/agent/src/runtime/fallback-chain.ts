@@ -15,6 +15,7 @@
 
 import type {
   AgentEvent,
+  FinishReason,
   Message,
   Provider,
   ProviderError,
@@ -71,6 +72,12 @@ export interface ProviderChainOutcome {
   readonly stepReasoningParts: ReasoningContent[];
   readonly stepUsage: Usage;
   readonly lastModelId: string;
+  /**
+   * Why the successful provider call ended; recorded on the step so
+   * `'length'` (output truncated at the token ceiling) is observable.
+   * Absent when no provider call completed.
+   */
+  readonly finishReason?: FinishReason;
 }
 
 export async function* runProviderFallbackChain<TOutput>(
@@ -92,6 +99,7 @@ export async function* runProviderFallbackChain<TOutput>(
   let lastError: ProviderError | undefined;
   let finalCalls: ToolCall[] = [];
   let stepReasoningParts: ReasoningContent[] = [];
+  let stepFinishReason: FinishReason | undefined;
   // context-engine-06: the request actually sent - rebuilt after an
   // emergency compaction so the retry carries the shrunk buffer
   // even on the structured-output path (which snapshots messages).
@@ -130,6 +138,7 @@ export async function* runProviderFallbackChain<TOutput>(
     };
     let providerError: ProviderError | undefined;
     let providerCallCompleted = false;
+    let providerFinishReason: FinishReason | undefined;
     let providerStepUsage: Usage = zeroUsage();
     try {
       const stream = providerForStep.stream(requestForStep);
@@ -151,6 +160,7 @@ export async function* runProviderFallbackChain<TOutput>(
         if (out.usage !== undefined) {
           providerStepUsage = addUsage(providerStepUsage, out.usage);
         }
+        if (out.finishReason !== undefined) providerFinishReason = out.finishReason;
         if (out.finished === true) providerCallCompleted = true;
       }
     } catch (cause) {
@@ -209,7 +219,51 @@ export async function* runProviderFallbackChain<TOutput>(
       continue;
     }
     if (providerCallCompleted) {
+      // Deep-retest 0.13.1 P1: a stream can finish - typically
+      // `finishReason: 'length'`, the output-token ceiling - while a
+      // tool call's argument JSON is still streaming (a
+      // `tool-call-start` with no `tool-call-end`). The call can never
+      // be dispatched, so completing the run would report success for
+      // a side effect that was never executed. Emit a terminal event
+      // per cut call and fail the run with a typed error instead. No
+      // fallback retry: the next provider would get the same request
+      // and ceiling, so the truncation would recur.
+      const closedIds = new Set(evState.finalCalls.map((call) => call.toolCallId));
+      const unclosedCalls = [...evState.calls.values()].filter(
+        (acc) => !closedIds.has(acc.toolCallId),
+      );
+      if (unclosedCalls.length > 0) {
+        const reason = providerFinishReason ?? 'stop';
+        for (const acc of unclosedCalls) {
+          yield {
+            type: 'tool.call.incomplete',
+            toolCallId: acc.toolCallId,
+            toolName: acc.toolName,
+            finishReason: reason,
+            argsPrefix: acc.argsBuffer,
+          };
+        }
+        accumulateUsage(stepUsage, providerStepUsage);
+        const names = unclosedCalls.map((acc) => acc.toolName).join(', ');
+        const message =
+          `provider stream finished ('${reason}') with ${unclosedCalls.length} ` +
+          `unfinished tool call(s): ${names}. The tool was never executed; raise ` +
+          'the output-token budget (maxTokens) or simplify the tool arguments.';
+        yield { type: 'agent.error', error: { message, code: 'incomplete-tool-call' } };
+        state.status = 'failed';
+        state.error = { message, code: 'incomplete-tool-call' };
+        return {
+          failed: true,
+          modelSucceeded,
+          textBuffer,
+          finalCalls,
+          stepReasoningParts,
+          stepUsage,
+          lastModelId,
+        };
+      }
       modelSucceeded = true;
+      stepFinishReason = providerFinishReason;
       textBuffer = evState.textBuffer;
       finalCalls = evState.finalCalls;
       // W-024: adapters with per-block structure ('reasoning-end'
@@ -246,5 +300,6 @@ export async function* runProviderFallbackChain<TOutput>(
     stepReasoningParts,
     stepUsage,
     lastModelId,
+    ...(stepFinishReason !== undefined ? { finishReason: stepFinishReason } : {}),
   };
 }

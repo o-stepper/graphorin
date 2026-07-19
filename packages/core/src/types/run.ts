@@ -1,3 +1,4 @@
+import type { FinishReason } from '../contracts/provider.js';
 import type { Tracer } from '../contracts/tracer.js';
 import type { HandoffRecord } from './handoff.js';
 import type { Message } from './message.js';
@@ -29,6 +30,13 @@ export interface RunStep {
    * Stable agent id active for this step (changes after a handoff).
    */
   readonly agentId: string;
+  /**
+   * Why the step's provider call ended (`'stop'`, `'tool-calls'`,
+   * `'length'`, ...). `'length'` on a completed run means the step's
+   * text may be truncated at the output-token ceiling. Absent on
+   * states persisted before this field existed.
+   */
+  readonly finishReason?: FinishReason;
   /**
    * The model response this step produced, recorded when the agent runs
    * with `recordProviderResponses: true`. Enables deterministic

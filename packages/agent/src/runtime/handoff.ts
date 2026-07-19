@@ -231,6 +231,7 @@ export interface SubRunSpec {
  * events, never the high-frequency text/reasoning deltas.
  */
 const LIFECYCLE_FORWARD_TYPES: ReadonlySet<string> = new Set([
+  'tool.call.incomplete',
   'tool.execute.start',
   'tool.execute.progress',
   'tool.execute.partial',
