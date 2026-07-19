@@ -32,7 +32,9 @@ jobs:
   install-and-recall:
     name: pnpm 10 consumer install + write / reopen / search
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 15 was enough for the FTS-only scenario; the quickstart promise
+    # test adds a second install + the embedding-model download.
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0

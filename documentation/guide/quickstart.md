@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: A 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings.
+description: A single-file memory-backed agent that streams tokens, persists a fact to local SQLite, and recalls it after a cold reopen - all offline via local embeddings.
 ---
 
 # Quickstart
@@ -15,17 +15,26 @@ pnpm 10 skips `better-sqlite3`'s install script unless it is approved, and the f
 
 A memory-backed agent that:
 
-1. Stores facts in a six-tier memory system on a local SQLite database.
+1. Stores a fact in a six-tier memory system on a local SQLite database.
 2. Streams tokens to your terminal as it answers.
-3. Survives a process restart with all state intact.
+3. Survives a restart: the script closes the store, reopens it cold, and recalls the stored fact.
 
 ## Hello world
 
-One self-contained file. The 20 lines of agent code at the bottom are the
-part you will keep; the `createStubProvider()` above them is a tiny,
-deterministic `Provider` that echoes the last user message - no API keys, no
-network - so the whole thing runs offline. Swap it for a real adapter from
-[Providers](/guide/providers) when you are ready.
+One self-contained file. The agent code at the bottom is the part you will
+keep; the `createStubProvider()` above it is a tiny, deterministic
+`Provider` that echoes the last user message - no API keys, no network - so
+the whole thing runs offline (the first run downloads the small embedding
+model once, after which that is cached too). Swap it for a real adapter
+from [Providers](/guide/providers) when you are ready.
+
+The run does three things: streams the stub's reply, persists one fact
+through the memory API, then reopens the database cold and recalls that
+fact - the same path a process restart takes. The persistence step is your
+code calling the memory API directly, so it happens on every run with any
+provider. The model-driven variant - the model itself deciding to call
+`fact_remember` - rides the same `tools: memory.tools` wiring and is
+inherently probabilistic; see the note under the diagram.
 
 ```ts
 import type { Provider, ProviderEvent, ProviderRequest } from '@graphorin/core';
@@ -104,7 +113,25 @@ for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })
   if (event.type === 'text.delta') process.stdout.write(event.delta);
 }
 
+// Persist a fact - explicit memory-API call, deterministic on every run.
+await memory.semantic.remember(
+  { userId: 'u1' },
+  { text: 'Front squat working set: 5x5 at 100 kg.' },
+);
 await sqlite.close();
+
+// "Restart": a fresh store handle on the same file - nothing rides in RAM.
+const reopened = await createSqliteStore({ path: './assistant.db' });
+await reopened.init();
+const recall = createMemory({
+  store: reopened.memory,
+  embeddings: reopened.embeddings,
+  embedder: createTransformersJsEmbedder(),
+  contextEngine: { compaction: false },
+});
+const hits = await recall.semantic.search({ userId: 'u1' }, 'how heavy are my front squats?');
+console.log(`\nrecalled: ${hits[0]?.record.text ?? 'nothing'}`);
+await reopened.close();
 ```
 
 The runnable [example apps](/guide/examples) ship a fuller version of this same
