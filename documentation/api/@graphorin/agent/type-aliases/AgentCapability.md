@@ -10,7 +10,7 @@
 type AgentCapability = "read-only";
 ```
 
-Defined in: packages/agent/src/types.ts:695
+Defined in: packages/agent/src/types.ts:703
 
 **`Stable`**
 

@@ -24,5 +24,5 @@ ignore the policy. `ttl` maps to Anthropic's extended cache TTL.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-breakpoints"></a> `breakpoints` | `readonly` | `"none"` \| `"auto"` | packages/core/src/contracts/provider.ts:83 |
+| <a id="property-breakpoints"></a> `breakpoints` | `readonly` | `"auto"` \| `"none"` | packages/core/src/contracts/provider.ts:83 |
 | <a id="property-ttl"></a> `ttl?` | `readonly` | `"5m"` \| `"1h"` | packages/core/src/contracts/provider.ts:84 |

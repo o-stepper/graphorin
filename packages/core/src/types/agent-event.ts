@@ -1,3 +1,4 @@
+import type { FinishReason } from '../contracts/provider.js';
 import type { RunError, RunState, RunStatus, RunVerdicts } from './run.js';
 import type { ContentChunk, ToolError } from './tool.js';
 import type { Usage } from './usage.js';
@@ -38,6 +39,7 @@ export type AgentEvent<TOutput = string> =
   | ToolCallStartEvent
   | ToolCallDeltaEvent
   | ToolCallEndEvent
+  | ToolCallIncompleteEvent
   | ToolExecuteStartEvent
   | ToolExecuteProgressEvent
   | ToolExecutePartialEvent
@@ -137,6 +139,28 @@ export interface ToolCallEndEvent {
   readonly type: 'tool.call.end';
   readonly toolCallId: string;
   readonly finalArgs: unknown;
+}
+
+/**
+ * Emitted when the provider stream finished without delivering the
+ * final arguments for a started tool call - typically `finishReason:
+ * 'length'`, the output-token ceiling cutting the call's argument JSON
+ * mid-stream. Terminal for this `toolCallId`: no `tool.call.end` or
+ * `tool.execute.*` events follow, the tool is never executed, and the
+ * run then fails with error code `'incomplete-tool-call'` instead of
+ * completing. Subscribers tracking call lifecycles close their state
+ * off this event.
+ *
+ * @stable
+ */
+export interface ToolCallIncompleteEvent {
+  readonly type: 'tool.call.incomplete';
+  readonly toolCallId: string;
+  readonly toolName: string;
+  /** Why the stream ended; `'length'` means the output-token ceiling. */
+  readonly finishReason: FinishReason;
+  /** The partial argument JSON accumulated before the stream ended. */
+  readonly argsPrefix: string;
 }
 
 /** @stable */

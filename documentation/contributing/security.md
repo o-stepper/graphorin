@@ -76,4 +76,3 @@ Graphorin's security primitives target the following baselines:
 - **Optional storage encryption-at-rest:** SQLCipher v4 via `better-sqlite3-multiple-ciphers`.
 
 Implementation details and rationale are published in the [security guide](https://docs.graphorin.com/guide/security), including its [Known limitations](https://docs.graphorin.com/guide/security#known-limitations) section, and in the `@graphorin/security` package README.
-

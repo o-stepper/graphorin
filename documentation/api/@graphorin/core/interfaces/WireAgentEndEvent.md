@@ -28,5 +28,5 @@ Wire twin of [AgentEndEvent](/api/@graphorin/core/interfaces/AgentEndEvent.md): 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-result"></a> `result` | `readonly` | `Omit`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;, `"state"`\> & \{ `state`: [`WireRunState`](/api/@graphorin/core/type-aliases/WireRunState.md); \} | - | packages/core/src/types/agent-event-wire.ts:60 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | `Omit.runId` | packages/core/src/types/agent-event.ts:322 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | `Omit.type` | packages/core/src/types/agent-event.ts:321 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | `Omit.runId` | packages/core/src/types/agent-event.ts:346 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | `Omit.type` | packages/core/src/types/agent-event.ts:345 |

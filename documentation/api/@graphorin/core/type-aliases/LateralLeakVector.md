@@ -14,7 +14,7 @@ type LateralLeakVector =
   | "protocol-header";
 ```
 
-Defined in: packages/core/src/types/agent-event.ts:534
+Defined in: packages/core/src/types/agent-event.ts:558
 
 **`Stable`**
 

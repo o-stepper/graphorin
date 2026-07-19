@@ -16,6 +16,7 @@ type AgentEvent<TOutput> =
   | ToolCallStartEvent
   | ToolCallDeltaEvent
   | ToolCallEndEvent
+  | ToolCallIncompleteEvent
   | ToolExecuteStartEvent
   | ToolExecuteProgressEvent
   | ToolExecutePartialEvent
@@ -47,7 +48,7 @@ type AgentEvent<TOutput> =
   | AgentErrorEvent;
 ```
 
-Defined in: packages/core/src/types/agent-event.ts:32
+Defined in: packages/core/src/types/agent-event.ts:33
 
 **`Stable`**
 

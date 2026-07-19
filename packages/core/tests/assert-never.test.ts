@@ -44,6 +44,8 @@ function describeAgentEvent(e: AgentEvent): string {
       return e.argsDelta;
     case 'tool.call.end':
       return e.toolCallId;
+    case 'tool.call.incomplete':
+      return e.toolCallId;
     case 'tool.execute.start':
       return e.toolCallId;
     case 'tool.execute.progress':

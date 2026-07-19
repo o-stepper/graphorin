@@ -10,7 +10,7 @@
 function flattenUsageByModel(byModel): readonly ModelUsage[];
 ```
 
-Defined in: packages/core/src/types/run.ts:288
+Defined in: packages/core/src/types/run.ts:296
 
 **`Stable`**
 

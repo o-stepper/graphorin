@@ -113,7 +113,9 @@ if (peerFloorsChanged > 0) {
 }
 console.log('[bump-version] manual follow-ups the script cannot decide for you:');
 console.log(
-  '  - root CHANGELOG.md: write the release section (changesets only writes per-package logs)',
+  '  - root CHANGELOG.md: write the release section (changesets only writes per-package logs),' +
+    ' then re-run node documentation/scripts/sync-root-docs.mjs and commit the synced pages' +
+    ' - enforced by the docs.yml purity gate, so CI fails if forgotten',
 );
 console.log('  - README.md "Latest release" line: refresh the date + highlights text');
 console.log('  - documentation/guide/migration.md: retitle the "-> next (unreleased)" section');

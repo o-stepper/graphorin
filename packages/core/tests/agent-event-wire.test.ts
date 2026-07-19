@@ -63,6 +63,13 @@ const FIXTURES: Record<AgentEvent['type'], AgentEvent> = {
   'tool.call.start': { type: 'tool.call.start', toolCallId: 't', toolName: 'n', args: { q: 1 } },
   'tool.call.delta': { type: 'tool.call.delta', toolCallId: 't', argsDelta: '{' },
   'tool.call.end': { type: 'tool.call.end', toolCallId: 't', finalArgs: { q: 1 } },
+  'tool.call.incomplete': {
+    type: 'tool.call.incomplete',
+    toolCallId: 't',
+    toolName: 'n',
+    finishReason: 'length',
+    argsPrefix: '{"q":',
+  },
   'tool.execute.start': { type: 'tool.execute.start', toolCallId: 't', toolName: 'n' },
   'tool.execute.progress': {
     type: 'tool.execute.progress',

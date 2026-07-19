@@ -331,6 +331,16 @@ When the abort races a suspend, no `awaiting_approval` checkpoint is written fir
 
 The loop consults `stopWhen` (default `isStepCount(50)`) at the top of every step. A run cut by its stop condition mid-task is **not** a clean finish: it ends `status: 'failed'` with `error.code: 'stop-condition'` and the condition's description in the message (plus an `agent.error` event), so a capped run is distinguishable from one that completed naturally. Raise the cap (`stopWhen: isStepCount(n)`) for legitimately long tool loops.
 
+## Truncated tool calls (`finishReason: 'length'`)
+
+`prepareStep`'s `maxTokens` is an **output**-token ceiling on the next provider call. When the ceiling (or the provider's own output limit) cuts the stream while a tool call is still streaming its argument JSON, the call can never be dispatched - and the run must not pretend otherwise. The loop treats a stream that finished with a started-but-unfinalized tool call as a failure:
+
+- a terminal `tool.call.incomplete` event is emitted per cut call (`toolCallId`, `toolName`, `finishReason`, and the accumulated `argsPrefix`) - no `tool.call.end` or `tool.execute.*` events follow for that call;
+- the run ends `status: 'failed'` with `error.code: 'incomplete-tool-call'` (plus an `agent.error` event); the truncated call's token usage is still recorded on the state;
+- there is **no automatic retry**: a fallback provider would receive the same request and ceiling, and re-running a side-effecting step needs an idempotency decision only the caller can make.
+
+Give schema-driven tools output headroom - a small `maxTokens` that comfortably fits a text answer can be too small for a tool call with optional fields (256 tokens is a safe floor for small schemas). A `'length'` finish **without** a pending tool call stays a completed run (the text is simply truncated); it is observable per step as `RunStep.finishReason: 'length'`.
+
 ## Run budget
 
 `agent.run(input, { budget })` enforces a per-run spend ceiling as a **between-step precheck** against the run's accumulated usage. Sub-agent usage counts: handoff and `toTool` children fold their tokens and cost into the parent run's accounting before the next check.

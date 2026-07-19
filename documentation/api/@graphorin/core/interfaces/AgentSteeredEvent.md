@@ -6,7 +6,7 @@
 
 # Interface: AgentSteeredEvent
 
-Defined in: packages/core/src/types/agent-event.ts:338
+Defined in: packages/core/src/types/agent-event.ts:362
 
 **`Stable`**
 
@@ -17,5 +17,5 @@ the next provider call within the current run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:340 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | packages/core/src/types/agent-event.ts:339 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:364 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | packages/core/src/types/agent-event.ts:363 |

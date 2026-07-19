@@ -10,7 +10,7 @@
 type PostCompactionHook = PostCompactionHook;
 ```
 
-Defined in: packages/agent/src/types.ts:115
+Defined in: packages/agent/src/types.ts:123
 
 **`Stable`**
 

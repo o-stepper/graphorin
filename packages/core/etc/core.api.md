@@ -91,7 +91,7 @@ export interface AgentEvaluatorIterationEvent {
 // Warning: (ae-forgotten-export) The symbol "SubagentEvent" needs to be exported by the entry point index.d.ts
 //
 // @public
-export type AgentEvent<TOutput = string> = AgentStartEvent | StepStartEvent | TextDeltaEvent | TextCompleteEvent | ReasoningDeltaEvent | ToolCallStartEvent | ToolCallDeltaEvent | ToolCallEndEvent | ToolExecuteStartEvent | ToolExecuteProgressEvent | ToolExecutePartialEvent | ToolExecuteEndEvent | ToolExecuteErrorEvent | ToolApprovalRequestedEvent | ToolApprovalGrantedEvent | ToolApprovalDeniedEvent | ContextCompactedEvent | HandoffEvent | AgentSteeredEvent | AgentFollowUpQueuedEvent | AgentCancellingEvent | AgentModelFellbackEvent | AgentFanOutSpawnedEvent | AgentFanOutMergedEvent | AgentEvaluatorIterationEvent | AgentEvaluatorConvergedEvent | AgentProgressWrittenEvent | AgentProgressReadEvent | AgentLateralLeakDetectedEvent | FileGeneratedEvent | SourceCitedEvent | StepEndEvent | GuardrailTrippedEvent | VerifierResultEvent | SubagentEvent | AgentEndEvent<TOutput> | AgentErrorEvent;
+export type AgentEvent<TOutput = string> = AgentStartEvent | StepStartEvent | TextDeltaEvent | TextCompleteEvent | ReasoningDeltaEvent | ToolCallStartEvent | ToolCallDeltaEvent | ToolCallEndEvent | ToolCallIncompleteEvent | ToolExecuteStartEvent | ToolExecuteProgressEvent | ToolExecutePartialEvent | ToolExecuteEndEvent | ToolExecuteErrorEvent | ToolApprovalRequestedEvent | ToolApprovalGrantedEvent | ToolApprovalDeniedEvent | ContextCompactedEvent | HandoffEvent | AgentSteeredEvent | AgentFollowUpQueuedEvent | AgentCancellingEvent | AgentModelFellbackEvent | AgentFanOutSpawnedEvent | AgentFanOutMergedEvent | AgentEvaluatorIterationEvent | AgentEvaluatorConvergedEvent | AgentProgressWrittenEvent | AgentProgressReadEvent | AgentLateralLeakDetectedEvent | FileGeneratedEvent | SourceCitedEvent | StepEndEvent | GuardrailTrippedEvent | VerifierResultEvent | SubagentEvent | AgentEndEvent<TOutput> | AgentErrorEvent;
 
 // @public
 export interface AgentFanOutMergedEvent {
@@ -1958,6 +1958,7 @@ export interface RunStep {
     readonly agentId: string;
     // (undocumented)
     readonly endedAt?: string;
+    readonly finishReason?: FinishReason;
     readonly providerResponse?: RunStepProviderResponse;
     // (undocumented)
     readonly startedAt: string;
@@ -2608,6 +2609,18 @@ export interface ToolCallEndEvent {
     readonly toolCallId: string;
     // (undocumented)
     readonly type: 'tool.call.end';
+}
+
+// @public
+export interface ToolCallIncompleteEvent {
+    readonly argsPrefix: string;
+    readonly finishReason: FinishReason;
+    // (undocumented)
+    readonly toolCallId: string;
+    // (undocumented)
+    readonly toolName: string;
+    // (undocumented)
+    readonly type: 'tool.call.incomplete';
 }
 
 // @public (undocumented)

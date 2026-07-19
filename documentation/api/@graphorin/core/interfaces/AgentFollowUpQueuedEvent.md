@@ -6,7 +6,7 @@
 
 # Interface: AgentFollowUpQueuedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:349
+Defined in: packages/core/src/types/agent-event.ts:373
 
 **`Stable`**
 
@@ -17,5 +17,5 @@ after the current turn completes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:351 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | packages/core/src/types/agent-event.ts:350 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:375 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.followup.queued"` | packages/core/src/types/agent-event.ts:374 |

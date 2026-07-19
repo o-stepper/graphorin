@@ -189,4 +189,3 @@ that the role described above misrepresents how Graphorin uses it,
 please [open a GitHub Issue](https://github.com/o-stepper/graphorin/issues)
 or email the project maintainer at <step.oleksiy@gmail.com> if the issue
 is security-sensitive.
-

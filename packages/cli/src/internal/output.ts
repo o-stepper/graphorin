@@ -126,6 +126,63 @@ export function statusMarker(status: 'ok' | 'warn' | 'fail' | 'skip' | 'info'): 
 }
 
 /**
+ * Characters safe to leave unquoted in a copy/paste shell hint. Keeps
+ * ordinary absolute paths pretty; anything else (spaces, quotes, `$`,
+ * glob characters) gets quoted. On Windows the backslash is a path
+ * separator, not an escape - every absolute path carries it, so it
+ * belongs in the safe set there.
+ */
+const SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^]+$/;
+const WIN_SHELL_SAFE_PATH = /^[A-Za-z0-9_\-./:@%+=,~^\\]+$/;
+
+/**
+ * Quote a filesystem path for a copy/paste-able shell hint, so
+ * `graphorin migrate --config <path>` survives paths with spaces or
+ * apostrophes - the unquoted hint `graphorin init` used to print
+ * truncated at the first space when pasted literally. Paths made of
+ * safe characters pass through untouched. Quoting is per platform
+ * family: POSIX shells get single quotes with embedded single quotes
+ * escaped as `'\''` (a backslash is literal inside POSIX single
+ * quotes); Windows gets double quotes (the form both cmd and
+ * PowerShell accept - single quotes are literal characters to cmd)
+ * with the MSVCRT argv rules applied: any run of backslashes
+ * immediately before a double quote or the closing quote is doubled,
+ * so a trailing path separator cannot swallow the closing quote.
+ *
+ * The `platform` parameter exists as a test seam (the win32 branch is
+ * exercised from every OS); production callers use the default.
+ *
+ * @internal
+ */
+export function shellQuotePath(path: string, platform: NodeJS.Platform = process.platform): string {
+  if (platform === 'win32') {
+    if (path.length > 0 && WIN_SHELL_SAFE_PATH.test(path)) return path;
+    // Single linear scan instead of the obvious backslash-run regexes,
+    // which backtrack polynomially on long runs (CodeQL
+    // js/polynomial-redos): backslashes double before an embedded
+    // quote (which itself escapes) and at the end of the string.
+    let escaped = '';
+    let backslashes = 0;
+    for (const ch of path) {
+      if (ch === '\\') {
+        backslashes += 1;
+        continue;
+      }
+      if (ch === '"') {
+        escaped += `${'\\'.repeat(backslashes * 2 + 1)}"`;
+      } else {
+        escaped += `${'\\'.repeat(backslashes)}${ch}`;
+      }
+      backslashes = 0;
+    }
+    escaped += '\\'.repeat(backslashes * 2);
+    return `"${escaped}"`;
+  }
+  if (path.length > 0 && SHELL_SAFE_PATH.test(path)) return path;
+  return `'${path.replace(/'/g, `'\\''`)}'`;
+}
+
+/**
  * Standardised `[graphorin/cli] <message>` prefix every human-format
  * line carries. Centralised so every command renders the same brand.
  *

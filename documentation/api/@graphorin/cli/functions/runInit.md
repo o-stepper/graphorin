@@ -10,7 +10,7 @@
 function runInit(options?): Promise<InitCommandResult>;
 ```
 
-Defined in: packages/cli/src/commands/init.ts:71
+Defined in: packages/cli/src/commands/init.ts:72
 
 **`Stable`**
 

@@ -813,6 +813,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           stepNumber,
         );
         if (chain.failed) {
+          // An 'incomplete-tool-call' failure carries the truncated
+          // call's real usage (the finish event arrived) - record it on
+          // the state so the spent tokens are not lost. Deliberately
+          // NOT fed to `usageAcc`: budgets guard future calls and the
+          // run is already finishing.
+          if (chain.stepUsage.totalTokens > 0) {
+            addModelUsage(state, chain.lastModelId, chain.stepUsage);
+            accumulateUsage(state.usage, chain.stepUsage);
+          }
           return yield* finishRun(state, finalSnapshot);
         }
         const { modelSucceeded, textBuffer, finalCalls, stepReasoningParts } = chain;
@@ -872,6 +881,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           usage: stepUsage,
           toolCalls: [],
           agentId: state.currentAgentId,
+          // Deep-retest 0.13.1: surface why the provider call ended so
+          // a 'length'-truncated text step is observable on the state.
+          ...(chain.finishReason !== undefined ? { finishReason: chain.finishReason } : {}),
           // C3: journal the RAW model response (pre-leak-block text) so
           // createReplayProvider(state) can re-drive the run offline.
           ...(config.recordProviderResponses === true

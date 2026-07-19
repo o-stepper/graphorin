@@ -6,7 +6,7 @@
 
 # Interface: TodoItem
 
-Defined in: packages/core/src/types/run.ts:273
+Defined in: packages/core/src/types/run.ts:281
 
 **`Stable`**
 
@@ -18,6 +18,6 @@ status-flip mutation target an item without rewriting the list.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:275 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:274 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:276 |
+| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:283 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:282 |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:284 |

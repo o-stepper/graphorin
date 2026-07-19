@@ -6,7 +6,7 @@
 
 # Interface: InboundTaintSeed
 
-Defined in: packages/agent/src/types.ts:557
+Defined in: packages/agent/src/types.ts:565
 
 **`Stable`**
 
@@ -23,6 +23,6 @@ it.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-sensitive"></a> `sensitive?` | `readonly` | `boolean` | Also arm the sensitive leg (rare; widen-only). | packages/agent/src/types.ts:569 |
-| <a id="property-sourcekind"></a> `sourceKind?` | `readonly` | `string` | Descriptive source kind for audit trails, e.g. `'channel:telegram'`. Default `'channel-inbound'`. | packages/agent/src/types.ts:567 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | The untrusted inbound text. Recorded as verbatim spans so a later sink call whose args copy the channel text trips the probe. | packages/agent/src/types.ts:562 |
+| <a id="property-sensitive"></a> `sensitive?` | `readonly` | `boolean` | Also arm the sensitive leg (rare; widen-only). | packages/agent/src/types.ts:577 |
+| <a id="property-sourcekind"></a> `sourceKind?` | `readonly` | `string` | Descriptive source kind for audit trails, e.g. `'channel:telegram'`. Default `'channel-inbound'`. | packages/agent/src/types.ts:575 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | The untrusted inbound text. Recorded as verbatim spans so a later sink call whose args copy the channel text trips the probe. | packages/agent/src/types.ts:570 |

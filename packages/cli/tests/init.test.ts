@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { runInit } from '../src/commands/init.js';
+import { shellQuotePath } from '../src/internal/output.js';
 
 async function fixtureDir(): Promise<string> {
   return await mkdtemp(join(tmpdir(), 'graphorin-cli-init-'));
@@ -247,5 +248,88 @@ describe('P1-4 (deep retest 2026-07-19) - the consent tier is actionable, not de
     const jsonBody = await readFile(json.configPath, 'utf8');
     expect(() => JSON.parse(jsonBody)).not.toThrow();
     expect(jsonLines.join('\n')).toContain('fail-closed default');
+  });
+});
+
+describe('deep-retest 0.13.1 P3 - copy/paste-safe next-step hints', () => {
+  it('quotes the config path in migrate/start hints when the directory has a space + apostrophe', async () => {
+    const base = await fixtureDir();
+    const dir = join(base, "it's a space dir");
+    const lines: string[] = [];
+    const result = await runInit({
+      cwd: dir,
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      print: (line) => {
+        lines.push(line);
+      },
+    });
+    const joined = lines.join('\n');
+    // Platform-family quoting: POSIX single quotes, Windows double
+    // quotes. Either way the spaced path MUST come out quoted.
+    const quoted = shellQuotePath(result.configPath);
+    expect(quoted).not.toBe(result.configPath);
+    expect(joined).toContain(`graphorin migrate --config ${quoted}`);
+    expect(joined).toContain(`graphorin start --config ${quoted}`);
+    // The raw, unquoted path must not appear inside a command hint - a
+    // literal paste would truncate at the first space.
+    expect(joined).not.toContain(`--config ${result.configPath}\``);
+  });
+
+  it('leaves ordinary absolute paths unquoted (pretty hints stay pretty)', async () => {
+    const dir = await fixtureDir();
+    const lines: string[] = [];
+    const result = await runInit({
+      cwd: dir,
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      print: (line) => {
+        lines.push(line);
+      },
+    });
+    expect(lines.join('\n')).toContain(`graphorin migrate --config ${result.configPath}\``);
+  });
+});
+
+describe('shellQuotePath', () => {
+  // The explicit platform argument is the test seam: both branches run
+  // on every OS, so the linux coverage leg exercises the win32 scan too.
+  it('POSIX: passes safe paths through and single-quotes the rest', () => {
+    expect(shellQuotePath('/opt/graphorin/graphorin.config.ts', 'linux')).toBe(
+      '/opt/graphorin/graphorin.config.ts',
+    );
+    expect(shellQuotePath('/tmp/space dir/config.json', 'linux')).toBe(
+      "'/tmp/space dir/config.json'",
+    );
+    expect(shellQuotePath("/tmp/it's here/config.json", 'darwin')).toBe(
+      "'/tmp/it'\\''s here/config.json'",
+    );
+    expect(shellQuotePath('', 'linux')).toBe("''");
+  });
+
+  it('Windows: backslash paths stay unquoted; spaced paths get double quotes', () => {
+    expect(shellQuotePath('C:\\Users\\dev\\graphorin.config.ts', 'win32')).toBe(
+      'C:\\Users\\dev\\graphorin.config.ts',
+    );
+    expect(shellQuotePath('C:\\space dir\\config.json', 'win32')).toBe(
+      '"C:\\space dir\\config.json"',
+    );
+    expect(shellQuotePath("C:\\it's here\\config.json", 'win32')).toBe(
+      '"C:\\it\'s here\\config.json"',
+    );
+    expect(shellQuotePath('', 'win32')).toBe('""');
+    // MSVCRT argv rules: a trailing backslash run doubles so it cannot
+    // swallow the closing quote, and backslashes before an embedded
+    // quote double ahead of the escaped quote.
+    expect(shellQuotePath('C:\\space dir\\', 'win32')).toBe('"C:\\space dir\\\\"');
+    expect(shellQuotePath('C:\\we"ird', 'win32')).toBe('"C:\\we\\"ird"');
+    expect(shellQuotePath('C:\\x\\"y z', 'win32')).toBe('"C:\\x\\\\\\"y z"');
+  });
+
+  it('defaults to the ambient platform', () => {
+    const ambient = shellQuotePath('/plain/path.json');
+    expect(ambient).toBe(shellQuotePath('/plain/path.json', process.platform));
   });
 });

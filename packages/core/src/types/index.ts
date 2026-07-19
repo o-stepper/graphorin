@@ -37,6 +37,7 @@ export type {
   ToolApprovalRequestedEvent,
   ToolCallDeltaEvent,
   ToolCallEndEvent,
+  ToolCallIncompleteEvent,
   ToolCallStartEvent,
   ToolExecuteEndEvent,
   ToolExecuteErrorEvent,

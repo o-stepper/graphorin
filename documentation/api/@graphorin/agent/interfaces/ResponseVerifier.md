@@ -6,7 +6,7 @@
 
 # Interface: ResponseVerifier
 
-Defined in: packages/agent/src/types.ts:496
+Defined in: packages/agent/src/types.ts:504
 
 **`Stable`**
 
@@ -23,7 +23,7 @@ take down a run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:497 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:505 |
 
 ## Methods
 
@@ -35,7 +35,7 @@ verify(ctx):
 | Promise<VerifierResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:498
+Defined in: packages/agent/src/types.ts:506
 
 #### Parameters
 

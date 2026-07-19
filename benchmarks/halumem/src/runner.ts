@@ -536,13 +536,17 @@ export async function main(): Promise<void> {
   }
   // P2-3 (deep retest 2026-07-19): a stub run's pass/fail counts are
   // plumbing-only noise, and `passed=0` reads like a failed quality
-  // gate to anyone skimming CI logs. Stub summaries say `not-scored`;
+  // gate to anyone skimming CI logs. Stub summaries lead with an
+  // explicit UNSCORED status (deep retest 0.13.1: `scored=not-scored`
+  // buried mid-line still read as a green quality result) so nobody
+  // mistakes an infrastructure smoke for a memory-quality proof;
   // real-provider runs keep the honest counts (and gate on them).
   if (label.startsWith('stub')) {
     console.log(
-      `[benchmark-halumem] stage=${args.stage} conflictPipeline=${conflictPipeline} ` +
-        `cases=${report.summary.total} scored=not-scored (stub run is plumbing-only; ` +
-        'real-provider runs gate on scores)',
+      `[benchmark-halumem] status=UNSCORED stage=${args.stage} ` +
+        `conflictPipeline=${conflictPipeline} cases=${report.summary.total} ` +
+        '(infrastructure smoke only - no quality claim; scored runs need a ' +
+        'real provider + dataset)',
     );
   } else {
     console.log(

@@ -6,7 +6,7 @@
 
 # Interface: VerifierResultEvent
 
-Defined in: packages/core/src/types/agent-event.ts:311
+Defined in: packages/core/src/types/agent-event.ts:335
 
 **`Stable`**
 
@@ -18,8 +18,8 @@ also appended to the transcript so the model can address it.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-feedback"></a> `feedback?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:315 |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:314 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:316 |
-| <a id="property-type"></a> `type` | `readonly` | `"verifier.result"` | packages/core/src/types/agent-event.ts:312 |
-| <a id="property-verifierid"></a> `verifierId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:313 |
+| <a id="property-feedback"></a> `feedback?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:339 |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:338 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:340 |
+| <a id="property-type"></a> `type` | `readonly` | `"verifier.result"` | packages/core/src/types/agent-event.ts:336 |
+| <a id="property-verifierid"></a> `verifierId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:337 |
