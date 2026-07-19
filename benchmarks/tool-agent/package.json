@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-tool-agent",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "private": true,
   "description": "Hermetic tool-use / harness reliability benchmark for the Graphorin framework. Drives the real createAgent(...) loop with a deterministic offline stub provider over a small retail multi-tool task set, scores each run with the trajectory scorers from @graphorin/evals (tool selection, argument validity, redundant calls, error recovery, goal-state), and reports pass^1 / pass^k against a committed baseline so a harness regression fails CI. Fully offline, no model, no network. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

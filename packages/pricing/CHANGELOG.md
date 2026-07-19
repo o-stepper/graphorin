@@ -1,5 +1,16 @@
 # @graphorin/pricing
 
+## 0.13.1
+
+### Patch Changes
+
+- [#209](https://github.com/o-stepper/graphorin/pull/209) [`7991726`](https://github.com/o-stepper/graphorin/commit/7991726fbd06426bdfb1e9c1a5c1e4bd5466d0f4) Thanks [@o-stepper](https://github.com/o-stepper)! - GPT-5.6 pricing is now complete against the official OpenAI price page: the three snapshot entries carry the explicit `cacheWriteUsdPerToken` premium (1.25x input: $1.25 / $3.125 / $6.25 per 1M for luna / terra / sol), so cache-write tokens are no longer under-billed 20% via the input-rate fallback, and a fourth entry prices the bare `gpt-5.6` alias at sol rates (the API routes `gpt-5.6` to `gpt-5.6-sol`), so `lookupPrice`/`calculateCost`/the CLI no longer miss on the alias. A fixture test pins `calculateCost` to the official four-leg formula (base input + cached read + cache write + output).
+
+- [#209](https://github.com/o-stepper/graphorin/pull/209) [`7991726`](https://github.com/o-stepper/graphorin/commit/7991726fbd06426bdfb1e9c1a5c1e4bd5466d0f4) Thanks [@o-stepper](https://github.com/o-stepper)! - Public TSDoc no longer carries internal audit/work-item ticket ids ("deep retest P1-3", "W-135", wave letters, finding families): roughly 1100 docblock sites across 28 packages were rewritten to describe the behaviour itself, with every technical statement preserved (decision-record references like ADR-x/DEC-x stay). Two runtime strings also dropped their ticket ids: the tools executor's approval-rewrite refusal message and the server's secret-resolution hint. A new `check-api-wording` gate scans the generated API reference and fails CI if ticket vocabulary ever leaks back in.
+
+- Updated dependencies [[`7991726`](https://github.com/o-stepper/graphorin/commit/7991726fbd06426bdfb1e9c1a5c1e4bd5466d0f4)]:
+  - @graphorin/core@0.13.1
+
 ## 0.13.0
 
 ### Patch Changes

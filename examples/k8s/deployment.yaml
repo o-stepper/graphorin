@@ -6,7 +6,7 @@
 #
 # The template assumes:
 #   - the operator built + pushed the image from `examples/docker/Dockerfile`
-#     and tagged it `ghcr.io/<org>/graphorin:0.13.0`
+#     and tagged it `ghcr.io/<org>/graphorin:0.13.1`
 #   - a Secret `graphorin-secrets` exists in the same namespace with
 #     keys `pepper`, `db-passphrase`, `audit-passphrase`
 #   - a PVC `graphorin-data` exists for the SQLite store
@@ -20,7 +20,7 @@ metadata:
   name: graphorin-config
   labels:
     app.kubernetes.io/name: graphorin
-    app.kubernetes.io/version: "0.13.0"
+    app.kubernetes.io/version: "0.13.1"
 data:
   config.json: |
     {
@@ -63,7 +63,7 @@ metadata:
   name: graphorin
   labels:
     app.kubernetes.io/name: graphorin
-    app.kubernetes.io/version: "0.13.0"
+    app.kubernetes.io/version: "0.13.1"
 spec:
   # SQLite is single-writer: do NOT raise replicas above 1. `Recreate`
   # (not RollingUpdate) guarantees the old pod releases the RWO volume
@@ -78,7 +78,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: graphorin
-        app.kubernetes.io/version: "0.13.0"
+        app.kubernetes.io/version: "0.13.1"
     spec:
       automountServiceAccountToken: false
       securityContext:
@@ -90,7 +90,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: graphorin
-          image: ghcr.io/o-stepper/graphorin:0.13.0
+          image: ghcr.io/o-stepper/graphorin:0.13.1
           imagePullPolicy: IfNotPresent
           # `--config` is the only way the CLI selects a config file; there is
           # no GRAPHORIN_CONFIG env var. Note the standalone daemon serves the

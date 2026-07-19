@@ -42,7 +42,7 @@ pnpm --filter ./examples/local-stack-cli dev
 Expected first-run banner:
 
 ```
-graphorin v0.13.0 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.13.1 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
 > hello
 …streamed reply from your local Ollama daemon…
 > Ctrl+C
@@ -150,7 +150,7 @@ The only network calls this example makes are to the configured Ollama daemon (d
 ```bash
 GRAPHORIN_OFFLINE=1 pnpm --filter ./examples/local-stack-cli dev
 # When Ollama is running:
-graphorin v0.13.0 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. ...
+graphorin v0.13.1 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. ...
 
 # When Ollama is NOT running:
 [graphorin/example-local-stack-cli] Ollama daemon is not reachable at 'http://127.0.0.1:11434'. Start it with `ollama serve` (and `ollama pull qwen2.5:7b-instruct-q4_K_M && ollama pull nomic-embed-text`) - or unset GRAPHORIN_OFFLINE to surface the underlying network error.
@@ -251,4 +251,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.13.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
