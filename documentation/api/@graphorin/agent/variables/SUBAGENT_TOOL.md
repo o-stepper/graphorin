@@ -12,7 +12,7 @@ const SUBAGENT_TOOL: unique symbol;
 
 Defined in: packages/agent/src/runtime/agent-to-tool.ts:79
 
-W-001: well-known marker on every `toTool()` tool object. The
+Well-known marker on every `toTool()` tool object. The
 graphorin tool-call walk detects it and executes the sub-agent
 INLINE (through the same seam as a handoff) so a child suspending on
 `awaiting_approval` parks on the parent instead of throwing from the

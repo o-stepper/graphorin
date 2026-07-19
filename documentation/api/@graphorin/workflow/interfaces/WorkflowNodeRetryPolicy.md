@@ -10,7 +10,7 @@ Defined in: packages/workflow/src/types.ts:192
 
 **`Stable`**
 
-Bounded retry policy for a workflow node (D1 / workflow-03).
+Bounded retry policy for a workflow node.
 
 ## Properties
 

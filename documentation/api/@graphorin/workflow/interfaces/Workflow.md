@@ -6,7 +6,7 @@
 
 # Interface: Workflow\&lt;TState, TInput\&gt;
 
-Defined in: packages/workflow/src/types.ts:431
+Defined in: packages/workflow/src/types.ts:430
 
 **`Stable`**
 
@@ -23,8 +23,8 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:435 |
-| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:436 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:434 |
+| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:435 |
 
 ## Methods
 
@@ -38,9 +38,9 @@ approve(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:478
+Defined in: packages/workflow/src/types.ts:477
 
-Resolve a named persisted approval (D1) - sugar over
+Resolve a named persisted approval - sugar over
 [resolveAwakeable](/api/@graphorin/workflow/interfaces/Workflow.md#resolveawakeable) for `requestApproval(name)` suspensions.
 
 #### Parameters
@@ -64,10 +64,10 @@ Resolve a named persisted approval (D1) - sugar over
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/types.ts:493
+Defined in: packages/workflow/src/types.ts:492
 
 Delete every checkpoint and pending write of `threadId` across all
-namespaces (W-005) - the operator lever for per-thread hygiene and
+namespaces - the operator lever for per-thread hygiene and
 targeted erasure requests. Idempotent: deleting an unknown thread
 is a no-op. Deleting a merely-suspended thread (pending approval /
 timer / awakeable) destroys its resume state - the caller decides.
@@ -90,7 +90,7 @@ timer / awakeable) destroys its resume state - the caller decides.
 execute(input, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:437
+Defined in: packages/workflow/src/types.ts:436
 
 #### Parameters
 
@@ -116,10 +116,10 @@ fork(
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:502
+Defined in: packages/workflow/src/types.ts:501
 
 Clone `threadId`'s timeline at `fromCheckpointId` into a fresh
-thread (the original stays untouched). E2: `opts.patch` merges
+thread (the original stays untouched). `opts.patch` merges
 channel-level values into the forked root's state (branch here,
 but with these corrected values) - keys must name declared
 channels, and the merged state re-runs the JSON-safety guard.
@@ -148,7 +148,7 @@ channels, and the merged state re-runs the JSON-safety guard.
 getState(threadId): Promise<WorkflowState<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:484
+Defined in: packages/workflow/src/types.ts:483
 
 #### Parameters
 
@@ -168,7 +168,7 @@ Defined in: packages/workflow/src/types.ts:484
 listCheckpoints(threadId): Promise<readonly Checkpoint[]>;
 ```
 
-Defined in: packages/workflow/src/types.ts:485
+Defined in: packages/workflow/src/types.ts:484
 
 #### Parameters
 
@@ -192,9 +192,9 @@ resolveAwakeable(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:468
+Defined in: packages/workflow/src/types.ts:467
 
-Resolve a named awakeable (durable promise, D1): the suspended
+Resolve a named awakeable (durable promise): the suspended
 `awaitExternal(name)` call returns `value` and the thread resumes.
 Fails with `pause-not-found` when no pending pause carries the name.
 
@@ -222,7 +222,7 @@ resume(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:438
+Defined in: packages/workflow/src/types.ts:437
 
 #### Parameters
 
@@ -244,11 +244,11 @@ Defined in: packages/workflow/src/types.ts:438
 retry(threadId, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:448
+Defined in: packages/workflow/src/types.ts:447
 
-Restart a `'failed'` thread from its last failure checkpoint
-(WF-3/WF-6): successful sibling tasks of the failed step replay
-from their persisted pending writes; only the failed work re-runs.
+Restart a `'failed'` thread from its last failure checkpoint:
+successful sibling tasks of the failed step replay from their
+persisted pending writes; only the failed work re-runs.
 
 #### Parameters
 
@@ -272,9 +272,9 @@ tick(threadId, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:456
+Defined in: packages/workflow/src/types.ts:455
 
-Fire due durable timers (D1). Scans the thread's pending pauses for
+Fire due durable timers. Scans the thread's pending pauses for
 `sleepUntil` records whose `wakeAt` has passed; when one is due the
 thread resumes (draining the resulting events internally). Returns
 whether a timer fired and the next earliest wake-at (epoch ms) still

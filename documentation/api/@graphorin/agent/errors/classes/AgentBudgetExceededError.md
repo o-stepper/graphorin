@@ -11,7 +11,7 @@ Defined in: packages/agent/src/errors/index.ts:316
 **`Stable`**
 
 Thrown when a run crosses its `RunBudget` ceiling under
-`onExceed: 'throw'` (C5). The run's promise REJECTS with this error
+`onExceed: 'throw'`. The run's promise REJECTS with this error
 after an `agent.error` event; graceful finalization is skipped. The
 default `onExceed: 'stop'` never throws - it resolves the run as
 `status: 'failed'` with `error.code: 'budget-exceeded'` instead.

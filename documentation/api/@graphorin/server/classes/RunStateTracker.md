@@ -31,7 +31,7 @@ Defined in: packages/server/src/runtime/run-state.ts:205
 | ------ | ------ | ------ |
 | `options` | \{ `now?`: () => `number`; `onTerminal?`: (`info`) => `void`; \} | - |
 | `options.now?` | () => `number` | - |
-| `options.onTerminal?` | (`info`) => `void` | IP-15: invoked exactly once per run, the first time it settles into a terminal state. Used to drive the run-count + duration metrics. Never throws into the tracker - wrap your handler if it might. |
+| `options.onTerminal?` | (`info`) => `void` | Invoked exactly once per run, the first time it settles into a terminal state. Used to drive the run-count + duration metrics. Never throws into the tracker - wrap your handler if it might. |
 
 #### Returns
 
@@ -210,7 +210,7 @@ registerSuspended(
 
 Defined in: packages/server/src/runtime/run-state.ts:372
 
-C3: register an EXTERNALLY-suspended run (e.g. a proactive fire
+Register an EXTERNALLY-suspended run (e.g. a proactive fire
 that ran in-process, outside the REST surface) so the messenger's
 `POST /runs/:runId/resume` can find and resume it. Declares the
 record when unknown; no activity events (the run never "started"
@@ -257,7 +257,7 @@ setActivityListener(listener): void;
 
 Defined in: packages/server/src/runtime/run-state.ts:229
 
-A2 (item 7): register the server-side activity listener. The
+Register the server-side activity listener. The
 tracker is the single choke point every REST/WS run passes
 through, so this is where the server bridges "a run started /
 settled" into `scheduler.recordActivity()` (idle debounce) and
@@ -357,7 +357,7 @@ suspend(runId, state): void;
 
 Defined in: packages/server/src/runtime/run-state.ts:356
 
-C3/W-119: park a run whose agent suspended on durable HITL. The
+Park a run whose agent suspended on durable HITL. The
 tracker retains the resumable `RunState` (opaque) so the REST
 resume endpoint can re-enter the agent loop in-process. Emits the
 `run-end` activity (active work stopped) but NOT the terminal
@@ -384,7 +384,7 @@ suspendedStateOf(runId): unknown;
 
 Defined in: packages/server/src/runtime/run-state.ts:388
 
-Peek the retained suspended state (C3). `undefined` when none.
+Peek the retained suspended state. `undefined` when none.
 
 #### Parameters
 

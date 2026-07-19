@@ -10,7 +10,7 @@
 const BUNDLED_SNAPSHOT: PricingSnapshot;
 ```
 
-Defined in: pricing/src/snapshot/bundled.ts:321
+Defined in: pricing/src/snapshot/bundled.ts:341
 
 **`Stable`**
 

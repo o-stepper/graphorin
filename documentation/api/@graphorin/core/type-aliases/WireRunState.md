@@ -20,7 +20,7 @@ Defined in: packages/core/src/utils/binary-json.ts:153
 
 JSON-safe twin of [RunState](/api/@graphorin/core/interfaces/RunState.md): `messages`, every
 `steps[].toolCalls[].outcome.contentParts`, and each parked
-`pendingSubRuns[].state` (recursively, W-001) are projected through
+`pendingSubRuns[].state` (recursively) are projected through
 the binary codec. Everything else is structurally identical.
 
 `pendingApprovals[].args` and `ToolResult.output` are model-produced

@@ -16,7 +16,7 @@ Defined in: src/reranker.ts:315
 
 Parse the model's reply into a non-negative integer score.
 
-PS-14 contract: ONLY a bare integer occupying the whole (trimmed)
+The contract: ONLY a bare integer occupying the whole (trimmed)
 reply is accepted (`/^-?\d+$/`) - `'7'`, `'7\n'`, `' 7 '`. Every
 verbose form (`'Score: 7'`, `'7/10'`, prose around a number) returns
 `null` and the reranker substitutes the fallback score. This is a

@@ -21,6 +21,6 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:96
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/store-sqlite/src/consolidator-store.ts:97 |
 | <a id="property-messageids"></a> `messageIds` | `readonly` | readonly `string`[] | - | packages/store-sqlite/src/consolidator-store.ts:100 |
 | <a id="property-nextretryat"></a> `nextRetryAt` | `readonly` | `number` \| `null` | - | packages/store-sqlite/src/consolidator-store.ts:104 |
-| <a id="property-phase"></a> `phase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | Phase that failed (MCON-10); `null` ⇒ legacy row. | packages/store-sqlite/src/consolidator-store.ts:107 |
+| <a id="property-phase"></a> `phase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | Phase that failed; `null` ⇒ legacy row. | packages/store-sqlite/src/consolidator-store.ts:107 |
 | <a id="property-retrycount"></a> `retryCount` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:105 |
 | <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/store-sqlite/src/consolidator-store.ts:99 |

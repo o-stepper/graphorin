@@ -14,7 +14,7 @@ Defined in: packages/server/src/runtime/retention.ts:186
 
 **`Stable`**
 
-W-010: schedule the periodic retention sweep. Same lifecycle shape
+Schedule the periodic retention sweep. Same lifecycle shape
 as `scheduleRunPruning`: `unref`-ed `setInterval` + a stop function.
 The FIRST sweep runs immediately on scheduling - a server that is
 restarted more often than `intervalMs` would otherwise never prune

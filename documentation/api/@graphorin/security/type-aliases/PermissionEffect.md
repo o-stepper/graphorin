@@ -14,7 +14,7 @@ Defined in: packages/security/src/policy/tool-argument-policy.ts:70
 
 **`Stable`**
 
-Four-value permission vocabulary (E1 / item 11):
+Four-value permission vocabulary:
 
 - `'allow'` - the call may run.
 - `'deny'`  - the call must not run (deterministic block).

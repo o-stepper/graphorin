@@ -16,7 +16,7 @@ Defined in: packages/cli/src/commands/memory.ts:323
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:334 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:324 |
-| <a id="property-importance"></a> `importance` | `readonly` | `number` \| `null` | X-1 / migration 015: per-fact importance (salience hint), if set. | packages/cli/src/commands/memory.ts:329 |
+| <a id="property-importance"></a> `importance` | `readonly` | `number` \| `null` | Per-fact importance (salience hint), if set (migration 015). | packages/cli/src/commands/memory.ts:329 |
 | <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | - | packages/cli/src/commands/memory.ts:327 |
 | <a id="property-status"></a> `status` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:326 |
 | <a id="property-supersededby"></a> `supersededBy` | `readonly` | `string` \| `null` | - | packages/cli/src/commands/memory.ts:333 |

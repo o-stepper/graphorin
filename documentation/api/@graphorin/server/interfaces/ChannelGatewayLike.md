@@ -24,7 +24,7 @@ optional setActivityListener(listener): void;
 
 Defined in: packages/server/src/channels/daemon.ts:48
 
-A2 bridge seam: when present, the server registers a listener
+Bridge seam: when present, the server registers a listener
 that records scheduler activity on every accepted inbound
 message (idle-trigger debounce).
 

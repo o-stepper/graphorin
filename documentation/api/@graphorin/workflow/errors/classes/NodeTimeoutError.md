@@ -8,10 +8,10 @@
 
 Defined in: packages/workflow/src/errors/index.ts:207
 
-Thrown when a node body exceeds its wall-clock budget (D1 /
-workflow-03). The task's `ctx.signal` is aborted first so a
-well-behaved body can stop; bodies that ignore the signal keep
-running in the background (same contract as cancellation).
+Thrown when a node body exceeds its wall-clock budget. The task's
+`ctx.signal` is aborted first so a well-behaved body can stop;
+bodies that ignore the signal keep running in the background (same
+contract as cancellation).
 
 ## Extends
 

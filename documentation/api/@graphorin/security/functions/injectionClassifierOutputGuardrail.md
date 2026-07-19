@@ -14,7 +14,7 @@ Defined in: packages/security/src/inspect/injection-classifier.ts:94
 
 **`Stable`**
 
-Adapter for the SDF-4 output-guardrail surface: wrap a classifier
+Adapter for the output-guardrail surface: wrap a classifier
 as an `OutputGuardrail` and add it to
 `createAgent({ guardrails: { output: [...] } })`. Non-string
 outputs pass through; classifier errors pass through (resilience

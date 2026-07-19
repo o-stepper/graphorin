@@ -24,7 +24,7 @@ Public surface of an active MCP client.
 | <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | packages/mcp/src/client/types.ts:352 |
 | `serverInfo.name` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:352 |
 | `serverInfo.version` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:352 |
-| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing - it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:367 |
+| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time. A session id means stateful routing - it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:367 |
 
 ## Methods
 
@@ -170,7 +170,7 @@ readResource(uri, opts?): Promise<MCPResourceContent>;
 
 Defined in: packages/mcp/src/client/types.ts:385
 
-First content item of the resource. mcp-skills-11: a multi-content
+First content item of the resource. A multi-content
 response (one URI can yield several items) is truncated to the
 FIRST item - a WARN + counter fire when that happens; use
 [readResourceContents](/api/@graphorin/mcp/interfaces/MCPClient.md#readresourcecontents) for the full array.
@@ -197,7 +197,7 @@ readResourceContents(uri, opts?): Promise<readonly MCPResourceContent[]>;
 
 Defined in: packages/mcp/src/client/types.ts:387
 
-Every content item of the resource (mcp-skills-11).
+Every content item of the resource.
 
 #### Parameters
 

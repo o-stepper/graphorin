@@ -12,7 +12,7 @@ function runWorkflowInspect(options): Promise<
 | null>;
 ```
 
-Defined in: packages/cli/src/commands/workflow.ts:54
+Defined in: packages/cli/src/commands/workflow.ts:53
 
 **`Stable`**
 

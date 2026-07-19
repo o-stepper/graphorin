@@ -25,9 +25,9 @@ context.
 | [MCPConnectionError](/api/@graphorin/mcp/errors/classes/MCPConnectionError.md) | Raised when a transport fails to connect or is dropped unexpectedly. |
 | [MCPInvalidConfigError](/api/@graphorin/mcp/errors/classes/MCPInvalidConfigError.md) | Raised on invalid `createMCPClient(...)` configuration. |
 | [MCPProtocolError](/api/@graphorin/mcp/errors/classes/MCPProtocolError.md) | Raised on JSON-RPC / MCP protocol-level errors. |
-| [MCPToolExecutionError](/api/@graphorin/mcp/errors/classes/MCPToolExecutionError.md) | Raised when the MCP server reports a tool-level failure (`CallToolResult.isError === true`, MC-4). The server's content text rides in the message so the model keeps its self-correction signal - while the executor records a real tool FAILURE (audit, retry and error policies all engage) instead of a fake success. |
+| [MCPToolExecutionError](/api/@graphorin/mcp/errors/classes/MCPToolExecutionError.md) | Raised when the MCP server reports a tool-level failure (`CallToolResult.isError === true`). The server's content text rides in the message so the model keeps its self-correction signal - while the executor records a real tool FAILURE (audit, retry and error policies all engage) instead of a fake success. |
 | [MCPToolNotFoundError](/api/@graphorin/mcp/errors/classes/MCPToolNotFoundError.md) | Raised when `MCPClient.callTool` is invoked for an unknown tool. |
-| [MCPToolPinningError](/api/@graphorin/mcp/errors/classes/MCPToolPinningError.md) | Raised when a pinned tool-definition fingerprint does not match the server's current definition and `onPinMismatch: 'reject'` is set (MC-6) - the approve-then-swap rug-pull posture. |
+| [MCPToolPinningError](/api/@graphorin/mcp/errors/classes/MCPToolPinningError.md) | Raised when a pinned tool-definition fingerprint does not match the server's current definition and `onPinMismatch: 'reject'` is set - the approve-then-swap rug-pull posture. |
 | [MCPTransportNotSupportedError](/api/@graphorin/mcp/errors/classes/MCPTransportNotSupportedError.md) | Raised when an operator requests a transport / capability that the runtime does not support (e.g. `resumable: true` on `stdio`). |
 
 ## Interfaces

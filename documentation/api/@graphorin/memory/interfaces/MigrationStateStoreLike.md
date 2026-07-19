@@ -10,8 +10,8 @@ Defined in: packages/memory/src/migration/embedder-migration.ts:60
 
 **`Stable`**
 
-Structural view of the persisted `migration_state` cursor store
-(wave-D D5 / MST-12). The default implementation is
+Structural view of the persisted `migration_state` cursor store.
+The default implementation is
 `@graphorin/store-sqlite`'s `store.embedderMigration.state`; declared
 structurally here so this package never imports the storage package.
 

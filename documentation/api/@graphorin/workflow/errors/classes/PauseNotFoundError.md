@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:274
 
-Thrown by `resolveAwakeable` / `approve` (D1) when no pending pause
+Thrown by `resolveAwakeable` / `approve` when no pending pause
 carries the requested name.
 
 ## Extends

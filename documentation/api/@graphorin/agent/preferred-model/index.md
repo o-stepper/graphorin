@@ -16,7 +16,7 @@ The four-step precedence ladder (highest wins):
      override always wins.
   2. `Tool.preferredModel`        - the tool author's per-tool hint.
      Only the tools the model actually CALLED on the previous step
-     are consulted (AG-15) - an advertised-but-uncalled hint never
+     are consulted - an advertised-but-uncalled hint never
      escalates the run. Multi-tool ties resolve to the highest cost
      tier (`'smart' > 'balanced' > 'fast'`; explicit `ModelSpec` is
      treated as the highest tier).
@@ -38,5 +38,5 @@ falls through to the next precedence step rather than throwing.
 
 | Function | Description |
 | ------ | ------ |
-| [pickTopTierAcrossTools](/api/@graphorin/agent/preferred-model/functions/pickTopTierAcrossTools.md) | Pick the highest-cost tier across the supplied per-tool hints. Explicit `ModelSpec` entries are treated as the highest tier (`'smart'`) for tie-breaking - the conservative-correctness rule documented in DEC-169 / suggested ADR-057. |
+| [pickTopTierAcrossTools](/api/@graphorin/agent/preferred-model/functions/pickTopTierAcrossTools.md) | Pick the highest-cost tier across the supplied per-tool hints. Explicit `ModelSpec` entries are treated as the highest tier (`'smart'`) for tie-breaking - the conservative-correctness rule documented in DEC-169. |
 | [resolvePreferredModel](/api/@graphorin/agent/preferred-model/functions/resolvePreferredModel.md) | Walk the precedence ladder and return the resolved provider for a single agent step. Pure function - no side effects. |

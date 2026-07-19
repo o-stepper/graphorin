@@ -19,4 +19,4 @@ Defined in: packages/core/src/types/proactive.ts:148
 **`Stable`**
 
 Discriminated union over the four rungs - what a proactive fire
-reports to `onOutcome` observers and what the C3 router consumes.
+reports to `onOutcome` observers and what the ladder router consumes.

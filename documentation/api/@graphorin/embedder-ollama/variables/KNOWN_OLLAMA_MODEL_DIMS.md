@@ -16,4 +16,4 @@ Model -> output-dimension hints used to seed the canonical id before the
 first `embed()` resolves the real width from a response. Only single-width
 families are listed; size-variant families (e.g. `qwen3-embedding`, whose
 dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so
-an ambiguous bind fails loudly rather than baking a wrong width (PS-11).
+an ambiguous bind fails loudly rather than baking a wrong width.

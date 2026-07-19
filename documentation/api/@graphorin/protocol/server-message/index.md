@@ -20,7 +20,7 @@ server may push to a client. Three families share the channel:
      - server-initiated messages that do not correlate with a
      single client RPC id.
 
-Versioning contract (W-109, honest edition): the frame ENVELOPE -
+Versioning contract: the frame ENVELOPE -
 the set of `kind`s, the fields of the control frames, and the
 `v: '1'` literal - is validated strictly (`.strict()`, literal `v`)
 on BOTH server and client, and evolves only in lockstep with both

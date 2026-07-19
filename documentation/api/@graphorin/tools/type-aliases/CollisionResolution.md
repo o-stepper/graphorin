@@ -126,7 +126,7 @@ records so the data path stays single-source.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `action` | `"suppressed"` | W-116: an auto-prefix loser whose rename was impossible (the residual case after the fallback namespace + truncation - e.g. a pathological future source shape). The loser is dropped from the catalogue, but never silently: this record, a `tool:collision:suppressed` audit row and the `tool.collision.suppressed.total` counter all mark it. | packages/tools/src/registry/types.ts:90 |
+| `action` | `"suppressed"` | An auto-prefix loser whose rename was impossible (the residual case after the fallback namespace + truncation - e.g. a pathological future source shape). The loser is dropped from the catalogue, but never silently: this record, a `tool:collision:suppressed` audit row and the `tool.collision.suppressed.total` counter all mark it. | packages/tools/src/registry/types.ts:90 |
 | `losers` | `ReadonlyArray`\&lt;[`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md)\&gt; | - | packages/tools/src/registry/types.ts:81 |
 | `toolName` | `string` | - | packages/tools/src/registry/types.ts:79 |
 | `winner` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/tools/src/registry/types.ts:80 |

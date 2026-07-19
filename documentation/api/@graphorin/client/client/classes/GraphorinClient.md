@@ -42,7 +42,7 @@ get transportKind():
   | undefined;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:509
+Defined in: packages/client/src/graphorin-client.ts:508
 
 Return the active transport kind (or `undefined` if not connected).
 
@@ -87,7 +87,7 @@ resolves with the server's `result` payload (typically
 cancelNotify(requestId): void;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:466
+Defined in: packages/client/src/graphorin-client.ts:465
 
 Send an MCP-compatible cancellation notification. Does not wait
 for a server reply (notifications have no `id`).
@@ -131,7 +131,7 @@ it during another `connect()` returns the same promise.
 disconnect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:484
+Defined in: packages/client/src/graphorin-client.ts:483
 
 Disconnect the underlying transport and abort every pending RPC
 + subscription. Idempotent.
@@ -167,17 +167,16 @@ resume(
 opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:418
+Defined in: packages/client/src/graphorin-client.ts:417
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
 does NOT carry a `resume` control message - resumes are durable
 + idempotent + body-carrying, which maps onto the REST endpoint
-`POST /v1/runs/:runId/resume`. Since C3/W-119 the server resumes
-in-process suspensions for real: pass
-`{ approvals: [{ toolCallId, granted }] }` as the directive; a run
-whose RunState this server process does not retain answers 409
-(`run-state-unavailable`) - resume those library-side via
-`agent.run(savedState, { directive })`.
+`POST /v1/runs/:runId/resume`. The server resumes in-process
+suspensions: pass `{ approvals: [{ toolCallId, granted }] }` as
+the directive; a run whose RunState this server process does not
+retain answers 409 (`run-state-unavailable`) - resume those
+library-side via `agent.run(savedState, { directive })`.
 
 #### Parameters
 

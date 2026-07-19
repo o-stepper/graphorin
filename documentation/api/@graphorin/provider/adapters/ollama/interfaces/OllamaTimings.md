@@ -10,8 +10,8 @@ Defined in: packages/provider/src/adapters/ollama.ts:427
 
 **`Stable`**
 
-Ollama server timings for one call, in milliseconds (audit
-2026-07-16, item 8). The server reports them in nanoseconds on the
+Ollama server timings for one call, in milliseconds. The
+server reports them in nanoseconds on the
 terminal chunk; normalized here so model load, prompt processing and
 generation are distinguishable in events and traces. Surfaced under
 `providerMetadata.ollama` on the `finish` event / `generate()`

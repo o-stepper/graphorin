@@ -14,7 +14,7 @@ Defined in: packages/store-sqlite/src/span-store.ts:137
 
 **`Stable`**
 
-Age-based span retention (W-008): delete every span that FINISHED
+Age-based span retention: delete every span that FINISHED
 before the cutoff, including rows with `session_id IS NULL` (not
 attached to any session, so age is their only deletion path). The
 cutoff is epoch **milliseconds** - the ns conversion happens here so

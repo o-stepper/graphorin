@@ -12,4 +12,4 @@ const APPROVAL_PAUSE_KIND: "graphorin.approval";
 
 Defined in: packages/core/src/channels/durable.ts:35
 
-Reserved pause-value kind for persisted approvals (D1).
+Reserved pause-value kind for persisted approvals.

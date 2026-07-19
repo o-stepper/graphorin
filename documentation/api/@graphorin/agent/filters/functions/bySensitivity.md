@@ -17,8 +17,8 @@ Defined in: packages/agent/src/filters/index.ts:189
 Drop messages that carry the literal `[REDACTED:secret]` redaction
 token when `maxTier` sits below `'secret'`.
 
-WEAK CONTRACT - read before relying on it at a trust boundary
-(AGENT-FIL-01): `MessageContent` has NO part-level sensitivity /
+WEAK CONTRACT - read before relying on it at a trust
+boundary: `MessageContent` has NO part-level sensitivity /
 `secret` / `inboundTrust` annotation in the current surface, so
 this filter can only key on the redaction token the framework's
 redaction layer stamps into text. Content that was never

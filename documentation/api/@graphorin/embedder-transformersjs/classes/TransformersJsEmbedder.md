@@ -44,7 +44,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:152
 configHash(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:188
+Defined in: packages/embedder-transformersjs/src/index.ts:187
 
 Stable hash of the embedder's configuration (model + revision + opts).
 
@@ -64,16 +64,15 @@ Stable hash of the embedder's configuration (model + revision + opts).
 dim(): number;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:179
+Defined in: packages/embedder-transformersjs/src/index.ts:178
 
 Output dimension - the explicit `dim` option, a known-model
-default, or the width resolved from the first `embed()`.
-periphery-05 (the PS-11 fix ported from the Ollama embedder):
-throws for an unknown model with no `dim` hint instead of silently
-assuming 768 - a wrong assumed width bakes a wrong-width id AND a
-wrong-width vec0 table, and the id then CHANGES after the first
-`embed()` resolves the truth, which `lock-on-first` reads as an
-embedder swap.
+default, or the width resolved from the first `embed()`. Like the
+Ollama embedder, this throws for an unknown model with no `dim`
+hint instead of silently assuming 768 - a wrong assumed width
+bakes a wrong-width id AND a wrong-width vec0 table, and the id
+then CHANGES after the first `embed()` resolves the truth, which
+`lock-on-first` reads as an embedder swap.
 
 #### Returns
 
@@ -91,7 +90,7 @@ embedder swap.
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:204
+Defined in: packages/embedder-transformersjs/src/index.ts:203
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 

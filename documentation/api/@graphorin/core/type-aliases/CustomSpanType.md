@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/tracer.ts:76
 
 **`Stable`**
 
-Namespaced escape hatch for user-defined span kinds (W-126): any
+Namespaced escape hatch for user-defined span kinds: any
 string under the `x.` prefix, e.g. `'x.acme.rerank'`. The prefix
 keeps typo-safety for the known literals - `'memory.serch.semantic'`
 is still a compile error because it does not start with `x.` -

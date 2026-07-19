@@ -18,7 +18,7 @@ Build the default spill writer - writes the un-truncated body to
 `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
 permissions and tier-aware sensitivity inheritance.
 
-Lifecycle (TL-10): `clear(runId)` removes one run's artifacts (the
+Lifecycle: `clear(runId)` removes one run's artifacts (the
 agent calls it on terminal completed/failed runs); `sweep(ttlMs)`
 removes run directories older than the TTL, and one best-effort
 7-day sweep fires at construction to collect orphans from crashed

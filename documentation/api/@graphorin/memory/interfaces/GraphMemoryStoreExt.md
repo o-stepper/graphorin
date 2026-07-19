@@ -11,7 +11,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:873
 **`Stable`**
 
 Optional storage extension for the lightweight in-SQLite relation
-graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
+graph. Owns the canonical `entities` table, the `fact_entities`
 mapping, and the append-only `entity_merges` ledger. The entity
 *resolution policy* (lexical + embedding dedup, optional LLM
 adjudication) lives in `@graphorin/memory`; this surface is the pure
@@ -37,7 +37,7 @@ optional expandActivation(
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:924
 
-PPR-lite graded expansion (D5): like [expandOneHop](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#expandonehop) but returns
+PPR-lite graded expansion: like [expandOneHop](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#expandonehop) but returns
 each neighbour with its minimum hop `depth` from the seeds, so the
 tier can weight it by damped spreading activation. Optional - stores
 without it fall back to flat one-hop expansion.
@@ -97,7 +97,7 @@ opts?): Promise<readonly Fact[]>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:934
 
-Exact entity-match retriever (D5): facts linked to the canonical
+Exact entity-match retriever: facts linked to the canonical
 entity for `normalizedName`. Optional. Powers a precise
 "facts about &lt;entity&gt;" candidate leg.
 
@@ -126,7 +126,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:890
 Uncapped indexed lookup of the canonical root for an exact normalized
 name. Lets the resolver dedup an exact alias of an arbitrarily-old
 entity without scanning (and deserializing) the bounded
-[listEntities](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#listentities) candidate window (CS-11). Optional: stores without
+[listEntities](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#listentities) candidate window. Optional: stores without
 it fall back to the capped lexical scan inside `resolveEntityDecision`.
 
 #### Parameters

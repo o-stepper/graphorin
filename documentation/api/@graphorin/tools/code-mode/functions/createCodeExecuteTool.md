@@ -16,7 +16,7 @@ Defined in: packages/tools/src/code-mode/meta-tools.ts:223
 
 Build the `code_execute` meta-tool. Its output is the script's final
 value rendered as a string, so the executor's `maxResultTokens` /
-`'spill-to-file'` pipeline bounds even a large final result (WI-10).
+`'spill-to-file'` pipeline bounds even a large final result.
 
 ## Parameters
 

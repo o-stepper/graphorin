@@ -6,7 +6,7 @@
 
 # Interface: RenderedTemplate
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:58
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:57
 
 **`Stable`**
 
@@ -18,5 +18,5 @@ the resolved template independently from the locale pack.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:59 |
-| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:60 |
+| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:58 |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:59 |

@@ -120,5 +120,5 @@ Discriminated union over MCP content parts.
 | `name` | `string` | - | packages/mcp/src/client/types.ts:336 |
 | `size?` | `number` | - | packages/mcp/src/client/types.ts:340 |
 | `title?` | `string` | - | packages/mcp/src/client/types.ts:337 |
-| `type` | `"resource_link"` | A link to a resource the server can serve on demand (MCP `resource_link`). Unlike an embedded `resource`, the body is **not** inlined: the adapter surfaces a preview + the `uri` as a result handle so the model fetches it via `read_result` only when needed (WI-13 / P2-2, ties to WI-10 result handles). | packages/mcp/src/client/types.ts:334 |
+| `type` | `"resource_link"` | A link to a resource the server can serve on demand (MCP `resource_link`). Unlike an embedded `resource`, the body is **not** inlined: the adapter surfaces a preview + the `uri` as a result handle so the model fetches it via `read_result` only when needed. | packages/mcp/src/client/types.ts:334 |
 | `uri` | `string` | - | packages/mcp/src/client/types.ts:335 |

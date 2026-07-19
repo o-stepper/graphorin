@@ -8,7 +8,7 @@
 
 Defined in: packages/store-sqlite/src/embedder-migration-support.ts:27
 
-One persisted migration-state row (schema 001, revived in wave-D D5).
+One persisted migration-state row (schema 001).
 
 ## Properties
 

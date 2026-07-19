@@ -10,7 +10,7 @@ Defined in: packages/memory/src/context-engine/locale-packs/types.ts:51
 
 **`Stable`**
 
-D4 inbound-sanitization preamble fragment. Injected after the
+Inbound-sanitization preamble fragment. Injected after the
 cache breakpoint (Layer 5/6 territory) on steps containing
 untrusted tool output.
 

@@ -19,7 +19,7 @@ Defined in: packages/core/src/channels/pause.ts:157
 
 Run `fn` inside a scope where successive `pause(...)` calls return the
 supplied `values` in order instead of throwing a fresh
-[PauseSignal](/api/@graphorin/core/classes/PauseSignal.md) (WF-2: a node body re-executes from the top on
+[PauseSignal](/api/@graphorin/core/classes/PauseSignal.md) (a node body re-executes from the top on
 every resume, so earlier pauses must replay their already-delivered
 values and only the FIRST unsatisfied `pause()` suspends again). An
 empty `values` array behaves exactly like no scope - every `pause()`

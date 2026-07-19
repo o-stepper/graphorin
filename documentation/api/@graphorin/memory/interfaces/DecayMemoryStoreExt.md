@@ -60,7 +60,7 @@ optional listDecaySignals(ids): Promise<readonly {
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:693
 
-Narrow decay-column read for exactly the given fact ids (MRET-8) -
+Narrow decay-column read for exactly the given fact ids -
 powers per-search decay re-ranking without the old O(scope)
 1000-row window read. Optional; absent ⇒ the tier falls back to
 `listForDecay`.
@@ -108,13 +108,13 @@ List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
 whole table. `limit` defaults to `1000`.
 
-Archived rows are EXCLUDED by default (MCON-6) - they never receive
+Archived rows are EXCLUDED by default - they never receive
 access bumps, so they would pin the LRU head and saturate the decay
 window, structurally stopping threshold-archiving and capacity
 eviction for live facts. Inspection paths pass
 `{ includeArchived: true }`.
 
-`importance` / `status` / `provenance` (X-1) feed the multi-signal
+`importance` / `status` / `provenance` feed the multi-signal
 salience score that orders capacity-bounded eviction.
 
 #### Parameters
@@ -155,11 +155,11 @@ queryHash?): Promise<void>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:681
 
-Record a retrieval access for the given facts (MRET-7): stamp
+Record a retrieval access for the given facts: stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).
 Optional - adapters without decay columns may omit it; callers
 MUST treat failures as non-fatal (the read path never breaks on a
-bookkeeping write). With `queryHash` (wave-D D4) the adapter also
+bookkeeping write). With `queryHash` the adapter also
 feeds the persistent recall ledger - the DISTINCT-query counter
 behind the PromotionPolicy `minUniqueQueries` threshold.
 

@@ -15,5 +15,5 @@ Defined in: packages/core/src/channels/pause.ts:40
 **`Stable`**
 
 Brand attached to the signal thrown by `pause(value)` when the
-positional replay diverges from the journaled pause identity
-(W-120). Cross-realm safe like [PAUSE\_SIGNAL\_BRAND](/api/@graphorin/core/variables/PAUSE_SIGNAL_BRAND.md).
+positional replay diverges from the journaled pause identity.
+Cross-realm safe like [PAUSE\_SIGNAL\_BRAND](/api/@graphorin/core/variables/PAUSE_SIGNAL_BRAND.md).

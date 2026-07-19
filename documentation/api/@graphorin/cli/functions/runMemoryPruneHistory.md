@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/memory.ts:1160
 
 **`Stable`**
 
-`graphorin memory prune-history --older-than <duration|date>` (W-066)
+`graphorin memory prune-history --older-than <duration|date>`
 - the supported surface over `MemoryStoreExt.pruneHistory`.
 `memory_history` grows by design (every supersede / quarantine
 transition appends) and `purge()` already scrubs sensitive text;

@@ -14,7 +14,7 @@ Defined in: packages/workflow/src/timer-driver.ts:112
 
 **`Stable`**
 
-Build a polling driver over the supplied workflows (W-032). Call
+Build a polling driver over the supplied workflows. Call
 `start()` to begin polling; the next pass is scheduled at
 `min(pollIntervalMs, earliest nextWakeAt)` so a short timer does not
 wait out a long poll interval.

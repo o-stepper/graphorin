@@ -10,7 +10,7 @@ Defined in: packages/tools/src/executor/types.ts:347
 
 **`Stable`**
 
-Structural adapter for the D4 tool-argument policy (Progent). The
+Structural adapter for the tool-argument policy (Progent-style). The
 agent runtime wires `evaluateToolArgumentPolicy` /
 `evaluatePermissionDecision` from `@graphorin/security/policy`;
 `@graphorin/tools` stays dependency-free on security.
@@ -32,7 +32,7 @@ optional decide(input):
 
 Defined in: packages/tools/src/executor/types.ts:358
 
-E1: four-value evaluation (`deny > defer > ask > allow`). When
+Four-value evaluation (`deny > defer > ask > allow`). When
 present the executor's policy phase prefers it over the binary
 `evaluate`; `ask`/`defer` verdicts fail closed at the executor
 unless the batch is pre-approved (only the agent pre-screen can
@@ -71,7 +71,7 @@ optional deniesName(toolName):
 
 Defined in: packages/tools/src/executor/types.ts:370
 
-E1 deny-by-name: advertise-time check consulted with NO args (the
+Deny-by-name: advertise-time check consulted with NO args (the
 per-step catalogue filter, `tool_search` exclusion and the
 executor's early mirror). Implementations must honour only
 predicate-free deny rules so the answer is deterministic for a

@@ -10,7 +10,7 @@
 const INBOUND_TRUST_ATTR: "graphorin.content.inbound.trust";
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:37
+Defined in: packages/memory/src/context-engine/annotations.ts:38
 
 **`Stable`**
 

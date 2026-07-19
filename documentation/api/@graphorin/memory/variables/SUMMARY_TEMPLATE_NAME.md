@@ -10,7 +10,7 @@
 const SUMMARY_TEMPLATE_NAME: "summary-sections" = 'summary-sections';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:49
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:48
 
 **`Stable`**
 

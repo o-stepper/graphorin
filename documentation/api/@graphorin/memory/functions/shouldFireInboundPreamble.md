@@ -10,11 +10,11 @@
 function shouldFireInboundPreamble(annotations): boolean;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:155
+Defined in: packages/memory/src/context-engine/annotations.ts:156
 
 **`Stable`**
 
-Decide whether the per-step inbound-sanitization preamble (D4)
+Decide whether the per-step inbound-sanitization preamble
 should fire for an assembled message list. The preamble fires
 iff at least one part carries an inbound-trust value other than
 `'trusted'` and `'n/a'`. Trusted-only steps skip the preamble for

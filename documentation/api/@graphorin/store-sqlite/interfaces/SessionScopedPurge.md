@@ -20,7 +20,7 @@ memory-history value scrub) must go with them.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-fts"></a> `fts?` | `readonly` | `string` | FTS5 shadow table joined by rowid, when the table has one. | packages/store-sqlite/src/session-store.ts:421 |
-| <a id="property-history"></a> `history?` | `readonly` | \{ `kind`: `string`; `textColumn`: `string`; `valueMatch`: `boolean`; \} | Scrub `memory_history` values for the deleted rows (store-04 parity). `valueMatch` additionally clears history rows whose values equal the deleted row's text (the SUPERSEDE shape). | packages/store-sqlite/src/session-store.ts:431 |
+| <a id="property-history"></a> `history?` | `readonly` | \{ `kind`: `string`; `textColumn`: `string`; `valueMatch`: `boolean`; \} | Scrub `memory_history` values for the deleted rows. `valueMatch` additionally clears history rows whose values equal the deleted row's text (the SUPERSEDE shape). | packages/store-sqlite/src/session-store.ts:431 |
 | `history.kind` | `readonly` | `string` | - | packages/store-sqlite/src/session-store.ts:432 |
 | `history.textColumn` | `readonly` | `string` | - | packages/store-sqlite/src/session-store.ts:433 |
 | `history.valueMatch` | `readonly` | `boolean` | - | packages/store-sqlite/src/session-store.ts:434 |

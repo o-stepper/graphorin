@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:61
 
 **`Stable`**
 
-Maintenance extension over [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) (W-066), mirroring
+Maintenance extension over [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md), mirroring
 the `SessionStoreExt` precedent: capabilities the sqlite adapter
 guarantees but a custom `MemoryStore` is not obliged to implement.
 The base contract is unchanged - existing implementations keep

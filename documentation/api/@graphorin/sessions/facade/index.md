@@ -17,7 +17,7 @@
 | [SessionExportOptions](/api/@graphorin/sessions/facade/interfaces/SessionExportOptions.md) | Options threaded into `Session.export({...})`. |
 | [SessionManager](/api/@graphorin/sessions/facade/interfaces/SessionManager.md) | Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/functions/createSessionManager.md). |
 | [SessionMemoryFacade](/api/@graphorin/sessions/facade/interfaces/SessionMemoryFacade.md) | Subset of the `Memory.session` surface this package consumes. Kept structural so callers can pass either the `Memory` facade from `@graphorin/memory` or any custom shim with the same shape. |
-| [SessionMessageWithMetadata](/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md) | A stored message paired with its persisted identity (RP-5). The core [Message](/api/@graphorin/core/type-aliases/Message.md) type carries no id / timestamp; these come from the store row. |
+| [SessionMessageWithMetadata](/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md) | A stored message paired with its persisted identity. The core [Message](/api/@graphorin/core/type-aliases/Message.md) type carries no id / timestamp; these come from the store row. |
 | [SessionRecordCassetteOptions](/api/@graphorin/sessions/facade/interfaces/SessionRecordCassetteOptions.md) | Options accepted by `Session.recordToolCassette({...})`. |
 | [SystemMessage](/api/@graphorin/sessions/facade/interfaces/SystemMessage.md) | - |
 | [ToolMessage](/api/@graphorin/sessions/facade/interfaces/ToolMessage.md) | - |

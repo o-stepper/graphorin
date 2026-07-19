@@ -44,7 +44,7 @@ keepLast): Promise<number>;
 
 Defined in: packages/workflow/src/checkpoint-store-memory.ts:230
 
-W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
+Compaction - keep the `keepLast` newest checkpoints of one pair.
 
 #### Parameters
 
@@ -166,7 +166,7 @@ listSuspended(namespace, opts?): Promise<readonly {
 
 Defined in: packages/workflow/src/checkpoint-store-memory.ts:173
 
-W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+Enumerate threads whose LATEST checkpoint in `namespace` is
 suspended with a due `wakeAt` - parity with the SQLite adapter.
 
 #### Parameters
@@ -199,7 +199,7 @@ pruneThreads(opts): Promise<number>;
 
 Defined in: packages/workflow/src/checkpoint-store-memory.ts:201
 
-W-009 retention sweep - parity with the SQLite implementation:
+Retention sweep - parity with the SQLite implementation:
 namespace-SCOPED (entries key as `threadId::namespace`), latest
 checkpoint decides age + status, suspended pairs survive unless
 `onlyTerminal: false`.

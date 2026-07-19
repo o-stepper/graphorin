@@ -10,7 +10,7 @@ Defined in: packages/core/src/types/memory.ts:353
 
 **`Stable`**
 
-Canonical entity in the lightweight in-SQLite relation graph (P2-1).
+Canonical entity in the lightweight in-SQLite relation graph.
 The entity resolver (`@graphorin/memory`) deduplicates the raw
 `subject`/`object` strings on facts into canonical entities - merging
 aliases ("Anna", "Anna S.", "my sister") via lexical + embedding
@@ -26,7 +26,7 @@ a root), so `mergedInto ?? id` is the canonical id.
 Core defines only the record shape; the storage surface for the graph
 (upsert / link / merge / one-hop expansion) is NOT part of the
 baseline [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) contract - it lives in the optional
-`GraphMemoryStoreExt` exported from `@graphorin/memory` (W-048).
+`GraphMemoryStoreExt` exported from `@graphorin/memory`.
 Adapters without it simply have no relation graph.
 
 ## Properties

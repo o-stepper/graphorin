@@ -12,9 +12,9 @@ Defined in: packages/workflow/src/types.ts:236
 
 Structural shape used to identify [Dispatch](/api/@graphorin/workflow/classes/Dispatch.md) instances without
 pulling the concrete class into this module's import graph. Requires
-the cross-realm brand (workflow-13): a bare `{ nodeName, args }`
-state object is channel WRITES, never a dispatch - construct
-dispatches via `dispatch(nodeName, args)` / `new Dispatch(...)`.
+the cross-realm brand: a bare `{ nodeName, args }` state object is
+channel WRITES, never a dispatch - construct dispatches via
+`dispatch(nodeName, args)` / `new Dispatch(...)`.
 
 ## Properties
 

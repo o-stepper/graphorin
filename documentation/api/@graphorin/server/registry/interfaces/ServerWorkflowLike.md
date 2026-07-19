@@ -29,7 +29,7 @@ optional deleteThread(threadId): Promise<void>;
 
 Defined in: packages/server/src/registry/index.ts:122
 
-W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
+Per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
 #### Parameters
 
@@ -79,7 +79,7 @@ optional fork(
 
 Defined in: packages/server/src/registry/index.ts:114
 
-W-119: fork a new thread from a checkpoint (`POST /:id/fork`). E2:
+Fork a new thread from a checkpoint (`POST /:id/fork`).
 `opts.patch` merges channel-level state into the forked root (the
 `state` field of the fork body).
 
@@ -152,7 +152,7 @@ opts?): AsyncIterable<unknown>;
 
 Defined in: packages/server/src/registry/index.ts:103
 
-W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
+Resolve a NAMED awakeable/approval (`POST /:id/resume` with
 `name`) - `approve` is the same primitive under the hood.
 
 #### Parameters
@@ -206,7 +206,7 @@ optional retry(threadId, opts?): AsyncIterable<unknown>;
 
 Defined in: packages/server/src/registry/index.ts:93
 
-W-119: replay a failed/aborted thread (`POST /:id/retry`).
+Replay a failed/aborted thread (`POST /:id/retry`).
 
 #### Parameters
 
@@ -233,7 +233,7 @@ optional tick(threadId, opts?): Promise<{
 
 Defined in: packages/server/src/registry/index.ts:95
 
-W-119: fire a due durable timer (`POST /:id/tick`).
+Fire a due durable timer (`POST /:id/tick`).
 
 #### Parameters
 

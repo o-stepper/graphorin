@@ -34,7 +34,7 @@ Final report shape.
 | `summary.passHatK.baseCases` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:101 |
 | `summary.passHatK.k` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:100 |
 | `summary.passHatK.value` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:102 |
-| `summary.passRateCi?` | `readonly` | \{ `hi`: `number`; `lo`: `number`; \} | 95% Wilson score interval on the overall pass rate (E8 / evals-05). Always present on reports produced by `runEvals`; optional so older persisted reports keep parsing. | packages/observability/src/eval/types.ts:94 |
+| `summary.passRateCi?` | `readonly` | \{ `hi`: `number`; `lo`: `number`; \} | 95% Wilson score interval on the overall pass rate. Always present on reports produced by `runEvals`; optional so older persisted reports keep parsing. | packages/observability/src/eval/types.ts:94 |
 | `summary.passRateCi.hi` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:94 |
 | `summary.passRateCi.lo` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:94 |
 | `summary.total` | `readonly` | `number` | - | packages/observability/src/eval/types.ts:79 |

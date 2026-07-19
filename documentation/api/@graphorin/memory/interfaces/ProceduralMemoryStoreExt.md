@@ -11,7 +11,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:775
 **`Stable`**
 
 Extension of the typed `ProceduralMemoryStore` with the optional
-promotion helper that storage adapters may expose (MCON-2).
+promotion helper that storage adapters may expose.
 
 ## Extends
 
@@ -76,7 +76,7 @@ optional recordSuccess(id): Promise<number>;
 Defined in: packages/memory/src/internal/storage-adapter.ts:807
 
 Record one demonstrated successful reuse of a rule and return the
-new counter value (MCON-2 part 4). Powers
+new counter value. Powers
 promotion-by-demonstrated-success via
 [ProceduralMemory.recordOutcome](/api/@graphorin/memory/classes/ProceduralMemory.md#recordoutcome). Optional - adapters without
 the counter simply never auto-promote.
@@ -129,7 +129,7 @@ opts?): Promise<readonly MemoryHit<Rule>[]>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:795
 
-Lexical runbook search over rule text (D3, migration 028) - content
+Lexical runbook search over rule text (migration 028) - content
 recall for "find the procedure for this task", as opposed to
 predicate activation. Quarantined (unvalidated induced) procedures
 are excluded unless the inspector opts in. Optional - adapters

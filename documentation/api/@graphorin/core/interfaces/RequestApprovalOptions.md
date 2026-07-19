@@ -10,7 +10,7 @@ Defined in: packages/core/src/channels/durable.ts:246
 
 **`Stable`**
 
-Options for [requestApproval](/api/@graphorin/core/functions/requestApproval.md) (E1 defer-timeout).
+Options for [requestApproval](/api/@graphorin/core/functions/requestApproval.md) (defer-timeout).
 
 ## Properties
 

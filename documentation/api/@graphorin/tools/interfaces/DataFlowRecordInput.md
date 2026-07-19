@@ -18,7 +18,7 @@ Input to [DataFlowGuard.record](/api/@graphorin/tools/interfaces/DataFlowGuard.m
 | <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/types.ts:256 |
 | <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/tools/src/executor/types.ts:252 |
 | <a id="property-source"></a> `source?` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/tools/src/executor/types.ts:253 |
-| <a id="property-taintoverride"></a> `taintOverride?` | `readonly` | \{ `sensitive?`: `boolean`; `sourceKind?`: `string`; `untrusted?`: `boolean`; \} | C6: per-result taint override from the tool's ToolReturn envelope. Flags only ever WIDEN the derived label (guards must never let an override downgrade an untrusted tool's output). | packages/tools/src/executor/types.ts:247 |
+| <a id="property-taintoverride"></a> `taintOverride?` | `readonly` | \{ `sensitive?`: `boolean`; `sourceKind?`: `string`; `untrusted?`: `boolean`; \} | Per-result taint override from the tool's ToolReturn envelope. Flags only ever WIDEN the derived label (guards must never let an override downgrade an untrusted tool's output). | packages/tools/src/executor/types.ts:247 |
 | `taintOverride.sensitive?` | `readonly` | `boolean` | - | packages/tools/src/executor/types.ts:249 |
 | `taintOverride.sourceKind?` | `readonly` | `string` | - | packages/tools/src/executor/types.ts:250 |
 | `taintOverride.untrusted?` | `readonly` | `boolean` | - | packages/tools/src/executor/types.ts:248 |

@@ -71,7 +71,7 @@ dim(): number;
 Defined in: packages/embedder-ollama/src/index.ts:191
 
 Output dimension - the explicit `dim` option, the resolved width from the
-first `embed()`, or a known-family default. PS-11: throws for an unknown
+first `embed()`, or a known-family default. Throws for an unknown
 model with no `dim` hint instead of returning `0` (which the store would
 persist and use to create a `float[0]` vec0 table, silently breaking
 vector search). Pass `dim` for any model not in [KNOWN\_OLLAMA\_MODEL\_DIMS](/api/@graphorin/embedder-ollama/variables/KNOWN_OLLAMA_MODEL_DIMS.md), or call `embed()` once first to resolve it.

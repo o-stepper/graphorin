@@ -18,4 +18,4 @@ Structural view of a tool this module can project.
 | <a id="property-description"></a> `description?` | `readonly` | `string` | - | packages/tools/src/code-mode/project.ts:36 |
 | <a id="property-inputschema"></a> `inputSchema?` | `readonly` | `unknown` | - | packages/tools/src/code-mode/project.ts:37 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/tools/src/code-mode/project.ts:35 |
-| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `unknown` | A5: the tool's output schema; renders the signature's return type. | packages/tools/src/code-mode/project.ts:39 |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `unknown` | The tool's output schema; renders the signature's return type. | packages/tools/src/code-mode/project.ts:39 |

@@ -16,7 +16,7 @@ Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:144
 
 Construct the PII detection guardrail.
 
-Note on normalization (W-150): the boolean detect predicate
+Note on normalization: the boolean detect predicate
 ([containsPii](/api/@graphorin/security/functions/containsPii.md)) matches against the NFKC + zero-width-stripped
 form of the text, so cheap character-injection obfuscation cannot
 dodge detection. The guardrail's REWRITE path (`redactText` /

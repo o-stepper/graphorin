@@ -14,7 +14,7 @@ Structured "why was this recalled?" explanation for one
 [SemanticMemory.search](/api/@graphorin/memory/classes/SemanticMemory.md#search) call: the query, the reranker that
 fused the candidate lists, and the per-memory signal breakdown in
 final-rank order. Pure data - safe to attach to a span, log, or
-render. X-3.
+render.
 
 ## Properties
 

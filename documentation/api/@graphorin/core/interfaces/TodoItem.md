@@ -6,11 +6,11 @@
 
 # Interface: TodoItem
 
-Defined in: packages/core/src/types/run.ts:274
+Defined in: packages/core/src/types/run.ts:273
 
 **`Stable`**
 
-One item in the agent's structured plan (D6). `status` drives both
+One item in the agent's structured plan. `status` drives both
 the recitation rendering and progress reporting; `id` lets a
 status-flip mutation target an item without rewriting the list.
 
@@ -18,6 +18,6 @@ status-flip mutation target an item without rewriting the list.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:276 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:275 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:277 |
+| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:275 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:274 |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:276 |

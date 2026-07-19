@@ -82,7 +82,7 @@ register, and execute tools the model can call:
   (`'worker-threads'` / `'isolated-vm'` / `'docker'` tier
   filesystems) inject their own writer via
   `createToolExecutor({ spill })`. The framework scans the FULL body
-  for imperative patterns once at spill time (W-156: a pattern split
+  for imperative patterns once at spill time (a pattern split
   by a `read_result` page boundary evades the per-page strip pass in
   both halves) and hands the result to every writer as
   `imperativePatternsPresent`; a custom writer that does not persist
@@ -242,7 +242,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [audit](/api/@graphorin/tools/audit/index.md) | Audit-event emitter + counter registry for `@graphorin/tools`. |
 | [builder](/api/@graphorin/tools/builder/index.md) | Tool builder surface for `@graphorin/tools`. |
 | [built-in](/api/@graphorin/tools/built-in/index.md) | Built-in tools shipped with `@graphorin/tools`. |
-| [code-mode](/api/@graphorin/tools/code-mode/index.md) | Code-mode / programmatic tool calling (P1-2). Public surface: |
+| [code-mode](/api/@graphorin/tools/code-mode/index.md) | Code-mode / programmatic tool calling. Public surface: |
 | [errors](/api/@graphorin/tools/errors/index.md) | Typed error classes for `@graphorin/tools`. |
 | [executor](/api/@graphorin/tools/executor/index.md) | Tool executor surface for `@graphorin/tools`. |
 | [inbound](/api/@graphorin/tools/inbound/index.md) | Inbound prompt-injection sanitization surface for `@graphorin/tools`. |
@@ -250,5 +250,5 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [package.json](/api/@graphorin/tools/package.json/index.md) | - |
 | [registry](/api/@graphorin/tools/registry/index.md) | Strategy-aware tool registry surface for `@graphorin/tools`. |
 | [result](/api/@graphorin/tools/result/index.md) | Tool result envelope helpers for `@graphorin/tools` - token counting, truncation pipeline (`'middle' | 'tail' | 'spill-to-file' | 'summarize'`), and the `ToolReturn` content-parts pass-through convention. |
-| [schema](/api/@graphorin/tools/schema/index.md) | Schema projection surface: the shared Zod-to-JSON-Schema converter used by the agent's `toolToDefinition`, the code-mode signature projection, and `ToolSearchMatch` (tools-01). |
+| [schema](/api/@graphorin/tools/schema/index.md) | Schema projection surface: the shared Zod-to-JSON-Schema converter used by the agent's `toolToDefinition`, the code-mode signature projection, and `ToolSearchMatch`. |
 | [streaming](/api/@graphorin/tools/streaming/index.md) | Streaming-tool execution surface for `@graphorin/tools`. |

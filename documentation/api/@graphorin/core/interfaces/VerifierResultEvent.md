@@ -10,7 +10,7 @@ Defined in: packages/core/src/types/agent-event.ts:311
 
 **`Stable`**
 
-Outcome of a terminal-response verifier check (C3). Emitted once per
+Outcome of a terminal-response verifier check. Emitted once per
 verifier per verification round; a failed verifier's `feedback` is
 also appended to the transcript so the model can address it.
 

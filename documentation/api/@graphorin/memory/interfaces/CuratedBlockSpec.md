@@ -10,7 +10,7 @@ Defined in: packages/memory/src/consolidator/phases/learned-context.ts:46
 
 **`Stable`**
 
-One curated-block declaration (wave-D D3): the deep phase maintains
+One curated-block declaration: the deep phase maintains
 a rewrite pass per entry - `learnedContext: true` is sugar for
 `[{ label: 'learned_context' }]`. `prompt` overrides the maintenance
 system prompt (the default is a generic fold-the-evidence rewrite,

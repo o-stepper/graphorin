@@ -74,10 +74,10 @@ limit?): Promise<readonly DlqBatchRow[]>;
 
 Defined in: packages/store-sqlite/src/consolidator-store.ts:394
 
-W-133: despite the name, this is a plain SELECT of due DLQ batches
+Despite the name, this is a plain SELECT of due DLQ batches
 WITHOUT any lease/claim semantics - two concurrent callers see the
 same rows. Serializing concurrent drains is the CALLER's job via
-the CS-8 consolidator scope lock (the runtime always drains under
+the consolidator scope lock (the runtime always drains under
 it); the worst case of a bypassed lock is duplicated LLM replay
 spend, not corruption. The name is kept because the method sits on
 the stable contract surface - renaming would be a breaking change
@@ -258,7 +258,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:466
 
 **`Stable`**
 
-W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
+Retention for the dead-letter queue. Deletes only EXHAUSTED
 batches (`next_retry_at IS NULL` - parked forever by
 `markBatchExhausted`) that failed before the cutoff; batches still
 awaiting a retry are never touched (they belong to
@@ -286,7 +286,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:449
 
 **`Stable`**
 
-W-065: retention for the per-tick run log. Deletes terminal runs
+Retention for the per-tick run log. Deletes terminal runs
 that started before the cutoff; in-flight rows
 (`status = 'running'`) always survive. Returns rows deleted.
 

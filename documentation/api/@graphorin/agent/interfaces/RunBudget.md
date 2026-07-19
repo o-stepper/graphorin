@@ -6,17 +6,17 @@
 
 # Interface: RunBudget
 
-Defined in: packages/agent/src/types.ts:592
+Defined in: packages/agent/src/types.ts:591
 
 **`Stable`**
 
-Run-level budget (C5 / W-084 residual, decision D-8). Enforced as a
+Run-level budget. Enforced as a
 between-step precheck against the run's accumulated usage - the step
 that crosses a ceiling completes (in-flight overshoot is inherent to
 between-step enforcement, exactly like the consolidator's
 `BudgetTracker`), and the run stops before the next provider call.
 Sub-agent usage is included: handoff / `toTool` children fold their
-usage into the parent run's accounting (W-033).
+usage into the parent run's accounting.
 
 The cost leg reads `Usage.cost`, which only exists when the provider
 chain reports it (wire `withCostTracking` from `@graphorin/provider`
@@ -30,7 +30,7 @@ unmetered - see [RunBudget.onUnpriced](/api/@graphorin/agent/interfaces/RunBudge
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | packages/agent/src/types.ts:594 |
-| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | packages/agent/src/types.ts:600 |
-| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | packages/agent/src/types.ts:610 |
-| <a id="property-onunpriced"></a> `onUnpriced?` | `readonly` | `"warn"` \| `"fail"` | What to do when `maxCostUsd` is set but the accumulated usage carries no USD cost data, so the ceiling cannot observe spend (deep retest 2026-07-19, P1-3). `'fail'` (default) is fail-closed: the run stops at the first between-step check in the `onExceed` shape (`'stop'` fails the run with `error.code: 'budget-unpriced'`; `'throw'` rejects with `AgentBudgetUnpricedError`) - a caller who set a cost cap must never keep spending unmetered. `'warn'` restores the pre-0.13 behaviour: one console WARN, ceiling unenforced. Wire `withCostTracking` with a pricing snapshot, or use `maxTokens` for a provider-independent ceiling. | packages/agent/src/types.ts:623 |
+| <a id="property-maxcostusd"></a> `maxCostUsd?` | `readonly` | `number` | Maximum cumulative run cost in USD (sub-agents included). | packages/agent/src/types.ts:593 |
+| <a id="property-maxtokens"></a> `maxTokens?` | `readonly` | `number` | Maximum cumulative run tokens (`Usage.totalTokens`, sub-agents included). Provider-independent - enforced even without pricing middleware. | packages/agent/src/types.ts:599 |
+| <a id="property-onexceed"></a> `onExceed?` | `readonly` | `"stop"` \| `"throw"` | What to do when a ceiling is crossed. `'stop'` (default) ends the run through the normal terminal path: the result resolves with `status: 'failed'` and `error.code: 'budget-exceeded'` (the stop-condition-cut precedent), so the resumable partial state stays on the result. `'throw'` rejects the run with [AgentBudgetExceededError](/api/@graphorin/agent/errors/classes/AgentBudgetExceededError.md) after emitting `agent.error` - graceful finalization (final checkpoint, `agent.end`) is skipped. | packages/agent/src/types.ts:609 |
+| <a id="property-onunpriced"></a> `onUnpriced?` | `readonly` | `"warn"` \| `"fail"` | What to do when `maxCostUsd` is set but the accumulated usage carries no USD cost data, so the ceiling cannot observe spend. `'fail'` (default) is fail-closed: the run stops at the first between-step check in the `onExceed` shape (`'stop'` fails the run with `error.code: 'budget-unpriced'`; `'throw'` rejects with `AgentBudgetUnpricedError`) - a caller who set a cost cap must never keep spending unmetered. `'warn'` restores the pre-0.13 behaviour: one console WARN, ceiling unenforced. Wire `withCostTracking` with a pricing snapshot, or use `maxTokens` for a provider-independent ceiling. | packages/agent/src/types.ts:622 |

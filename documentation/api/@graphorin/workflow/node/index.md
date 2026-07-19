@@ -14,7 +14,7 @@ supplied `name` + `run(...)` callback.
 
 | Function | Description |
 | ------ | ------ |
-| [createNode](/api/@graphorin/workflow/node/functions/createNode.md) | Construct a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). The wrapper exists to give the engine a stable shape and to keep `createWorkflow({...})` callers from instantiating nodes by hand. Carries the optional per-node execution policy (D1 / workflow-03): `timeoutMs` + `retry`. |
+| [createNode](/api/@graphorin/workflow/node/functions/createNode.md) | Construct a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). The wrapper exists to give the engine a stable shape and to keep `createWorkflow({...})` callers from instantiating nodes by hand. Carries the optional per-node execution policy: `timeoutMs` + `retry`. |
 
 ## References
 

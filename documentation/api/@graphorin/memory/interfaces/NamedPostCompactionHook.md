@@ -30,7 +30,7 @@ resolveContent(deps, ctx?): Promise<readonly MessageContent[]>;
 
 Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:64
 
-`ctx` carries the REAL compaction outcome (CE-6) - result, scope,
+`ctx` carries the REAL compaction outcome - result, scope,
 runId, sessionId, agentId, source - built by `compactNow` after the
 pipeline finishes. Record-form built-ins may ignore it; the
 function-form wrapper forwards it to the operator's hook verbatim.

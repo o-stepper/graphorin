@@ -14,7 +14,7 @@ Defined in: packages/store-sqlite/src/span-store.ts:120
 
 **`Stable`**
 
-Delete every persisted span of one session (W-006). Called by the
+Delete every persisted span of one session. Called by the
 session hard-delete cascade (the `spans` entry of
 `SESSION_SCOPED_PURGES`); exported for hosts that manage spans out
 of band. Returns the number of rows deleted.

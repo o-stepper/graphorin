@@ -28,7 +28,7 @@ optional count(scope): Promise<number>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:282
 
-Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
+Count the live messages in the scoped session - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
 counts instead of `list(...)`-materialising up to 1000 rows.
 
@@ -107,7 +107,7 @@ optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMeta
 
 Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
-List messages with their persisted identity (RP-5). Optional: stores that
+List messages with their persisted identity. Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
 
 #### Parameters
@@ -169,7 +169,7 @@ Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/
 
 Full-text search over the scoped session messages.
 
-Query precedence (W-127): the POSITIONAL `query` parameter is
+Query precedence: the POSITIONAL `query` parameter is
 authoritative; when the caller also sets `opts.query` (the field
 exists because [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOptions.md) is shared with the
 option-object search surfaces), implementations MUST ignore it.

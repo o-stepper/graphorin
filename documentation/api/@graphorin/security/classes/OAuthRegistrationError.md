@@ -11,7 +11,7 @@ Defined in: packages/security/src/oauth/errors.ts:71
 **`Stable`**
 
 Thrown when the Dynamic Client Registration endpoint returns a non-2xx
-response (OAUTH-ADV-01). Carries the RFC 7591 `error` / `error_description`
+response. Carries the RFC 7591 `error` / `error_description`
 body fields so callers see the spec-defined cause (e.g.
 `invalid_client_metadata`) instead of only the bare HTTP status.
 

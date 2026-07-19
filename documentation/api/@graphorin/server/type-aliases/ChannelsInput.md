@@ -20,6 +20,6 @@ Defined in: packages/server/src/app-daemons.ts:43
 
 **`Stable`**
 
-B1.6: accepted forms for `createServer({ channels })` - a pre-built
+Accepted forms for `createServer({ channels })` - a pre-built
 daemon or the bare gateway (matched structurally; the server takes
 no dependency on `@graphorin/channels`).

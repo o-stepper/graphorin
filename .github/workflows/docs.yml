@@ -96,6 +96,33 @@ jobs:
             exit 1
           fi
 
+      # The public API reference must describe behaviour, not internal
+      # planning artifacts: audit/work-item ids ("deep retest P1-3",
+      # "W-135", wave letters) leaked into published pages once (0.13.0
+      # deep retest). The source docblocks were swept; this keeps them
+      # swept.
+      - name: API wording gate (no internal audit labels)
+        run: node scripts/check-api-wording.mjs
+
+      # Docs payload budget: the client-side local-search index once
+      # grew to 6.8 MiB because the generated API reference was fully
+      # indexed. The API pages are excluded in .vitepress/config.ts
+      # (_render); this budget catches any regression that would ship a
+      # multi-megabyte index to every visitor again.
+      - name: Docs payload budget (client search index)
+        run: |
+          idx="$(find documentation/.vitepress/dist/assets/chunks -name '@localSearchIndex*.js' | head -1)"
+          if [ -z "$idx" ]; then
+            echo "::error title=search index chunk not found::expected an @localSearchIndex*.js chunk under .vitepress/dist/assets/chunks"
+            exit 1
+          fi
+          size="$(stat -c%s "$idx")"
+          echo "client search index chunk: $idx (${size} bytes)"
+          if [ "$size" -gt 2097152 ]; then
+            echo "::error title=search index over budget::${size} bytes > 2 MiB - keep the API reference out of the client index (see .vitepress/config.ts search options._render)"
+            exit 1
+          fi
+
       # E10 (docs-14): --include-fragments makes lychee validate #anchors
       # against the target page's heading ids - without it seven broken
       # in-site anchors (VitePress slugifies '_' to '-') sailed through.

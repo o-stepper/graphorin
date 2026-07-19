@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:111
 
 **`Stable`**
 
-A stored message paired with its persisted identity (RP-5). The [Message](/api/@graphorin/core/type-aliases/Message.md)
+A stored message paired with its persisted identity. The [Message](/api/@graphorin/core/type-aliases/Message.md)
 type itself carries no id / timestamp; these come from the store row, so an
 exporter can preserve message identity + chronology across a round-trip.
 

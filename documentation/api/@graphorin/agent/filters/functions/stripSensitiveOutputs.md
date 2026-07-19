@@ -16,7 +16,7 @@ Defined in: packages/agent/src/filters/index.ts:232
 
 Strip tool messages whose `content` carries a literal
 `[REDACTED:` redaction token - ANY redaction tier trips it, not
-only `secret` (AGENT-FIL-02). There is no `secret` annotation on
+only `secret`. There is no `secret` annotation on
 the message surface in the current slice; the token stamped by the
 redaction layer at session-write time is the only signal this
 filter scans, so an output that was never redaction-stamped passes

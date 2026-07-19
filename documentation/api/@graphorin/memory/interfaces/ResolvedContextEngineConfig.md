@@ -18,7 +18,7 @@ Resolved configuration snapshot returned by
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-clouduploadconsent"></a> `cloudUploadConsent` | `readonly` | `boolean` | - | packages/memory/src/context-engine/io-types.ts:119 |
-| <a id="property-compactioneffective"></a> `compactionEffective` | `readonly` | `boolean` | Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a `providerContextWindow` was supplied. `compactionEnabled: true` with `compactionEffective: false` is the honest signal that compaction is configured-on but a no-op for want of a context window. | packages/memory/src/context-engine/io-types.ts:115 |
+| <a id="property-compactioneffective"></a> `compactionEffective` | `readonly` | `boolean` | Whether compaction can actually fire: `compactionEnabled` **and** a `providerContextWindow` was supplied. `compactionEnabled: true` with `compactionEffective: false` is the honest signal that compaction is configured-on but a no-op for want of a context window. | packages/memory/src/context-engine/io-types.ts:115 |
 | <a id="property-compactionenabled"></a> `compactionEnabled` | `readonly` | `boolean` | - | packages/memory/src/context-engine/io-types.ts:108 |
 | <a id="property-compactionthresholdtokens"></a> `compactionThresholdTokens` | `readonly` | `number` | - | packages/memory/src/context-engine/io-types.ts:116 |
 | <a id="property-defaultsensitivity"></a> `defaultSensitivity` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/memory/src/context-engine/io-types.ts:120 |

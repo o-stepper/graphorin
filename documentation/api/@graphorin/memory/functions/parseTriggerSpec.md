@@ -10,7 +10,7 @@
 function parseTriggerSpec(spec): ParsedTrigger;
 ```
 
-Defined in: packages/memory/src/consolidator/triggers.ts:44
+Defined in: packages/memory/src/consolidator/triggers.ts:45
 
 Parse a [ConsolidatorTriggerSpec](/api/@graphorin/memory/type-aliases/ConsolidatorTriggerSpec.md) into a [ParsedTrigger](/api/@graphorin/memory/type-aliases/ParsedTrigger.md).
 

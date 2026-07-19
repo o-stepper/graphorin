@@ -14,7 +14,7 @@ Defined in: packages/memory/src/consolidator/types.ts:39
 
 **`Stable`**
 
-B3 (item 15): deterministic pre-extraction admission gate. Runs on
+Deterministic pre-extraction admission gate. Runs on
 every fetched [SessionMessageRecord](/api/@graphorin/memory/interfaces/SessionMessageRecord.md) BEFORE noise filtering on
 both consolidator batch paths (runtime dispatch pre-fetch and the
 standard phase's self-fetch). Return `true` to admit the record

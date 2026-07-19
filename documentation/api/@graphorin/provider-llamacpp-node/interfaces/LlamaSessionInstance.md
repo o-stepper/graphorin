@@ -65,7 +65,7 @@ optional setChatHistory(history): void;
 
 Defined in: src/runtime.ts:66
 
-W-096: replace the session's chat history (node-llama-cpp v3
+Replace the session's chat history (node-llama-cpp v3
 `setChatHistory`). When present, the adapter feeds multi-turn
 transcripts as REAL chat history + prompts only the last user turn
 - instead of serialising the whole conversation into one

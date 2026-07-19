@@ -92,7 +92,7 @@ any `EmbedderProvider`; the default is
   LLM call that also rates its importance `1-10` (normalized to `[0, 1]`),
   so episodic triple-signal retrieval (recency × relevance × importance) finally
   runs on all three signals. Auto-formed episodes carry `provenance: 'extraction'`
-  + `status: 'quarantined'` (P1-4) - surfaced for review via
+  + `status: 'quarantined'` - surfaced for review via
   `episodic.search(..., { includeQuarantined: true })`. Importance is a *soft*
   signal (never a retention gate). Controlled by the per-tier `formEpisodes` /
   `importanceScoring` flags (on at `standard` / `full`); budget-aware
@@ -197,7 +197,7 @@ any `EmbedderProvider`; the default is
   + Voyager-style success criteria for self-verification on reuse
   (`checkSuccessCriteria`). Induction fires on **success only** (a failed run
   never calls the inducer), and the result lands **quarantined** +
-  `provenance: 'induction'` (P1-4) - procedures drive *actions*, so this is the
+  `provenance: 'induction'` - procedures drive *actions*, so this is the
   highest-poisoning-risk write and is excluded from `activate()` until validated.
   `trajectoryFromRunState(runState)` distils the agent's already-emitted run
   state, so capture needs **no agent change**. Wire it with
@@ -427,7 +427,7 @@ MIT © 2026 Oleksiy Stepurenko.
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/memory/README.md) | `@graphorin/memory` - seven-tier memory system for the Graphorin framework (MST-13: working / session / episodic / semantic / procedural / shared + the read-only insight tier from P1-1). |
+| [](/api/@graphorin/memory/README.md) | `@graphorin/memory` - seven-tier memory system for the Graphorin framework (working / session / episodic / semantic / procedural / shared + the read-only insight tier). |
 | [conflict](/api/@graphorin/memory/conflict/index.md) | Public surface of the multi-stage conflict resolution pipeline shipped in `@graphorin/memory` Phase 10b (DEC-117 / ADR-018 ext / RB-02). |
 | [errors](/api/@graphorin/memory/errors/index.md) | Typed error classes raised by `@graphorin/memory`. Every memory subsystem throws one of these instead of plain `Error` so consumers can pattern-match on `kind` and `name` without parsing the message. |
 | [facade](/api/@graphorin/memory/facade/index.md) | `createMemory()` - the facade that wires every tier sub-module (the seven-tier system) + the eleven (+1 gated) memory tools + the search reranker + the context engine stubs + the consolidator placeholder. |
@@ -435,4 +435,4 @@ MIT © 2026 Oleksiy Stepurenko.
 | [package.json](/api/@graphorin/memory/package.json/index.md) | - |
 | [search](/api/@graphorin/memory/search/index.md) | Hybrid search composition for `@graphorin/memory`. Owns the `ReRanker` contract and the built-in `RRFReranker` (k=60 default). |
 | [tiers](/api/@graphorin/memory/tiers/index.md) | Six tier sub-modules for `@graphorin/memory`. Imported by the `createMemory()` facade; consumers can also instantiate a tier directly when wiring the package against a custom `MemoryStore`. |
-| [tools](/api/@graphorin/memory/tools/index.md) | Eleven memory tools registered with `@graphorin/tools` by the `createMemory()` facade - plus an opt-in twelfth, `deep_recall` (P2-4), appended only when iterative retrieval is configured. Each factory takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) bundle so consumers can scope the tool surface (per-tier ACL, scope resolver, etc.) without rebuilding the underlying memory facade. |
+| [tools](/api/@graphorin/memory/tools/index.md) | Eleven memory tools registered with `@graphorin/tools` by the `createMemory()` facade - plus an opt-in twelfth, `deep_recall`, appended only when iterative retrieval is configured. Each factory takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) bundle so consumers can scope the tool surface (per-tier ACL, scope resolver, etc.) without rebuilding the underlying memory facade. |

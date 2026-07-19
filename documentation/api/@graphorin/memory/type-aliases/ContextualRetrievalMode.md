@@ -15,4 +15,4 @@ Defined in: packages/memory/src/internal/contextualize.ts:31
 **`Stable`**
 
 Contextual-retrieval mode. `'late-chunk'` is the offline default;
-`'llm'` is the opt-in, consolidator-only enrichment. P1-3.
+`'llm'` is the opt-in, consolidator-only enrichment.

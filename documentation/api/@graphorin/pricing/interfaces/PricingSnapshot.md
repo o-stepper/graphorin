@@ -16,7 +16,7 @@ Single bundled snapshot.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-conversion"></a> `conversion?` | `readonly` | \{ `format`: `"genai-prices"`; `skipped`: `number`; \} | W-097: present when `refreshPricing` converted a foreign dataset (today: `@pydantic/genai-prices`) instead of consuming the native shape. `skipped` counts model entries the supported subset could not represent (tiered / conditional pricing). | pricing/src/types.ts:60 |
+| <a id="property-conversion"></a> `conversion?` | `readonly` | \{ `format`: `"genai-prices"`; `skipped`: `number`; \} | Present when `refreshPricing` converted a foreign dataset (today: `@pydantic/genai-prices`) instead of consuming the native shape. `skipped` counts model entries the supported subset could not represent (tiered / conditional pricing). | pricing/src/types.ts:60 |
 | `conversion.format` | `readonly` | `"genai-prices"` | - | pricing/src/types.ts:61 |
 | `conversion.skipped` | `readonly` | `number` | - | pricing/src/types.ts:62 |
 | <a id="property-currency"></a> `currency` | `readonly` | `"USD"` | - | pricing/src/types.ts:51 |

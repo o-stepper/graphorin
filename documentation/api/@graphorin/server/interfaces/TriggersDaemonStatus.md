@@ -22,5 +22,5 @@ endpoint can flag a deployment that disabled every cron trigger.
 | <a id="property-deferred"></a> `deferred` | `readonly` | `number` | - | packages/server/src/triggers/daemon.ts:30 |
 | <a id="property-disabled"></a> `disabled` | `readonly` | `number` | - | packages/server/src/triggers/daemon.ts:29 |
 | <a id="property-lastfireat"></a> `lastFireAt?` | `readonly` | `string` | Last fire timestamp across the entire pool (ISO-8601). | packages/server/src/triggers/daemon.ts:37 |
-| <a id="property-orphaned"></a> `orphaned?` | `readonly` | `number` | Persisted rows with no live declaration in this process (W-123) - they never fire until re-registered or pruned. | packages/server/src/triggers/daemon.ts:35 |
+| <a id="property-orphaned"></a> `orphaned?` | `readonly` | `number` | Persisted rows with no live declaration in this process - they never fire until re-registered or pruned. | packages/server/src/triggers/daemon.ts:35 |
 | <a id="property-running"></a> `running` | `readonly` | `boolean` | - | packages/server/src/triggers/daemon.ts:27 |

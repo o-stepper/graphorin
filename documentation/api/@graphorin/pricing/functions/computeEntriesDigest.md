@@ -10,7 +10,7 @@
 function computeEntriesDigest(entries): string;
 ```
 
-Defined in: pricing/src/snapshot/bundled.ts:299
+Defined in: pricing/src/snapshot/bundled.ts:319
 
 **`Internal`**
 

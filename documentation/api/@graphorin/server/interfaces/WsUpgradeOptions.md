@@ -16,7 +16,7 @@ Public configuration accepted by [createWsUpgradeEvents](/api/@graphorin/server/
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-anonymous"></a> `anonymous?` | `readonly` | `boolean` | IP-13: authentication is disabled server-wide (`auth.kind='none'`). Accept the upgrade unconditionally with a full (`admin:*`) scope grant instead of silently refusing to mount the WS route. Trusted-loopback / single-operator mode only. | packages/server/src/ws/upgrade.ts:76 |
+| <a id="property-anonymous"></a> `anonymous?` | `readonly` | `boolean` | Authentication is disabled server-wide (`auth.kind='none'`). Accept the upgrade unconditionally with a full (`admin:*`) scope grant instead of silently refusing to mount the WS route. Trusted-loopback / single-operator mode only. | packages/server/src/ws/upgrade.ts:76 |
 | <a id="property-dispatcher"></a> `dispatcher` | `readonly` | [`WsDispatcher`](/api/@graphorin/server/interfaces/WsDispatcher.md) | - | packages/server/src/ws/upgrade.ts:62 |
 | <a id="property-newsubscriberid"></a> `newSubscriberId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:86 |
 | <a id="property-newsubscriptionid"></a> `newSubscriptionId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:85 |
@@ -24,4 +24,4 @@ Public configuration accepted by [createWsUpgradeEvents](/api/@graphorin/server/
 | <a id="property-runs"></a> `runs?` | `readonly` | [`RunStateTracker`](/api/@graphorin/server/classes/RunStateTracker.md) | - | packages/server/src/ws/upgrade.ts:77 |
 | <a id="property-serversubprotocol"></a> `serverSubprotocol?` | `readonly` | `string` | Subprotocol the server advertises. Defaults to [SUBPROTOCOL\_NAME](/api/@graphorin/protocol/subprotocol/variables/SUBPROTOCOL_NAME.md); tests can override to exercise the mismatch path. | packages/server/src/ws/upgrade.ts:84 |
 | <a id="property-tickets"></a> `tickets` | `readonly` | [`WsTicketStore`](/api/@graphorin/server/interfaces/WsTicketStore.md) | - | packages/server/src/ws/upgrade.ts:63 |
-| <a id="property-verifier"></a> `verifier?` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | Token verifier for bearer / ticket upgrades. Optional only in the IP-13 no-auth loopback mode (`anonymous: true`), where there is no verifier to construct and every upgrade is accepted. | packages/server/src/ws/upgrade.ts:69 |
+| <a id="property-verifier"></a> `verifier?` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | Token verifier for bearer / ticket upgrades. Optional only in the no-auth loopback mode (`anonymous: true`), where there is no verifier to construct and every upgrade is accepted. | packages/server/src/ws/upgrade.ts:69 |

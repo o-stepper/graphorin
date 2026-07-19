@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/tool.ts:329
 
 **`Stable`**
 
-W-115: `true` when [isToolReturnEnvelope](/api/@graphorin/core/functions/isToolReturnEnvelope.md) matched WITHOUT the
+`true` when [isToolReturnEnvelope](/api/@graphorin/core/functions/isToolReturnEnvelope.md) matched WITHOUT the
 brand - observability for the future deprecation of the structural
 sniff.
 

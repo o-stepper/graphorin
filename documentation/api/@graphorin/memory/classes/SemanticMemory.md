@@ -36,20 +36,20 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:448
 | ------ | ------ | ------ |
 | `args` | \{ `conflictPipeline?`: [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md); `contextualRetrieval?`: `"off"` \| `"late-chunk"`; `embedder`: \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null`; `embedderIdProvider`: () => `string` \| `null`; `entityResolver?`: [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md); `grader?`: [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md); `injectionClassifier?`: \| [`InjectionClassifier`](/api/@graphorin/tools/interfaces/InjectionClassifier.md) \| `null`; `iterativeDifficultyThreshold?`: `number`; `iterativeMaxIterations?`: `number`; `queryTransformer?`: [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md); `reranker`: [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md); `searchDefaults?`: [`SemanticSearchDefaults`](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md); `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); `trustWeights?`: `SalienceWeights`; \} | - |
 | `args.conflictPipeline?` | [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md) | - |
-| `args.contextualRetrieval?` | `"off"` \| `"late-chunk"` | Contextual-retrieval mode for the write path (P1-3). `'late-chunk'` (default) prepends a deterministic situating context to the text that is embedded + FTS-indexed, leaving the canonical `text` untouched; `'off'` indexes the bare text. The hot write path never makes an LLM call - the `'llm'` enrichment is confined to the background consolidator, which supplies a precomputed `indexText`. |
+| `args.contextualRetrieval?` | `"off"` \| `"late-chunk"` | Contextual-retrieval mode for the write path. `'late-chunk'` (default) prepends a deterministic situating context to the text that is embedded + FTS-indexed, leaving the canonical `text` untouched; `'off'` indexes the bare text. The hot write path never makes an LLM call - the `'llm'` enrichment is confined to the background consolidator, which supplies a precomputed `indexText`. |
 | `args.embedder` | \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null` | - |
 | `args.embedderIdProvider` | () => `string` \| `null` | - |
-| `args.entityResolver?` | [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md) | Entity resolver for the relation graph (P2-1). When supplied, `remember(...)` resolves a fact's subject / object to canonical entities and links them, enabling `search(..., { expandHops: 1 })`. Omitted (the default) ⇒ writes carry s/p/o but form no entity links, and the write path stays offline + unchanged. |
-| `args.grader?` | [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md) | Retrieval grader for the gated iterative loop (P2-4). When supplied, `searchIterative(...)` can grade a retrieved set and reformulate on hard queries; omitted (the default) ⇒ `searchIterative` runs a single, difficulty-gated pass and makes no provider call. |
-| `args.injectionClassifier?` | \| [`InjectionClassifier`](/api/@graphorin/tools/interfaces/InjectionClassifier.md) \| `null` | B4 (D-12): optional pluggable injection classifier consulted at the write-time quarantine gate AFTER the regex heuristics. A flagged verdict quarantines the write exactly like a regex hit; classifier errors never fail the write (resilience contract). |
-| `args.iterativeDifficultyThreshold?` | `number` | Default difficulty-gate threshold for `searchIterative` (W-088). Omitted ⇒ the gate's built-in `0.5`. Per-call `difficultyThreshold` overrides it. |
+| `args.entityResolver?` | [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md) | Entity resolver for the relation graph. When supplied, `remember(...)` resolves a fact's subject / object to canonical entities and links them, enabling `search(..., { expandHops: 1 })`. Omitted (the default) ⇒ writes carry s/p/o but form no entity links, and the write path stays offline + unchanged. |
+| `args.grader?` | [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md) | Retrieval grader for the gated iterative loop. When supplied, `searchIterative(...)` can grade a retrieved set and reformulate on hard queries; omitted (the default) ⇒ `searchIterative` runs a single, difficulty-gated pass and makes no provider call. |
+| `args.injectionClassifier?` | \| [`InjectionClassifier`](/api/@graphorin/tools/interfaces/InjectionClassifier.md) \| `null` | Optional pluggable injection classifier consulted at the write-time quarantine gate AFTER the regex heuristics. A flagged verdict quarantines the write exactly like a regex hit; classifier errors never fail the write (resilience contract). |
+| `args.iterativeDifficultyThreshold?` | `number` | Default difficulty-gate threshold for `searchIterative`. Omitted ⇒ the gate's built-in `0.5`. Per-call `difficultyThreshold` overrides it. |
 | `args.iterativeMaxIterations?` | `number` | Default total-pass cap for `searchIterative`. Default 3. |
-| `args.queryTransformer?` | [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md) | Query transformer for multi-query / HyDE retrieval (P2-3). When supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one cheap LLM call to rewrite / hypothesize the query; omitted (the default) ⇒ those options are silent no-ops and search stays offline + single-shot. |
+| `args.queryTransformer?` | [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md) | Query transformer for multi-query / HyDE retrieval. When supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one cheap LLM call to rewrite / hypothesize the query; omitted (the default) ⇒ those options are silent no-ops and search stays offline + single-shot. |
 | `args.reranker` | [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md) | - |
-| `args.searchDefaults?` | [`SemanticSearchDefaults`](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md) | Construction-time retrieval defaults (W-086) merged under every `search(...)` call - see [SemanticSearchDefaults](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md). Because the merge happens inside `search()`, the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) inherit them without any per-surface wiring; per-call options override key-by-key (so e.g. `deep_recall`'s widen-pass `expandHops` still wins). |
+| `args.searchDefaults?` | [`SemanticSearchDefaults`](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md) | Construction-time retrieval defaults merged under every `search(...)` call - see [SemanticSearchDefaults](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md). Because the merge happens inside `search()`, the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) inherit them without any per-surface wiring; per-call options override key-by-key (so e.g. `deep_recall`'s widen-pass `expandHops` still wins). |
 | `args.store` | [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md) | - |
 | `args.tracer` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | - |
-| `args.trustWeights?` | `SalienceWeights` | Weights for the rank-time trust discount (C5). Reuses the eviction-path `SalienceWeights` semantics; defaults to `DEFAULT_SALIENCE_WEIGHTS`. |
+| `args.trustWeights?` | `SalienceWeights` | Weights for the rank-time trust discount. Reuses the eviction-path `SalienceWeights` semantics; defaults to `DEFAULT_SALIENCE_WEIGHTS`. |
 
 #### Returns
 
@@ -151,7 +151,7 @@ to, oldest → newest, including superseded / soft-deleted rows so
 callers can answer "how did this fact change over time". Requires
 a storage adapter that implements
 `SemanticMemoryStoreExt.historyOf(...)` - the default
-`@graphorin/store-sqlite` adapter wires this through. P0-2.
+`@graphorin/store-sqlite` adapter wires this through.
 
 #### Parameters
 
@@ -180,7 +180,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:1155
 **`Stable`**
 
 Raw vector KNN neighbours for the consolidator's reconcile
-pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
+pre-filter. Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
 and decay so the store's normalized `[0, 1]` similarity scores
 survive intact (Stage 2 maps them back to raw cosine before
 applying the conflict-pipeline zone thresholds), and it **includes
@@ -353,7 +353,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:1078
 
 **`Stable`**
 
-Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
+Gated, iterative ("deep") recall for hard queries. A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
 query is even a loop candidate; simple lookups take exactly one
 [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) pass and make no provider call. For a query judged
@@ -423,7 +423,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:1308
 
 Mark `oldId` superseded by a new fact. Returns the new record.
 
-W-019 (security-first, knowledge-preserving): when the successor
+Security-first and knowledge-preserving: when the successor
 lands QUARANTINED (the default for `extraction`/synthesized
 provenance), the old ACTIVE fact's validity interval is NOT closed
 - default recall keeps returning the old knowledge until the
@@ -431,10 +431,10 @@ successor passes [validate](/api/@graphorin/memory/classes/SemanticMemory.md#val
 The link is recorded on the successor's `supersedes` field. With
 `autoPromoteSynthesized` (threaded from the consolidator's
 `autoPromoteExtraction` escape hatch) an injection-clean successor
-is active immediately and the interval closes right away - the
-pre-W-019 behaviour. Inverting the default (auto-activating the
-successor) would hand a MINJA attacker instant active memory via
-any text the reconciler classifies as an 'update'.
+is active immediately and the interval closes right away.
+Inverting the default (auto-activating the successor) would hand a
+MINJA attacker instant active memory via any text the reconciler
+classifies as an 'update'.
 
 #### Parameters
 
@@ -470,14 +470,14 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:1234
 
 **`Stable`**
 
-Promote a quarantined fact to `active` (P1-4). The validation path
+Promote a quarantined fact to `active`. The validation path
 that admits a synthesized memory into action-driving recall once a
 human (or trusted non-agent caller) has reviewed it. Writes a
 `memory_history` audit row. Requires a storage adapter that
 implements `SemanticMemoryStoreExt.setStatus(...)` - the default
 `@graphorin/store-sqlite` adapter wires this through.
 
-MRET-3 / MST-1: promotion of a fact whose text still trips the
+Promotion of a fact whose text still trips the
 offline injection heuristics is **refused** with
 [QuarantinePromotionRefusedError](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md) - the model-facing
 `fact_validate` tool calls this with no `force`, so a poisoned
@@ -543,7 +543,7 @@ static fuseWeighted<TRecord>(
 
 Defined in: packages/memory/src/tiers/semantic-memory.ts:1408
 
-Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
+Pure weighted-fusion helper - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by
 `weights[i]`. A missing / invalid entry defaults to `1`, so equal or
 absent weights reproduce RRF.

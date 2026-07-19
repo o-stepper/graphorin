@@ -14,5 +14,5 @@ Defined in: packages/memory/src/tools/index.ts:69
 
 **`Stable`**
 
-Memory tool profile (wave-D D3): which slice of the canonical set an
+Memory tool profile: which slice of the canonical set an
 agent receives. `'interactive'` is read-only by construction.

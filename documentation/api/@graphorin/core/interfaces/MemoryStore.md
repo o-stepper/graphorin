@@ -18,7 +18,7 @@ Sub-namespaces map 1:1 to the six tiers so each implementation can
 pick its own physical layout (one big table, six tables, mixed) while
 preserving append-only semantics - soft-delete only.
 
-**Baseline vs full adapter (W-048).** This interface is the MINIMUM a
+**Baseline vs full adapter.** This interface is the MINIMUM a
 third-party adapter must implement; `@graphorin/memory` accepts it and
 degrades gracefully (vector search, decay, consolidation, insights,
 graph expansion, conflict audit switch off where the surface is

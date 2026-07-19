@@ -165,7 +165,7 @@ tests and for piping into observability without monkey-patching.
 ```
 
 A persisted trigger row has no re-registered declaration in this
-process (W-123). It will never fire; re-register the declaration
+process. It will never fire; re-register the declaration
 or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
 
 ***
@@ -180,7 +180,7 @@ or prune the row (`POST /v1/triggers/prune { "orphaned": true }`).
 ```
 
 The trigger's `expiresAt` instant passed, so the scheduler
-auto-paused it (C4): the persistent `disabled` flag is set instead
+auto-paused it: the persistent `disabled` flag is set instead
 of firing the callback. Renew with a later `expiresAt` +
 `setDisabled(id, false)`, or prune it
 (`POST /v1/triggers/prune { "disabled": true }`).

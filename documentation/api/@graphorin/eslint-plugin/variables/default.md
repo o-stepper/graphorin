@@ -25,7 +25,7 @@ const default: {
 
 Defined in: src/index.ts:73
 
-PS-17: ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form
+Ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form
 (`plugins: ['@graphorin']`); `flat/recommended` is the ESLint 9+ flat-config
 form that maps the namespace to the plugin object, so flat-config consumers
 can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules.

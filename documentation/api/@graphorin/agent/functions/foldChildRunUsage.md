@@ -18,7 +18,7 @@ Defined in: packages/agent/src/runtime/messages.ts:288
 
 Fold a completed (or failed - tokens were spent either way) child
 run's usage into the parent run's accounting: `state.usage`,
-`state.usageByModel` and the run's [UsageAccumulator](/api/@graphorin/core/interfaces/UsageAccumulator.md) (W-033).
+`state.usageByModel` and the run's [UsageAccumulator](/api/@graphorin/core/interfaces/UsageAccumulator.md).
 Children carrying a per-model breakdown fold model-by-model (each
 child model entry counts as one attempt on the parent); a child
 without `usageByModel` folds its aggregate under the synthetic id

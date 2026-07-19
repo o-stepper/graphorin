@@ -179,7 +179,7 @@ replace(skill): void;
 
 Defined in: packages/skills/src/registry/index.ts:75
 
-Upsert a skill by name (RP-11). Unlike [SkillRegistry.register](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#register),
+Upsert a skill by name. Unlike [SkillRegistry.register](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#register),
 `replace` overwrites an existing registration instead of throwing on a
 name collision - the upgrade path for hot-reloading a re-loaded skill.
 

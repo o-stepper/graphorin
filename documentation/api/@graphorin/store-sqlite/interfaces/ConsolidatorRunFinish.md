@@ -16,13 +16,13 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:61
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-conflictsresolved"></a> `conflictsResolved?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:69 |
 | <a id="property-emptyextractions"></a> `emptyExtractions?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:71 |
-| <a id="property-episodesformed"></a> `episodesFormed?` | `readonly` | `number` | Episodes auto-formed by the run (P1-2 / MCON-17). | packages/store-sqlite/src/consolidator-store.ts:73 |
+| <a id="property-episodesformed"></a> `episodesFormed?` | `readonly` | `number` | Episodes auto-formed by the run. | packages/store-sqlite/src/consolidator-store.ts:73 |
 | <a id="property-errormessage"></a> `errorMessage?` | `readonly` | `string` \| `null` | - | packages/store-sqlite/src/consolidator-store.ts:76 |
 | <a id="property-factscreated"></a> `factsCreated?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:67 |
 | <a id="property-factsupdated"></a> `factsUpdated?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:68 |
 | <a id="property-finishedat"></a> `finishedAt` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:63 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/store-sqlite/src/consolidator-store.ts:62 |
-| <a id="property-insightscreated"></a> `insightsCreated?` | `readonly` | `number` | Insights synthesized by the run's reflection pass (P1-1 / MCON-17). | packages/store-sqlite/src/consolidator-store.ts:75 |
+| <a id="property-insightscreated"></a> `insightsCreated?` | `readonly` | `number` | Insights synthesized by the run's reflection pass. | packages/store-sqlite/src/consolidator-store.ts:75 |
 | <a id="property-llmcostusd"></a> `llmCostUsd?` | `readonly` | `number` \| `null` | - | packages/store-sqlite/src/consolidator-store.ts:66 |
 | <a id="property-llmtokensused"></a> `llmTokensUsed?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:65 |
 | <a id="property-noisefilteredcount"></a> `noiseFilteredCount?` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:70 |

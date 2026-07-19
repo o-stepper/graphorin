@@ -31,7 +31,7 @@ the token is unknown. The store is responsible for setting the
 | `id` | `string` | - |
 | `opts` | \{ `now?`: () => `number`; `verifier?`: \{ `invalidate`: `void`; \}; \} | - |
 | `opts.now?` | () => `number` | - |
-| `opts.verifier?` | \{ `invalidate`: `void`; \} | SPL-9: pass the live `TokenVerifier` so revocation invalidates its LRU entry immediately - without it a revoked token keeps verifying from the cache for up to `cacheTtlMaxMs` (default 60s). |
+| `opts.verifier?` | \{ `invalidate`: `void`; \} | Pass the live `TokenVerifier` so revocation invalidates its LRU entry immediately - without it a revoked token keeps verifying from the cache for up to `cacheTtlMaxMs` (default 60s). |
 | `opts.verifier.invalidate` | - |
 
 ## Returns

@@ -12,7 +12,7 @@ function parseScore(text): number | null;
 
 Defined in: packages/evals/src/scorers/llm/judge.ts:107
 
-EB-7: parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
+Parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
 the reply. Anchoring on a deliberate, trailing marker - rather than the first
 integer anywhere - means a number the judge echoes from the candidate, or a
 refusal that mentions the `0-10` range, cannot be mistaken for the grade.

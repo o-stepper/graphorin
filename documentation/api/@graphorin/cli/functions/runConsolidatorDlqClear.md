@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/consolidator.ts:315
 
 **`Stable`**
 
-W-065: clear dead-letter batches. Defaults are conservative:
+Clear dead-letter batches. Defaults are conservative:
 exhausted-only, all users, no age bound. The batch payload (message
 ids) is lost on delete - that is the explicit point of the command.
 

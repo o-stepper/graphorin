@@ -19,6 +19,6 @@ Used by health endpoints / `graphorin doctor` once those ship.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cachesize"></a> `cacheSize` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:139 |
 | <a id="property-inflight"></a> `inFlight` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:140 |
-| <a id="property-peripfailures"></a> `perIpFailures` | `readonly` | `number` | Distinct IPs currently in the failure window map (SPL-19, capped). | packages/security/src/auth/verify.ts:142 |
+| <a id="property-peripfailures"></a> `perIpFailures` | `readonly` | `number` | Distinct IPs currently in the failure window map (capped). | packages/security/src/auth/verify.ts:142 |
 | <a id="property-periplockouts"></a> `perIpLockouts` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:143 |
 | <a id="property-pertokenlockouts"></a> `perTokenLockouts` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:144 |

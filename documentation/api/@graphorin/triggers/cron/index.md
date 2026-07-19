@@ -36,7 +36,7 @@ OR-combines the two restricted fields. AND semantics are easier to
 reason about in personal-assistant scenarios; the framework stays
 consistent with this rule rather than mixing the two conventions.
 
-**Timezones (W-124).** By default the scheduler evaluates every
+**Timezones.** By default the scheduler evaluates every
 expression in **UTC**. `nextFireAfter(parsed, from, timeZone)`
 accepts an optional IANA zone name; the five fields then match the
 wall clock of that zone and the returned `Date` is the corresponding

@@ -121,9 +121,10 @@ string (cron expr / event name).
 }
 ```
 
-Item 7 (A2): fire when the unconsolidated transcript tail (from
-the standard-phase cursor) reaches `tokens` tokens (chars/4 proxy,
-same measure as the W-081 transcript budget). Evaluated on
-activity signals via `Consolidator.notifyActivity(...)` - the
-scheduler cannot measure the tail on its own. Not to be confused
-with `budget:F`, which is a spent-budget fraction.
+Fire when the unconsolidated transcript tail (from the
+standard-phase cursor) reaches `tokens` tokens (chars/4 proxy, the
+same measure as the `maxTranscriptChars` transcript budget).
+Evaluated on activity signals via
+`Consolidator.notifyActivity(...)` - the scheduler cannot measure
+the tail on its own. Not to be confused with `budget:F`, which is
+a spent-budget fraction.

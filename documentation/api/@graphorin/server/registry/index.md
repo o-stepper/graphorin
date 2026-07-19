@@ -15,7 +15,7 @@ Every entry is keyed by string id; lookups never throw - callers
 receive `undefined` and the route handler decides how to surface
 the miss (typically a 404 with a typed error body).
 
-W-053: compatibility of `ServerAgentLike` / `ServerWorkflowLike` with
+Compatibility of `ServerAgentLike` / `ServerWorkflowLike` with
 the real `Agent` / `Workflow` surfaces is gated at compile time by
 `tests/registry-contract.types.test.ts` - a drift in either direction
 fails the server package's typecheck, not a user's runtime. When a

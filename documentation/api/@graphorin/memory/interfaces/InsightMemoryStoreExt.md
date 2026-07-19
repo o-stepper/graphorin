@@ -10,8 +10,8 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:732
 
 **`Stable`**
 
-Optional storage extension for the reflection `insights` table
-(P1-1). The consolidator's reflection pass inserts quarantined,
+Optional storage extension for the reflection `insights` table.
+The consolidator's reflection pass inserts quarantined,
 cited insights here; the thin `InsightMemory` read surface lists /
 searches them; the ExpeL salience loop bumps + prunes them. Search is
 FTS-only by design - insights are a soft, rank-capped inspector
@@ -182,7 +182,7 @@ scope?): Promise<void>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:750
 
-Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
+Set an insight's retrieval-trust `status` - promote a quarantined
 (reflection) insight or re-quarantine an active one, with a
 `memory_history` audit row. Powers [InsightMemory.validate](/api/@graphorin/memory/classes/InsightMemory.md#validate).
 

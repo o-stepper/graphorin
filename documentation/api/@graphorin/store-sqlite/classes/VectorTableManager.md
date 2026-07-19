@@ -14,7 +14,7 @@ Lazy-creator for per-embedder `vec0` virtual tables. The first write
 for `(entity, embedder_id)` creates the corresponding `*_vec_<slug>`
 virtual table; subsequent writes hit the cached existence check.
 
-Wave-D D5: in `'linear-fallback'` mode (sqlite-vec unavailable +
+In `'linear-fallback'` mode (sqlite-vec unavailable +
 `onMissingSqliteVec: 'linear-fallback'`) the same table names are
 created as PLAIN tables (`<id> TEXT PRIMARY KEY, embedding BLOB`)
 and KNN is served by [VectorTableManager.linearKnn](/api/@graphorin/store-sqlite/classes/VectorTableManager.md#linearknn) - a
@@ -55,7 +55,7 @@ get mode(): "vec0" | "linear-fallback" | "disabled";
 
 Defined in: packages/store-sqlite/src/vector-table-mgr.ts:96
 
-Active vector-serving mode (wave-D D5).
+Active vector-serving mode.
 
 ##### Returns
 
@@ -149,7 +149,7 @@ Defined in: packages/store-sqlite/src/vector-table-mgr.ts:109
 
 **`Stable`**
 
-In-process cosine KNN over a plain fallback sidecar (wave-D D5):
+In-process cosine KNN over a plain fallback sidecar:
 scans the table in batches of `batchSize` rows, yielding to the
 event loop between batches (`setImmediate`) so a large scan cannot
 monopolise it, and keeps the `k` nearest by cosine distance

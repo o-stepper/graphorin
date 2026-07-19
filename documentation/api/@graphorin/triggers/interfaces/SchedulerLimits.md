@@ -10,7 +10,7 @@ Defined in: packages/triggers/src/index.ts:285
 
 **`Stable`**
 
-Opt-in scheduler harness for proactive task fleets (C4). Values are
+Opt-in scheduler harness for proactive task fleets. Values are
 bot policy; the defaults are conservative.
 
 ## Properties

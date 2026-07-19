@@ -94,5 +94,5 @@ subject grammar enforced by the server:
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
 | `id` | `string` | - | packages/client/src/graphorin-client.ts:89 |
-| `runId?` | `string` | E-12: the server emits workflow run events ONLY on the run-scoped subject (`workflow:<id>/runs/<runId>/events`) advertised by `POST /v1/workflows/:id/execute` (and resume), never on the base `workflow:<id>/events` subject - pass the advertised `runId` to receive them. | packages/client/src/graphorin-client.ts:97 |
+| `runId?` | `string` | The server emits workflow run events ONLY on the run-scoped subject (`workflow:<id>/runs/<runId>/events`) advertised by `POST /v1/workflows/:id/execute` (and resume), never on the base `workflow:<id>/events` subject - pass the advertised `runId` to receive them. | packages/client/src/graphorin-client.ts:97 |
 | `target` | `"workflow"` | - | packages/client/src/graphorin-client.ts:88 |

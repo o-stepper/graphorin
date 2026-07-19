@@ -10,7 +10,7 @@
 function memoryFlushHook(options): NamedPreCompactionHook;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/memory-flush.ts:67
+Defined in: packages/memory/src/context-engine/compaction/hooks/memory-flush.ts:66
 
 **`Stable`**
 

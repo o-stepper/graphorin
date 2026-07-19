@@ -10,7 +10,7 @@
 function toSpanAttributes(annotation): Readonly<Record<string, string>>;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:138
+Defined in: packages/memory/src/context-engine/annotations.ts:139
 
 **`Stable`**
 

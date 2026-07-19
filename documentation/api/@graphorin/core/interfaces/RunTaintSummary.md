@@ -6,19 +6,19 @@
 
 # Interface: RunTaintSummary
 
-Defined in: packages/core/src/types/run.ts:225
+Defined in: packages/core/src/types/run.ts:224
 
 **`Stable`**
 
 Coarse, serializable data-flow taint summary persisted in [RunState](/api/@graphorin/core/interfaces/RunState.md)
-across suspend/resume (AG-19). Structurally identical to
+across suspend/resume. Structurally identical to
 `@graphorin/security`'s `TaintLedgerSnapshot`; carries no untrusted text.
 
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:227 |
-| <a id="property-spantilehashes"></a> `spanTileHashes?` | `readonly` | readonly `string`[] | C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms the verbatim-carry probe after a resume at tile granularity. Hashes only - no untrusted text is ever persisted (the invariant above holds). | packages/core/src/types/run.ts:235 |
-| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:226 |
-| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | - | packages/core/src/types/run.ts:228 |
+| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:226 |
+| <a id="property-spantilehashes"></a> `spanTileHashes?` | `readonly` | readonly `string`[] | One-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms the verbatim-carry probe after a resume at tile granularity. Hashes only - no untrusted text is ever persisted (the invariant above holds). | packages/core/src/types/run.ts:234 |
+| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:225 |
+| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | - | packages/core/src/types/run.ts:227 |

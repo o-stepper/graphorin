@@ -23,7 +23,7 @@ cron schedule. Returns a UTC `Date`.
 Without `timeZone` the expression is evaluated in **UTC** (the
 historical default). With an IANA `timeZone` the fields match the
 wall clock of that zone; DST transitions follow Vixie cron
-semantics (see the module doc, W-124).
+semantics (see the module doc).
 
 Returns `null` if no fire happens in the next 4 years (defensive -
 impossible for a well-formed cron expression except a vacuous

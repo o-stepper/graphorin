@@ -10,7 +10,7 @@ Defined in: packages/memory/src/context-engine/compaction/types.ts:229
 
 **`Stable`**
 
-Per-call context handed to a PRE-compaction hook (wave-D D4) -
+Per-call context handed to a PRE-compaction hook -
 fired BEFORE the summarizer runs, while the full buffer is still
 available. This is the seam the built-in `memoryFlushHook` uses to
 salvage durable facts from content that is about to be summarized

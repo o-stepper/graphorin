@@ -9,9 +9,9 @@
 Defined in: packages/workflow/src/errors/index.ts:345
 
 Thrown when a value that rides the checkpoint would not survive a
-JSON round-trip (WF-10) - Map/Set/Date/class instances silently
+JSON round-trip - Map/Set/Date/class instances silently
 degrade with the SQLite store, so every store rejects them eagerly.
-Covers EVERYTHING that round-trips through the checkpoint (W-121):
+Covers EVERYTHING that round-trips through the checkpoint:
 channel state, pause values and approval payloads, dispatchArgs,
 satisfied resume values, and operator directives (validated at
 resume entry, before the node body runs). The pseudo-channels

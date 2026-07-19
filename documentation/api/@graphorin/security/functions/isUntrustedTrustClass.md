@@ -14,7 +14,7 @@ Defined in: packages/security/src/dataflow/derive.ts:34
 
 **`Stable`**
 
-Whether a tool trust class is an UNTRUSTED-content source (W-101).
+Whether a tool trust class is an UNTRUSTED-content source.
 The single definition shared by the taint engine
 ([deriveTaintLabel](/api/@graphorin/security/functions/deriveTaintLabel.md)) and the Rule-of-Two `untrustedInput` leg -
 the two layers must never disagree about what "untrusted" means.

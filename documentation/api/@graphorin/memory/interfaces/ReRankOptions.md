@@ -17,6 +17,6 @@ propagated to any async work the reranker performs.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-labels"></a> `labels?` | `readonly` | readonly `string`[] | Stable per-list labels for the explanation signals (MRET-13) - `rrf.<label>` instead of the ephemeral `rrf.list_<index>`. Callers that fan lists out conditionally (multi-query, HyDE, graph) pass retriever-kind labels so X-3 consumers can identify which leg a contribution came from across calls. Missing entries fall back to the positional key. | packages/memory/src/search/types.ts:49 |
+| <a id="property-labels"></a> `labels?` | `readonly` | readonly `string`[] | Stable per-list labels for the explanation signals - `rrf.<label>` instead of the ephemeral `rrf.list_<index>`. Callers that fan lists out conditionally (multi-query, HyDE, graph) pass retriever-kind labels so explanation consumers can identify which leg a contribution came from across calls. Missing entries fall back to the positional key. | packages/memory/src/search/types.ts:50 |
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/memory/src/search/types.ts:40 |
 | <a id="property-topk"></a> `topK?` | `readonly` | `number` | - | packages/memory/src/search/types.ts:39 |

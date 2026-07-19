@@ -9,8 +9,8 @@
 Defined in: packages/mcp/src/errors/index.ts:101
 
 Raised when a pinned tool-definition fingerprint does not match the
-server's current definition and `onPinMismatch: 'reject'` is set
-(MC-6) - the approve-then-swap rug-pull posture.
+server's current definition and `onPinMismatch: 'reject'` is
+set - the approve-then-swap rug-pull posture.
 
 ## Extends
 

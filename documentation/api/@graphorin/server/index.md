@@ -126,7 +126,7 @@ The most-frequently-touched options:
 | Module | Description |
 | ------ | ------ |
 | [](/api/@graphorin/server/README.md) | `@graphorin/server` - standalone server runtime for the Graphorin framework. |
-| [channels](/api/@graphorin/server/channels/index.md) | `@graphorin/server/channels` - B1.6 lifecycle adapter for a channel gateway (structural typing over `@graphorin/channels`; no package dependency). |
+| [channels](/api/@graphorin/server/channels/index.md) | `@graphorin/server/channels` - lifecycle adapter for a channel gateway (structural typing over `@graphorin/channels`; no package dependency). |
 | [commentary](/api/@graphorin/server/commentary/index.md) | Delivery-layer commentary-phase trace sanitization for `@graphorin/server`. |
 | [config](/api/@graphorin/server/config/index.md) | Strongly-typed configuration loader for the Graphorin server. |
 | [consolidator](/api/@graphorin/server/consolidator/index.md) | `@graphorin/server/consolidator` - Phase 14c lifecycle adapter for the consolidator runtime. |

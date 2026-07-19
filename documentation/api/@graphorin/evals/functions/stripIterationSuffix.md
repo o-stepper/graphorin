@@ -15,7 +15,7 @@ Defined in: packages/evals/src/stats.ts:85
 **`Stable`**
 
 Strip the `-iter-N` disambiguation suffix the runner appends under
-`iterations > 1` (EB-6), recovering the base case id.
+`iterations > 1`, recovering the base case id.
 
 ## Parameters
 

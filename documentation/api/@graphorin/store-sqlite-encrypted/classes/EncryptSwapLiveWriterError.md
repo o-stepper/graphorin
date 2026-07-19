@@ -11,7 +11,7 @@ Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:100
 **`Stable`**
 
 Thrown when `encryptDatabase({ swap: true })` detects another live
-connection on the source database (W-012). The swap path renames the
+connection on the source database. The swap path renames the
 source file; a live writer would keep writing into the renamed
 `.bak.<ts>` inode and silently diverge from the encrypted copy.
 

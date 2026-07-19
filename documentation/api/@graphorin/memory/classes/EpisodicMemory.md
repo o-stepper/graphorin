@@ -106,7 +106,7 @@ opts?): Promise<readonly Episode[]>;
 Defined in: packages/memory/src/tiers/episodic-memory.ts:277
 
 Most-recent episodes by end time (newest first), with no embedding / FTS
-query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` - the default
+query. Requires `EpisodicMemoryStoreExt.listRecent` - the default
 `@graphorin/store-sqlite` adapter implements it. Optionally includes
 quarantined episodes (the importance source for the reflection gate).
 
@@ -215,7 +215,7 @@ options?): Promise<void>;
 
 Defined in: packages/memory/src/tiers/episodic-memory.ts:308
 
-Promote a quarantined episode into default recall (MCON-2). Mirrors
+Promote a quarantined episode into default recall. Mirrors
 [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the
 stored summary and **refuses** promotion of an injection-flagged episode
 (`QuarantinePromotionRefusedError`) unless an operator passes

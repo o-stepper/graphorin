@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/tool.ts:200
 
 **`Stable`**
 
-Existentially-typed [Tool](/api/@graphorin/core/interfaces/Tool.md) for collection seams (W-100).
+Existentially-typed [Tool](/api/@graphorin/core/interfaces/Tool.md) for collection seams.
 
 `Tool` is invariant in `TInput` (the `needsApproval` /
 `idempotencyKey` predicate properties are contravariant in it), so a

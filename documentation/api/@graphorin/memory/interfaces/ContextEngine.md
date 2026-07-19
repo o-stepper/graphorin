@@ -65,9 +65,9 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 | `input.agentId` | `string` | - |
 | `input.memory` | [`Memory`](/api/@graphorin/memory/interfaces/Memory.md) | - |
 | `input.messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
-| `input.prefixMessages?` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | The caller's pinned system prefix - the messages EXCLUDED from `messages` before this call (context-engine-04). Used only for accounting: the anti-thrash guard and the "still above threshold" warning must compare against the FULL post-splice context (prefix + summary + preserved + essentials), or a real system prompt defeats the guard and a summarizer call fires every step at the context edge. Never compacted, never returned. |
-| `input.preserveRecentTurns?` | `number` | Per-call override of the strategy's preserve-recent count (CE-3). |
-| `input.procedural?` | \{ `tags?`: readonly `string`[]; `topic?`: `string`; \} | Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). |
+| `input.prefixMessages?` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | The caller's pinned system prefix - the messages EXCLUDED from `messages` before this call. Used only for accounting: the anti-thrash guard and the "still above threshold" warning must compare against the FULL post-splice context (prefix + summary + preserved + essentials), or a real system prompt defeats the guard and a summarizer call fires every step at the context edge. Never compacted, never returned. |
+| `input.preserveRecentTurns?` | `number` | Per-call override of the strategy's preserve-recent count. |
+| `input.procedural?` | \{ `tags?`: readonly `string`[]; `topic?`: `string`; \} | Topic/tags narrowing for the procedural-rules re-anchor hook. |
 | `input.procedural.tags?` | readonly `string`[] | - |
 | `input.procedural.topic?` | `string` | - |
 | `input.runId` | `string` | - |
@@ -129,7 +129,7 @@ is warm.
 | ------ | ------ | ------ |
 | `messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
 | `options?` | \{ `compactableFromIndex?`: `number`; `precomputedTokens?`: `number`; \} | - |
-| `options.compactableFromIndex?` | `number` | Index of the first COMPACTABLE message (context-engine-04): the caller's pinned, never-compacted system prefix ends here. The SOTA-4 reclaim floor counts only `messages.slice(from)` older turns as reclaimable - without it a large system prompt is counted as reclaimable and the floor fires the summarizer for near-zero real reclaim. Default `0` (everything compactable). |
+| `options.compactableFromIndex?` | `number` | Index of the first COMPACTABLE message: the caller's pinned, never-compacted system prefix ends here. The The reclaim floor counts only `messages.slice(from)` older turns as reclaimable - without it a large system prompt is counted as reclaimable and the floor fires the summarizer for near-zero real reclaim. Default `0` (everything compactable). |
 | `options.precomputedTokens?` | `number` | - |
 
 #### Returns

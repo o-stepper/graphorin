@@ -10,7 +10,7 @@ Defined in: packages/agent/src/errors/index.ts:352
 
 **`Stable`**
 
-Deep retest 2026-07-19 (P1-3): `RunBudget.maxCostUsd` is set but the
+`RunBudget.maxCostUsd` is set but the
 accumulated usage carries no USD cost data, so the ceiling cannot
 observe spend. Under the fail-closed default
 (`RunBudget.onUnpriced: 'fail'`) the run stops at the first

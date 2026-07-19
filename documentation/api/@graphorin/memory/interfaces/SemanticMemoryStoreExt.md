@@ -28,7 +28,7 @@ optional count(scope): Promise<number>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:159
 
-Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
+Count the recall-eligible facts for the scope - a `COUNT(*)` with
 the default recall filters (live, non-archived, non-quarantined), never
 materialising rows. Powers honest `metadata()` counts.
 
@@ -55,7 +55,7 @@ scope?): Promise<void>;
 
 Defined in: [packages/core/dist/contracts/memory-store.d.ts](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts)
 
-Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+Soft-delete a fact. When `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
 deterministic no-op (0 rows changed) - defense in depth so a
 leaked / cross-user id reaching a mutator cannot touch another
@@ -118,7 +118,7 @@ return every fact in it, oldest → newest (by `validFrom`),
 including superseded / soft-deleted rows so callers can answer
 "how did this fact change over time". Scope-guarded and
 cycle-safe; returns `[]` for an unknown id. Powers
-[SemanticMemory.history](/api/@graphorin/memory/classes/SemanticMemory.md#history) (P0-2). The default
+[SemanticMemory.history](/api/@graphorin/memory/classes/SemanticMemory.md#history). The default
 `@graphorin/store-sqlite` adapter implements it.
 
 #### Parameters
@@ -142,7 +142,7 @@ optional linkPendingSupersede(newId, oldId): Promise<void>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:175
 
-W-019: record a PENDING supersede link - set `newId.supersedes =
+Record a PENDING supersede link - set `newId.supersedes =
 oldId` WITHOUT closing the old fact's validity interval. Used when
 a supersede's successor lands quarantined: the old fact must stay
 in default recall until the successor is validated, at which point
@@ -171,13 +171,13 @@ optional listActive(scope, options?): Promise<readonly Fact[]>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:197
 
-Enumerate the recall-eligible facts for the scope (wave-D): live,
+Enumerate the recall-eligible facts for the scope: live,
 non-archived, `status = 'active'`, validity interval containing
 now - the same view default recall sees, but as a deterministic
 list (`created_at` order) instead of a ranked search. Powers the
-profile-projection pass (D2) and the operation-level benchmark
-observation (D1). `excludePendingSupersede` additionally drops
-facts whose supersede is still pending W-019 validation (a
+profile-projection pass and the operation-level benchmark
+observation. `excludePendingSupersede` additionally drops
+facts whose supersede is still pending validation (a
 quarantined successor links to them) - a projection must not
 present a value that is already known to be contested.
 
@@ -209,7 +209,7 @@ optional listPromotionCandidates(scope, options?): Promise<readonly {
 Defined in: packages/memory/src/internal/storage-adapter.ts:211
 
 Enumerate quarantined, live, non-archived facts together with
-their recall statistics (wave-D D4) - the candidate feed for the
+their recall statistics - the candidate feed for the
 deterministic PromotionPolicy: `accessCount` is the monotonic
 migration-027 counter, `uniqueQueryCount` the migration-036
 distinct-query ledger count. Deterministic `created_at` order.
@@ -355,10 +355,10 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:112
 | `embedding` | `Float32Array` | - |
 | `embedderId` | `string` | - |
 | `topK` | `number` | - |
-| `asOf?` | `string` | Point-in-time filter applied after KNN: only facts whose validity interval contains `asOf` (ISO-8601) survive. P0-2. |
-| `includeQuarantined?` | `boolean` | Include quarantined facts in the KNN result (validation / inspector path). Default reads exclude them. P1-4. |
-| `includeSuperseded?` | `boolean` | Include superseded / validity-expired facts. Default reads evaluate validity at NOW (memory-retrieval-01). |
-| `owner?` | \| [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md) \| readonly [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md)[] | Retrieval-time principal filter (D3). Rows with no stored owner are treated as `'user'`. Absent ⇒ no owner filter. |
+| `asOf?` | `string` | Point-in-time filter applied after KNN: only facts whose validity interval contains `asOf` (ISO-8601) survive. |
+| `includeQuarantined?` | `boolean` | Include quarantined facts in the KNN result (validation / inspector path). Default reads exclude them. |
+| `includeSuperseded?` | `boolean` | Include superseded / validity-expired facts. Default reads evaluate validity at NOW. |
+| `owner?` | \| [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md) \| readonly [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md)[] | Retrieval-time principal filter. Rows with no stored owner are treated as `'user'`. Absent ⇒ no owner filter. |
 
 #### Returns
 
@@ -379,7 +379,7 @@ scope?): Promise<void>;
 Defined in: packages/memory/src/internal/storage-adapter.ts:148
 
 Set a fact's retrieval-trust `status` and write a `memory_history`
-audit row (P1-4). Promotes a quarantined fact to `active` (the
+audit row. Promotes a quarantined fact to `active` (the
 validation path) or re-quarantines an active one. Never touches
 content / embedding / tombstone - quarantine is a retrieval gate.
 Powers [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate); the default

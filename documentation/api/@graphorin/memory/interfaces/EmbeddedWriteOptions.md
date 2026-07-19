@@ -24,4 +24,4 @@ storage package directly.
 | <a id="property-embedding"></a> `embedding?` | `readonly` | \{ `embedderId`: `string`; `vector`: `Float32Array`; \} | - | packages/memory/src/internal/storage-adapter.ts:37 |
 | `embedding.embedderId` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:38 |
 | `embedding.vector` | `readonly` | `Float32Array` | - | packages/memory/src/internal/storage-adapter.ts:39 |
-| <a id="property-indextext"></a> `indexText?` | `readonly` | `string` | Contextual-retrieval index text (P1-3). When supplied, the adapter indexes its lexical (FTS) surface against this context-prepended text while persisting the canonical `text` unchanged. Absent ⇒ the canonical text is indexed (pre-P1-3 behaviour). | packages/memory/src/internal/storage-adapter.ts:47 |
+| <a id="property-indextext"></a> `indexText?` | `readonly` | `string` | Contextual-retrieval index text. When supplied, the adapter indexes its lexical (FTS) surface against this context-prepended text while persisting the canonical `text` unchanged. Absent ⇒ the canonical text is indexed (no situating prefix). | packages/memory/src/internal/storage-adapter.ts:47 |

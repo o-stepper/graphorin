@@ -15,7 +15,7 @@ instance is shared across workers (a Graphorin `Agent` enforces one
 run in flight per instance). This is a run *configuration* error -
 every remaining case on the shared instance would fail the same way,
 so the runner fails fast with the remedy instead of burying the
-cause in per-case scorer failures (E-19). The original agent error
+cause in per-case scorer failures. The original agent error
 is preserved as `cause`.
 
 ## Extends

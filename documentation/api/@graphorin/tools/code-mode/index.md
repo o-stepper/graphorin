@@ -6,7 +6,7 @@
 
 # code-mode
 
-Code-mode / programmatic tool calling (P1-2). Public surface:
+Code-mode / programmatic tool calling. Public surface:
 
 - [projectToolApi](/api/@graphorin/tools/code-mode/functions/projectToolApi.md) - project a resolved tool set as a typed code
   API (catalogue + per-tool signatures).
@@ -40,6 +40,6 @@ projection. The agent runtime wires them behind the opt-in
 
 | Function | Description |
 | ------ | ------ |
-| [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md) | Build the `code_execute` meta-tool. Its output is the script's final value rendered as a string, so the executor's `maxResultTokens` / `'spill-to-file'` pipeline bounds even a large final result (WI-10). |
+| [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md) | Build the `code_execute` meta-tool. Its output is the script's final value rendered as a string, so the executor's `maxResultTokens` / `'spill-to-file'` pipeline bounds even a large final result. |
 | [createCodeSearchTool](/api/@graphorin/tools/code-mode/functions/createCodeSearchTool.md) | Build the `code_search` meta-tool. Returns matching `tools.<name>(…)` signatures as text (eager substring match + the deferred pool). |
 | [projectToolApi](/api/@graphorin/tools/code-mode/functions/projectToolApi.md) | Project a set of resolved tools as a typed code API. See the module docstring. |

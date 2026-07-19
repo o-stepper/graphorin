@@ -14,7 +14,7 @@ Defined in: packages/security/src/policy/tool-argument-policy.ts:225
 
 **`Stable`**
 
-Name-level deny check (E1 deny-by-name): does a PREDICATE-FREE
+Name-level deny check (deny-by-name): does a PREDICATE-FREE
 `deny`/`forbid` rule match this tool name? Used at advertise time -
 the per-step catalogue, `tool_search` results/promotion and the
 executor's early mirror all consult it BEFORE any args exist. A rule

@@ -10,7 +10,7 @@ Defined in: packages/provider/src/middleware/with-cost-tracking.ts:42
 
 **`Stable`**
 
-A process-local cost accumulator (PS-8). Wire [CostAccumulator.onUsage](/api/@graphorin/provider/interfaces/CostAccumulator.md#property-onusage)
+A process-local cost accumulator. Wire [CostAccumulator.onUsage](/api/@graphorin/provider/interfaces/CostAccumulator.md#property-onusage)
 into [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md) and read the running totals - keyed by
 `provider × model` - back via [CostAccumulator.totals](/api/@graphorin/provider/interfaces/CostAccumulator.md#totals) /
 [CostAccumulator.totalFor](/api/@graphorin/provider/interfaces/CostAccumulator.md#totalfor).

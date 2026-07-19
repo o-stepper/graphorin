@@ -11,7 +11,7 @@ Defined in: packages/agent/src/errors/index.ts:159
 **`Stable`**
 
 Thrown when a second `run()` / `stream()` starts while another run is
-in flight on the same `Agent` instance (AG-11). The public surface
+in flight on the same `Agent` instance. The public surface
 (`steer` / `followUp` / `abort` / `compact`) addresses "the run"
 without a run handle, so overlapping runs would share the abort
 controller, steer queue, and executor bridge - start the second run

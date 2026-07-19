@@ -13,7 +13,7 @@ function ensureFileMode(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/hardening/file-modes.ts:45
+Defined in: packages/security/src/hardening/file-modes.ts:44
 
 **`Stable`**
 

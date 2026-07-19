@@ -8,7 +8,7 @@
 
 Defined in: packages/agent/src/runtime/agent-to-tool.ts:82
 
-Child taint flags carried across the toTool fold (D2).
+Child taint flags carried across the toTool fold.
 
 ## Properties
 

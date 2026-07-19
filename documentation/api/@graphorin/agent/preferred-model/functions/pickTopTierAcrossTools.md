@@ -22,7 +22,7 @@ Defined in: packages/agent/src/preferred-model/index.ts:96
 Pick the highest-cost tier across the supplied per-tool hints.
 Explicit `ModelSpec` entries are treated as the highest tier
 (`'smart'`) for tie-breaking - the conservative-correctness rule
-documented in DEC-169 / suggested ADR-057.
+documented in DEC-169.
 
 Returns the picked hint together with the original `ModelSpec`
 (when an explicit spec won the tie-break).

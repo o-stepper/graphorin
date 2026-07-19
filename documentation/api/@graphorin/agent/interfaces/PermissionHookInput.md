@@ -10,7 +10,7 @@ Defined in: [packages/tools/dist/executor/types.d.ts](https://github.com/o-stepp
 
 **`Stable`**
 
-E1: input handed to a [PermissionHook](/api/@graphorin/agent/type-aliases/PermissionHook.md).
+Input handed to a [PermissionHook](/api/@graphorin/agent/type-aliases/PermissionHook.md).
 
 ## Properties
 

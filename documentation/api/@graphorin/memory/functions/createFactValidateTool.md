@@ -14,12 +14,12 @@ Defined in: packages/memory/src/tools/fact-tools.ts:448
 
 **`Stable`**
 
-`fact_validate` - promote a quarantined fact to active (P1-4). The
+`fact_validate` - promote a quarantined fact to active. The
 validation path that admits a synthesized (consolidator / reflection)
 memory into action-driving recall once it has been reviewed; the
 promotion is audited in `memory_history`.
 
-MRET-3 / MST-1 - two gates close the one-turn memory-poisoning chain
+Two gates close the one-turn memory-poisoning chain
 (`fact_remember(poison)` → `fact_validate(id)` → active recall):
 
 1. `needsApproval: true` - the run suspends for a human decision

@@ -14,7 +14,7 @@ Input to [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | Raw-shaped POST-REPAIR arguments (stringified by the guard for probing): what the approval gate saw and what the validate phase derives the executed input from (W-118). Bytes-equal to the model's `call.args` when no repair hook ran. Residual limitation: probed before schema coercion, so spans introduced purely by Zod `transform`/`default` are not visible to the verbatim probe. | packages/tools/src/executor/types.ts:234 |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | Raw-shaped POST-REPAIR arguments (stringified by the guard for probing): what the approval gate saw and what the validate phase derives the executed input from. Bytes-equal to the model's `call.args` when no repair hook ran. Residual limitation: probed before schema coercion, so spans introduced purely by Zod `transform`/`default` are not visible to the verbatim probe. | packages/tools/src/executor/types.ts:234 |
 | <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/types.ts:235 |
 | <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/tools/src/executor/types.ts:224 |
 | <a id="property-sideeffectclass"></a> `sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - | packages/tools/src/executor/types.ts:222 |
