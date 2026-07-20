@@ -63,6 +63,82 @@ describe('@graphorin/observability/redaction - validator', () => {
     expect(JSON.parse(out?.value as string)).toEqual({ card: '[REDACTED creditcard]' });
   });
 
+  it('masks a signed numeric PAN leaf, absorbing the sign (deep-retest 0.13.5 P2)', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    const out = v.validate({ value: '{"card":-4111111111111111}', tier: 'public' });
+    expect(out?.value).toBe('{"card":"[REDACTED creditcard]"}');
+    expect(JSON.parse(out?.value as string)).toEqual({ card: '[REDACTED creditcard]' });
+  });
+
+  it('keeps JSON valid across whitespace / array / mixed-verify signed cases', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    const M = '[REDACTED creditcard]';
+    const cases: ReadonlyArray<[string, unknown]> = [
+      ['[-4111111111111111,2]', [M, 2]],
+      ['{"card": -4111111111111111 }', { card: M }],
+      ['-4111111111111111', M],
+      // The Luhn-invalid neighbour stays a byte-identical number while the
+      // valid PAN is masked - mixed accept/reject in one document.
+      ['{"ok":4111111111111111,"num":4111111111111112}', { ok: M, num: 4111111111111112 }],
+      // Two accepted matches, one signed, in one document.
+      ['{"a":-4111111111111111,"b":5500000000000004}', { a: M, b: M }],
+    ];
+    for (const [input, expected] of cases) {
+      const out = v.validate({ value: input, tier: 'public' });
+      expect(JSON.parse(String(out?.value))).toEqual(expected);
+    }
+  });
+
+  it('keeps the prose minus when the match is not in a JSON value position', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    const out = v.validate({ value: 'refund -4111111111111111 issued', tier: 'public' });
+    expect(out?.value).toBe('refund -[REDACTED creditcard] issued');
+  });
+
+  it('property: a valid JSON document stays valid after redaction (seeded corpus)', () => {
+    // Deterministic LCG (same recipe as the provider corpus test) so the
+    // documents are stable across runs.
+    let seed = 0x2f6e2b1;
+    const next = (): number => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
+    // Luhn-valid test PANs with major-network leads; all below 2^53 so the
+    // numeric leaves round-trip exactly through JSON.stringify.
+    const PANS = [4111111111111111, 5500000000000004, 340000000000009, 6011000000000004];
+    const pick = <T>(arr: readonly T[]): T => arr[Math.floor(next() * arr.length)] as T;
+    const genLeaf = (): unknown => {
+      const r = next();
+      if (r < 0.2) return pick(PANS) * (next() < 0.5 ? -1 : 1);
+      if (r < 0.35) return `card ${pick(PANS)} on file`;
+      if (r < 0.5) return next() * 1000;
+      if (r < 0.6) return 1700000000000 + Math.floor(next() * 1e10);
+      if (r < 0.7) return next() < 0.5;
+      if (r < 0.8) return null;
+      return 'plain text';
+    };
+    const genValue = (depth: number): unknown => {
+      if (depth >= 2 || next() < 0.3) return genLeaf();
+      if (next() < 0.5) {
+        return Array.from({ length: 1 + Math.floor(next() * 3) }, () => genValue(depth + 1));
+      }
+      const obj: Record<string, unknown> = {};
+      const n = 1 + Math.floor(next() * 3);
+      for (let i = 0; i < n; i += 1) obj[`k${i}`] = genValue(depth + 1);
+      return obj;
+    };
+    const v = createRedactionValidator({ minTier: 'public' });
+    for (let i = 0; i < 200; i += 1) {
+      const doc = JSON.stringify(genValue(0), null, next() < 0.5 ? 0 : 2);
+      const out = v.validate({ value: doc, tier: 'public' });
+      const text = String(out?.value);
+      expect(() => JSON.parse(text)).not.toThrow();
+      expect(text).not.toMatch(
+        /4111111111111111|5500000000000004|340000000000009|6011000000000004/,
+      );
+    }
+  });
+
   it('throws when failOnUnredactedSensitive is true and a tier exceeds the floor', () => {
     const v = createRedactionValidator({ minTier: 'public', failOnUnredactedSensitive: true });
     expect(() => v.validate({ value: 'x', tier: 'secret' })).toThrow(RedactionValidationError);

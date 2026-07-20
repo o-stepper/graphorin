@@ -39,7 +39,7 @@ import type {
 import { SECRET_VALUE_BRAND } from '@graphorin/core';
 import {
   BUILT_IN_PATTERNS,
-  jsonSafeMask,
+  jsonSafeSpan,
   type RedactionPattern,
 } from '@graphorin/observability/redaction/patterns';
 import { PromptRedactionError } from '../errors/errors.js';
@@ -475,8 +475,9 @@ function scrubText(
     let accepted = 0;
     pattern.regex.lastIndex = 0;
     // Manual exec loop (not String.replace) so each accepted match knows its
-    // offset: `jsonSafeMask` quotes the mask when the span sits in a bare
-    // JSON value position, keeping a masked numeric leaf parseable.
+    // offset: `jsonSafeSpan` quotes the mask when the span sits in a bare
+    // JSON value position (absorbing a leading minus sign), keeping a
+    // masked numeric leaf parseable.
     let rewritten = '';
     let lastEnd = 0;
     let m = pattern.regex.exec(scrubbed);
@@ -490,9 +491,9 @@ function scrubText(
       if (verify === undefined || verify(value)) {
         accepted += 1;
         matchLength += value.length;
-        rewritten +=
-          scrubbed.slice(lastEnd, m.index) + jsonSafeMask(scrubbed, m.index, value.length, mask);
-        lastEnd = m.index + value.length;
+        const span = jsonSafeSpan(scrubbed, m.index, value.length, mask);
+        rewritten += scrubbed.slice(lastEnd, span.start) + span.text;
+        lastEnd = span.end;
       }
       if (!pattern.regex.global) break;
       m = pattern.regex.exec(scrubbed);

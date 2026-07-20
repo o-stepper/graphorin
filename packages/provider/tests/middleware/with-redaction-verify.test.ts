@@ -186,6 +186,76 @@ describe('withRedaction - serialized numbers survive the creditcard pattern', ()
   });
 });
 
+describe('withRedaction - signed numeric leaves stay grammar-safe (deep-retest 0.13.5 P2)', () => {
+  it('masks a negative numeric PAN leaf, absorbing the sign', async () => {
+    const h = harness();
+    const out = await scrubToolContent('{"card":-4111111111111111}', h);
+    expect(out).toBe('{"card":"[REDACTED creditcard]"}');
+    expect(JSON.parse(out)).toEqual({ card: '[REDACTED creditcard]' });
+    expect(h.violations.some((v) => v.patternName === 'creditcard')).toBe(true);
+  });
+
+  it('handles whitespace / array / top-level signed leaves', async () => {
+    const M = '[REDACTED creditcard]';
+    expect(JSON.parse(await scrubToolContent('{"card": -4111111111111111 }'))).toEqual({
+      card: M,
+    });
+    expect(JSON.parse(await scrubToolContent('[-4111111111111111,2]'))).toEqual([M, 2]);
+    expect(JSON.parse(await scrubToolContent('-4111111111111111'))).toBe(M);
+  });
+
+  it('keeps the prose minus and the unquoted mask outside JSON positions', async () => {
+    const out = await scrubToolContent('refund -4111111111111111 issued');
+    expect(out).toBe('refund -[REDACTED creditcard] issued');
+  });
+
+  it('masks the accepted match and keeps the rejected one byte-identical in one document', async () => {
+    const out = await scrubToolContent('{"ok":-4111111111111111,"num":4111111111111112}');
+    expect(JSON.parse(out)).toEqual({
+      ok: '[REDACTED creditcard]',
+      num: 4111111111111112,
+    });
+  });
+
+  it('property: a valid JSON document stays valid after the scrub (seeded corpus)', async () => {
+    let seed = 0x51f15eed;
+    const next = (): number => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
+    // Luhn-valid test PANs with major-network leads; below 2^53 so numeric
+    // leaves survive JSON.stringify exactly.
+    const PANS = [4111111111111111, 5500000000000004, 340000000000009, 6011000000000004];
+    const pick = <T>(arr: readonly T[]): T => arr[Math.floor(next() * arr.length)] as T;
+    const genLeaf = (): unknown => {
+      const r = next();
+      if (r < 0.2) return pick(PANS) * (next() < 0.5 ? -1 : 1);
+      if (r < 0.35) return `card ${pick(PANS)} on file`;
+      if (r < 0.5) return next() * 1000;
+      if (r < 0.6) return 1700000000000 + Math.floor(next() * 1e10);
+      if (r < 0.7) return next() < 0.5;
+      if (r < 0.8) return null;
+      return 'plain text';
+    };
+    const genValue = (depth: number): unknown => {
+      if (depth >= 2 || next() < 0.3) return genLeaf();
+      if (next() < 0.5) {
+        return Array.from({ length: 1 + Math.floor(next() * 3) }, () => genValue(depth + 1));
+      }
+      const obj: Record<string, unknown> = {};
+      const n = 1 + Math.floor(next() * 3);
+      for (let i = 0; i < n; i += 1) obj[`k${i}`] = genValue(depth + 1);
+      return obj;
+    };
+    for (let i = 0; i < 120; i += 1) {
+      const doc = JSON.stringify(genValue(0), null, next() < 0.5 ? 0 : 2);
+      const out = await scrubToolContent(doc);
+      expect(() => JSON.parse(out)).not.toThrow();
+      expect(out).not.toMatch(/4111111111111111|5500000000000004|340000000000009|6011000000000004/);
+    }
+  });
+});
+
 describe('withRedaction - verify contract', () => {
   const rejectAll: RedactionPattern = {
     name: 'reject-all',

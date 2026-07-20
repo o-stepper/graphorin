@@ -4,6 +4,7 @@ import {
   ALL_BUILT_IN_PATTERNS,
   BUILT_IN_PATTERNS,
   jsonSafeMask,
+  jsonSafeSpan,
   OPT_IN_PATTERNS,
   type RedactionPattern,
 } from '../../src/redaction/patterns.js';
@@ -213,5 +214,74 @@ describe('@graphorin/observability/redaction - jsonSafeMask', () => {
     expect(jsonSafeMask(stringLeaf, stringLeaf.indexOf('4111'), 16, M)).toBe(M);
     const leadingProse = '4111111111111111 is my card';
     expect(jsonSafeMask(leadingProse, leadingProse.indexOf('4111'), 16, M)).toBe(M);
+  });
+
+  it('keeps its historical unquoted result for a signed numeric leaf', () => {
+    // The string-returning signature cannot absorb the `-`, so the wrapper
+    // deliberately falls back to the plain mask; span-aware callers use
+    // `jsonSafeSpan` instead.
+    const object = '{"card":-4111111111111111}';
+    expect(jsonSafeMask(object, object.indexOf('4111'), 16, M)).toBe(M);
+  });
+});
+
+describe('@graphorin/observability/redaction - jsonSafeSpan', () => {
+  const M = '[REDACTED creditcard]';
+
+  const apply = (source: string, span: { start: number; end: number; text: string }): string =>
+    source.slice(0, span.start) + span.text + source.slice(span.end);
+
+  it('absorbs the minus sign of a signed numeric leaf and quotes the mask', () => {
+    const object = '{"card":-4111111111111111}';
+    const span = jsonSafeSpan(object, object.indexOf('4111'), 16, M);
+    expect(span).toEqual({ start: object.indexOf('-'), end: object.length - 1, text: `"${M}"` });
+    expect(JSON.parse(apply(object, span))).toEqual({ card: M });
+  });
+
+  it('absorbs the sign across insignificant whitespace', () => {
+    const spaced = '{"card": -4111111111111111 }';
+    const span = jsonSafeSpan(spaced, spaced.indexOf('4111'), 16, M);
+    expect(JSON.parse(apply(spaced, span))).toEqual({ card: M });
+  });
+
+  it('handles signed leaves in arrays and at top level', () => {
+    const array = '[-4111111111111111,2]';
+    expect(JSON.parse(apply(array, jsonSafeSpan(array, array.indexOf('4111'), 16, M)))).toEqual([
+      M,
+      2,
+    ]);
+    const whole = '-4111111111111111';
+    expect(JSON.parse(apply(whole, jsonSafeSpan(whole, whole.indexOf('4111'), 16, M)))).toBe(M);
+  });
+
+  it('keeps a prose minus outside the span (mask unquoted)', () => {
+    const prose = 'refund -4111111111111111 issued';
+    const span = jsonSafeSpan(prose, prose.indexOf('4111'), 16, M);
+    expect(span).toEqual({
+      start: prose.indexOf('4111'),
+      end: prose.indexOf(' issued'),
+      text: M,
+    });
+    expect(apply(prose, span)).toBe('refund -[REDACTED creditcard] issued');
+  });
+
+  it('covers exactly the match when the right side is not a value boundary', () => {
+    const notValue = '{"card":-4111111111111111x}';
+    const span = jsonSafeSpan(notValue, notValue.indexOf('4111'), 16, M);
+    expect(span).toEqual({
+      start: notValue.indexOf('4111'),
+      end: notValue.indexOf('x'),
+      text: M,
+    });
+  });
+
+  it('quotes positive leaves without moving the span start', () => {
+    const object = '{"card":4111111111111111}';
+    const span = jsonSafeSpan(object, object.indexOf('4111'), 16, M);
+    expect(span).toEqual({
+      start: object.indexOf('4111'),
+      end: object.length - 1,
+      text: `"${M}"`,
+    });
   });
 });

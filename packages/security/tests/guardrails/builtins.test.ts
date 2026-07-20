@@ -111,6 +111,88 @@ describe('piiDetection', () => {
     }
   });
 
+  it('rewrites a signed numeric PAN leaf, absorbing the sign (deep-retest 0.13.5 P2)', async () => {
+    const g = guardrails.piiDetection<string>();
+    const result = await g.check('{"card":-4111111111111111}', ctx);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.rewrite).toBe('{"card":"[REDACTED:credit-card]"}');
+      expect(JSON.parse(result.rewrite as string)).toEqual({ card: '[REDACTED:credit-card]' });
+    }
+  });
+
+  it('keeps JSON valid across whitespace / array / mixed-verify signed cases', async () => {
+    const g = guardrails.piiDetection<string>();
+    const M = '[REDACTED:credit-card]';
+    const cases: ReadonlyArray<[string, unknown]> = [
+      ['[-4111111111111111,2]', [M, 2]],
+      ['{"card": -4111111111111111 }', { card: M }],
+      ['-4111111111111111', M],
+      // Luhn-invalid neighbour stays a byte-identical number while the
+      // valid PAN is masked.
+      ['{"ok":4111111111111111,"num":4111111111111112}', { ok: M, num: 4111111111111112 }],
+      ['{"a":-4111111111111111,"b":5500000000000004}', { a: M, b: M }],
+    ];
+    for (const [input, expected] of cases) {
+      const result = await g.check(input, ctx);
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(JSON.parse(result.rewrite as string)).toEqual(expected);
+    }
+  });
+
+  it('keeps the prose minus and no longer swallows the space after the PAN', async () => {
+    const g = guardrails.piiDetection<string>();
+    const signed = await g.check('refund -4111111111111111 issued', ctx);
+    if (!signed.ok) expect(signed.rewrite).toBe('refund -[REDACTED:credit-card] issued');
+    // Digit-anchored pattern: the separator after the last digit stays in
+    // the text instead of being swallowed into the match (the mask used to
+    // glue onto the following word).
+    const spaced = await g.check('card 4111 1111 1111 1111 ok', ctx);
+    if (!spaced.ok) expect(spaced.rewrite).toBe('card [REDACTED:credit-card] ok');
+  });
+
+  it('property: a valid JSON document stays valid after the rewrite (seeded corpus)', async () => {
+    let seed = 0x5ec0de;
+    const next = (): number => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
+    // Luhn-valid test PANs with major-network leads; below 2^53 so numeric
+    // leaves survive JSON.stringify exactly.
+    const PANS = [4111111111111111, 5500000000000004, 340000000000009, 6011000000000004];
+    const pick = <T>(arr: readonly T[]): T => arr[Math.floor(next() * arr.length)] as T;
+    const genLeaf = (): unknown => {
+      const r = next();
+      if (r < 0.2) return pick(PANS) * (next() < 0.5 ? -1 : 1);
+      if (r < 0.35) return `card ${pick(PANS)} on file`;
+      if (r < 0.5) return next() * 1000;
+      if (r < 0.6) return 1700000000000 + Math.floor(next() * 1e10);
+      if (r < 0.7) return next() < 0.5;
+      if (r < 0.8) return null;
+      return 'plain text';
+    };
+    const genValue = (depth: number): unknown => {
+      if (depth >= 2 || next() < 0.3) return genLeaf();
+      if (next() < 0.5) {
+        return Array.from({ length: 1 + Math.floor(next() * 3) }, () => genValue(depth + 1));
+      }
+      const obj: Record<string, unknown> = {};
+      const n = 1 + Math.floor(next() * 3);
+      for (let i = 0; i < n; i += 1) obj[`k${i}`] = genValue(depth + 1);
+      return obj;
+    };
+    const g = guardrails.piiDetection<string>();
+    for (let i = 0; i < 120; i += 1) {
+      const doc = JSON.stringify(genValue(0), null, next() < 0.5 ? 0 : 2);
+      const result = await g.check(doc, ctx);
+      const text = result.ok ? doc : (result.rewrite as string);
+      expect(() => JSON.parse(text)).not.toThrow();
+      expect(text).not.toMatch(
+        /4111111111111111|5500000000000004|340000000000009|6011000000000004/,
+      );
+    }
+  });
+
   it("supports action: 'block'", async () => {
     const g = guardrails.piiDetection<string>({ action: 'block' });
     const result = await g.check('Email me at hello@example.com', ctx);
