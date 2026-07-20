@@ -15,6 +15,10 @@ type OpCliErrorKind =
   | "unknown";
 ```
 
-Defined in: packages/secret-1password/src/op-cli.ts:95
+Defined in: packages/secret-1password/src/op-cli.ts:101
 
 **`Stable`**
+
+`signed-out` covers every operator-fixable auth state: not signed
+in, an expired session, and (op CLI 2.35+) `no accounts configured`
+- the error's `hint` distinguishes the setup path.

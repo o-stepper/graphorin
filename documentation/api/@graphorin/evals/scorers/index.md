@@ -46,6 +46,12 @@ Re-exports [CorrectToolSelectedOptions](/api/@graphorin/evals/interfaces/Correct
 
 ***
 
+### defaultMemoryPointMatcher
+
+Re-exports [defaultMemoryPointMatcher](/api/@graphorin/evals/functions/defaultMemoryPointMatcher.md)
+
+***
+
 ### exactMatch
 
 Re-exports [exactMatch](/api/@graphorin/evals/functions/exactMatch.md)
@@ -79,6 +85,18 @@ Re-exports [finalStateCorrect](/api/@graphorin/evals/functions/finalStateCorrect
 ### FinalStateCorrectOptions
 
 Re-exports [FinalStateCorrectOptions](/api/@graphorin/evals/interfaces/FinalStateCorrectOptions.md)
+
+***
+
+### goldCoverageMatcher
+
+Re-exports [goldCoverageMatcher](/api/@graphorin/evals/functions/goldCoverageMatcher.md)
+
+***
+
+### goldTokenCoverage
+
+Re-exports [goldTokenCoverage](/api/@graphorin/evals/functions/goldTokenCoverage.md)
 
 ***
 

@@ -26,16 +26,28 @@ import type {
   MemoryOperationsEvalInput,
   MemoryOperationsObservation,
 } from '../../loaders/memory-eval.js';
-import { anyMatch, type MemoryPointMatcher, sampleList, tokenF1, tokenF1Matcher } from './util.js';
+import {
+  anyMatch,
+  defaultMemoryPointMatcher,
+  type MemoryPointMatcher,
+  sampleList,
+  tokenF1,
+} from './util.js';
 
 /** @stable */
 export interface MemoryUpdateOmissionOptions {
   /** Optional name override. Default `'memory-update-omission'`. */
   readonly name?: string;
-  /** Custom gold-vs-observed matcher. Default: token-set F1 at {@link minTokenF1}. */
+  /**
+   * Custom gold-vs-observed matcher. Default:
+   * {@link defaultMemoryPointMatcher} - token-set F1 OR directional
+   * gold coverage.
+   */
   readonly matcher?: MemoryPointMatcher;
-  /** Threshold for the default token-F1 matcher. Default `0.5`. */
+  /** Threshold for the default matcher's F1 leg. Default `0.5`. */
   readonly minTokenF1?: number;
+  /** Threshold for the default matcher's gold-coverage leg. Default `0.6`. */
+  readonly minGoldCoverage?: number;
   /** Omission rate at or below which the case passes. Default `0.5`. */
   readonly maxOmissionRate?: number;
 }
@@ -50,7 +62,12 @@ export function memoryUpdateOmission(
   options: MemoryUpdateOmissionOptions = {},
 ): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation> {
   const name = options.name ?? 'memory-update-omission';
-  const matcher = options.matcher ?? tokenF1Matcher(options.minTokenF1);
+  const matcher =
+    options.matcher ??
+    defaultMemoryPointMatcher({
+      minTokenF1: options.minTokenF1,
+      minGoldCoverage: options.minGoldCoverage,
+    });
   const maxOmissionRate = options.maxOmissionRate ?? 0.5;
   return {
     name,

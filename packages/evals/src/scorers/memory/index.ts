@@ -22,6 +22,9 @@ export {
 } from './update.js';
 export {
   anyMatch,
+  defaultMemoryPointMatcher,
+  goldCoverageMatcher,
+  goldTokenCoverage,
   type MemoryPointMatcher,
   memoryPointTokens,
   tokenF1,

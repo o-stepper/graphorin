@@ -91,7 +91,13 @@ export class OpCliError extends Error {
   }
 }
 
-/** @stable */
+/**
+ * `signed-out` covers every operator-fixable auth state: not signed
+ * in, an expired session, and (op CLI 2.35+) `no accounts configured`
+ * - the error's `hint` distinguishes the setup path.
+ *
+ * @stable
+ */
 export type OpCliErrorKind =
   | 'binary-missing'
   | 'signed-out'
@@ -101,8 +107,8 @@ export type OpCliErrorKind =
 
 /**
  * Default {@link OpCli} implementation. Spawns `op read --no-color
- * --reveal '<uri>'` with the configured timeout and inherits the
- * parent environment.
+ * '<uri>'` with the configured timeout and inherits the parent
+ * environment.
  *
  * @stable
  */
@@ -130,7 +136,12 @@ export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli
     async read(uri: string, options: OpCliReadOptions = {}): Promise<OpCliReadResult> {
       const binary = options.binary ?? 'op';
       const timeoutMs = options.timeoutMs ?? 15_000;
-      const args = ['read', '--reveal'];
+      // `op read` resolves the reference and prints the raw value by
+      // definition - it has NO `--reveal` flag (that one belongs to
+      // `op item get`). Shipping `--reveal` made every resolve fail
+      // with `unknown flag` against the real CLI (op 2.35.0,
+      // deep-retest 0.13.7 P1); the argv-shape tests pin the contract.
+      const args = ['read'];
       if (options.preserveColor !== true) args.push('--no-color');
       if (options.account !== undefined && options.account.length > 0) {
         args.push('--account', options.account);
@@ -234,7 +245,7 @@ export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli
             return;
           }
           if (code !== 0) {
-            const kind = classifyExitError(code ?? -1, stderr);
+            const { kind, hint } = classifyExitError(code ?? -1, stderr);
             reject(
               new OpCliError(
                 kind,
@@ -242,7 +253,7 @@ export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli
                 {
                   ...(code !== null ? { exitCode: code } : {}),
                   stderr,
-                  hint: hintForExitKind(kind),
+                  hint,
                 },
               ),
             );
@@ -255,8 +266,27 @@ export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli
   };
 }
 
-function classifyExitError(_code: number, stderr: string): OpCliErrorKind {
+interface ExitErrorClassification {
+  readonly kind: OpCliErrorKind;
+  readonly hint: string;
+}
+
+function classifyExitError(_code: number, stderr: string): ExitErrorClassification {
   const lower = stderr.toLowerCase();
+  // op CLI 2.35: a machine with the CLI installed but never wired to
+  // an account says 'No accounts configured for use with 1Password
+  // CLI.' (deep-retest 0.13.7 P2). It is an auth/setup state, so the
+  // kind stays 'signed-out', but the generic signin hint would
+  // mislead: `op signin` cannot succeed before an account exists.
+  if (lower.includes('no accounts configured')) {
+    return {
+      kind: 'signed-out',
+      hint:
+        'no 1Password accounts are configured: enable the desktop-app CLI integration ' +
+        "(Settings > Developer), run 'op account add', set OP_SERVICE_ACCOUNT_TOKEN " +
+        '(headless), or set OP_CONNECT_HOST/OP_CONNECT_TOKEN (Connect).',
+    };
+  }
   if (
     // op CLI v2 says 'you are not currently signed in.'; the optional
     // 'currently' keeps both the v2 and the legacy 'not signed in' phrasing.
@@ -265,7 +295,7 @@ function classifyExitError(_code: number, stderr: string): OpCliErrorKind {
     lower.includes('not authenticated') ||
     lower.includes('session expired')
   ) {
-    return 'signed-out';
+    return { kind: 'signed-out', hint: hintForExitKind('signed-out') };
   }
   if (
     lower.includes("couldn't find") ||
@@ -274,9 +304,9 @@ function classifyExitError(_code: number, stderr: string): OpCliErrorKind {
     lower.includes('field not found') ||
     lower.includes('reference not found')
   ) {
-    return 'reference-not-found';
+    return { kind: 'reference-not-found', hint: hintForExitKind('reference-not-found') };
   }
-  return 'unknown';
+  return { kind: 'unknown', hint: hintForExitKind('unknown') };
 }
 
 function hintForExitKind(kind: OpCliErrorKind): string {

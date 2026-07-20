@@ -10,7 +10,7 @@
 function createOpCli(deps?): OpCli;
 ```
 
-Defined in: packages/secret-1password/src/op-cli.ts:127
+Defined in: packages/secret-1password/src/op-cli.ts:133
 
 **`Stable`**
 

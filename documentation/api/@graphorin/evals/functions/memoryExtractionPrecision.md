@@ -10,7 +10,7 @@
 function memoryExtractionPrecision(options?): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>;
 ```
 
-Defined in: packages/evals/src/scorers/memory/extraction.ts:81
+Defined in: packages/evals/src/scorers/memory/extraction.ts:97
 
 **`Stable`**
 
