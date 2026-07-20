@@ -29,6 +29,7 @@ import type { Provider, SessionScope } from '@graphorin/core';
 import {
   type AgentLike,
   type Case,
+  createFakeEmbedder,
   type Dataset,
   detectRegressions,
   type EvalReport,
@@ -48,7 +49,7 @@ import {
   type Scorer,
 } from '@graphorin/evals';
 import { createMemory, type Memory } from '@graphorin/memory';
-import { BUNDLED_SNAPSHOT, lookupPrice } from '@graphorin/pricing';
+import { priceLookupByModel } from '@graphorin/pricing';
 import {
   composeProviderMiddleware,
   createCostAccumulator,
@@ -147,31 +148,14 @@ export function withBenchCostCeiling(maxCostUsd: number): {
   return { wrap, observedCostUsd };
 }
 
-/** Model-id-keyed price lookup over the bundled snapshot (vendor-agnostic). */
-export function benchPriceLookup(info: { readonly modelId: string }): {
-  readonly inputPerMtok?: number;
-  readonly outputPerMtok?: number;
-  readonly cachedReadPerMtok?: number;
-  readonly cacheWritePerMtok?: number;
-} | null {
-  const dateless = info.modelId.replace(/-\d{8}$/, '');
-  const entry =
-    BUNDLED_SNAPSHOT.entries.find((e) => e.model === info.modelId) ??
-    BUNDLED_SNAPSHOT.entries.find((e) => e.model === dateless);
-  if (entry === undefined) return null;
-  const price = lookupPrice({ provider: entry.provider, model: entry.model });
-  if (price === null) return null;
-  return {
-    inputPerMtok: price.inputUsdPerToken * 1_000_000,
-    outputPerMtok: price.outputUsdPerToken * 1_000_000,
-    ...(price.cachedReadUsdPerToken !== undefined
-      ? { cachedReadPerMtok: price.cachedReadUsdPerToken * 1_000_000 }
-      : {}),
-    ...(price.cacheWriteUsdPerToken !== undefined
-      ? { cacheWritePerMtok: price.cacheWriteUsdPerToken * 1_000_000 }
-      : {}),
-  };
-}
+/**
+ * Model-id-keyed price lookup over the bundled snapshot
+ * (vendor-agnostic). The implementation moved to
+ * `@graphorin/pricing`'s `priceLookupByModel` (deep-retest-0.13.6
+ * P2-4) so the HaluMem harness enforces the same ceiling; this alias
+ * keeps the historical bench-local name.
+ */
+export const benchPriceLookup: typeof priceLookupByModel = priceLookupByModel;
 
 /**
  * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default - and any
@@ -294,40 +278,11 @@ export function createRetrievalStats(): RetrievalStats {
   return { queries: 0, abstained: 0, insufficient: 0 };
 }
 
-/**
- * Deterministic, offline bag-of-words hash embedder (evals-01). Not a real
- * semantic model - it exists so the VECTOR leg of hybrid search (and the
- * graph/HyDE paths that ride it) can be exercised and A/B-compared in CI
- * without a model download. Real embedding quality needs a real embedder.
- */
-export function createFakeEmbedder(dim = 64): import('@graphorin/core').EmbedderProvider {
-  function embedOne(text: string): Float32Array {
-    const vec = new Float32Array(dim);
-    const tokens = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
-    for (const token of tokens) {
-      let hash = 0x811c9dc5;
-      for (let i = 0; i < token.length; i++) {
-        hash ^= token.charCodeAt(i);
-        hash = Math.imul(hash, 0x01000193);
-      }
-      const slot = (hash >>> 0) % dim;
-      vec[slot] = (vec[slot] ?? 0) + 1;
-    }
-    let norm = 0;
-    for (const v of vec) norm += v * v;
-    norm = Math.sqrt(norm);
-    if (norm > 0) {
-      for (let i = 0; i < dim; i++) vec[i] = (vec[i] ?? 0) / norm;
-    }
-    return vec;
-  }
-  return {
-    id: () => `fake:bow-${dim}`,
-    dim: () => dim,
-    configHash: () => `fake-bow-${dim}`,
-    embed: async (texts) => texts.map((t) => embedOne(t)),
-  };
-}
+// Deterministic offline embedder: the implementation moved to
+// `@graphorin/evals` (deep-retest-0.13.6 P2-Q) so the HaluMem harness
+// shares the same `--embedder fake` axis; re-exported under the
+// historical bench-local name.
+export { createFakeEmbedder };
 
 async function recall(
   memory: Memory,

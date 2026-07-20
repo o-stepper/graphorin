@@ -48,6 +48,7 @@ export {
   setLookupWarnSink,
 } from './lookup.js';
 export { listMissingModels, type MissingModelEntry } from './missing.js';
+export { type ModelPriceRates, priceLookupByModel } from './model-lookup.js';
 export { type RefreshPricingOptions, refreshPricing } from './refresh.js';
 export { BUNDLED_SNAPSHOT, computeEntriesDigest, SNAPSHOT_DATE } from './snapshot/index.js';
 export type {

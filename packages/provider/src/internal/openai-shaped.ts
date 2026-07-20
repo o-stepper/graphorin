@@ -19,7 +19,11 @@ import type {
   Usage,
 } from '@graphorin/core';
 
-import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
+import {
+  LocalProviderInsecureTransportError,
+  ProviderHttpError,
+  ProviderStreamParseError,
+} from '../errors/errors.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
 import { foldToolExamples } from '../tool-examples.js';
@@ -37,6 +41,17 @@ import { parseEventStream } from './sse.js';
 import { stripTrailingSlashes } from './url-utils.js';
 
 /**
+ * Wire name for the completion-token ceiling. The long tail of
+ * OpenAI-compatible servers (llama.cpp, LM Studio, vLLM, LocalAI)
+ * expects `max_tokens`; current OpenAI models (GPT-5 family,
+ * o-series) reject it with HTTP 400 and require
+ * `max_completion_tokens`.
+ *
+ * @stable
+ */
+export type TokenLimitParam = 'max_tokens' | 'max_completion_tokens';
+
+/**
  * Options shared by every OpenAI-compatible adapter.
  *
  * @internal
@@ -46,6 +61,14 @@ export interface OpenAIShapedOptions {
   readonly model: string;
   readonly baseUrl: string;
   readonly chatPath?: string;
+  /**
+   * Which wire parameter carries `ProviderRequest.maxTokens`. Default
+   * `'max_tokens'`. When left unset and the server answers HTTP 400
+   * naming `max_completion_tokens`, the request is re-sent once with
+   * the remapped parameter and the instance keeps the switch; setting
+   * the option pins the name and disables that auto-remap.
+   */
+  readonly tokenLimitParam?: TokenLimitParam;
   readonly apiKey?: string;
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetchImpl?: typeof fetch;
@@ -141,8 +164,16 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
     ...DEFAULT_CAPABILITIES,
     ...opts.capabilities,
   };
-  const chatPath = opts.chatPath ?? '/v1/chat/completions';
-  const url = `${stripTrailingSlashes(opts.baseUrl)}${chatPath}`;
+  const base = stripTrailingSlashes(opts.baseUrl);
+  // deep-retest-0.13.6 P2-1: the ecosystem convention is a base URL that
+  // already INCLUDES the /v1 prefix (api.openai.com/v1, LM Studio, vLLM,
+  // groq's /openai/v1). Appending the /v1-prefixed default path to such a
+  // base produced /v1/v1/chat/completions and a guaranteed 404, so the
+  // default adapts to the base; an explicit chatPath always wins verbatim.
+  const chatPath =
+    opts.chatPath ?? (base.endsWith('/v1') ? '/chat/completions' : '/v1/chat/completions');
+  const url = `${base}${chatPath}`;
+  const tokenParam: TokenParamState = { pinned: opts.tokenLimitParam, learned: null };
 
   const provider: Provider = {
     name: opts.providerName,
@@ -150,10 +181,20 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
     capabilities,
     acceptsSensitivity,
     stream(req) {
-      return streamOpenAIShaped(opts, url, applyOpenAIShapedPreflight(req, capabilities));
+      return streamOpenAIShaped(
+        opts,
+        url,
+        tokenParam,
+        applyOpenAIShapedPreflight(req, capabilities),
+      );
     },
     async generate(req) {
-      return generateOpenAIShaped(opts, url, applyOpenAIShapedPreflight(req, capabilities));
+      return generateOpenAIShaped(
+        opts,
+        url,
+        tokenParam,
+        applyOpenAIShapedPreflight(req, capabilities),
+      );
     },
   };
 
@@ -176,19 +217,68 @@ function applyOpenAIShapedPreflight(
   return { ...req, messages: filtered };
 }
 
-async function* streamOpenAIShaped(
+/**
+ * Per-provider-instance memory for the completion-token wire name.
+ * `pinned` mirrors the explicit option (never overridden); `learned`
+ * flips to `'max_completion_tokens'` after the one-shot 400 remap so
+ * every later request skips the doomed first attempt.
+ */
+interface TokenParamState {
+  readonly pinned: TokenLimitParam | undefined;
+  learned: TokenLimitParam | null;
+}
+
+function effectiveTokenParam(state: TokenParamState): TokenLimitParam {
+  return state.pinned ?? state.learned ?? 'max_tokens';
+}
+
+/**
+ * deep-retest-0.13.6 P2-2: current OpenAI models reject `max_tokens`
+ * with HTTP 400 ("Use 'max_completion_tokens' instead"). The remap
+ * fires only from the unpinned default, only once (learned state), and
+ * only when the failed request actually carried the parameter.
+ */
+function shouldRemapTokenParam(
+  state: TokenParamState,
+  err: unknown,
+  req: ProviderRequest,
+): boolean {
+  return (
+    state.pinned === undefined &&
+    state.learned === null &&
+    req.maxTokens !== undefined &&
+    err instanceof ProviderHttpError &&
+    err.status === 400 &&
+    err.message.includes('max_completion_tokens')
+  );
+}
+
+function learnTokenParamRemap(opts: OpenAIShapedOptions, state: TokenParamState): void {
+  state.learned = 'max_completion_tokens';
+  const log = opts.logger ?? defaultLogger;
+  log(
+    'warn',
+    `[${opts.providerName}] server rejected 'max_tokens' (HTTP 400 naming max_completion_tokens); ` +
+      `re-sending with 'max_completion_tokens' and keeping it for this provider instance`,
+  );
+}
+
+function callChatHttp(
   opts: OpenAIShapedOptions,
   url: string,
+  tokenParam: TokenLimitParam,
   req: ProviderRequest,
-): AsyncIterable<ProviderEvent> {
+  stream: boolean,
+): Promise<Response> {
   const body = buildBody(
     opts.model,
     req,
-    true,
+    stream,
     opts.capabilities?.structuredOutput ?? true,
     conversionOptionsFor(opts),
+    tokenParam,
   );
-  const resp = await callJsonHttp({
+  return callJsonHttp({
     providerName: opts.providerName,
     url,
     headers: buildHeaders(opts),
@@ -197,6 +287,22 @@ async function* streamOpenAIShaped(
     ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
     ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
   });
+}
+
+async function* streamOpenAIShaped(
+  opts: OpenAIShapedOptions,
+  url: string,
+  state: TokenParamState,
+  req: ProviderRequest,
+): AsyncIterable<ProviderEvent> {
+  let resp: Response;
+  try {
+    resp = await callChatHttp(opts, url, effectiveTokenParam(state), req, true);
+  } catch (err) {
+    if (!shouldRemapTokenParam(state, err, req)) throw err;
+    learnTokenParamRemap(opts, state);
+    resp = await callChatHttp(opts, url, 'max_completion_tokens', req, true);
+  }
 
   yield makeStreamStartEvent({ providerName: opts.providerName, modelId: opts.model });
 
@@ -300,24 +406,17 @@ async function* streamOpenAIShaped(
 async function generateOpenAIShaped(
   opts: OpenAIShapedOptions,
   url: string,
+  state: TokenParamState,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(
-    opts.model,
-    req,
-    false,
-    opts.capabilities?.structuredOutput ?? true,
-    conversionOptionsFor(opts),
-  );
-  const resp = await callJsonHttp({
-    providerName: opts.providerName,
-    url,
-    headers: buildHeaders(opts),
-    body,
-    ...(req.signal !== undefined ? { signal: req.signal } : {}),
-    ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
-    ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
-  });
+  let resp: Response;
+  try {
+    resp = await callChatHttp(opts, url, effectiveTokenParam(state), req, false);
+  } catch (err) {
+    if (!shouldRemapTokenParam(state, err, req)) throw err;
+    learnTokenParamRemap(opts, state);
+    resp = await callChatHttp(opts, url, 'max_completion_tokens', req, false);
+  }
   let json: OpenAIChunk;
   try {
     json = (await resp.json()) as OpenAIChunk;
@@ -359,6 +458,7 @@ function buildBody(
   stream: boolean,
   structuredOutput: boolean,
   conversion: ChatMessageConversionOptions,
+  tokenParam: TokenLimitParam,
 ): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
@@ -379,7 +479,7 @@ function buildBody(
     body.stream_options = { include_usage: true };
   }
   if (req.temperature !== undefined) body.temperature = req.temperature;
-  if (req.maxTokens !== undefined) body.max_tokens = req.maxTokens;
+  if (req.maxTokens !== undefined) body[tokenParam] = req.maxTokens;
   if (req.tools !== undefined && req.tools.length > 0) {
     // C2: fold worked examples in the adapter itself (idempotent when an
     // upstream createProvider fold already ran).

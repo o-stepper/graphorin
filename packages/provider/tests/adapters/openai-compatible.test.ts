@@ -400,6 +400,224 @@ describe('C2 - adapter-level worked-example folding (OpenAI wire)', () => {
   });
 });
 
+describe('deep-retest-0.13.6 P2-1 - /v1-aware default chatPath', () => {
+  async function urlFor(baseUrl: string, chatPath?: string): Promise<string> {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'qwen2.5-7b-instruct',
+      baseUrl,
+      ...(chatPath !== undefined ? { chatPath } : {}),
+      fetchImpl: makeFetchImpl({
+        jsonOnce: { choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }] },
+        capture,
+      }),
+      logger: () => {},
+    });
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }] });
+    return capture.url ?? '';
+  }
+
+  it('the providers-guide example baseUrl (.../v1) reaches /v1/chat/completions exactly once', async () => {
+    // The exact snippet from documentation/guide/providers.md - a
+    // copy/paste user must land on the endpoint, not /v1/v1/... + 404.
+    expect(await urlFor('http://127.0.0.1:1234/v1')).toBe(
+      'http://127.0.0.1:1234/v1/chat/completions',
+    );
+  });
+
+  it('an origin baseUrl keeps the classic default', async () => {
+    expect(await urlFor('http://127.0.0.1:1234')).toBe('http://127.0.0.1:1234/v1/chat/completions');
+  });
+
+  it('a trailing slash after /v1 normalizes the same way', async () => {
+    expect(await urlFor('http://127.0.0.1:1234/v1/')).toBe(
+      'http://127.0.0.1:1234/v1/chat/completions',
+    );
+  });
+
+  it('a vendor prefix ending in /v1 (groq-style /openai/v1) is preserved once', async () => {
+    expect(await urlFor('https://api.groq.com/openai/v1')).toBe(
+      'https://api.groq.com/openai/v1/chat/completions',
+    );
+  });
+
+  it('an explicit chatPath wins verbatim even when baseUrl ends with /v1', async () => {
+    expect(await urlFor('http://127.0.0.1:1234/v1', '/v1/chat/completions')).toBe(
+      'http://127.0.0.1:1234/v1/v1/chat/completions',
+    );
+  });
+
+  it('a host segment merely ending in v1 (no slash) does not trigger the rule', async () => {
+    expect(await urlFor('http://127.0.0.1:1234/apiv1')).toBe(
+      'http://127.0.0.1:1234/apiv1/v1/chat/completions',
+    );
+  });
+});
+
+describe('deep-retest-0.13.6 P2-2 - completion-token wire parameter', () => {
+  const OK_JSON = JSON.stringify({
+    choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+  });
+  const REJECT_MAX_TOKENS = JSON.stringify({
+    error: {
+      message:
+        "Unsupported parameter: 'max_tokens' is not supported with this model. " +
+        "Use 'max_completion_tokens' instead.",
+      type: 'invalid_request_error',
+      param: 'max_tokens',
+      code: 'unsupported_parameter',
+    },
+  });
+
+  function makeSequencedFetch(
+    responses: ReadonlyArray<() => Response>,
+    calls: Array<{ url: string; body: Record<string, unknown> }>,
+  ): typeof fetch {
+    return (async (input: unknown, init?: RequestInit): Promise<Response> => {
+      calls.push({
+        url: String(input),
+        body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+      });
+      const next = responses[Math.min(calls.length - 1, responses.length - 1)];
+      if (next === undefined) throw new Error('sequenced fetch exhausted');
+      return next();
+    }) as typeof fetch;
+  }
+
+  it('sends max_tokens by default', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'qwen2.5-7b-instruct',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch([() => new Response(OK_JSON, { status: 200 })], calls),
+      logger: () => {},
+    });
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }], maxTokens: 64 });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.body.max_tokens).toBe(64);
+    expect('max_completion_tokens' in (calls[0]?.body ?? {})).toBe(false);
+  });
+
+  it('tokenLimitParam pins max_completion_tokens up front', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      tokenLimitParam: 'max_completion_tokens',
+      fetchImpl: makeSequencedFetch([() => new Response(OK_JSON, { status: 200 })], calls),
+      logger: () => {},
+    });
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }], maxTokens: 64 });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.body.max_completion_tokens).toBe(64);
+    expect('max_tokens' in (calls[0]?.body ?? {})).toBe(false);
+  });
+
+  it('generate(): a 400 naming max_completion_tokens is retried once remapped, then learned', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () => new Response(REJECT_MAX_TOKENS, { status: 400 }),
+          () => new Response(OK_JSON, { status: 200 }),
+          () => new Response(OK_JSON, { status: 200 }),
+        ],
+        calls,
+      ),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const first = await provider.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      maxTokens: 64,
+    });
+    expect(first.text).toBe('ok');
+    expect(calls).toHaveLength(2);
+    expect(calls[0]?.body.max_tokens).toBe(64);
+    expect(calls[1]?.body.max_completion_tokens).toBe(64);
+    expect('max_tokens' in (calls[1]?.body ?? {})).toBe(false);
+    expect(warns.some((w) => w.includes('max_completion_tokens'))).toBe(true);
+
+    // The instance remembers: the next call goes straight to the
+    // remapped parameter with a single request.
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }], maxTokens: 32 });
+    expect(calls).toHaveLength(3);
+    expect(calls[2]?.body.max_completion_tokens).toBe(32);
+    expect('max_tokens' in (calls[2]?.body ?? {})).toBe(false);
+  });
+
+  it('stream(): the same 400 remaps before the first event', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () => new Response(REJECT_MAX_TOKENS, { status: 400 }),
+          () =>
+            new Response(
+              makeSseStream([
+                { choices: [{ delta: { content: 'ok' } }] },
+                { choices: [{ finish_reason: 'stop' }] },
+                '[DONE]',
+              ]),
+              { status: 200 },
+            ),
+        ],
+        calls,
+      ),
+      logger: () => {},
+    });
+    const events = await collect(
+      provider.stream({ messages: [{ role: 'user', content: 'hi' }], maxTokens: 64 }),
+    );
+    expect(calls).toHaveLength(2);
+    expect(calls[1]?.body.max_completion_tokens).toBe(64);
+    expect(events.some((e) => e.type === 'text-delta')).toBe(true);
+    expect(events.at(-1)?.type).toBe('finish');
+  });
+
+  it('an explicitly pinned max_tokens never auto-remaps - the 400 propagates', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      tokenLimitParam: 'max_tokens',
+      fetchImpl: makeSequencedFetch(
+        [() => new Response(REJECT_MAX_TOKENS, { status: 400 })],
+        calls,
+      ),
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({ messages: [{ role: 'user', content: 'hi' }], maxTokens: 64 }),
+    ).rejects.toThrow(/max_completion_tokens/);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('a request without maxTokens does not retry on that 400', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [() => new Response(REJECT_MAX_TOKENS, { status: 400 })],
+        calls,
+      ),
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({ messages: [{ role: 'user', content: 'hi' }] }),
+    ).rejects.toThrow();
+    expect(calls).toHaveLength(1);
+  });
+});
+
 describe('W-095 - multimodal image passing', () => {
   const IMG = new Uint8Array([1, 2, 3]);
   const RESPONSE = {

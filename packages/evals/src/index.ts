@@ -45,6 +45,7 @@ export {
   type WrittenReport,
   writeReports,
 } from './cli/index.js';
+export { createFakeEmbedder } from './fake-embedder.js';
 export type {
   FromTracesOptions,
   HaluMemStage,

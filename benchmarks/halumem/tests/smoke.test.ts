@@ -2,15 +2,18 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
+import type { Provider, ProviderRequest, ProviderResponse } from '@graphorin/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   CliUsageError,
+  countInfrastructureFailures,
   createOperationsAgent,
+  INFRA_MARKER,
   parseArgs,
   runHaluMemBenchmark,
   USAGE,
+  withBenchCostCeiling,
 } from '../src/runner.js';
 import { createHaluMemStubProvider } from '../src/stub-provider.js';
 
@@ -96,6 +99,117 @@ describe('benchmark-halumem operations stage (offline stub)', () => {
   });
 });
 
+const BENCH_CAPABILITIES = {
+  streaming: false,
+  toolCalling: false,
+  parallelToolCalls: false,
+  multimodal: false,
+  structuredOutput: true,
+  reasoning: false,
+  contextWindow: 32_000,
+  maxOutput: 4_000,
+} as const;
+
+describe('deep-retest-0.13.6 P2-3 - infrastructure failures are not quality zeros', () => {
+  function createFailingProvider(): Provider {
+    return {
+      name: 'failing-openai-compatible',
+      modelId: 'gpt-4o-mini',
+      capabilities: BENCH_CAPABILITIES,
+      async generate(): Promise<ProviderResponse> {
+        throw new Error('HTTP 404 from http://example.invalid/v1/v1/chat/completions');
+      },
+      stream(): AsyncIterable<never> {
+        throw new Error('no stream');
+      },
+    };
+  }
+
+  it('a provider failure during ingest is stamped as infrastructure, per case', async () => {
+    const report = await runHaluMemBenchmark({
+      datasetPath: FIXTURE,
+      stage: 'operations',
+      provider: createFailingProvider(),
+      conflictPipeline: 'off',
+      smoke: true,
+    });
+    expect(report.summary.failed).toBe(2);
+    const infra = countInfrastructureFailures(report);
+    expect(infra.count).toBe(2);
+    const reason = report.results[0]?.scores[0]?.result.reason ?? '';
+    expect(reason).toContain('agent.run threw');
+    expect(reason).toContain(INFRA_MARKER);
+    expect(reason).toContain('NOT a quality result');
+    // The observation never materializes - no empty memoryPoints that
+    // could read as a measured quality zero.
+    expect(report.results[0]?.output).toBeUndefined();
+  });
+
+  it('a clean stub run counts zero infrastructure failures', async () => {
+    const report = await runHaluMemBenchmark({
+      datasetPath: FIXTURE,
+      stage: 'operations',
+      provider: createHaluMemStubProvider(),
+      conflictPipeline: 'off',
+      smoke: true,
+    });
+    expect(countInfrastructureFailures(report).count).toBe(0);
+  });
+});
+
+describe('deep-retest-0.13.6 P2-4 - --max-cost-usd observes real spend', () => {
+  function createUsageProvider(modelId: string): Provider {
+    return {
+      name: 'usage-reporter',
+      modelId,
+      capabilities: BENCH_CAPABILITIES,
+      async generate(_req: ProviderRequest): Promise<ProviderResponse> {
+        return {
+          text: '{"facts":[]}',
+          usage: { promptTokens: 1_000_000, completionTokens: 0, totalTokens: 1_000_000 },
+          finishReason: 'stop',
+        };
+      },
+      stream(): AsyncIterable<never> {
+        throw new Error('no stream');
+      },
+    };
+  }
+  const REQ: ProviderRequest = { messages: [{ role: 'user', content: 'hi' }] };
+
+  it('prices usage via the bundled snapshot and trips the ceiling', async () => {
+    const ceiling = withBenchCostCeiling(0.5);
+    const wrapped = ceiling.wrap(createUsageProvider('gpt-5.6-luna'));
+    await wrapped.generate(REQ);
+    // 1M prompt tokens at the snapshot's $1/Mtok input rate.
+    expect(ceiling.observedCostUsd()).toBeCloseTo(1, 5);
+    await expect(wrapped.generate(REQ)).rejects.toThrow(/cost|budget|exceed/i);
+  });
+
+  it('unknown models keep honest zeros so main() can warn UNENFORCED', async () => {
+    const ceiling = withBenchCostCeiling(0.5);
+    const wrapped = ceiling.wrap(createUsageProvider('model-not-in-snapshot'));
+    await wrapped.generate(REQ);
+    expect(ceiling.observedCostUsd()).toBe(0);
+  });
+});
+
+describe('deep-retest-0.13.6 P2-Q - embedder axis', () => {
+  it('the fake embedder runs the vector leg through the full ingest pipeline', async () => {
+    const report = await runHaluMemBenchmark({
+      datasetPath: FIXTURE,
+      stage: 'operations',
+      provider: createHaluMemStubProvider(),
+      conflictPipeline: 'on',
+      embedder: 'fake',
+      smoke: true,
+    });
+    expect(report.summary.total).toBe(2);
+    expect(countInfrastructureFailures(report).count).toBe(0);
+    expect(report.results.every((r) => Array.isArray(r.output.memoryPoints))).toBe(true);
+  });
+});
+
 describe('benchmark-halumem CLI', () => {
   let dir: string;
 
@@ -112,6 +226,7 @@ describe('benchmark-halumem CLI', () => {
       '--dataset',
       '--stage',
       '--conflict-pipeline',
+      '--embedder',
       '--smoke',
       '--results',
       '--json',
@@ -133,6 +248,8 @@ describe('benchmark-halumem CLI', () => {
     expect(() => parseArgs(['node', 'runner.js', '--conflict-pipeline', 'x'])).toThrow(
       CliUsageError,
     );
+    expect(parseArgs(['node', 'runner.js', '--embedder', 'fake']).embedder).toBe('fake');
+    expect(() => parseArgs(['node', 'runner.js', '--embedder', 'real'])).toThrow(CliUsageError);
     expect(() => parseArgs(['node', 'runner.js', '--max-cost-usd', '0'])).toThrow(CliUsageError);
     expect(() => parseArgs(['node', 'runner.js', '--typo'])).toThrow(/--typo/);
   });

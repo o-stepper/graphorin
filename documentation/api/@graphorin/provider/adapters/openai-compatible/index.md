@@ -28,3 +28,9 @@ policy table, one error type.
 | Function | Description |
 | ------ | ------ |
 | [openAICompatibleAdapter](/api/@graphorin/provider/adapters/openai-compatible/functions/openAICompatibleAdapter.md) | Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by an OpenAI-compatible HTTP server. The same code path serves LMStudio, LocalAI, vLLM, and any other compatible self-host endpoint. |
+
+## References
+
+### TokenLimitParam
+
+Re-exports [TokenLimitParam](/api/@graphorin/provider/type-aliases/TokenLimitParam.md)

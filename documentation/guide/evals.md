@@ -93,7 +93,7 @@ Reports now carry honest statistics: `summary.passRateCi` is a 95% Wilson interv
 
 The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-longmemeval`, `benchmark-halumem`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, `benchmark-scale` (see [Performance & scale](/guide/performance)), and others. The `longmemeval` and `halumem` benchmarks ship the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
 
-`benchmark-halumem` is the operation-level counterpart to the QA-level `longmemeval` suite: each case's sessions replay through the REAL ingest pipeline (`session.push` -> consolidator standard phase -> extraction -> conflict pipeline) into a fresh in-memory store, the post-ingest memory state is observed, and the staged `memory/` scorers grade it. Its `--conflict-pipeline on|off` axis is the value proof for the neighbour-aware extract-reconcile-supersede path: run both legs and compare `memory-update-omission`. Both legs hold `autoPromoteExtraction: true` constant so the A/B isolates the reconcile path rather than the quarantine workflow.
+`benchmark-halumem` is the operation-level counterpart to the QA-level `longmemeval` suite: each case's sessions replay through the REAL ingest pipeline (`session.push` -> consolidator standard phase -> extraction -> conflict pipeline) into a fresh in-memory store, the post-ingest memory state is observed, and the staged `memory/` scorers grade it. Its `--conflict-pipeline on|off` axis is designed as the value proof for the neighbour-aware extract-reconcile-supersede path: run both legs and compare `memory-update-omission`. The comparison is only meaningful with a vector signal - pass `--embedder fake` (or a real embedder via the programmatic path), because the reconcile route is gated on an embedding-similarity mid-zone and an FTS-only store converges both legs to identical numbers. Both legs hold `autoPromoteExtraction: true` constant so the A/B isolates the reconcile path rather than the quarantine workflow. A measured on-vs-off improvement on real models is still an open baseline (the scheduled real-provider matrix), so treat the axis as the instrument, not as an already-proven win. Ingest failures (provider HTTP errors, consolidator faults) are stamped `INFRASTRUCTURE_FAILED` per case and the run exits non-zero - a `0/N` score line never doubles as a quality claim.
 
 > Real-provider benchmark runs cost real model calls; they are never run by default. The offline stub mode is what keeps the suite green in CI.
 
@@ -131,9 +131,12 @@ block, so a number always says what configuration produced it:
   QA quality.
 - `--max-cost-usd N` puts a run-level USD ceiling over the resolved
   SUT + judge providers (`withCostLimit` composed over `withCostTracking`).
-  The ceiling observes the cost the providers themselves report; when a
-  provider reports no usage cost the runner WARNs that the cap was
-  effectively unenforced instead of pretending otherwise.
+  Usage is priced by model id against the bundled pricing snapshot
+  (`priceLookupByModel` from `@graphorin/pricing` - shared by the
+  `longmemeval` and `halumem` runners), so the ceiling observes spend even
+  through the vendor-agnostic `openai-compatible` adapter; for models the
+  snapshot does not know the runner WARNs that the cap was effectively
+  unenforced instead of pretending otherwise.
 
 The adaptive injected-task scenarios (verbatim / unicode-obfuscated /
 split / paraphrase exfiltration against the dataflow policy) live in
