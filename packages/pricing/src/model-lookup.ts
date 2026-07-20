@@ -33,9 +33,10 @@ export interface ModelPriceRates {
 /**
  * Resolve per-Mtok USD rates for a model id against the bundled
  * snapshot, ignoring the provider dimension. Dated ids fall back to
- * their dateless alias (the `lookupPrice` contract). Returns `null`
- * for unknown models so cost accumulators keep reporting zero instead
- * of guessing.
+ * their dateless alias, and `-latest` ids resolve like `lookupPrice`
+ * does (dateless entry first, else the single retained dated entry).
+ * Returns `null` for unknown models so cost accumulators keep
+ * reporting zero instead of guessing.
  *
  * Drop-in for `withCostTracking({ priceLookup })`: the extra
  * `providerName` the middleware passes is simply ignored.
@@ -43,10 +44,24 @@ export interface ModelPriceRates {
  * @stable
  */
 export function priceLookupByModel(info: { readonly modelId: string }): ModelPriceRates | null {
-  const dateless = info.modelId.replace(/-\d{8}$/, '');
-  const entry =
+  // Both vendor date formats, in sync with `lookup.ts` (deep-retest
+  // 0.13.8 P1): compact `-20251001` and dashed `-2025-04-14`.
+  const dateless = info.modelId.replace(/-(?:\d{8}|\d{4}-\d{2}-\d{2})$/, '');
+  let entry =
     BUNDLED_SNAPSHOT.entries.find((e) => e.model === info.modelId) ??
     BUNDLED_SNAPSHOT.entries.find((e) => e.model === dateless);
+  if (entry === undefined && info.modelId.endsWith('-latest')) {
+    const base = info.modelId.slice(0, -'-latest'.length);
+    entry = BUNDLED_SNAPSHOT.entries.find((e) => e.model === base);
+    if (entry === undefined) {
+      const dated = BUNDLED_SNAPSHOT.entries.filter(
+        (e) =>
+          e.model.startsWith(`${base}-`) &&
+          /^(?:\d{8}|\d{4}-\d{2}-\d{2})$/.test(e.model.slice(base.length + 1)),
+      );
+      if (dated.length === 1) entry = dated[0];
+    }
+  }
   if (entry === undefined) return null;
   const price = lookupPrice({ provider: entry.provider, model: entry.model });
   if (price === null) return null;

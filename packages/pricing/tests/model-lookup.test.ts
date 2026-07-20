@@ -30,6 +30,30 @@ describe('priceLookupByModel', () => {
     expect(priceLookupByModel({ modelId: 'totally-unknown-model' })).toBeNull();
   });
 
+  it('prices the gpt-4o-mini alias (deep-retest 0.13.8 P1)', () => {
+    expect(priceLookupByModel({ modelId: 'gpt-4o-mini' })).toEqual({
+      inputPerMtok: 0.15,
+      outputPerMtok: 0.6,
+      cachedReadPerMtok: 0.075,
+    });
+  });
+
+  it('falls back from a dashed-date id to its dateless alias (deep-retest 0.13.8 P1)', () => {
+    const dated = priceLookupByModel({ modelId: 'gpt-4.1-mini-2025-04-14' });
+    const alias = priceLookupByModel({ modelId: 'gpt-4.1-mini' });
+    expect(dated).not.toBeNull();
+    expect(dated).toEqual(alias);
+  });
+
+  it('resolves -latest ids like lookupPrice does', () => {
+    const viaAnchor = priceLookupByModel({ modelId: 'claude-haiku-4-5-latest' });
+    expect(viaAnchor).toEqual(priceLookupByModel({ modelId: 'claude-haiku-4-5' }));
+    const viaSingleDated = priceLookupByModel({ modelId: 'claude-3-5-sonnet-latest' });
+    expect(viaSingleDated).toEqual(priceLookupByModel({ modelId: 'claude-3-5-sonnet-20241022' }));
+    expect(viaSingleDated).not.toBeNull();
+    expect(priceLookupByModel({ modelId: 'never-heard-of-it-latest' })).toBeNull();
+  });
+
   it('ignores the extra providerName the middleware passes (drop-in contract)', () => {
     const asMiddlewareLookup: (info: {
       readonly providerName: string;

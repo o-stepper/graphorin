@@ -12,15 +12,16 @@ function priceLookupByModel(info):
   | null;
 ```
 
-Defined in: pricing/src/model-lookup.ts:45
+Defined in: pricing/src/model-lookup.ts:46
 
 **`Stable`**
 
 Resolve per-Mtok USD rates for a model id against the bundled
 snapshot, ignoring the provider dimension. Dated ids fall back to
-their dateless alias (the `lookupPrice` contract). Returns `null`
-for unknown models so cost accumulators keep reporting zero instead
-of guessing.
+their dateless alias, and `-latest` ids resolve like `lookupPrice`
+does (dateless entry first, else the single retained dated entry).
+Returns `null` for unknown models so cost accumulators keep
+reporting zero instead of guessing.
 
 Drop-in for `withCostTracking({ priceLookup })`: the extra
 `providerName` the middleware passes is simply ignored.

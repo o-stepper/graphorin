@@ -16,7 +16,7 @@ import { createHash } from 'node:crypto';
 import type { ModelPrice, PricingSnapshot } from '../types.js';
 
 /** @internal - used for `lookupPrice` defaults. */
-export const SNAPSHOT_DATE = '2026-07-19';
+export const SNAPSHOT_DATE = '2026-07-20';
 
 const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
   // -----------------------------------------------------------------
@@ -188,6 +188,62 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     inputUsdPerToken: 1.1 / 1_000_000,
     outputUsdPerToken: 4.4 / 1_000_000,
     cachedReadUsdPerToken: 0.275 / 1_000_000,
+  },
+  // Official undated aliases of retained dated snapshots (deep-retest
+  // 0.13.8 P1). `lookupPrice` deliberately has NO undated->dated reverse
+  // strip - an alias may route to ANY snapshot, not necessarily the one
+  // this catalogue retains - so every alias the API still serves gets an
+  // explicit row at its CURRENT routing target's rates. Routing and
+  // rates verified against the official per-model pages on 2026-07-20:
+  //   gpt-4o      -> gpt-4o-2024-11-20
+  //   gpt-4o-mini -> gpt-4o-mini-2024-07-18 (still the default small model)
+  //   o1          -> o1-2024-12-17 (deprecated upstream, still billed)
+  //   o3-mini     -> o3-mini-2025-01-31 (deprecated upstream, still billed)
+  // The alias/dated price-equality invariant is pinned by test.
+  {
+    provider: 'openai',
+    model: 'gpt-4o',
+    inputUsdPerToken: 2.5 / 1_000_000,
+    outputUsdPerToken: 10 / 1_000_000,
+    cachedReadUsdPerToken: 1.25 / 1_000_000,
+  },
+  {
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+    inputUsdPerToken: 0.15 / 1_000_000,
+    outputUsdPerToken: 0.6 / 1_000_000,
+    cachedReadUsdPerToken: 0.075 / 1_000_000,
+  },
+  {
+    provider: 'openai',
+    model: 'o1',
+    inputUsdPerToken: 15 / 1_000_000,
+    outputUsdPerToken: 60 / 1_000_000,
+    cachedReadUsdPerToken: 7.5 / 1_000_000,
+  },
+  {
+    provider: 'openai',
+    model: 'o3-mini',
+    inputUsdPerToken: 1.1 / 1_000_000,
+    outputUsdPerToken: 4.4 / 1_000_000,
+    cachedReadUsdPerToken: 0.55 / 1_000_000,
+  },
+  // Embeddings - billed on input only; the zero output rate IS the price
+  // (embeddings return vectors, not completion tokens), not a fallback.
+  // Rates verified against the official model pages on 2026-07-20.
+  {
+    provider: 'openai',
+    model: 'text-embedding-3-small',
+    inputUsdPerToken: 0.02 / 1_000_000,
+    outputUsdPerToken: 0,
+    notes: 'Embeddings: input-billed only.',
+  },
+  {
+    provider: 'openai',
+    model: 'text-embedding-3-large',
+    inputUsdPerToken: 0.13 / 1_000_000,
+    outputUsdPerToken: 0,
+    notes: 'Embeddings: input-billed only.',
   },
   // Retired / legacy ids retained for historical cost attribution.
   {
