@@ -25,6 +25,59 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.5 - 2026-07-20
+
+The **compose-and-completeness patch** (PRs #224, #225): the reviewer
+backlog batch - the standalone daemon can now serve the full domain
+surface, every type referenced by a public API became importable, and
+the docs artifact lost 87% of its weight. No breaking changes.
+
+### Standalone server - config-driven compose (`@graphorin/server`, `@graphorin/cli`)
+
+- A new `app` config field points at a compose module: `graphorin
+  start` imports it, calls the default-exported factory (typed as
+  `GraphorinAppFactory`, with `GraphorinAppContext` and
+  `GraphorinAppBag` alongside in `@graphorin/server`) and spreads the
+  returned adapter bag into `createServer(...)` - sessions, memory,
+  agents, and workflows mount instead of 404-ing on a bare
+  infrastructure daemon. The bag's optional `close` hook runs after
+  `server.stop()` on shutdown and on failed boots.
+- `graphorin init --app` scaffolds a working `graphorin.app.mjs`
+  (SQLite store + memory + sessions REST adapters over the configured
+  storage) and wires the config field; the scaffold is boot-tested in
+  CI (a session is created and listed through REST).
+- The standalone-server guide gains the compose section and a
+  mounted-surfaces table (bare start vs app module vs programmatic
+  embedding).
+
+### API reference completeness (17 packages)
+
+- About 130 types referenced by public APIs but unreachable from any
+  documented barrel are now exported: memory tool input/output shapes,
+  executor and truncation hooks, audit listener signatures, protocol
+  frame zod schemas, sandbox peer-module structural views, the core
+  agent-event variants, sqlite store row types, and more. All 115
+  TypeDoc referenced-but-not-included warnings are cleared and the new
+  warning budget ratchets at zero.
+- Four never-importable file-local names gained descriptive names
+  while becoming public: `ToolAuditListener`,
+  `MemoryGuardAuditListener`, `SecretValueAuditListener`, and
+  `ToolSearchToolMatch` (the registry-level `ToolSearchMatch` is
+  unchanged). No previously importable name changed.
+
+### Infrastructure (not npm-published)
+
+- Docs dist 1.1 GB -> 150 MB: the full TypeDoc symbol sidebar is no
+  longer server-rendered into every API page - each page now carries
+  the 29 package links plus only the current package's modules. New CI
+  budgets pin the total dist, per-page HTML sizes, and the largest
+  asset.
+- Core branch coverage 62% -> 84% via direct unit suites for the
+  durable-workflow primitives, the ToolReturn envelope, and usage
+  flattening; core coverage thresholds ratcheted to 90/90/80/90.
+
+---
+
 ## 0.13.4 - 2026-07-20
 
 The **grammar-safe redaction patch** (PR #220): remediation of the
