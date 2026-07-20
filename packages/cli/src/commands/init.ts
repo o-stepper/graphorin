@@ -50,6 +50,15 @@ export interface InitCommandOptions {
   readonly cloudConsent?: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly encrypted?: boolean;
   readonly cwd?: string;
+  /**
+   * Also scaffold a `graphorin.app.mjs` compose module next to the
+   * config and reference it via the config's `app` field, so
+   * `graphorin start` serves the full domain surface (sessions /
+   * memory REST adapters over the configured SQLite store) instead of
+   * the bare infrastructure daemon. Default `false` - the historical
+   * infra-only init is unchanged.
+   */
+  readonly app?: boolean;
   /** Test seam: skip writing files (only print the report). */
   readonly dryRun?: boolean;
   /** Test seam: redirect stdout/err. */
@@ -64,6 +73,8 @@ export interface InitCommandResult {
   readonly serverPepperHex: string;
   readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly storageEncrypted: boolean;
+  /** Absolute path of the scaffolded app module (with `--app` only). */
+  readonly appPath?: string;
 }
 
 /**
@@ -81,21 +92,35 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   const pepper = generatePepper();
   const pepperHex = await pepper.useBuffer((buf) => buf.toString('hex'));
 
+  const appModulePath =
+    options.app === true ? resolve(dirname(target), APP_MODULE_NAME) : undefined;
+
   if (options.dryRun !== true) {
     if (await fileExists(target)) {
       throw new Error(
         `[graphorin/cli] refusing to overwrite existing '${target}'. Move it aside or pass --out <path>.`,
       );
     }
+    if (appModulePath !== undefined && (await fileExists(appModulePath))) {
+      throw new Error(
+        `[graphorin/cli] refusing to overwrite existing '${appModulePath}'. Move it aside first.`,
+      );
+    }
     await mkdir(dirname(target), { recursive: true });
     const content =
       format === 'json'
-        ? renderConfigJson({ cloudConsent, storageEncrypted })
-        : renderConfig({ cloudConsent, storageEncrypted });
+        ? renderConfigJson({ cloudConsent, storageEncrypted, app: options.app === true })
+        : renderConfig({ cloudConsent, storageEncrypted, app: options.app === true });
     await writeFile(target, content, { mode: 0o600 });
+    if (appModulePath !== undefined) {
+      await writeFile(appModulePath, renderAppModule(), { mode: 0o600 });
+    }
   }
 
   print(`[graphorin/cli] wrote ${target}`);
+  if (appModulePath !== undefined) {
+    print(`[graphorin/cli] wrote ${appModulePath} (app-compose module; edit it to shape your API)`);
+  }
   print(`[graphorin/cli] server pepper hex (store in your keyring as 'graphorin_server_pepper'):`);
   print(`  ${pepperHex}`);
   print('');
@@ -126,8 +151,12 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
     serverPepperHex: pepperHex,
     cloudConsent,
     storageEncrypted,
+    ...(appModulePath !== undefined ? { appPath: appModulePath } : {}),
   });
 }
+
+/** File name of the scaffolded compose module (next to the config). */
+const APP_MODULE_NAME = 'graphorin.app.mjs';
 
 function resolveFormat(options: InitCommandOptions): 'ts' | 'json' {
   if (options.format !== undefined) {
@@ -202,10 +231,18 @@ async function resolveEncryption(options: InitCommandOptions): Promise<boolean> 
 function renderConfig(input: {
   readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly storageEncrypted: boolean;
+  readonly app?: boolean;
 }): string {
   return `import { defineConfig } from '@graphorin/server';
 
-export default defineConfig({
+export default defineConfig({${
+    input.app === true
+      ? `
+  // Compose module: \`graphorin start\` imports it and mounts the
+  // returned sessions / memory / agents adapters.
+  app: './graphorin.app.mjs',`
+      : ''
+  }
   server: {
     host: '127.0.0.1',
     port: 8080,
@@ -303,8 +340,10 @@ export function consentSnippet(
 function renderConfigJson(input: {
   readonly cloudConsent: 'public-only' | 'public-and-internal' | 'all-with-warnings';
   readonly storageEncrypted: boolean;
+  readonly app?: boolean;
 }): string {
   const config = {
+    ...(input.app === true ? { app: './graphorin.app.mjs' } : {}),
     server: {
       host: '127.0.0.1',
       port: 8080,
@@ -332,4 +371,111 @@ function renderConfigJson(input: {
     },
   };
   return `${JSON.stringify(config, null, 2)}\n`;
+}
+
+/**
+ * the scaffolded `graphorin.app.mjs`. Composes the
+ * configured SQLite store + memory + sessions and returns the adapter
+ * bag `graphorin start` spreads into `createServer(...)`. Written as
+ * plain ESM so it runs on any Node without a TS loader; every call in
+ * it is real (the CLI integration test boots a server through it).
+ */
+function renderAppModule(): string {
+  return `/**
+ * graphorin.app.mjs - app-compose module for \`graphorin start\`.
+ *
+ * The launcher imports this file (config \`app\` field), calls the
+ * default-exported factory with { config, configPath, configDir }, and
+ * spreads the returned bag into createServer(...): the sessions and
+ * memory REST surfaces below mount at /v1/sessions and /v1/memory.
+ * Extend the bag with agents / workflows / consolidator as your app
+ * grows - see the standalone-server guide.
+ */
+import { resolve } from 'node:path';
+
+import { createMemory } from '@graphorin/memory';
+import { createSessionManager } from '@graphorin/sessions';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+
+export default async function createApp({ config, configDir }) {
+  const store = await createSqliteStore({
+    path: config.storage.path === ':memory:' ? ':memory:' : resolve(configDir, config.storage.path),
+    mode: config.storage.mode,
+  });
+  await store.init();
+
+  const memory = createMemory({ store: store.memory, embeddings: store.embeddings });
+  const sessions = createSessionManager({ store: store.sessions, memory: memory.session });
+
+  return {
+    // The server reuses this store for its infrastructure surfaces and
+    // never closes an injected store - the close hook below owns it.
+    store,
+    sessions: sessionApi(sessions),
+    memory: memoryApi(memory),
+    // agents: build an AgentRegistry with your Agent instances to serve
+    // POST /v1/agents/:id/invoke.
+    close: async () => {
+      await store.close();
+    },
+  };
+}
+
+/** Thin SessionApi shim over the SessionManager facade. */
+function sessionApi(sessions) {
+  return {
+    list: (opts) => sessions.listSessions(opts),
+    get: async (sessionId) => {
+      const session = await sessions.find(sessionId);
+      return session === null ? null : await session.metadata();
+    },
+    create: async (input) => {
+      const session = await sessions.create(input);
+      return await session.metadata();
+    },
+    remove: async (sessionId) => {
+      if ((await sessions.find(sessionId)) === null) return false;
+      await sessions.deleteSession(sessionId);
+      return true;
+    },
+    listMessages: async (sessionId, opts) => {
+      const session = await sessions.find(sessionId);
+      return session === null ? [] : await session.list(opts);
+    },
+    // Handoffs live on run state; surface them here once your app
+    // records agent-to-agent handoffs.
+    listHandoffs: async () => [],
+  };
+}
+
+/** Thin MemoryApi shim over the memory facade (semantic + working tiers). */
+function memoryApi(memory) {
+  return {
+    search: (input) =>
+      memory.semantic.search(input.scope, input.query, {
+        ...(input.topK !== undefined ? { limit: input.topK } : {}),
+      }),
+    remember: async (input) => {
+      const fact = await memory.semantic.remember(input.scope, {
+        text: input.text,
+        ...(input.sensitivity !== undefined ? { sensitivity: input.sensitivity } : {}),
+        ...(input.metadata !== undefined ? { metadata: input.metadata } : {}),
+      });
+      return { factId: fact.id };
+    },
+    forget: async (scope, factId) => {
+      await memory.semantic.forget(scope, factId);
+      return true;
+    },
+    upsertBlock: async (input) => {
+      await memory.working.write(input.scope, input.label, input.body);
+      return { label: input.label };
+    },
+    deleteBlock: async (scope, label) => {
+      await memory.working.forget(scope, label);
+      return true;
+    },
+  };
+}
+`;
 }

@@ -44,6 +44,15 @@ export type DeliveryCommentaryPolicyConfig = 'wrap' | 'strip' | 'pass-through';
 
 /** @stable */
 export interface ServerConfigSpec {
+  /**
+   * Path to an app-compose module, relative to the config file. The
+   * standalone launcher (`graphorin start`) imports it and spreads the
+   * returned adapter bag (sessions / memory / agents / workflows / ...)
+   * into `createServer(...)`, mounting the full domain surface.
+   * Ignored by `createServer` itself - programmatic embedders pass
+   * adapters directly.
+   */
+  readonly app?: string;
   readonly server: {
     readonly host: string;
     readonly port: number;
@@ -438,6 +447,9 @@ const healthSchema = z
  */
 export const ServerConfigSchema = z
   .object({
+    // Consumed by the standalone launcher (graphorin start), not by
+    // createServer - see ServerConfigSpec.app.
+    app: z.string().min(1).optional(),
     server: serverSchema,
     storage: storageSchema,
     retention: retentionSchema,

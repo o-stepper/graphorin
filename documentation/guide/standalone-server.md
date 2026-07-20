@@ -37,8 +37,51 @@ For a CLI script or a desktop app, embed the library packages directly. See [Arc
 Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`](https://github.com/honojs/node-server) (MIT). The default `basePath` is `/v1`. Every authenticated endpoint requires a bearer token signed with HMAC-SHA256 against the deployment-wide pepper. The unauthenticated `/v1/health` route is exempt.
 
 ::: warning Adapter-gated routes - what `graphorin start` actually serves
-Most domain routes below mount **only when the corresponding adapter is passed to `createServer({...})` programmatically**: sessions, memory, skills, MCP, audit, triggers, and replay routes need their adapter; `/v1/agents/*` and `/v1/workflows/*` need agents / workflows registered in the registries. The `graphorin start` daemon currently composes **none of these** - it serves health, metrics, tokens, auth tickets, and the WS/SSE endpoints only. To get the full surface, embed the server: build your adapter bag and call `createServer({ agents, workflows, sessions, memory, ... })` from your own entrypoint. A config-driven compose hook for `graphorin start` is tracked as future work.
+Most domain routes below mount **only when the corresponding adapter reaches `createServer({...})`**: sessions, memory, skills, MCP, audit, triggers, and replay routes need their adapter; `/v1/agents/*` and `/v1/workflows/*` need agents / workflows registered in the registries. A bare `graphorin start` composes none of these - it serves health, metrics, tokens, auth tickets, and the WS/SSE endpoints only. To serve the full surface from the daemon, point the config's `app` field at a compose module (see "Composing the full API surface" below); embedding the server programmatically with your own adapter bag works exactly as before.
 :::
+
+### Composing the full API surface (app module)
+
+Set `app` in `graphorin.config.*` to a module path (relative to the config file) and `graphorin start` will import it, call its default-exported factory with `{ config, configPath, configDir }` (the validated config plus the config file's location), and spread the returned adapter bag into `createServer(...)`:
+
+```ts
+import { resolve } from 'node:path';
+
+import type { GraphorinAppBag, GraphorinAppFactory } from '@graphorin/server';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+
+const createApp: GraphorinAppFactory = async (ctx) => {
+  const store = await createSqliteStore({
+    path: resolve(ctx.configDir, ctx.config.storage.path),
+    mode: ctx.config.storage.mode,
+  });
+  await store.init();
+  const bag: GraphorinAppBag = {
+    // The server reuses this store and never closes an injected one -
+    // the close hook below owns it. Add sessions / memory / agents /
+    // workflows adapters here as your app grows.
+    store,
+    close: async () => {
+      await store.close();
+    },
+  };
+  return bag;
+};
+export default createApp;
+```
+
+`graphorin init --app` scaffolds a working `graphorin.app.mjs` (SQLite store + memory + sessions REST adapters over the configured storage path) and wires the `app` field for you - edit it to add agents, workflows, or your own adapters. The optional `close` hook runs after `server.stop()` on shutdown, because the server never closes an injected store or other app-owned resources.
+
+Which route groups are live per launch mode:
+
+| Surface | Bare `graphorin start` | With an `app` module | Programmatic `createServer({...})` |
+|---|---|---|---|
+| `/v1/health`, `/v1/metrics`, tokens, auth tickets, WS/SSE endpoints | yes | yes | yes |
+| `/v1/sessions/*` | 404 | when the bag has `sessions` | when options have `sessions` |
+| `/v1/memory/*` | 404 | when the bag has `memory` | when options have `memory` |
+| `/v1/agents/*` (list/invoke) | empty registry | when the bag has `agents` | when options have `agents` |
+| `/v1/workflows/*` | empty registry | when the bag has `workflows` | when options have `workflows` |
+| skills / MCP / audit / triggers / replay routes | 404 | when the bag has the adapter | when options have the adapter |
 
 | Method | Path | Purpose |
 |---|---|---|

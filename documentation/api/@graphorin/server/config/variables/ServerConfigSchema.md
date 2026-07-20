@@ -8,6 +8,7 @@
 
 ```ts
 const ServerConfigSchema: ZodDefault<ZodObject<{
+  app: ZodOptional<ZodString>;
   audit: ZodDefault<ZodObject<{
      cipher: ZodOptional<ZodString>;
      enabled: ZodDefault<ZodBoolean>;
@@ -429,6 +430,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      walCheckpointIntervalMs?: number;
   }>>;
 }, "strict", ZodTypeAny, {
+  app?: string;
   audit: {
      cipher?: string;
      enabled: boolean;
@@ -547,6 +549,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      walCheckpointIntervalMs?: number;
   };
 }, {
+  app?: string;
   audit?: {
      cipher?: string;
      enabled?: boolean;
@@ -667,7 +670,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
 }>>;
 ```
 
-Defined in: packages/server/src/config.ts:439
+Defined in: packages/server/src/config.ts:448
 
 **`Stable`**
 

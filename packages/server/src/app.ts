@@ -213,6 +213,52 @@ export const VERSION: string = pkg.version;
  *
  * @stable
  */
+/**
+ * Context handed to a {@link GraphorinAppFactory} by the standalone
+ * launcher (`graphorin start`). Carries the validated config plus the
+ * config file's location so the factory can resolve relative paths
+ * (SQLite files, credential bundles, ...) against the project
+ * directory.
+ *
+ * @stable
+ */
+export interface GraphorinAppContext {
+  /** Validated server config (CLI overrides already applied). */
+  readonly config: ServerConfigSpec;
+  /** Absolute path of the resolved `graphorin.config.*` file. */
+  readonly configPath: string;
+  /** Directory containing the config file. */
+  readonly configDir: string;
+}
+
+/**
+ * Adapter bag a compose module returns: everything
+ * {@link CreateServerOptions} accepts except the config itself, plus an
+ * optional `close` hook the launcher awaits AFTER `server.stop()` so
+ * app-owned resources (an injected store, provider clients, ...) shut
+ * down cleanly - `stop()` never closes an injected store by contract.
+ *
+ * @stable
+ */
+export type GraphorinAppBag = Omit<CreateServerOptions, 'config' | 'validatedConfig'> & {
+  readonly close?: () => void | Promise<void>;
+};
+
+/**
+ * Factory signature of an app-compose module (`graphorin.config`'s
+ * `app` field). The module default-exports it (or exports it as
+ * `createApp`); the launcher imports the module, calls the factory
+ * with a {@link GraphorinAppContext}, and spreads the returned
+ * {@link GraphorinAppBag} into `createServer(...)`, mounting the
+ * sessions / memory / agents / workflows surface that a bare
+ * `graphorin start` leaves 404.
+ *
+ * @stable
+ */
+export type GraphorinAppFactory = (
+  ctx: GraphorinAppContext,
+) => GraphorinAppBag | Promise<GraphorinAppBag>;
+
 export async function createServer(options: CreateServerOptions = {}): Promise<GraphorinServer> {
   const config: ServerConfigSpec =
     options.validatedConfig ?? parseServerConfig(options.config ?? {});

@@ -49,13 +49,18 @@ graphorin start --host 127.0.0.1 --port 8787
 
 Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration) (the config loader reads `.ts` / `.js` / `.mjs` / `.json` files, not TOML). At startup the process logs the resolved config file path and a single listening line (`@graphorin/server v<version> listening on http://<host>:<port><basePath>`); secret values are never printed.
 
+When the config carries an `app` field, `start` imports that compose module and spreads its adapter bag into `createServer(...)`, mounting the sessions / memory / agents / workflows surface - see [Standalone server § Composing the full API surface](/guide/standalone-server#composing-the-full-api-surface-app-module). Without it the daemon serves the infrastructure surface only.
+
 ## `graphorin init`
 
 ```bash
 graphorin init                       # writes ./graphorin.config.ts + prints the pepper once
 graphorin init --format json         # writes ./graphorin.config.json (defineConfig-free)
+graphorin init --app                 # + graphorin.app.mjs compose module (full REST surface)
 graphorin init --non-interactive --encrypted --out ./deploy/graphorin.config.json
 ```
+
+With `--app`, init also scaffolds a working `graphorin.app.mjs` next to the config (SQLite store + memory + sessions REST adapters over the configured storage) and points the config's `app` field at it, so the very first `graphorin start` serves `/v1/sessions` and `/v1/memory` instead of a bare infrastructure daemon. Edit the module to add agents, workflows, or your own adapters.
 
 Two config flavours (`--format ts|json`, default `ts`; a `.json` `--out` implies `json`):
 
