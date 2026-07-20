@@ -10,7 +10,7 @@
 function memoryUpdateOmission(options?): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>;
 ```
 
-Defined in: packages/evals/src/scorers/memory/update.ts:49
+Defined in: packages/evals/src/scorers/memory/update.ts:61
 
 **`Stable`**
 

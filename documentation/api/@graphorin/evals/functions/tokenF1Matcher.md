@@ -14,7 +14,7 @@ Defined in: packages/evals/src/scorers/memory/util.ts:57
 
 **`Stable`**
 
-Build the default matcher: token-set F1 at or above `minTokenF1`
+Build a symmetric matcher: token-set F1 at or above `minTokenF1`
 (default `0.5`).
 
 ## Parameters

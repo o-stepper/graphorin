@@ -13,7 +13,7 @@ function anyMatch(
    matcher): boolean;
 ```
 
-Defined in: packages/evals/src/scorers/memory/util.ts:62
+Defined in: packages/evals/src/scorers/memory/util.ts:176
 
 True when some observed point matches the gold text.
 

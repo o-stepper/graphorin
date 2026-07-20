@@ -6,7 +6,7 @@
 
 # Interface: MemoryUpdateOmissionOptions
 
-Defined in: packages/evals/src/scorers/memory/update.ts:32
+Defined in: packages/evals/src/scorers/memory/update.ts:38
 
 **`Stable`**
 
@@ -14,7 +14,8 @@ Defined in: packages/evals/src/scorers/memory/update.ts:32
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-matcher"></a> `matcher?` | `readonly` | [`MemoryPointMatcher`](/api/@graphorin/evals/type-aliases/MemoryPointMatcher.md) | Custom gold-vs-observed matcher. Default: token-set F1 at [minTokenF1](/api/@graphorin/evals/interfaces/MemoryUpdateOmissionOptions.md#property-mintokenf1). | packages/evals/src/scorers/memory/update.ts:36 |
-| <a id="property-maxomissionrate"></a> `maxOmissionRate?` | `readonly` | `number` | Omission rate at or below which the case passes. Default `0.5`. | packages/evals/src/scorers/memory/update.ts:40 |
-| <a id="property-mintokenf1"></a> `minTokenF1?` | `readonly` | `number` | Threshold for the default token-F1 matcher. Default `0.5`. | packages/evals/src/scorers/memory/update.ts:38 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. Default `'memory-update-omission'`. | packages/evals/src/scorers/memory/update.ts:34 |
+| <a id="property-matcher"></a> `matcher?` | `readonly` | [`MemoryPointMatcher`](/api/@graphorin/evals/type-aliases/MemoryPointMatcher.md) | Custom gold-vs-observed matcher. Default: [defaultMemoryPointMatcher](/api/@graphorin/evals/functions/defaultMemoryPointMatcher.md) - token-set F1 OR directional gold coverage. | packages/evals/src/scorers/memory/update.ts:46 |
+| <a id="property-maxomissionrate"></a> `maxOmissionRate?` | `readonly` | `number` | Omission rate at or below which the case passes. Default `0.5`. | packages/evals/src/scorers/memory/update.ts:52 |
+| <a id="property-mingoldcoverage"></a> `minGoldCoverage?` | `readonly` | `number` | Threshold for the default matcher's gold-coverage leg. Default `0.6`. | packages/evals/src/scorers/memory/update.ts:50 |
+| <a id="property-mintokenf1"></a> `minTokenF1?` | `readonly` | `number` | Threshold for the default matcher's F1 leg. Default `0.5`. | packages/evals/src/scorers/memory/update.ts:48 |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. Default `'memory-update-omission'`. | packages/evals/src/scorers/memory/update.ts:40 |

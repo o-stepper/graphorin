@@ -10,7 +10,7 @@
 function memoryExtractionRecall(options?): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>;
 ```
 
-Defined in: packages/evals/src/scorers/memory/extraction.ts:39
+Defined in: packages/evals/src/scorers/memory/extraction.ts:50
 
 **`Stable`**
 
