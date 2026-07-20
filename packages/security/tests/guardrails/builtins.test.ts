@@ -101,6 +101,16 @@ describe('piiDetection', () => {
     expect((await g.check('digits 4155551212', ctx)).ok).toBe(false);
   });
 
+  it('rewrites a raw numeric PAN leaf with a quoted marker so the JSON stays valid', async () => {
+    const g = guardrails.piiDetection<string>();
+    const result = await g.check('{"card":4111111111111111}', ctx);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.rewrite).toBe('{"card":"[REDACTED:credit-card]"}');
+      expect(JSON.parse(result.rewrite as string)).toEqual({ card: '[REDACTED:credit-card]' });
+    }
+  });
+
   it("supports action: 'block'", async () => {
     const g = guardrails.piiDetection<string>({ action: 'block' });
     const result = await g.check('Email me at hello@example.com', ctx);

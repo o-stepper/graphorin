@@ -10,7 +10,7 @@
 type PromptRedactionScanScope = "all" | "untrusted" | "secret-value-only";
 ```
 
-Defined in: packages/provider/src/middleware/with-redaction.ts:52
+Defined in: packages/provider/src/middleware/with-redaction.ts:53
 
 **`Stable`**
 

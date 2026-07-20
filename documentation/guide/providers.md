@@ -42,7 +42,19 @@ A `MiddlewareOrderingError` is thrown the moment the array argument violates the
 | `withCostLimit` | Refuses requests that would breach the configured budget. |
 | `withCostTracking` | Records per-call cost for auditing. |
 | `withFallback` | Composes a chain of fallback providers. |
-| `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), per-pattern `verify` predicates are honoured (the built-in `creditcard` check requires a Luhn-valid number with a major-network leading digit, so serialized floats and epoch timestamps are never corrupted), and the streaming scan keeps a bounded tail buffer so a secret split across two `text-delta` chunks is still caught. |
+| `withRedaction` | Innermost: strips secrets / PII from the **request** immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), and per-pattern `verify` predicates are honoured (the built-in `creditcard` check requires a Luhn-valid number with a major-network leading digit, so serialized floats and epoch timestamps are never corrupted). A masked bare numeric JSON leaf is quoted, so the document stays parseable. |
+
+::: warning Request redaction vs response detection
+`withRedaction` **rewrites only the outbound request**. On the response side it *detects*: the streaming scan keeps a bounded tail buffer, matches the same catalogue across `text-delta` chunk boundaries, and emits one violation row per finding - but it never mutates the streamed text (mid-stream rewriting would corrupt structured-output and tool-call parsing), and `generate()` responses are not rewritten either. If model output reaches end users, compose the response half with an output guardrail:
+
+```ts
+import { guardrails } from '@graphorin/security';
+
+// Request side: withRedaction in the provider middleware chain.
+// Response side: a rewrite-mode PII guardrail on the output stage.
+const outputPii = guardrails.piiDetection<string>({ stage: 'output', action: 'rewrite' });
+```
+:::
 
 Token counting, model-tier classification, and reasoning-retention policy are **separate APIs** (`createDefaultCounter(...)`, `classifyModelTier(...)`, `resolveReasoningRetention(...)`) - not middleware. Reasoning retention is consulted by the runtime per step; `classifyModelTier(...)` is an operator-side helper for building and sanity-checking a `modelTierMap` - the agent's tier resolution walks its own precedence ladder and does NOT invoke the classifier at runtime, so an inconsistent tier-map is not auto-validated.
 

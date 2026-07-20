@@ -10,7 +10,7 @@
 const withRedaction: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-redaction.ts:120
+Defined in: packages/provider/src/middleware/with-redaction.ts:121
 
 **`Stable`**
 

@@ -56,6 +56,13 @@ describe('@graphorin/observability/redaction - validator', () => {
     expect(id?.value).toBe('id=1240000000000000001');
   });
 
+  it('masks a raw numeric PAN leaf with a quoted mask so the JSON stays valid', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    const out = v.validate({ value: '{"card":4111111111111111}', tier: 'public' });
+    expect(out?.value).toBe('{"card":"[REDACTED creditcard]"}');
+    expect(JSON.parse(out?.value as string)).toEqual({ card: '[REDACTED creditcard]' });
+  });
+
   it('throws when failOnUnredactedSensitive is true and a tier exceeds the floor', () => {
     const v = createRedactionValidator({ minTier: 'public', failOnUnredactedSensitive: true });
     expect(() => v.validate({ value: 'x', tier: 'secret' })).toThrow(RedactionValidationError);

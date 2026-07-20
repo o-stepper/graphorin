@@ -15,7 +15,7 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:135
+Defined in: pricing/src/lookup.ts:138
 
 **`Stable`**
 

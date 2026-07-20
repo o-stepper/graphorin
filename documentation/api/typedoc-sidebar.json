@@ -1346,6 +1346,16 @@
                     "link": "/api/@graphorin/observability/redaction/patterns/variables/OPT_IN_PATTERNS.md"
                   }
                 ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "jsonSafeMask",
+                    "link": "/api/@graphorin/observability/redaction/patterns/functions/jsonSafeMask.md"
+                  }
+                ]
               }
             ]
           }

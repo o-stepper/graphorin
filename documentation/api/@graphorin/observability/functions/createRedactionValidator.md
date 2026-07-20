@@ -10,7 +10,7 @@
 function createRedactionValidator(opts?): RedactionValidatorInstance;
 ```
 
-Defined in: packages/observability/src/redaction/validator.ts:171
+Defined in: packages/observability/src/redaction/validator.ts:184
 
 **`Stable`**
 

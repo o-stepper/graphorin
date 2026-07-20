@@ -249,6 +249,39 @@ export const OPT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS.filter(
  */
 export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 
+/** JSON insignificant whitespace (RFC 8259). */
+const JSON_WS = new Set([' ', '\t', '\n', '\r']);
+
+/**
+ * Grammar-preserving mask placement. When the matched span occupies a bare
+ * JSON *value* position - the nearest non-whitespace neighbour on the left
+ * is `:` / `,` / `[` (or the start of the text) and on the right `,` / `}`
+ * / `]` (or the end of the text) - the mask is returned wrapped in double
+ * quotes, so masking a raw numeric leaf (`{"card":4111111111111111}`)
+ * yields a document that still parses (`{"card":"[REDACTED creditcard]"}`).
+ * Everywhere else (prose, CSV, inside a JSON string leaf) the mask is
+ * returned unchanged. The text is never parsed, so numeric lexemes outside
+ * the match keep their exact source form.
+ *
+ * @stable
+ */
+export function jsonSafeMask(
+  source: string,
+  matchIndex: number,
+  matchLength: number,
+  mask: string,
+): string {
+  let i = matchIndex - 1;
+  while (i >= 0 && JSON_WS.has(source[i] as string)) i -= 1;
+  const left = i < 0 ? undefined : source[i];
+  if (!(left === undefined || left === ':' || left === ',' || left === '[')) return mask;
+  let j = matchIndex + matchLength;
+  while (j < source.length && JSON_WS.has(source[j] as string)) j += 1;
+  const right = j >= source.length ? undefined : source[j];
+  if (!(right === undefined || right === ',' || right === '}' || right === ']')) return mask;
+  return `"${mask}"`;
+}
+
 /**
  * Verifier for the `creditcard` pattern: Luhn checksum + leading digit of a
  * major card network (2 = Mir / Mastercard 2-series, 3 = JCB / Amex /

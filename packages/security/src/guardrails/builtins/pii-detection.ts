@@ -173,7 +173,12 @@ export function piiDetection<TValue = unknown>(
           continue;
         }
         matchedKinds.push(pat.kind);
-        const replacement = `[REDACTED:${pat.kind}]`;
+        const replacement = jsonSafeReplacement(
+          text,
+          m.index,
+          m[0].length,
+          `[REDACTED:${pat.kind}]`,
+        );
         text = text.slice(0, m.index) + replacement + text.slice(m.index + m[0].length);
         re.lastIndex = m.index + replacement.length;
         m = re.exec(text);
@@ -223,6 +228,36 @@ export function piiDetection<TValue = unknown>(
   return stage === 'input'
     ? (defineInputGuardrail<TValue>(spec) as InputGuardrail<TValue>)
     : (defineOutputGuardrail<TValue>(spec) as OutputGuardrail<TValue>);
+}
+
+/** JSON insignificant whitespace (RFC 8259). */
+const JSON_WS = new Set([' ', '\t', '\n', '\r']);
+
+/**
+ * Grammar-preserving replacement placement - local twin of
+ * `jsonSafeMask` in `@graphorin/observability/redaction/patterns`
+ * (security does not depend on observability). When the matched span
+ * occupies a bare JSON value position, the replacement is wrapped in
+ * double quotes so masking a raw numeric leaf keeps the document
+ * parseable; everywhere else it is returned unchanged.
+ */
+function jsonSafeReplacement(
+  source: string,
+  matchIndex: number,
+  matchLength: number,
+  replacement: string,
+): string {
+  let i = matchIndex - 1;
+  while (i >= 0 && JSON_WS.has(source[i] as string)) i -= 1;
+  const left = i < 0 ? undefined : source[i];
+  if (!(left === undefined || left === ':' || left === ',' || left === '[')) return replacement;
+  let j = matchIndex + matchLength;
+  while (j < source.length && JSON_WS.has(source[j] as string)) j += 1;
+  const right = j >= source.length ? undefined : source[j];
+  if (!(right === undefined || right === ',' || right === '}' || right === ']')) {
+    return replacement;
+  }
+  return `"${replacement}"`;
 }
 
 /**

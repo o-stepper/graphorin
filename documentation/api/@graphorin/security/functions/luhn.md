@@ -10,7 +10,7 @@
 function luhn(value): boolean;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:248
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:283
 
 **`Stable`**
 

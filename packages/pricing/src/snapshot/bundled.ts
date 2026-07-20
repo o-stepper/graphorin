@@ -342,6 +342,12 @@ export const BUNDLED_SNAPSHOT: PricingSnapshot = Object.freeze({
   version: 'graphorin/0.1',
   source:
     'https://github.com/o-stepper/graphorin/tree/main/packages/pricing/src/snapshot/bundled.ts',
+  // The authorities the entries were transcribed from, as of snapshotDate
+  // (local runtimes - ollama / llama.cpp - are free and have no upstream).
+  upstreamSources: Object.freeze([
+    'https://docs.anthropic.com/en/docs/about-claude/pricing',
+    'https://developers.openai.com/api/docs/pricing',
+  ]),
   snapshotDate: SNAPSHOT_DATE,
   currency: 'USD',
   sha256: computeEntriesDigest(ENTRIES),
