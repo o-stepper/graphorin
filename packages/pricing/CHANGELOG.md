@@ -1,5 +1,12 @@
 # @graphorin/pricing
 
+## 0.13.6
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.6
+
 ## 0.13.5
 
 ### Patch Changes

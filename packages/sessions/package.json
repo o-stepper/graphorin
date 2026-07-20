@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/sessions",
-  "version": "0.13.5",
+  "version": "0.13.6",
   "description": "Hybrid facade-with-state session module for the Graphorin framework: createSessionManager() facade that wraps @graphorin/memory.session for message CRUD (single source of truth), AgentRegistry singleton with register / retire / delete / placeholder semantics, automatic handoff records with input-filter + secrets-inheritance metadata, workflow-run attachments, JSONL session export schema 1.0 (sentinel header + footer, N-2 backwards-compat, lenient-forward-parse, opt-in --hash / --sign / --encrypt), tool-cassette schema 1.0 (graphorin-tool-cassette/1.0) with substitution-vs-live replay policy honouring per-tool sideEffectClass, sanitized-by-default replay with audit + 30-day TTL + traces:read[:sanitized|:raw] scopes, and per-message commentary-phase trace sanitization at the session-output boundary.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/store-sqlite",
-  "version": "0.13.5",
+  "version": "0.13.6",
   "description": "Default SQLite-backed persistence layer for the Graphorin framework. Implements every storage contract from `@graphorin/core` (MemoryStore, CheckpointStore, SessionStore, TriggerStore, AuthTokenStore, OAuthServerStore, IdempotencyStore) on top of `better-sqlite3` with WAL hardening, an atomic migration runner, multi-table per-embedder vec0 vector layout, multilingual FTS5, an idle WAL-checkpoint manager, and a passphrase-resolution / encryption-or-fail-fast hook for the optional `@graphorin/store-sqlite-encrypted` cipher subpackage.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
