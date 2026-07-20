@@ -1,5 +1,15 @@
 # @graphorin/provider
 
+## 0.13.4
+
+### Patch Changes
+
+- [#220](https://github.com/o-stepper/graphorin/pull/220) [`a17f82d`](https://github.com/o-stepper/graphorin/commit/a17f82dc46be7727afbf7ceea22bfe788b8d1171) Thanks [@o-stepper](https://github.com/o-stepper)! - Masking a bare numeric JSON leaf now keeps the document parseable: when a redaction match occupies a JSON value position, the mask is emitted in double quotes (`{"card":4111111111111111}` becomes `{"card":"[REDACTED creditcard]"}`), in all three layers - the `withRedaction` provider middleware, the OTLP `RedactionValidator`, and the security `piiDetection` guardrail. Prose and string-leaf masking are unchanged. The helper is exported as `jsonSafeMask` from `@graphorin/observability/redaction/patterns`.
+
+- Updated dependencies [[`a17f82d`](https://github.com/o-stepper/graphorin/commit/a17f82dc46be7727afbf7ceea22bfe788b8d1171)]:
+  - @graphorin/observability@0.13.4
+  - @graphorin/core@0.13.4
+
 ## 0.13.3
 
 ### Patch Changes

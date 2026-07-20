@@ -25,6 +25,53 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.4 - 2026-07-20
+
+The **grammar-safe redaction patch** (PR #220): remediation of the
+sixth external deep retest, which re-audited the released 0.13.3 and
+found no P0/P1. No breaking changes.
+
+### Redaction - masking a numeric JSON leaf keeps the document parseable (`@graphorin/provider`, `@graphorin/observability`, `@graphorin/security`)
+
+- When a redaction match sits in a bare JSON value position (its
+  nearest non-whitespace neighbours are `:` / `,` / `[` on the left
+  and `,` / `}` / `]` on the right), the mask is now emitted in double
+  quotes, so masking a raw numeric leaf keeps the document valid:
+  `{"card":4111111111111111}` becomes
+  `{"card":"[REDACTED creditcard]"}` instead of the previous unquoted
+  mask that broke `JSON.parse`. Applied consistently across the
+  `withRedaction` provider middleware, the OTLP `RedactionValidator`,
+  and the security `piiDetection` guardrail. Prose and string-leaf
+  masking are unchanged, and the text is never parsed, so numeric
+  lexemes outside the match keep their exact source form.
+- The helper is exported as `jsonSafeMask` from
+  `@graphorin/observability/redaction/patterns` for custom catalogues.
+
+### Pricing - provenance carries the upstream authorities (`@graphorin/pricing`)
+
+- `PricingSnapshot` and `LookupPriceResult` gained an optional
+  `upstreamSources` list naming the original pricing pages the numbers
+  were transcribed from, alongside the existing `source` artifact
+  link. The bundled snapshot declares the Anthropic and OpenAI pricing
+  pages; `refreshPricing(...)` declares its fetch URL. An external
+  audit can now follow artifact then upstream without guessing.
+
+### Documentation and infrastructure (not npm-published)
+
+- The providers guide now separates request redaction (rewrites the
+  outbound request) from response detection (emits violations but does
+  not mutate the stream), with a canonical output-guardrail
+  composition recipe.
+- Perf-latency canaries in `@graphorin/security` and
+  `@graphorin/sessions` skip under any coverage instrumentation (the
+  CI coverage leg and a plain `vitest --coverage` run alike), so an
+  instrumented microbenchmark no longer flakes.
+- New TypeDoc warning ratchet: the docs build fails if the conversion
+  warning count exceeds the committed budget, so the reference can
+  only get more complete over time.
+
+---
+
 ## 0.13.3 - 2026-07-20
 
 The **numeric-integrity patch** (PR #215): remediation of the fifth

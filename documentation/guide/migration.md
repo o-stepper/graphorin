@@ -52,6 +52,24 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.3 -> 0.13.4
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **A masked numeric JSON value is now quoted.** When redaction masks
+  a bare numeric leaf, it wraps the mask in double quotes so the
+  document still parses: `{"card":4111111111111111}` becomes
+  `{"card":"[REDACTED creditcard]"}` rather than the previous
+  unquoted mask that produced invalid JSON. This spans the
+  `withRedaction` middleware, the OTLP `RedactionValidator`, and the
+  `piiDetection` guardrail. If you asserted on the exact old
+  (JSON-breaking) output, update the expectation; prose and
+  string-leaf masking are unchanged.
+- **Pricing results may carry `upstreamSources`.** `LookupPriceResult`
+  and `PricingSnapshot` gained an optional `upstreamSources` array. It
+  is additive; existing readers of `source` are unaffected.
+
 ### 0.13.2 -> 0.13.3
 
 A patch release; nothing to migrate. One behavioural correction to be

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/proactive",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "description": "Proactivity layer for the Graphorin framework: heartbeat runner (checklist-driven periodic agent beats with sentinel suppression, busy-deferral via Agent.isBusy(), active-hours windows and per-beat budget/model pinning) and a cron-leg task runner (fresh session per fire over durable triggers, fail-closed model pinning, deterministic no-recursive-scheduling guard) emitting the typed notify/question/review/act escalation ladder.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
