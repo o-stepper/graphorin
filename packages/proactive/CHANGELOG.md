@@ -1,5 +1,16 @@
 # @graphorin/proactive
 
+## 0.13.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/sessions@0.13.3
+  - @graphorin/agent@0.13.3
+  - @graphorin/triggers@0.13.3
+  - @graphorin/workflow@0.13.3
+  - @graphorin/core@0.13.3
+
 ## 0.13.2
 
 ### Patch Changes

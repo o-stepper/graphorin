@@ -52,6 +52,26 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.2 -> 0.13.3
+
+A patch release; nothing to migrate. One behavioural correction to be
+aware of:
+
+- **Redaction no longer masks number look-alikes.** The
+  `withRedaction` provider middleware now honours per-pattern `verify`
+  predicates (previously only the OTLP validator did), and the
+  built-in `creditcard` pattern requires a Luhn-valid number with a
+  major-network leading digit (2-6) that is not part of a decimal.
+  Serialized floats, epoch timestamps, and snowflake ids in tool
+  results pass through byte-identical instead of being corrupted to
+  `[REDACTED creditcard]`; real PANs are still masked. The security
+  guardrail's `credit-card` and `us-phone` patterns follow the same
+  rules (`us-phone` no longer fires inside longer digit runs). If a
+  deployment must catch exotic 1/7/8/9-prefix card networks (UATP,
+  petroleum, RuPay `81`/`82`, Troy), register a custom pattern; if
+  your observability dashboards counted the old false-positive
+  `creditcard` violations, expect those counters to drop.
+
 ### 0.13.1 -> 0.13.2
 
 A patch release; nothing to migrate, but one behavioural correction is

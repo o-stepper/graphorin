@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-memory-sim",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "private": true,
   "description": "Lightweight synthetic dialogue-simulator benchmark for the Graphorin framework. Generates deterministic conversational fixtures with seeded PRNGs, then scores memory recall on a retrieval task and reports simulation accuracy. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

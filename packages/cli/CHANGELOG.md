@@ -1,5 +1,22 @@
 # @graphorin/cli
 
+## 0.13.3
+
+### Patch Changes
+
+- Updated dependencies [[`1cdec71`](https://github.com/o-stepper/graphorin/commit/1cdec71b5a8bd4ed9dbbd283eb7bf578886088f8)]:
+  - @graphorin/provider@0.13.3
+  - @graphorin/security@0.13.3
+  - @graphorin/memory@0.13.3
+  - @graphorin/sessions@0.13.3
+  - @graphorin/store-sqlite@0.13.3
+  - @graphorin/server@0.13.3
+  - @graphorin/skills@0.13.3
+  - @graphorin/workflow@0.13.3
+  - @graphorin/core@0.13.3
+  - @graphorin/eslint-plugin@0.13.3
+  - @graphorin/pricing@0.13.3
+
 ## 0.13.2
 
 ### Patch Changes
