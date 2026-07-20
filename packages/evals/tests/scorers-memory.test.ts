@@ -8,6 +8,8 @@ import type {
   MemoryOperationsObservation,
 } from '../src/index.js';
 import {
+  defaultMemoryPointMatcher,
+  goldTokenCoverage,
   memoryExtractionPrecision,
   memoryExtractionRecall,
   memoryQaHallucination,
@@ -148,6 +150,77 @@ describe('memoryUpdateOmission', () => {
     );
     expect(vacuous.pass).toBe(true);
     expect(vacuous.score).toBe(1);
+  });
+});
+
+describe('deep-retest 0.13.7 P2 - verbose-but-correct memories (gold-coverage leg)', () => {
+  // Live gpt-4.1-mini memory from the 0.13.7 external retest:
+  // semantically a perfect update (stale vegetarian gone, pescatarian
+  // present), yet the symmetric-F1 default scored it missed +
+  // hallucinated + omitted at once (F1 vs the 3-token gold = 4/17).
+  const VERBOSE_PESCATARIAN =
+    'The user started eating fish again on 2026-01-20, so the user identifies as pescatarian.';
+  const STALE_VEGETARIAN =
+    'The user is vegetarian and prefers restaurant suggestions that accommodate this diet.';
+  const GOLD_NEW = 'User is pescatarian';
+  const GOLD_OLD = 'User is vegetarian';
+  const dietUpdate: MemoryGoldPoint = { kind: 'update', content: GOLD_NEW, previous: GOLD_OLD };
+
+  it('goldTokenCoverage strips function words and reads 1.0 on the verbose paraphrase', () => {
+    expect(tokenF1(GOLD_NEW, VERBOSE_PESCATARIAN)).toBeCloseTo(4 / 17, 5);
+    expect(goldTokenCoverage(GOLD_NEW, VERBOSE_PESCATARIAN)).toBe(1);
+    // Directional: the same verbose text does NOT cover the old value.
+    expect(goldTokenCoverage(GOLD_OLD, VERBOSE_PESCATARIAN)).toBe(0.5);
+  });
+
+  it('the default matcher accepts the paraphrase and never cross-matches the stale value', () => {
+    const matcher = defaultMemoryPointMatcher();
+    expect(matcher(GOLD_NEW, VERBOSE_PESCATARIAN)).toBe(true);
+    expect(matcher(GOLD_NEW, STALE_VEGETARIAN)).toBe(false);
+    expect(matcher(GOLD_OLD, STALE_VEGETARIAN)).toBe(true);
+    expect(matcher(GOLD_OLD, VERBOSE_PESCATARIAN)).toBe(false);
+  });
+
+  it('update-omission: the verbose correct update counts as applied once the stale value is gone', async () => {
+    const r = await memoryUpdateOmission({ maxOmissionRate: 0 }).score(
+      scoreArgs(makeCase([dietUpdate]), { memoryPoints: [VERBOSE_PESCATARIAN] }),
+    );
+    expect(r.pass).toBe(true);
+    expect(r.score).toBe(1);
+  });
+
+  it('update-omission: a surviving stale value still marks the update omitted', async () => {
+    const r = await memoryUpdateOmission({ maxOmissionRate: 0 }).score(
+      scoreArgs(makeCase([dietUpdate]), {
+        memoryPoints: [STALE_VEGETARIAN, VERBOSE_PESCATARIAN],
+      }),
+    );
+    expect(r.pass).toBe(false);
+    expect(r.metadata?.stale).toEqual([GOLD_OLD]);
+  });
+
+  it('extraction recall matches the paraphrase; precision grounds it instead of calling it hallucinated', async () => {
+    const c = makeCase([{ kind: 'extract', content: GOLD_NEW }, dietUpdate]);
+    const recall = await memoryExtractionRecall().score(
+      scoreArgs(c, { memoryPoints: [VERBOSE_PESCATARIAN] }),
+    );
+    expect(recall.score).toBe(1);
+    const precision = await memoryExtractionPrecision().score(
+      scoreArgs(c, { memoryPoints: [VERBOSE_PESCATARIAN, 'User owns a yacht'] }),
+    );
+    expect(precision.score).toBeCloseTo(0.5);
+    expect(precision.metadata?.hallucinated).toEqual(['User owns a yacht']);
+  });
+
+  it('minGoldCoverage tightens the coverage leg per scorer', async () => {
+    const c = makeCase([{ kind: 'extract', content: 'User lives in Kyiv' }]);
+    const output = { memoryPoints: ['The user moved to Kyiv'] };
+    const loose = await memoryExtractionRecall().score(scoreArgs(c, output));
+    expect(loose.score).toBe(1); // coverage 2/3 >= 0.6 (F1 alone is 4/9)
+    const tight = await memoryExtractionRecall({ minGoldCoverage: 0.7 }).score(
+      scoreArgs(c, output),
+    );
+    expect(tight.score).toBe(0); // coverage 2/3 < 0.7 and F1 4/9 < 0.5
   });
 });
 

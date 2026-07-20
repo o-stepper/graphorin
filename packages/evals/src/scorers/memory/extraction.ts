@@ -15,16 +15,27 @@ import type {
   MemoryOperationsEvalInput,
   MemoryOperationsObservation,
 } from '../../loaders/memory-eval.js';
-import { anyMatch, type MemoryPointMatcher, sampleList, tokenF1Matcher } from './util.js';
+import {
+  anyMatch,
+  defaultMemoryPointMatcher,
+  type MemoryPointMatcher,
+  sampleList,
+} from './util.js';
 
 /** @stable */
 export interface MemoryPointScorerOptions {
   /** Optional name override. */
   readonly name?: string;
-  /** Custom gold-vs-observed matcher. Default: token-set F1 at {@link minTokenF1}. */
+  /**
+   * Custom gold-vs-observed matcher. Default:
+   * {@link defaultMemoryPointMatcher} - token-set F1 OR directional
+   * gold coverage.
+   */
   readonly matcher?: MemoryPointMatcher;
-  /** Threshold for the default token-F1 matcher. Default `0.5`. */
+  /** Threshold for the default matcher's F1 leg. Default `0.5`. */
   readonly minTokenF1?: number;
+  /** Threshold for the default matcher's gold-coverage leg. Default `0.6`. */
+  readonly minGoldCoverage?: number;
   /** Metric value at or above which the case passes. Default `0.5`. */
   readonly passThreshold?: number;
 }
@@ -40,7 +51,12 @@ export function memoryExtractionRecall(
   options: MemoryPointScorerOptions = {},
 ): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation> {
   const name = options.name ?? 'memory-extraction-recall';
-  const matcher = options.matcher ?? tokenF1Matcher(options.minTokenF1);
+  const matcher =
+    options.matcher ??
+    defaultMemoryPointMatcher({
+      minTokenF1: options.minTokenF1,
+      minGoldCoverage: options.minGoldCoverage,
+    });
   const passThreshold = options.passThreshold ?? 0.5;
   return {
     name,
@@ -82,7 +98,12 @@ export function memoryExtractionPrecision(
   options: MemoryPointScorerOptions = {},
 ): Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation> {
   const name = options.name ?? 'memory-extraction-precision';
-  const matcher = options.matcher ?? tokenF1Matcher(options.minTokenF1);
+  const matcher =
+    options.matcher ??
+    defaultMemoryPointMatcher({
+      minTokenF1: options.minTokenF1,
+      minGoldCoverage: options.minGoldCoverage,
+    });
   const passThreshold = options.passThreshold ?? 0.5;
   return {
     name,
