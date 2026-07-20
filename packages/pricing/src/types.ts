@@ -46,7 +46,15 @@ export interface ModelPrice {
  */
 export interface PricingSnapshot {
   readonly version: string;
+  /** Where this snapshot artifact itself lives (repo file, refresh URL). */
   readonly source: string;
+  /**
+   * Original pricing authorities the numbers were transcribed from
+   * (provider pricing pages, upstream datasets), valid as of
+   * `snapshotDate`. Lets an external audit follow the chain
+   * artifact -> upstream without guessing.
+   */
+  readonly upstreamSources?: ReadonlyArray<string>;
   readonly snapshotDate: string;
   readonly currency: 'USD';
   readonly sha256: string;
@@ -86,6 +94,8 @@ export interface LookupPriceResult {
   readonly cacheWriteUsdPerToken?: number;
   readonly reasoningUsdPerToken?: number;
   readonly source: string;
+  /** Upstream pricing authorities, when the snapshot declares them. */
+  readonly upstreamSources?: ReadonlyArray<string>;
   readonly snapshotDate: string;
 }
 

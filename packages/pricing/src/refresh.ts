@@ -111,6 +111,10 @@ export async function refreshPricing(opts: RefreshPricingOptions): Promise<Prici
   return Object.freeze<PricingSnapshot>({
     version,
     source: opts.url,
+    // For a refreshed snapshot the fetch URL IS the upstream authority;
+    // declaring it keeps the artifact -> upstream chain uniform with the
+    // bundled snapshot.
+    upstreamSources: Object.freeze([opts.url]),
     snapshotDate,
     currency: 'USD',
     sha256: computeEntriesDigest(entries),

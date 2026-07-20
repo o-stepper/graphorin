@@ -6,6 +6,7 @@ import {
   onMemoryGuardAudit,
 } from '../../src/guard/audit-emitter.js';
 import { createAuditOnlyGuard } from '../../src/guard/audit-only-guard.js';
+import { coverageInstrumented } from '../perf-env.js';
 import { createReader } from './_helpers.js';
 
 describe('createAuditOnlyGuard', () => {
@@ -81,8 +82,9 @@ describe('createAuditOnlyGuard', () => {
   });
 
   // Same reasoning as verify-perf.test.ts: instrumentation makes the
-  // p95 canary meaningless - the CI coverage leg skips it.
-  it.skipIf(process.env.GRAPHORIN_COVERAGE === '1')(
+  // p95 canary meaningless - skipped on the CI coverage leg AND under a
+  // plain `vitest --coverage` run (auto-detected).
+  it.skipIf(coverageInstrumented())(
     'snapshot + verify hold p95 <= 200 us/call on a 10 KB region',
     async () => {
       // DEC-153 design target is ≤ 50 µs per phase on 10 KB state with a

@@ -52,6 +52,15 @@ describe('@graphorin/pricing - lookupPrice', () => {
     expect(price?.source).toBe(BUNDLED_SNAPSHOT.source);
   });
 
+  it('surfaces the upstream pricing authorities alongside the artifact source', () => {
+    const price = lookupPrice({ provider: 'anthropic', model: 'claude-3-opus-20240229' });
+    expect(price?.upstreamSources).toEqual(BUNDLED_SNAPSHOT.upstreamSources);
+    expect(BUNDLED_SNAPSHOT.upstreamSources?.length).toBeGreaterThan(0);
+    // The artifact source and the upstream authorities are distinct links
+    // in the provenance chain.
+    expect(BUNDLED_SNAPSHOT.upstreamSources).not.toContain(BUNDLED_SNAPSHOT.source);
+  });
+
   it('honours the optional region filter when an entry declares one', async () => {
     const { computeEntriesDigest } = await import('../src/snapshot/bundled.js');
     const entries = [

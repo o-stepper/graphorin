@@ -1,0 +1,4 @@
+{
+  "$comment": "Ratchet for TypeDoc conversion warnings (referenced-but-not-included types etc.). The build fails when the count EXCEEDS maxWarnings; when a change lowers the count, lower maxWarnings in the same PR so the improvement can never regress. Target: 0.",
+  "maxWarnings": 115
+}

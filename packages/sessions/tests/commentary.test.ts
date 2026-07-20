@@ -5,6 +5,18 @@ import {
   createCommentarySanitizer,
 } from '../src/commentary/index.js';
 
+// Local twin of packages/security/tests/perf-env.ts (tests cannot import
+// across packages): true under the CI coverage leg or a plain
+// `vitest --coverage` run, so microbenchmark canaries skip when
+// instrumentation would inflate their latencies.
+function coverageInstrumented(): boolean {
+  if (process.env.GRAPHORIN_COVERAGE === '1') return true;
+  const worker = (globalThis as Record<string, unknown>).__vitest_worker__ as
+    | { config?: { coverage?: { enabled?: boolean } } }
+    | undefined;
+  return worker?.config?.coverage?.enabled === true;
+}
+
 const COMMENTARY_LEAK = `Hello! {"type":"tool.execute.end","toolCallId":"tc-1","result":{"webhook_url":"https://example.com"}}`;
 
 describe('Commentary sanitizer', () => {
@@ -165,9 +177,10 @@ describe('Commentary sanitizer', () => {
   });
 
   // V8 coverage instrumentation inflates the timing 5-8x, so the latency
-  // canary is meaningless there - the CI coverage leg sets
-  // GRAPHORIN_COVERAGE=1 and skips it (the plain matrix legs still run it).
-  it.skipIf(process.env.GRAPHORIN_COVERAGE === '1')(
+  // canary is meaningless there - skipped on the CI coverage leg
+  // (GRAPHORIN_COVERAGE=1) AND under a plain `vitest --coverage` run,
+  // auto-detected via the vitest worker's resolved coverage config.
+  it.skipIf(coverageInstrumented())(
     'per-part sanitization is well under 2 ms p95 on a 100-part fixture',
     () => {
       const sanitizer = createCommentarySanitizer();

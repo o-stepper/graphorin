@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ALL_BUILT_IN_PATTERNS,
   BUILT_IN_PATTERNS,
+  jsonSafeMask,
   OPT_IN_PATTERNS,
   type RedactionPattern,
 } from '../../src/redaction/patterns.js';
@@ -188,5 +189,29 @@ describe('@graphorin/observability/redaction - creditcard verify (Luhn + network
 
   it('rejects Luhn-invalid runs regardless of prefix', () => {
     expect(creditcard?.verify?.('4111111111111112')).toBe(false);
+  });
+});
+
+describe('@graphorin/observability/redaction - jsonSafeMask', () => {
+  const M = '[REDACTED creditcard]';
+
+  it('quotes the mask in bare JSON value positions', () => {
+    const object = '{"card":4111111111111111}';
+    expect(jsonSafeMask(object, object.indexOf('4111'), 16, M)).toBe(`"${M}"`);
+    const spaced = '{"card":  4111111111111111  }';
+    expect(jsonSafeMask(spaced, spaced.indexOf('4111'), 16, M)).toBe(`"${M}"`);
+    const array = '[4111111111111111,1]';
+    expect(jsonSafeMask(array, array.indexOf('4111'), 16, M)).toBe(`"${M}"`);
+    const whole = '4111111111111111';
+    expect(jsonSafeMask(whole, whole.indexOf('4111'), 16, M)).toBe(`"${M}"`);
+  });
+
+  it('returns the mask unchanged outside value positions', () => {
+    const prose = 'card 4111111111111111 thanks';
+    expect(jsonSafeMask(prose, prose.indexOf('4111'), 16, M)).toBe(M);
+    const stringLeaf = '{"card":"4111111111111111"}';
+    expect(jsonSafeMask(stringLeaf, stringLeaf.indexOf('4111'), 16, M)).toBe(M);
+    const leadingProse = '4111111111111111 is my card';
+    expect(jsonSafeMask(leadingProse, leadingProse.indexOf('4111'), 16, M)).toBe(M);
   });
 });

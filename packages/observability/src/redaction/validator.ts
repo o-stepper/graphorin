@@ -8,7 +8,12 @@
 import { SENSITIVITY_ORDER, type Sensitivity } from '@graphorin/core';
 
 import { RedactionValidationError } from './errors.js';
-import { ALL_BUILT_IN_PATTERNS, BUILT_IN_PATTERNS, type RedactionPattern } from './patterns.js';
+import {
+  ALL_BUILT_IN_PATTERNS,
+  BUILT_IN_PATTERNS,
+  jsonSafeMask,
+  type RedactionPattern,
+} from './patterns.js';
 import type {
   RedactionCounters,
   RedactionInput,
@@ -118,26 +123,34 @@ function applyPatterns(
   let out = s;
   for (const p of patterns) {
     const mask = p.mask ?? `[REDACTED ${p.name}]`;
-    p.regex.lastIndex = 0;
-    if (p.verify === undefined) {
-      if (p.regex.test(out)) {
-        matched.add(p.name);
-        p.regex.lastIndex = 0;
-        out = out.replace(p.regex, mask);
-      }
-      continue;
-    }
-    // RP-21: per-match predicate - only mask hits the verifier accepts (e.g.
-    // Luhn-valid PANs), and only count the pattern as matched when one did.
+    // RP-21: per-match `verify` predicate - only mask hits the verifier
+    // accepts (e.g. Luhn-valid PANs), and only count the pattern as matched
+    // when one did. The manual exec loop gives each accepted match its
+    // offset so `jsonSafeMask` can quote the mask in a bare JSON value
+    // position, keeping a masked numeric leaf parseable.
     const verify = p.verify;
     p.regex.lastIndex = 0;
-    out = out.replace(p.regex, (m) => {
-      if (verify(m)) {
-        matched.add(p.name);
-        return mask;
+    let rewritten = '';
+    let lastEnd = 0;
+    let hit = false;
+    let m = p.regex.exec(out);
+    while (m !== null) {
+      const value = m[0];
+      if (value.length === 0) {
+        p.regex.lastIndex += 1;
+        m = p.regex.exec(out);
+        continue;
       }
-      return m;
-    });
+      if (verify === undefined || verify(value)) {
+        hit = true;
+        matched.add(p.name);
+        rewritten += out.slice(lastEnd, m.index) + jsonSafeMask(out, m.index, value.length, mask);
+        lastEnd = m.index + value.length;
+      }
+      if (!p.regex.global) break;
+      m = p.regex.exec(out);
+    }
+    if (hit) out = rewritten + out.slice(lastEnd);
   }
   return out;
 }

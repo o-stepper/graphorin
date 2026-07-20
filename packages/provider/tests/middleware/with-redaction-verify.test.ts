@@ -140,11 +140,27 @@ describe('withRedaction - serialized numbers survive the creditcard pattern', ()
     expect(h.violations.some((v) => v.patternName === 'creditcard')).toBe(true);
   });
 
-  it('still redacts a real PAN stored as a raw JSON number (fail-safe over validity)', async () => {
+  it('redacts a raw numeric PAN with a quoted mask, keeping the JSON valid', async () => {
     const h = harness();
     const out = await scrubToolContent('{"card":4111111111111111}', h);
-    expect(out).toBe('{"card":[REDACTED creditcard]}');
+    expect(out).toBe('{"card":"[REDACTED creditcard]"}');
+    expect(JSON.parse(out)).toEqual({ card: '[REDACTED creditcard]' });
     expect(h.violations.some((v) => v.patternName === 'creditcard')).toBe(true);
+  });
+
+  it('quotes every masked numeric leaf in an array, keeping the JSON valid', async () => {
+    const h = harness();
+    const out = await scrubToolContent('{"cards":[4111111111111111, 5500000000000004]}', h);
+    expect(JSON.parse(out)).toEqual({
+      cards: ['[REDACTED creditcard]', '[REDACTED creditcard]'],
+    });
+    expect(h.violations.some((v) => v.patternName === 'creditcard')).toBe(true);
+  });
+
+  it('keeps the mask unquoted in prose', async () => {
+    const h = harness();
+    const out = await scrubToolContent('card 4111 1111 1111 1111 thanks', h);
+    expect(out).toBe('card [REDACTED creditcard] thanks');
   });
 
   it('round-trips a seeded corpus of floats / epochs / ids without a single hit', async () => {

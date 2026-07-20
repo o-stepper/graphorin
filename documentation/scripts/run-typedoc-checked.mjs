@@ -26,6 +26,7 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -63,9 +64,10 @@ if (result.status !== 0) {
 }
 
 if (process.exitCode !== undefined && process.exitCode !== 0) {
-  // typedoc already failed; skip the link scan (its input is partial).
+  // typedoc already failed; skip the scans (their input is partial).
 } else {
   runLinkScan();
+  runWarningBudget();
 }
 
 function runLinkScan() {
@@ -90,4 +92,38 @@ function runLinkScan() {
     return;
   }
   console.log('[run-typedoc-checked] OK - no {@link} validation warnings.');
+}
+
+/**
+ * Warning ratchet: the conversion warning count (referenced-but-not-included
+ * types etc.) must never exceed the committed budget in
+ * documentation/typedoc-warning-budget.json. When a change LOWERS the
+ * count, lower the budget in the same PR so the win sticks; target is 0.
+ */
+function runWarningBudget() {
+  const plain = output.replace(ANSI_RE, '');
+  const summary = plain.match(/Found (\d+) errors? and (\d+) warnings?/);
+  if (summary === null) {
+    console.warn(
+      '[run-typedoc-checked] WARN - no "Found N errors and M warnings" summary in the typedoc output; warning budget not evaluated.',
+    );
+    return;
+  }
+  const warnings = Number(summary[2]);
+  const budgetPath = join(DOCS_DIR, 'typedoc-warning-budget.json');
+  const { maxWarnings } = JSON.parse(readFileSync(budgetPath, 'utf8'));
+  if (warnings > maxWarnings) {
+    console.error(
+      `\n[run-typedoc-checked] FAIL - ${warnings} TypeDoc warning(s) exceed the budget of ${maxWarnings} (typedoc-warning-budget.json). New public API must be fully included in the reference (barrel-export the referenced types) instead of adding warnings.`,
+    );
+    process.exitCode = 1;
+    return;
+  }
+  if (warnings < maxWarnings) {
+    console.log(
+      `[run-typedoc-checked] warning budget: ${warnings}/${maxWarnings} - lower maxWarnings in documentation/typedoc-warning-budget.json to ${warnings} so the improvement can never regress.`,
+    );
+    return;
+  }
+  console.log(`[run-typedoc-checked] warning budget: ${warnings}/${maxWarnings}.`);
 }

@@ -92,6 +92,9 @@ function entryToResult(entry: ModelPrice, snapshot: PricingSnapshot): LookupPric
       ? {}
       : { reasoningUsdPerToken: entry.reasoningUsdPerToken }),
     source: snapshot.source,
+    ...(snapshot.upstreamSources === undefined
+      ? {}
+      : { upstreamSources: snapshot.upstreamSources }),
     snapshotDate: snapshot.snapshotDate,
   };
 }
