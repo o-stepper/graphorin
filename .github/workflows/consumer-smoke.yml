@@ -54,9 +54,37 @@ jobs:
           SMOKE_VERSION: ${{ github.event.inputs.version || 'latest' }}
         run: node ./scripts/smoke-consumer.mjs --version "$SMOKE_VERSION"
 
+  # Deep-retest 0.13.8 P2: the workspace's own scanners audit
+  # pnpm-lock.yaml - which applies pnpm overrides npm consumers never
+  # inherit - so an advisory in the PUBLISHED auto-installed peer graph
+  # (the vulnerable adm-zip pin underneath the transformers.js embedder)
+  # was structurally invisible to every existing gate. This job audits
+  # what consumers actually get: a fresh isolated npm install of EVERY
+  # published package, high/critical advisories gated against the
+  # reviewed allowlist in .github/published-peer-audit-allowlist.json.
+  # A listed advisory that stops appearing fails too, so the allowlist
+  # (and its documented consumer mitigations) cannot go stale.
+  published-peer-audit:
+    name: npm audit of published package graphs
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: '22'
+
+      - name: Audit published peer graphs
+        env:
+          SMOKE_VERSION: ${{ github.event.inputs.version || 'latest' }}
+        run: node ./scripts/audit-published-peers.mjs --version "$SMOKE_VERSION"
+
   # A red weekly run must not die silently in the Actions tab.
   notify-on-failure:
-    needs: [install-and-recall]
+    needs: [install-and-recall, published-peer-audit]
     if: failure() && github.event_name == 'schedule'
     permissions:
       issues: write
