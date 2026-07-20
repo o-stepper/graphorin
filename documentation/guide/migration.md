@@ -52,6 +52,34 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.7 -> 0.13.8
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **`@graphorin/secret-1password` works against the real CLI again.**
+  The resolver used to spawn `op read --reveal`, a flag the real
+  1Password CLI rejects at parse time (`--reveal` belongs to
+  `op item get`), so every resolve failed regardless of auth state.
+  The fixed argv is `op read --no-color '<uri>'`. On a machine with
+  the CLI installed but no account wired, the `no accounts configured`
+  error is now classified `signed-out` and the error's `hint` walks
+  through the setup options (desktop-app CLI integration,
+  `op account add`, `OP_SERVICE_ACCOUNT_TOKEN`, or Connect).
+- **Memory-eval numbers shift.** The operation-level scorers
+  (`memoryExtractionRecall` / `memoryExtractionPrecision` /
+  `memoryUpdateOmission`) match gold points with token F1 OR the new
+  directional gold-content coverage, so verbose-but-correct memories
+  are no longer scored missed, hallucinated, or omitted. Recorded
+  baselines will read differently on re-runs; pass a custom `matcher`
+  (or tune `minGoldCoverage`) if you need the old strictly-symmetric
+  behaviour.
+- **Benchmark reports name their spend.** With `--max-cost-usd` set,
+  HaluMem/LongMemEval JSON reports stamp `benchConfig.observedCostUsd`,
+  `costPricingMatched`, and `unpricedModels`; the cap still checks
+  already-observed spend before each next request, so a single request
+  can overshoot it by its own cost.
+
 ### 0.13.6 -> 0.13.7
 
 A patch release; nothing to migrate. Behavioural refinements worth

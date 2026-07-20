@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-memory-graph-recall",
-  "version": "0.13.7",
+  "version": "0.13.8",
   "private": true,
   "description": "Memory deep-dive for the Graphorin framework: entity graph with expandHops, deep recall with a graded loop and abstention, fact validation/quarantine, and the insights read tier - fully offline on a scripted stub provider. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

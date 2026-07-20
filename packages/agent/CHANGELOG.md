@@ -1,5 +1,16 @@
 # @graphorin/agent
 
+## 0.13.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.8
+  - @graphorin/memory@0.13.8
+  - @graphorin/security@0.13.8
+  - @graphorin/skills@0.13.8
+  - @graphorin/tools@0.13.8
+
 ## 0.13.7
 
 ### Patch Changes
