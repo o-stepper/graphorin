@@ -10,7 +10,7 @@
 function compareSensitivityTiers(a, b): number;
 ```
 
-Defined in: packages/observability/src/redaction/validator.ts:318
+Defined in: packages/observability/src/redaction/validator.ts:320
 
 **`Stable`**
 

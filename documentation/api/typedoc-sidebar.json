@@ -1451,6 +1451,10 @@
                 "collapsed": true,
                 "items": [
                   {
+                    "text": "JsonSafeSpan",
+                    "link": "/api/@graphorin/observability/redaction/patterns/interfaces/JsonSafeSpan.md"
+                  },
+                  {
                     "text": "RedactionPattern",
                     "link": "/api/@graphorin/observability/redaction/patterns/interfaces/RedactionPattern.md"
                   }
@@ -1495,6 +1499,10 @@
                   {
                     "text": "jsonSafeMask",
                     "link": "/api/@graphorin/observability/redaction/patterns/functions/jsonSafeMask.md"
+                  },
+                  {
+                    "text": "jsonSafeSpan",
+                    "link": "/api/@graphorin/observability/redaction/patterns/functions/jsonSafeSpan.md"
                   }
                 ]
               }
