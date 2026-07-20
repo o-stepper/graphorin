@@ -133,6 +133,10 @@ describe('DockerSandbox', () => {
   // for installing the optional `dockerode` peer dependency and
   // pulling the required image first.
   describe.runIf(dockerOptIn)('with a live Docker daemon', () => {
+    // The vitest timeout must outlive the sandbox's own 60s budget: a cold
+    // one-shot container (create + start + wait + logs) takes longer than
+    // the 5s default on CI runners, which failed the first scheduled
+    // integration-real run.
     it('runs a one-shot container and returns the JSON output', async () => {
       const sandbox = createDockerSandbox({
         image: process.env.GRAPHORIN_DOCKER_TEST_IMAGE ?? 'node:22-alpine',
@@ -147,7 +151,7 @@ describe('DockerSandbox', () => {
       );
       expect(result.ok).toBe(true);
       if (result.ok) expect(result.output.ok).toBe(true);
-    });
+    }, 90_000);
   });
 
   describe.skipIf(dockerOptIn)('without an opt-in (default - DoD `skipped` row)', () => {
