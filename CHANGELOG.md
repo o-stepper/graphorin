@@ -14,6 +14,41 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.3 - 2026-07-20
+
+The **numeric-integrity patch** (PR #215): remediation of the fifth
+external deep retest, which re-audited the released 0.13.2 and found
+one new defect. No breaking changes.
+
+### Redaction - serialized numbers survive intact (`@graphorin/provider`, `@graphorin/observability`, `@graphorin/security`)
+
+- The `withRedaction` provider middleware now honours per-pattern
+  `verify` predicates in both the request scrub and the streaming
+  response scan. Previously only the OTLP validator applied them, so
+  the middleware masked ANY 13-19 digit run as
+  `[REDACTED creditcard]` - a `fact_search` score like
+  `0.01639344262295082` or an epoch-ms timestamp inside a JSON tool
+  result came back corrupted, breaking the JSON the model reads. A
+  rejected look-alike now stays byte-identical, emits no violation,
+  and does not trip fail-closed mode.
+- The built-in `creditcard` pattern refuses decimal-adjacent digit
+  runs (a fractional part or the integer part of a decimal is never a
+  card) and its verifier requires a major-network leading digit (2-6)
+  on top of the Luhn checksum, so Luhn-lucky snowflake ids and
+  timestamps are left alone. Exotic 1/7/8/9-prefix networks (UATP,
+  petroleum, RuPay `81`/`82`, Troy) are documented as out of the
+  built-in catalogue - register a custom pattern to cover them.
+- The security guardrail's `credit-card` and `us-phone` patterns
+  gained the same boundary guards (`us-phone` previously matched any
+  10 consecutive digits inside a longer run). Standalone phone
+  numbers, `+1` forms, and real PANs are still detected; the exported
+  `luhn` helper is unchanged.
+- Regression coverage: the reviewer's exact repro, epoch/snowflake
+  fixtures, a seeded 250-payload corpus round-trip, verify-contract
+  conformance, and streaming-scan cases across all three layers.
+
+---
+
 ## 0.13.2 - 2026-07-19
 
 The **honest-status patch** (PR #213): remediation of the fourth

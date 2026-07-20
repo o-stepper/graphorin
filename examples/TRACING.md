@@ -1,6 +1,6 @@
 # Example apps - tracing and diagnostics
 
-**Graphorin** v0.13.2 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** v0.13.3 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 Every package under `examples/*` can emit OpenTelemetry-style spans when you opt in via environment variables. Nothing is exported by default - consistent with the framework's privacy stance.
 

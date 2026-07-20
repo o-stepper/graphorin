@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.2](https://img.shields.io/badge/version-v0.13.2-blue.svg)](./CHANGELOG.md)
+[![Version: 0.13.3](https://img.shields.io/badge/version-v0.13.3-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.2`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.13.3`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.2** (2026-07-19) - the honest-status patch, closing the fourth external deep retest: an agent run whose provider stream is cut at the output-token ceiling mid tool call now **fails** with `error.code: 'incomplete-tool-call'` (plus a terminal `tool.call.incomplete` event) instead of reporting a completed run for a side effect that never executed - the truncated call's usage is still accounted, and text-only truncation is observable as `RunStep.finishReason`; `graphorin init` prints shell-quoted, literally pasteable next-step commands even from directories with spaces; and the docs build is now purity-gated so generated pages can never drift from git again. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-1-0-13-2) for upgrade notes.
+Latest release: **0.13.3** (2026-07-20) - the numeric-integrity patch, closing the fifth external deep retest: `withRedaction` now honours per-pattern `verify` predicates in the request scrub and the streaming scan, and the `creditcard` / `us-phone` patterns gained decimal-boundary and network-prefix guards - a JSON tool result carrying a score float, an epoch-ms timestamp, or a snowflake id passes through byte-identical instead of coming back as `[REDACTED creditcard]` with the JSON broken, while real PANs and standalone phone numbers are still masked. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-2-0-13-3) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.2 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.13.3 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

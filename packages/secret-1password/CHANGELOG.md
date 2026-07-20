@@ -1,5 +1,13 @@
 # @graphorin/secret-1password
 
+## 0.13.3
+
+### Patch Changes
+
+- Updated dependencies [[`1cdec71`](https://github.com/o-stepper/graphorin/commit/1cdec71b5a8bd4ed9dbbd283eb7bf578886088f8)]:
+  - @graphorin/security@0.13.3
+  - @graphorin/core@0.13.3
+
 ## 0.13.2
 
 ### Patch Changes
