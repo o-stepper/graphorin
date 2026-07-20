@@ -26,4 +26,4 @@ than once.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockReplaceInput`, `BlockReplaceOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`BlockReplaceInput`](/api/@graphorin/memory/tools/interfaces/BlockReplaceInput.md), [`BlockReplaceOutput`](/api/@graphorin/memory/tools/interfaces/BlockReplaceOutput.md)\&gt;

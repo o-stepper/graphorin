@@ -79,6 +79,7 @@ export {
   type MemoryInspectOptions,
   type MemoryInspectResult,
   type MemoryMigrateOptions,
+  type MemoryMigrateResult,
   type MemoryPruneHistoryOptions,
   type MemoryPruneHistoryResult,
   type MemoryReviewItem,
@@ -167,7 +168,9 @@ export {
   type StorageCompactOptions,
   type StorageCompactResult,
   type StorageEncryptOptions,
+  type StorageEncryptResult,
   type StorageRekeyOptions,
+  type StorageRekeyResult,
   type StorageStatusResult,
 } from './storage.js';
 export {
@@ -197,8 +200,12 @@ export {
 } from './token.js';
 export {
   runToolsLint,
+  type ToolsLintCounterSink,
   type ToolsLintOptions,
   type ToolsLintReport,
+  type ToolsLintReportFinding,
+  type ToolsLintReportTool,
+  type ToolsLintThresholdViolation,
 } from './tools-lint.js';
 export {
   runTracesPrune,

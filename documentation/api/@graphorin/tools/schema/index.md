@@ -57,3 +57,15 @@ Re-exports [projectSchemaToJsonSchema](/api/@graphorin/tools/functions/projectSc
 ### zodToJsonSchema
 
 Re-exports [zodToJsonSchema](/api/@graphorin/tools/functions/zodToJsonSchema.md)
+
+***
+
+### ZodV3Like
+
+Re-exports [ZodV3Like](/api/@graphorin/tools/interfaces/ZodV3Like.md)
+
+***
+
+### ZodV4Like
+
+Re-exports [ZodV4Like](/api/@graphorin/tools/interfaces/ZodV4Like.md)

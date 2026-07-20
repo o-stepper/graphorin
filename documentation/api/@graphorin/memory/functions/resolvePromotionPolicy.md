@@ -22,4 +22,4 @@ Apply defaults.
 
 ## Returns
 
-`ResolvedPromotionPolicy`
+[`ResolvedPromotionPolicy`](/api/@graphorin/memory/interfaces/ResolvedPromotionPolicy.md)

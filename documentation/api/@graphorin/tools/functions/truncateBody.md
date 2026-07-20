@@ -20,10 +20,10 @@ Apply the per-strategy truncation pipeline.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `body`: `string`; `maxTokens`: `number`; `options?`: `TruncateOptions`; `strategy`: [`TruncationStrategy`](/api/@graphorin/core/type-aliases/TruncationStrategy.md); \} |
+| `opts` | \{ `body`: `string`; `maxTokens`: `number`; `options?`: [`TruncateOptions`](/api/@graphorin/tools/interfaces/TruncateOptions.md); `strategy`: [`TruncationStrategy`](/api/@graphorin/core/type-aliases/TruncationStrategy.md); \} |
 | `opts.body` | `string` |
 | `opts.maxTokens` | `number` |
-| `opts.options?` | `TruncateOptions` |
+| `opts.options?` | [`TruncateOptions`](/api/@graphorin/tools/interfaces/TruncateOptions.md) |
 | `opts.strategy` | [`TruncationStrategy`](/api/@graphorin/core/type-aliases/TruncationStrategy.md) |
 
 ## Returns

@@ -10,7 +10,7 @@
 function aggregateUsageFromByModel(byModel): Usage;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:593
+Defined in: packages/agent/src/run-state/index.ts:598
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function onSecretValueAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:60
+Defined in: packages/security/src/secrets/secret-value.ts:65
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ Returns an unsubscribe function.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `AuditListener` |
+| `listener` | [`SecretValueAuditListener`](/api/@graphorin/security/type-aliases/SecretValueAuditListener.md) |
 
 ## Returns
 

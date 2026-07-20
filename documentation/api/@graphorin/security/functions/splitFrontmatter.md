@@ -26,4 +26,4 @@ present.
 
 ## Returns
 
-`SplitFrontmatter`
+[`SplitFrontmatter`](/api/@graphorin/security/interfaces/SplitFrontmatter.md)

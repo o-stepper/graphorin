@@ -10,7 +10,7 @@
 function isEventFrame(message): message is { eventId: string; kind: "event"; payload?: unknown; subject: string; subscriptionId: string; type: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:210
+Defined in: src/server-message.ts:259
 
 **`Stable`**
 

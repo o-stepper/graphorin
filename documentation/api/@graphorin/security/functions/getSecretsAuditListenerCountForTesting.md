@@ -10,7 +10,7 @@
 function _getSecretsAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:125
+Defined in: packages/security/src/secrets/audit-emitter.ts:130
 
 **`Experimental`**
 

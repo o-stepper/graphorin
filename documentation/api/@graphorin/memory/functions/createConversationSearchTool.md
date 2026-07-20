@@ -25,4 +25,4 @@ messages.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ConversationSearchInput`, `ConversationSearchOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`ConversationSearchInput`](/api/@graphorin/memory/tools/interfaces/ConversationSearchInput.md), [`ConversationSearchOutput`](/api/@graphorin/memory/tools/interfaces/ConversationSearchOutput.md)\&gt;

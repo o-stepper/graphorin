@@ -196,6 +196,12 @@ Re-exports [WireMessageContent](/api/@graphorin/core/type-aliases/WireMessageCon
 
 ***
 
+### WirePendingSubRun
+
+Re-exports [WirePendingSubRun](/api/@graphorin/core/type-aliases/WirePendingSubRun.md)
+
+***
+
 ### WireRunState
 
 Re-exports [WireRunState](/api/@graphorin/core/type-aliases/WireRunState.md)

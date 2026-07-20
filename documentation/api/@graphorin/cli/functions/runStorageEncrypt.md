@@ -28,4 +28,4 @@ actionable hint.
 
 ## Returns
 
-`Promise`\&lt;`StorageEncryptResult`\&gt;
+`Promise`\&lt;[`StorageEncryptResult`](/api/@graphorin/cli/interfaces/StorageEncryptResult.md)\&gt;

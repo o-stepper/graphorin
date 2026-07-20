@@ -10,7 +10,7 @@
 function _setKeyringEntryCtorForTesting(ctor): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/keyring.ts:73
+Defined in: packages/security/src/secrets/resolvers/keyring.ts:79
 
 **`Experimental`**
 
@@ -21,7 +21,7 @@ of taking a hard dependency on `@napi-rs/keyring` in the unit tests.
 
 | Parameter | Type |
 | ------ | ------ |
-| `ctor` | `KeyringEntryCtor` \| `null` |
+| `ctor` | \| [`KeyringEntryCtor`](/api/@graphorin/security/type-aliases/KeyringEntryCtor.md) \| `null` |
 
 ## Returns
 

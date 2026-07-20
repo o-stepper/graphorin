@@ -48,6 +48,6 @@ an explicit `{ target, inputFilter? }` envelope.
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `forwardEvents?` | `SubagentForwardPolicy` | Which child events forward into the parent stream. | packages/agent/src/types.ts:156 |
+| `forwardEvents?` | [`SubagentForwardPolicy`](/api/@graphorin/agent/type-aliases/SubagentForwardPolicy.md) | Which child events forward into the parent stream. | packages/agent/src/types.ts:156 |
 | `inputFilter?` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) | - | packages/agent/src/types.ts:154 |
 | `target` | [`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\&lt;`TDeps`, `any`\&gt; | - | packages/agent/src/types.ts:153 |

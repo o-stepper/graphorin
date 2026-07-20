@@ -22,4 +22,4 @@ Defined in: packages/server/src/health/checks.ts:145
 | <a id="property-secrets"></a> `secrets?` | `readonly` | [`SecretsCheck`](/api/@graphorin/server/interfaces/SecretsCheck.md) | packages/server/src/health/checks.ts:148 |
 | <a id="property-storage"></a> `storage?` | `readonly` | [`StorageCheck`](/api/@graphorin/server/interfaces/StorageCheck.md) | packages/server/src/health/checks.ts:146 |
 | <a id="property-triggers"></a> `triggers?` | `readonly` | [`TriggersCheck`](/api/@graphorin/server/interfaces/TriggersCheck.md) | packages/server/src/health/checks.ts:151 |
-| <a id="property-workflowtimers"></a> `workflowTimers?` | `readonly` | `WorkflowTimersCheck` | packages/server/src/health/checks.ts:152 |
+| <a id="property-workflowtimers"></a> `workflowTimers?` | `readonly` | [`WorkflowTimersCheck`](/api/@graphorin/server/interfaces/WorkflowTimersCheck.md) | packages/server/src/health/checks.ts:152 |

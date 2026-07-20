@@ -6,7 +6,7 @@
 
 # Class: JsTiktokenCounter
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:75
+Defined in: packages/provider/src/counters/js-tiktoken.ts:86
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ to supply a fixture-shaped substitute.
 new JsTiktokenCounter(options?): JsTiktokenCounter;
 ```
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:83
+Defined in: packages/provider/src/counters/js-tiktoken.ts:94
 
 #### Parameters
 
@@ -42,8 +42,8 @@ Defined in: packages/provider/src/counters/js-tiktoken.ts:83
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/js-tiktoken.ts:76 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/js-tiktoken.ts:77 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/js-tiktoken.ts:87 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/js-tiktoken.ts:88 |
 
 ## Methods
 
@@ -53,7 +53,7 @@ Defined in: packages/provider/src/counters/js-tiktoken.ts:83
 count(messages): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:91
+Defined in: packages/provider/src/counters/js-tiktoken.ts:102
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -79,7 +79,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:101
+Defined in: packages/provider/src/counters/js-tiktoken.ts:112
 
 Count tokens in a raw text string.
 

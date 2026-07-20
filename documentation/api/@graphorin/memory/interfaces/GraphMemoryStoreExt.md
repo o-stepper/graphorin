@@ -48,7 +48,7 @@ without it fall back to flat one-hop expansion.
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `seedFactIds` | readonly `string`[] |
-| `opts?` | `ExpandHopsStoreOptions` |
+| `opts?` | [`ExpandHopsStoreOptions`](/api/@graphorin/memory/interfaces/ExpandHopsStoreOptions.md) |
 
 #### Returns
 
@@ -78,7 +78,7 @@ Expand seed facts to neighbours sharing a canonical entity (one-hop CTE).
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `seedFactIds` | readonly `string`[] |
-| `opts?` | `ExpandHopsStoreOptions` |
+| `opts?` | [`ExpandHopsStoreOptions`](/api/@graphorin/memory/interfaces/ExpandHopsStoreOptions.md) |
 
 #### Returns
 
@@ -107,7 +107,7 @@ entity for `normalizedName`. Optional. Powers a precise
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `normalizedName` | `string` |
-| `opts?` | `ExpandHopsStoreOptions` |
+| `opts?` | [`ExpandHopsStoreOptions`](/api/@graphorin/memory/interfaces/ExpandHopsStoreOptions.md) |
 
 #### Returns
 
@@ -118,7 +118,9 @@ entity for `normalizedName`. Optional. Powers a precise
 ### findEntityByNormalizedName()?
 
 ```ts
-optional findEntityByNormalizedName(scope, normalizedName): Promise<EntityWithEmbedding | null>;
+optional findEntityByNormalizedName(scope, normalizedName): Promise<
+  | EntityWithEmbedding
+| null>;
 ```
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:890
@@ -138,7 +140,9 @@ it fall back to the capped lexical scan inside `resolveEntityDecision`.
 
 #### Returns
 
-`Promise`\&lt;`EntityWithEmbedding` \| `null`\&gt;
+`Promise`\<
+  \| [`EntityWithEmbedding`](/api/@graphorin/memory/interfaces/EntityWithEmbedding.md)
+  \| `null`\>
 
 ***
 
@@ -213,7 +217,7 @@ Candidate entities for the resolver (roots only unless `includeMerged`).
 
 #### Returns
 
-`Promise`\&lt;readonly `EntityWithEmbedding`[]\&gt;
+`Promise`\&lt;readonly [`EntityWithEmbedding`](/api/@graphorin/memory/interfaces/EntityWithEmbedding.md)[]\&gt;
 
 ***
 
@@ -237,7 +241,7 @@ The append-only merge / unmerge ledger, newest first.
 
 #### Returns
 
-`Promise`\&lt;readonly `EntityMergeRecord`[]\&gt;
+`Promise`\&lt;readonly [`EntityMergeRecord`](/api/@graphorin/memory/interfaces/EntityMergeRecord.md)[]\&gt;
 
 ***
 
@@ -335,7 +339,7 @@ Find-or-create the canonical (root) entity for the normalized name.
 | Parameter | Type |
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
-| `input` | `EntityUpsertInput` |
+| `input` | [`EntityUpsertInput`](/api/@graphorin/memory/interfaces/EntityUpsertInput.md) |
 
 #### Returns
 

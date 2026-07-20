@@ -10,7 +10,7 @@
 function onOAuthAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/oauth/audit-emitter.ts:72
+Defined in: packages/security/src/oauth/audit-emitter.ts:77
 
 **`Stable`**
 
@@ -22,7 +22,7 @@ audit database.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `OAuthAuditListener` |
+| `listener` | [`OAuthAuditListener`](/api/@graphorin/security/type-aliases/OAuthAuditListener.md) |
 
 ## Returns
 

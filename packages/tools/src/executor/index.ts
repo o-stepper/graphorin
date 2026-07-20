@@ -5,6 +5,7 @@
  */
 
 export {
+  type ApprovalDecision,
   type ApprovalGate,
   createToolExecutor,
   type DataFlowGuard,
@@ -12,6 +13,7 @@ export {
   type DataFlowRecordInput,
   type DataFlowVerdict,
   type ExecuteBatchOptions,
+  type ExecutorEvent,
   type ExecutorOptions,
   type PermissionHook,
   type PermissionHookInput,
@@ -19,9 +21,11 @@ export {
   type ToolArgumentPolicyFacts,
   type ToolArgumentPolicyGuard,
   type ToolExecutor,
+  type ToolRepairHook,
 } from './executor.js';
 export {
   buildToolExecutionContext,
+  type SecretResolverHook,
   type ToolContextOptions,
 } from './tool-context.js';
 export { ToolRateLimitError } from './tool-errors.js';

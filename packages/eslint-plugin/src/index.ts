@@ -52,7 +52,12 @@ export const rules = {
 } as const;
 
 /** Shared severity map for both the legacy and flat recommended presets. */
-const RECOMMENDED_RULES = {
+/**
+ * Rule map behind the `flat/recommended` config.
+ *
+ * @stable
+ */
+export const RECOMMENDED_RULES = {
   '@graphorin/no-bare-tool-exec': 'warn',
   '@graphorin/no-implicit-network-call': 'error',
   '@graphorin/no-secret-in-deps': 'error',

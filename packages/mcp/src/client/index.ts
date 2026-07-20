@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 
+export type { AdaptCallResultArgs } from './adapt-result.js';
 export { _resetSseWarnDedupForTesting, createMCPClient } from './client.js';
 export {
   type CreateManagedMCPClientOptions,
@@ -16,6 +17,7 @@ export {
 } from './mcp-resource-reader.js';
 export {
   _resetMcpAdapterDedupForTesting,
+  type AdaptedToolsResult,
   adaptCallResult,
   adaptMCPTools,
   DEFAULT_DEFER_LOADING_THRESHOLD,
@@ -28,6 +30,7 @@ export type {
   MCPElicitationHandler,
   MCPElicitationRequest,
   MCPElicitationResult,
+  MCPPinStore,
   MCPPromptDefinition,
   MCPPromptMessage,
   MCPResourceContent,

@@ -28,6 +28,7 @@ Two surfaces:
 | ------ | ------ |
 | [ToolAuditAction](/api/@graphorin/tools/audit/type-aliases/ToolAuditAction.md) | Discriminator for the audit-event family emitted by the tools subsystem. |
 | [ToolAuditDecision](/api/@graphorin/tools/audit/type-aliases/ToolAuditDecision.md) | Decision recorded by an audit event. |
+| [ToolAuditListener](/api/@graphorin/tools/audit/type-aliases/ToolAuditListener.md) | Callback shape accepted by [onToolAudit](/api/@graphorin/tools/audit/functions/onToolAudit.md). |
 
 ## Functions
 

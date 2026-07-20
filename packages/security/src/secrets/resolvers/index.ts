@@ -42,13 +42,18 @@ export function installBuiltinResolvers(opts: { allowReplace?: boolean } = {}): 
 
 export {
   _setArgon2idForTesting,
+  type Argon2idFn,
   decryptBundle,
   deriveAesKey,
   ENCRYPTED_FILE_MAGIC,
 } from './encrypted-file.js';
 export { _resetFileResolverWarningsForTesting } from './file.js';
 
-export { _setKeyringEntryCtorForTesting, KEYRING_DEFAULT_SERVICE } from './keyring.js';
+export {
+  _setKeyringEntryCtorForTesting,
+  KEYRING_DEFAULT_SERVICE,
+  type KeyringEntryCtor,
+} from './keyring.js';
 export {
   _resetLiteralResolverForTesting,
   isLiteralAllowed,

@@ -10,7 +10,7 @@
 function createDockerSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: packages/security/src/sandbox/docker.ts:105
+Defined in: packages/security/src/sandbox/docker.ts:121
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function parseIntegerResponse(text): number | null;
 ```
 
-Defined in: src/reranker.ts:315
+Defined in: src/reranker.ts:320
 
 **`Stable`**
 

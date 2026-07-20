@@ -10,7 +10,7 @@
 function onOAuthLifecycle(listener): () => void;
 ```
 
-Defined in: packages/security/src/oauth/events.ts:46
+Defined in: packages/security/src/oauth/events.ts:51
 
 **`Stable`**
 
@@ -21,7 +21,7 @@ function.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `OAuthLifecycleListener` |
+| `listener` | [`OAuthLifecycleListener`](/api/@graphorin/security/type-aliases/OAuthLifecycleListener.md) |
 
 ## Returns
 

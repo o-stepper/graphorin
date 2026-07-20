@@ -264,6 +264,12 @@ Re-exports [MemoryMigrateOptions](/api/@graphorin/cli/interfaces/MemoryMigrateOp
 
 ***
 
+### MemoryMigrateResult
+
+Re-exports [MemoryMigrateResult](/api/@graphorin/cli/interfaces/MemoryMigrateResult.md)
+
+***
+
 ### MemoryPruneHistoryOptions
 
 Re-exports [MemoryPruneHistoryOptions](/api/@graphorin/cli/interfaces/MemoryPruneHistoryOptions.md)
@@ -972,9 +978,21 @@ Re-exports [StorageEncryptOptions](/api/@graphorin/cli/interfaces/StorageEncrypt
 
 ***
 
+### StorageEncryptResult
+
+Re-exports [StorageEncryptResult](/api/@graphorin/cli/interfaces/StorageEncryptResult.md)
+
+***
+
 ### StorageRekeyOptions
 
 Re-exports [StorageRekeyOptions](/api/@graphorin/cli/interfaces/StorageRekeyOptions.md)
+
+***
+
+### StorageRekeyResult
+
+Re-exports [StorageRekeyResult](/api/@graphorin/cli/interfaces/StorageRekeyResult.md)
 
 ***
 
@@ -1044,6 +1062,12 @@ Re-exports [TokenVerifyResult](/api/@graphorin/cli/interfaces/TokenVerifyResult.
 
 ***
 
+### ToolsLintCounterSink
+
+Re-exports [ToolsLintCounterSink](/api/@graphorin/cli/type-aliases/ToolsLintCounterSink.md)
+
+***
+
 ### ToolsLintOptions
 
 Re-exports [ToolsLintOptions](/api/@graphorin/cli/interfaces/ToolsLintOptions.md)
@@ -1053,6 +1077,24 @@ Re-exports [ToolsLintOptions](/api/@graphorin/cli/interfaces/ToolsLintOptions.md
 ### ToolsLintReport
 
 Re-exports [ToolsLintReport](/api/@graphorin/cli/interfaces/ToolsLintReport.md)
+
+***
+
+### ToolsLintReportFinding
+
+Re-exports [ToolsLintReportFinding](/api/@graphorin/cli/interfaces/ToolsLintReportFinding.md)
+
+***
+
+### ToolsLintReportTool
+
+Re-exports [ToolsLintReportTool](/api/@graphorin/cli/interfaces/ToolsLintReportTool.md)
+
+***
+
+### ToolsLintThresholdViolation
+
+Re-exports [ToolsLintThresholdViolation](/api/@graphorin/cli/interfaces/ToolsLintThresholdViolation.md)
 
 ***
 

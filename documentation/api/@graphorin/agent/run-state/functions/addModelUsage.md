@@ -13,7 +13,7 @@ function addModelUsage(
    delta): void;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:542
+Defined in: packages/agent/src/run-state/index.ts:547
 
 **`Stable`**
 

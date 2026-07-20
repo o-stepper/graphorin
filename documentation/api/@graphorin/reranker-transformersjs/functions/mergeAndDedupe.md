@@ -10,7 +10,7 @@
 function mergeAndDedupe<TRecord>(lists): readonly MergedEntry<TRecord>[];
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:300
+Defined in: packages/reranker-transformersjs/src/reranker.ts:305
 
 **`Stable`**
 
@@ -33,4 +33,4 @@ exported for the unit test fixture.
 
 ## Returns
 
-readonly `MergedEntry`\&lt;`TRecord`\&gt;[]
+readonly [`MergedEntry`](/api/@graphorin/reranker-transformersjs/interfaces/MergedEntry.md)\&lt;`TRecord`\&gt;[]

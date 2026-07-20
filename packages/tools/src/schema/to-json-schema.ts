@@ -59,12 +59,12 @@ interface WalkContext {
  * ------------------------------------------------------------------ */
 
 /** Structural view of a Zod v4 schema (`zod@4` or the `zod/v4` subpath of 3.25+). */
-interface ZodV4Like {
+export interface ZodV4Like {
   readonly _zod: { readonly def: { readonly type: string } & Record<string, unknown> };
 }
 
 /** Structural view of a Zod v3 classic schema. */
-interface ZodV3Like {
+export interface ZodV3Like {
   readonly _def: { readonly typeName: string } & Record<string, unknown>;
 }
 

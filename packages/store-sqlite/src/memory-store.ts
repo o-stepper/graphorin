@@ -2062,7 +2062,7 @@ export class SqliteInsightStore {
   /**
    * Promote / demote an insight's retrieval-trust `status` and write a
    * `memory_history` audit row. Mirrors `setStatus` on facts - a retrieval gate
-   * only. Powers {@link InsightMemory.validate} so a quarantined (reflection)
+   * only. Powers `InsightMemory.validate` so a quarantined (reflection)
    * insight can be promoted out of quarantine.
    */
   async setStatus(
@@ -2151,7 +2151,12 @@ interface EntityMergeRow {
 }
 
 /** Find-or-create payload for {@link SqliteGraphStore.upsertEntity}. */
-interface SqliteEntityUpsertInput {
+/**
+ * Input row accepted by {@link SqliteGraphStore.upsertEntity}.
+ *
+ * @stable
+ */
+export interface SqliteEntityUpsertInput {
   readonly name: string;
   readonly normalizedName: string;
   readonly vector?: Float32Array;
@@ -2159,13 +2164,23 @@ interface SqliteEntityUpsertInput {
 }
 
 /** A canonical entity returned with its name embedding for dedup. */
-interface SqliteEntityWithEmbedding extends GraphEntity {
+/**
+ * Entity row (plus optional embedding) returned by the graph store reads.
+ *
+ * @stable
+ */
+export interface SqliteEntityWithEmbedding extends GraphEntity {
   readonly vector: Float32Array | null;
   readonly embedderId: string | null;
 }
 
 /** One row of the append-only merge / unmerge audit ledger. */
-interface SqliteEntityMergeRecord {
+/**
+ * Merge-audit row returned by {@link SqliteGraphStore.listMerges}.
+ *
+ * @stable
+ */
+export interface SqliteEntityMergeRecord {
   readonly id: string;
   readonly userId: string;
   readonly kind: 'merge' | 'unmerge';

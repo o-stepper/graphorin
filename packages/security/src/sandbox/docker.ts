@@ -28,7 +28,12 @@ import type {
   SandboxRunOptions,
 } from './sandbox.js';
 
-interface DockerodeContainer {
+/**
+ * Structural view of a `dockerode` container instance.
+ *
+ * @stable
+ */
+export interface DockerodeContainer {
   readonly id: string;
   readonly start: () => Promise<void>;
   readonly wait: () => Promise<{ readonly StatusCode: number }>;
@@ -45,7 +50,12 @@ interface DockerodeContainer {
   }) => Promise<NodeJS.ReadWriteStream>;
 }
 
-interface DockerodeClient {
+/**
+ * Structural view of a `dockerode` client instance.
+ *
+ * @stable
+ */
+export interface DockerodeClient {
   readonly createContainer: (opts: Record<string, unknown>) => Promise<DockerodeContainer>;
   readonly modem?: {
     readonly demuxStream?: (
@@ -56,7 +66,13 @@ interface DockerodeClient {
   };
 }
 
-interface DockerodeModule {
+/**
+ * Structural view of the `dockerode` module returned by
+ * `DockerSandboxOptions.peerLoader`.
+ *
+ * @stable
+ */
+export interface DockerodeModule {
   default?: new (opts?: { readonly socketPath?: string }) => DockerodeClient;
 }
 

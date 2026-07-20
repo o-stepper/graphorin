@@ -10,7 +10,7 @@
 type ServerEventFrame = z.infer<typeof EventFrame>;
 ```
 
-Defined in: src/server-message.ts:185
+Defined in: src/server-message.ts:234
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function onWithSecretAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:153
+Defined in: packages/security/src/secrets/acl.ts:158
 
 **`Stable`**
 
@@ -20,7 +20,7 @@ Subscribe to `withSecret(...)` scope events.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `WithSecretListener` |
+| `listener` | [`WithSecretListener`](/api/@graphorin/security/type-aliases/WithSecretListener.md) |
 
 ## Returns
 

@@ -10,7 +10,7 @@
 function completedToolCallsFromState(state): readonly CompletedToolCall<unknown>[];
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:638
+Defined in: packages/agent/src/run-state/index.ts:643
 
 **`Stable`**
 

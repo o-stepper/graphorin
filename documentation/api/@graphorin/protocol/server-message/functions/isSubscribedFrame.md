@@ -10,7 +10,7 @@
 function isSubscribedFrame(message): message is { kind: "subscribed"; snapshotEventId?: string; subject: string; subscriptionId: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:225
+Defined in: src/server-message.ts:274
 
 **`Stable`**
 

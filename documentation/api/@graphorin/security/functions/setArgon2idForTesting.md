@@ -10,7 +10,7 @@
 function _setArgon2idForTesting(fn): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:105
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:111
 
 **`Experimental`**
 
@@ -20,7 +20,7 @@ Test-only override.
 
 | Parameter | Type |
 | ------ | ------ |
-| `fn` | `Argon2idFn` \| `null` |
+| `fn` | \| [`Argon2idFn`](/api/@graphorin/security/type-aliases/Argon2idFn.md) \| `null` |
 
 ## Returns
 

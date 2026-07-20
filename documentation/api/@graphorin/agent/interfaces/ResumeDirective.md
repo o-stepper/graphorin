@@ -22,4 +22,4 @@ approvals: [...] } })` to resume.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:550 |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly [`ApprovalDecision`](/api/@graphorin/agent/interfaces/ApprovalDecision.md)[] | packages/agent/src/types.ts:550 |

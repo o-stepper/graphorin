@@ -13,6 +13,10 @@ Defined in: packages/observability/src/exporters/types.ts:69
 A trace exporter contract. Exporters consume a stream of finished
 spans and forward them to a sink (console, file, OTLP wire, …).
 
+## Extended by
+
+- [`JSONLExporter`](/api/@graphorin/observability/interfaces/JSONLExporter.md)
+
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |

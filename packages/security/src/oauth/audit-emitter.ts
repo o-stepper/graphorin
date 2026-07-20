@@ -58,7 +58,12 @@ export interface OAuthAuditEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type OAuthAuditListener = (event: OAuthAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onOAuthAudit}.
+ *
+ * @stable
+ */
+export type OAuthAuditListener = (event: OAuthAuditEvent) => void;
 
 const listeners = new Set<OAuthAuditListener>();
 

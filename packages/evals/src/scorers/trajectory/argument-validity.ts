@@ -11,7 +11,13 @@
 import type { Scorer } from '@graphorin/observability/eval';
 import type { Trajectory } from './types.js';
 
-interface SchemaLike {
+/**
+ * Structural view of a JSON-Schema-bearing tool definition accepted by
+ * {@link ArgumentValidityOptions}.
+ *
+ * @stable
+ */
+export interface SchemaLike {
   safeParse(value: unknown): { readonly success: boolean };
 }
 

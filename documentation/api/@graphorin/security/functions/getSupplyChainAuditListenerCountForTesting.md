@@ -10,7 +10,7 @@
 function _getSupplyChainAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:105
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:110
 
 **`Experimental`**
 

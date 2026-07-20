@@ -10,7 +10,7 @@
 function isUnsubscribeRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "subscription.unsubscribe"; params: { subscriptionId: string }; v: "1" };
 ```
 
-Defined in: src/client-message.ts:177
+Defined in: src/client-message.ts:182
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function emitSupplyChainAudit(event): void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:80
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:85
 
 **`Stable`**
 

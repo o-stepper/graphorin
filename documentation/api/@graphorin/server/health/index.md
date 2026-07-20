@@ -147,3 +147,9 @@ Re-exports [StorageCheck](/api/@graphorin/server/interfaces/StorageCheck.md)
 ### TriggersCheck
 
 Re-exports [TriggersCheck](/api/@graphorin/server/interfaces/TriggersCheck.md)
+
+***
+
+### WorkflowTimersCheck
+
+Re-exports [WorkflowTimersCheck](/api/@graphorin/server/interfaces/WorkflowTimersCheck.md)

@@ -42,4 +42,4 @@ approved.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactValidateInput`, `FactValidateOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`FactValidateInput`](/api/@graphorin/memory/tools/interfaces/FactValidateInput.md), [`FactValidateOutput`](/api/@graphorin/memory/tools/interfaces/FactValidateOutput.md)\&gt;

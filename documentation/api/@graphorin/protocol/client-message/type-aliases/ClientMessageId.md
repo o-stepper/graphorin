@@ -10,7 +10,7 @@
 type ClientMessageId = z.infer<typeof RpcId>;
 ```
 
-Defined in: src/client-message.ts:154
+Defined in: src/client-message.ts:159
 
 **`Stable`**
 

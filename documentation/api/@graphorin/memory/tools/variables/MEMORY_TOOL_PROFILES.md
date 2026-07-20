@@ -10,6 +10,6 @@
 const MEMORY_TOOL_PROFILES: ReadonlyArray<MemoryToolProfile>;
 ```
 
-Defined in: packages/memory/src/tools/index.ts:72
+Defined in: packages/memory/src/tools/index.ts:105
 
 The valid profile values (runtime validation source).

@@ -86,10 +86,6 @@ export interface AgentEvaluatorIterationEvent {
     readonly type: 'agent.evaluator.iteration';
 }
 
-// Warning: (ae-forgotten-export) The symbol "FileGeneratedEvent" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "SourceCitedEvent" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "SubagentEvent" needs to be exported by the entry point index.d.ts
-//
 // @public
 export type AgentEvent<TOutput = string> = AgentStartEvent | StepStartEvent | TextDeltaEvent | TextCompleteEvent | ReasoningDeltaEvent | ToolCallStartEvent | ToolCallDeltaEvent | ToolCallEndEvent | ToolCallIncompleteEvent | ToolExecuteStartEvent | ToolExecuteProgressEvent | ToolExecutePartialEvent | ToolExecuteEndEvent | ToolExecuteErrorEvent | ToolApprovalRequestedEvent | ToolApprovalGrantedEvent | ToolApprovalDeniedEvent | ContextCompactedEvent | HandoffEvent | AgentSteeredEvent | AgentFollowUpQueuedEvent | AgentCancellingEvent | AgentModelFellbackEvent | AgentFanOutSpawnedEvent | AgentFanOutMergedEvent | AgentEvaluatorIterationEvent | AgentEvaluatorConvergedEvent | AgentProgressWrittenEvent | AgentProgressReadEvent | AgentLateralLeakDetectedEvent | FileGeneratedEvent | SourceCitedEvent | StepEndEvent | GuardrailTrippedEvent | VerifierResultEvent | SubagentEvent | AgentEndEvent<TOutput> | AgentErrorEvent;
 
@@ -808,6 +804,16 @@ export interface FileContent {
 }
 
 // @public
+export interface FileGeneratedEvent {
+    // (undocumented)
+    readonly data: Uint8Array;
+    // (undocumented)
+    readonly mimeType: string;
+    // (undocumented)
+    readonly type: 'file.generated';
+}
+
+// @public
 export function filter<T>(source: AsyncIterable<T>, pred: (value: T, index: number) => boolean | Promise<boolean>, signal?: AbortSignal): AsyncIterable<T>;
 
 // @public
@@ -1354,6 +1360,14 @@ export interface PayloadSchemaLike<T> {
 }
 
 // @public
+export interface PendingSubRun {
+    readonly state: RunState;
+    readonly targetAgentName: string;
+    readonly toolCallId: string;
+    readonly toolName: string;
+}
+
+// @public
 export interface PendingWrite {
     // (undocumented)
     readonly channel: string;
@@ -1663,7 +1677,6 @@ export interface ReadonlyRunState {
     readonly messages: ReadonlyArray<Message>;
     // (undocumented)
     readonly pendingApprovals: ReadonlyArray<ToolApproval>;
-    // Warning: (ae-forgotten-export) The symbol "PendingSubRun" needs to be exported by the entry point index.d.ts
     readonly pendingSubRuns?: ReadonlyArray<PendingSubRun>;
     readonly promotedTools?: ReadonlyArray<string>;
     // (undocumented)
@@ -2342,6 +2355,16 @@ export function sleepFor(ms: number): void;
 export function sleepUntil(at: string | number | Date): void;
 
 // @public
+export interface SourceCitedEvent {
+    // (undocumented)
+    readonly title?: string;
+    // (undocumented)
+    readonly type: 'source.cited';
+    // (undocumented)
+    readonly uri: string;
+}
+
+// @public
 export type SpanAttributes = Readonly<Record<string, SpanAttributeValue>>;
 
 // @public (undocumented)
@@ -2427,6 +2450,15 @@ export interface SttTranscriptionRequest {
     readonly mimeType: string;
     // (undocumented)
     readonly signal?: AbortSignal;
+}
+
+// @public
+export interface SubagentEvent {
+    readonly agentName: string;
+    readonly event: AgentEvent<unknown>;
+    readonly toolCallId: string;
+    // (undocumented)
+    readonly type: 'subagent.event';
 }
 
 // @public (undocumented)
@@ -2996,8 +3028,6 @@ export interface WireAgentEndEvent<TOutput = string> extends Omit<AgentEndEvent<
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "WireSubagentEvent" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export type WireAgentEvent<TOutput = string> = Exclude<AgentEvent<TOutput>, FileGeneratedEvent | ToolExecutePartialEvent | AgentEndEvent<TOutput> | SubagentEvent> | WireFileGeneratedEvent | WireToolExecutePartialEvent | WireSubagentEvent | WireAgentEndEvent<TOutput>;
 
@@ -3052,6 +3082,11 @@ export type WireMessage = SystemMessage | WireUserMessage | WireAssistantMessage
 export type WireMessageContent = Exclude<MessageContent, ImageContent | AudioContent | FileContent> | WireImageContent | WireAudioContent | WireFileContent;
 
 // @public
+export type WirePendingSubRun = Omit<PendingSubRun, 'state'> & {
+    readonly state: WireRunState;
+};
+
+// @public
 export type WireRunState = Omit<RunState, 'messages' | 'steps' | 'pendingSubRuns'> & {
     readonly messages: readonly WireMessage[];
     readonly steps: readonly WireRunStep[];
@@ -3062,6 +3097,12 @@ export type WireRunState = Omit<RunState, 'messages' | 'steps' | 'pendingSubRuns
 export type WireRunStep = Omit<RunStep, 'toolCalls'> & {
     readonly toolCalls: readonly WireCompletedToolCall[];
 };
+
+// @public
+export interface WireSubagentEvent extends Omit<SubagentEvent, 'event'> {
+    // (undocumented)
+    readonly event: WireAgentEvent<unknown>;
+}
 
 // @public
 export interface WireToolExecutePartialEvent extends Omit<ToolExecutePartialEvent, 'chunk'> {
@@ -3286,10 +3327,6 @@ export interface ZodLikeSchema<TOutput = unknown, TInput = unknown> {
     // (undocumented)
     safeParse(data: unknown): ZodLikeSafeParseResult<TOutput, TInput>;
 }
-
-// Warnings were encountered during analysis:
-//
-// src/utils/binary-json.ts:156:3 - (ae-forgotten-export) The symbol "WirePendingSubRun" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

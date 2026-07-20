@@ -30,4 +30,4 @@ tables and compacts free pages.
 
 ## Returns
 
-`Promise`\&lt;`MemoryMigrateResult`\&gt;
+`Promise`\&lt;[`MemoryMigrateResult`](/api/@graphorin/cli/interfaces/MemoryMigrateResult.md)\&gt;

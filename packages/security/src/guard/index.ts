@@ -19,6 +19,7 @@ export {
   type MemoryGuardActor,
   type MemoryGuardAuditAction,
   type MemoryGuardAuditEvent,
+  type MemoryGuardAuditListener,
   type MemoryGuardDecision,
   onMemoryGuardAudit,
 } from './audit-emitter.js';

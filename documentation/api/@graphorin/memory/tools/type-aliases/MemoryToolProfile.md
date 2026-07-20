@@ -10,7 +10,7 @@
 type MemoryToolProfile = "interactive" | "reviser" | "full";
 ```
 
-Defined in: packages/memory/src/tools/index.ts:69
+Defined in: packages/memory/src/tools/index.ts:102
 
 **`Stable`**
 

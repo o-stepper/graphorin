@@ -10,7 +10,7 @@
 function isReplayMarkerFrame(message): message is { droppedCount?: number; eventId: string; kind: "replay-marker"; note?: string; subscriptionId: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:240
+Defined in: src/server-message.ts:289
 
 **`Stable`**
 

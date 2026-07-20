@@ -10,6 +10,6 @@
 type ServerPongFrame = z.infer<typeof PongFrame>;
 ```
 
-Defined in: src/server-message.ts:195
+Defined in: src/server-message.ts:244
 
 **`Stable`**

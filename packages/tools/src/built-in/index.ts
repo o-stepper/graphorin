@@ -9,5 +9,16 @@
  * @packageDocumentation
  */
 
-export { createReadResultTool, type ReadResultToolOptions } from './read-result.js';
-export { createToolSearchTool, type ToolSearchToolOptions } from './tool-search.js';
+export {
+  createReadResultTool,
+  type ReadResultInput,
+  type ReadResultOutput,
+  type ReadResultToolOptions,
+} from './read-result.js';
+export {
+  createToolSearchTool,
+  type ToolSearchInput,
+  type ToolSearchOutput,
+  type ToolSearchToolMatch,
+  type ToolSearchToolOptions,
+} from './tool-search.js';

@@ -26,4 +26,4 @@ Phase 10b extends the body with the multi-stage conflict resolution.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactRememberInput`, `FactRememberOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`FactRememberInput`](/api/@graphorin/memory/tools/interfaces/FactRememberInput.md), [`FactRememberOutput`](/api/@graphorin/memory/tools/interfaces/FactRememberOutput.md)\&gt;

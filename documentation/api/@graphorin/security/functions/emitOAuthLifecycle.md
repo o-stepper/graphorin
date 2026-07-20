@@ -10,7 +10,7 @@
 function emitOAuthLifecycle(event): void;
 ```
 
-Defined in: packages/security/src/oauth/events.ts:59
+Defined in: packages/security/src/oauth/events.ts:64
 
 **`Stable`**
 

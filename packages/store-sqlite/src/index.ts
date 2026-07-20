@@ -65,6 +65,7 @@ import {
   SqliteConsolidatorStateStore,
 } from './consolidator-store.js';
 import {
+  type BatcherRow,
   createMigrationBatcher,
   dropRetiredVectorTables,
   EmbedderMigrationStateRepository,
@@ -101,11 +102,21 @@ import {
 } from './idempotency-store.js';
 import {
   type EmbeddingPayload,
+  type SqliteEntityMergeRecord,
+  type SqliteEntityUpsertInput,
+  type SqliteEntityWithEmbedding,
+  SqliteGraphStore,
+  SqliteInsightStore,
   SqliteMemoryStore,
   type SqliteMemoryWriteOptions,
 } from './memory-store.js';
 import { listMigrations, type Migration, registerMigration } from './migrations/registry.js';
-import { type AppliedMigration, pendingMigrations, runMigrations } from './migrations/runner.js';
+import {
+  type AppliedMigration,
+  pendingMigrations,
+  type RunMigrationsOptions,
+  runMigrations,
+} from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
 import { SqlitePairingStore } from './pairing-store.js';
 import {
@@ -379,6 +390,7 @@ export {
   type AppliedMigration,
   // audit db
   type AuditDatabase,
+  type BatcherRow,
   // encryption
   CipherPeerMissingError,
   // conflict store (Phase 10b)
@@ -429,6 +441,7 @@ export {
   pendingMigrations,
   pruneSpans,
   type RegisterEmbedderInput,
+  type RunMigrationsOptions,
   readPragma,
   readWalSize,
   registerMigration,
@@ -443,7 +456,12 @@ export {
   SqliteCheckpointStore,
   SqliteConflictStore,
   SqliteConsolidatorStateStore,
+  type SqliteEntityMergeRecord,
+  type SqliteEntityUpsertInput,
+  type SqliteEntityWithEmbedding,
+  SqliteGraphStore,
   SqliteIdempotencyStore,
+  SqliteInsightStore,
   // store impls
   SqliteMemoryStore,
   type SqliteMemoryWriteOptions,

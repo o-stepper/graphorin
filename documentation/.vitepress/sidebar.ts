@@ -106,45 +106,118 @@ const contributingSidebar: DefaultTheme.SidebarItem[] = [
 ];
 
 /**
- * Reads the TypeDoc-generated sidebar (when present) and returns a
- * VitePress sidebar block. The file is emitted by `typedoc-vitepress-theme`
- * into `api/typedoc-sidebar.json` on every `pnpm build:typedoc` run.
+ * Prunes the TypeDoc sidebar tree to package / module level.
  *
- * Returns an empty list when the API has not been generated yet (e.g.
- * during `pnpm dev` before the first TypeDoc run).
+ * VitePress server-renders the ENTIRE sidebar DOM into every `/api/**`
+ * page. The full symbol tree (~780 nodes) weighed ~320 KB per page -
+ * 90% of a typical 357 KB API page - which multiplied across ~3200
+ * pages into ~1 GB of the dist. Category nodes ("Classes",
+ * "Interfaces", ...) carry no link of their own, so dropping every
+ * linkless node prunes exactly the symbol tier while keeping the
+ * linked package and module index pages; symbols stay reachable
+ * through the member tables on each module page and via
+ * `llms-api.txt`. Guarded by the docs-dist budget gate in docs.yml.
  */
-function loadTypedocSidebar(): DefaultTheme.SidebarItem[] {
-  const sidebarPath = resolve(here, '..', 'api', 'typedoc-sidebar.json');
-  if (!existsSync(sidebarPath)) {
-    return [
+function pruneToModuleLevel(items: DefaultTheme.SidebarItem[]): DefaultTheme.SidebarItem[] {
+  const pruned: DefaultTheme.SidebarItem[] = [];
+  for (const item of items) {
+    if (item.link === undefined) continue;
+    const children = item.items === undefined ? [] : pruneToModuleLevel(item.items);
+    pruned.push({
+      text: item.text,
+      link: item.link,
+      ...(children.length > 0 ? { items: children, collapsed: true } : {}),
+    });
+  }
+  return pruned;
+}
+
+/** A bare package link without its module children. */
+function packageLinkOnly(item: DefaultTheme.SidebarItem): DefaultTheme.SidebarItem {
+  return { text: item.text, ...(item.link !== undefined ? { link: item.link } : {}) };
+}
+
+/**
+ * Builds one sidebar entry per package path prefix. Every `/api/**` page
+ * lists all packages as bare links, and ONLY the current package (the
+ * longest matching prefix, which VitePress resolves first) carries its
+ * module children. Combined with {@link pruneToModuleLevel} this keeps
+ * the per-page sidebar DOM at "29 links + a handful of modules" instead
+ * of the full symbol forest, while the reader always sees the tree that
+ * matters for the page they are on.
+ */
+function buildApiSidebar(
+  tree: DefaultTheme.SidebarItem[],
+): Record<string, DefaultTheme.SidebarItem[]> {
+  const map: Record<string, DefaultTheme.SidebarItem[]> = {
+    '/api/': [
       {
         text: 'API reference',
         collapsed: false,
-        items: [
-          {
-            text: 'Run `pnpm build:typedoc` to generate',
-            link: '/api/',
-          },
-        ],
+        items: tree.map(packageLinkOnly),
+      },
+    ],
+  };
+  for (const pkg of tree) {
+    if (pkg.link === undefined) continue;
+    map[pkg.link] = [
+      {
+        text: 'API reference',
+        collapsed: false,
+        items: tree.map((p) =>
+          p === pkg
+            ? {
+                text: p.text,
+                ...(p.link !== undefined ? { link: p.link } : {}),
+                ...(p.items !== undefined && p.items.length > 0
+                  ? { items: p.items, collapsed: false }
+                  : {}),
+              }
+            : packageLinkOnly(p),
+        ),
       },
     ];
+  }
+  return map;
+}
+
+/**
+ * Reads the TypeDoc-generated sidebar (when present) and returns the
+ * per-prefix `/api/**` sidebar map. The source file is emitted by
+ * `typedoc-vitepress-theme` into `api/typedoc-sidebar.json` on every
+ * `pnpm build:typedoc` run.
+ *
+ * Returns a stub when the API has not been generated yet (e.g. during
+ * `pnpm dev` before the first TypeDoc run).
+ */
+function loadTypedocSidebar(): Record<string, DefaultTheme.SidebarItem[]> {
+  const sidebarPath = resolve(here, '..', 'api', 'typedoc-sidebar.json');
+  if (!existsSync(sidebarPath)) {
+    return {
+      '/api/': [
+        {
+          text: 'API reference',
+          collapsed: false,
+          items: [
+            {
+              text: 'Run `pnpm build:typedoc` to generate',
+              link: '/api/',
+            },
+          ],
+        },
+      ],
+    };
   }
   try {
     const raw = readFileSync(sidebarPath, 'utf8');
     const parsed = JSON.parse(raw) as DefaultTheme.SidebarItem[];
-    return [
-      {
-        text: 'API reference',
-        collapsed: false,
-        items: parsed,
-      },
-    ];
+    return buildApiSidebar(pruneToModuleLevel(parsed));
   } catch (err) {
     console.warn(
       '[graphorin/docs] Failed to read typedoc-sidebar.json:',
       err instanceof Error ? err.message : err,
     );
-    return [];
+    return {};
   }
 }
 
@@ -152,5 +225,5 @@ export const sidebar: DefaultTheme.Sidebar = {
   '/guide/': guideSidebar,
   '/reference/': referenceSidebar,
   '/contributing/': contributingSidebar,
-  '/api/': loadTypedocSidebar(),
+  ...loadTypedocSidebar(),
 };

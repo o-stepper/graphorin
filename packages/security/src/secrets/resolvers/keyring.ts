@@ -15,7 +15,13 @@ import { SecretValue } from '../secret-value.js';
  */
 export const KEYRING_DEFAULT_SERVICE = 'graphorin';
 
-type KeyringEntryCtor = new (
+/**
+ * Constructor shape of `@napi-rs/keyring`'s `Entry` - swappable via
+ * `_setKeyringEntryCtorForTesting`.
+ *
+ * @stable
+ */
+export type KeyringEntryCtor = new (
   service: string,
   account: string,
 ) => {

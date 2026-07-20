@@ -33,7 +33,11 @@
 
 import { z } from 'zod';
 
-const RpcId = z.union([z.string().min(1), z.number().int()]);
+import { RpcId } from './client-message.js';
+
+// Shared with the client-message module - re-exported so the
+// server-message entry stays self-contained for consumers.
+export { RpcId } from './client-message.js';
 
 const RpcError = z
   .object({
@@ -43,7 +47,12 @@ const RpcError = z
   })
   .strict();
 
-const RpcSuccess = z
+/**
+ * Zod schema behind {@link ServerRpcSuccess}.
+ *
+ * @stable
+ */
+export const RpcSuccess = z
   .object({
     v: z.literal('1'),
     jsonrpc: z.literal('2.0'),
@@ -59,7 +68,12 @@ const RpcSuccess = z
     message: 'JSON-RPC success frame must carry a result member',
   });
 
-const RpcFailure = z
+/**
+ * Zod schema behind {@link ServerRpcFailure}.
+ *
+ * @stable
+ */
+export const RpcFailure = z
   .object({
     v: z.literal('1'),
     jsonrpc: z.literal('2.0'),
@@ -68,7 +82,12 @@ const RpcFailure = z
   })
   .strict();
 
-const SubscribedFrame = z
+/**
+ * Zod schema behind {@link ServerSubscribedFrame}.
+ *
+ * @stable
+ */
+export const SubscribedFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('subscribed'),
@@ -78,7 +97,12 @@ const SubscribedFrame = z
   })
   .strict();
 
-const UnsubscribedFrame = z
+/**
+ * Zod schema behind {@link ServerUnsubscribedFrame}.
+ *
+ * @stable
+ */
+export const UnsubscribedFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('unsubscribed'),
@@ -93,7 +117,12 @@ const UnsubscribedFrame = z
 // union documented in `@graphorin/core` (decode with
 // `fromWireAgentEvent`); the cross-package round-trip is pinned by a
 // gate test in core.
-const EventFrame = z
+/**
+ * Zod schema behind {@link ServerEventFrame}.
+ *
+ * @stable
+ */
+export const EventFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('event'),
@@ -105,7 +134,12 @@ const EventFrame = z
   })
   .strict();
 
-const LifecycleFrame = z
+/**
+ * Zod schema behind {@link ServerLifecycleFrame}.
+ *
+ * @stable
+ */
+export const LifecycleFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('lifecycle'),
@@ -115,7 +149,12 @@ const LifecycleFrame = z
   })
   .strict();
 
-const ErrorFrame = z
+/**
+ * Zod schema behind {@link ServerErrorFrame}.
+ *
+ * @stable
+ */
+export const ErrorFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('error'),
@@ -127,7 +166,12 @@ const ErrorFrame = z
   })
   .strict();
 
-const PongFrame = z
+/**
+ * Zod schema behind {@link ServerPongFrame}.
+ *
+ * @stable
+ */
+export const PongFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('pong'),
@@ -135,7 +179,12 @@ const PongFrame = z
   })
   .strict();
 
-const ReplayMarkerFrame = z
+/**
+ * Zod schema behind {@link ServerReplayMarkerFrame}.
+ *
+ * @stable
+ */
+export const ReplayMarkerFrame = z
   .object({
     v: z.literal('1'),
     kind: z.literal('replay-marker'),

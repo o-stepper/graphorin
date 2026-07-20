@@ -8,6 +8,12 @@
 
 Barrel export for every shipped scorer family.
 
+## Interfaces
+
+| Interface | Description |
+| ------ | ------ |
+| [SchemaLike](/api/@graphorin/evals/scorers/interfaces/SchemaLike.md) | Structural view of a JSON-Schema-bearing tool definition accepted by [ArgumentValidityOptions](/api/@graphorin/evals/interfaces/ArgumentValidityOptions.md). |
+
 ## References
 
 ### anyMatch

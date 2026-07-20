@@ -155,7 +155,13 @@ export class EmbedderMigrationStateRepository {
 }
 
 /** Row shape handed to the runner (structural `MigrationRow`). */
-interface BatcherRow {
+/**
+ * One row handed to the embedder-migration batcher by
+ * `GraphorinSqliteStore.embedderMigration.nextBatch`.
+ *
+ * @stable
+ */
+export interface BatcherRow {
   readonly id: string;
   readonly text: string;
   readonly write: (vector: Float32Array) => Promise<void>;

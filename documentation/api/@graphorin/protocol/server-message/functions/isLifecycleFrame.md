@@ -10,7 +10,7 @@
 function isLifecycleFrame(message): message is { kind: "lifecycle"; reason?: string; status: "aborted" | "running" | "paused" | "completed" | "failed"; subscriptionId: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:215
+Defined in: src/server-message.ts:264
 
 **`Stable`**
 

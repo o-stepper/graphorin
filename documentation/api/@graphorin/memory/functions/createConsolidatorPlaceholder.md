@@ -10,7 +10,7 @@
 function createConsolidatorPlaceholder(options?): Consolidator;
 ```
 
-Defined in: packages/memory/src/consolidator/index.ts:187
+Defined in: packages/memory/src/consolidator/index.ts:188
 
 **`Stable`**
 

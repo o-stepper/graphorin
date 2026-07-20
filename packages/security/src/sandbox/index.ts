@@ -15,6 +15,9 @@ export {
 } from './bridged-source.js';
 export {
   createDockerSandbox,
+  type DockerodeClient,
+  type DockerodeContainer,
+  type DockerodeModule,
   type DockerSandboxOptions,
 } from './docker.js';
 export {
@@ -27,7 +30,11 @@ export {
 } from './errors.js';
 export {
   createIsolatedVMSandbox,
+  type IsolatedVMContext,
+  type IsolatedVMIsolate,
+  type IsolatedVMPeerModule,
   type IsolatedVMSandboxOptions,
+  type IsolatedVMScript,
 } from './isolated-vm.js';
 export {
   createNoneSandbox,

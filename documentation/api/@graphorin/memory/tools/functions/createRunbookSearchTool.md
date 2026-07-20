@@ -26,4 +26,4 @@ surface here: they must not drive actions until validated.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`RunbookSearchInput`, `RunbookSearchOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`RunbookSearchInput`](/api/@graphorin/memory/tools/interfaces/RunbookSearchInput.md), [`RunbookSearchOutput`](/api/@graphorin/memory/tools/interfaces/RunbookSearchOutput.md)\&gt;

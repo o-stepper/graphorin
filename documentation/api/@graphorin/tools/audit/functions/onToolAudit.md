@@ -10,7 +10,7 @@
 function onToolAudit(listener): () => void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:129
+Defined in: packages/tools/src/audit/index.ts:134
 
 **`Stable`**
 
@@ -22,7 +22,7 @@ shutdown to avoid leaks in long-running server processes.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `Listener` |
+| `listener` | [`ToolAuditListener`](/api/@graphorin/tools/audit/type-aliases/ToolAuditListener.md) |
 
 ## Returns
 

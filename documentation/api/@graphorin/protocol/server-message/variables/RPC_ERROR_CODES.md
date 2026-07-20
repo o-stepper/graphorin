@@ -23,7 +23,7 @@ const RPC_ERROR_CODES: Readonly<{
 }>;
 ```
 
-Defined in: src/server-message.ts:262
+Defined in: src/server-message.ts:311
 
 **`Stable`**
 

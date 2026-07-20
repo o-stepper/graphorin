@@ -8,7 +8,11 @@
  * @packageDocumentation
  */
 
-export { type ArgumentValidityOptions, argumentValidity } from './argument-validity.js';
+export {
+  type ArgumentValidityOptions,
+  argumentValidity,
+  type SchemaLike,
+} from './argument-validity.js';
 export {
   type CorrectToolSelectedOptions,
   correctToolSelected,

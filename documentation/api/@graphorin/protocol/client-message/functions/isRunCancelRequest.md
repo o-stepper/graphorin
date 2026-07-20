@@ -10,7 +10,7 @@
 function isRunCancelRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "run.cancel"; params: { drain?: boolean; onPendingApprovals?: "deny" | "preserve"; reason?: string; runId: string }; v: "1" };
 ```
 
-Defined in: src/client-message.ts:184
+Defined in: src/client-message.ts:189
 
 **`Stable`**
 

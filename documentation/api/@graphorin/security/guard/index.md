@@ -133,6 +133,12 @@ Re-exports [MemoryGuardAuditEvent](/api/@graphorin/security/interfaces/MemoryGua
 
 ***
 
+### MemoryGuardAuditListener
+
+Re-exports [MemoryGuardAuditListener](/api/@graphorin/security/type-aliases/MemoryGuardAuditListener.md)
+
+***
+
 ### MemoryGuardBudgetExceededError
 
 Re-exports [MemoryGuardBudgetExceededError](/api/@graphorin/security/classes/MemoryGuardBudgetExceededError.md)

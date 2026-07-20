@@ -10,7 +10,7 @@
 function __resetTiktokenCache(): void;
 ```
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:149
+Defined in: packages/provider/src/counters/js-tiktoken.ts:160
 
 **`Internal`**
 

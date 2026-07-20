@@ -10,7 +10,7 @@
 type ServerMessage = z.infer<typeof ServerMessageSchema>;
 ```
 
-Defined in: src/server-message.ts:177
+Defined in: src/server-message.ts:226
 
 **`Stable`**
 

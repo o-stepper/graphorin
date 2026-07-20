@@ -428,6 +428,10 @@
             "collapsed": true,
             "items": [
               {
+                "text": "DeserializeOptions",
+                "link": "/api/@graphorin/agent/run-state/interfaces/DeserializeOptions.md"
+              },
+              {
                 "text": "SerializedPendingSubRun",
                 "link": "/api/@graphorin/agent/run-state/interfaces/SerializedPendingSubRun.md"
               },
@@ -875,7 +879,20 @@
       },
       {
         "text": "scorers",
-        "link": "/api/@graphorin/evals/scorers/"
+        "link": "/api/@graphorin/evals/scorers/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SchemaLike",
+                "link": "/api/@graphorin/evals/scorers/interfaces/SchemaLike.md"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -1119,8 +1136,132 @@
             "collapsed": true,
             "items": [
               {
+                "text": "BlockAppendInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockAppendInput.md"
+              },
+              {
+                "text": "BlockAppendOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockAppendOutput.md"
+              },
+              {
+                "text": "BlockReplaceInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockReplaceInput.md"
+              },
+              {
+                "text": "BlockReplaceOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockReplaceOutput.md"
+              },
+              {
+                "text": "BlockRethinkInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockRethinkInput.md"
+              },
+              {
+                "text": "BlockRethinkOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/BlockRethinkOutput.md"
+              },
+              {
                 "text": "BuildMemoryToolsOptions",
                 "link": "/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md"
+              },
+              {
+                "text": "ConversationSearchInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/ConversationSearchInput.md"
+              },
+              {
+                "text": "ConversationSearchOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/ConversationSearchOutput.md"
+              },
+              {
+                "text": "DeepRecallHit",
+                "link": "/api/@graphorin/memory/tools/interfaces/DeepRecallHit.md"
+              },
+              {
+                "text": "DeepRecallInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/DeepRecallInput.md"
+              },
+              {
+                "text": "DeepRecallOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/DeepRecallOutput.md"
+              },
+              {
+                "text": "FactForgetInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactForgetInput.md"
+              },
+              {
+                "text": "FactForgetOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactForgetOutput.md"
+              },
+              {
+                "text": "FactHistoryEntry",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactHistoryEntry.md"
+              },
+              {
+                "text": "FactHistoryInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactHistoryInput.md"
+              },
+              {
+                "text": "FactHistoryOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactHistoryOutput.md"
+              },
+              {
+                "text": "FactRememberInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactRememberInput.md"
+              },
+              {
+                "text": "FactRememberOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactRememberOutput.md"
+              },
+              {
+                "text": "FactSearchHit",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactSearchHit.md"
+              },
+              {
+                "text": "FactSearchInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactSearchInput.md"
+              },
+              {
+                "text": "FactSearchOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactSearchOutput.md"
+              },
+              {
+                "text": "FactSupersedeInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactSupersedeInput.md"
+              },
+              {
+                "text": "FactSupersedeOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactSupersedeOutput.md"
+              },
+              {
+                "text": "FactValidateInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactValidateInput.md"
+              },
+              {
+                "text": "FactValidateOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/FactValidateOutput.md"
+              },
+              {
+                "text": "RecallEpisodeHit",
+                "link": "/api/@graphorin/memory/tools/interfaces/RecallEpisodeHit.md"
+              },
+              {
+                "text": "RecallEpisodesInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/RecallEpisodesInput.md"
+              },
+              {
+                "text": "RecallEpisodesOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/RecallEpisodesOutput.md"
+              },
+              {
+                "text": "RunbookProcedureHit",
+                "link": "/api/@graphorin/memory/tools/interfaces/RunbookProcedureHit.md"
+              },
+              {
+                "text": "RunbookSearchInput",
+                "link": "/api/@graphorin/memory/tools/interfaces/RunbookSearchInput.md"
+              },
+              {
+                "text": "RunbookSearchOutput",
+                "link": "/api/@graphorin/memory/tools/interfaces/RunbookSearchOutput.md"
               }
             ]
           },
@@ -1463,6 +1604,10 @@
               {
                 "text": "ClientMessageSchema",
                 "link": "/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md"
+              },
+              {
+                "text": "RpcId",
+                "link": "/api/@graphorin/protocol/client-message/variables/RpcId.md"
               }
             ]
           },
@@ -1599,12 +1744,48 @@
             "collapsed": true,
             "items": [
               {
+                "text": "ErrorFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/ErrorFrame.md"
+              },
+              {
+                "text": "EventFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/EventFrame.md"
+              },
+              {
+                "text": "LifecycleFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/LifecycleFrame.md"
+              },
+              {
+                "text": "PongFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/PongFrame.md"
+              },
+              {
+                "text": "ReplayMarkerFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/ReplayMarkerFrame.md"
+              },
+              {
                 "text": "RPC_ERROR_CODES",
                 "link": "/api/@graphorin/protocol/server-message/variables/RPC_ERROR_CODES.md"
               },
               {
+                "text": "RpcFailure",
+                "link": "/api/@graphorin/protocol/server-message/variables/RpcFailure.md"
+              },
+              {
+                "text": "RpcSuccess",
+                "link": "/api/@graphorin/protocol/server-message/variables/RpcSuccess.md"
+              },
+              {
                 "text": "ServerMessageSchema",
                 "link": "/api/@graphorin/protocol/server-message/variables/ServerMessageSchema.md"
+              },
+              {
+                "text": "SubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/SubscribedFrame.md"
+              },
+              {
+                "text": "UnsubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/variables/UnsubscribedFrame.md"
               }
             ]
           },
@@ -3222,6 +3403,10 @@
               {
                 "text": "ToolAuditDecision",
                 "link": "/api/@graphorin/tools/audit/type-aliases/ToolAuditDecision.md"
+              },
+              {
+                "text": "ToolAuditListener",
+                "link": "/api/@graphorin/tools/audit/type-aliases/ToolAuditListener.md"
               }
             ]
           },
@@ -3275,12 +3460,20 @@
                 "link": "/api/@graphorin/tools/code-mode/interfaces/CodeApiProjection.md"
               },
               {
+                "text": "CodeExecuteInput",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeExecuteInput.md"
+              },
+              {
                 "text": "CodeExecuteLimits",
                 "link": "/api/@graphorin/tools/code-mode/interfaces/CodeExecuteLimits.md"
               },
               {
                 "text": "CodeExecuteToolOptions",
                 "link": "/api/@graphorin/tools/code-mode/interfaces/CodeExecuteToolOptions.md"
+              },
+              {
+                "text": "CodeSearchInput",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeSearchInput.md"
               },
               {
                 "text": "CodeSearchMatch",

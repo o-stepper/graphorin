@@ -10,7 +10,7 @@
 type SqliteStoreMode = "lib" | "server";
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:143
+Defined in: packages/store-sqlite/src/index.ts:154
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function _getToolAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:150
+Defined in: packages/tools/src/audit/index.ts:155
 
 **`Experimental`**
 

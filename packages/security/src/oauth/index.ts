@@ -18,6 +18,7 @@ export {
   type OAuthAuditActor,
   type OAuthAuditDecision,
   type OAuthAuditEvent,
+  type OAuthAuditListener,
   onOAuthAudit,
 } from './audit-emitter.js';
 export {
@@ -76,6 +77,7 @@ export {
   emitOAuthLifecycle,
   type OAuthLifecycleEvent,
   type OAuthLifecycleEventName,
+  type OAuthLifecycleListener,
   onOAuthLifecycle,
 } from './events.js';
 export { createInMemoryOAuthServerStore } from './in-memory-store.js';

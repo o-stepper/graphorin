@@ -22,7 +22,7 @@ Snapshot returned by [RunStateTracker.snapshot](/api/@graphorin/server/classes/R
 | `error.code?` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:86 |
 | `error.hint?` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:86 |
 | `error.message` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:86 |
-| <a id="property-kind"></a> `kind` | `readonly` | `RunKind` | packages/server/src/runtime/run-state.ts:82 |
+| <a id="property-kind"></a> `kind` | `readonly` | [`RunKind`](/api/@graphorin/server/type-aliases/RunKind.md) | packages/server/src/runtime/run-state.ts:82 |
 | <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:81 |
 | <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:90 |
 | <a id="property-startedat"></a> `startedAt?` | `readonly` | `number` | packages/server/src/runtime/run-state.ts:84 |

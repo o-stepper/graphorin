@@ -19,5 +19,6 @@ export {
   type AppliedMigration,
   listAppliedMigrations,
   pendingMigrations,
+  type RunMigrationsOptions,
   runMigrations,
 } from './runner.js';

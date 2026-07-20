@@ -10,7 +10,7 @@
 function argumentValidity<I>(options): Scorer<I, Trajectory>;
 ```
 
-Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:27
+Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:33
 
 **`Stable`**
 

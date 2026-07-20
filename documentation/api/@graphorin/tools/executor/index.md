@@ -10,6 +10,12 @@ Tool executor surface for `@graphorin/tools`.
 
 ## References
 
+### ApprovalDecision
+
+Re-exports [ApprovalDecision](/api/@graphorin/tools/type-aliases/ApprovalDecision.md)
+
+***
+
 ### ApprovalGate
 
 Re-exports [ApprovalGate](/api/@graphorin/tools/interfaces/ApprovalGate.md)
@@ -58,6 +64,12 @@ Re-exports [ExecuteBatchOptions](/api/@graphorin/tools/interfaces/ExecuteBatchOp
 
 ***
 
+### ExecutorEvent
+
+Re-exports [ExecutorEvent](/api/@graphorin/tools/type-aliases/ExecutorEvent.md)
+
+***
+
 ### ExecutorOptions
 
 Re-exports [ExecutorOptions](/api/@graphorin/tools/interfaces/ExecutorOptions.md)
@@ -79,6 +91,12 @@ Re-exports [PermissionHookInput](/api/@graphorin/tools/interfaces/PermissionHook
 ### PermissionHookResult
 
 Re-exports [PermissionHookResult](/api/@graphorin/tools/interfaces/PermissionHookResult.md)
+
+***
+
+### SecretResolverHook
+
+Re-exports [SecretResolverHook](/api/@graphorin/tools/interfaces/SecretResolverHook.md)
 
 ***
 
@@ -109,3 +127,9 @@ Re-exports [ToolExecutor](/api/@graphorin/tools/interfaces/ToolExecutor.md)
 ### ToolRateLimitError
 
 Re-exports [ToolRateLimitError](/api/@graphorin/tools/classes/ToolRateLimitError.md)
+
+***
+
+### ToolRepairHook
+
+Re-exports [ToolRepairHook](/api/@graphorin/tools/interfaces/ToolRepairHook.md)

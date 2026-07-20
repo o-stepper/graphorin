@@ -145,6 +145,7 @@ export {
 export { type Consolidator, createConsolidator } from './runtime.js';
 export {
   type ConsolidatorCatchupPolicy,
+  type ConsolidatorLike,
   type RegisterTriggersOptions,
   type RegisterTriggersResult,
   registerConsolidatorTriggers,

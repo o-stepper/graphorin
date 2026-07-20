@@ -72,6 +72,24 @@ Re-exports [DEFAULT_TIMEOUTS_MS](/api/@graphorin/security/variables/DEFAULT_TIME
 
 ***
 
+### DockerodeClient
+
+Re-exports [DockerodeClient](/api/@graphorin/security/interfaces/DockerodeClient.md)
+
+***
+
+### DockerodeContainer
+
+Re-exports [DockerodeContainer](/api/@graphorin/security/interfaces/DockerodeContainer.md)
+
+***
+
+### DockerodeModule
+
+Re-exports [DockerodeModule](/api/@graphorin/security/interfaces/DockerodeModule.md)
+
+***
+
 ### DockerSandboxOptions
 
 Re-exports [DockerSandboxOptions](/api/@graphorin/security/interfaces/DockerSandboxOptions.md)
@@ -84,9 +102,33 @@ Re-exports [GraphorinSandboxError](/api/@graphorin/security/classes/GraphorinSan
 
 ***
 
+### IsolatedVMContext
+
+Re-exports [IsolatedVMContext](/api/@graphorin/security/interfaces/IsolatedVMContext.md)
+
+***
+
+### IsolatedVMIsolate
+
+Re-exports [IsolatedVMIsolate](/api/@graphorin/security/interfaces/IsolatedVMIsolate.md)
+
+***
+
+### IsolatedVMPeerModule
+
+Re-exports [IsolatedVMPeerModule](/api/@graphorin/security/interfaces/IsolatedVMPeerModule.md)
+
+***
+
 ### IsolatedVMSandboxOptions
 
 Re-exports [IsolatedVMSandboxOptions](/api/@graphorin/security/interfaces/IsolatedVMSandboxOptions.md)
+
+***
+
+### IsolatedVMScript
+
+Re-exports [IsolatedVMScript](/api/@graphorin/security/interfaces/IsolatedVMScript.md)
 
 ***
 

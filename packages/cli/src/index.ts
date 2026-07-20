@@ -28,3 +28,4 @@ export {
   isOfflineMode,
   OfflineModeViolationError,
 } from './internal/offline.js';
+export type { CommonOutputOptions, JsonSink, PrintSink } from './internal/output.js';

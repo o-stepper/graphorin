@@ -39,7 +39,7 @@ function-form wrapper forwards it to the operator's hook verbatim.
 
 | Parameter | Type |
 | ------ | ------ |
-| `deps` | `HookDeps` |
+| `deps` | [`HookDeps`](/api/@graphorin/memory/interfaces/HookDeps.md) |
 | `ctx?` | [`PostCompactionHookContext`](/api/@graphorin/memory/interfaces/PostCompactionHookContext.md) |
 
 #### Returns

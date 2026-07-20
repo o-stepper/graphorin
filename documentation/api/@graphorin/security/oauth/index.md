@@ -328,6 +328,12 @@ Re-exports [OAuthAuditEvent](/api/@graphorin/security/interfaces/OAuthAuditEvent
 
 ***
 
+### OAuthAuditListener
+
+Re-exports [OAuthAuditListener](/api/@graphorin/security/type-aliases/OAuthAuditListener.md)
+
+***
+
 ### OAuthAuthorizationError
 
 Re-exports [OAuthAuthorizationError](/api/@graphorin/security/classes/OAuthAuthorizationError.md)
@@ -373,6 +379,12 @@ Re-exports [OAuthLifecycleEvent](/api/@graphorin/security/interfaces/OAuthLifecy
 ### OAuthLifecycleEventName
 
 Re-exports [OAuthLifecycleEventName](/api/@graphorin/security/type-aliases/OAuthLifecycleEventName.md)
+
+***
+
+### OAuthLifecycleListener
+
+Re-exports [OAuthLifecycleListener](/api/@graphorin/security/type-aliases/OAuthLifecycleListener.md)
 
 ***
 

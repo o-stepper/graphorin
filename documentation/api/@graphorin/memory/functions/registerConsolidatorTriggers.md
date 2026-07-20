@@ -32,7 +32,7 @@ caller is responsible for those (e.g. invoking
 
 | Parameter | Type |
 | ------ | ------ |
-| `consolidator` | `ConsolidatorLike` |
+| `consolidator` | [`ConsolidatorLike`](/api/@graphorin/memory/interfaces/ConsolidatorLike.md) |
 | `scheduler` | [`SchedulerLike`](/api/@graphorin/memory/interfaces/SchedulerLike.md) |
 | `options` | [`RegisterTriggersOptions`](/api/@graphorin/memory/interfaces/RegisterTriggersOptions.md) |
 

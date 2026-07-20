@@ -166,8 +166,11 @@ export type {
   AgentCallOptions,
   AgentCapability,
   AgentConfig,
+  AgentFanOutOptions,
   AgentInput,
+  AgentProgressIO,
   AgentToToolOptions,
+  ApprovalDecision,
   CompactionApiResult,
   CompactOptions,
   HandoffEntry,
@@ -183,5 +186,6 @@ export type {
   ResumeDirective,
   RunBudget,
   SkillsRegistryLike,
+  SubagentForwardPolicy,
   VerifierResult,
 } from './types.js';

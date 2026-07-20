@@ -28,6 +28,18 @@ Re-exports [adaptCallResult](/api/@graphorin/mcp/functions/adaptCallResult.md)
 
 ***
 
+### AdaptCallResultArgs
+
+Re-exports [AdaptCallResultArgs](/api/@graphorin/mcp/interfaces/AdaptCallResultArgs.md)
+
+***
+
+### AdaptedToolsResult
+
+Re-exports [AdaptedToolsResult](/api/@graphorin/mcp/interfaces/AdaptedToolsResult.md)
+
+***
+
 ### adaptMCPTools
 
 Re-exports [adaptMCPTools](/api/@graphorin/mcp/functions/adaptMCPTools.md)
@@ -109,6 +121,12 @@ Re-exports [MCPElicitationRequest](/api/@graphorin/mcp/interfaces/MCPElicitation
 ### MCPElicitationResult
 
 Re-exports [MCPElicitationResult](/api/@graphorin/mcp/type-aliases/MCPElicitationResult.md)
+
+***
+
+### MCPPinStore
+
+Re-exports [MCPPinStore](/api/@graphorin/mcp/interfaces/MCPPinStore.md)
 
 ***
 

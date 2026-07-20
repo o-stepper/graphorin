@@ -18,7 +18,7 @@ handlers consume them through `getRequestState`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-auth"></a> `auth` | `readonly` | `AuthState` | packages/server/src/internal/context.ts:43 |
+| <a id="property-auth"></a> `auth` | `readonly` | [`AuthState`](/api/@graphorin/server/type-aliases/AuthState.md) | packages/server/src/internal/context.ts:43 |
 | <a id="property-clientip"></a> `clientIp` | `readonly` | `string` \| `undefined` | packages/server/src/internal/context.ts:42 |
 | <a id="property-idempotencykey"></a> `idempotencyKey?` | `readonly` | `string` | packages/server/src/internal/context.ts:44 |
 | <a id="property-idempotencyreplay"></a> `idempotencyReplay?` | `readonly` | `boolean` | packages/server/src/internal/context.ts:45 |

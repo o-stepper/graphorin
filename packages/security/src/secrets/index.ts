@@ -17,6 +17,7 @@ export {
   onWithSecretAudit,
   type ToolSecretsContext,
   type WithSecretAuditEvent,
+  type WithSecretListener,
   withChildToolSecretsContext,
   withSecret,
   withToolSecretsContext,
@@ -31,6 +32,7 @@ export {
   type SecretsAuditActor,
   type SecretsAuditDecision,
   type SecretsAuditEvent,
+  type SecretsAuditListener,
 } from './audit-emitter.js';
 export {
   GraphorinSecretsError,
@@ -66,6 +68,7 @@ export {
   _resetResolversForTesting,
   _setArgon2idForTesting,
   _setKeyringEntryCtorForTesting,
+  type Argon2idFn,
   areBuiltinsInstalled,
   decryptBundle,
   deriveAesKey,
@@ -77,6 +80,7 @@ export {
   installBuiltinResolvers,
   isLiteralAllowed,
   KEYRING_DEFAULT_SERVICE,
+  type KeyringEntryCtor,
   keyringResolver,
   listResolverSchemes,
   literalResolver,
@@ -114,6 +118,7 @@ export {
   onSecretValueAudit,
   SecretValue,
   type SecretValueAuditEvent,
+  type SecretValueAuditListener,
 } from './secret-value.js';
 export {
   EncryptedFileSecretsStore,

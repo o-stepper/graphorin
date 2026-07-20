@@ -10,7 +10,7 @@
 function deriveAesKey(passphrase, salt): Promise<Buffer<ArrayBufferLike>>;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:115
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:121
 
 **`Stable`**
 

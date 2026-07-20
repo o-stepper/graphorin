@@ -62,6 +62,7 @@ export {
 export {
   type CrossEncoderRerankerOptions,
   createCrossEncoderReranker,
+  type MergedEntry,
   mergeAndDedupe,
   RERANKER_ID,
   TransformersJsReRanker,

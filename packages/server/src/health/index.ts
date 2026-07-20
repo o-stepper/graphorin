@@ -25,6 +25,7 @@ export {
   type SecretsCheck,
   type StorageCheck,
   type TriggersCheck,
+  type WorkflowTimersCheck,
 } from './checks.js';
 export {
   createExtendedHealthRoutes,
