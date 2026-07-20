@@ -1,5 +1,22 @@
 # @graphorin/cli
 
+## 0.13.8
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.8
+  - @graphorin/eslint-plugin@0.13.8
+  - @graphorin/memory@0.13.8
+  - @graphorin/pricing@0.13.8
+  - @graphorin/provider@0.13.8
+  - @graphorin/security@0.13.8
+  - @graphorin/server@0.13.8
+  - @graphorin/sessions@0.13.8
+  - @graphorin/skills@0.13.8
+  - @graphorin/store-sqlite@0.13.8
+  - @graphorin/workflow@0.13.8
+
 ## 0.13.7
 
 ### Patch Changes

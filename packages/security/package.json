@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/security",
-  "version": "0.13.7",
+  "version": "0.13.8",
   "description": "Security primitives for the Graphorin framework: SecretValue runtime-safe wrapper, SecretRef URI parser, pluggable SecretsStore implementations, per-tool ACL, AsyncLocalStorage-based audit scope tracking, server token authentication (HMAC-SHA256 + pepper + scopes), tamper-evident audit log, four sandbox adapters (none / worker-threads / isolated-vm / docker), tier-based memory-modification guard, declarative input/output guardrails, process-hardening startup helpers, outbound OAuth flows (Authorization Code + PKCE / Device Authorization Grant / Dynamic Client Registration / refresh + revoke), and skills supply-chain helpers (ed25519 SKILL.md signature verification, --ignore-scripts enforcement, allow / deny policy resolver).",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -14,6 +14,61 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.8 - 2026-07-20
+
+The **1Password + eval-honesty patch** (PR #233): remediation of the
+ninth external deep retest, which re-audited the released 0.13.7 - it
+confirmed all four 0.13.6 adapter fixes live against the real OpenAI
+API, measured the conflict pipeline's first real A/B gain (update
+score 0.50 to 0.75), ran Docker, llama.cpp, Ollama, and macOS Keychain
+end-to-end - and found one P1 in the optional 1Password package plus
+scorer and cost-report honesty gaps. No breaking changes.
+
+### Secrets - the 1Password resolver works against the real CLI (`@graphorin/secret-1password`)
+
+- `op read` has no `--reveal` flag (that flag belongs to
+  `op item get`), so every resolve failed at the CLI's flag parser
+  with `unknown flag: --reveal`. The wrapper now spawns
+  `op read --no-color '<uri>'`; argv-shape tests pin the exact spawn
+  arrays, and a real-binary integration leg
+  (`GRAPHORIN_RUN_OP_INTEGRATION=1`, an isolated `OP_CONFIG_DIR`, a
+  pinned checksum-verified op 2.35.0 in the weekly `integration-real`
+  workflow) proves the flags parse without any 1Password account.
+- The `No accounts configured for use with 1Password CLI.` state of
+  op CLI 2.35+ is now classified `signed-out` with an actionable setup
+  hint (desktop-app CLI integration, `op account add`,
+  `OP_SERVICE_ACCOUNT_TOKEN`, or Connect) instead of `unknown` with a
+  generic one.
+
+### Evals - memory scorers stop punishing verbose-but-correct memories (`@graphorin/evals`)
+
+- The operation-level scorers' default matcher is now token-set F1 OR
+  directional gold-content coverage (function words stripped from the
+  gold side, negations kept; tunable via the new `minGoldCoverage`
+  option). Previously a semantically perfect memory (gold
+  `User is pescatarian` vs the model's `The user started eating fish
+  again ... identifies as pescatarian.`, token F1 0.235) was graded
+  missed, hallucinated, and omitted at once, deflating extraction
+  recall, extraction precision, and the update-omission A/B on small
+  operation benchmarks. Expect those numbers to shift on existing
+  reports; supply a custom `matcher` to keep the old symmetric-F1-only
+  behaviour.
+- New exports: `goldTokenCoverage`, `goldCoverageMatcher`,
+  `defaultMemoryPointMatcher`.
+
+### Bench harnesses - observed spend is reported, not just enforced
+
+- The HaluMem and LongMemEval runners stamp
+  `benchConfig.observedCostUsd`, `costPricingMatched`, and (when the
+  pricing snapshot misses a model) `unpricedModels` into JSON reports,
+  print the observed total in the run summary, and add an
+  `Observed cost (USD)` line to the RESULTS header. The evals guide
+  documents the honest cap semantics: already-observed spend is
+  checked before each next request, so a run can overshoot the cap by
+  at most one request's cost.
+- `integration-real.yml` gains the `onepassword-cli` job described
+  above and was dispatched green on this release's merge commit.
+
 ## 0.13.7 - 2026-07-20
 
 The **OpenAI-compat adapter patch** (PR #230): remediation of the

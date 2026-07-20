@@ -1,5 +1,15 @@
 # @graphorin/secret-1password
 
+## 0.13.8
+
+### Patch Changes
+
+- [#233](https://github.com/o-stepper/graphorin/pull/233) [`82f332f`](https://github.com/o-stepper/graphorin/commit/82f332fa4c6ea4dc47436dc52e8a00f5a7415238) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the 1Password CLI invocation: `op read` has no `--reveal` flag (that flag belongs to `op item get`), so every resolve failed with `unknown flag: --reveal` against the real CLI (verified on op 2.35.0). The wrapper now spawns `op read --no-color '<uri>'`, argv-shape tests pin the exact spawn contract, and a real-binary integration leg (`GRAPHORIN_RUN_OP_INTEGRATION=1`, wired into the weekly `integration-real` workflow with a pinned op 2.35.0) proves the flags parse without any 1Password account. The `no accounts configured` stderr of op CLI 2.35+ is now classified `signed-out` with an actionable setup hint (desktop-app CLI integration, `op account add`, `OP_SERVICE_ACCOUNT_TOKEN`, or Connect) instead of `unknown`.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.8
+  - @graphorin/security@0.13.8
+
 ## 0.13.7
 
 ### Patch Changes

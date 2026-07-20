@@ -1,5 +1,15 @@
 # @graphorin/evals
 
+## 0.13.8
+
+### Patch Changes
+
+- [#233](https://github.com/o-stepper/graphorin/pull/233) [`82f332f`](https://github.com/o-stepper/graphorin/commit/82f332fa4c6ea4dc47436dc52e8a00f5a7415238) Thanks [@o-stepper](https://github.com/o-stepper)! - Operation-level memory scorers no longer punish verbose-but-correct memories: the default matcher is now token-set F1 OR directional gold-content coverage (function words stripped from the gold side; new `goldTokenCoverage` / `goldCoverageMatcher` / `defaultMemoryPointMatcher` exports plus a `minGoldCoverage` option on the extraction and update scorers). Previously a semantically correct memory (gold `User is pescatarian` vs `The user started eating fish again ... identifies as pescatarian.`, token F1 0.235) was scored missed + hallucinated + omitted at once, deflating extraction recall/precision and the update-omission A/B on small operation benchmarks. Expect extraction and update numbers to shift on existing reports; supply a custom `matcher` to keep the old symmetric-F1-only behaviour.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.8
+  - @graphorin/observability@0.13.8
+
 ## 0.13.7
 
 ### Patch Changes

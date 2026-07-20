@@ -36,7 +36,7 @@ pnpm --filter ./examples/secure-replay-agent dev
 Expected output:
 
 ```
-graphorin v0.13.7 secure-replay-agent - offline security+replay showcase (scripted stub provider, zero network).
+graphorin v0.13.8 secure-replay-agent - offline security+replay showcase (scripted stub provider, zero network).
 stage 1 stub-provider: status=completed, turns=1, reply='scripted stub reply: zero network, fully deterministic.'
 stage 2a dataflow shadow: sink ran=yes (audit-only), flagged=1, flow=untrusted-to-sink, counter-delta=1.
 stage 2b dataflow enforce: sink blocked - send_message failed kind=dataflow_policy_blocked, flow=untrusted-to-sink, dispatched=0.
@@ -189,4 +189,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.13.7 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.8 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

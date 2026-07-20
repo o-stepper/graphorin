@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.13.7**](../../index.md)
+[**Graphorin API reference v0.13.8**](../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.13.7
+- **Version:** v0.13.8
 - **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/cli>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
@@ -129,11 +129,11 @@ Phase 15 ships ready-to-copy templates for production deployments:
 
 ## Status
 
-`@graphorin/cli` is part of the Graphorin framework's `v0.13.7` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
+`@graphorin/cli` is part of the Graphorin framework's `v0.13.8` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
 
 ---
 
-**Project Graphorin** · v0.13.7 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.13.8 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
