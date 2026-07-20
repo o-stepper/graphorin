@@ -52,6 +52,32 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.6 -> 0.13.7
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **`openAICompatibleAdapter` URL join is now `/v1`-aware.** A
+  `baseUrl` already ending in `/v1` gets the default path
+  `/chat/completions` instead of `/v1/chat/completions`, so the
+  documented `http://127.0.0.1:1234/v1` form stops producing
+  `/v1/v1/...` 404s. A bare origin behaves exactly as before, and an
+  explicit `chatPath` is still appended verbatim - if you deliberately
+  relied on the doubled prefix, pass `chatPath: '/v1/chat/completions'`
+  explicitly.
+- **`maxTokens` can auto-remap to `max_completion_tokens`.** When the
+  server answers the specific HTTP 400 naming `max_completion_tokens`
+  (current OpenAI models), the adapter re-sends the request once with
+  the remapped parameter and keeps the switch for the provider
+  instance; one WARN is logged. Pin `tokenLimitParam` to either name
+  to disable the auto-remap.
+- **HaluMem runs fail loudly on ingest errors.** Provider/consolidator
+  failures now print `status=INFRASTRUCTURE_FAILED` and exit non-zero
+  instead of reporting a quality `0/N`; CI scripts that tolerated the
+  old silent zeros should treat the new exit code as the infra signal
+  it is. The `--conflict-pipeline` A/B additionally wants `--embedder
+  fake` - without a vector signal both legs converge by construction.
+
 ### 0.13.5 -> 0.13.6
 
 A patch release; nothing to migrate. Behavioural refinements worth

@@ -1,5 +1,17 @@
 # @graphorin/server
 
+## 0.13.7
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.7
+  - @graphorin/protocol@0.13.7
+  - @graphorin/security@0.13.7
+  - @graphorin/store-sqlite@0.13.7
+  - @graphorin/tools@0.13.7
+  - @graphorin/triggers@0.13.7
+
 ## 0.13.6
 
 ### Patch Changes
