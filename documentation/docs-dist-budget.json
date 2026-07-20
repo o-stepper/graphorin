@@ -1,7 +1,8 @@
 {
-  "$comment": "Size budgets for the built docs site (.vitepress/dist), enforced by documentation/scripts/check-dist-budget.mjs in docs.yml. Baseline 2026-07-20 after the sidebar diet: total 145 MB, api avg 33 KB / p95 47 KB, largest asset llms-full.txt 6.9 MB. Budgets carry ~30% headroom; lower them when the site shrinks, never raise them casually - a breach means an SSR/asset amplification regressed.",
+  "$comment": "Size budgets for the built docs site (.vitepress/dist), enforced by documentation/scripts/check-dist-budget.mjs in docs.yml. Baseline 2026-07-20 after the sidebar diet: total 145 MB, api avg 33 KB / p95 47 KB, largest asset llms-full.txt 6.9 MB, largest JS chunk the local-search index at 755 KB (then app 599 KB, mermaid/wardley 598 KB). Budgets carry ~30% headroom; lower them when the site shrinks, never raise them casually - a breach means an SSR/asset amplification regressed (for JS chunks: the search index growing with the API surface, or a new eager dependency landing in the app bundle).",
   "maxTotalBytes": 189000000,
   "maxApiHtmlAvgBytes": 49152,
   "maxApiHtmlP95Bytes": 65536,
-  "maxLargestAssetBytes": 8388608
+  "maxLargestAssetBytes": 8388608,
+  "maxJsChunkBytes": 1048576
 }
