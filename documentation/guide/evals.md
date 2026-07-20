@@ -134,15 +134,22 @@ block, so a number always says what configuration produced it:
   Usage is priced by model id against the bundled pricing snapshot
   (`priceLookupByModel` from `@graphorin/pricing` - shared by the
   `longmemeval` and `halumem` runners), so the ceiling observes spend even
-  through the vendor-agnostic `openai-compatible` adapter; for models the
-  snapshot does not know the runner WARNs that the cap was effectively
-  unenforced instead of pretending otherwise. The final spend is stamped
-  into reports (`benchConfig.observedCostUsd`, `costPricingMatched`, and an
-  `unpricedModels` list when the snapshot missed some), the RESULTS header,
-  and the terminal summary. Semantics: the ceiling compares
-  ALREADY-observed spend before each next request, so a run can overshoot
-  the cap by at most one request's cost - it is a run-level budget guard,
-  not a per-cent hard stop.
+  through the vendor-agnostic `openai-compatible` adapter. The snapshot
+  prices the official undated aliases (`gpt-4o-mini`, `gpt-4o`, `o1`,
+  `o3-mini`) and `-latest` ids alongside dated snapshots, so common judge
+  ids count toward the cap. A model the snapshot cannot price would
+  contribute $0 to the shared accumulator - so with a cap set, the runner
+  resolves pricing for the subject AND judge BEFORE the first request and
+  fails closed when any model is unpriced (mirroring the agent-level
+  `RunBudget.onUnpriced: 'fail'` default); pass `--allow-unpriced-model`
+  to proceed anyway with the spend knowingly under-counted. The final
+  spend is stamped into reports (`benchConfig.observedCostUsd`,
+  `costPricingMatched`, an `unpricedModels` list when the snapshot missed
+  some, and `allowUnpricedModel: true` when the escape hatch was used),
+  the RESULTS header, and the terminal summary. Semantics: the ceiling
+  compares ALREADY-observed spend before each next request, so a run can
+  overshoot the cap by at most one request's cost - it is a run-level
+  budget guard, not a per-cent hard stop.
 
 The adaptive injected-task scenarios (verbatim / unicode-obfuscated /
 split / paraphrase exfiltration against the dataflow policy) live in

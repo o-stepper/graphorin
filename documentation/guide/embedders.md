@@ -72,6 +72,14 @@ Set `GRAPHORIN_CACHE_DIR` to control where models are cached and to
 pre-stage them in offline / air-gapped deployments (download once on a
 networked machine, copy the cache, run offline thereafter).
 
+> [!WARNING]
+> A fresh install of this adapter currently reports one high `npm audit`
+> advisory inherited through `@huggingface/transformers` ->
+> `onnxruntime-node` -> `adm-zip@0.5.x`. The exposure is install-script
+> only, and a one-line consumer override resolves it - see
+> [published dependency-graph advisories](/guide/security#published-dependency-graph-advisories)
+> for the verified mitigation and upstream status.
+
 ## Embedder identity & migrations
 
 Each embedder reports a stable canonical id (`id()`) derived from its
