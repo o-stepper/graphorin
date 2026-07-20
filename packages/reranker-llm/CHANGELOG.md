@@ -1,5 +1,13 @@
 # @graphorin/reranker-llm
 
+## 0.13.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/memory@0.13.4
+  - @graphorin/core@0.13.4
+
 ## 0.13.3
 
 ### Patch Changes

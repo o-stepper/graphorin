@@ -1,5 +1,14 @@
 # @graphorin/pricing
 
+## 0.13.4
+
+### Patch Changes
+
+- [#220](https://github.com/o-stepper/graphorin/pull/220) [`a17f82d`](https://github.com/o-stepper/graphorin/commit/a17f82dc46be7727afbf7ceea22bfe788b8d1171) Thanks [@o-stepper](https://github.com/o-stepper)! - Pricing provenance now carries the full chain: `PricingSnapshot` and `LookupPriceResult` gained an optional `upstreamSources` list naming the original pricing authorities (provider pricing pages, refresh datasets) alongside the existing `source` artifact link. The bundled snapshot declares the Anthropic and OpenAI pricing pages; `refreshPricing(...)` declares its fetch URL.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.4
+
 ## 0.13.3
 
 ### Patch Changes
