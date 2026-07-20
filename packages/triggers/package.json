@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/triggers",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "description": "Background-task scheduler for the Graphorin framework. Ships durable cron / interval / idle / event triggers with the same code path in library and server modes, an in-tree 5-field cron parser, per-trigger catch-up policies (`'none'` default; `'last'` or `'all'` opt-in), and an AsyncIterable lifecycle event stream so consumers can plug into observability without monkey-patching.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

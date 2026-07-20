@@ -150,7 +150,7 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 
 ---
 
-**Graphorin** · v0.13.6 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.7 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
 
 ## Pack gate
 

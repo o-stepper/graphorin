@@ -25,6 +25,56 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.7 - 2026-07-20
+
+The **OpenAI-compat adapter patch** (PR #230): remediation of the
+eighth external deep retest, which re-audited the released 0.13.6,
+confirmed the framework GO, and localized four P2 findings to the
+generic OpenAI-compatible adapter and the real-eval harnesses. No
+breaking changes.
+
+### Provider - both base-URL conventions and current OpenAI models work (`@graphorin/provider`)
+
+- A `baseUrl` that already ends in `/v1` (the `api.openai.com/v1` /
+  LM Studio / vLLM convention - and the providers-guide example
+  verbatim) now gets `/chat/completions` appended instead of producing
+  a guaranteed-404 `/v1/v1/chat/completions`; a bare origin keeps the
+  classic default, and an explicit `chatPath` always wins verbatim.
+  Applies to `openAICompatibleAdapter` and `llamaCppServerAdapter`.
+- New `tokenLimitParam` option (`'max_tokens' |
+  'max_completion_tokens'`, exported type `TokenLimitParam`) pins the
+  wire name for `maxTokens`. Left unset, the adapter reacts to the
+  specific HTTP 400 naming `max_completion_tokens` by re-sending the
+  request once with the remapped parameter and remembers the switch
+  for the provider instance - current OpenAI models (GPT-5.6 family)
+  now work through the generic adapter and the eval CLIs with no
+  extra flags. Fields like `reasoning_effort` pass through per request
+  via the existing `providerOptions` merge (now documented).
+
+### Pricing and evals - shared real-eval helpers (`@graphorin/pricing`, `@graphorin/evals`)
+
+- New `priceLookupByModel` (+ `ModelPriceRates`) in
+  `@graphorin/pricing`: vendor-agnostic, model-id-keyed per-Mtok
+  lookup over the bundled snapshot with the dateless-alias fallback,
+  drop-in for `withCostTracking({ priceLookup })`. Extracted from the
+  LongMemEval runner so every harness enforces `--max-cost-usd` with
+  the same lookup.
+- New `createFakeEmbedder` in `@graphorin/evals`: the deterministic
+  offline bag-of-words embedder moved out of the LongMemEval runner so
+  any harness can arm the vector leg without a model download.
+
+### Bench harness honesty (not npm-published)
+
+- The HaluMem runner no longer masks provider failures as quality
+  zeros: consolidator outcomes are checked per session, ingest
+  failures print `status=INFRASTRUCTURE_FAILED` with a non-zero exit,
+  and the JSON report carries `infrastructureFailedCases`.
+- HaluMem `--max-cost-usd` now actually enforces the cap (usage priced
+  via the shared snapshot lookup), and the new `--embedder none|fake`
+  axis arms the embedding three-zone reconcile route - without a
+  vector signal the conflict on/off legs structurally converge, which
+  the evals guide now states plainly.
+
 ## 0.13.6 - 2026-07-20
 
 The **signed-leaf redaction patch** (PRs #227, #228): remediation of

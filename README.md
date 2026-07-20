@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.6](https://img.shields.io/badge/version-v0.13.6-blue.svg)](./CHANGELOG.md)
+[![Version: 0.13.7](https://img.shields.io/badge/version-v0.13.7-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.6`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.13.7`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.6** (2026-07-20) - the signed-leaf redaction patch: masking a negative numeric JSON value now absorbs the sign and emits a quoted mask, so redacted documents keep parsing in the provider middleware, the OTLP validator, and the security guardrail alike (the new span-based `jsonSafeSpan` helper is exported for custom catalogues), and the security credit-card mask no longer swallows the separator after the number. Seeded property tests now assert that any valid JSON stays valid after redaction. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-5-0-13-6) for upgrade notes.
+Latest release: **0.13.7** (2026-07-20) - the OpenAI-compat adapter patch: `openAICompatibleAdapter` now accepts both base-URL conventions (a `baseUrl` ending in `/v1` no longer produces a `/v1/v1/...` 404, so the documented LM Studio / `api.openai.com/v1` form works verbatim) and reaches current OpenAI models - the new `tokenLimitParam` option pins `max_tokens` vs `max_completion_tokens`, and left unset the adapter auto-remaps once on the telltale HTTP 400 and remembers the switch. `@graphorin/pricing` gains `priceLookupByModel` and `@graphorin/evals` gains `createFakeEmbedder`, the shared helpers behind honest real-eval runs (enforced `--max-cost-usd`, `INFRASTRUCTURE_FAILED` instead of fake quality zeros, the `--embedder` A/B axis). See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-6-0-13-7) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.6 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.13.7 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

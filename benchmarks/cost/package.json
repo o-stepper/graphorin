@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-cost",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "private": true,
   "description": "Prompt-assembly token-cost regression suite for the Graphorin framework. Drives a real createAgent(...) turn through an offline capturing provider and counts the tokens of the ASSEMBLED ProviderRequest (system prompt + instructions + advertised tool schemas + transcript) per scenario, asserting < 10 % growth against a stored baseline - so a regression in prompt assembly (longer system prompt, fatter tool descriptions) is caught. Nominal USD from the bundled @graphorin/pricing snapshot. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

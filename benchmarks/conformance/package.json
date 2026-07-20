@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-conformance",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "private": true,
   "description": "Per-release conformance benchmark for the Graphorin framework - a deterministic, offline suite of named behavioral invariants (the framework floor) spanning the agent loop, memory, sessions, workflow checkpoints, security, server durability, and pricing. Runs on every PR via benchmark:ci and stamps a versioned conformance report so a release can prove the promised behaviors still hold. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
