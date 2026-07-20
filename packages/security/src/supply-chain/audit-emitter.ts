@@ -54,7 +54,12 @@ export interface SupplyChainAuditEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type SupplyChainAuditListener = (event: SupplyChainAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onSupplyChainAudit}.
+ *
+ * @stable
+ */
+export type SupplyChainAuditListener = (event: SupplyChainAuditEvent) => void;
 
 const listeners = new Set<SupplyChainAuditListener>();
 

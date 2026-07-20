@@ -121,3 +121,15 @@ Re-exports [serializedToString](/api/@graphorin/provider/functions/serializedToS
 ### setGlobalTokenCounter
 
 Re-exports [setGlobalTokenCounter](/api/@graphorin/provider/functions/setGlobalTokenCounter.md)
+
+***
+
+### TiktokenEncoding
+
+Re-exports [TiktokenEncoding](/api/@graphorin/provider/interfaces/TiktokenEncoding.md)
+
+***
+
+### TiktokenModule
+
+Re-exports [TiktokenModule](/api/@graphorin/provider/interfaces/TiktokenModule.md)

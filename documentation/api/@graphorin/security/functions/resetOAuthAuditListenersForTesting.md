@@ -10,7 +10,7 @@
 function _resetOAuthAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/oauth/audit-emitter.ts:102
+Defined in: packages/security/src/oauth/audit-emitter.ts:107
 
 **`Experimental`**
 

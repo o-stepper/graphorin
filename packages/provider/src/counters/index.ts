@@ -27,6 +27,8 @@ export {
   __resetTiktokenCache,
   JsTiktokenCounter,
   type JsTiktokenCounterOptions,
+  type TiktokenEncoding,
+  type TiktokenModule,
 } from './js-tiktoken.js';
 export {
   type SerializedMessage,

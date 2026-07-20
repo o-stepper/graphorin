@@ -24,7 +24,7 @@ fully-migrated DB is a no-op.
 | Parameter | Type |
 | ------ | ------ |
 | `conn` | [`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) |
-| `options?` | `RunMigrationsOptions` |
+| `options?` | [`RunMigrationsOptions`](/api/@graphorin/store-sqlite/interfaces/RunMigrationsOptions.md) |
 
 ## Returns
 

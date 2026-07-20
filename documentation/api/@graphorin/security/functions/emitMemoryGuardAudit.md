@@ -10,7 +10,7 @@
 function emitMemoryGuardAudit(event): void;
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:126
+Defined in: packages/security/src/guard/audit-emitter.ts:131
 
 **`Stable`**
 

@@ -6,7 +6,7 @@
 
 # Interface: ArgumentValidityOptions
 
-Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:19
+Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:25
 
 **`Stable`**
 
@@ -14,5 +14,5 @@ Defined in: packages/evals/src/scorers/trajectory/argument-validity.ts:19
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | packages/evals/src/scorers/trajectory/argument-validity.ts:23 |
-| <a id="property-tools"></a> `tools` | `readonly` | readonly \{ `inputSchema`: `SchemaLike`; `name`: `string`; \}[] | The tools whose `inputSchema` is used to validate matching calls. | packages/evals/src/scorers/trajectory/argument-validity.ts:21 |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | packages/evals/src/scorers/trajectory/argument-validity.ts:29 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly \{ `inputSchema`: [`SchemaLike`](/api/@graphorin/evals/scorers/interfaces/SchemaLike.md); `name`: `string`; \}[] | The tools whose `inputSchema` is used to validate matching calls. | packages/evals/src/scorers/trajectory/argument-validity.ts:27 |

@@ -33,7 +33,12 @@ export interface OAuthLifecycleEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type OAuthLifecycleListener = (event: OAuthLifecycleEvent) => void;
+/**
+ * Callback shape accepted by {@link onOAuthLifecycle}.
+ *
+ * @stable
+ */
+export type OAuthLifecycleListener = (event: OAuthLifecycleEvent) => void;
 
 const listeners = new Set<OAuthLifecycleListener>();
 

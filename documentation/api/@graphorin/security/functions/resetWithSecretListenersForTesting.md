@@ -10,7 +10,7 @@
 function _resetWithSecretListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:165
+Defined in: packages/security/src/secrets/acl.ts:170
 
 **`Experimental`**
 

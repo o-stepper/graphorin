@@ -29,6 +29,7 @@ The matching subprotocol identifier is `graphorin.protocol.v1`
 | Variable | Description |
 | ------ | ------ |
 | [ClientMessageSchema](/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md) | Zod schema for every legal client → server frame. Use [ClientMessageSchema](/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md).safeParse() inside the server upgrade handler before dispatching to the corresponding subscription / cancel / ping handler. |
+| [RpcId](/api/@graphorin/protocol/client-message/variables/RpcId.md) | Zod schema for RPC correlation ids (non-empty string or integer). |
 
 ## Functions
 

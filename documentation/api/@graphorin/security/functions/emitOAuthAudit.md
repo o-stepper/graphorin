@@ -10,7 +10,7 @@
 function emitOAuthAudit(event): void;
 ```
 
-Defined in: packages/security/src/oauth/audit-emitter.ts:86
+Defined in: packages/security/src/oauth/audit-emitter.ts:91
 
 **`Stable`**
 

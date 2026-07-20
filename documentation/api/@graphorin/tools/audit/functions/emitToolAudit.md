@@ -10,7 +10,7 @@
 function emitToolAudit(event): void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:161
+Defined in: packages/tools/src/audit/index.ts:166
 
 **`Stable`**
 

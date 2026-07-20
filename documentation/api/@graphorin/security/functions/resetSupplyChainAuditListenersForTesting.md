@@ -10,7 +10,7 @@
 function _resetSupplyChainAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:96
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:101
 
 **`Experimental`**
 

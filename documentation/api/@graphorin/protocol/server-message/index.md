@@ -54,8 +54,17 @@ do not loosen `.strict()` for it piecemeal.
 
 | Variable | Description |
 | ------ | ------ |
+| [ErrorFrame](/api/@graphorin/protocol/server-message/variables/ErrorFrame.md) | Zod schema behind [ServerErrorFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerErrorFrame.md). |
+| [EventFrame](/api/@graphorin/protocol/server-message/variables/EventFrame.md) | Zod schema behind [ServerEventFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerEventFrame.md). |
+| [LifecycleFrame](/api/@graphorin/protocol/server-message/variables/LifecycleFrame.md) | Zod schema behind [ServerLifecycleFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerLifecycleFrame.md). |
+| [PongFrame](/api/@graphorin/protocol/server-message/variables/PongFrame.md) | Zod schema behind [ServerPongFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerPongFrame.md). |
+| [ReplayMarkerFrame](/api/@graphorin/protocol/server-message/variables/ReplayMarkerFrame.md) | Zod schema behind [ServerReplayMarkerFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerReplayMarkerFrame.md). |
 | [RPC\_ERROR\_CODES](/api/@graphorin/protocol/server-message/variables/RPC_ERROR_CODES.md) | Stable JSON-RPC error code catalogue used by the server when surfacing routine failures (per JSON-RPC 2.0 § 5.1 + Graphorin extensions). Application-level errors use codes in the implementation-defined range (`-32000` … `-32099`). |
+| [RpcFailure](/api/@graphorin/protocol/server-message/variables/RpcFailure.md) | Zod schema behind [ServerRpcFailure](/api/@graphorin/protocol/server-message/type-aliases/ServerRpcFailure.md). |
+| [RpcSuccess](/api/@graphorin/protocol/server-message/variables/RpcSuccess.md) | Zod schema behind [ServerRpcSuccess](/api/@graphorin/protocol/server-message/type-aliases/ServerRpcSuccess.md). |
 | [ServerMessageSchema](/api/@graphorin/protocol/server-message/variables/ServerMessageSchema.md) | Zod schema for every legal server → client frame. Validation runs twice in the server pipeline: first when a route handler enqueues the frame onto the dispatcher's send queue (so a malformed frame never escapes the process), then again on the client side to defend against protocol drift. |
+| [SubscribedFrame](/api/@graphorin/protocol/server-message/variables/SubscribedFrame.md) | Zod schema behind [ServerSubscribedFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerSubscribedFrame.md). |
+| [UnsubscribedFrame](/api/@graphorin/protocol/server-message/variables/UnsubscribedFrame.md) | Zod schema behind [ServerUnsubscribedFrame](/api/@graphorin/protocol/server-message/type-aliases/ServerUnsubscribedFrame.md). |
 
 ## Functions
 
@@ -70,3 +79,9 @@ do not loosen `.strict()` for it piecemeal.
 | [isRpcSuccess](/api/@graphorin/protocol/server-message/functions/isRpcSuccess.md) | - |
 | [isSubscribedFrame](/api/@graphorin/protocol/server-message/functions/isSubscribedFrame.md) | - |
 | [isUnsubscribedFrame](/api/@graphorin/protocol/server-message/functions/isUnsubscribedFrame.md) | - |
+
+## References
+
+### RpcId
+
+Re-exports [RpcId](/api/@graphorin/protocol/client-message/variables/RpcId.md)

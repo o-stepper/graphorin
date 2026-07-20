@@ -23,13 +23,16 @@ export type {
   AgentSteeredEvent,
   ContextCompactedEvent,
   FanOutChildMetadata,
+  FileGeneratedEvent,
   GuardrailTrippedEvent,
   HandoffEvent,
   LateralLeakVector,
   ProgressArtifactRef,
   ReasoningDeltaEvent,
+  SourceCitedEvent,
   StepEndEvent,
   StepStartEvent,
+  SubagentEvent,
   TextCompleteEvent,
   TextDeltaEvent,
   ToolApprovalDeniedEvent,
@@ -51,6 +54,7 @@ export type {
   WireAgentEvent,
   WireContentChunk,
   WireFileGeneratedEvent,
+  WireSubagentEvent,
   WireToolExecutePartialEvent,
 } from './agent-event-wire.js';
 export { fromWireAgentEvent, toWireAgentEvent } from './agent-event-wire.js';
@@ -108,6 +112,7 @@ export {
 } from './proactive.js';
 export {
   flattenUsageByModel,
+  type PendingSubRun,
   type ReadonlyRunState,
   type RunContext,
   type RunError,

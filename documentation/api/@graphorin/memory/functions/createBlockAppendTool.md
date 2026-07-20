@@ -25,4 +25,4 @@ memory block.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockAppendInput`, `BlockAppendOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`BlockAppendInput`](/api/@graphorin/memory/tools/interfaces/BlockAppendInput.md), [`BlockAppendOutput`](/api/@graphorin/memory/tools/interfaces/BlockAppendOutput.md)\&gt;

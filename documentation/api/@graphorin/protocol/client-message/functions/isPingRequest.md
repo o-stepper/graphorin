@@ -10,7 +10,7 @@
 function isPingRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "ping"; params?: { nonce?: string }; v: "1" };
 ```
 
-Defined in: src/client-message.ts:191
+Defined in: src/client-message.ts:196
 
 **`Stable`**
 

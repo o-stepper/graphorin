@@ -293,6 +293,12 @@ Re-exports [splitFrontmatter](/api/@graphorin/security/functions/splitFrontmatte
 
 ***
 
+### SplitFrontmatter
+
+Re-exports [SplitFrontmatter](/api/@graphorin/security/interfaces/SplitFrontmatter.md)
+
+***
+
 ### SupplyChainAuditAction
 
 Re-exports [SupplyChainAuditAction](/api/@graphorin/security/type-aliases/SupplyChainAuditAction.md)
@@ -314,6 +320,12 @@ Re-exports [SupplyChainAuditDecision](/api/@graphorin/security/type-aliases/Supp
 ### SupplyChainAuditEvent
 
 Re-exports [SupplyChainAuditEvent](/api/@graphorin/security/interfaces/SupplyChainAuditEvent.md)
+
+***
+
+### SupplyChainAuditListener
+
+Re-exports [SupplyChainAuditListener](/api/@graphorin/security/type-aliases/SupplyChainAuditListener.md)
 
 ***
 

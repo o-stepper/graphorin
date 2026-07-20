@@ -25,6 +25,7 @@ export {
   type SupplyChainAuditActor,
   type SupplyChainAuditDecision,
   type SupplyChainAuditEvent,
+  type SupplyChainAuditListener,
 } from './audit-emitter.js';
 export {
   GraphorinSupplyChainError,
@@ -39,6 +40,7 @@ export {
   canonicalizeForSignature,
   extractSignatureBlock,
   parseFrontmatter,
+  type SplitFrontmatter,
   splitFrontmatter,
 } from './frontmatter.js';
 export {

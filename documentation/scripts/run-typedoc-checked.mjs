@@ -103,13 +103,20 @@ function runLinkScan() {
 function runWarningBudget() {
   const plain = output.replace(ANSI_RE, '');
   const summary = plain.match(/Found (\d+) errors? and (\d+) warnings?/);
+  let warnings;
   if (summary === null) {
-    console.warn(
-      '[run-typedoc-checked] WARN - no "Found N errors and M warnings" summary in the typedoc output; warning budget not evaluated.',
-    );
-    return;
+    // TypeDoc omits the summary line entirely on a fully clean run;
+    // treat that as zero ONLY when no [warning] lines exist either.
+    if (/\[warning\]/.test(plain)) {
+      console.warn(
+        '[run-typedoc-checked] WARN - [warning] lines present but no "Found N errors and M warnings" summary; warning budget not evaluated.',
+      );
+      return;
+    }
+    warnings = 0;
+  } else {
+    warnings = Number(summary[2]);
   }
-  const warnings = Number(summary[2]);
   const budgetPath = join(DOCS_DIR, 'typedoc-warning-budget.json');
   const { maxWarnings } = JSON.parse(readFileSync(budgetPath, 'utf8'));
   if (warnings > maxWarnings) {

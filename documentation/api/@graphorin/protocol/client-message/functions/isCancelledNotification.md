@@ -10,7 +10,7 @@
 function isCancelledNotification(message): message is { jsonrpc: "2.0"; method: "notifications/cancelled"; params: { requestId: string }; v: "1" };
 ```
 
-Defined in: src/client-message.ts:196
+Defined in: src/client-message.ts:201
 
 **`Stable`**
 

@@ -22,7 +22,7 @@ Configuration for [buildToolExecutionContext](/api/@graphorin/tools/functions/bu
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-logger"></a> `logger?` | `readonly` | [`Logger`](/api/@graphorin/core/interfaces/Logger.md) | - | packages/tools/src/executor/tool-context.ts:59 |
 | <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; | - | packages/tools/src/executor/tool-context.ts:55 |
-| <a id="property-secretresolver"></a> `secretResolver?` | `readonly` | `SecretResolverHook` | The secrets resolver injected by the agent runtime. | packages/tools/src/executor/tool-context.ts:61 |
+| <a id="property-secretresolver"></a> `secretResolver?` | `readonly` | [`SecretResolverHook`](/api/@graphorin/tools/interfaces/SecretResolverHook.md) | The secrets resolver injected by the agent runtime. | packages/tools/src/executor/tool-context.ts:61 |
 | <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | - | packages/tools/src/executor/tool-context.ts:56 |
 | <a id="property-streamingchannel"></a> `streamingChannel` | `readonly` | [`StreamingChannel`](/api/@graphorin/tools/interfaces/StreamingChannel.md) | - | packages/tools/src/executor/tool-context.ts:57 |
 | <a id="property-tool"></a> `tool` | `readonly` | [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`unknown`, `unknown`, `TDeps`\&gt; | - | packages/tools/src/executor/tool-context.ts:53 |

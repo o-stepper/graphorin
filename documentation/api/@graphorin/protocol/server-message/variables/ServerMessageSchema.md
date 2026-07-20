@@ -124,7 +124,7 @@ const ServerMessageSchema: ZodUnion<[ZodUnion<[ZodEffects<ZodObject<{
 }>]>]>;
 ```
 
-Defined in: src/server-message.ts:170
+Defined in: src/server-message.ts:219
 
 **`Stable`**
 

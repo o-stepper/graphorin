@@ -40,9 +40,21 @@ Re-exports [createOTLPHttpExporter](/api/@graphorin/observability/functions/crea
 
 ***
 
+### DateProvider
+
+Re-exports [DateProvider](/api/@graphorin/observability/type-aliases/DateProvider.md)
+
+***
+
 ### isValidatedExporter
 
 Re-exports [isValidatedExporter](/api/@graphorin/observability/functions/isValidatedExporter.md)
+
+***
+
+### JSONLExporter
+
+Re-exports [JSONLExporter](/api/@graphorin/observability/interfaces/JSONLExporter.md)
 
 ***
 

@@ -10,7 +10,7 @@
 function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unknown>[];
 ```
 
-Defined in: packages/memory/src/tools/index.ts:122
+Defined in: packages/memory/src/tools/index.ts:155
 
 **`Stable`**
 

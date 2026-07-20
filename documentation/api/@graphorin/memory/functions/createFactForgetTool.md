@@ -25,4 +25,4 @@ deleted at this layer).
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactForgetInput`, `FactForgetOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`FactForgetInput`](/api/@graphorin/memory/tools/interfaces/FactForgetInput.md), [`FactForgetOutput`](/api/@graphorin/memory/tools/interfaces/FactForgetOutput.md)\&gt;

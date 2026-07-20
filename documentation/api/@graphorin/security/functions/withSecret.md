@@ -13,7 +13,7 @@ function withSecret<T>(
 opts?): Promise<T>;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:195
+Defined in: packages/security/src/secrets/acl.ts:200
 
 **`Stable`**
 

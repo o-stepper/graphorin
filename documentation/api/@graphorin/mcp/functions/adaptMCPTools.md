@@ -29,4 +29,4 @@ Build the [Tool](/api/@graphorin/core/interfaces/Tool.md) array for the supplied
 
 ## Returns
 
-`AdaptedToolsResult`
+[`AdaptedToolsResult`](/api/@graphorin/mcp/interfaces/AdaptedToolsResult.md)

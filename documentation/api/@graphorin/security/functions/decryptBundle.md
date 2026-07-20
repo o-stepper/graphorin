@@ -13,7 +13,7 @@ function decryptBundle(bundle, passphrase): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:132
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:138
 
 **`Stable`**
 

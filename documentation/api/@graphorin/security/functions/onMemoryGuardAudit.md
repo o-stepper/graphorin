@@ -10,7 +10,7 @@
 function onMemoryGuardAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:95
+Defined in: packages/security/src/guard/audit-emitter.ts:100
 
 **`Stable`**
 
@@ -20,7 +20,7 @@ Subscribe to guard audit events. Returns an unsubscribe function.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `Listener` |
+| `listener` | [`MemoryGuardAuditListener`](/api/@graphorin/security/type-aliases/MemoryGuardAuditListener.md) |
 
 ## Returns
 

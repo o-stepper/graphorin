@@ -10,7 +10,7 @@
 function isUnsubscribedFrame(message): message is { kind: "unsubscribed"; subscriptionId: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:230
+Defined in: src/server-message.ts:279
 
 **`Stable`**
 

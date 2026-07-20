@@ -125,7 +125,7 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
 }>]>;
 ```
 
-Defined in: src/client-message.ts:130
+Defined in: src/client-message.ts:135
 
 **`Stable`**
 

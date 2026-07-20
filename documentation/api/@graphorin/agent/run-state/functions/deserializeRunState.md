@@ -10,7 +10,7 @@
 function deserializeRunState(payload, options?): RunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:273
+Defined in: packages/agent/src/run-state/index.ts:278
 
 **`Stable`**
 
@@ -29,7 +29,7 @@ and the field is synthesized from the aggregate `usage` with
 | Parameter | Type |
 | ------ | ------ |
 | `payload` | `unknown` |
-| `options` | `DeserializeOptions` |
+| `options` | [`DeserializeOptions`](/api/@graphorin/agent/run-state/interfaces/DeserializeOptions.md) |
 
 ## Returns
 

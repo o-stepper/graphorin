@@ -40,6 +40,12 @@ import { createRunbookSearchTool } from './runbook-tools.js';
 import type { MemoryToolDeps } from './types.js';
 
 export {
+  type BlockAppendInput,
+  type BlockAppendOutput,
+  type BlockReplaceInput,
+  type BlockReplaceOutput,
+  type BlockRethinkInput,
+  type BlockRethinkOutput,
   createBlockAppendTool,
   createBlockReplaceTool,
   createBlockRethinkTool,
@@ -51,13 +57,40 @@ export {
   createFactSearchTool,
   createFactSupersedeTool,
   createFactValidateTool,
+  type FactForgetInput,
+  type FactForgetOutput,
+  type FactHistoryEntry,
+  type FactHistoryInput,
+  type FactHistoryOutput,
+  type FactRememberInput,
+  type FactRememberOutput,
+  type FactSearchHit,
+  type FactSearchInput,
+  type FactSearchOutput,
+  type FactSupersedeInput,
+  type FactSupersedeOutput,
+  type FactValidateInput,
+  type FactValidateOutput,
 } from './fact-tools.js';
 export {
+  type ConversationSearchInput,
+  type ConversationSearchOutput,
   createConversationSearchTool,
   createDeepRecallTool,
   createRecallEpisodesTool,
+  type DeepRecallHit,
+  type DeepRecallInput,
+  type DeepRecallOutput,
+  type RecallEpisodeHit,
+  type RecallEpisodesInput,
+  type RecallEpisodesOutput,
 } from './recall-tools.js';
-export { createRunbookSearchTool } from './runbook-tools.js';
+export {
+  createRunbookSearchTool,
+  type RunbookProcedureHit,
+  type RunbookSearchInput,
+  type RunbookSearchOutput,
+} from './runbook-tools.js';
 export type { MemoryToolDeps, ScopeResolver } from './types.js';
 
 /**

@@ -31,8 +31,8 @@ Operators that need a sandbox-aware path inject their own writer via
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `DefaultSpillWriterOptions` |
+| `options` | [`DefaultSpillWriterOptions`](/api/@graphorin/tools/interfaces/DefaultSpillWriterOptions.md) |
 
 ## Returns
 
-`SpillWriter`
+[`SpillWriter`](/api/@graphorin/tools/interfaces/SpillWriter.md)

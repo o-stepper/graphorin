@@ -84,7 +84,7 @@ export function shouldArchive(args: {
 export const NEUTRAL_IMPORTANCE = 0.5;
 
 /**
- * Tunable weights for the multi-signal {@link salience} score.
+ * Tunable weights for the multi-signal `salience` score.
  * Each weight is the *magnitude* of the corresponding signal's pull on
  * the retention curve; all default to values chosen so the ordering is
  * sensible without ever inverting it.
@@ -117,7 +117,7 @@ export interface SalienceWeights {
    * signal. How strongly the monotonic access counter stretches
    * retention: the factor is
    * `1 + weight * min(1, log1p(count) / log1p(saturation))`, saturating
-   * at {@link ACCESS_REINFORCEMENT_SATURATION} accesses. At the default
+   * at `ACCESS_REINFORCEMENT_SATURATION` accesses. At the default
    * `0` the factor is exactly `1` - behaviour is byte-identical until an
    * operator opts in (e.g. `0.3` ⇒ a heavily-used fact keeps up to 1.3x
    * its retention). Optional so existing weight literals stay valid.

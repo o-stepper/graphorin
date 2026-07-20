@@ -31,6 +31,9 @@ export {
   type LlamaCppNativeCounterOptions,
 } from './counter.js';
 export type {
+  LlamaChatHistoryItem,
+  LlamaChatSessionCtor,
+  LlamaChatSessionPeer,
   LlamaCppNodeRuntimeOverrides,
   LlamaInstance,
   LlamaModelInstance,

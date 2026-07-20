@@ -6,7 +6,7 @@
 
 # Class: SecretValue
 
-Defined in: packages/security/src/secrets/secret-value.ts:146
+Defined in: packages/security/src/secrets/secret-value.ts:151
 
 **`Stable`**
 
@@ -40,12 +40,12 @@ constructed in Worker threads or `vm` contexts.
 
 | Property | Modifier | Type | Default value | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-secret_value_brand"></a> `[SECRET_VALUE_BRAND]` | `readonly` | `true` | `true` | Cross-realm brand. Implementations set this to `SECRET_VALUE_BRAND`. | packages/security/src/secrets/secret-value.ts:160 |
-| <a id="property-fetchedat"></a> `fetchedAt` | `readonly` | `number` | `undefined` | Epoch milliseconds at construction time. Safe to log. | packages/security/src/secrets/secret-value.ts:153 |
-| <a id="property-source"></a> `source?` | `readonly` | \{ `ref?`: `string`; `resolver?`: `string`; \} | `undefined` | Free-form provenance string carried for audit telemetry. | packages/security/src/secrets/secret-value.ts:151 |
-| `source.ref?` | `readonly` | `string` | `undefined` | - | packages/security/src/secrets/secret-value.ts:151 |
-| `source.resolver?` | `readonly` | `string` | `undefined` | - | packages/security/src/secrets/secret-value.ts:151 |
-| <a id="property-ttlms"></a> `ttlMs?` | `readonly` | `number` | `undefined` | Optional TTL in milliseconds. Carriers for resolver caching. | packages/security/src/secrets/secret-value.ts:155 |
+| <a id="property-secret_value_brand"></a> `[SECRET_VALUE_BRAND]` | `readonly` | `true` | `true` | Cross-realm brand. Implementations set this to `SECRET_VALUE_BRAND`. | packages/security/src/secrets/secret-value.ts:165 |
+| <a id="property-fetchedat"></a> `fetchedAt` | `readonly` | `number` | `undefined` | Epoch milliseconds at construction time. Safe to log. | packages/security/src/secrets/secret-value.ts:158 |
+| <a id="property-source"></a> `source?` | `readonly` | \{ `ref?`: `string`; `resolver?`: `string`; \} | `undefined` | Free-form provenance string carried for audit telemetry. | packages/security/src/secrets/secret-value.ts:156 |
+| `source.ref?` | `readonly` | `string` | `undefined` | - | packages/security/src/secrets/secret-value.ts:156 |
+| `source.resolver?` | `readonly` | `string` | `undefined` | - | packages/security/src/secrets/secret-value.ts:156 |
+| <a id="property-ttlms"></a> `ttlMs?` | `readonly` | `number` | `undefined` | Optional TTL in milliseconds. Carriers for resolver caching. | packages/security/src/secrets/secret-value.ts:160 |
 
 ## Accessors
 
@@ -57,7 +57,7 @@ constructed in Worker threads or `vm` contexts.
 get disposed(): boolean;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:236
+Defined in: packages/security/src/secrets/secret-value.ts:241
 
 Whether `dispose()` has been called.
 
@@ -75,7 +75,7 @@ Whether `dispose()` has been called.
 get length(): number;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:231
+Defined in: packages/security/src/secrets/secret-value.ts:236
 
 Length of the wrapped value in bytes. Safe to log.
 
@@ -97,7 +97,7 @@ Number of bytes in the wrapped value. Safe to log.
 NODEJS_INSPECT_CUSTOM: string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:378
+Defined in: packages/security/src/secrets/secret-value.ts:383
 
 **`Stable`**
 
@@ -121,7 +121,7 @@ a `SecretValue` is recognisable in REPL / structured output.
 toPrimitive: string | number;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:355
+Defined in: packages/security/src/secrets/secret-value.ts:360
 
 **`Stable`**
 
@@ -151,7 +151,7 @@ primary leakage barrier for template literals.
 dispose(): void;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:324
+Defined in: packages/security/src/secrets/secret-value.ts:329
 
 **`Stable`**
 
@@ -175,7 +175,7 @@ not affect derived V8 strings already created via `.use(fn)` /
 reveal(): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:290
+Defined in: packages/security/src/secrets/secret-value.ts:295
 
 **`Stable`**
 
@@ -198,7 +198,7 @@ Prefer `.use(fn)` whenever possible.
 toJSON(): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:367
+Defined in: packages/security/src/secrets/secret-value.ts:372
 
 **`Stable`**
 
@@ -222,7 +222,7 @@ logging never serializes the raw value.
 toString(): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:344
+Defined in: packages/security/src/secrets/secret-value.ts:349
 
 **`Stable`**
 
@@ -241,7 +241,7 @@ Defined in: packages/security/src/secrets/secret-value.ts:344
 unwrap(): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:313
+Defined in: packages/security/src/secrets/secret-value.ts:318
 
 **`Stable`**
 
@@ -265,7 +265,7 @@ Use `.reveal()` for the explicit one-shot read or
 use<T>(fn): Promise<T>;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:247
+Defined in: packages/security/src/secrets/secret-value.ts:252
 
 **`Stable`**
 
@@ -301,7 +301,7 @@ scopes the V8 string literal to a single call.
 useBuffer<T>(fn): Promise<T>;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:268
+Defined in: packages/security/src/secrets/secret-value.ts:273
 
 **`Stable`**
 
@@ -337,7 +337,7 @@ through a V8 string would defeat the wrapper's hygiene.
 static fromBuffer(buf, opts?): SecretValue;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:200
+Defined in: packages/security/src/secrets/secret-value.ts:205
 
 **`Stable`**
 
@@ -363,7 +363,7 @@ safely zero or reuse their input.
 static fromString(raw, opts?): SecretValue;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:190
+Defined in: packages/security/src/secrets/secret-value.ts:195
 
 **`Stable`**
 
@@ -391,7 +391,7 @@ leaked to a V8 string.
 static isSecretValue(value): value is SecretValue;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:211
+Defined in: packages/security/src/secrets/secret-value.ts:216
 
 **`Stable`**
 
@@ -417,7 +417,7 @@ object carrying `Symbol.for('graphorin.SecretValue')` set to `true`
 static timingSafeEquals(a, b): boolean;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:224
+Defined in: packages/security/src/secrets/secret-value.ts:229
 
 **`Stable`**
 

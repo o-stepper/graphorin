@@ -10,6 +10,6 @@
 type ServerLifecycleFrame = z.infer<typeof LifecycleFrame>;
 ```
 
-Defined in: src/server-message.ts:187
+Defined in: src/server-message.ts:236
 
 **`Stable`**

@@ -18,6 +18,7 @@ export type {
   WireImageContent,
   WireMessage,
   WireMessageContent,
+  WirePendingSubRun,
   WireRunState,
   WireRunStep,
   WireToolMessage,

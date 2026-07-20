@@ -10,7 +10,7 @@
 function _getOAuthAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/security/src/oauth/audit-emitter.ts:111
+Defined in: packages/security/src/oauth/audit-emitter.ts:116
 
 **`Experimental`**
 

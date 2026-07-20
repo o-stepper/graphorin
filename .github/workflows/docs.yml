@@ -139,6 +139,12 @@ jobs:
             exit 1
           fi
 
+      # The API reference once weighed 1.0 GB because the full symbol
+      # sidebar was SSR'd into every page; the budgets keep the dist,
+      # per-page HTML, and largest asset from silently regressing.
+      - name: Docs dist size budgets
+        run: node documentation/scripts/check-dist-budget.mjs
+
       # E10 (docs-14): --include-fragments makes lychee validate #anchors
       # against the target page's heading ids - without it seven broken
       # in-site anchors (VitePress slugifies '_' to '-') sailed through.

@@ -29,6 +29,11 @@ baseline [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) contract 
 `GraphMemoryStoreExt` exported from `@graphorin/memory`.
 Adapters without it simply have no relation graph.
 
+## Extended by
+
+- [`EntityWithEmbedding`](/api/@graphorin/memory/interfaces/EntityWithEmbedding.md)
+- [`SqliteEntityWithEmbedding`](/api/@graphorin/store-sqlite/interfaces/SqliteEntityWithEmbedding.md)
+
 ## Properties
 
 | Property | Modifier | Type | Description | Defined in |

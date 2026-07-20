@@ -27,4 +27,4 @@ did the user say before" / "how did this change". Read-only.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactHistoryInput`, `FactHistoryOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`FactHistoryInput`](/api/@graphorin/memory/tools/interfaces/FactHistoryInput.md), [`FactHistoryOutput`](/api/@graphorin/memory/tools/interfaces/FactHistoryOutput.md)\&gt;

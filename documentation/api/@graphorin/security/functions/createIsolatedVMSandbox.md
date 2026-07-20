@@ -10,7 +10,7 @@
 function createIsolatedVMSandbox(opts?): SandboxImpl;
 ```
 
-Defined in: packages/security/src/sandbox/isolated-vm.ts:97
+Defined in: packages/security/src/sandbox/isolated-vm.ts:118
 
 **`Stable`**
 

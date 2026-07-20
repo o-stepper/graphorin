@@ -22,7 +22,7 @@ backward-compatible TextContent mirror.
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | `AdaptCallResultArgs` |
+| `args` | [`AdaptCallResultArgs`](/api/@graphorin/mcp/interfaces/AdaptCallResultArgs.md) |
 
 ## Returns
 

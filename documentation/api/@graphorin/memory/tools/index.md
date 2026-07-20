@@ -25,7 +25,38 @@ the reviser mutates.
 
 | Interface | Description |
 | ------ | ------ |
+| [BlockAppendInput](/api/@graphorin/memory/tools/interfaces/BlockAppendInput.md) | Explicit interfaces instead of `z.infer<typeof schema>` - the inferred aliases baked concrete v3 zod object generics into the published d.ts, which do not typecheck under a zod@4 consumer. Interface&lt;-&gt;schema equality is pinned by type tests. |
+| [BlockAppendOutput](/api/@graphorin/memory/tools/interfaces/BlockAppendOutput.md) | - |
+| [BlockReplaceInput](/api/@graphorin/memory/tools/interfaces/BlockReplaceInput.md) | - |
+| [BlockReplaceOutput](/api/@graphorin/memory/tools/interfaces/BlockReplaceOutput.md) | - |
+| [BlockRethinkInput](/api/@graphorin/memory/tools/interfaces/BlockRethinkInput.md) | - |
+| [BlockRethinkOutput](/api/@graphorin/memory/tools/interfaces/BlockRethinkOutput.md) | - |
 | [BuildMemoryToolsOptions](/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md) | Options for [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md). |
+| [ConversationSearchInput](/api/@graphorin/memory/tools/interfaces/ConversationSearchInput.md) | - |
+| [ConversationSearchOutput](/api/@graphorin/memory/tools/interfaces/ConversationSearchOutput.md) | - |
+| [DeepRecallHit](/api/@graphorin/memory/tools/interfaces/DeepRecallHit.md) | - |
+| [DeepRecallInput](/api/@graphorin/memory/tools/interfaces/DeepRecallInput.md) | - |
+| [DeepRecallOutput](/api/@graphorin/memory/tools/interfaces/DeepRecallOutput.md) | - |
+| [FactForgetInput](/api/@graphorin/memory/tools/interfaces/FactForgetInput.md) | - |
+| [FactForgetOutput](/api/@graphorin/memory/tools/interfaces/FactForgetOutput.md) | - |
+| [FactHistoryEntry](/api/@graphorin/memory/tools/interfaces/FactHistoryEntry.md) | - |
+| [FactHistoryInput](/api/@graphorin/memory/tools/interfaces/FactHistoryInput.md) | - |
+| [FactHistoryOutput](/api/@graphorin/memory/tools/interfaces/FactHistoryOutput.md) | - |
+| [FactRememberInput](/api/@graphorin/memory/tools/interfaces/FactRememberInput.md) | Explicit interfaces instead of `z.infer<typeof schema>` - the inferred aliases baked concrete v3 zod object generics into the published d.ts, which do not typecheck under a zod@4 consumer. Interface&lt;-&gt;schema equality is pinned by type tests. Optionals carry `| undefined` to match zod's `.optional()` inference exactly. |
+| [FactRememberOutput](/api/@graphorin/memory/tools/interfaces/FactRememberOutput.md) | - |
+| [FactSearchHit](/api/@graphorin/memory/tools/interfaces/FactSearchHit.md) | - |
+| [FactSearchInput](/api/@graphorin/memory/tools/interfaces/FactSearchInput.md) | - |
+| [FactSearchOutput](/api/@graphorin/memory/tools/interfaces/FactSearchOutput.md) | - |
+| [FactSupersedeInput](/api/@graphorin/memory/tools/interfaces/FactSupersedeInput.md) | - |
+| [FactSupersedeOutput](/api/@graphorin/memory/tools/interfaces/FactSupersedeOutput.md) | - |
+| [FactValidateInput](/api/@graphorin/memory/tools/interfaces/FactValidateInput.md) | - |
+| [FactValidateOutput](/api/@graphorin/memory/tools/interfaces/FactValidateOutput.md) | - |
+| [RecallEpisodeHit](/api/@graphorin/memory/tools/interfaces/RecallEpisodeHit.md) | - |
+| [RecallEpisodesInput](/api/@graphorin/memory/tools/interfaces/RecallEpisodesInput.md) | Explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. |
+| [RecallEpisodesOutput](/api/@graphorin/memory/tools/interfaces/RecallEpisodesOutput.md) | - |
+| [RunbookProcedureHit](/api/@graphorin/memory/tools/interfaces/RunbookProcedureHit.md) | - |
+| [RunbookSearchInput](/api/@graphorin/memory/tools/interfaces/RunbookSearchInput.md) | Explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. |
+| [RunbookSearchOutput](/api/@graphorin/memory/tools/interfaces/RunbookSearchOutput.md) | - |
 
 ## Type Aliases
 

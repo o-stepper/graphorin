@@ -10,7 +10,7 @@
 function onSecretsAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:86
+Defined in: packages/security/src/secrets/audit-emitter.ts:91
 
 **`Stable`**
 
@@ -22,7 +22,7 @@ dedicated audit database.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `SecretsAuditListener` |
+| `listener` | [`SecretsAuditListener`](/api/@graphorin/security/type-aliases/SecretsAuditListener.md) |
 
 ## Returns
 

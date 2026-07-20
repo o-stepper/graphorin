@@ -20,10 +20,13 @@ export {
   type ResultReadRange,
   SPILL_HANDLE_SCHEME,
 } from './reader.js';
-export { createDefaultSpillWriter } from './spill.js';
+export { createDefaultSpillWriter, type DefaultSpillWriterOptions } from './spill.js';
 export {
   countTokensHeuristic,
+  type ResultSummarizer,
+  type SpillWriter,
   type TokenCounter,
+  type TruncateOptions,
   type TruncationOutcome,
   truncateBody,
 } from './truncate.js';

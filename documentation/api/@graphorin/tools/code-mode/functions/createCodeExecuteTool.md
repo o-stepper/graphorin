@@ -26,4 +26,4 @@ value rendered as a string, so the executor's `maxResultTokens` /
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`CodeExecuteInput`, `string`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`CodeExecuteInput`](/api/@graphorin/tools/code-mode/interfaces/CodeExecuteInput.md), `string`\&gt;

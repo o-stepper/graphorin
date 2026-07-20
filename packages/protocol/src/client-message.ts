@@ -15,7 +15,12 @@
 
 import { z } from 'zod';
 
-const RpcId = z.union([z.string().min(1), z.number().int()]);
+/**
+ * Zod schema for RPC correlation ids (non-empty string or integer).
+ *
+ * @stable
+ */
+export const RpcId = z.union([z.string().min(1), z.number().int()]);
 
 const InitializeParams = z
   .object({

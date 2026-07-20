@@ -10,7 +10,7 @@
 function _resetSecretValueAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:73
+Defined in: packages/security/src/secrets/secret-value.ts:78
 
 **`Experimental`**
 

@@ -55,3 +55,9 @@ Re-exports [registerMigration](/api/@graphorin/store-sqlite/functions/registerMi
 ### runMigrations
 
 Re-exports [runMigrations](/api/@graphorin/store-sqlite/functions/runMigrations.md)
+
+***
+
+### RunMigrationsOptions
+
+Re-exports [RunMigrationsOptions](/api/@graphorin/store-sqlite/interfaces/RunMigrationsOptions.md)

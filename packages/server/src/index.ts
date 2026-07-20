@@ -105,8 +105,14 @@ export {
   type SecretsCheck,
   type StorageCheck,
   type TriggersCheck,
+  type WorkflowTimersCheck,
 } from './health/index.js';
-export type { RequestToken, ServerRequestState, ServerVariables } from './internal/context.js';
+export type {
+  AuthState,
+  RequestToken,
+  ServerRequestState,
+  ServerVariables,
+} from './internal/context.js';
 export {
   type BeforeShutdownContext,
   type BeforeStartContext,
@@ -197,12 +203,16 @@ export {
   scheduleRetentionSweeps,
 } from './runtime/retention.js';
 export {
+  type RunActivityEvent,
   type RunDescriptor,
   type RunHandle,
+  type RunKind,
   type RunStateSnapshot,
   RunStateTracker,
   type RunStatus,
   type SuspendedRunPersistenceHooks,
+  type TerminalRunInfo,
+  type TerminalRunStatus,
 } from './runtime/run-state.js';
 export {
   createSuspendedRunPersistence,

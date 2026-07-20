@@ -116,8 +116,13 @@ export interface ToolAuditEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type Listener = (event: ToolAuditEvent) => void;
-const listeners = new Set<Listener>();
+/**
+ * Callback shape accepted by {@link onToolAudit}.
+ *
+ * @stable
+ */
+export type ToolAuditListener = (event: ToolAuditEvent) => void;
+const listeners = new Set<ToolAuditListener>();
 
 /**
  * Subscribe to tool-subsystem audit events. Returns a teardown
@@ -126,7 +131,7 @@ const listeners = new Set<Listener>();
  *
  * @stable
  */
-export function onToolAudit(listener: Listener): () => void {
+export function onToolAudit(listener: ToolAuditListener): () => void {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);

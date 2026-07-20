@@ -141,7 +141,12 @@ export interface WithSecretAuditEvent {
   readonly ts: number;
 }
 
-type WithSecretListener = (event: WithSecretAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onWithSecretAudit}.
+ *
+ * @stable
+ */
+export type WithSecretListener = (event: WithSecretAuditEvent) => void;
 
 const withSecretListeners = new Set<WithSecretListener>();
 

@@ -17,8 +17,10 @@
 
 export {
   type CodeExecuteBridge,
+  type CodeExecuteInput,
   type CodeExecuteLimits,
   type CodeExecuteToolOptions,
+  type CodeSearchInput,
   type CodeSearchMatch,
   type CodeSearchToolOptions,
   createCodeExecuteTool,

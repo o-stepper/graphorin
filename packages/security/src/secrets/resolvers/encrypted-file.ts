@@ -49,7 +49,13 @@ export const ARGON2ID_PARAMS = Object.freeze({
   parallelism: 1, // p=1
 });
 
-type Argon2idFn = (
+/**
+ * Signature of the argon2id KDF the encrypted-file resolver calls -
+ * swappable via `_setArgon2idForTesting`.
+ *
+ * @stable
+ */
+export type Argon2idFn = (
   password: Buffer | string,
   options: {
     salt: Buffer;

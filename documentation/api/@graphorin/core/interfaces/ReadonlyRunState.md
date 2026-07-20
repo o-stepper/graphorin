@@ -32,7 +32,7 @@ the nested types are already readonly-typed, and keyof-parity with
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/core/src/types/run.ts:197 |
 | <a id="property-messages"></a> `messages` | `readonly` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - | packages/core/src/types/run.ts:204 |
 | <a id="property-pendingapprovals"></a> `pendingApprovals` | `readonly` | readonly [`ToolApproval`](/api/@graphorin/core/interfaces/ToolApproval.md)[] | - | packages/core/src/types/run.ts:205 |
-| <a id="property-pendingsubruns"></a> `pendingSubRuns?` | `readonly` | readonly `PendingSubRun`[] | See [RunState.pendingSubRuns](/api/@graphorin/core/interfaces/RunState.md#property-pendingsubruns). | packages/core/src/types/run.ts:219 |
+| <a id="property-pendingsubruns"></a> `pendingSubRuns?` | `readonly` | readonly [`PendingSubRun`](/api/@graphorin/core/interfaces/PendingSubRun.md)[] | See [RunState.pendingSubRuns](/api/@graphorin/core/interfaces/RunState.md#property-pendingsubruns). | packages/core/src/types/run.ts:219 |
 | <a id="property-promotedtools"></a> `promotedTools?` | `readonly` | readonly `string`[] | See [RunState.promotedTools](/api/@graphorin/core/interfaces/RunState.md#property-promotedtools). | packages/core/src/types/run.ts:213 |
 | <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | - | packages/core/src/types/run.ts:200 |
 | <a id="property-startedat"></a> `startedAt` | `readonly` | `string` | - | packages/core/src/types/run.ts:220 |

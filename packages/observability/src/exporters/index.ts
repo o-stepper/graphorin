@@ -16,6 +16,8 @@ export {
 } from './console.js';
 export {
   createJSONLExporter,
+  type DateProvider,
+  type JSONLExporter,
   type JSONLExporterOptions,
 } from './jsonl.js';
 export {

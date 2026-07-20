@@ -32,5 +32,5 @@ walk them.
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
 | `messages` | readonly [`WireMessage`](/api/@graphorin/core/type-aliases/WireMessage.md)[] | packages/core/src/utils/binary-json.ts:154 |
-| `pendingSubRuns?` | readonly `WirePendingSubRun`[] | packages/core/src/utils/binary-json.ts:156 |
+| `pendingSubRuns?` | readonly [`WirePendingSubRun`](/api/@graphorin/core/type-aliases/WirePendingSubRun.md)[] | packages/core/src/utils/binary-json.ts:156 |
 | `steps` | readonly [`WireRunStep`](/api/@graphorin/core/type-aliases/WireRunStep.md)[] | packages/core/src/utils/binary-json.ts:155 |

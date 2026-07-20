@@ -25,7 +25,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:849 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:848 |
-| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:885 |
+| <a id="property-progress"></a> `progress` | `readonly` | [`AgentProgressIO`](/api/@graphorin/agent/interfaces/AgentProgressIO.md) | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:885 |
 | <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:893 |
 
 ## Methods
@@ -120,7 +120,7 @@ strategy decides whether to propagate).
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `AgentFanOutOptions`\&lt;`TFanOutOutput`\&gt; |
+| `options` | [`AgentFanOutOptions`](/api/@graphorin/agent/interfaces/AgentFanOutOptions.md)\&lt;`TFanOutOutput`\&gt; |
 
 #### Returns
 

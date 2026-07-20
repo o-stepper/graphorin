@@ -43,9 +43,14 @@ export type SecretValueAuditEvent = {
   readonly ts: number;
 };
 
-type AuditListener = (event: SecretValueAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onSecretValueAudit}.
+ *
+ * @stable
+ */
+export type SecretValueAuditListener = (event: SecretValueAuditEvent) => void;
 
-const auditListeners = new Set<AuditListener>();
+const auditListeners = new Set<SecretValueAuditListener>();
 
 /**
  * Subscribe to `SecretValue` lifecycle events (construct / reveal / use /
@@ -57,7 +62,7 @@ const auditListeners = new Set<AuditListener>();
  *
  * @stable
  */
-export function onSecretValueAudit(listener: AuditListener): () => void {
+export function onSecretValueAudit(listener: SecretValueAuditListener): () => void {
   auditListeners.add(listener);
   return () => {
     auditListeners.delete(listener);

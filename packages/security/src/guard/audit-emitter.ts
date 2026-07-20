@@ -83,16 +83,21 @@ export interface MemoryGuardAuditEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type Listener = (event: MemoryGuardAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onMemoryGuardAudit}.
+ *
+ * @stable
+ */
+export type MemoryGuardAuditListener = (event: MemoryGuardAuditEvent) => void;
 
-const listeners = new Set<Listener>();
+const listeners = new Set<MemoryGuardAuditListener>();
 
 /**
  * Subscribe to guard audit events. Returns an unsubscribe function.
  *
  * @stable
  */
-export function onMemoryGuardAudit(listener: Listener): () => void {
+export function onMemoryGuardAudit(listener: MemoryGuardAuditListener): () => void {
   listeners.add(listener);
   return () => {
     listeners.delete(listener);

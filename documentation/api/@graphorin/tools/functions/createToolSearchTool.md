@@ -24,4 +24,4 @@ Build a `tool_search` tool bound to a specific registry.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ToolSearchInput`, `ToolSearchOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`ToolSearchInput`](/api/@graphorin/tools/interfaces/ToolSearchInput.md), [`ToolSearchOutput`](/api/@graphorin/tools/interfaces/ToolSearchOutput.md)\&gt;

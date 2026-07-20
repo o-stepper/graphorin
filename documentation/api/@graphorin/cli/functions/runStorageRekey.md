@@ -22,4 +22,4 @@ Defined in: packages/cli/src/commands/storage.ts:415
 
 ## Returns
 
-`Promise`\&lt;`StorageRekeyResult`\&gt;
+`Promise`\&lt;[`StorageRekeyResult`](/api/@graphorin/cli/interfaces/StorageRekeyResult.md)\&gt;

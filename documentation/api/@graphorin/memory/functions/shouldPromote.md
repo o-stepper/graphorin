@@ -25,7 +25,7 @@ The pure verdict: does this candidate clear every threshold at
 | Parameter | Type |
 | ------ | ------ |
 | `candidate` | [`PromotionCandidate`](/api/@graphorin/memory/interfaces/PromotionCandidate.md) |
-| `policy` | `ResolvedPromotionPolicy` |
+| `policy` | [`ResolvedPromotionPolicy`](/api/@graphorin/memory/interfaces/ResolvedPromotionPolicy.md) |
 | `nowMs` | `number` |
 
 ## Returns

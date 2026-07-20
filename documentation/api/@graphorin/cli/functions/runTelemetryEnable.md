@@ -18,7 +18,7 @@ Defined in: packages/cli/src/commands/telemetry.ts:60
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `CommonOutputOptions` |
+| `options` | [`CommonOutputOptions`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md) |
 
 ## Returns
 

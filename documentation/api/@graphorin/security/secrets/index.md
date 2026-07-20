@@ -80,6 +80,12 @@ Re-exports [areBuiltinsInstalled](/api/@graphorin/security/functions/areBuiltins
 
 ***
 
+### Argon2idFn
+
+Re-exports [Argon2idFn](/api/@graphorin/security/type-aliases/Argon2idFn.md)
+
+***
+
 ### assertNotNakedString
 
 Re-exports [assertNotNakedString](/api/@graphorin/security/functions/assertNotNakedString.md)
@@ -269,6 +275,12 @@ Re-exports [isLiteralAllowed](/api/@graphorin/security/functions/isLiteralAllowe
 ### KEYRING\_DEFAULT\_SERVICE
 
 Re-exports [KEYRING_DEFAULT_SERVICE](/api/@graphorin/security/variables/KEYRING_DEFAULT_SERVICE.md)
+
+***
+
+### KeyringEntryCtor
+
+Re-exports [KeyringEntryCtor](/api/@graphorin/security/type-aliases/KeyringEntryCtor.md)
 
 ***
 
@@ -470,6 +482,12 @@ Re-exports [SecretsAuditEvent](/api/@graphorin/security/interfaces/SecretsAuditE
 
 ***
 
+### SecretsAuditListener
+
+Re-exports [SecretsAuditListener](/api/@graphorin/security/type-aliases/SecretsAuditListener.md)
+
+***
+
 ### SecretsStoreKind
 
 Re-exports [SecretsStoreKind](/api/@graphorin/security/type-aliases/SecretsStoreKind.md)
@@ -491,6 +509,12 @@ Re-exports [SecretValue](/api/@graphorin/security/classes/SecretValue.md)
 ### SecretValueAuditEvent
 
 Re-exports [SecretValueAuditEvent](/api/@graphorin/security/type-aliases/SecretValueAuditEvent.md)
+
+***
+
+### SecretValueAuditListener
+
+Re-exports [SecretValueAuditListener](/api/@graphorin/security/type-aliases/SecretValueAuditListener.md)
 
 ***
 
@@ -575,6 +599,12 @@ Re-exports [withSecret](/api/@graphorin/security/functions/withSecret.md)
 ### WithSecretAuditEvent
 
 Re-exports [WithSecretAuditEvent](/api/@graphorin/security/interfaces/WithSecretAuditEvent.md)
+
+***
+
+### WithSecretListener
+
+Re-exports [WithSecretListener](/api/@graphorin/security/type-aliases/WithSecretListener.md)
 
 ***
 

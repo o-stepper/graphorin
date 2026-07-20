@@ -14,5 +14,7 @@ export {
   looksLikeJsonSchema,
   type ProjectSchemaOptions,
   projectSchemaToJsonSchema,
+  type ZodV3Like,
+  type ZodV4Like,
   zodToJsonSchema,
 } from './to-json-schema.js';

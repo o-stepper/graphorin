@@ -76,7 +76,7 @@ it keep the legacy render-prompt path.
 
 | Parameter | Type |
 | ------ | ------ |
-| `history` | readonly `LlamaChatHistoryItem`[] |
+| `history` | readonly [`LlamaChatHistoryItem`](/api/@graphorin/provider-llamacpp-node/type-aliases/LlamaChatHistoryItem.md)[] |
 
 #### Returns
 

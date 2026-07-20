@@ -24,8 +24,10 @@ projection. The agent runtime wires them behind the opt-in
 | Interface | Description |
 | ------ | ------ |
 | [CodeApiProjection](/api/@graphorin/tools/code-mode/interfaces/CodeApiProjection.md) | The projected code API for a set of tools. |
+| [CodeExecuteInput](/api/@graphorin/tools/code-mode/interfaces/CodeExecuteInput.md) | Explicit interface - no concrete zod generics in the d.ts. |
 | [CodeExecuteLimits](/api/@graphorin/tools/code-mode/interfaces/CodeExecuteLimits.md) | Tunable sandbox limits for [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md). |
 | [CodeExecuteToolOptions](/api/@graphorin/tools/code-mode/interfaces/CodeExecuteToolOptions.md) | Configuration for [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md). |
+| [CodeSearchInput](/api/@graphorin/tools/code-mode/interfaces/CodeSearchInput.md) | Explicit interface - no concrete zod generics in the d.ts. |
 | [CodeSearchMatch](/api/@graphorin/tools/code-mode/interfaces/CodeSearchMatch.md) | A tool-search match `code_search` can fold in (deferred pool). |
 | [CodeSearchToolOptions](/api/@graphorin/tools/code-mode/interfaces/CodeSearchToolOptions.md) | Configuration for [createCodeSearchTool](/api/@graphorin/tools/code-mode/functions/createCodeSearchTool.md). |
 | [ProjectableTool](/api/@graphorin/tools/code-mode/interfaces/ProjectableTool.md) | Structural view of a tool this module can project. |

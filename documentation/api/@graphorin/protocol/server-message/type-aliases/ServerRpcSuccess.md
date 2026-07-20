@@ -10,6 +10,6 @@
 type ServerRpcSuccess = z.infer<typeof RpcSuccess>;
 ```
 
-Defined in: src/server-message.ts:199
+Defined in: src/server-message.ts:248
 
 **`Stable`**

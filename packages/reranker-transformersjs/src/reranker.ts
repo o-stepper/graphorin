@@ -284,7 +284,12 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
   }
 }
 
-interface MergedEntry<TRecord extends MemoryRecord> {
+/**
+ * One merged row returned by {@link mergeAndDedupe}.
+ *
+ * @stable
+ */
+export interface MergedEntry<TRecord extends MemoryRecord> {
   readonly hit: MemoryHit<TRecord>;
   readonly firstSeenOrder: number;
 }

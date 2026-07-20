@@ -1,4 +1,4 @@
 {
-  "$comment": "Ratchet for TypeDoc conversion warnings (referenced-but-not-included types etc.). The build fails when the count EXCEEDS maxWarnings; when a change lowers the count, lower maxWarnings in the same PR so the improvement can never regress. Target: 0.",
-  "maxWarnings": 115
+  "$comment": "Ratchet for TypeDoc conversion warnings (referenced-but-not-included types etc.). The build fails when the count EXCEEDS maxWarnings; when a change lowers the count, lower maxWarnings in the same PR so the improvement can never regress. Reached 0 on 2026-07-20 (115 cleared) - keep it there: every type referenced by a public API must be exported from a documented barrel.",
+  "maxWarnings": 0
 }

@@ -44,8 +44,8 @@ Defined in: packages/store-sqlite/src/memory-store.ts:211
 | <a id="property-conflicts"></a> `conflicts` | `readonly` | [`SqliteConflictStore`](/api/@graphorin/store-sqlite/classes/SqliteConflictStore.md) | - | packages/store-sqlite/src/memory-store.ts:204 |
 | <a id="property-consolidator"></a> `consolidator` | `readonly` | [`SqliteConsolidatorStateStore`](/api/@graphorin/store-sqlite/classes/SqliteConsolidatorStateStore.md) | - | packages/store-sqlite/src/memory-store.ts:205 |
 | <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:200 |
-| <a id="property-graph"></a> `graph` | `readonly` | `SqliteGraphStore` | Lightweight relation-graph surface: entities + one-hop CTE. | packages/store-sqlite/src/memory-store.ts:209 |
-| <a id="property-insights"></a> `insights` | `readonly` | `SqliteInsightStore` | Reflection insight surface. FTS-only; no per-embedder vec0 table. | packages/store-sqlite/src/memory-store.ts:207 |
+| <a id="property-graph"></a> `graph` | `readonly` | [`SqliteGraphStore`](/api/@graphorin/store-sqlite/classes/SqliteGraphStore.md) | Lightweight relation-graph surface: entities + one-hop CTE. | packages/store-sqlite/src/memory-store.ts:209 |
+| <a id="property-insights"></a> `insights` | `readonly` | [`SqliteInsightStore`](/api/@graphorin/store-sqlite/classes/SqliteInsightStore.md) | Reflection insight surface. FTS-only; no per-embedder vec0 table. | packages/store-sqlite/src/memory-store.ts:207 |
 | <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:202 |
 | <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:201 |
 | <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:199 |

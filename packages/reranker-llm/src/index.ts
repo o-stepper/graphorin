@@ -36,6 +36,7 @@ export {
   createLlmReranker,
   LlmReRanker,
   type LlmRerankerOptions,
+  type MergedEntry,
   mergeAndDedupe,
   normalizeScore,
   parseIntegerResponse,

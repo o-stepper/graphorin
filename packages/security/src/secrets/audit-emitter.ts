@@ -72,7 +72,12 @@ export interface SecretsAuditEvent {
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
-type SecretsAuditListener = (event: SecretsAuditEvent) => void;
+/**
+ * Callback shape accepted by {@link onSecretsAudit}.
+ *
+ * @stable
+ */
+export type SecretsAuditListener = (event: SecretsAuditEvent) => void;
 
 const listeners = new Set<SecretsAuditListener>();
 

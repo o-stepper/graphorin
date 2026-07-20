@@ -10,7 +10,7 @@
 function onSupplyChainAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:67
+Defined in: packages/security/src/supply-chain/audit-emitter.ts:72
 
 **`Stable`**
 
@@ -21,7 +21,7 @@ registers exactly one listener.
 
 | Parameter | Type |
 | ------ | ------ |
-| `listener` | `SupplyChainAuditListener` |
+| `listener` | [`SupplyChainAuditListener`](/api/@graphorin/security/type-aliases/SupplyChainAuditListener.md) |
 
 ## Returns
 

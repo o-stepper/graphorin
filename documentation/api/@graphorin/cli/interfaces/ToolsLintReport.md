@@ -25,4 +25,4 @@ mirror the ESLint LSP convention).
 | `summary.threshold` | `readonly` | `number` | packages/cli/src/commands/tools-lint.ts:121 |
 | `summary.totalFindings` | `readonly` | `number` | packages/cli/src/commands/tools-lint.ts:120 |
 | `summary.totalTools` | `readonly` | `number` | packages/cli/src/commands/tools-lint.ts:119 |
-| <a id="property-tools"></a> `tools` | `readonly` | readonly `ToolsLintReportTool`[] | packages/cli/src/commands/tools-lint.ts:125 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly [`ToolsLintReportTool`](/api/@graphorin/cli/interfaces/ToolsLintReportTool.md)[] | packages/cli/src/commands/tools-lint.ts:125 |

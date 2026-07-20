@@ -239,7 +239,12 @@ export function runStateToJSON(state: RunState, options?: SerializeRunStateOptio
   return JSON.stringify(serializeRunState(state, options));
 }
 
-interface DeserializeOptions {
+/**
+ * Options accepted by {@link deserializeRunState} / {@link runStateFromJSON}.
+ *
+ * @stable
+ */
+export interface DeserializeOptions {
   /**
    * Synthesize `usageByModel` from a v0.1-alpha state that omits
    * the field. Defaults to `true` so callers can rehydrate older

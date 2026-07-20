@@ -10,7 +10,7 @@
 type ClientMessage = z.infer<typeof ClientMessageSchema>;
 ```
 
-Defined in: src/client-message.ts:146
+Defined in: src/client-message.ts:151
 
 **`Stable`**
 

@@ -31,6 +31,12 @@ Re-exports [createFileResultReader](/api/@graphorin/tools/functions/createFileRe
 
 ***
 
+### DefaultSpillWriterOptions
+
+Re-exports [DefaultSpillWriterOptions](/api/@graphorin/tools/interfaces/DefaultSpillWriterOptions.md)
+
+***
+
 ### FileResultReaderOptions
 
 Re-exports [FileResultReaderOptions](/api/@graphorin/tools/interfaces/FileResultReaderOptions.md)
@@ -61,9 +67,21 @@ Re-exports [ResultReadRange](/api/@graphorin/tools/interfaces/ResultReadRange.md
 
 ***
 
+### ResultSummarizer
+
+Re-exports [ResultSummarizer](/api/@graphorin/tools/interfaces/ResultSummarizer.md)
+
+***
+
 ### SPILL\_HANDLE\_SCHEME
 
 Re-exports [SPILL_HANDLE_SCHEME](/api/@graphorin/tools/variables/SPILL_HANDLE_SCHEME.md)
+
+***
+
+### SpillWriter
+
+Re-exports [SpillWriter](/api/@graphorin/tools/interfaces/SpillWriter.md)
 
 ***
 
@@ -88,6 +106,12 @@ Re-exports [toResultEnvelope](/api/@graphorin/tools/functions/toResultEnvelope.m
 ### truncateBody
 
 Re-exports [truncateBody](/api/@graphorin/tools/functions/truncateBody.md)
+
+***
+
+### TruncateOptions
+
+Re-exports [TruncateOptions](/api/@graphorin/tools/interfaces/TruncateOptions.md)
 
 ***
 

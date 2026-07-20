@@ -28,24 +28,45 @@ import type {
  * the adapter. Declared inline so `@graphorin/security` does not
  * require type definitions for the optional peer at compile time.
  */
-interface IsolatedVMPeerModule {
+/**
+ * Structural view of the `isolated-vm` module returned by
+ * `IsolatedVMSandboxOptions.peerLoader`.
+ *
+ * @stable
+ */
+export interface IsolatedVMPeerModule {
   readonly Isolate: {
     new (opts: { memoryLimit?: number }): IsolatedVMIsolate;
   };
 }
 
-interface IsolatedVMIsolate {
+/**
+ * Structural view of an `isolated-vm` Isolate instance.
+ *
+ * @stable
+ */
+export interface IsolatedVMIsolate {
   readonly createContext: () => Promise<IsolatedVMContext>;
   readonly compileScript: (source: string) => Promise<IsolatedVMScript>;
   readonly dispose: () => void;
 }
 
-interface IsolatedVMContext {
+/**
+ * Structural view of an `isolated-vm` execution context.
+ *
+ * @stable
+ */
+export interface IsolatedVMContext {
   readonly global: { readonly setSync: (name: string, value: unknown) => void };
   readonly release: () => void;
 }
 
-interface IsolatedVMScript {
+/**
+ * Structural view of an `isolated-vm` compiled script.
+ *
+ * @stable
+ */
+export interface IsolatedVMScript {
   readonly run: (
     context: IsolatedVMContext,
     opts?: { readonly timeout?: number; readonly promise?: boolean; readonly copy?: boolean },

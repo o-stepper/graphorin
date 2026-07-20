@@ -10,7 +10,7 @@
 function createRegisteredEvent(opts): ToolAuditEvent;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:180
+Defined in: packages/tools/src/audit/index.ts:185
 
 **`Stable`**
 

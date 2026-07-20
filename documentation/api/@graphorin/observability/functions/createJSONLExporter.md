@@ -25,4 +25,4 @@ passing the result to `createTracer({ exporters })`.
 
 ## Returns
 
-`JSONLExporter`
+[`JSONLExporter`](/api/@graphorin/observability/interfaces/JSONLExporter.md)

@@ -24,4 +24,4 @@ Defined in: packages/memory/src/tools/block-tools.ts:152
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockRethinkInput`, `BlockRethinkOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;[`BlockRethinkInput`](/api/@graphorin/memory/tools/interfaces/BlockRethinkInput.md), [`BlockRethinkOutput`](/api/@graphorin/memory/tools/interfaces/BlockRethinkOutput.md)\&gt;

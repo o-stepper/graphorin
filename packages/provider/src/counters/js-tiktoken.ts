@@ -18,7 +18,12 @@ import { serialiseMessageForCount, serializedToString } from './serialize.js';
  *
  * @internal
  */
-interface TiktokenEncoding {
+/**
+ * Structural view of a `js-tiktoken` encoding instance.
+ *
+ * @stable
+ */
+export interface TiktokenEncoding {
   readonly name?: string;
   encode(
     text: string,
@@ -39,7 +44,13 @@ function encodeCount(enc: TiktokenEncoding, text: string): number {
   return enc.encode(text, [], []).length;
 }
 
-interface TiktokenModule {
+/**
+ * Structural view of the `js-tiktoken` module accepted by
+ * `JsTiktokenCounterOptions.moduleOverride`.
+ *
+ * @stable
+ */
+export interface TiktokenModule {
   getEncoding(name: string): TiktokenEncoding;
   encodingForModel?: (model: string) => TiktokenEncoding;
 }

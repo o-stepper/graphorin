@@ -27,7 +27,7 @@ origin. Quarantine wins when both apply (same branch order as
 | `record` | \{ `provenance?`: `string` \| `null`; `status?`: `string`; \} | `undefined` |
 | `record.provenance?` | `string` \| `null` | `undefined` |
 | `record.status?` | `string` | `undefined` |
-| `weights` | `SalienceWeights` | `DEFAULT_SALIENCE_WEIGHTS` |
+| `weights` | [`SalienceWeights`](/api/@graphorin/memory/interfaces/SalienceWeights.md) | `DEFAULT_SALIENCE_WEIGHTS` |
 
 ## Returns
 

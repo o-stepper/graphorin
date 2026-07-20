@@ -10,7 +10,7 @@
 function createSqliteStore(options): Promise<GraphorinSqliteStore>;
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:254
+Defined in: packages/store-sqlite/src/index.ts:265
 
 **`Stable`**
 

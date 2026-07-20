@@ -69,7 +69,7 @@ export interface ToolSearchInput {
   query: string;
   k?: number | undefined;
 }
-export interface ToolSearchMatch {
+export interface ToolSearchToolMatch {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
@@ -77,7 +77,7 @@ export interface ToolSearchMatch {
   source: 'semantic' | 'bm25' | 'regex-name';
 }
 export interface ToolSearchOutput {
-  matches: ToolSearchMatch[];
+  matches: ToolSearchToolMatch[];
 }
 
 // W-013 parity gate (compile-time only, erased from the build and the

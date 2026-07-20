@@ -10,7 +10,7 @@
 function _resetOAuthLifecycleListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/oauth/events.ts:75
+Defined in: packages/security/src/oauth/events.ts:80
 
 **`Experimental`**
 

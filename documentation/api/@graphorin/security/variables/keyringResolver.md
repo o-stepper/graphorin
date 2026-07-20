@@ -10,7 +10,7 @@
 const keyringResolver: SecretResolver;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/keyring.ts:85
+Defined in: packages/security/src/secrets/resolvers/keyring.ts:91
 
 **`Stable`**
 
