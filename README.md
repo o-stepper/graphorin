@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.4](https://img.shields.io/badge/version-v0.13.4-blue.svg)](./CHANGELOG.md)
+[![Version: 0.13.5](https://img.shields.io/badge/version-v0.13.5-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.4`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.13.5`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.4** (2026-07-20) - the grammar-safe redaction patch, closing the sixth external deep retest: masking a bare numeric JSON leaf now emits a quoted mask across all three redaction layers (`withRedaction`, the OTLP validator, the `piiDetection` guardrail), so `{"card":4111111111111111}` becomes `{"card":"[REDACTED creditcard]"}` and the document still parses; pricing provenance gained an `upstreamSources` chain, and perf-latency canaries no longer flake under coverage instrumentation. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-3-0-13-4) for upgrade notes.
+Latest release: **0.13.5** (2026-07-20) - the compose-and-completeness patch: `graphorin start` can now serve the full domain surface via the new `app` config field (`graphorin init --app` scaffolds a working compose module wiring sessions + memory over your configured storage), and about 130 types referenced by public APIs became importable across 17 packages, clearing every TypeDoc completeness warning. The docs artifact also slimmed from 1.1 GB to 150 MB. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-4-0-13-5) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.4 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.13.5 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

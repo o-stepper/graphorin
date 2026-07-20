@@ -37,7 +37,7 @@ pnpm --filter ./examples/three-agent-harness dev
 Expected output (artifact root defaults to `./.graphorin/three-agent-harness`):
 
 ```
-graphorin v0.13.4 three-agent-harness - recipe='stub', runId='harness_..._...', termination='pass', iterations=1, finalScore=9.
+graphorin v0.13.5 three-agent-harness - recipe='stub', runId='harness_..._...', termination='pass', iterations=1, finalScore=9.
 ```
 
 Add the research-and-decide variant on top:
@@ -48,7 +48,7 @@ GRAPHORIN_HARNESS_VARIANT=research-and-decide \
 ```
 
 ```
-graphorin v0.13.4 three-agent-harness research-and-decide - children=3, bound=3, unbound=0.
+graphorin v0.13.5 three-agent-harness research-and-decide - children=3, bound=3, unbound=0.
 ```
 
 ---
@@ -255,4 +255,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.13.4 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.5 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

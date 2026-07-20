@@ -52,6 +52,23 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.4 -> 0.13.5
+
+A patch release; nothing to migrate. Additions worth knowing about:
+
+- **`graphorin start` can serve the full surface.** Point the config's
+  new `app` field at a compose module (or scaffold one with
+  `graphorin init --app`) and the daemon mounts sessions / memory /
+  agents / workflows from the returned adapter bag - see
+  [Standalone server](/guide/standalone-server#composing-the-full-api-surface-app-module).
+  Bare starts behave exactly as before.
+- **About 130 newly exported types.** Types that public APIs already
+  referenced (memory tool IO shapes, executor hooks, audit listener
+  signatures, protocol frame schemas, and more) are now importable
+  from their packages' barrels. Purely additive; four previously
+  file-local (never importable) helpers received descriptive public
+  names, and no existing import changes meaning.
+
 ### 0.13.3 -> 0.13.4
 
 A patch release; nothing to migrate. Behavioural refinements worth

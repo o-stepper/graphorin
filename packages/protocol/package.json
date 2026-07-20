@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/protocol",
-  "version": "0.13.4",
+  "version": "0.13.5",
   "description": "Wire protocol contract for the Graphorin framework: Zod schemas + TypeScript types for the WebSocket subprotocol `graphorin.protocol.v1`. Defines the `ClientMessage` and `ServerMessage` discriminated unions, the JSON-RPC-shaped control channel (`initialize` / `subscription.subscribe` / `subscription.unsubscribe` / `run.cancel` / `ping`), the typed event push frames (`{ kind: 'event', subject, type, payload, eventId }`), the asynchronous server-initiated error frames (`{ kind: 'error', code, message }`), the subprotocol negotiation helpers, and the close-code taxonomy (4001 auth.required, 4002 auth.invalid, 4003 auth.revoked, 4004 auth.scope_denied, 4005 rate.limited, 4006 flow.throttled, 4007 server.shutdown, 4008 protocol.violation). Browser-friendly: zero Node-only dependencies; the only runtime dependency is `zod`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

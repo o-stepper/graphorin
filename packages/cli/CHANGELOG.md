@@ -1,5 +1,26 @@
 # @graphorin/cli
 
+## 0.13.5
+
+### Patch Changes
+
+- [#224](https://github.com/o-stepper/graphorin/pull/224) [`e80d6af`](https://github.com/o-stepper/graphorin/commit/e80d6af60cbad7352b2ebaf35bcef45b91989ce6) Thanks [@o-stepper](https://github.com/o-stepper)! - Every type referenced by a public API is now exported from a documented barrel - about 130 previously unreachable types (memory tool input/output shapes, executor and truncation hooks, audit listener signatures, protocol frame schemas, sandbox peer-module views, new core agent-event variants, and more) became importable, clearing all 115 TypeDoc referenced-but-not-included warnings. Three previously file-local names were renamed while being made public: the tools audit listener is `ToolAuditListener`, the memory-guard listener is `MemoryGuardAuditListener`, the secret-value listener is `SecretValueAuditListener`, and the built-in tool-search match row is `ToolSearchToolMatch` (the registry-level `ToolSearchMatch` is unchanged). None of these were importable before, so no consumer code breaks.
+
+- [#225](https://github.com/o-stepper/graphorin/pull/225) [`a1e5154`](https://github.com/o-stepper/graphorin/commit/a1e515442786b0dc448067e9f994b72fbf8b6a5f) Thanks [@o-stepper](https://github.com/o-stepper)! - `graphorin start` can now serve the full domain surface. A new `app` config field points at a compose module; the launcher imports it, calls the default-exported factory (typed as `GraphorinAppFactory` in `@graphorin/server`, with `GraphorinAppContext` / `GraphorinAppBag` alongside) and spreads the returned adapter bag into `createServer(...)`, mounting sessions / memory / agents / workflows instead of the bare infrastructure daemon. The bag's optional `close` hook runs after `server.stop()` on shutdown. `graphorin init --app` scaffolds a working `graphorin.app.mjs` (SQLite store + memory + sessions REST adapters over the configured storage) and wires the config field; the scaffold is boot-tested in CI.
+
+- Updated dependencies [[`e80d6af`](https://github.com/o-stepper/graphorin/commit/e80d6af60cbad7352b2ebaf35bcef45b91989ce6), [`a1e5154`](https://github.com/o-stepper/graphorin/commit/a1e515442786b0dc448067e9f994b72fbf8b6a5f)]:
+  - @graphorin/core@0.13.5
+  - @graphorin/eslint-plugin@0.13.5
+  - @graphorin/memory@0.13.5
+  - @graphorin/provider@0.13.5
+  - @graphorin/security@0.13.5
+  - @graphorin/server@0.13.5
+  - @graphorin/store-sqlite@0.13.5
+  - @graphorin/pricing@0.13.5
+  - @graphorin/sessions@0.13.5
+  - @graphorin/skills@0.13.5
+  - @graphorin/workflow@0.13.5
+
 ## 0.13.4
 
 ### Patch Changes
