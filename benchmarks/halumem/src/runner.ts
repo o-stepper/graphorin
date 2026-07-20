@@ -22,6 +22,12 @@ import pkg from '../package.json' with { type: 'json' };
  * reconcile path - otherwise W-019 pending supersedes would park every
  * update behind quarantine on both legs.
  *
+ * deep-retest-0.13.6 P2-Q: the reconcile mid-zone only exists when the
+ * store carries a vector signal - run the A/B with `--embedder fake`
+ * (or a real embedder via the programmatic path). Without one the
+ * store is FTS-only, the embedding three-zone classifier starves the
+ * reconcile route, and the on/off legs converge to identical numbers.
+ *
  * EB-11 caveat honoured: this harness MUTATES memory per case, so it
  * never shares an ingest cache across cases - every case gets a fresh
  * `:memory:` store.
@@ -35,6 +41,7 @@ import type { Fact, Provider, SessionScope } from '@graphorin/core';
 import {
   type AgentLike,
   type Case,
+  createFakeEmbedder,
   type EvalReport,
   exitOnFailures,
   loadHaluMemDataset,
@@ -49,6 +56,7 @@ import {
   type Scorer,
 } from '@graphorin/evals';
 import { createMemory } from '@graphorin/memory';
+import { priceLookupByModel } from '@graphorin/pricing';
 import {
   composeProviderMiddleware,
   createCostAccumulator,
@@ -128,12 +136,50 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): {
   };
 }
 
+/** Embedder axis (P2-Q): `'fake'` arms the vector leg offline. */
+export type BenchEmbedderMode = 'none' | 'fake';
+
 /** Options for {@link createOperationsAgent}. */
 export interface OperationsAgentOptions {
   readonly provider: Provider;
   readonly conflictPipeline?: ConflictPipelineMode;
+  /**
+   * Embedder under test. Default `'none'` (FTS-only store). The
+   * conflict A/B needs `'fake'` (or a real embedder) - the reconcile
+   * mid-zone is an embedding-similarity band.
+   */
+  readonly embedder?: BenchEmbedderMode;
   /** Recall depth for the QA stage. Default 8. */
   readonly topK?: number;
+}
+
+/**
+ * deep-retest-0.13.6 P2-3: a provider/consolidator failure during
+ * ingest. Thrown so the evals runner records the cause per case
+ * instead of scoring an empty memory as a quality zero.
+ */
+export class HaluMemInfrastructureError extends Error {
+  constructor(detail: string) {
+    super(`${INFRA_MARKER} ${detail}`);
+    this.name = 'HaluMemInfrastructureError';
+  }
+}
+
+/** Stable marker `countInfrastructureFailures` scans reasons for. */
+export const INFRA_MARKER = '[benchmark-halumem] infrastructure:';
+
+/**
+ * Scan a report for cases whose failure is an ingest infrastructure
+ * error (the agent threw {@link HaluMemInfrastructureError}) rather
+ * than a quality result.
+ */
+export function countInfrastructureFailures(
+  report: EvalReport<MemoryOperationsEvalInput, MemoryOperationsObservation>,
+): { count: number; caseIds: string[] } {
+  const caseIds = report.results
+    .filter((r) => r.scores.some((s) => s.result.reason?.includes(INFRA_MARKER) === true))
+    .map((r) => r.caseId);
+  return { count: caseIds.length, caseIds };
 }
 
 /**
@@ -168,50 +214,86 @@ export function createOperationsAgent(
       // NOT be reused here.
       const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
       await store.init();
-      const memory = createMemory({
-        store: store.memory as never,
-        embeddings: store.embeddings,
-        resolveScope: () => scope,
-        conflictPipeline: { mode: options.conflictPipeline ?? 'off' },
-        // Both A/B legs promote synthesized facts at write time (see the
-        // module header) - the gate evidence is a pass-through here
-        // because the benchmark measures extraction, not admission.
-        ingestGate: () => true,
-        consolidator: {
-          enabled: true,
-          provider: options.provider,
-          tier: 'standard',
-          defaultScope: scope,
-          autoPromoteExtraction: true,
-        },
-      });
-      for (const session of input.haystackSessions) {
-        for (const turn of session.turns) {
-          // The standard-phase transcript already prefixes role +
-          // timestamp per line - push the raw turn content.
-          const stamp = turn.timestamp !== undefined ? `[${turn.timestamp}] ` : '';
-          await memory.session.push(scope, {
-            role: turn.role,
-            content: `${stamp}${turn.content}`,
-          });
+      try {
+        const memory = createMemory({
+          store: store.memory as never,
+          embeddings: store.embeddings,
+          resolveScope: () => scope,
+          conflictPipeline: { mode: options.conflictPipeline ?? 'off' },
+          // P2-Q: the fake embedder arms the vector leg so the
+          // three-zone classifier has real similarity bands to route
+          // through - see the module header.
+          ...(options.embedder === 'fake' ? { embedder: createFakeEmbedder() } : {}),
+          // Both A/B legs promote synthesized facts at write time (see the
+          // module header) - the gate evidence is a pass-through here
+          // because the benchmark measures extraction, not admission.
+          ingestGate: () => true,
+          consolidator: {
+            enabled: true,
+            provider: options.provider,
+            tier: 'standard',
+            defaultScope: scope,
+            autoPromoteExtraction: true,
+          },
+        });
+        for (const session of input.haystackSessions) {
+          for (const turn of session.turns) {
+            // The standard-phase transcript already prefixes role +
+            // timestamp per line - push the raw turn content.
+            const stamp = turn.timestamp !== undefined ? `[${turn.timestamp}] ` : '';
+            await memory.session.push(scope, {
+              role: turn.role,
+              content: `${stamp}${turn.content}`,
+            });
+          }
+          // One standard-phase fire per session mirrors incremental
+          // consolidation: later sessions reconcile against the facts the
+          // earlier ones produced.
+          //
+          // P2-3: the consolidator is resilient BY DESIGN - a provider
+          // failure comes back as a failed PhaseOutcome, not a throw.
+          // Discarding it here is what turned an HTTP 404 into
+          // "memoryPoints: []" and a fake quality zero, so surface it
+          // (and stamp direct throws - budget preflight etc. - with the
+          // same marker so classification is path-independent).
+          let outcome: Awaited<ReturnType<typeof memory.consolidator.fireNow>>;
+          try {
+            outcome = await memory.consolidator.fireNow('standard', scope);
+          } catch (err) {
+            if (err instanceof HaluMemInfrastructureError) throw err;
+            throw new HaluMemInfrastructureError(
+              `consolidator standard phase threw: ` +
+                `${err instanceof Error ? err.message : String(err)} - ` +
+                'provider/ingest failure, NOT a quality result',
+            );
+          }
+          if (
+            outcome !== null &&
+            (outcome.status === 'failed' ||
+              outcome.status === 'deferred' ||
+              (outcome.status === 'partial' && outcome.errorMessage !== null))
+          ) {
+            throw new HaluMemInfrastructureError(
+              `consolidator standard phase ${outcome.status}: ` +
+                `${outcome.errorMessage ?? 'no error message'} - ` +
+                'provider/ingest failure, NOT a quality result',
+            );
+          }
         }
-        // One standard-phase fire per session mirrors incremental
-        // consolidation: later sessions reconcile against the facts the
-        // earlier ones produced.
-        await memory.consolidator.fireNow('standard', scope);
+        const semantic = store.memory.semantic as ListActiveCapable;
+        const facts =
+          typeof semantic.listActive === 'function'
+            ? await semantic.listActive(scope, { limit: 1000 })
+            : [];
+        const memoryPoints = facts.map((fact) => fact.text);
+        let answer: string | undefined;
+        if (input.question !== undefined) {
+          answer = await answerFromMemory(memory, scope, input.question, options);
+        }
+        return { memoryPoints, ...(answer !== undefined ? { answer } : {}) };
+      } finally {
+        await store.close();
       }
-      const semantic = store.memory.semantic as ListActiveCapable;
-      const facts =
-        typeof semantic.listActive === 'function'
-          ? await semantic.listActive(scope, { limit: 1000 })
-          : [];
-      const memoryPoints = facts.map((fact) => fact.text);
-      let answer: string | undefined;
-      if (input.question !== undefined) {
-        answer = await answerFromMemory(memory, scope, input.question, options);
-      }
-      await store.close();
-      return { memoryPoints, ...(answer !== undefined ? { answer } : {}) };
     },
   };
 }
@@ -248,6 +330,8 @@ export interface RunHaluMemOptions {
   /** evals-04: the judge for the QA stage - never the system under test. */
   readonly judgeProvider?: Provider;
   readonly conflictPipeline?: ConflictPipelineMode;
+  /** Embedder axis (P2-Q). Default `'none'`. */
+  readonly embedder?: BenchEmbedderMode;
   readonly smoke?: boolean;
   readonly concurrency?: number;
 }
@@ -264,6 +348,7 @@ export async function runHaluMemBenchmark(
     ...(options.conflictPipeline !== undefined
       ? { conflictPipeline: options.conflictPipeline }
       : {}),
+    ...(options.embedder !== undefined ? { embedder: options.embedder } : {}),
   });
   const scorers: Scorer<MemoryOperationsEvalInput, MemoryOperationsObservation>[] =
     options.stage === 'operations'
@@ -282,6 +367,7 @@ export interface CliArgs {
   dataset: string;
   stage: HaluMemBenchStage;
   conflictPipeline?: ConflictPipelineMode;
+  embedder?: BenchEmbedderMode;
   smoke: boolean;
   results: string;
   json?: string;
@@ -310,6 +396,10 @@ Flags:
   --stage <operations|qa>     Which stage to run (default: operations)
   --conflict-pipeline <on|off> Conflict pipeline under test (default: off) - run
                               both values and compare update omission (N-1)
+  --embedder <none|fake>      Embedder under test (default: none). The conflict
+                              A/B needs 'fake' (or a real embedder): the
+                              reconcile mid-zone is an embedding band, so an
+                              FTS-only store converges on/off to the same numbers
   --smoke                     First 2 cases only
   --results <path>            RESULTS markdown output (default: RESULTS.md)
   --json <path>               Write the JSON report
@@ -363,6 +453,13 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       }
       args.conflictPipeline = mode;
       i++;
+    } else if (a === '--embedder') {
+      const mode = value(a, next);
+      if (mode !== 'none' && mode !== 'fake') {
+        throw new CliUsageError(`--embedder must be 'none' or 'fake', got '${mode}'`);
+      }
+      args.embedder = mode;
+      i++;
     } else if (a === '--results') {
       args.results = value(a, next);
       i++;
@@ -409,8 +506,12 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
 
 /**
  * D1 (W-084): shared run-level USD ceiling over the resolved providers -
- * same shape as the longmemeval helper. Providers that report no usage
- * cost keep the ceiling inert; `main()` warns when that happens.
+ * same shape as the longmemeval helper. deep-retest-0.13.6 P2-4: the
+ * bundled pricing snapshot prices the usage (`priceLookupByModel`) so
+ * the ceiling actually observes spend - without a lookup the
+ * accumulator saw $0 and `--max-cost-usd` was honestly-warned but
+ * UNENFORCED. Providers whose models are absent from the snapshot
+ * still keep the ceiling inert; `main()` warns when that happens.
  */
 export function withBenchCostCeiling(maxCostUsd: number): {
   wrap: (provider: Provider) => Provider;
@@ -428,7 +529,7 @@ export function withBenchCostCeiling(maxCostUsd: number): {
       onExceed: 'throw',
       resolveObservedCost: () => observedCostUsd(),
     }),
-    withCostTracking({ onUsage: accumulator.onUsage }),
+    withCostTracking({ onUsage: accumulator.onUsage, priceLookup: priceLookupByModel }),
   ]);
   return { wrap, observedCostUsd };
 }
@@ -438,6 +539,7 @@ function buildResultsHeader(
   meta: {
     stage: HaluMemBenchStage;
     conflictPipeline: ConflictPipelineMode;
+    embedder: BenchEmbedderMode;
     judge?: string;
   },
 ): string {
@@ -449,6 +551,7 @@ function buildResultsHeader(
     `**Provider:** ${providerLabel}`,
     `**Stage:** ${meta.stage}`,
     `**Conflict pipeline:** ${meta.conflictPipeline}`,
+    `**Embedder:** ${meta.embedder}`,
     ...(meta.judge !== undefined ? [`**Judge:** ${meta.judge}`] : []),
     '',
     `_Generated: ${new Date().toISOString()}_`,
@@ -520,14 +623,35 @@ export async function main(): Promise<void> {
     console.log(`[benchmark-halumem] run-level cost ceiling: $${args.maxCostUsd}`);
   }
   const conflictPipeline: ConflictPipelineMode = args.conflictPipeline ?? 'off';
+  const embedder: BenchEmbedderMode = args.embedder ?? 'none';
+  if (conflictPipeline === 'on' && embedder === 'none') {
+    console.warn(
+      '[benchmark-halumem] --conflict-pipeline on with --embedder none: the reconcile ' +
+        'mid-zone is an embedding band, so an FTS-only store starves the reconcile route ' +
+        'and the A/B legs converge - pass --embedder fake for a meaningful comparison (P2-Q).',
+    );
+  }
   const report = await runHaluMemBenchmark({
     datasetPath: args.dataset,
     stage: args.stage,
     provider: sutProvider,
     ...(judgeResolved !== undefined ? { judgeProvider: judgeResolved.provider } : {}),
     conflictPipeline,
+    embedder,
     smoke: args.smoke,
   });
+  // P2-3: ingest failures (provider HTTP errors, consolidator faults)
+  // are infrastructure, not quality - name them before any score line
+  // so `0/N passed` can never masquerade as a measured quality zero.
+  const infra = countInfrastructureFailures(report);
+  if (infra.count > 0) {
+    console.error(
+      `[benchmark-halumem] status=INFRASTRUCTURE_FAILED cases=${infra.count}/${report.summary.total} ` +
+        `(${infra.caseIds.join(', ')}): provider/consolidator errors during ingest - ` +
+        'the scores below are NOT quality results. First error is recorded per case in the report.',
+    );
+    process.exitCode = 1;
+  }
   if (ceiling !== undefined && ceiling.observedCostUsd() === 0) {
     console.warn(
       '[benchmark-halumem] --max-cost-usd was set but the providers reported zero usage cost, ' +
@@ -544,22 +668,25 @@ export async function main(): Promise<void> {
   if (label.startsWith('stub')) {
     console.log(
       `[benchmark-halumem] status=UNSCORED stage=${args.stage} ` +
-        `conflictPipeline=${conflictPipeline} cases=${report.summary.total} ` +
+        `conflictPipeline=${conflictPipeline} embedder=${embedder} cases=${report.summary.total} ` +
         '(infrastructure smoke only - no quality claim; scored runs need a ' +
         'real provider + dataset)',
     );
   } else {
     console.log(
       `[benchmark-halumem] stage=${args.stage} conflictPipeline=${conflictPipeline} ` +
-        `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed}`,
+        `embedder=${embedder} cases=${report.summary.total} passed=${report.summary.passed} ` +
+        `failed=${report.summary.failed}`,
     );
   }
   const benchConfig = {
     stage: args.stage,
     conflictPipeline,
+    embedder,
     provider: label,
     ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
+    ...(infra.count > 0 ? { infrastructureFailedCases: infra.caseIds } : {}),
   };
   await mkdir(dirname(args.results), { recursive: true });
   await writeFile(
@@ -567,6 +694,7 @@ export async function main(): Promise<void> {
     `${buildResultsHeader(label, {
       stage: args.stage,
       conflictPipeline,
+      embedder,
       ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
     })}${renderMarkdownReport(report)}`,
     'utf8',

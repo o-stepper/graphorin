@@ -248,6 +248,13 @@ const provider = createProvider(
 );
 ```
 
+Both base-URL conventions work: a bare origin (`http://127.0.0.1:1234`) gets the classic `/v1/chat/completions` default path, while a base that already ends in `/v1` (the `api.openai.com/v1` / LM Studio / vLLM convention, as above) gets `/chat/completions` appended - either way the request reaches the server's single real endpoint instead of a `/v1/v1/...` 404. An explicit `chatPath` always wins verbatim for exotic layouts.
+
+Two knobs matter when pointing this adapter at current cloud models:
+
+- `tokenLimitParam: 'max_completion_tokens'` pins the wire name for `maxTokens` - current OpenAI models reject the classic `max_tokens` with HTTP 400. Left unset, the adapter reacts to that exact 400 by re-sending the request once with the remapped name and remembers the switch for the provider instance, so eval CLIs work against the GPT-5.6 family without extra flags.
+- Extra body fields (for example `reasoning_effort: 'none'` on reasoning models) pass through per request via `providerOptions`, which is merged onto the wire body last.
+
 ### `llama.cpp` HTTP server
 
 ```ts

@@ -15,7 +15,9 @@
 
 import type { Provider, ProviderCapabilities, Sensitivity } from '@graphorin/core';
 
-import { buildOpenAIShapedProvider } from '../internal/openai-shaped.js';
+import { buildOpenAIShapedProvider, type TokenLimitParam } from '../internal/openai-shaped.js';
+
+export type { TokenLimitParam } from '../internal/openai-shaped.js';
 
 /**
  * Options accepted by {@link openAICompatibleAdapter}.
@@ -30,8 +32,25 @@ export interface OpenAICompatibleAdapterOptions {
    * the protocol + host to assign a `LocalProviderTrust` value.
    */
   readonly baseUrl: string;
-  /** Optional REST path override. Defaults to `/v1/chat/completions`. */
+  /**
+   * Optional REST path override, appended to `baseUrl` verbatim.
+   * Defaults to `/v1/chat/completions`, or to `/chat/completions` when
+   * `baseUrl` already ends with `/v1` (the `api.openai.com/v1` /
+   * LM Studio / vLLM convention), so both base-URL styles reach the
+   * server's single real endpoint.
+   */
   readonly chatPath?: string;
+  /**
+   * Which wire parameter carries `maxTokens`: classic `'max_tokens'`
+   * (default; llama.cpp, LM Studio, vLLM, LocalAI) or
+   * `'max_completion_tokens'` (current OpenAI models, which reject the
+   * classic name with HTTP 400). When left unset, the adapter reacts to
+   * that specific 400 by re-sending the request once with
+   * `max_completion_tokens` and remembers the switch for the lifetime
+   * of the provider instance; setting the option pins the name and
+   * disables the auto-remap.
+   */
+  readonly tokenLimitParam?: TokenLimitParam;
   /** Optional bearer-auth API key. */
   readonly apiKey?: string;
   /** Extra headers merged on top of `content-type` + `accept` defaults. */
@@ -78,6 +97,7 @@ export function openAICompatibleAdapter(options: OpenAICompatibleAdapterOptions)
     model: options.model,
     baseUrl: options.baseUrl,
     ...(options.chatPath !== undefined ? { chatPath: options.chatPath } : {}),
+    ...(options.tokenLimitParam !== undefined ? { tokenLimitParam: options.tokenLimitParam } : {}),
     ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
     ...(options.headers !== undefined ? { headers: options.headers } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),

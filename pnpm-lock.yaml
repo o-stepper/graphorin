@@ -137,6 +137,9 @@ importers:
       '@graphorin/memory':
         specifier: workspace:*
         version: link:../../packages/memory
+      '@graphorin/pricing':
+        specifier: workspace:*
+        version: link:../../packages/pricing
       '@graphorin/provider':
         specifier: workspace:*
         version: link:../../packages/provider
