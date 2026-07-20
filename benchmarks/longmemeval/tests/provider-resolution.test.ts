@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildResultsHeader,
+  preflightUnpricedModels,
   resolveBenchProvider,
   resolveJudgeSpec,
   withBenchCostCeiling,
@@ -111,6 +112,37 @@ describe('deep-retest 0.13.7 P3 - observed-cost reporting', () => {
     await ceiling.wrap(usageProvider).generate({ messages: [{ role: 'user', content: 'hi' }] });
     expect(ceiling.observedCostUsd()).toBe(0);
     expect(ceiling.unpricedModels()).toEqual(['model-not-in-snapshot']);
+  });
+
+  it('deep-retest 0.13.8 P1: preflight names every model the cap cannot observe', () => {
+    const withModel = (modelId: string): Provider => ({
+      name: 'preflight-probe',
+      modelId,
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: false,
+        reasoning: false,
+        contextWindow: 4096,
+        maxOutput: 1024,
+      },
+      async generate(): Promise<ProviderResponse> {
+        throw new Error('preflight must never call the provider');
+      },
+      stream(): AsyncIterable<never> {
+        throw new Error('no stream');
+      },
+    });
+    // The ninth retest's exact shape: priced subject, judge on the
+    // gpt-4o-mini alias - now priced, so the preflight stays silent.
+    expect(preflightUnpricedModels([withModel('gpt-4.1-mini'), withModel('gpt-4o-mini')])).toEqual(
+      [],
+    );
+    expect(
+      preflightUnpricedModels([withModel('gpt-4.1-mini'), withModel('mystery-model')]),
+    ).toEqual(['mystery-model']);
   });
 });
 

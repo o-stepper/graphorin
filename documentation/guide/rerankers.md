@@ -120,6 +120,13 @@ const memory = createMemory({
 });
 ```
 
+> [!WARNING]
+> Like the transformers.js embedder, a fresh install of
+> `@graphorin/reranker-transformersjs` currently reports one high
+> `npm audit` advisory (install-script-only `adm-zip` exposure under
+> `onnxruntime-node`); a one-line consumer override resolves it - see
+> [published dependency-graph advisories](/guide/security#published-dependency-graph-advisories).
+
 ### Notes & tuning
 
 - **`reranker-transformersjs`** validates `batchSize` at construction (a

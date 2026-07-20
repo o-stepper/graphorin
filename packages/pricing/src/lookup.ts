@@ -53,11 +53,13 @@ export function lookupPrice(
 
   if (exact !== undefined) return entryToResult(exact, snapshot);
 
-  // Date-suffix fallback (core-provider-03): dated ids like
-  // `claude-haiku-4-5-20251001` resolve to their dateless alias entry
-  // (`claude-haiku-4-5`) so the snapshot does not need one row per
-  // dated release.
-  const dateless = args.model.replace(/-\d{8}$/, '');
+  // Date-suffix fallback (core-provider-03): dated ids resolve to their
+  // dateless alias entry so the snapshot does not need one row per dated
+  // release. Both vendor date formats are recognised (deep-retest 0.13.8
+  // P1): compact Anthropic (`claude-haiku-4-5-20251001`) and dashed
+  // OpenAI (`gpt-4.1-mini-2025-04-14`). Keep the pattern in sync with
+  // `model-lookup.ts`.
+  const dateless = args.model.replace(/-(?:\d{8}|\d{4}-\d{2}-\d{2})$/, '');
   if (dateless !== args.model) {
     const alias = snapshot.entries.find(
       (entry) =>
@@ -66,6 +68,29 @@ export function lookupPrice(
         (args.region === undefined || entry.region === undefined || entry.region === args.region),
     );
     if (alias !== undefined) return entryToResult(alias, snapshot);
+  }
+
+  // `-latest` alias fallback (deep-retest 0.13.8 P1): vendors document
+  // `<family>-latest` as routing to the newest dated snapshot. Resolve to
+  // the family's dateless entry when one exists, else to its dated entry
+  // when the snapshot retains exactly ONE - two or more dated rows means
+  // we cannot know which snapshot "latest" bills as, so stay null + WARN
+  // instead of guessing (the no-invented-numbers rule).
+  if (args.model.endsWith('-latest')) {
+    const base = args.model.slice(0, -'-latest'.length);
+    const scoped = snapshot.entries.filter(
+      (entry) =>
+        entry.provider === args.provider &&
+        (args.region === undefined || entry.region === undefined || entry.region === args.region),
+    );
+    const anchor = scoped.find((entry) => entry.model === base);
+    if (anchor !== undefined) return entryToResult(anchor, snapshot);
+    const dated = scoped.filter(
+      (entry) =>
+        entry.model.startsWith(`${base}-`) &&
+        /^(?:\d{8}|\d{4}-\d{2}-\d{2})$/.test(entry.model.slice(base.length + 1)),
+    );
+    if (dated.length === 1) return entryToResult(dated[0] as ModelPrice, snapshot);
   }
 
   // Wildcard fallback - used by local providers (`provider: 'ollama', model: '*'`).

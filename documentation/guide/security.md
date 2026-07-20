@@ -194,6 +194,39 @@ The root check runs after the ed25519 signature itself is valid, so the result d
 
 The `publishers` leg is domain-bound: the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
 
+## Published dependency-graph advisories
+
+The workspace's vulnerability scanning runs over `pnpm-lock.yaml` - which applies the repo's pnpm overrides. npm consumers never inherit those overrides, so an advisory in the **published** auto-installed dependency/peer graph can be invisible to every workspace-side gate while being real for every consumer. The `published-peer-audit` job in the consumer-smoke workflow closes that blind spot: on a schedule (and on demand) it performs a fresh isolated `npm install` of every published `@graphorin/*` package and gates `npm audit --omit=dev` high/critical findings against the reviewed allowlist in `.github/published-peer-audit-allowlist.json`. An allowlisted advisory that stops appearing fails the job too, so accepted advisories and their documented mitigations cannot silently go stale.
+
+### Known advisory: adm-zip under the transformers.js embedder
+
+Consumers of `@graphorin/embedder-transformersjs` (and `@graphorin/reranker-transformersjs`) currently see one high advisory in `npm audit`:
+
+- Chain: `@huggingface/transformers` -> `onnxruntime-node` -> `adm-zip@0.5.x` ([GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85), memory exhaustion on a crafted ZIP; patched in `adm-zip@0.6.0`).
+- Exposure: `adm-zip` is used only inside `onnxruntime-node`'s **install script** to unpack its own release archives. The runtime never parses foreign ZIP files, so the practical exposure is an install-time denial of service through a compromised download channel - narrow, but the advisory (and the red `npm audit`) is real.
+- Upstream status: every `onnxruntime-node` release to date pins `adm-zip ^0.5.16` (the patched `0.6.0` is outside that range), and `@huggingface/transformers` pins `onnxruntime-node` exactly, so no dependency bump resolves it today.
+
+Until upstream widens the range, mitigate in the **consumer's root manifest** (verified: the install scripts and the runtime work unchanged on `adm-zip@0.6.0`, and `npm audit --omit=dev` comes back clean):
+
+::: code-group
+
+```json [npm (package.json)]
+{
+  "overrides": {
+    "adm-zip": "^0.6.0"
+  }
+}
+```
+
+```yaml [pnpm (pnpm-workspace.yaml)]
+overrides:
+  'adm-zip@<0.6.0': '>=0.6.0 <1'
+```
+
+:::
+
+The Graphorin workspace itself ships the pnpm form of this override, which is exactly why lockfile-based scanners report it clean - treat a clean workspace scan as a statement about the workspace, never about the published graph.
+
 ## Lateral-leak defense layer
 
 The agent runtime's defense layer composes orthogonally with the security primitives above:

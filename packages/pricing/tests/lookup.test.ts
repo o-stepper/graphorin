@@ -275,6 +275,120 @@ describe('W-045 - Cost.amount units pin (whole dollars, never minor units)', () 
   });
 });
 
+describe('deep-retest 0.13.8 P1 - alias rows, date formats, -latest', () => {
+  beforeEach(() => {
+    _resetLookupWarningsForTesting();
+    setLookupWarnSink(() => {});
+  });
+
+  it('prices the official undated OpenAI aliases at their routing target rates', () => {
+    const pairs = [
+      ['gpt-4o', 'gpt-4o-2024-11-20'],
+      ['gpt-4o-mini', 'gpt-4o-mini-2024-07-18'],
+      ['o1', 'o1-2024-12-17'],
+      ['o3-mini', 'o3-mini-2025-01-31'],
+    ] as const;
+    for (const [alias, dated] of pairs) {
+      const aliasPrice = lookupPrice({ provider: 'openai', model: alias });
+      const datedPrice = lookupPrice({ provider: 'openai', model: dated });
+      expect(aliasPrice, `${alias} must be priced`).not.toBeNull();
+      expect(aliasPrice, `${alias} must equal ${dated}`).toEqual(datedPrice);
+    }
+  });
+
+  it('pins the alias/dated price-equality invariant across the whole snapshot', () => {
+    // Every dated entry whose family also has a dateless row must carry the
+    // SAME rates - an alias row is a routing statement, not a second price.
+    for (const entry of BUNDLED_SNAPSHOT.entries) {
+      const base = entry.model.replace(/-(?:\d{8}|\d{4}-\d{2}-\d{2})$/, '');
+      if (base === entry.model) continue;
+      const anchor = BUNDLED_SNAPSHOT.entries.find(
+        (e) => e.provider === entry.provider && e.model === base,
+      );
+      if (anchor === undefined) continue;
+      expect(anchor.inputUsdPerToken, `${base} vs ${entry.model} input`).toBe(
+        entry.inputUsdPerToken,
+      );
+      expect(anchor.outputUsdPerToken, `${base} vs ${entry.model} output`).toBe(
+        entry.outputUsdPerToken,
+      );
+      expect(anchor.cachedReadUsdPerToken, `${base} vs ${entry.model} cachedRead`).toBe(
+        entry.cachedReadUsdPerToken,
+      );
+    }
+  });
+
+  it('strips dashed OpenAI-style date suffixes to the dateless entry', () => {
+    // No exact row for this dated id - it must resolve through gpt-4.1-mini.
+    const dated = lookupPrice({ provider: 'openai', model: 'gpt-4.1-mini-2025-04-14' });
+    const anchor = lookupPrice({ provider: 'openai', model: 'gpt-4.1-mini' });
+    expect(dated).not.toBeNull();
+    expect(dated).toEqual(anchor);
+  });
+
+  it('resolves -latest through the dateless entry when the family has one', () => {
+    const latest = lookupPrice({ provider: 'anthropic', model: 'claude-haiku-4-5-latest' });
+    const anchor = lookupPrice({ provider: 'anthropic', model: 'claude-haiku-4-5' });
+    expect(latest).not.toBeNull();
+    expect(latest).toEqual(anchor);
+  });
+
+  it('resolves -latest to the single retained dated entry of a legacy family', () => {
+    const latest = lookupPrice({ provider: 'anthropic', model: 'claude-3-5-sonnet-latest' });
+    const dated = lookupPrice({ provider: 'anthropic', model: 'claude-3-5-sonnet-20241022' });
+    expect(latest).not.toBeNull();
+    expect(latest).toEqual(dated);
+  });
+
+  it('stays null for -latest when the family has TWO dated snapshots (ambiguous)', async () => {
+    const { computeEntriesDigest } = await import('../src/snapshot/bundled.js');
+    const entries = [
+      {
+        provider: 'openai',
+        model: 'gpt-x-2025-01-01',
+        inputUsdPerToken: 1 / 1_000_000,
+        outputUsdPerToken: 2 / 1_000_000,
+      },
+      {
+        provider: 'openai',
+        model: 'gpt-x-2025-06-01',
+        inputUsdPerToken: 3 / 1_000_000,
+        outputUsdPerToken: 4 / 1_000_000,
+      },
+    ];
+    const snapshot = {
+      version: 'test',
+      source: 'test',
+      snapshotDate: '2026-07-20',
+      currency: 'USD' as const,
+      sha256: computeEntriesDigest(entries),
+      entries,
+    };
+    expect(lookupPrice({ provider: 'openai', model: 'gpt-x-latest' }, snapshot)).toBeNull();
+  });
+
+  it('does not resolve -latest through non-date suffixed rows', () => {
+    // gemini-1.5-pro-002 is a build suffix, not a date - "latest" cannot
+    // know what it bills as, so the honest answer stays null.
+    expect(lookupPrice({ provider: 'google', model: 'gemini-1.5-pro-latest' })).toBeNull();
+  });
+
+  it('prices OpenAI embeddings on input only (zero output rate is the price)', () => {
+    const small = lookupPrice({ provider: 'openai', model: 'text-embedding-3-small' });
+    expect(small?.inputUsdPerToken).toBeCloseTo(0.02 / 1_000_000, 15);
+    expect(small?.outputUsdPerToken).toBe(0);
+    const large = lookupPrice({ provider: 'openai', model: 'text-embedding-3-large' });
+    expect(large?.inputUsdPerToken).toBeCloseTo(0.13 / 1_000_000, 15);
+    const cost = calculateCost({
+      provider: 'openai',
+      model: 'text-embedding-3-small',
+      inputTokens: 1_000_000,
+      outputTokens: 0,
+    });
+    expect(cost).toEqual({ amount: 0.02, currency: 'USD' });
+  });
+});
+
 describe('GPT-5.6 family pricing', () => {
   it('resolves luna/terra/sol at the official standard short-context rates', () => {
     const luna = lookupPrice({ provider: 'openai', model: 'gpt-5.6-luna' });
