@@ -8,9 +8,15 @@
  * not touch the network until `generate()`), never called.
  */
 
+import type { Provider, ProviderRequest, ProviderResponse } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 
-import { buildResultsHeader, resolveBenchProvider, resolveJudgeSpec } from '../src/runner.js';
+import {
+  buildResultsHeader,
+  resolveBenchProvider,
+  resolveJudgeSpec,
+  withBenchCostCeiling,
+} from '../src/runner.js';
 
 describe('EB-1: real-provider resolution', () => {
   it('defaults to the offline stub, labelled plumbing-only', () => {
@@ -56,6 +62,55 @@ describe('EB-1: RESULTS provenance stamp', () => {
   it('stamps a real provider label into the RESULTS header', () => {
     const header = buildResultsHeader('ollama:llama3.1');
     expect(header).toContain('**Provider:** ollama:llama3.1');
+  });
+});
+
+describe('deep-retest 0.13.7 P3 - observed-cost reporting', () => {
+  it('stamps observed cost (and unpriced models) into the RESULTS header', () => {
+    const header = buildResultsHeader('ollama:llama3.1', {
+      observedCostUsd: 0.000123,
+      maxCostUsd: 0.1,
+    });
+    expect(header).toContain('**Observed cost (USD):** $0.000123 (cap $0.1)');
+    expect(header).not.toContain('NO snapshot price');
+
+    const unpriced = buildResultsHeader('ollama:llama3.1', {
+      observedCostUsd: 0,
+      maxCostUsd: 0.1,
+      unpricedModels: ['mystery-model'],
+    });
+    expect(unpriced).toContain('NO snapshot price for: mystery-model');
+  });
+
+  it('withBenchCostCeiling names unpriced models for the benchConfig stamp', async () => {
+    const usageProvider: Provider = {
+      name: 'usage-reporter',
+      modelId: 'model-not-in-snapshot',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: false,
+        reasoning: false,
+        contextWindow: 4096,
+        maxOutput: 1024,
+      },
+      async generate(_req: ProviderRequest): Promise<ProviderResponse> {
+        return {
+          text: 'ok',
+          usage: { promptTokens: 1000, completionTokens: 0, totalTokens: 1000 },
+          finishReason: 'stop',
+        };
+      },
+      stream(): AsyncIterable<never> {
+        throw new Error('no stream');
+      },
+    };
+    const ceiling = withBenchCostCeiling(2);
+    await ceiling.wrap(usageProvider).generate({ messages: [{ role: 'user', content: 'hi' }] });
+    expect(ceiling.observedCostUsd()).toBe(0);
+    expect(ceiling.unpricedModels()).toEqual(['model-not-in-snapshot']);
   });
 });
 

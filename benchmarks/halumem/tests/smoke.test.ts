@@ -192,6 +192,16 @@ describe('deep-retest-0.13.6 P2-4 - --max-cost-usd observes real spend', () => {
     await wrapped.generate(REQ);
     expect(ceiling.observedCostUsd()).toBe(0);
   });
+
+  it('deep-retest 0.13.7 P3: names unpriced models so reports can stamp costPricingMatched', async () => {
+    const priced = withBenchCostCeiling(2);
+    await priced.wrap(createUsageProvider('gpt-5.6-luna')).generate(REQ);
+    expect(priced.unpricedModels()).toEqual([]);
+
+    const unpriced = withBenchCostCeiling(2);
+    await unpriced.wrap(createUsageProvider('model-not-in-snapshot')).generate(REQ);
+    expect(unpriced.unpricedModels()).toEqual(['model-not-in-snapshot']);
+  });
 });
 
 describe('deep-retest-0.13.6 P2-Q - embedder axis', () => {

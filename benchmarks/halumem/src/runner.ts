@@ -516,8 +516,10 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
 export function withBenchCostCeiling(maxCostUsd: number): {
   wrap: (provider: Provider) => Provider;
   observedCostUsd: () => number;
+  unpricedModels: () => ReadonlyArray<string>;
 } {
   const accumulator = createCostAccumulator();
+  const unpriced = new Set<string>();
   const observedCostUsd = (): number => {
     let total = 0;
     for (const totals of accumulator.totals().values()) total += totals.costUsd;
@@ -529,9 +531,19 @@ export function withBenchCostCeiling(maxCostUsd: number): {
       onExceed: 'throw',
       resolveObservedCost: () => observedCostUsd(),
     }),
-    withCostTracking({ onUsage: accumulator.onUsage, priceLookup: priceLookupByModel }),
+    withCostTracking({
+      onUsage: accumulator.onUsage,
+      // Deep-retest 0.13.7 P3: record the models the snapshot cannot
+      // price so reports can stamp `costPricingMatched: false` instead
+      // of silently under-counting observed spend.
+      priceLookup: (info) => {
+        const rates = priceLookupByModel(info);
+        if (rates === null) unpriced.add(info.modelId);
+        return rates;
+      },
+    }),
   ]);
-  return { wrap, observedCostUsd };
+  return { wrap, observedCostUsd, unpricedModels: () => [...unpriced] };
 }
 
 function buildResultsHeader(
@@ -541,6 +553,9 @@ function buildResultsHeader(
     conflictPipeline: ConflictPipelineMode;
     embedder: BenchEmbedderMode;
     judge?: string;
+    observedCostUsd?: number;
+    maxCostUsd?: number;
+    unpricedModels?: ReadonlyArray<string>;
   },
 ): string {
   return [
@@ -553,6 +568,15 @@ function buildResultsHeader(
     `**Conflict pipeline:** ${meta.conflictPipeline}`,
     `**Embedder:** ${meta.embedder}`,
     ...(meta.judge !== undefined ? [`**Judge:** ${meta.judge}`] : []),
+    ...(meta.observedCostUsd !== undefined
+      ? [
+          `**Observed cost (USD):** $${meta.observedCostUsd.toFixed(6)} (cap $${meta.maxCostUsd})${
+            (meta.unpricedModels?.length ?? 0) > 0
+              ? ` - NO snapshot price for: ${(meta.unpricedModels ?? []).join(', ')} (spend under-counted)`
+              : ''
+          }`,
+        ]
+      : []),
     '',
     `_Generated: ${new Date().toISOString()}_`,
     '',
@@ -658,6 +682,20 @@ export async function main(): Promise<void> {
         'so the ceiling could not observe spend (PS-8) - it was effectively UNENFORCED.',
     );
   }
+  // Deep-retest 0.13.7 P3: the run's actual spend was tracked but never
+  // reported - it could only be reconstructed from the billing console.
+  if (ceiling !== undefined) {
+    if (ceiling.unpricedModels().length > 0) {
+      console.warn(
+        `[benchmark-halumem] no snapshot price for: ${ceiling.unpricedModels().join(', ')} - ` +
+          'observed cost under-counts their usage (costPricingMatched=false in benchConfig).',
+      );
+    }
+    console.log(
+      `[benchmark-halumem] observed cost: $${ceiling.observedCostUsd().toFixed(6)} ` +
+        `(cap $${args.maxCostUsd})`,
+    );
+  }
   // P2-3 (deep retest 2026-07-19): a stub run's pass/fail counts are
   // plumbing-only noise, and `passed=0` reads like a failed quality
   // gate to anyone skimming CI logs. Stub summaries lead with an
@@ -686,6 +724,15 @@ export async function main(): Promise<void> {
     provider: label,
     ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
+    ...(ceiling !== undefined
+      ? {
+          observedCostUsd: ceiling.observedCostUsd(),
+          costPricingMatched: ceiling.unpricedModels().length === 0,
+          ...(ceiling.unpricedModels().length > 0
+            ? { unpricedModels: ceiling.unpricedModels() }
+            : {}),
+        }
+      : {}),
     ...(infra.count > 0 ? { infrastructureFailedCases: infra.caseIds } : {}),
   };
   await mkdir(dirname(args.results), { recursive: true });
@@ -696,6 +743,13 @@ export async function main(): Promise<void> {
       conflictPipeline,
       embedder,
       ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
+      ...(ceiling !== undefined && args.maxCostUsd !== undefined
+        ? {
+            observedCostUsd: ceiling.observedCostUsd(),
+            maxCostUsd: args.maxCostUsd,
+            unpricedModels: ceiling.unpricedModels(),
+          }
+        : {}),
     })}${renderMarkdownReport(report)}`,
     'utf8',
   );
