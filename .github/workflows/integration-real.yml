@@ -11,8 +11,12 @@ name: Real integration
 #     weights on the runner; candidate third job if the provider grows.
 #   - OS keyring: needs a headless secret-service (gnome-keyring + dbus
 #     choreography), which is flake-prone on hosted runners.
-#   - 1Password: needs a paid service-account secret in the repo - a
-#     maintainer decision, not a workflow default.
+#   - AUTHENTICATED 1Password reads: need a paid service-account secret in
+#     the repo - a maintainer decision, not a workflow default. The
+#     UNAUTHENTICATED CLI contract (argv parses against the real binary) IS
+#     covered below: 0.13.7 shipped `op read --reveal`, a flag the real CLI
+#     rejects, because only injected-spawn fakes ever saw the wrapper
+#     (deep-retest 0.13.7 P1).
 
 on:
   workflow_dispatch:
@@ -153,8 +157,67 @@ jobs:
                  | length) == 0
           ' doctor-report.json
 
+  onepassword-cli:
+    name: 1Password CLI contract (real binary, no account)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @graphorin/secret-1password (turbo builds its dependencies)
+        run: pnpm exec turbo run build --filter=@graphorin/secret-1password
+
+      # Pinned official binary from 1Password's canonical distribution host
+      # (no third-party action): version + sha256 move together on bumps.
+      - name: Install the 1Password CLI
+        run: |
+          set -euo pipefail
+          curl -fsSLo op.zip "https://cache.agilebits.com/dist/1P/op2/pkg/v2.35.0/op_linux_amd64_v2.35.0.zip"
+          echo "4457ade59850b852c64c77164235b34dd0b984ef7826eb0ccd32f1fd78a2ceb7  op.zip" | sha256sum -c -
+          unzip -o op.zip op
+          sudo install -m 0755 op /usr/local/bin/op
+          op --version
+
+      # GRAPHORIN_RUN_OP_INTEGRATION=1 arms the real-binary leg in
+      # tests/op-cli.test.ts: an isolated OP_CONFIG_DIR forces the
+      # deterministic 'no accounts configured' state, so the leg proves the
+      # spawn argv parses (the P1 failure mode died at flag parsing, before
+      # any auth check) without needing any 1Password secret.
+      - name: Run the op contract suite against the real binary
+        run: |
+          set -euo pipefail
+          GRAPHORIN_RUN_OP_INTEGRATION=1 pnpm --filter @graphorin/secret-1password exec \
+            vitest run tests/op-cli.test.ts \
+            --reporter=default --reporter=json --outputFile=op-vitest.json
+
+      # Guard against a silent no-op: the real-binary test must have RUN and
+      # passed, not been collected as skipped (which is what happens when the
+      # opt-in env var gets lost).
+      - name: Assert the real-binary leg actually ran
+        run: |
+          set -euo pipefail
+          jq -e '
+            [.testResults[].assertionResults[]
+             | select(.title | contains("account/auth stage"))
+             | select(.status == "passed")]
+            | length == 1
+          ' packages/secret-1password/op-vitest.json
+
   notify-on-failure:
-    needs: [docker-sandbox, ollama-doctor]
+    needs: [docker-sandbox, ollama-doctor, onepassword-cli]
     if: failure() && github.event_name == 'schedule'
     permissions:
       issues: write
