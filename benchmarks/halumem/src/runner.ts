@@ -378,6 +378,11 @@ export interface CliArgs {
   judgeModel?: string;
   judgeBaseUrl?: string;
   maxCostUsd?: number;
+  /**
+   * Deep-retest 0.13.8 P1: opt out of the fail-closed unpriced-model
+   * preflight under `--max-cost-usd` (spend stays under-counted).
+   */
+  allowUnpricedModel: boolean;
   help: boolean;
 }
 
@@ -409,7 +414,11 @@ Flags:
   --judge-provider <name>     Dedicated judge provider for the qa stage
   --judge-model <id>          Judge model id
   --judge-base-url <url>      Judge base URL
-  --max-cost-usd <n>          Abort when observed provider spend exceeds n USD
+  --max-cost-usd <n>          Abort when observed provider spend exceeds n USD.
+                              Fails closed before the first request when a
+                              subject/judge model has no pricing-snapshot entry
+  --allow-unpriced-model      Proceed under --max-cost-usd despite unpriced
+                              models (their spend stays under-counted)
   --help, -h                  Show this help
 
 Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
@@ -426,6 +435,7 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     stage: 'operations',
     smoke: false,
     results: join(pkgRoot(), 'RESULTS.md'),
+    allowUnpricedModel: false,
     help: false,
   };
   const value = (flag: string, next: string | undefined): string => {
@@ -491,6 +501,8 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       }
       args.maxCostUsd = ceiling;
       i++;
+    } else if (a === '--allow-unpriced-model') {
+      args.allowUnpricedModel = true;
     } else if (a === '--smoke') {
       args.smoke = true;
     } else if (a === '--help' || a === '-h') {
@@ -544,6 +556,25 @@ export function withBenchCostCeiling(maxCostUsd: number): {
     }),
   ]);
   return { wrap, observedCostUsd, unpricedModels: () => [...unpriced] };
+}
+
+/**
+ * Deep-retest 0.13.8 P1: `--max-cost-usd` preflight. A model the pricing
+ * snapshot cannot price contributes $0 to the shared accumulator, so the
+ * ceiling silently under-observes its spend - with an unpriced subject
+ * AND judge the cap is fully inert. Mirror the agent-level precedent
+ * (`RunBudget.onUnpriced` defaults to `'fail'`): resolve pricing for
+ * every capped provider BEFORE the first request and fail closed unless
+ * the operator explicitly accepts under-counting.
+ */
+export function preflightUnpricedModels(providers: ReadonlyArray<Provider>): ReadonlyArray<string> {
+  const unpriced = new Set<string>();
+  for (const provider of providers) {
+    if (priceLookupByModel({ modelId: provider.modelId }) === null) {
+      unpriced.add(provider.modelId);
+    }
+  }
+  return [...unpriced];
 }
 
 function buildResultsHeader(
@@ -639,6 +670,28 @@ export async function main(): Promise<void> {
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
   let sutProvider = provider;
   if (args.maxCostUsd !== undefined) {
+    // Deep-retest 0.13.8 P1: fail closed BEFORE the first request when the
+    // cap cannot observe a model's spend, instead of running with a
+    // silently porous ceiling (agent `RunBudget.onUnpriced` precedent).
+    const unpriced = preflightUnpricedModels([
+      provider,
+      ...(judgeResolved !== undefined ? [judgeResolved.provider] : []),
+    ]);
+    if (unpriced.length > 0 && !args.allowUnpricedModel) {
+      console.error(
+        `[benchmark-halumem] --max-cost-usd cannot observe spend for: ${unpriced.join(', ')} ` +
+          '(no pricing-snapshot entry). Use a model id the snapshot prices, refresh the ' +
+          'snapshot, or pass --allow-unpriced-model to accept under-counted spend.',
+      );
+      process.exitCode = 1;
+      return;
+    }
+    if (unpriced.length > 0) {
+      console.warn(
+        '[benchmark-halumem] --allow-unpriced-model: proceeding although the ceiling cannot ' +
+          `observe spend for: ${unpriced.join(', ')} - costPricingMatched=false in benchConfig.`,
+      );
+    }
     ceiling = withBenchCostCeiling(args.maxCostUsd);
     sutProvider = ceiling.wrap(provider);
     if (judgeResolved !== undefined) {
@@ -724,6 +777,7 @@ export async function main(): Promise<void> {
     provider: label,
     ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
+    ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),

@@ -170,6 +170,26 @@ export function withBenchCostCeiling(maxCostUsd: number): {
 export const benchPriceLookup: typeof priceLookupByModel = priceLookupByModel;
 
 /**
+ * Deep-retest 0.13.8 P1: `--max-cost-usd` preflight. A model the pricing
+ * snapshot cannot price contributes $0 to the shared accumulator, so the
+ * ceiling silently under-observes its spend - with an unpriced subject
+ * AND judge the cap is fully inert. Mirror the agent-level precedent
+ * (`RunBudget.onUnpriced` defaults to `'fail'`): resolve pricing for
+ * every capped provider BEFORE the first request and fail closed unless
+ * the operator explicitly accepts under-counting. Keep in sync with the
+ * HaluMem twin.
+ */
+export function preflightUnpricedModels(providers: ReadonlyArray<Provider>): ReadonlyArray<string> {
+  const unpriced = new Set<string>();
+  for (const provider of providers) {
+    if (benchPriceLookup({ modelId: provider.modelId }) === null) {
+      unpriced.add(provider.modelId);
+    }
+  }
+  return [...unpriced];
+}
+
+/**
  * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default - and any
  * `stub` name - is the deterministic offline stub, labelled
  * `stub (plumbing-only)` so a plumbing run can never be mistaken for a real
@@ -740,6 +760,11 @@ export interface CliArgs {
   conflictPipeline?: ConflictPipelineMode;
   /** D1 (W-084): run-level USD ceiling on the resolved bench providers. */
   maxCostUsd?: number;
+  /**
+   * Deep-retest 0.13.8 P1: opt out of the fail-closed unpriced-model
+   * preflight under `--max-cost-usd` (spend stays under-counted).
+   */
+  allowUnpricedModel: boolean;
   /** C8 (evals-05): repeat cases for variance. */
   iterations?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
@@ -789,7 +814,11 @@ Flags:
   --conflict-pipeline <on|off> Conflict pipeline under test (default: off; the
                               A/B axis for update-omission - see benchmark-halumem)
   --max-cost-usd <n>          Abort the run when observed provider spend exceeds
-                              n USD (needs a provider that reports usage cost)
+                              n USD (needs a provider that reports usage cost).
+                              Fails closed before the first request when a
+                              subject/judge model has no pricing-snapshot entry
+  --allow-unpriced-model      Proceed under --max-cost-usd despite unpriced
+                              models (their spend stays under-counted)
   --iterations <n>            Repeat cases for variance reporting
   --help, -h                  Show this help
 
@@ -814,6 +843,7 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     consolidate: false,
     gateOn: 'all',
     allowSelfJudge: false,
+    allowUnpricedModel: false,
     help: false,
     bareRun: true,
   };
@@ -902,6 +932,8 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       i++;
     } else if (a === '--allow-self-judge') {
       args.allowSelfJudge = true;
+    } else if (a === '--allow-unpriced-model') {
+      args.allowUnpricedModel = true;
     } else if (a === '--smoke') {
       args.smoke = true;
     } else if (a === '--consolidate') {
@@ -1112,6 +1144,28 @@ export async function main(): Promise<void> {
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
   let sutProvider = provider;
   if (args.maxCostUsd !== undefined) {
+    // Deep-retest 0.13.8 P1: fail closed BEFORE the first request when the
+    // cap cannot observe a model's spend, instead of running with a
+    // silently porous ceiling (agent `RunBudget.onUnpriced` precedent).
+    const unpriced = preflightUnpricedModels([
+      provider,
+      ...(judgeResolved !== undefined ? [judgeResolved.provider] : []),
+    ]);
+    if (unpriced.length > 0 && !args.allowUnpricedModel) {
+      console.error(
+        `[benchmark-longmemeval] --max-cost-usd cannot observe spend for: ${unpriced.join(', ')} ` +
+          '(no pricing-snapshot entry). Use a model id the snapshot prices, refresh the ' +
+          'snapshot, or pass --allow-unpriced-model to accept under-counted spend.',
+      );
+      process.exitCode = 1;
+      return;
+    }
+    if (unpriced.length > 0) {
+      console.warn(
+        '[benchmark-longmemeval] --allow-unpriced-model: proceeding although the ceiling cannot ' +
+          `observe spend for: ${unpriced.join(', ')} - costPricingMatched=false in benchConfig.`,
+      );
+    }
     ceiling = withBenchCostCeiling(args.maxCostUsd);
     sutProvider = ceiling.wrap(provider);
     if (judgeResolved !== undefined) {
@@ -1200,6 +1254,7 @@ export async function main(): Promise<void> {
     ...(args.variant !== undefined ? { variant: args.variant } : {}),
     ...(args.ability !== undefined ? { ability: args.ability } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
+    ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),

@@ -11,6 +11,7 @@ import {
   createOperationsAgent,
   INFRA_MARKER,
   parseArgs,
+  preflightUnpricedModels,
   runHaluMemBenchmark,
   USAGE,
   withBenchCostCeiling,
@@ -202,6 +203,25 @@ describe('deep-retest-0.13.6 P2-4 - --max-cost-usd observes real spend', () => {
     await unpriced.wrap(createUsageProvider('model-not-in-snapshot')).generate(REQ);
     expect(unpriced.unpricedModels()).toEqual(['model-not-in-snapshot']);
   });
+
+  it('deep-retest 0.13.8 P1: preflight names every model the cap cannot observe', () => {
+    // Priced subject + priced judge: nothing to report - including the
+    // formerly-unpriced gpt-4o-mini judge alias the ninth retest ran with.
+    expect(
+      preflightUnpricedModels([
+        createUsageProvider('gpt-4.1-mini'),
+        createUsageProvider('gpt-4o-mini'),
+      ]),
+    ).toEqual([]);
+    // An unpriced model is named exactly once, priced peers stay silent.
+    expect(
+      preflightUnpricedModels([
+        createUsageProvider('gpt-4.1-mini'),
+        createUsageProvider('mystery-model'),
+        createUsageProvider('mystery-model'),
+      ]),
+    ).toEqual(['mystery-model']);
+  });
 });
 
 describe('deep-retest-0.13.6 P2-Q - embedder axis', () => {
@@ -247,9 +267,14 @@ describe('benchmark-halumem CLI', () => {
       '--judge-model',
       '--judge-base-url',
       '--max-cost-usd',
+      '--allow-unpriced-model',
       '--help',
     ];
     for (const flag of flags) expect(USAGE).toContain(flag);
+    expect(parseArgs(['node', 'runner.js']).allowUnpricedModel).toBe(false);
+    expect(parseArgs(['node', 'runner.js', '--allow-unpriced-model']).allowUnpricedModel).toBe(
+      true,
+    );
     expect(parseArgs(['node', 'runner.js', '--stage', 'qa']).stage).toBe('qa');
     expect(parseArgs(['node', 'runner.js', '--conflict-pipeline', 'on']).conflictPipeline).toBe(
       'on',

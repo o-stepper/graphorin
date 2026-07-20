@@ -78,12 +78,20 @@ describe('benchmarks/longmemeval CLI args', () => {
       '--embedder',
       '--conflict-pipeline',
       '--max-cost-usd',
+      '--allow-unpriced-model',
       '--iterations',
       '--help',
     ];
     for (const flag of flags) {
       expect(USAGE).toContain(flag);
     }
+  });
+
+  it('deep-retest 0.13.8 P1: --allow-unpriced-model parses and defaults to fail-closed', () => {
+    expect(parseArgs(['node', 'runner.js']).allowUnpricedModel).toBe(false);
+    expect(parseArgs(['node', 'runner.js', '--allow-unpriced-model']).allowUnpricedModel).toBe(
+      true,
+    );
   });
 
   it('D1: validates --conflict-pipeline and --max-cost-usd values', () => {
