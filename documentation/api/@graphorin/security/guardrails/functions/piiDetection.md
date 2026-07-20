@@ -10,7 +10,7 @@
 function piiDetection<TValue>(opts?): GuardrailDefinition<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:150
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:153
 
 **`Stable`**
 

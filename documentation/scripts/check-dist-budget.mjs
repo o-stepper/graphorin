@@ -13,6 +13,9 @@
  *   - total dist size
  *   - average and p95 size of api/**.html pages
  *   - largest single file in the dist
+ *   - largest single JS chunk (the local-search index grows with the API
+ *     surface; the app bundle grows when a dependency lands eagerly -
+ *     both were flagged by the 0.13.5 external retest at 600-770 KB)
  *
  * Usage: node documentation/scripts/check-dist-budget.mjs [--self-test]
  * Exit codes: 0 ok - 1 budget breached / dist missing - 2 self-test failure.
@@ -50,6 +53,7 @@ function loadBudget() {
     'maxApiHtmlAvgBytes',
     'maxApiHtmlP95Bytes',
     'maxLargestAssetBytes',
+    'maxJsChunkBytes',
   ]) {
     if (typeof budget[key] !== 'number' || budget[key] <= 0) {
       throw new Error(`docs-dist-budget.json: ${key} must be a positive number`);
@@ -124,6 +128,19 @@ if (largest.size > budget.maxLargestAssetBytes) {
 } else {
   console.log(
     `[check-dist-budget] largest asset: ${relative(DIST, largest.path)} (${mb(largest.size)}, budget ${mb(budget.maxLargestAssetBytes)}).`,
+  );
+}
+
+const largestJs = files
+  .filter((f) => f.path.endsWith('.js'))
+  .reduce((max, f) => (f.size > max.size ? f : max), { path: '(none)', size: 0 });
+if (largestJs.size > budget.maxJsChunkBytes) {
+  failures.push(
+    `largest JS chunk ${relative(DIST, largestJs.path)} at ${kb(largestJs.size)} exceeds budget ${kb(budget.maxJsChunkBytes)}`,
+  );
+} else {
+  console.log(
+    `[check-dist-budget] largest JS chunk: ${relative(DIST, largestJs.path)} (${kb(largestJs.size)}, budget ${kb(budget.maxJsChunkBytes)}).`,
   );
 }
 

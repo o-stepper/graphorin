@@ -63,7 +63,10 @@ export const DEFAULT_PII_PATTERNS: ReadonlyArray<PiiPattern> = Object.freeze([
     kind: 'credit-card',
     // Lookarounds skip decimal-adjacent digit runs (`0.01639344262295082`,
     // `4111111111119.75`) so serialized floats survive redaction intact.
-    pattern: /\b(?<!\.)(?:\d[ -]?){13,19}\b(?!\.\d)/g,
+    // Digit-anchored on both ends: separators only appear BETWEEN digits,
+    // so the match never swallows the space after the PAN (which glued
+    // the mask to the following word).
+    pattern: /\b(?<!\.)\d(?:[ -]?\d){12,18}\b(?!\.\d)/g,
     validate: likelyPan,
   }),
   Object.freeze({
@@ -173,14 +176,9 @@ export function piiDetection<TValue = unknown>(
           continue;
         }
         matchedKinds.push(pat.kind);
-        const replacement = jsonSafeReplacement(
-          text,
-          m.index,
-          m[0].length,
-          `[REDACTED:${pat.kind}]`,
-        );
-        text = text.slice(0, m.index) + replacement + text.slice(m.index + m[0].length);
-        re.lastIndex = m.index + replacement.length;
+        const span = jsonSafeReplacement(text, m.index, m[0].length, `[REDACTED:${pat.kind}]`);
+        text = text.slice(0, span.start) + span.text + text.slice(span.end);
+        re.lastIndex = span.start + span.text.length;
         m = re.exec(text);
       }
     }
@@ -235,29 +233,48 @@ const JSON_WS = new Set([' ', '\t', '\n', '\r']);
 
 /**
  * Grammar-preserving replacement placement - local twin of
- * `jsonSafeMask` in `@graphorin/observability/redaction/patterns`
+ * `jsonSafeSpan` in `@graphorin/observability/redaction/patterns`
  * (security does not depend on observability). When the matched span
  * occupies a bare JSON value position, the replacement is wrapped in
  * double quotes so masking a raw numeric leaf keeps the document
- * parseable; everywhere else it is returned unchanged.
+ * parseable; a leading minus sign is absorbed into the returned span
+ * (`start` moves onto the `-`), because a stranded sign before a quoted
+ * replacement would not parse. Everywhere else the replacement is
+ * returned unquoted and the span covers exactly the match. A text that
+ * consists solely of the match is indistinguishable from a single-value
+ * JSON document and gets the quoted form - safe in both readings.
  */
 function jsonSafeReplacement(
   source: string,
   matchIndex: number,
   matchLength: number,
   replacement: string,
-): string {
+): { readonly start: number; readonly end: number; readonly text: string } {
+  const end = matchIndex + matchLength;
+  let start = matchIndex;
   let i = matchIndex - 1;
   while (i >= 0 && JSON_WS.has(source[i] as string)) i -= 1;
   const left = i < 0 ? undefined : source[i];
-  if (!(left === undefined || left === ':' || left === ',' || left === '[')) return replacement;
-  let j = matchIndex + matchLength;
+  if (left === '-') {
+    let k = i - 1;
+    while (k >= 0 && JSON_WS.has(source[k] as string)) k -= 1;
+    const beforeSign = k < 0 ? undefined : source[k];
+    if (
+      !(beforeSign === undefined || beforeSign === ':' || beforeSign === ',' || beforeSign === '[')
+    ) {
+      return { start, end, text: replacement };
+    }
+    start = i;
+  } else if (!(left === undefined || left === ':' || left === ',' || left === '[')) {
+    return { start, end, text: replacement };
+  }
+  let j = end;
   while (j < source.length && JSON_WS.has(source[j] as string)) j += 1;
   const right = j >= source.length ? undefined : source[j];
   if (!(right === undefined || right === ',' || right === '}' || right === ']')) {
-    return replacement;
+    return { start: matchIndex, end, text: replacement };
   }
-  return `"${replacement}"`;
+  return { start, end, text: `"${replacement}"` };
 }
 
 /**

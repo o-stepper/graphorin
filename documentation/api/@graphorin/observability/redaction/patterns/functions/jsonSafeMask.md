@@ -14,19 +14,18 @@ function jsonSafeMask(
    mask): string;
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:268
+Defined in: packages/observability/src/redaction/patterns.ts:340
 
 **`Stable`**
 
-Grammar-preserving mask placement. When the matched span occupies a bare
-JSON *value* position - the nearest non-whitespace neighbour on the left
-is `:` / `,` / `[` (or the start of the text) and on the right `,` / `}`
-/ `]` (or the end of the text) - the mask is returned wrapped in double
-quotes, so masking a raw numeric leaf (`{"card":4111111111111111}`)
-yields a document that still parses (`{"card":"[REDACTED creditcard]"}`).
-Everywhere else (prose, CSV, inside a JSON string leaf) the mask is
-returned unchanged. The text is never parsed, so numeric lexemes outside
-the match keep their exact source form.
+String-returning wrapper around [jsonSafeSpan](/api/@graphorin/observability/redaction/patterns/functions/jsonSafeSpan.md) for callers that
+replace exactly the matched span. Because its signature cannot widen
+the replaced region, it CANNOT absorb the leading minus of a signed
+numeric leaf - for `{"card":-4111111111111111}` it returns the plain
+unquoted mask (its historical behaviour), which leaves the document
+unparseable. Prefer [jsonSafeSpan](/api/@graphorin/observability/redaction/patterns/functions/jsonSafeSpan.md) in new code; this wrapper is
+kept for custom catalogues that adopted it in 0.13.4. The same
+whole-text ambiguity documented on [jsonSafeSpan](/api/@graphorin/observability/redaction/patterns/functions/jsonSafeSpan.md) applies.
 
 ## Parameters
 

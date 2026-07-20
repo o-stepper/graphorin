@@ -253,15 +253,87 @@ export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 const JSON_WS = new Set([' ', '\t', '\n', '\r']);
 
 /**
+ * A replacement decision from {@link jsonSafeSpan}: replace
+ * `source.slice(start, end)` with `text`. `start` normally equals the
+ * match index; it moves one lexeme left only when a leading minus sign
+ * has to be absorbed so a signed numeric leaf stays parseable.
+ *
+ * @stable
+ */
+export interface JsonSafeSpan {
+  readonly start: number;
+  readonly end: number;
+  readonly text: string;
+}
+
+/**
  * Grammar-preserving mask placement. When the matched span occupies a bare
  * JSON *value* position - the nearest non-whitespace neighbour on the left
  * is `:` / `,` / `[` (or the start of the text) and on the right `,` / `}`
- * / `]` (or the end of the text) - the mask is returned wrapped in double
- * quotes, so masking a raw numeric leaf (`{"card":4111111111111111}`)
- * yields a document that still parses (`{"card":"[REDACTED creditcard]"}`).
- * Everywhere else (prose, CSV, inside a JSON string leaf) the mask is
- * returned unchanged. The text is never parsed, so numeric lexemes outside
- * the match keep their exact source form.
+ * / `]` (or the end of the text) - the mask is wrapped in double quotes,
+ * so masking a raw numeric leaf (`{"card":4111111111111111}`) yields a
+ * document that still parses (`{"card":"[REDACTED creditcard]"}`). A
+ * leading minus sign is part of the value position: for
+ * `{"card":-4111111111111111}` the returned span absorbs the sign
+ * (`start` moves to the `-`), because a mask emitted after a stranded
+ * sign (`-"[REDACTED ...]"`) would not parse. Everywhere else (prose,
+ * CSV, inside a JSON string leaf) the mask is returned unquoted and the
+ * span covers exactly the match. The text is never parsed, so lexemes
+ * outside the returned span keep their exact source form.
+ *
+ * Ambiguity note: a text consisting solely of the match (plus
+ * insignificant whitespace) is indistinguishable from a single-value
+ * JSON document, so the mask is quoted even when the caller meant plain
+ * prose. That direction is safe - the redacted document parses in the
+ * JSON reading and leaks nothing in the prose reading.
+ *
+ * @stable
+ */
+export function jsonSafeSpan(
+  source: string,
+  matchIndex: number,
+  matchLength: number,
+  mask: string,
+): JsonSafeSpan {
+  const end = matchIndex + matchLength;
+  let start = matchIndex;
+  let i = matchIndex - 1;
+  while (i >= 0 && JSON_WS.has(source[i] as string)) i -= 1;
+  const left = i < 0 ? undefined : source[i];
+  if (left === '-') {
+    // Signed numeric leaf candidate: the value position is decided by the
+    // neighbour left of the sign, and the sign must be absorbed into the
+    // replaced span (a stranded `-` before a quoted mask does not parse).
+    let k = i - 1;
+    while (k >= 0 && JSON_WS.has(source[k] as string)) k -= 1;
+    const beforeSign = k < 0 ? undefined : source[k];
+    if (
+      !(beforeSign === undefined || beforeSign === ':' || beforeSign === ',' || beforeSign === '[')
+    ) {
+      return { start, end, text: mask };
+    }
+    start = i;
+  } else if (!(left === undefined || left === ':' || left === ',' || left === '[')) {
+    return { start, end, text: mask };
+  }
+  let j = end;
+  while (j < source.length && JSON_WS.has(source[j] as string)) j += 1;
+  const right = j >= source.length ? undefined : source[j];
+  if (!(right === undefined || right === ',' || right === '}' || right === ']')) {
+    return { start: matchIndex, end, text: mask };
+  }
+  return { start, end, text: `"${mask}"` };
+}
+
+/**
+ * String-returning wrapper around {@link jsonSafeSpan} for callers that
+ * replace exactly the matched span. Because its signature cannot widen
+ * the replaced region, it CANNOT absorb the leading minus of a signed
+ * numeric leaf - for `{"card":-4111111111111111}` it returns the plain
+ * unquoted mask (its historical behaviour), which leaves the document
+ * unparseable. Prefer {@link jsonSafeSpan} in new code; this wrapper is
+ * kept for custom catalogues that adopted it in 0.13.4. The same
+ * whole-text ambiguity documented on {@link jsonSafeSpan} applies.
  *
  * @stable
  */
@@ -271,15 +343,8 @@ export function jsonSafeMask(
   matchLength: number,
   mask: string,
 ): string {
-  let i = matchIndex - 1;
-  while (i >= 0 && JSON_WS.has(source[i] as string)) i -= 1;
-  const left = i < 0 ? undefined : source[i];
-  if (!(left === undefined || left === ':' || left === ',' || left === '[')) return mask;
-  let j = matchIndex + matchLength;
-  while (j < source.length && JSON_WS.has(source[j] as string)) j += 1;
-  const right = j >= source.length ? undefined : source[j];
-  if (!(right === undefined || right === ',' || right === '}' || right === ']')) return mask;
-  return `"${mask}"`;
+  const span = jsonSafeSpan(source, matchIndex, matchLength, mask);
+  return span.start === matchIndex ? span.text : mask;
 }
 
 /**

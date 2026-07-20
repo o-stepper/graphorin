@@ -11,7 +11,7 @@ import { RedactionValidationError } from './errors.js';
 import {
   ALL_BUILT_IN_PATTERNS,
   BUILT_IN_PATTERNS,
-  jsonSafeMask,
+  jsonSafeSpan,
   type RedactionPattern,
 } from './patterns.js';
 import type {
@@ -126,8 +126,9 @@ function applyPatterns(
     // RP-21: per-match `verify` predicate - only mask hits the verifier
     // accepts (e.g. Luhn-valid PANs), and only count the pattern as matched
     // when one did. The manual exec loop gives each accepted match its
-    // offset so `jsonSafeMask` can quote the mask in a bare JSON value
-    // position, keeping a masked numeric leaf parseable.
+    // offset so `jsonSafeSpan` can quote the mask in a bare JSON value
+    // position (absorbing a leading minus sign), keeping a masked numeric
+    // leaf parseable.
     const verify = p.verify;
     p.regex.lastIndex = 0;
     let rewritten = '';
@@ -144,8 +145,9 @@ function applyPatterns(
       if (verify === undefined || verify(value)) {
         hit = true;
         matched.add(p.name);
-        rewritten += out.slice(lastEnd, m.index) + jsonSafeMask(out, m.index, value.length, mask);
-        lastEnd = m.index + value.length;
+        const span = jsonSafeSpan(out, m.index, value.length, mask);
+        rewritten += out.slice(lastEnd, span.start) + span.text;
+        lastEnd = span.end;
       }
       if (!p.regex.global) break;
       m = p.regex.exec(out);

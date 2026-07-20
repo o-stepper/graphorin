@@ -10,7 +10,7 @@
 function containsPii(text, patterns?): boolean;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:109
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:112
 
 **`Stable`**
 
