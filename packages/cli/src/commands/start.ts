@@ -14,6 +14,7 @@ import process from 'node:process';
 import { applyProcessHardening, RefuseToRunAsRootError } from '@graphorin/security';
 import { ConfigInvalidError, createServer, GraphorinServerError } from '@graphorin/server';
 
+import { loadAppModule } from '../internal/app-module.js';
 import { loadConfig } from '../internal/load-config.js';
 
 /**
@@ -61,20 +62,51 @@ export async function runStart(
   }
   const overrides = applyCliOverrides(loaded.config, options);
 
+  // App-compose module (config `app` field): dynamically imported, its
+  // adapter bag is spread into createServer so the sessions / memory /
+  // agents / workflows surface mounts; a bare start stays
+  // infrastructure-only.
+  const appPath = (overrides as { app?: unknown }).app;
+  let appBag: Record<string, unknown> = {};
+  let appClose: (() => void | Promise<void>) | undefined;
+  if (typeof appPath === 'string') {
+    try {
+      const app = await loadAppModule(appPath, loaded.path, overrides);
+      appBag = app.bag as Record<string, unknown>;
+      appClose = app.close;
+      process.stderr.write(`[graphorin/cli] app module composed: ${appPath}\n`);
+    } catch (err) {
+      fatal(err);
+    }
+  }
+
   let server: Awaited<ReturnType<typeof createServer>> | undefined;
   try {
-    server = await createServer({ config: overrides });
+    server = await createServer({ config: overrides, ...appBag });
   } catch (err) {
+    await closeQuietly(appClose);
     fatal(err);
   }
   if (server === undefined) process.exit(1);
 
-  const listening = await safeStart(server);
+  const listening = await safeStart(server, appClose);
   process.stderr.write(
     `[graphorin/cli] @graphorin/server v${server.version} listening on http://${listening.host}:${listening.port}${server.config.server.basePath}\n`,
   );
-  installSignalHandlers(server);
+  installSignalHandlers(server, appClose);
   return listening;
+}
+
+/** Best-effort app-resource shutdown on failure paths. */
+async function closeQuietly(close: (() => void | Promise<void>) | undefined): Promise<void> {
+  if (close === undefined) return;
+  try {
+    await close();
+  } catch (err) {
+    process.stderr.write(
+      `[graphorin/cli] app close hook failed: ${err instanceof Error ? err.message : String(err)}\n`,
+    );
+  }
 }
 
 /**
@@ -108,10 +140,14 @@ export function applyCliOverrides(
   return next;
 }
 
-async function safeStart(server: Awaited<ReturnType<typeof createServer>>) {
+async function safeStart(
+  server: Awaited<ReturnType<typeof createServer>>,
+  appClose?: () => void | Promise<void>,
+) {
   try {
     return await server.start();
   } catch (err) {
+    await closeQuietly(appClose);
     fatal(err);
   }
   process.exit(1);
@@ -158,7 +194,10 @@ export function applyHardeningEarly(): void {
   }
 }
 
-function installSignalHandlers(server: Awaited<ReturnType<typeof createServer>>): void {
+function installSignalHandlers(
+  server: Awaited<ReturnType<typeof createServer>>,
+  appClose?: () => void | Promise<void>,
+): void {
   let shuttingDown = false;
   const onSignal = (signal: NodeJS.Signals) => {
     if (shuttingDown) return;
@@ -166,6 +205,9 @@ function installSignalHandlers(server: Awaited<ReturnType<typeof createServer>>)
     process.stderr.write(`[graphorin/cli] received ${signal}; draining...\n`);
     server
       .stop()
+      // The app owns its resources (injected store, provider clients);
+      // stop() never closes them, so the close hook runs after drain.
+      .then(() => closeQuietly(appClose))
       .then(() => {
         process.stderr.write('[graphorin/cli] graceful shutdown complete\n');
         process.exit(0);

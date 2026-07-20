@@ -10,7 +10,7 @@
 type ServerConfigInput = z.input<typeof ServerConfigSchema>;
 ```
 
-Defined in: packages/server/src/config.ts:461
+Defined in: packages/server/src/config.ts:473
 
 **`Stable`**
 

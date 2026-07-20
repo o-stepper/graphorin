@@ -10,7 +10,7 @@
 type SecretsSourceFlag = "auto" | "keyring" | "encrypted-file" | "env";
 ```
 
-Defined in: packages/cli/src/commands/start.ts:25
+Defined in: packages/cli/src/commands/start.ts:26
 
 **`Stable`**
 

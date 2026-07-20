@@ -10,7 +10,7 @@
 function parseServerConfig(input): ServerConfigSpec;
 ```
 
-Defined in: packages/server/src/config.ts:482
+Defined in: packages/server/src/config.ts:494
 
 **`Stable`**
 

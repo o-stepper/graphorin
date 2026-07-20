@@ -206,6 +206,10 @@ function registerLifecycleCommands(program: Command): void {
     )
     .option('--encrypted', 'Enable storage encryption opt-in.')
     .option('--no-encrypted', 'Disable storage encryption opt-in.')
+    .option(
+      '--app',
+      'Also scaffold a graphorin.app.mjs compose module (sessions + memory REST adapters over the configured store) and reference it from the config, so `graphorin start` serves the full domain surface.',
+    )
     .action(
       async (opts: {
         out?: string;
@@ -213,6 +217,7 @@ function registerLifecycleCommands(program: Command): void {
         nonInteractive?: boolean;
         cloudConsent?: 'public-only' | 'public-and-internal' | 'all-with-warnings';
         encrypted?: boolean;
+        app?: boolean;
       }) => {
         if (isOfflineMode()) {
           process.stderr.write(
@@ -225,6 +230,7 @@ function registerLifecycleCommands(program: Command): void {
           ...(opts.nonInteractive !== undefined ? { nonInteractive: opts.nonInteractive } : {}),
           ...(opts.cloudConsent !== undefined ? { cloudConsent: opts.cloudConsent } : {}),
           ...(opts.encrypted !== undefined ? { encrypted: opts.encrypted } : {}),
+          ...(opts.app !== undefined ? { app: opts.app } : {}),
         });
       },
     );
