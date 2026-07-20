@@ -52,6 +52,32 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.5 -> 0.13.6
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **A masked signed numeric JSON value now absorbs its sign.** Where
+  0.13.4 quoted the mask for `{"card":4111111111111111}` but still
+  broke `JSON.parse` for the negative twin
+  (`{"card":-4111111111111111}` became `{"card":-[REDACTED
+  creditcard]}`), redaction now absorbs the leading minus and emits
+  `{"card":"[REDACTED creditcard]"}` across the `withRedaction`
+  middleware, the OTLP `RedactionValidator`, and the `piiDetection`
+  guardrail. A minus in prose is untouched. If you asserted on the old
+  JSON-breaking output, update the expectation.
+- **`jsonSafeSpan` is the span-aware helper.** Custom catalogues that
+  used `jsonSafeMask` keep its exact old behaviour (its string-return
+  signature cannot absorb a sign); switch to `jsonSafeSpan` from
+  `@graphorin/observability/redaction/patterns` for signed-leaf
+  support. Both docblocks now document the whole-text ambiguity (a
+  text that is solely the match reads as a single-value JSON document
+  and gets the quoted form).
+- **The security credit-card mask no longer swallows the trailing
+  separator.** `card 4111 1111 1111 1111 ok` now rewrites to `card
+  [REDACTED:credit-card] ok` instead of gluing the marker onto the
+  following word.
+
 ### 0.13.4 -> 0.13.5
 
 A patch release; nothing to migrate. Additions worth knowing about:

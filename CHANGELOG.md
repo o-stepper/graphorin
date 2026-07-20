@@ -14,6 +14,48 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.6 - 2026-07-20
+
+The **signed-leaf redaction patch** (PRs #227, #228): remediation of
+the seventh external deep retest, which re-audited the released 0.13.5
+and found no P0/P1. No breaking changes.
+
+### Redaction - signed numeric JSON leaves stay grammar-safe (`@graphorin/provider`, `@graphorin/observability`, `@graphorin/security`)
+
+- Masking a negative numeric leaf (`{"card":-4111111111111111}`) left
+  a stranded minus before an unquoted mask, breaking `JSON.parse` in
+  all three layers. The new span-based helper `jsonSafeSpan` (exported
+  from `@graphorin/observability/redaction/patterns`, local twin in the
+  security guardrail) absorbs the leading sign when the neighbour left
+  of it is a JSON value delimiter and emits the quoted mask
+  (`{"card":"[REDACTED creditcard]"}`); a prose minus stays untouched.
+- `jsonSafeMask` keeps its exact historical behaviour for span-fixed
+  callers, and both docblocks now state the whole-text ambiguity: a
+  text consisting solely of the match is indistinguishable from a
+  single-value JSON document and gets the quoted form (safe in both
+  readings).
+- The security `credit-card` pattern is digit-anchored on both ends,
+  so the match no longer swallows the separator after the PAN (the
+  `[REDACTED:credit-card]` marker used to glue onto the following
+  word).
+- Shared regression corpora plus seeded JSON-preservation property
+  tests now run in all three suites: any valid JSON document stays
+  valid after redaction.
+
+### Infrastructure (not npm-published)
+
+- The docs dist gate budgets the largest JS chunk (1 MB) so the local
+  search index growing with the API surface, or a dependency landing
+  eagerly in the app bundle, fails CI instead of shipping silently.
+- New weekly `integration-real` workflow (never PR-blocking): a live
+  Docker daemon runs the real sandbox one-shot container leg, and a
+  live Ollama daemon (qwen3:0.6b + nomic-embed-text) runs every
+  `doctor --smoke-local` leg end to end, with assertions that the real
+  paths executed rather than degrading to skip. llama.cpp, OS keyring,
+  and 1Password legs are documented as intentionally uncovered.
+
+---
+
 ## 0.13.5 - 2026-07-20
 
 The **compose-and-completeness patch** (PRs #224, #225): the reviewer

@@ -1,5 +1,13 @@
 # @graphorin/store-sqlite
 
+## 0.13.6
+
+### Patch Changes
+
+- Updated dependencies [[`6715ad4`](https://github.com/o-stepper/graphorin/commit/6715ad451e5617c882d282c7f2b2ce67ebd1e4ac)]:
+  - @graphorin/observability@0.13.6
+  - @graphorin/core@0.13.6
+
 ## 0.13.5
 
 ### Patch Changes
