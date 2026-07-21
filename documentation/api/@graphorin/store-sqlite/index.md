@@ -127,7 +127,7 @@ only when the interval is passed explicitly. There is no worker pool
 and no reader fan-out - a single synchronous connection serves both
 modes. For what is safe to run against the file while a server holds
 it, see the
-[concurrency matrix](https://graphorin.com/guide/storage#concurrency-matrix).
+[concurrency matrix](https://docs.graphorin.com/guide/storage#concurrency-matrix).
 
 ## Migrations
 
