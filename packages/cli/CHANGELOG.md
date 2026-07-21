@@ -1,5 +1,24 @@
 # @graphorin/cli
 
+## 0.13.12
+
+### Patch Changes
+
+- [#242](https://github.com/o-stepper/graphorin/pull/242) [`8a85b51`](https://github.com/o-stepper/graphorin/commit/8a85b51f91fefab5f5432d49a69c5a54642126d8) Thanks [@o-stepper](https://github.com/o-stepper)! - CI-safe init pepper handling + bootstrap-aware doctor (thirteenth deep retest). `graphorin init --pepper-out <path>` writes the server pepper hex to a `0600` file (never overwrites) instead of printing it, so non-interactive bootstrap logs (CI, image builds) stop retaining the key material behind every token HMAC; the next-steps hint walks the file-based `secrets set --from-stdin` path and tells the operator to delete the file. `graphorin doctor` on an UNINITIALIZED host (no `~/.graphorin`, no `--config`) now reports the `audit-db` encryption check as `skip` with an init hint instead of a hard `fail` - nothing could have registered an audit binding before bootstrap; configured or bootstrapped deployments keep the strict fail.
+
+- Updated dependencies [[`8a85b51`](https://github.com/o-stepper/graphorin/commit/8a85b51f91fefab5f5432d49a69c5a54642126d8), [`8a85b51`](https://github.com/o-stepper/graphorin/commit/8a85b51f91fefab5f5432d49a69c5a54642126d8)]:
+  - @graphorin/security@0.13.12
+  - @graphorin/provider@0.13.12
+  - @graphorin/memory@0.13.12
+  - @graphorin/server@0.13.12
+  - @graphorin/skills@0.13.12
+  - @graphorin/sessions@0.13.12
+  - @graphorin/core@0.13.12
+  - @graphorin/eslint-plugin@0.13.12
+  - @graphorin/pricing@0.13.12
+  - @graphorin/store-sqlite@0.13.12
+  - @graphorin/workflow@0.13.12
+
 ## 0.13.11
 
 ### Patch Changes

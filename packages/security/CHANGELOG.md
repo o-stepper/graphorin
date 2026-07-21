@@ -1,5 +1,14 @@
 # @graphorin/security
 
+## 0.13.12
+
+### Patch Changes
+
+- [#242](https://github.com/o-stepper/graphorin/pull/242) [`8a85b51`](https://github.com/o-stepper/graphorin/commit/8a85b51f91fefab5f5432d49a69c5a54642126d8) Thanks [@o-stepper](https://github.com/o-stepper)! - `checkEncryption` accepts a `bootstrapped` flag (thirteenth deep retest). When the caller reports an uninitialized host (`bootstrapped: false`, no `auditEnabled` knowledge), a missing audit-db binding is a `skip` with a bootstrap hint rather than a `fail` - `fail` stays reserved for configured or bootstrapped deployments where the binding is genuinely expected. An audit-enabled config always keeps the strict fail regardless of the flag.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.12
+
 ## 0.13.11
 
 ### Patch Changes

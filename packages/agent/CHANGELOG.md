@@ -1,5 +1,16 @@
 # @graphorin/agent
 
+## 0.13.12
+
+### Patch Changes
+
+- Updated dependencies [[`8a85b51`](https://github.com/o-stepper/graphorin/commit/8a85b51f91fefab5f5432d49a69c5a54642126d8)]:
+  - @graphorin/security@0.13.12
+  - @graphorin/memory@0.13.12
+  - @graphorin/skills@0.13.12
+  - @graphorin/tools@0.13.12
+  - @graphorin/core@0.13.12
+
 ## 0.13.11
 
 ### Patch Changes

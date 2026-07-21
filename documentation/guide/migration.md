@@ -52,6 +52,35 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.11 -> 0.13.12
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **Cold concurrent parameter recovery is single-flight.** While one
+  call climbs the HTTP-400 recovery ladder, cold siblings wait for it
+  and retry once from the learned state - fewer duplicate 400s and
+  less rate-limit pressure. Call counts during a cold burst change
+  (five-way worst case 15 -> 11 requests); results and learned
+  behaviour do not, and every call still recovers independently if
+  the leading call fails.
+- **`llmJudge` re-asks once on a missing `SCORE:` marker** with a
+  raised output budget, so eval runs make one extra judge call in
+  that (previously failing) situation. Pass `offFormatRetries: 0` to
+  restore the old single-shot fail-loud behaviour. Exhausted retries
+  throw the new typed `JudgeOffFormatError`, and the HaluMem runner
+  reports such cases as `JUDGE_FAILED` instead of subject failures.
+- **`doctor` on an uninitialized host reports `skip`, not `fail`,
+  for `audit-db`.** Automation that (incorrectly) relied on a
+  non-zero doctor exit from a host with no `~/.graphorin` and no
+  `--config` should assert on the individual check instead;
+  configured deployments keep the strict fail.
+- **New, opt-in:** `graphorin init --pepper-out <path>` (pepper hex
+  to a `0600` file instead of the terminal), reranker `lastFailures`
+  / `lastOffFormatCount` diagnostics, `pnpm smoke-examples
+  --exclude <name>`, and a `benchmark:compare` A/B table for HaluMem
+  reports.
+
 ### 0.13.10 -> 0.13.11
 
 A patch release; nothing to migrate. Behavioural refinements worth

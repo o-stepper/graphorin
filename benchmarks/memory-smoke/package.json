@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-memory-smoke",
-  "version": "0.13.11",
+  "version": "0.13.12",
   "private": true,
   "description": "Synthetic memory-retrieval smoke test for the Graphorin framework - a small set of hand-written QA cases scored by deterministic substring match, kept fast and offline for benchmark:ci. This is NOT the published LOCOMO benchmark; for the real memory-eval harness (LongMemEval + real LOCOMO + DMR with LLM-judge 'J' scoring and per-category regression gates) use @graphorin/benchmark-longmemeval. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
