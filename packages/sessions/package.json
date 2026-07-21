@@ -105,6 +105,6 @@
     "@graphorin/memory": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.9.0"
+    "better-sqlite3": "^13.0.1"
   }
 }

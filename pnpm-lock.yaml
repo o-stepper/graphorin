@@ -863,8 +863,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
       fast-check:
         specifier: ^3.23.0
         version: 3.23.2
@@ -991,9 +991,6 @@ importers:
       better-sqlite3-multiple-ciphers:
         specifier: ^12.9.0
         version: 12.9.0
-      dockerode:
-        specifier: ^4.0.0
-        version: 4.0.12
       isolated-vm:
         specifier: ^5.0.0
         version: 5.0.4
@@ -1007,6 +1004,9 @@ importers:
       '@node-rs/argon2':
         specifier: ^2.0.2
         version: 2.0.2
+      dockerode:
+        specifier: ^5.0.1
+        version: 5.0.1
       fast-check:
         specifier: ^3.23.0
         version: 3.23.2
@@ -1066,8 +1066,8 @@ importers:
         specifier: ^8.18.1
         version: 8.18.1
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
       ws:
         specifier: '>=8.21.0 <9'
         version: 8.21.0
@@ -1094,8 +1094,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
 
   packages/skills:
     dependencies:
@@ -1132,8 +1132,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
       sqlite-vec:
         specifier: ~0.1.9
         version: 0.1.9
@@ -1151,8 +1151,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
 
   packages/tools:
     dependencies:
@@ -1196,8 +1196,8 @@ importers:
         specifier: ^7.6.13
         version: 7.6.13
       better-sqlite3:
-        specifier: ^12.9.0
-        version: 12.9.0
+        specifier: ^13.0.1
+        version: 13.0.1
 
 packages:
 
@@ -3344,9 +3344,9 @@ packages:
     resolution: {integrity: sha512-471izuwJKCgvCGJ0VP10Z0IN7NWFW+pk/A8KXItZXVJ0V2AEAB5HZfmc9U3VLMmJ46bRaPbdgaBbgWpBJ/biUg==}
     engines: {node: 20.x || 22.x || 23.x || 24.x}
 
-  better-sqlite3@12.9.0:
-    resolution: {integrity: sha512-wqUv4Gm3toFpHDQmaKD4QhZm3g1DjUBI0yzS4UBl6lElUmXFYdTQmmEDpAFa5o8FiFiymURypEnfVHzILKaxqQ==}
-    engines: {node: 20.x || 22.x || 23.x || 24.x || 25.x}
+  better-sqlite3@13.0.1:
+    resolution: {integrity: sha512-LYpmOXdkpQYf4wmlxkdzW01XGlOXNIbjLg45yNkh0FQ4814VbK9PdOFmhZpYbej+EZtR/i3FDdhEG98HqZdgnA==}
+    engines: {node: '>=22'}
 
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
@@ -3784,9 +3784,9 @@ packages:
     resolution: {integrity: sha512-XJgGhoR/CLpqshm4d3L7rzH6t8NgDFUIIpztYlLHIApeJjMZKYJMz2zxPsYxnejq5h3ELYSw/RBsi3t5h7gNTA==}
     engines: {node: '>= 8.0'}
 
-  dockerode@4.0.12:
-    resolution: {integrity: sha512-/bCZd6KlGcjZO8Buqmi/vXuqEGVEZ0PNjx/biBNqJD3MhK9DmdiAuKxqfNhflgDESDIiBz3qF+0e55+CpnrUcw==}
-    engines: {node: '>= 8.0'}
+  dockerode@5.0.1:
+    resolution: {integrity: sha512-avsq/xk4YPIrn0CgleX5bjT9Y8IT1p9PxrNQ++RBQ2WEyFfHCTDsT9kmyxz+H/axnjAwg8wJWEIuPGOUuNupiA==}
+    engines: {node: '>= 14.17'}
 
   dompurify@3.4.11:
     resolution: {integrity: sha512-zhlUV12GsaRzMsf9q5M254YhA4+VuF0fG+QFqu6aYpoGlKtz+w8//jBcGVYBgQkR5GHjUomejY84AV+/uPbWdw==}
@@ -7910,10 +7910,9 @@ snapshots:
       bindings: 1.5.0
       prebuild-install: 7.1.3
 
-  better-sqlite3@12.9.0:
+  better-sqlite3@13.0.1:
     dependencies:
-      bindings: 1.5.0
-      prebuild-install: 7.1.3
+      node-addon-api: 8.7.0
 
   bindings@1.5.0:
     dependencies:
@@ -8365,7 +8364,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  dockerode@4.0.12:
+  dockerode@5.0.1:
     dependencies:
       '@balena/dockerignore': 1.0.2
       '@grpc/grpc-js': 1.14.4
@@ -8373,7 +8372,6 @@ snapshots:
       docker-modem: 5.0.7
       protobufjs: 7.6.5
       tar-fs: 2.1.4
-      uuid: 11.1.1
     transitivePeerDependencies:
       - supports-color
 
