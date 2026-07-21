@@ -6,7 +6,7 @@
 
 # Interface: SkillsApi
 
-Defined in: packages/server/src/routes/skills.ts:21
+Defined in: packages/server/src/routes/skills.ts:20
 
 **`Stable`**
 
@@ -18,7 +18,7 @@ Defined in: packages/server/src/routes/skills.ts:21
 get(name): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/skills.ts:23
+Defined in: packages/server/src/routes/skills.ts:22
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: packages/server/src/routes/skills.ts:23
 install(input): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/skills.ts:24
+Defined in: packages/server/src/routes/skills.ts:23
 
 #### Parameters
 
@@ -63,7 +63,7 @@ list(): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/server/src/routes/skills.ts:22
+Defined in: packages/server/src/routes/skills.ts:21
 
 #### Returns
 

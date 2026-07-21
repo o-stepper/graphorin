@@ -81,6 +81,24 @@ OFF; opt in via `createSqliteStore({ encryption: { enabled: true } })`):
 pnpm add better-sqlite3-multiple-ciphers
 ```
 
+On pnpm 10+ also approve the native build scripts in your
+**application's** `package.json` (pnpm blocks them by default, and the
+first open then fails with `Could not locate bindings`):
+
+```jsonc
+{
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3", "sqlite-vec"]
+  }
+}
+```
+
+then `pnpm install && pnpm rebuild better-sqlite3` (or the interactive
+`pnpm approve-builds`); append `"better-sqlite3-multiple-ciphers"` when
+you enable encryption-at-rest. See the
+[installation guide](https://docs.graphorin.com/guide/installation) for
+the full block.
+
 ## Quick start
 
 ```ts

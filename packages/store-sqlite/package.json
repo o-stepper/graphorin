@@ -77,7 +77,7 @@
     "@graphorin/observability": "workspace:*"
   },
   "peerDependencies": {
-    "better-sqlite3": "^12.9.0",
+    "better-sqlite3": "^12.9.0 || ^13.0.0",
     "better-sqlite3-multiple-ciphers": "^12.9.0",
     "sqlite-vec": "~0.1.9"
   },

@@ -155,12 +155,21 @@ overrides).
 stopped server**: the swap renames the source, and a live writer would keep
 committing into the renamed `.bak.<ts>` inode - those writes silently diverge
 from the new encrypted database and are later deleted by
-`storage cleanup-backups`. The command probes for a live connection and
-refuses the swap when one is detected (best-effort: the probe-to-rename window
-remains, so stopping the server is the rule, not the probe). Writes committed
-between the snapshot and the swap live only in the `.bak.<ts>` file reported
-as `swap.originalRenamedTo`. `storage rekey` on a live WAL database already
-fails fast with "database is locked".
+`storage cleanup-backups`. The command runs a fail-closed live-writer check
+and refuses the swap with `EncryptSwapLiveWriterError` while ANY other
+connection holds the database: first by WAL sidecar presence (`<db>-wal` /
+`<db>-shm` exist only while a connection is open or after an unclean
+shutdown - in the second case open the database once, for example with
+`graphorin storage status`, so SQLite recovers and removes them, then retry),
+then by a journal-mode probe whose returned value must actually read
+`delete`. The check runs twice - before the copy and again immediately before
+the rename pair - and the swap moves the WAL sidecars together with the
+backup, so even a check-to-rename race leaves any late frames recoverable
+next to the `.bak.<ts>` file. It is still a seatbelt, not a lock: stopping
+every writer is the rule. Writes committed between the snapshot and the swap
+live only in the `.bak.<ts>` file reported as `swap.originalRenamedTo`.
+`storage rekey` on a live WAL database already fails fast with "database is
+locked".
 
 ## Custom backends
 

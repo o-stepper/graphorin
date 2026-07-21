@@ -6,7 +6,7 @@
 
 # Interface: TriggersRoutesDeps
 
-Defined in: packages/server/src/triggers/routes.ts:36
+Defined in: packages/server/src/triggers/routes.ts:37
 
 **`Stable`**
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/triggers/routes.ts:36
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | packages/server/src/triggers/routes.ts:37 |
+| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | packages/server/src/triggers/routes.ts:38 |

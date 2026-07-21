@@ -6,7 +6,7 @@
 
 # Interface: SessionApi
 
-Defined in: packages/server/src/routes/sessions.ts:32
+Defined in: packages/server/src/routes/sessions.ts:31
 
 **`Stable`**
 
@@ -22,7 +22,7 @@ lighter stub.
 create(input): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:38
+Defined in: packages/server/src/routes/sessions.ts:37
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/server/src/routes/sessions.ts:38
 optional exportSession(sessionId, opts): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:51
+Defined in: packages/server/src/routes/sessions.ts:50
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: packages/server/src/routes/sessions.ts:51
 get(sessionId): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:37
+Defined in: packages/server/src/routes/sessions.ts:36
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Defined in: packages/server/src/routes/sessions.ts:37
 list(opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:33
+Defined in: packages/server/src/routes/sessions.ts:32
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: packages/server/src/routes/sessions.ts:33
 listHandoffs(sessionId): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:50
+Defined in: packages/server/src/routes/sessions.ts:49
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: packages/server/src/routes/sessions.ts:50
 listMessages(sessionId, opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:46
+Defined in: packages/server/src/routes/sessions.ts:45
 
 #### Parameters
 
@@ -154,7 +154,7 @@ Defined in: packages/server/src/routes/sessions.ts:46
 remove(sessionId): Promise<boolean>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:45
+Defined in: packages/server/src/routes/sessions.ts:44
 
 #### Parameters
 
@@ -174,7 +174,7 @@ Defined in: packages/server/src/routes/sessions.ts:45
 optional replaySession(sessionId, opts): AsyncIterable<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:58
+Defined in: packages/server/src/routes/sessions.ts:57
 
 #### Parameters
 

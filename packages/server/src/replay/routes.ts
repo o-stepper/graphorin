@@ -25,8 +25,8 @@ import { type ParsedScope, parseScope, scopeMatches } from '@graphorin/security/
 import { Hono } from 'hono';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import { z } from 'zod';
-
 import type { AuthState, ServerVariables } from '../internal/context.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 
 /** @stable */
 export type ReplayMode = 'sanitized' | 'raw';
@@ -84,7 +84,11 @@ export function createReplayRoutes(deps: ReplayRoutesDeps): Hono<{ Variables: Se
 
   app.post('/runs/:runId/replay', async (c) => {
     const runId = c.req.param('runId');
-    const body = ReplayRequestSchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const body = ReplayRequestSchema.safeParse(raw);
     if (!body.success) {
       return c.json(buildValidationError('Invalid replay body.', body.error.issues), 400);
     }
@@ -121,7 +125,11 @@ export function createReplayRoutes(deps: ReplayRoutesDeps): Hono<{ Variables: Se
 
   app.post('/sessions/:id/replay', async (c) => {
     const sessionId = c.req.param('id');
-    const body = ReplayRequestSchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const body = ReplayRequestSchema.safeParse(raw);
     if (!body.success) {
       return c.json(buildValidationError('Invalid replay body.', body.error.issues), 400);
     }
@@ -242,14 +250,4 @@ function buildValidationError(
     message,
     issues: issues.map((i) => ({ path: i.path, message: i.message })),
   };
-}
-
-async function safelyParseJson(c: {
-  readonly req: { readonly json: () => Promise<unknown> };
-}): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }

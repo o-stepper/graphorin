@@ -115,9 +115,17 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
         }
       }
 
-      pragma(stmt: string, _options?: { simple?: boolean }): unknown {
+      pragma(stmt: string, options?: { simple?: boolean }): unknown {
         this.history.pragmas.push(stmt);
         const trimmed = stmt.trim().replace(/;$/, '');
+        // Real-driver faithful: a journal-mode switch echoes the NEW
+        // mode (the encrypt runner's live-writer probe now checks the
+        // returned value, not just the absence of a throw).
+        const journalMatch = /^journal_mode\s*=\s*(\w+)$/i.exec(trimmed);
+        if (journalMatch) {
+          const mode = (journalMatch[1] ?? '').toLowerCase();
+          return options?.simple === true ? mode : [{ journal_mode: mode }];
+        }
         if (trimmed === 'page_size') return 4096;
         if (trimmed === 'wal_checkpoint(PASSIVE)') return [{ busy: 0, log: 0, checkpointed: 0 }];
         if (trimmed === 'cipher_integrity_check') {

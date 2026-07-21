@@ -6,7 +6,7 @@
 
 # Interface: SessionRoutesDeps
 
-Defined in: packages/server/src/routes/sessions.ts:99
+Defined in: packages/server/src/routes/sessions.ts:98
 
 **`Stable`**
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/routes/sessions.ts:99
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | packages/server/src/routes/sessions.ts:100 |
+| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | packages/server/src/routes/sessions.ts:99 |

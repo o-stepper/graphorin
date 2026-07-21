@@ -14,13 +14,12 @@
  * @packageDocumentation
  */
 
-import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
-
 import { WorkflowNotFoundError } from '../errors/index.js';
 import type { ServerVariables } from '../internal/context.js';
 import { newRequestId } from '../internal/ids.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { toWireError } from '../internal/wire-error.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 import type { WorkflowRegistry } from '../registry/index.js';
@@ -103,7 +102,11 @@ export function createWorkflowRoutes(
         const err = new WorkflowNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = ExecuteBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = ExecuteBodySchema.safeParse(raw);
       if (!parsed.success) {
         return c.json(
           {
@@ -155,7 +158,11 @@ export function createWorkflowRoutes(
         const err = new WorkflowNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = ResumeBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = ResumeBodySchema.safeParse(raw);
       if (!parsed.success) {
         return c.json(
           {
@@ -226,7 +233,11 @@ export function createWorkflowRoutes(
         const err = new WorkflowNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = ThreadBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = ThreadBodySchema.safeParse(raw);
       if (!parsed.success) {
         return c.json(
           {
@@ -286,7 +297,11 @@ export function createWorkflowRoutes(
         const err = new WorkflowNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = ThreadBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = ThreadBodySchema.safeParse(raw);
       if (!parsed.success) {
         return c.json(
           {
@@ -436,7 +451,11 @@ export function createWorkflowRoutes(
         const err = new WorkflowNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = ForkBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = ForkBodySchema.safeParse(raw);
       if (!parsed.success) {
         return c.json(
           {
@@ -667,12 +686,4 @@ function emitWorkflowEvent(
   }
   streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
   return undefined;
-}
-
-async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }

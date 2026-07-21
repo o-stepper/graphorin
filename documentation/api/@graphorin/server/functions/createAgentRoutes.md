@@ -12,7 +12,7 @@ function createAgentRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/agents.ts:68
+Defined in: packages/server/src/routes/agents.ts:69
 
 **`Stable`**
 

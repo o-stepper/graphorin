@@ -25,7 +25,7 @@ import type { Context, MiddlewareHandler } from 'hono';
 
 import type { ServerConfigSpec } from '../config.js';
 import type { ServerVariables } from '../internal/context.js';
-import { fingerprintRequest } from '../internal/json.js';
+import { fingerprintRequest, INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { SERVER_METRIC_NAMES } from '../metrics/catalog.js';
 import type { MetricRegistry } from '../metrics/registry.js';
 
@@ -140,6 +140,14 @@ export function createIdempotencyMiddleware(
       );
     }
     c.set('state', { ...c.get('state'), idempotencyKey: key });
+    // deep-retest-0.13.10 P1: a syntactically broken JSON body fails
+    // with 400 BEFORE fingerprinting or key reservation - the route
+    // handler rejects it anyway, and reserving the key for a doomed
+    // request would make the client's corrected retry under the same
+    // key collide with a stored 400.
+    if ((await readJsonBody(c)) === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
     const fingerprint = await computeFingerprint(c);
     const cached = lru.get(key);
     let record: IdempotencyRecord | null;

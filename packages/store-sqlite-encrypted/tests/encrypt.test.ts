@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -102,7 +102,7 @@ describe('encryptDatabase', () => {
     expect(noSwapHistory?.pragmas.some((p) => /journal_mode/.test(p))).toBe(false);
   });
 
-  it('W-012: on the swap path the probe switches DELETE then restores WAL', async () => {
+  it('W-012: on the swap path the probe switches DELETE then restores WAL - twice (pre-copy and pre-rename)', async () => {
     const { Ctor } = buildStubDriver();
     _setCipherPeerForTesting(Ctor as never);
     const { src, tgt } = setupTempDb();
@@ -110,8 +110,116 @@ describe('encryptDatabase', () => {
     // src was renamed by the swap; its history bucket keeps the probe trace.
     const history = getStubHistory(src);
     const journalPragmas = (history?.pragmas ?? []).filter((p) => /journal_mode/.test(p));
+    // deep-retest-0.13.10 P0: the probe runs once before the copy and
+    // again immediately before the rename pair.
+    expect(journalPragmas).toHaveLength(4);
     expect(journalPragmas[0]).toMatch(/DELETE/);
     expect(journalPragmas[1]).toMatch(/WAL/);
+    expect(journalPragmas[2]).toMatch(/DELETE/);
+    expect(journalPragmas[3]).toMatch(/WAL/);
+  });
+
+  it('deep-retest-0.13.10 P0: swap refuses when the journal-mode switch is refused SILENTLY (cross-driver holder)', async () => {
+    const { Ctor } = buildStubDriver();
+    const { src, tgt } = setupTempDb();
+    // A holder linked against a DIFFERENT SQLite build does not raise
+    // "database is locked" - the pragma just returns 'wal' unchanged.
+    class SilentWalCtor extends (Ctor as new (
+      path: string,
+      o?: unknown,
+    ) => InstanceType<typeof Ctor>) {
+      override pragma(stmt: string, o?: { simple?: boolean }): unknown {
+        if (/journal_mode\s*=\s*DELETE/.test(stmt) && this.path === src) {
+          return o?.simple === true ? 'wal' : [{ journal_mode: 'wal' }];
+        }
+        return super.pragma(stmt, o);
+      }
+    }
+    _setCipherPeerForTesting(SilentWalCtor as never);
+    await expect(
+      encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'topsecret', swap: true }),
+    ).rejects.toThrow(EncryptSwapLiveWriterError);
+    // Nothing was renamed and nothing encrypted was left behind.
+    expect(readFileSync(src, 'utf8')).toBe('unencrypted-bytes');
+    expect(existsSync(tgt)).toBe(false);
+  });
+
+  it('deep-retest-0.13.10 P0: a writer appearing between the copy and the rename aborts the swap and cleans the target', async () => {
+    const { Ctor } = buildStubDriver();
+    const { src, tgt } = setupTempDb();
+    // First probe passes; the second (pre-rename) sees a live holder.
+    let probeCalls = 0;
+    class LateWriterCtor extends (Ctor as new (
+      path: string,
+      o?: unknown,
+    ) => InstanceType<typeof Ctor>) {
+      override pragma(stmt: string, o?: { simple?: boolean }): unknown {
+        if (/journal_mode\s*=\s*DELETE/.test(stmt) && this.path === src) {
+          probeCalls += 1;
+          if (probeCalls > 1) {
+            return o?.simple === true ? 'wal' : [{ journal_mode: 'wal' }];
+          }
+        }
+        return super.pragma(stmt, o);
+      }
+    }
+    _setCipherPeerForTesting(LateWriterCtor as never);
+    await expect(
+      encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'topsecret', swap: true }),
+    ).rejects.toThrow(EncryptSwapLiveWriterError);
+    expect(probeCalls).toBe(2);
+    // The source is untouched and the orphaned encrypted copy is gone.
+    expect(readFileSync(src, 'utf8')).toBe('unencrypted-bytes');
+    expect(existsSync(tgt)).toBe(false);
+  });
+
+  it('deep-retest-0.13.10 P0: pre-existing WAL sidecars refuse the swap (live holder or unclean shutdown)', async () => {
+    const { Ctor } = buildStubDriver();
+    _setCipherPeerForTesting(Ctor as never);
+    const { src, tgt } = setupTempDb();
+    writeFileSync(`${src}-wal`, 'stale-wal-frames');
+    await expect(
+      encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'topsecret', swap: true }),
+    ).rejects.toThrow(/sidecar file\(s\) present/);
+    // Refused before ANY connection opened: the probe never ran.
+    const history = getStubHistory(src);
+    expect(history?.pragmas.some((p) => /journal_mode/.test(p)) ?? false).toBe(false);
+    expect(readFileSync(src, 'utf8')).toBe('unencrypted-bytes');
+    expect(existsSync(tgt)).toBe(false);
+  });
+
+  it('deep-retest-0.13.10 P0: a sidecar appearing inside the check-to-rename window still moves with the backup', async () => {
+    const { Ctor } = buildStubDriver();
+    const { src, tgt } = setupTempDb();
+    // Create the sidecar DURING the second probe's WAL restore - after
+    // the sidecar existence check, right before the rename pair.
+    let walRestores = 0;
+    class LateSidecarCtor extends (Ctor as new (
+      path: string,
+      o?: unknown,
+    ) => InstanceType<typeof Ctor>) {
+      override pragma(stmt: string, o?: { simple?: boolean }): unknown {
+        const out = super.pragma(stmt, o);
+        if (/journal_mode\s*=\s*WAL/.test(stmt) && this.path === src) {
+          walRestores += 1;
+          if (walRestores === 2) writeFileSync(`${src}-wal`, 'late-wal-frames');
+        }
+        return out;
+      }
+    }
+    _setCipherPeerForTesting(LateSidecarCtor as never);
+    const result = await encryptDatabase({
+      sourcePath: src,
+      targetPath: tgt,
+      passphrase: 'topsecret',
+      swap: true,
+    });
+    const bak = result.swap?.originalRenamedTo ?? '';
+    // The race-window net: the sidecar followed the backup, so the new
+    // encrypted file at the source path never sees a foreign -wal and
+    // any frames inside it stay recoverable next to the backup.
+    expect(readFileSync(`${bak}-wal`, 'utf8')).toBe('late-wal-frames');
+    expect(existsSync(`${src}-wal`)).toBe(false);
   });
 
   it('respects a non-default cipher selection', async () => {

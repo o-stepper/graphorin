@@ -6,7 +6,7 @@
 
 # Interface: AuditRoutesDeps
 
-Defined in: packages/server/src/routes/audit.ts:82
+Defined in: packages/server/src/routes/audit.ts:81
 
 **`Stable`**
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/routes/audit.ts:82
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-audit"></a> `audit` | `readonly` | [`AuditApi`](/api/@graphorin/server/interfaces/AuditApi.md) | packages/server/src/routes/audit.ts:83 |
+| <a id="property-audit"></a> `audit` | `readonly` | [`AuditApi`](/api/@graphorin/server/interfaces/AuditApi.md) | packages/server/src/routes/audit.ts:82 |

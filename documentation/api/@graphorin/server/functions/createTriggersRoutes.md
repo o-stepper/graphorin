@@ -12,7 +12,7 @@ function createTriggersRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/triggers/routes.ts:43
+Defined in: packages/server/src/triggers/routes.ts:44
 
 **`Stable`**
 

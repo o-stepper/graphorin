@@ -27,6 +27,7 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 
 import type { ServerVariables } from '../internal/context.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 import type { TriggersDaemon } from './daemon.js';
 
@@ -111,11 +112,9 @@ export function createTriggersRoutes(
   });
 
   app.post('/prune', createScopeMiddleware('triggers:disable'), async (c) => {
-    let raw: unknown;
-    try {
-      raw = await c.req.json();
-    } catch {
-      raw = {};
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
     }
     const parsed = PruneBodySchema.safeParse(raw ?? {});
     if (!parsed.success) {

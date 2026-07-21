@@ -274,6 +274,10 @@ function registerDoctorCommand(program: Command): void {
       'Run the local-first smoke: native SQLite stack, write/reopen/search, Ollama reachability + models, embedding dimension, and (with --ollama-model) a streamed tool-call round-trip.',
     )
     .option(
+      '--strict-smoke-local',
+      'CI-grade smoke: implies --smoke-local and exits non-zero unless EVERY smoke check is ok (warn and skip count as failures).',
+    )
+    .option(
       '--ollama-base-url <url>',
       'Ollama base URL for --smoke-local (default http://127.0.0.1:11434).',
     )
@@ -293,6 +297,7 @@ function registerDoctorCommand(program: Command): void {
         checkSystemd?: boolean;
         all?: boolean;
         smokeLocal?: boolean;
+        strictSmokeLocal?: boolean;
         ollamaBaseUrl?: string;
         ollamaModel?: string;
         embedModel?: string;
@@ -307,6 +312,9 @@ function registerDoctorCommand(program: Command): void {
           ...(opts.checkSystemd !== undefined ? { checkSystemd: opts.checkSystemd } : {}),
           ...(opts.all !== undefined ? { all: opts.all } : {}),
           ...(opts.smokeLocal !== undefined ? { smokeLocal: opts.smokeLocal } : {}),
+          ...(opts.strictSmokeLocal !== undefined
+            ? { strictSmokeLocal: opts.strictSmokeLocal }
+            : {}),
           ...(opts.ollamaBaseUrl !== undefined ? { ollamaBaseUrl: opts.ollamaBaseUrl } : {}),
           ...(opts.ollamaModel !== undefined ? { ollamaModel: opts.ollamaModel } : {}),
           ...(opts.embedModel !== undefined ? { embedModel: opts.embedModel } : {}),

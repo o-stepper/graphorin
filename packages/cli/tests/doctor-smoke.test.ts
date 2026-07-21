@@ -169,3 +169,65 @@ describe('runDoctor --smoke-local integration', () => {
     expect(report.summary.fail).toBe(0);
   });
 });
+
+describe('runDoctor --strict-smoke-local (deep-retest-0.13.10 P2)', () => {
+  afterEach(() => {
+    process.exitCode = 0;
+  });
+
+  it('an unreachable daemon exits 0 interactively but non-zero under strict', async () => {
+    const lax = await runDoctor({
+      smokeLocal: true,
+      smokeDir: dir,
+      smokeFetchImpl: unreachableFetch,
+      home: dir,
+      json: true,
+      print: () => {},
+    });
+    expect(lax.summary.fail).toBe(0);
+    expect(process.exitCode === 0 || process.exitCode === undefined).toBe(true);
+
+    const report = await runDoctor({
+      strictSmokeLocal: true,
+      smokeDir: dir,
+      smokeFetchImpl: unreachableFetch,
+      home: dir,
+      json: true,
+      print: () => {},
+    });
+    // Strict implies the smoke ran, and warn/skip legs now gate.
+    expect(report.checks.some((c) => c.check === 'smoke:ollama' && c.status === 'warn')).toBe(true);
+    expect(process.exitCode).not.toBe(0);
+  });
+
+  it('an explicitly requested but missing model exits non-zero under strict', async () => {
+    process.exitCode = 0;
+    await runDoctor({
+      strictSmokeLocal: true,
+      smokeDir: dir,
+      smokeFetchImpl: stubOllamaFetch({ models: ['nomic-embed-text:latest'] }),
+      ollamaModel: 'qwen3:8b-q4_K_M',
+      home: dir,
+      json: true,
+      print: () => {},
+    });
+    expect(process.exitCode).not.toBe(0);
+  });
+
+  it('a fully green smoke keeps exit code 0 under strict', async () => {
+    process.exitCode = 0;
+    const report = await runDoctor({
+      strictSmokeLocal: true,
+      smokeDir: dir,
+      smokeFetchImpl: stubOllamaFetch({ models: ['qwen3:8b-q4_K_M', 'nomic-embed-text:latest'] }),
+      ollamaModel: 'qwen3:8b-q4_K_M',
+      home: dir,
+      json: true,
+      print: () => {},
+    });
+    expect(report.checks.every((c) => !c.check.startsWith('smoke:') || c.status === 'ok')).toBe(
+      true,
+    );
+    expect(process.exitCode === 0 || process.exitCode === undefined).toBe(true);
+  });
+});

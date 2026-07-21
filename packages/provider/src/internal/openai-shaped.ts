@@ -262,17 +262,21 @@ function effectiveTokenParam(state: TokenParamState): TokenLimitParam {
 /**
  * deep-retest-0.13.6 P2-2: current OpenAI models reject `max_tokens`
  * with HTTP 400 ("Use 'max_completion_tokens' instead"). The remap
- * fires only from the unpinned default, only once (learned state), and
- * only when the failed request actually carried the parameter.
+ * fires only from the unpinned default and only when the FAILED
+ * ATTEMPT actually sent the old spelling - judged via the attempt
+ * snapshot, never via the live shared state (deep-retest-0.13.10 P1:
+ * a concurrent sibling may have learned between this attempt's send
+ * and its 400, and that must not cost this call its own retry).
  */
 function shouldRemapTokenParam(
   state: TokenParamState,
+  sent: AttemptSnapshot,
   err: unknown,
   req: ProviderRequest,
 ): boolean {
   return (
     state.pinned === undefined &&
-    state.learned === null &&
+    sent.tokenParam === 'max_tokens' &&
     req.maxTokens !== undefined &&
     err instanceof ProviderHttpError &&
     err.status === 400 &&
@@ -281,6 +285,10 @@ function shouldRemapTokenParam(
 }
 
 function learnTokenParamRemap(opts: OpenAIShapedOptions, state: TokenParamState): void {
+  // Idempotent under concurrency: the first learner mutates and
+  // warns; a sibling that raced the same 400 just proceeds to its
+  // own retry.
+  if (state.learned !== null) return;
   state.learned = 'max_completion_tokens';
   const log = opts.logger ?? defaultLogger;
   log(
@@ -308,15 +316,42 @@ interface ParamCompatState {
   toolsReasoningEffortNone: boolean;
 }
 
+/**
+ * deep-retest-0.13.10 P1: what one attempt ACTUALLY sent on the wire.
+ * Recovery predicates judge the failed attempt via this snapshot -
+ * never via the live shared state, which a concurrent sibling call
+ * may have mutated between the attempt's send and its 400. Under a
+ * cold concurrent batch (the LLM reranker fires `batchSize` requests
+ * at once) the old state-based predicates made every sibling but the
+ * first forfeit its retry and surface the 400.
+ */
+interface AttemptSnapshot {
+  readonly tokenParam: TokenLimitParam;
+  readonly sentTemperature: boolean;
+  readonly sentReasoningEffortNone: boolean;
+}
+
+function snapshotAttempt(
+  tokenState: TokenParamState,
+  compat: ParamCompatState,
+  req: ProviderRequest,
+): AttemptSnapshot {
+  return {
+    tokenParam: effectiveTokenParam(tokenState),
+    sentTemperature: req.temperature !== undefined && !compat.stripTemperature,
+    sentReasoningEffortNone:
+      compat.toolsReasoningEffortNone && req.tools !== undefined && req.tools.length > 0,
+  };
+}
+
 function shouldStripTemperature(
   state: ParamCompatState,
+  sent: AttemptSnapshot,
   err: unknown,
   req: ProviderRequest,
 ): boolean {
-  if (state.recovery === 'off' || state.stripTemperature) return false;
-  if (req.temperature === undefined || req.providerOptions?.temperature !== undefined) {
-    return false;
-  }
+  if (state.recovery === 'off' || !sent.sentTemperature) return false;
+  if (req.providerOptions?.temperature !== undefined) return false;
   if (!(err instanceof ProviderHttpError) || err.status !== 400) return false;
   // Both live OpenAI spellings: "Unsupported value: 'temperature' does
   // not support 0 with this model." and "Unsupported parameter:
@@ -328,6 +363,7 @@ function shouldStripTemperature(
 }
 
 function learnStripTemperature(opts: OpenAIShapedOptions, state: ParamCompatState): void {
+  if (state.stripTemperature) return;
   state.stripTemperature = true;
   const log = opts.logger ?? defaultLogger;
   log(
@@ -340,10 +376,11 @@ function learnStripTemperature(opts: OpenAIShapedOptions, state: ParamCompatStat
 
 function shouldForceReasoningEffortNone(
   state: ParamCompatState,
+  sent: AttemptSnapshot,
   err: unknown,
   req: ProviderRequest,
 ): boolean {
-  if (state.recovery === 'off' || state.toolsReasoningEffortNone) return false;
+  if (state.recovery === 'off' || sent.sentReasoningEffortNone) return false;
   if (req.tools === undefined || req.tools.length === 0) return false;
   if (req.providerOptions?.reasoning_effort !== undefined) return false;
   return (
@@ -354,6 +391,7 @@ function shouldForceReasoningEffortNone(
 }
 
 function learnReasoningEffortNone(opts: OpenAIShapedOptions, state: ParamCompatState): void {
+  if (state.toolsReasoningEffortNone) return;
   state.toolsReasoningEffortNone = true;
   const log = opts.logger ?? defaultLogger;
   log(
@@ -366,9 +404,11 @@ function learnReasoningEffortNone(opts: OpenAIShapedOptions, state: ParamCompatS
 
 /**
  * Sends the chat request, applying each learned-parameter recovery at
- * most once. Bounded: every recoverable 400 class flips instance
- * state on its first firing and its predicate refuses thereafter, so
- * the loop iterates at most once per class plus the final attempt.
+ * most once PER CALL. Bounded by the per-call ledger below, not by
+ * the shared learned state: concurrent calls all recover
+ * independently while the instance still learns (and warns) once.
+ * Each retry re-snapshots, so it also picks up whatever a sibling
+ * learned in the meantime.
  */
 async function callChatWithRecovery(
   opts: OpenAIShapedOptions,
@@ -378,19 +418,24 @@ async function callChatWithRecovery(
   req: ProviderRequest,
   stream: boolean,
 ): Promise<Response> {
+  const attempted = { tokenParam: false, temperature: false, reasoning: false };
   for (;;) {
+    const sent = snapshotAttempt(tokenState, compat, req);
     try {
-      return await callChatHttp(opts, url, effectiveTokenParam(tokenState), compat, req, stream);
+      return await callChatHttp(opts, url, sent, req, stream);
     } catch (err) {
-      if (shouldRemapTokenParam(tokenState, err, req)) {
+      if (!attempted.tokenParam && shouldRemapTokenParam(tokenState, sent, err, req)) {
+        attempted.tokenParam = true;
         learnTokenParamRemap(opts, tokenState);
         continue;
       }
-      if (shouldStripTemperature(compat, err, req)) {
+      if (!attempted.temperature && shouldStripTemperature(compat, sent, err, req)) {
+        attempted.temperature = true;
         learnStripTemperature(opts, compat);
         continue;
       }
-      if (shouldForceReasoningEffortNone(compat, err, req)) {
+      if (!attempted.reasoning && shouldForceReasoningEffortNone(compat, sent, err, req)) {
+        attempted.reasoning = true;
         learnReasoningEffortNone(opts, compat);
         continue;
       }
@@ -402,8 +447,7 @@ async function callChatWithRecovery(
 function callChatHttp(
   opts: OpenAIShapedOptions,
   url: string,
-  tokenParam: TokenLimitParam,
-  compat: ParamCompatState,
+  sent: AttemptSnapshot,
   req: ProviderRequest,
   stream: boolean,
 ): Promise<Response> {
@@ -413,8 +457,7 @@ function callChatHttp(
     stream,
     opts.capabilities?.structuredOutput ?? true,
     conversionOptionsFor(opts),
-    tokenParam,
-    compat,
+    sent,
   );
   return callJsonHttp({
     providerName: opts.providerName,
@@ -584,8 +627,7 @@ function buildBody(
   stream: boolean,
   structuredOutput: boolean,
   conversion: ChatMessageConversionOptions,
-  tokenParam: TokenLimitParam,
-  compat: ParamCompatState,
+  sent: AttemptSnapshot,
 ): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
@@ -608,11 +650,13 @@ function buildBody(
   // deep-retest-0.13.9 P1: once the instance has learned (via HTTP
   // 400) that the model only accepts default sampling, the field is
   // omitted rather than mechanically replaced with 1 - the caller's
-  // determinism intent cannot be honored, so nothing is sent.
-  if (req.temperature !== undefined && !compat.stripTemperature) {
+  // determinism intent cannot be honored, so nothing is sent. The
+  // snapshot records the decision so the recovery predicates can
+  // judge exactly what this attempt carried.
+  if (sent.sentTemperature) {
     body.temperature = req.temperature;
   }
-  if (req.maxTokens !== undefined) body[tokenParam] = req.maxTokens;
+  if (req.maxTokens !== undefined) body[sent.tokenParam] = req.maxTokens;
   if (req.tools !== undefined && req.tools.length > 0) {
     // C2: fold worked examples in the adapter itself (idempotent when an
     // upstream createProvider fold already ran).
@@ -657,7 +701,7 @@ function buildBody(
   // an explicit caller reasoning_effort always wins over the learned
   // tool-contract recovery.
   if (
-    compat.toolsReasoningEffortNone &&
+    sent.sentReasoningEffortNone &&
     body.tools !== undefined &&
     body.reasoning_effort === undefined
   ) {

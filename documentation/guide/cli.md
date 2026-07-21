@@ -102,6 +102,16 @@ graphorin doctor --smoke-local --ollama-model qwen3:8b-q4_K_M
 graphorin doctor --smoke-local --ollama-base-url http://127.0.0.1:11434 --json
 ```
 
+Interactively, an unreachable daemon or a missing model degrades to
+`warn`/`skip` and the command still exits `0` - useful on a laptop, useless in
+a pipeline that just provisioned the daemon and needs the legs actually
+exercised. For CI, `--strict-smoke-local` (implies `--smoke-local`) exits
+non-zero unless **every** `smoke:*` check reports `ok`:
+
+```bash
+graphorin doctor --strict-smoke-local --ollama-model qwen3:0.6b --json
+```
+
 A healthy machine with a cold model looks like this - note the load-dominated chat timing:
 
 ```text

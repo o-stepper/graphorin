@@ -15,8 +15,8 @@
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
-
 import type { ServerVariables } from '../internal/context.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 
 const ScopeSchema = z
@@ -77,7 +77,11 @@ export function createMemoryRoutes(deps: MemoryRoutesDeps): Hono<{ Variables: Se
   const app = new Hono<{ Variables: ServerVariables }>();
 
   app.post('/search', createScopeMiddleware('memory:read'), async (c) => {
-    const parsed = SearchBodySchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = SearchBodySchema.safeParse(raw);
     if (!parsed.success) {
       return invalid(c, parsed.error.issues);
     }
@@ -86,7 +90,11 @@ export function createMemoryRoutes(deps: MemoryRoutesDeps): Hono<{ Variables: Se
   });
 
   app.post('/facts', createScopeMiddleware('memory:write'), async (c) => {
-    const parsed = RememberBodySchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = RememberBodySchema.safeParse(raw);
     if (!parsed.success) return invalid(c, parsed.error.issues);
     const out = await deps.memory.remember(parsed.data);
     return c.json({ fact: out }, 201);
@@ -108,7 +116,11 @@ export function createMemoryRoutes(deps: MemoryRoutesDeps): Hono<{ Variables: Se
   });
 
   app.post('/blocks', createScopeMiddleware('memory:write'), async (c) => {
-    const parsed = BlockBodySchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = BlockBodySchema.safeParse(raw);
     if (!parsed.success) return invalid(c, parsed.error.issues);
     const out = await deps.memory.upsertBlock(parsed.data);
     return c.json({ block: out }, 201);
@@ -141,12 +153,4 @@ function invalid(c: Context<{ Variables: ServerVariables }>, issues: ReadonlyArr
     },
     400,
   );
-}
-
-async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }

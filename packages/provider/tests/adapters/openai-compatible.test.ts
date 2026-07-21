@@ -930,3 +930,246 @@ describe('W-095 - multimodal image passing', () => {
     expect(dropWarns[0]).toContain('image');
   });
 });
+
+describe('deep-retest-0.13.10 P1 - concurrent cold-start recovery', () => {
+  const OK_JSON = JSON.stringify({
+    choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+  });
+  const REJECT_TEMPERATURE = JSON.stringify({
+    error: {
+      message:
+        "Unsupported value: 'temperature' does not support 0 with this model. " +
+        'Only the default (1) value is supported.',
+      type: 'invalid_request_error',
+      param: 'temperature',
+      code: 'unsupported_value',
+    },
+  });
+  const REJECT_MAX_TOKENS = JSON.stringify({
+    error: {
+      message:
+        "Unsupported parameter: 'max_tokens' is not supported with this model. " +
+        "Use 'max_completion_tokens' instead.",
+      type: 'invalid_request_error',
+      param: 'max_tokens',
+      code: 'unsupported_parameter',
+    },
+  });
+  const REJECT_TOOLS_REASONING = JSON.stringify({
+    error: {
+      message:
+        'Function tools with reasoning_effort are not supported for gpt-5.6-luna in ' +
+        "/v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.",
+      type: 'invalid_request_error',
+      param: null,
+      code: 'unsupported_parameter',
+    },
+  });
+  const TOOLS = [
+    {
+      name: 'add_numbers',
+      description: 'Add two numbers',
+      inputSchema: { type: 'object', properties: { a: { type: 'number' } } },
+    },
+  ];
+
+  /**
+   * Holds the first `holdFirst` requests until ALL of them are in
+   * flight, then releases them together - the deterministic shape of
+   * a cold concurrent batch where every sibling's first attempt fails
+   * before any of them has learned.
+   */
+  function makeBarrierFetch(opts: {
+    readonly holdFirst: number;
+    readonly respond: (body: Record<string, unknown>) => Response;
+    readonly calls: Array<{ url: string; body: Record<string, unknown> }>;
+  }): typeof fetch {
+    const waiters: Array<() => void> = [];
+    return (async (input: unknown, init?: RequestInit): Promise<Response> => {
+      const body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      opts.calls.push({ url: String(input), body });
+      if (opts.calls.length <= opts.holdFirst) {
+        await new Promise<void>((resolve) => {
+          waiters.push(resolve);
+          if (waiters.length === opts.holdFirst) {
+            for (const w of waiters) w();
+          }
+        });
+      }
+      return opts.respond(body);
+    }) as typeof fetch;
+  }
+
+  it('two concurrent cold generates with unsupported temperature BOTH recover', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeBarrierFetch({
+        holdFirst: 2,
+        calls,
+        respond: (body) =>
+          'temperature' in body
+            ? new Response(REJECT_TEMPERATURE, { status: 400 })
+            : new Response(OK_JSON, { status: 200 }),
+      }),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const [a, b] = await Promise.all([
+      provider.generate({ messages: [{ role: 'user', content: 'a' }], temperature: 0 }),
+      provider.generate({ messages: [{ role: 'user', content: 'b' }], temperature: 0 }),
+    ]);
+    // The old state-gated predicates made the second sibling forfeit
+    // its retry and surface the 400 (reranker fallback / caller error).
+    expect(a.text).toBe('ok');
+    expect(b.text).toBe('ok');
+    expect(calls).toHaveLength(4);
+    expect(calls.filter((c) => 'temperature' in c.body)).toHaveLength(2);
+    // The instance still learns (and warns) exactly once.
+    expect(warns.filter((w) => w.includes("'temperature'"))).toHaveLength(1);
+  });
+
+  it('cold concurrent batch of five (the reranker shape) - zero surfaced errors', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeBarrierFetch({
+        holdFirst: 5,
+        calls,
+        respond: (body) =>
+          'temperature' in body
+            ? new Response(REJECT_TEMPERATURE, { status: 400 })
+            : new Response(OK_JSON, { status: 200 }),
+      }),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const results = await Promise.all(
+      Array.from({ length: 5 }, (_, i) =>
+        provider.generate({ messages: [{ role: 'user', content: `p${i}` }], temperature: 0 }),
+      ),
+    );
+    expect(results.map((r) => r.text)).toEqual(['ok', 'ok', 'ok', 'ok', 'ok']);
+    expect(calls).toHaveLength(10);
+    expect(warns.filter((w) => w.includes("'temperature'"))).toHaveLength(1);
+  });
+
+  it('two concurrent cold tool calls both recover via reasoning_effort none', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeBarrierFetch({
+        holdFirst: 2,
+        calls,
+        respond: (body) =>
+          body.tools !== undefined && body.reasoning_effort === undefined
+            ? new Response(REJECT_TOOLS_REASONING, { status: 400 })
+            : new Response(OK_JSON, { status: 200 }),
+      }),
+      logger: () => {},
+    });
+    const [a, b] = await Promise.all([
+      provider.generate({ messages: [{ role: 'user', content: 'a' }], tools: TOOLS }),
+      provider.generate({ messages: [{ role: 'user', content: 'b' }], tools: TOOLS }),
+    ]);
+    expect(a.text).toBe('ok');
+    expect(b.text).toBe('ok');
+    expect(calls).toHaveLength(4);
+    expect(calls.filter((c) => c.body.reasoning_effort === 'none')).toHaveLength(2);
+  });
+
+  it('chained token+temperature recovery survives a concurrent cold start', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeBarrierFetch({
+        holdFirst: 2,
+        calls,
+        respond: (body) => {
+          if ('max_tokens' in body) return new Response(REJECT_MAX_TOKENS, { status: 400 });
+          if ('temperature' in body) return new Response(REJECT_TEMPERATURE, { status: 400 });
+          return new Response(OK_JSON, { status: 200 });
+        },
+      }),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const [a, b] = await Promise.all([
+      provider.generate({
+        messages: [{ role: 'user', content: 'a' }],
+        temperature: 0,
+        maxTokens: 8,
+      }),
+      provider.generate({
+        messages: [{ role: 'user', content: 'b' }],
+        temperature: 0,
+        maxTokens: 8,
+      }),
+    ]);
+    expect(a.text).toBe('ok');
+    expect(b.text).toBe('ok');
+    // Exact interleaving of the second wave is engine-scheduling
+    // dependent (a sibling may pick up the strip learned in between),
+    // so assert bounds instead of a fixed trace.
+    expect(calls.length).toBeGreaterThanOrEqual(5);
+    expect(calls.length).toBeLessThanOrEqual(6);
+    // Learned state settles: a third call goes through in ONE request.
+    const before = calls.length;
+    await provider.generate({
+      messages: [{ role: 'user', content: 'c' }],
+      temperature: 0,
+      maxTokens: 8,
+    });
+    expect(calls).toHaveLength(before + 1);
+    const last = calls.at(-1)?.body ?? {};
+    expect('max_tokens' in last).toBe(false);
+    expect('temperature' in last).toBe(false);
+    expect(last.max_completion_tokens).toBe(8);
+    expect(warns.filter((w) => w.includes('max_completion_tokens'))).toHaveLength(1);
+  });
+
+  it('a concurrent stream() and generate() pair both recover from the shared cold start', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeBarrierFetch({
+        holdFirst: 2,
+        calls,
+        respond: (body) => {
+          if ('temperature' in body) return new Response(REJECT_TEMPERATURE, { status: 400 });
+          if (body.stream === true) {
+            return new Response(
+              makeSseStream([
+                { choices: [{ delta: { content: 'ok' } }] },
+                { choices: [{ finish_reason: 'stop' }] },
+                '[DONE]',
+              ]),
+              { status: 200 },
+            );
+          }
+          return new Response(OK_JSON, { status: 200 });
+        },
+      }),
+      logger: () => {},
+    });
+    const [events, gen] = await Promise.all([
+      collect(provider.stream({ messages: [{ role: 'user', content: 's' }], temperature: 0 })),
+      provider.generate({ messages: [{ role: 'user', content: 'g' }], temperature: 0 }),
+    ]);
+    expect(events.at(-1)?.type).toBe('finish');
+    expect(gen.text).toBe('ok');
+    expect(calls).toHaveLength(4);
+  });
+});

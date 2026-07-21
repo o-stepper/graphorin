@@ -40,6 +40,8 @@ The `'worker-threads'` tier is **best-effort** isolation, not a security boundar
 
 `isolated-vm` and `dockerode` are **opt-in peer dependencies** - they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
+When you do install `dockerode`, prefer **v5** (the peer range accepts `^4.0.0 || ^5.0.0`, and the workspace tests against 5.x): dockerode 4.x pulls in `uuid@10`, which carries a moderate advisory ([GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)); dockerode 5 dropped the `uuid` dependency entirely. If you must stay on 4.x, add the override the workspace itself uses: `"dockerode>uuid": ">=11.1.1 <12"` (pnpm `overrides`).
+
 ## Sensitivity model
 
 Every message, memory row, tool result, and trace attribute carries a `Sensitivity` tag:
@@ -226,6 +228,8 @@ overrides:
 :::
 
 The Graphorin workspace itself ships the pnpm form of this override, which is exactly why lockfile-based scanners report it clean - treat a clean workspace scan as a statement about the workspace, never about the published graph.
+
+The same guidance is printed on both packages' npm pages (their READMEs carry the advisory section verbatim), and the scheduled `published-peer-audit` job now also **proves the mitigation**: it installs a consumer fixture with the documented override against the live registry and fails if the one-liner ever stops removing the advisory.
 
 ## Lateral-leak defense layer
 

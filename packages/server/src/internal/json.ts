@@ -7,6 +7,41 @@
 import { createHash } from 'node:crypto';
 
 /**
+ * Sentinel returned by {@link readJsonBody} when a request body is
+ * PRESENT but not syntactically valid JSON. Route handlers must turn
+ * it into an HTTP 400 before any idempotency reservation or side
+ * effect.
+ */
+export const INVALID_JSON_BODY: unique symbol = Symbol('graphorin.invalid-json-body');
+
+/**
+ * deep-retest-0.13.10 P1 (NEG-E2E-SERVER-JSON-01): reads a request
+ * body under the strict JSON contract. An ABSENT body (empty or
+ * whitespace-only) parses as `{}` - several routes deliberately
+ * accept a bodiless POST and fill schema defaults. A present body
+ * that fails `JSON.parse` returns {@link INVALID_JSON_BODY}. The old
+ * per-route helpers swallowed the syntax error into `{}`, which let
+ * a truncated payload (`{"input":`) satisfy `.default({})` schemas
+ * and actually execute agents and workflows.
+ */
+export async function readJsonBody(c: {
+  readonly req: { readonly text: () => Promise<string> };
+}): Promise<unknown> {
+  let text: string;
+  try {
+    text = await c.req.text();
+  } catch {
+    return INVALID_JSON_BODY;
+  }
+  if (text.trim() === '') return {};
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return INVALID_JSON_BODY;
+  }
+}
+
+/**
  * Stable, recursive JSON canonicalisation: object keys sorted
  * lexicographically, arrays preserved as-is. Used by the idempotency
  * middleware so two semantically-identical bodies produce the same

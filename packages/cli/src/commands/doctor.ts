@@ -91,6 +91,16 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
    * local daemon, which CI hosts may not run.
    */
   readonly smokeLocal?: boolean;
+  /**
+   * deep-retest-0.13.10 P2: CI-grade smoke semantics. Interactively,
+   * an unreachable Ollama daemon or a missing model degrades to
+   * `warn`/`skip` and exits 0 - useful for a human, useless for a
+   * pipeline that just installed the daemon and NEEDS the legs
+   * exercised. With `strictSmokeLocal` every `smoke:*` check must
+   * come back `ok`: any `warn`/`skip`/`fail` sets the recoverable
+   * exit code. Implies {@link smokeLocal}.
+   */
+  readonly strictSmokeLocal?: boolean;
   /** Ollama base URL for the smoke. Default `http://127.0.0.1:11434`. */
   readonly ollamaBaseUrl?: string;
   /** Chat model the smoke exercises end to end (streaming + tool call). */
@@ -204,7 +214,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
     checks.push(...result);
   }
 
-  if (options.smokeLocal === true) {
+  if (options.smokeLocal === true || options.strictSmokeLocal === true) {
     checks.push(
       ...(await runLocalSmoke({
         ...(options.ollamaBaseUrl !== undefined ? { ollamaBaseUrl: options.ollamaBaseUrl } : {}),
@@ -241,6 +251,19 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
 
   if (summary.fail > 0) {
     process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
+  }
+  // deep-retest-0.13.10 P2: strict smoke semantics for pipelines -
+  // every smoke leg must be exercised and green, so a warn (daemon
+  // unreachable) or skip (model missing) is a failure, not a shrug.
+  if (options.strictSmokeLocal === true) {
+    const notOk = checks.filter((c) => c.check.startsWith('smoke:') && c.status !== 'ok');
+    if (notOk.length > 0) {
+      process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
+      console.error(
+        `[graphorin doctor] --strict-smoke-local: ${notOk.length} smoke check(s) not ok: ` +
+          notOk.map((c) => `${c.check}=${c.status}`).join(', '),
+      );
+    }
   }
 
   return report;
@@ -310,7 +333,7 @@ function expandFlags(options: DoctorCommandOptions): DoctorChecks {
   if (!explicit) {
     // `--smoke-local` alone selects only the smoke; the host checks
     // still compose with it via the explicit `--check-*` flags / `--all`.
-    if (options.smokeLocal === true) {
+    if (options.smokeLocal === true || options.strictSmokeLocal === true) {
       return { perms: false, secrets: false, encryption: false, systemd: false };
     }
     return { perms: true, secrets: false, encryption: false, systemd: false };
