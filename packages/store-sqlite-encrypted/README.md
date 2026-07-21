@@ -41,6 +41,30 @@ toolchain and Python 3 available; consult the upstream
 [`better-sqlite3-multiple-ciphers`](https://www.npmjs.com/package/better-sqlite3-multiple-ciphers)
 README for details.
 
+### pnpm 10+: approve the native build first
+
+pnpm 10 blocks dependency install scripts by default: `pnpm add` exits
+0, but the first real open then fails with `Could not locate bindings`
+because the cipher peer's binding was never set up. Approve it in your
+**application's** `package.json`:
+
+```jsonc
+{
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "better-sqlite3-multiple-ciphers"
+    ]
+  }
+}
+```
+
+then run `pnpm install && pnpm rebuild better-sqlite3-multiple-ciphers`
+(or the interactive `pnpm approve-builds`). pnpm scopes the approval to
+each project, so every consumer needs its own copy - see the
+[installation guide](https://docs.graphorin.com/guide/installation) for
+the full block.
+
 ---
 
 ## Usage

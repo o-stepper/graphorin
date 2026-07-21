@@ -107,9 +107,16 @@ jobs:
         run: pnpm exec turbo run build --filter=@graphorin/cli
 
       - name: Install and start Ollama
+        env:
+          # deep-retest-0.13.10 P2 / issue #239: an unpinned `latest`
+          # install segfaulted (llama-server) during model warm-up,
+          # before any Graphorin assertion ran. Pin a known-good
+          # release; bump deliberately, with a green scheduled run.
+          OLLAMA_VERSION: 0.32.0
         run: |
           set -euo pipefail
           curl -fsSL https://ollama.com/install.sh | sh
+          ollama --version
           # The installer starts a systemd service on Ubuntu; fall back to a
           # foreground daemon if it did not come up.
           for i in $(seq 1 30); do
@@ -125,20 +132,35 @@ jobs:
           cat /tmp/ollama-serve.log 2>/dev/null || true
           exit 1
 
-      - name: Pull and warm the models
+      - name: Pull the models
         run: |
           set -euo pipefail
           ollama pull qwen3:0.6b
           ollama pull nomic-embed-text
-          # Load the chat model into memory so the doctor chat leg measures a
-          # warm round-trip instead of racing its cold-load against the
-          # 60-second budget.
-          ollama run qwen3:0.6b "Reply with the single word OK."
 
-      - name: Run doctor --smoke-local against the live daemon
+      - name: Warm the chat model (one retry)
         run: |
           set -euo pipefail
-          node packages/cli/dist/bin/graphorin.js doctor --smoke-local \
+          # Load the chat model into memory so the doctor chat leg measures a
+          # warm round-trip instead of racing its cold-load against the
+          # 60-second budget. The warm-up is the step that crashed under the
+          # unpinned runtime (issue #239) - retry it ONCE so a transient
+          # loader hiccup does not kill the whole integration signal, while a
+          # reproducible crash still fails loudly.
+          warm() { ollama run qwen3:0.6b "Reply with the single word OK."; }
+          if ! warm; then
+            echo 'warm-up failed once; retrying after 5s' >&2
+            sleep 5
+            warm
+          fi
+
+      - name: Run doctor --strict-smoke-local against the live daemon
+        run: |
+          set -euo pipefail
+          # --strict-smoke-local (deep-retest-0.13.10 P2) exits non-zero
+          # unless EVERY smoke leg is ok - this run live-proves the flag on
+          # each schedule; the jq assertion below stays as the second belt.
+          node packages/cli/dist/bin/graphorin.js doctor --strict-smoke-local \
             --ollama-model qwen3:0.6b --json | tee doctor-report.json
 
       # A missing daemon degrades to warn+skip by design (doctor still exits
@@ -156,6 +178,28 @@ jobs:
                   | select(.status != "ok")]
                  | length) == 0
           ' doctor-report.json
+
+      # deep-retest-0.13.10 P2: when the job dies before any Graphorin
+      # assertion (daemon crash, model-load segfault), the diagnosis
+      # must not depend on rerunning - always ship the daemon logs.
+      - name: Collect Ollama daemon logs
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p ollama-diagnostics
+          sudo journalctl -u ollama --no-pager -n 500 > ollama-diagnostics/journal.log 2>&1 || true
+          cp /tmp/ollama-serve.log ollama-diagnostics/ 2>/dev/null || true
+          ollama --version > ollama-diagnostics/version.txt 2>&1 || true
+          dmesg --ctime 2>/dev/null | tail -n 100 > ollama-diagnostics/dmesg-tail.log || true
+
+      - name: Upload Ollama daemon logs
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ollama-diagnostics
+          path: ollama-diagnostics/
+          retention-days: 14
+          if-no-files-found: ignore
 
   onepassword-cli:
     name: 1Password CLI contract (real binary, no account)

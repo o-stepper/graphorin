@@ -180,12 +180,83 @@ function main() {
   if (skipped.length > 0) {
     console.log(`[published-peer-audit] skipped (not on registry): ${skipped.join(', ')}`);
   }
+
+  // deep-retest-0.13.10 P2: prove the DOCUMENTED mitigation still
+  // neutralizes each allowlisted advisory against the live registry.
+  // An allowlist entry may declare `mitigation`: the consumer package
+  // to install plus the npm `overrides` block the docs prescribe. The
+  // fixture install applies the override and the advisory must be
+  // GONE - if upstream shifts and the documented one-liner stops
+  // working, this fails before a user discovers it the hard way.
+  for (const entry of allowlist) {
+    if (entry.mitigation === undefined) continue;
+    if (!seen.has(entry.ghsa)) continue; // the stale path already failed above
+    const spec = `${entry.mitigation.package}@${VERSION}`;
+    const dir = mkdtempSync(join(tmpdir(), 'graphorin-peer-audit-mitigated-'));
+    try {
+      writeFileSync(
+        join(dir, 'package.json'),
+        JSON.stringify(
+          { name: 'peer-audit-mitigated', private: true, overrides: entry.mitigation.overrides },
+          null,
+          2,
+        ),
+      );
+      const install = run(
+        'npm',
+        ['install', spec, '--ignore-scripts', '--no-audit', '--no-fund', '--loglevel=error'],
+        { cwd: dir },
+      );
+      if (install.status !== 0) {
+        console.error(`::error::[published-peer-audit] mitigated install ${spec} failed:`);
+        console.error(install.stderr.trim() || install.stdout.trim());
+        process.exitCode = 1;
+        continue;
+      }
+      const audit = run('npm', ['audit', '--omit=dev', '--json'], { cwd: dir });
+      let report;
+      try {
+        report = JSON.parse(audit.stdout);
+      } catch {
+        console.error(
+          `::error::[published-peer-audit] mitigated npm audit ${spec} returned no JSON`,
+        );
+        process.exitCode = 1;
+        continue;
+      }
+      const still = new Set();
+      for (const vuln of Object.values(report.vulnerabilities ?? {})) {
+        for (const via of vuln.via ?? []) {
+          if (typeof via !== 'object' || via === null) continue;
+          const ghsa = ghsaFromUrl(via.url);
+          if (ghsa !== null) still.add(ghsa);
+        }
+      }
+      if (still.has(entry.ghsa)) {
+        console.error(
+          `::error::[published-peer-audit] MITIGATION FAILED for ${entry.ghsa}: the documented ` +
+            `override no longer removes the advisory from ${spec} - update the mitigation ` +
+            'and its docs together.',
+        );
+        process.exitCode = 1;
+      } else {
+        console.log(
+          `[published-peer-audit] mitigation verified: ${entry.ghsa} absent from ${spec} ` +
+            'with the documented override',
+        );
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
   if (offending.length > 0 || stale.length > 0 || process.exitCode === 1) {
     process.exit(1);
   }
   console.log(
     `[published-peer-audit] PASS: ${packages.length - skipped.length} package graphs audited, ` +
-      `${seen.size} known advisories total, all high/critical ones allowlisted and live.`,
+      `${seen.size} known advisories total, all high/critical ones allowlisted, live, ` +
+      'and their documented mitigations verified.',
   );
 }
 

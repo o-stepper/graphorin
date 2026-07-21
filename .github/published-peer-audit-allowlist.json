@@ -7,7 +7,13 @@
       "severity": "high",
       "reason": "onnxruntime-node (every release up to 1.27.0) pins adm-zip ^0.5.16, below the patched 0.6.0; it reaches consumers via @graphorin/embedder-transformersjs -> @huggingface/transformers (which pins onnxruntime-node exactly). adm-zip is used ONLY in onnxruntime-node's install script to unzip its own release archives - the runtime never parses foreign ZIPs, so the practical exposure is an install-time DoS via a compromised download channel. The workspace itself is on adm-zip 0.6.0 via a pnpm override (PR #206); the documented consumer mitigation is an equivalent override in the consumer's root manifest - see documentation/guide/security.md.",
       "addedOn": "2026-07-20",
-      "removeWhen": "onnxruntime-node widens its adm-zip range to >=0.6.0 AND @huggingface/transformers picks that release up."
+      "removeWhen": "onnxruntime-node widens its adm-zip range to >=0.6.0 AND @huggingface/transformers picks that release up.",
+      "mitigation": {
+        "package": "@graphorin/embedder-transformersjs",
+        "overrides": {
+          "adm-zip": "^0.6.0"
+        }
+      }
     }
   ]
 }
