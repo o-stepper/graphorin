@@ -25,6 +25,92 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.12 - 2026-07-21
+
+The **reliability + audit-hygiene patch** (PR #242): remediation of the
+thirteenth external deep retest - the first round completed end-to-end
+against the published npm packages and live OpenAI, plus a defensive
+security audit. It found no P0 and confirmed every 0.13.11 fix live;
+this release addresses its remaining reliability and hygiene findings.
+No breaking changes.
+
+### Provider - single-flight cold parameter recovery (`@graphorin/provider`)
+
+- While one call (the leader) climbs the HTTP-400 recovery ladder
+  (`max_tokens` remap, `temperature` strip, tools `reasoning_effort`),
+  concurrent siblings that hit their own recoverable 400 now wait for
+  the leader and retry once from the fully learned state instead of
+  climbing every remaining rung themselves. A cold five-way batch (the
+  LLM-reranker shape) drops from 15 HTTP calls to 11, and only the
+  leader ever sends doomed intermediate parameter shapes - less 400
+  noise and less rate-limit pressure during the learning window. The
+  0.13.11 correctness guarantee is unchanged: each call keeps its own
+  per-call attempt ledger, so a waiter still recovers independently
+  when the leader dies mid-ladder (429, network error). New
+  deterministic tests cover the five-way chained batch, a
+  tri-recovery interleaving (all three parameters learned
+  concurrently), and the leader-death fallback.
+
+### LLM reranker - actionable failure diagnostics (`@graphorin/reranker-llm`)
+
+- `lastErrorCount` alone said "something degraded"; diagnosing a live
+  incident meant re-running billed calls. After each `rerank(...)`,
+  `lastFailures` now records per-passage detail - error class name,
+  HTTP status when present, or the truncated off-format reply
+  snippet - capped at 25 entries, and `lastOffFormatCount` counts
+  unparseable replies separately from provider failures
+  (`lastErrorCount` semantics unchanged). For live cloud usage,
+  compose the provider with `withRetry` before handing it to
+  `createLlmReranker`: the raw adapter deliberately retries nothing,
+  so a cold `batchSize` burst can trip provider rate limits and
+  degrade passages to the fallback score.
+
+### Evals - judge off-format retry + typed classification (`@graphorin/evals`)
+
+- Reasoning-model judges can burn a tight `maxOutputTokens` on hidden
+  reasoning and return an EMPTY visible reply - observed live on the
+  HaluMem QA smoke. `llmJudge` now re-asks once on a missing
+  `SCORE: <n>` marker with a constrained marker-only instruction and a
+  raised output budget (`offFormatRetries: 0` restores single-shot
+  fail-loud). Exhausted retries throw the typed `JudgeOffFormatError`
+  carrying a stable `judge-off-format:` marker, and the HaluMem
+  runner reports such cases as `status=JUDGE_FAILED` (the subject's
+  answer was never graded; the run still exits non-zero) with
+  `benchConfig.judgeOffFormatCases`. A new `benchmark:compare` entry
+  point renders two benchmark `--json` artifacts as one A/B markdown
+  table, and a `diet` golden proves the update-omission harness passes
+  with a well-behaved scripted provider and flags a lazy one.
+
+### CLI - CI-safe pepper + bootstrap-aware doctor (`@graphorin/cli`, `@graphorin/security`)
+
+- `graphorin init --pepper-out <path>` writes the server pepper hex to
+  a `0600` file (never overwrites) instead of printing it, so
+  non-interactive bootstrap logs stop retaining the key material; the
+  next-steps hint walks the file-based `secrets set --from-stdin`
+  path and tells the operator to delete the file afterwards.
+- `graphorin doctor` on an uninitialized host (no `~/.graphorin`, no
+  `--config`) reports the `audit-db` encryption check as `skip` with
+  an init hint instead of a hard `fail` - nothing could have
+  registered an audit binding before bootstrap. Configured or
+  bootstrapped deployments keep the strict fail
+  (`checkEncryption` gains the `bootstrapped` option).
+
+### Repository hygiene (no package changes)
+
+- CI gains a **blocking secret scan** (gitleaks, pinned by version and
+  sha256) with a narrow `.gitleaks.toml` path allowlist covering only
+  synthetic-fixture trees - runtime source is fully scanned.
+- The Docker smoke workflow publishes an **SPDX SBOM** of the built
+  image (syft, pinned) as a build artifact.
+- The Kubernetes template and deployment guide carry a loud
+  `trustProxy: true` caution (spoofable `X-Forwarded-*` unless a
+  trusted ingress overwrites them).
+- `pnpm smoke-examples --exclude <name>` officially skips named
+  examples for non-security audits; unknown names fail loudly and
+  every exclusion is printed.
+- The docs dist-budget notes mark the Rollup "large chunk" warning as
+  accepted - the enforced ceiling is the 1 MB `maxJsChunkBytes` gate.
+
 ## 0.13.11 - 2026-07-21
 
 The **data-safety + wire-hygiene patch** (PR #240): remediation of the
