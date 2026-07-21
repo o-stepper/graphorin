@@ -5,6 +5,8 @@ import {
   factualityScorer,
   fenceForJudge,
   helpfulnessScorer,
+  JUDGE_OFF_FORMAT_MARKER,
+  JudgeOffFormatError,
   llmJudge,
   parseScore,
   toxicityScorer,
@@ -97,6 +99,73 @@ describe('llmJudge', () => {
     // "On a 0-10 scale, I refuse" trips an old first-integer parser into 0.
     const scorer = llmJudge({ provider: buildProvider('On a 0-10 scale, I refuse.') });
     await expect(scorer.score(CASE)).rejects.toThrow(/SCORE/);
+  });
+
+  // ---- deep-retest-0.13.11 P3: off-format judge retry + typed classification ----
+
+  it('retries ONCE on a missing marker with a constrained reprompt and a raised budget', async () => {
+    const requests: ProviderRequest[] = [];
+    const scorer = llmJudge({
+      provider: buildProvider((req) => {
+        requests.push(req);
+        return requests.length === 1 ? '' : 'SCORE: 8';
+      }),
+    });
+    const r = await scorer.score(CASE);
+    expect(r.pass).toBe(true);
+    expect(requests).toHaveLength(2);
+    // The retry raises the output ceiling (an empty first reply is the
+    // reasoning-burn signature) and appends the marker-only instruction.
+    expect(requests[0]?.maxTokens).toBe(16);
+    expect(requests[1]?.maxTokens).toBe(32);
+    const lastMessage = requests[1]?.messages.at(-1);
+    const lastText =
+      typeof lastMessage?.content === 'string'
+        ? lastMessage.content
+        : ((lastMessage?.content[0] as { text?: string } | undefined)?.text ?? '');
+    expect(lastText).toContain('did not contain the required marker');
+    // An EMPTY prior reply is not echoed back as an assistant turn.
+    expect(requests[1]?.messages.some((m) => m.role === 'assistant')).toBe(false);
+  });
+
+  it('echoes a non-empty off-format reply back as an assistant turn on retry', async () => {
+    const requests: ProviderRequest[] = [];
+    const scorer = llmJudge({
+      provider: buildProvider((req) => {
+        requests.push(req);
+        return requests.length === 1 ? 'I think it deserves an eight.' : 'SCORE: 8';
+      }),
+    });
+    await scorer.score(CASE);
+    expect(requests[1]?.messages.some((m) => m.role === 'assistant')).toBe(true);
+  });
+
+  it('throws JudgeOffFormatError with the stable marker when retries are exhausted', async () => {
+    let calls = 0;
+    const scorer = llmJudge({
+      provider: buildProvider(() => {
+        calls += 1;
+        return 'still not a score';
+      }),
+    });
+    const err = await scorer.score(CASE).catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(JudgeOffFormatError);
+    expect((err as Error).message).toContain(JUDGE_OFF_FORMAT_MARKER);
+    expect((err as Error).message).toContain('after 2 attempt(s)');
+    expect(calls).toBe(2);
+  });
+
+  it('offFormatRetries: 0 restores single-shot fail-loud', async () => {
+    let calls = 0;
+    const scorer = llmJudge({
+      provider: buildProvider(() => {
+        calls += 1;
+        return 'nope';
+      }),
+      offFormatRetries: 0,
+    });
+    await expect(scorer.score(CASE)).rejects.toThrow(/SCORE/);
+    expect(calls).toBe(1);
   });
 
   it('ignores a SCORE marker injected into the (fenced) candidate output', async () => {

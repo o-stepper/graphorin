@@ -23,6 +23,39 @@ import { defaultPassageExtractor, type PassageExtractor } from './text-extractio
 export const RERANKER_ID = 'llm-judge' as const;
 
 /**
+ * Cap on the failure details retained per `rerank(...)` call - a huge
+ * candidate list against a dead endpoint must not accumulate an
+ * unbounded diagnostic array. `lastErrorCount` / `lastOffFormatCount`
+ * keep the FULL totals regardless.
+ */
+const MAX_RECORDED_FAILURES = 25;
+
+/**
+ * One recorded per-passage scoring failure from the most recent
+ * `rerank(...)` call (deep-retest-0.13.11: `lastErrorCount` alone said
+ * "something failed" but live diagnosis needed the status/stage, which
+ * meant re-running billed external calls).
+ *
+ * @stable
+ */
+export interface LlmRerankFailure {
+  /** Index of the passage in the merged candidate list. */
+  readonly passageIndex: number;
+  /**
+   * `'provider-error'` - the `generate` call rejected (counted in
+   * `lastErrorCount`); `'off-format'` - the reply carried no parseable
+   * integer and the passage fell back (counted in `lastOffFormatCount`).
+   */
+  readonly kind: 'provider-error' | 'off-format';
+  /** Error class name for provider errors (e.g. `'ProviderHttpError'`). */
+  readonly name?: string;
+  /** HTTP status when the underlying failure carried one. */
+  readonly status?: number;
+  /** Error message, or the (truncated) off-format reply text. */
+  readonly message: string;
+}
+
+/**
  * Options accepted by {@link createLlmReranker}.
  *
  * @stable
@@ -109,6 +142,8 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
   #invocationCount = 0;
   #lastPromptTokens = 0;
   #lastErrorCount = 0;
+  #lastOffFormatCount = 0;
+  #lastFailures: LlmRerankFailure[] = [];
 
   constructor(options: LlmRerankerOptions<TRecord>) {
     this.provider = options.provider;
@@ -163,6 +198,31 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
     return this.#lastErrorCount;
   }
 
+  /**
+   * Number of off-format replies (no parseable integer → `fallbackScore`)
+   * on the most recent `rerank(...)`. Distinct from `lastErrorCount`:
+   * the provider call SUCCEEDED but the model drifted off the
+   * integer-only contract.
+   *
+   * @stable
+   */
+  get lastOffFormatCount(): number {
+    return this.#lastOffFormatCount;
+  }
+
+  /**
+   * Per-passage failure details (both kinds) from the most recent
+   * `rerank(...)`, capped at 25 entries - enough to diagnose a live
+   * incident (status codes, error classes, off-format reply snippets)
+   * without re-running billed calls. The counters above keep full
+   * totals.
+   *
+   * @stable
+   */
+  get lastFailures(): ReadonlyArray<LlmRerankFailure> {
+    return this.#lastFailures;
+  }
+
   async rerank<TInputRecord extends MemoryRecord>(
     query: string,
     lists: ReadonlyArray<ReadonlyArray<MemoryHit<TInputRecord>>>,
@@ -174,6 +234,8 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
     this.#invocationCount += 1;
     this.#lastPromptTokens = 0;
     this.#lastErrorCount = 0;
+    this.#lastOffFormatCount = 0;
+    this.#lastFailures = [];
     const merged = mergeAndDedupe(lists);
     if (merged.length === 0) return [];
     const passages = merged.map((entry) =>
@@ -248,6 +310,12 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
       const text = response.text ?? '';
       const parsed = parseIntegerResponse(text);
       if (parsed === null) {
+        this.#lastOffFormatCount += 1;
+        this.#recordFailure({
+          passageIndex: idx,
+          kind: 'off-format',
+          message: text.length > 200 ? `${text.slice(0, 200)}...` : text,
+        });
         return { idx, score: this.fallbackScore * this.maxScore };
       }
       return { idx, score: parsed };
@@ -258,8 +326,21 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
       // record the error. A deliberate abort is not transient: re-throw it.
       if (isAbortError(err)) throw err;
       this.#lastErrorCount += 1;
+      const status = (err as { status?: unknown }).status;
+      this.#recordFailure({
+        passageIndex: idx,
+        kind: 'provider-error',
+        ...(err instanceof Error ? { name: err.name } : {}),
+        ...(typeof status === 'number' ? { status } : {}),
+        message: err instanceof Error ? err.message : String(err),
+      });
       return { idx, score: this.fallbackScore * this.maxScore };
     }
+  }
+
+  #recordFailure(failure: LlmRerankFailure): void {
+    if (this.#lastFailures.length >= MAX_RECORDED_FAILURES) return;
+    this.#lastFailures.push(failure);
   }
 }
 

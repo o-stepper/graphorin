@@ -34,6 +34,7 @@ export const VERSION: string = pkg.version;
 
 export {
   createLlmReranker,
+  type LlmRerankFailure,
   LlmReRanker,
   type LlmRerankerOptions,
   type MergedEntry,
