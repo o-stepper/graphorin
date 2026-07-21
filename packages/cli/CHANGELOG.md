@@ -1,5 +1,24 @@
 # @graphorin/cli
 
+## 0.13.11
+
+### Patch Changes
+
+- [#240](https://github.com/o-stepper/graphorin/pull/240) [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34) Thanks [@o-stepper](https://github.com/o-stepper)! - Twelfth external deep retest, P2: new `graphorin doctor --strict-smoke-local` flag (implies `--smoke-local`) for pipelines. Interactively, an unreachable Ollama daemon or a missing model degrades to `warn`/`skip` and exits 0; under strict mode every `smoke:*` check must come back `ok`, so a provisioned-but-broken local stack fails the job instead of shrugging. The scheduled real-integration workflow now runs the strict flag against a live daemon.
+
+- Updated dependencies [[`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34), [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34), [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34), [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34)]:
+  - @graphorin/provider@0.13.11
+  - @graphorin/security@0.13.11
+  - @graphorin/server@0.13.11
+  - @graphorin/store-sqlite@0.13.11
+  - @graphorin/memory@0.13.11
+  - @graphorin/skills@0.13.11
+  - @graphorin/sessions@0.13.11
+  - @graphorin/workflow@0.13.11
+  - @graphorin/core@0.13.11
+  - @graphorin/eslint-plugin@0.13.11
+  - @graphorin/pricing@0.13.11
+
 ## 0.13.10
 
 ### Patch Changes

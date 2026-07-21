@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.10](https://img.shields.io/badge/version-v0.13.10-blue.svg)](./CHANGELOG.md)
+[![Version: 0.13.11](https://img.shields.io/badge/version-v0.13.11-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.10`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.13.11`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.10** (2026-07-21) - the modern-model compatibility + sandbox-contract patch: the OpenAI-shaped adapters now recover, once per instance and with a WARN, from the GPT-5.6-class HTTP 400s (`temperature` rejected -> the request is re-sent without the field; function tools requiring `reasoning_effort: 'none'` on chat completions -> re-sent with it), so the memory pipeline, the LLM judge, and the LLM reranker work against current OpenAI reasoning models out of the box (new `unsupportedParamRecovery` opt-out, explicit `providerOptions` values still fail loudly). `DockerSandbox` now executes the full stable per-call contract - `env` allowlist, per-call `maxMemoryMb`, abort via `signal` with `kind: 'aborted'`, and separated stdout/stderr diagnostics with the real exception in the error cause. Benchmark cost reports stamp `costPricingMatched` from the preflight/observed union so fail-before-usage runs cannot claim matched pricing, and a new `check-doc-links` gate keeps docs links off the bare landing domain. See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-13-9-0-13-10) for upgrade notes.
+Latest release: **0.13.11** (2026-07-21) - the data-safety + wire-hygiene patch: `encryptDatabase({ swap: true })` is now fail-closed against live writers across SQLite builds (WAL-sidecar refusal plus a journal-mode probe that trusts only an actual `delete` result, re-checked immediately before the rename pair, with sidecars moving next to the backup) - the cross-driver case could silently discard a COMMIT the writer believed durable. Every server route now answers `400 invalid-json` to syntactically broken bodies before any side effect (a truncated `{"input":` used to RUN agents and workflows), and broken requests never reserve the idempotency key. Provider unsupported-parameter recovery is concurrency-safe: cold parallel batches all recover while the instance still learns and WARNs once. Plus `graphorin doctor --strict-smoke-local` for pipelines, a mitigation-proof leg in the published-consumer audit, `better-sqlite3` peer accepting v13, `dockerode` peer accepting v5 (drops the `uuid` advisory chain), and npm-page advisories for the transformers.js pair. See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-13-10-0-13-11) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.10 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.13.11 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

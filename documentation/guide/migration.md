@@ -52,6 +52,36 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.10 -> 0.13.11
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **`encryptDatabase({ swap: true })` refuses more often, on
+  purpose.** The live-writer check is now fail-closed: WAL sidecar
+  files (`<db>-wal`/`<db>-shm`) next to the source refuse the swap
+  even when no process appears to hold the database - after a crashed
+  writer, open the database once (for example `graphorin storage
+  status`) so SQLite recovers and removes them, then retry. Scripts
+  that relied on the old best-effort probe letting a swap through
+  will now see `EncryptSwapLiveWriterError`; stopping every writer
+  first was always the documented contract.
+- **Syntactically broken JSON now gets `400 invalid-json`.** Clients
+  that sent malformed bodies and relied on the server treating them
+  as `{}` (running agents/workflows with defaults) must send valid
+  JSON; an EMPTY body keeps its documented `{}` meaning. Broken
+  requests no longer reserve the `Idempotency-Key`.
+- **Cold concurrent provider batches recover cleanly.** The 0.13.10
+  unsupported-parameter recovery could surface a 400 to all but one
+  request in a cold parallel batch; all siblings now recover, the
+  WARN still fires once per instance.
+- **`doctor --strict-smoke-local`** is available for CI: every
+  `smoke:*` check must be `ok` or the exit code is non-zero.
+- **Peers widened:** `better-sqlite3` accepts v13
+  (`^12.9.0 || ^13.0.0`) and `dockerode` accepts v5
+  (`^4.0.0 || ^5.0.0`; v5 removes the `uuid` advisory chain). Neither
+  requires action to stay on the previous majors.
+
 ### 0.13.9 -> 0.13.10
 
 A patch release; nothing to migrate. Behavioural refinements worth

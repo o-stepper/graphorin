@@ -1,5 +1,14 @@
 # @graphorin/embedder-transformersjs
 
+## 0.13.11
+
+### Patch Changes
+
+- [#240](https://github.com/o-stepper/graphorin/pull/240) [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34) Thanks [@o-stepper](https://github.com/o-stepper)! - Twelfth external deep retest, P2 (docs): the README now carries the known `adm-zip` advisory (GHSA-xcpc-8h2w-3j85, install-script-only exposure under `onnxruntime-node`) together with the verified one-line consumer override, so the npm package page tells the whole story instead of deferring to the security guide. The scheduled published-consumer audit additionally proves the documented override keeps neutralizing the advisory against the live registry.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.11
+
 ## 0.13.10
 
 ### Patch Changes

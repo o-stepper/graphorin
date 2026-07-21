@@ -1,5 +1,14 @@
 # @graphorin/security
 
+## 0.13.11
+
+### Patch Changes
+
+- [#240](https://github.com/o-stepper/graphorin/pull/240) [`c9e1465`](https://github.com/o-stepper/graphorin/commit/c9e14652cb0674e121bfdaa3b96a75907360ee34) Thanks [@o-stepper](https://github.com/o-stepper)! - Twelfth external deep retest, P2: the `dockerode` peer range now accepts v5 (`^4.0.0 || ^5.0.0`), and the workspace tests the Docker sandbox against 5.0.1 (stub suite plus the live-daemon leg). dockerode 5 drops the `uuid` dependency entirely, which removes the moderate `uuid@10` advisory chain from consumer installs; the security guide documents the recommendation and the override for consumers staying on 4.x.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.11
+
 ## 0.13.10
 
 ### Patch Changes
