@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.8](https://img.shields.io/badge/version-v0.13.8-blue.svg)](./CHANGELOG.md)
+[![Version: 0.13.9](https://img.shields.io/badge/version-v0.13.9-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.8`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.13.9`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.8** (2026-07-20) - the 1Password + eval-honesty patch: the optional `@graphorin/secret-1password` resolver now works against the real 1Password CLI (`op read` never had a `--reveal` flag; the argv is fixed, pinned by tests, and proven weekly against a real pinned `op` binary in CI), and the `no accounts configured` state maps to `signed-out` with an actionable setup hint. `@graphorin/evals` memory scorers stop punishing verbose-but-correct memories (default matcher = token F1 OR gold-content coverage, new `minGoldCoverage` option + `goldTokenCoverage`/`goldCoverageMatcher`/`defaultMemoryPointMatcher` exports), and the benchmark runners now report the actual observed spend (`benchConfig.observedCostUsd`, `costPricingMatched`, `unpricedModels`) alongside the enforced `--max-cost-usd` cap. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-7-0-13-8) for upgrade notes.
+Latest release: **0.13.9** (2026-07-21) - the pricing-honesty + supply-chain-audit patch: `@graphorin/pricing` now prices the official undated OpenAI aliases (`gpt-4o-mini`, `gpt-4o`, `o1`, `o3-mini`), the OpenAI embedding models, dashed date suffixes, and `-latest` ids, so `--max-cost-usd` can actually observe judge spend - and the benchmark runners fail closed before the first request when a subject or judge model is unpriced (new `--allow-unpriced-model` escape hatch). A new weekly `published-peer-audit` CI job installs every published package into a fresh consumer and gates `npm audit` against a reviewed allowlist, closing the blind spot where workspace pnpm overrides masked a high `adm-zip` advisory that real consumers inherit; the security guide documents the verified one-line consumer override. See the [changelog](./CHANGELOG.md) and the [migration guide](https://graphorin.com/guide/migration#_0-13-8-0-13-9) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.8 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.13.9 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

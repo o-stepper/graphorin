@@ -1,5 +1,13 @@
 # @graphorin/provider-llamacpp-node
 
+## 0.13.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/provider@0.13.9
+  - @graphorin/core@0.13.9
+
 ## 0.13.8
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/agent",
-  "version": "0.13.8",
+  "version": "0.13.9",
   "description": "Agent runtime for the Graphorin framework: createAgent({...}) factory, the typed model -> tool calls -> model loop, the AgentEvent<TOutput> discriminated event stream, steering / followUp queues, durable HITL approvals via runStateToJSON / runStateFromJSON, multi-agent handoffs (Agent.toTool, filter library, secrets isolation), agent-level model fallback chain, intra-loop reasoning preservation, post-compaction hook lifecycle, agent-step-level fan-out (Agent.fanOut + evaluatorOptimizer + progress artifacts), per-tool model-tier hint resolution, lateral-leak defense layer (CausalityMonitor + MergeAgentSidewaysInjectionGuard + protocol-guard), inbound-content sanitization preamble injection, and AbortSignal-aware hard-kill / drain cancellation. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

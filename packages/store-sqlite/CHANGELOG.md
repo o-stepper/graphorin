@@ -1,5 +1,13 @@
 # @graphorin/store-sqlite
 
+## 0.13.9
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.9
+  - @graphorin/observability@0.13.9
+
 ## 0.13.8
 
 ### Patch Changes
