@@ -84,7 +84,7 @@ jobs:
           ' packages/security/docker-vitest.json
 
   ollama-doctor:
-    name: Ollama end-to-end (doctor --smoke-local)
+    name: Ollama end-to-end (doctor --strict-smoke-local)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
