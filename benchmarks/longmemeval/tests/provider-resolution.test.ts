@@ -13,6 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildResultsHeader,
+  combineUnpricedModels,
   preflightUnpricedModels,
   resolveBenchProvider,
   resolveJudgeSpec,
@@ -143,6 +144,16 @@ describe('deep-retest 0.13.7 P3 - observed-cost reporting', () => {
     expect(
       preflightUnpricedModels([withModel('gpt-4.1-mini'), withModel('mystery-model')]),
     ).toEqual(['mystery-model']);
+  });
+
+  it('deep-retest 0.13.9 P2: report stamps union preflight knowledge with ceiling observations', () => {
+    // The regression shape: --allow-unpriced-model with an endpoint
+    // that dies before the first usage response. The ceiling observed
+    // nothing, but the preflight already knew the model is unpriced -
+    // costPricingMatched must come out false, not true.
+    expect(combineUnpricedModels(['mystery-model'], [])).toEqual(['mystery-model']);
+    expect(combineUnpricedModels(['a', 'b'], ['b', 'c'])).toEqual(['a', 'b', 'c']);
+    expect(combineUnpricedModels([], [])).toEqual([]);
   });
 });
 

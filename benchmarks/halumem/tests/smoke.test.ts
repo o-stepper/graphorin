@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   CliUsageError,
+  combineUnpricedModels,
   countInfrastructureFailures,
   createOperationsAgent,
   INFRA_MARKER,
@@ -221,6 +222,20 @@ describe('deep-retest-0.13.6 P2-4 - --max-cost-usd observes real spend', () => {
         createUsageProvider('mystery-model'),
       ]),
     ).toEqual(['mystery-model']);
+  });
+
+  it('deep-retest 0.13.9 P2: report stamps union preflight knowledge with ceiling observations', () => {
+    // The regression shape: --allow-unpriced-model with an endpoint
+    // that dies before the first usage response. The ceiling observed
+    // nothing, but the preflight already knew the model is unpriced -
+    // costPricingMatched must come out false, not true.
+    const failBeforeUsage = combineUnpricedModels(['mystery-model'], []);
+    expect(failBeforeUsage).toEqual(['mystery-model']);
+    expect(failBeforeUsage.length === 0).toBe(false);
+    // Overlap dedupes; observed-only entries survive.
+    expect(combineUnpricedModels(['a', 'b'], ['b', 'c'])).toEqual(['a', 'b', 'c']);
+    // Fully priced run stays matched.
+    expect(combineUnpricedModels([], [])).toEqual([]);
   });
 });
 
