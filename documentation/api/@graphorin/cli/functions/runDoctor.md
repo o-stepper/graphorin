@@ -10,7 +10,7 @@
 function runDoctor(options?): Promise<DoctorReport>;
 ```
 
-Defined in: packages/cli/src/commands/doctor.ts:133
+Defined in: packages/cli/src/commands/doctor.ts:143
 
 **`Stable`**
 

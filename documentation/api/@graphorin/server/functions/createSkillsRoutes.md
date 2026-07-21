@@ -12,7 +12,7 @@ function createSkillsRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/skills.ts:47
+Defined in: packages/server/src/routes/skills.ts:46
 
 **`Stable`**
 

@@ -10,7 +10,7 @@
 function encryptDatabase(options): Promise<EncryptDatabaseResult>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:114
+Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:143
 
 ## Parameters
 

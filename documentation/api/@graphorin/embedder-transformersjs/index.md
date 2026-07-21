@@ -31,6 +31,35 @@ The package implements the `EmbedderProvider` contract from
 pnpm add @graphorin/embedder-transformersjs @huggingface/transformers
 ```
 
+### Known advisory: adm-zip via onnxruntime-node
+
+`npm audit` flags a high advisory
+([GHSA-xcpc-8h2w-3j85](https://github.com/advisories/GHSA-xcpc-8h2w-3j85))
+in this package's chain:
+`@huggingface/transformers -> onnxruntime-node -> adm-zip@0.5.x`.
+`adm-zip` runs only inside `onnxruntime-node`'s install script to
+unpack its own release archives - the runtime never parses foreign ZIP
+files - and every current `onnxruntime-node` release pins the
+vulnerable range, so no dependency bump resolves it today. Until
+upstream moves, add the verified one-line override to your
+application's root manifest (`npm audit --omit=dev` then comes back
+clean; the install scripts and runtime work unchanged):
+
+```jsonc
+// npm / bun: package.json
+{ "overrides": { "adm-zip": "^0.6.0" } }
+```
+
+```jsonc
+// pnpm: package.json
+{ "pnpm": { "overrides": { "adm-zip@<0.6.0": ">=0.6.0 <1" } } }
+```
+
+Full analysis in the
+[security guide](https://docs.graphorin.com/guide/security); the
+scheduled published-consumer audit tracks the advisory against a
+reviewed allowlist and fails if the exposure ever widens.
+
 ## Quick start
 
 ```ts

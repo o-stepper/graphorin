@@ -12,7 +12,7 @@ function createTokensRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/tokens.ts:48
+Defined in: packages/server/src/routes/tokens.ts:47
 
 **`Stable`**
 

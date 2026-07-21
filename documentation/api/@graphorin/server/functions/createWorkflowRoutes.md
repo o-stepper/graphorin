@@ -12,7 +12,7 @@ function createWorkflowRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/workflows.ts:86
+Defined in: packages/server/src/routes/workflows.ts:85
 
 **`Stable`**
 

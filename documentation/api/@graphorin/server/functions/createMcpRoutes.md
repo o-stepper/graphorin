@@ -12,7 +12,7 @@ function createMcpRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/mcp.ts:49
+Defined in: packages/server/src/routes/mcp.ts:48
 
 **`Stable`**
 

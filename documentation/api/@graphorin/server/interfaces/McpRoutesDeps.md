@@ -6,7 +6,7 @@
 
 # Interface: McpRoutesDeps
 
-Defined in: packages/server/src/routes/mcp.ts:42
+Defined in: packages/server/src/routes/mcp.ts:41
 
 **`Stable`**
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/routes/mcp.ts:42
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-mcp"></a> `mcp` | `readonly` | [`McpApi`](/api/@graphorin/server/interfaces/McpApi.md) | packages/server/src/routes/mcp.ts:43 |
+| <a id="property-mcp"></a> `mcp` | `readonly` | [`McpApi`](/api/@graphorin/server/interfaces/McpApi.md) | packages/server/src/routes/mcp.ts:42 |
