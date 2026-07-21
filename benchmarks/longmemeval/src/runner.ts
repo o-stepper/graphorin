@@ -587,6 +587,23 @@ function judgeScorer(provider: Provider): Scorer<MemoryEvalInput, string> {
   });
 }
 
+/**
+ * deep-retest-0.13.10 P1: models emit typographic punctuation - an
+ * "I don\u2019t have that information." answer scored as a FAILED
+ * abstention because the refusal regex only knew the ASCII
+ * apostrophe, while the LLM judge scored the same answer 10/10.
+ * Normalized before matching: curly single quotes / modifier
+ * apostrophe (U+2018/U+2019/U+02BC) to ', curly double quotes
+ * (U+201C/U+201D) to ", no-break space (U+00A0) to a plain space.
+ * Exported for the scorer tests.
+ */
+export function normalizeForRefusalMatch(text: string): string {
+  return text
+    .replace(/[\u2018\u2019\u02bc]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/\u00a0/g, ' ');
+}
+
 /** Per-ability deterministic scorer: did an abstention case correctly refuse? */
 function abstentionScorer(): Scorer<MemoryEvalInput, string> {
   const refusal =
@@ -596,7 +613,7 @@ function abstentionScorer(): Scorer<MemoryEvalInput, string> {
     check: ({ case: c, output }) => {
       if (c.input.ability !== 'abstention')
         return { pass: true, reason: 'n/a (not an abstention case)' };
-      const refused = refusal.test(output ?? '');
+      const refused = refusal.test(normalizeForRefusalMatch(output ?? ''));
       return {
         pass: refused,
         score: refused ? 1 : 0,
