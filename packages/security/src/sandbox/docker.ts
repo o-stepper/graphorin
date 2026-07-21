@@ -13,6 +13,20 @@
  * devices, or persistent containers should configure the adapter
  * accordingly via a custom `peerLoader`.
  *
+ * `SandboxRunOptions` contract notes (deep-retest-0.13.9 P1):
+ *
+ * - `input` is visible to `kind: 'source'` code as the `__INPUT__`
+ *   global (JSON-embedded in the wrapper); `kind: 'handler'` exports
+ *   receive it as their single argument.
+ * - `env` entries are forwarded as the container's `Env`. Unlike the
+ *   worker-threads adapter the image's own baseline environment
+ *   (`PATH`, `HOME`, ... from the image config) cannot be removed -
+ *   the allowlist is additive on top of that baseline.
+ * - `maxMemoryMb` overrides the constructor-level `memoryLimitMb`
+ *   for the call; `signal` force-removes the container and resolves
+ *   with `kind: 'aborted'`; the wrapper's stderr is captured
+ *   separately and reported in the failure `cause`.
+ *
  * The `dockerode` peer dependency is declared as **optional**; the
  * adapter resolves it lazily on the first `run(...)` call so the
  * package can be imported on hosts without Docker.
@@ -151,6 +165,14 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
     ): Promise<SandboxResult<TOutput>> => {
       const startedAt = performance.now();
 
+      if (runOpts.signal?.aborted === true) {
+        return {
+          ok: false,
+          error: { kind: 'aborted', message: 'DockerSandbox: aborted before start' },
+          durationMs: performance.now() - startedAt,
+        };
+      }
+
       const client = await getClient();
       if (!client) {
         return {
@@ -178,10 +200,15 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
       const command = ['node', '-e', wrapperScript(code, runOpts.input)];
 
       let container: DockerodeContainer | undefined;
+      let abortListener: (() => void) | undefined;
       try {
         container = await client.createContainer({
           Image: image,
           Cmd: command,
+          // deep-retest-0.13.9 P1: the SandboxRunOptions.env allowlist
+          // must actually reach the container. The image baseline env
+          // (PATH etc.) remains; the allowlist is additive on top.
+          Env: Object.entries(runOpts.env ?? {}).map(([k, v]) => `${k}=${v}`),
           AttachStdin: true,
           AttachStdout: true,
           AttachStderr: true,
@@ -190,7 +217,8 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
           Tty: false,
           NetworkDisabled: runOpts.allowNetwork !== true,
           HostConfig: {
-            Memory: memoryLimitMb * 1024 * 1024,
+            // Per-call ceiling wins over the constructor default.
+            Memory: (runOpts.maxMemoryMb ?? memoryLimitMb) * 1024 * 1024,
             ReadonlyRootfs: runOpts.allowFs !== true,
             Tmpfs: { '/work': 'rw,size=64m' },
             AutoRemove: false,
@@ -203,6 +231,11 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
 
         const timeoutMs = runOpts.timeoutMs ?? defaultTimeoutMs;
         const waitPromise = container.wait();
+        // The race can be decided by timeout/abort while wait() is
+        // still pending; the force-remove in the finally block then
+        // settles it unobserved, which must not surface as an
+        // unhandled rejection.
+        void Promise.resolve(waitPromise).catch(() => {});
         const timeoutPromise = new Promise<{
           readonly StatusCode: number;
           readonly timedOut: true;
@@ -210,11 +243,37 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
           const t = setTimeout(() => resolve({ StatusCode: 124, timedOut: true }), timeoutMs);
           t.unref?.();
         });
+        const abortPromise = new Promise<{ readonly StatusCode: number; readonly aborted: true }>(
+          (resolve) => {
+            if (runOpts.signal === undefined) return;
+            // An abort that raced createContainer/start would otherwise
+            // be missed - a listener added to an already-aborted signal
+            // never fires.
+            if (runOpts.signal.aborted) {
+              resolve({ StatusCode: 137, aborted: true });
+              return;
+            }
+            abortListener = () => resolve({ StatusCode: 137, aborted: true });
+            runOpts.signal.addEventListener('abort', abortListener, { once: true });
+          },
+        );
 
-        const result = (await Promise.race([waitPromise, timeoutPromise])) as {
+        const result = (await Promise.race([waitPromise, timeoutPromise, abortPromise])) as {
           readonly StatusCode: number;
           readonly timedOut?: true;
+          readonly aborted?: true;
         };
+
+        if (result.aborted === true) {
+          return {
+            ok: false,
+            error: {
+              kind: 'aborted',
+              message: 'DockerSandbox: aborted by signal',
+            },
+            durationMs: performance.now() - startedAt,
+          };
+        }
 
         if (result.timedOut === true) {
           return {
@@ -227,22 +286,28 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
           };
         }
 
-        const logs = await container.logs({ stdout: true, stderr: false });
+        const logs = await container.logs({ stdout: true, stderr: true });
         const raw =
           typeof logs === 'string'
             ? Buffer.from(logs, 'utf8')
             : Buffer.isBuffer(logs)
               ? logs
               : await readStream(logs);
-        const text = demuxDockerLogs(raw);
+        const { stdout: text, stderr: errText } = demuxDockerStreams(raw);
 
         if (result.StatusCode !== 0) {
+          // deep-retest-0.13.9 P1: the wrapper reports the actual
+          // exception on stderr - surface its first line in the
+          // message and the full text in the cause.
+          const firstErrLine = errText.trim().split('\n')[0] ?? '';
           return {
             ok: false,
             error: {
               kind: 'execution-failed',
-              message: `DockerSandbox: container exited with status ${result.StatusCode}`,
-              cause: { stdout: text },
+              message:
+                `DockerSandbox: container exited with status ${result.StatusCode}` +
+                (firstErrLine !== '' ? ` - ${firstErrLine.slice(0, 300)}` : ''),
+              cause: { stdout: text, stderr: errText },
             },
             durationMs: performance.now() - startedAt,
           };
@@ -266,6 +331,9 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
           durationMs: performance.now() - startedAt,
         };
       } finally {
+        if (abortListener !== undefined) {
+          runOpts.signal?.removeEventListener('abort', abortListener);
+        }
         try {
           await container?.remove({ force: true });
         } catch {
@@ -319,14 +387,17 @@ async function readStream(stream: NodeJS.ReadableStream): Promise<Buffer> {
  * 8-byte-framed records - `[streamType, 0, 0, 0, payloadSizeBE32]`
  * followed by the payload, where type 1 is stdout and type 2 stderr -
  * so the raw bytes must be demultiplexed before `JSON.parse`. Strips
- * the frame headers and concatenates the stdout payloads. Buffers that
- * do not start with a well-formed frame header (TTY containers, test
- * stubs returning plain text) pass through unchanged; JSON output can
- * never be mistaken for a frame because it cannot start with a byte in
- * the 0x00-0x02 range.
+ * the frame headers and splits the payloads by stream: stdout stays
+ * the JSON channel, stderr carries the wrapper's exception report
+ * (deep-retest-0.13.9 P1). Buffers that do not start with a
+ * well-formed frame header (TTY containers, test stubs returning
+ * plain text) pass through unchanged as stdout; JSON output can never
+ * be mistaken for a frame because it cannot start with a byte in the
+ * 0x00-0x02 range.
  */
-function demuxDockerLogs(raw: Buffer): string {
+function demuxDockerStreams(raw: Buffer): { stdout: string; stderr: string } {
   const stdout: Buffer[] = [];
+  const stderr: Buffer[] = [];
   let offset = 0;
   while (offset + 8 <= raw.length) {
     const streamType = raw[offset];
@@ -335,16 +406,20 @@ function demuxDockerLogs(raw: Buffer): string {
       raw[offset + 1] === 0 &&
       raw[offset + 2] === 0 &&
       raw[offset + 3] === 0;
-    if (!framed) return raw.toString('utf8');
+    if (!framed) return { stdout: raw.toString('utf8'), stderr: '' };
     const size = raw.readUInt32BE(offset + 4);
     const start = offset + 8;
-    if (streamType === 1) {
-      stdout.push(raw.subarray(start, Math.min(start + size, raw.length)));
-    }
+    const payload = raw.subarray(start, Math.min(start + size, raw.length));
+    if (streamType === 1) stdout.push(payload);
+    else if (streamType === 2) stderr.push(payload);
     offset = start + size;
   }
   // offset === 0: shorter than one frame header - treat as plain text.
-  return offset === 0 ? raw.toString('utf8') : Buffer.concat(stdout).toString('utf8');
+  if (offset === 0) return { stdout: raw.toString('utf8'), stderr: '' };
+  return {
+    stdout: Buffer.concat(stdout).toString('utf8'),
+    stderr: Buffer.concat(stderr).toString('utf8'),
+  };
 }
 
 async function defaultPeerLoader(): Promise<DockerodeModule> {
