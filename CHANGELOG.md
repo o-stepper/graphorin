@@ -14,6 +14,91 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.11 - 2026-07-21
+
+The **data-safety + wire-hygiene patch** (PR #240): remediation of the
+twelfth external deep retest, which re-audited the released 0.13.10 -
+it confirmed the modern-model recovery, the Docker sandbox contract,
+the benchmark cost stamps, and the docs-domain fix live, and found one
+P0 (a silent data-loss path in the online encrypted swap) plus three
+P1s. No breaking changes.
+
+### Encrypted storage - fail-closed swap (`@graphorin/store-sqlite-encrypted`)
+
+- `encryptDatabase({ swap: true })` could silently lose a CONFIRMED
+  write when the live holder ran a different SQLite build than the
+  cipher peer (the server links plain `better-sqlite3`; the migration
+  runs `better-sqlite3-multiple-ciphers`). POSIX fcntl locks never
+  conflict inside one process, so the journal-mode liveness probe
+  raised no error - the swap renamed the source out from under the
+  writer, whose post-swap `COMMIT` succeeded into an orphaned WAL that
+  matched neither the backup nor the encrypted replacement. The
+  live-writer check is now layered and fail-closed: WAL sidecar
+  presence refuses the swap first (also after an unclean shutdown,
+  with a recovery hint in the error), the journal-mode probe accepts
+  only an actual `delete` result, the check reruns immediately before
+  the rename pair, and `-wal`/`-shm` sidecars move together with the
+  backup so even a race-window commit stays recoverable next to the
+  `.bak.<ts>` file. Verified cross-driver with both real native
+  drivers.
+
+### Server - broken JSON never executes (`@graphorin/server`)
+
+- A syntactically broken body (a truncated `{"input":`) was swallowed
+  into `{}` by every route's parse helper, satisfied the
+  `.default({})` schemas, and actually executed agents (200),
+  streaming runs (202), and workflows (202). All 21 body-parse sites
+  (nine route files plus `triggers/prune`) now answer
+  `400 { "error": "invalid-json" }` before any side effect; a
+  genuinely empty body keeps its documented bodiless-POST meaning.
+  The idempotency middleware rejects broken JSON before fingerprinting
+  or key reservation, so a corrected retry under the same
+  `Idempotency-Key` executes instead of colliding with a stored 400.
+
+### Provider - concurrency-safe parameter recovery (`@graphorin/provider`)
+
+- The 0.13.10 unsupported-parameter recovery judged the LIVE shared
+  learned state, so in a cold concurrent batch (the LLM reranker
+  fires `batchSize` parallel requests) only the first sibling to
+  process its HTTP 400 retried - every other one forfeited its retry
+  and surfaced the error (observed live as a silent fallback score).
+  Each attempt now records what it actually sent and recovers from
+  that snapshot, bounded per call; the instance still learns and
+  WARNs exactly once, and retries pick up sibling learning.
+
+### Benchmarks - Unicode-safe abstention scoring
+
+- A correct refusal written with a typographic apostrophe
+  (`I don't have...` with U+2019) failed the deterministic LongMemEval
+  abstention regex while the LLM judge scored it 10/10 - the live
+  full-context report published 2/3 where the sample was 3/3. Scorer
+  input is now normalized (curly quotes, modifier apostrophe,
+  no-break space) before matching.
+
+### Operations and supply chain
+
+- `graphorin doctor --strict-smoke-local` (implies `--smoke-local`):
+  CI-grade semantics - every `smoke:*` check must be `ok` or the exit
+  code is non-zero; the scheduled real-integration workflow runs it
+  live, with `OLLAMA_VERSION` pinned, a one-retry warm-up step, and
+  daemon diagnostics uploaded on failure.
+- The published-consumer audit now PROVES documented mitigations: an
+  allowlist entry may declare the consumer package plus the npm
+  override, and the job fails if the documented one-liner stops
+  removing the advisory from the live registry graph.
+- `better-sqlite3` peer widened to `^12.9.0 || ^13.0.0` (validated
+  against 13.0.1; the workspace default stays 12.x while upstream
+  13.0.x ships without `prebuild-install`); `dockerode` peer widened
+  to `^4.0.0 || ^5.0.0` and tested on 5.0.1, which drops the `uuid`
+  advisory chain for consumers.
+- Package pages tell the whole story: the transformers.js pair's
+  READMEs carry the known `adm-zip` advisory and verified override;
+  the SQLite store READMEs document the pnpm 10 build-approval step.
+- The observability span-budget canary asserts the median and skips
+  the strict bound under any turbo-parallel run (`TURBO_HASH`), and
+  `mvp-readiness` failure reports extract the first failing turbo
+  task's own output block.
+
 ## 0.13.10 - 2026-07-21
 
 The **modern-model compatibility + sandbox-contract patch** (PR #237):

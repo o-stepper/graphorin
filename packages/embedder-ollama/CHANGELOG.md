@@ -1,5 +1,12 @@
 # @graphorin/embedder-ollama
 
+## 0.13.11
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.11
+
 ## 0.13.10
 
 ### Patch Changes

@@ -1,5 +1,0 @@
----
-'@graphorin/store-sqlite-encrypted': patch
----
-
-Twelfth external deep retest, P0: `encryptDatabase({ swap: true })` could silently lose a confirmed write when the live holder ran a different SQLite build than the cipher peer (the server's plain `better-sqlite3` vs `better-sqlite3-multiple-ciphers`) - POSIX fcntl locks never conflict inside one process, so the journal-mode probe raised no error, the swap renamed the source out from under the writer, and its post-swap COMMIT landed in an orphaned WAL that matched neither the backup nor the encrypted replacement. The live-writer check is now fail-closed and layered: WAL sidecar presence refuses the swap first (also after an unclean shutdown, with a recovery hint), the journal-mode probe demands an actual `delete` result instead of merely not throwing, the check reruns immediately before the rename pair, and the swap moves `-wal`/`-shm` sidecars together with the backup so even a race-window commit stays recoverable next to the `.bak.<ts>` file. Verified cross-driver with both real native drivers, including the published pairing (plain v13 writer, cipher v12 migrator).
