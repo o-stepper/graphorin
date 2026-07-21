@@ -59,6 +59,13 @@ export interface InitCommandOptions {
    * infra-only init is unchanged.
    */
   readonly app?: boolean;
+  /**
+   * deep-retest-0.13.11: CI-safe pepper handling. Write the generated
+   * pepper hex to this file (mode `0600`, never overwrites) INSTEAD of
+   * printing it - non-interactive bootstrap logs (CI, image builds)
+   * otherwise capture the key material behind every token HMAC.
+   */
+  readonly pepperOut?: string;
   /** Test seam: skip writing files (only print the report). */
   readonly dryRun?: boolean;
   /** Test seam: redirect stdout/err. */
@@ -75,6 +82,8 @@ export interface InitCommandResult {
   readonly storageEncrypted: boolean;
   /** Absolute path of the scaffolded app module (with `--app` only). */
   readonly appPath?: string;
+  /** Absolute path the pepper hex was written to (with `--pepper-out` only). */
+  readonly pepperOutPath?: string;
 }
 
 /**
@@ -94,6 +103,8 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
 
   const appModulePath =
     options.app === true ? resolve(dirname(target), APP_MODULE_NAME) : undefined;
+  const pepperOutPath =
+    options.pepperOut !== undefined ? resolve(cwd, options.pepperOut) : undefined;
 
   if (options.dryRun !== true) {
     if (await fileExists(target)) {
@@ -106,6 +117,11 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
         `[graphorin/cli] refusing to overwrite existing '${appModulePath}'. Move it aside first.`,
       );
     }
+    if (pepperOutPath !== undefined && (await fileExists(pepperOutPath))) {
+      throw new Error(
+        `[graphorin/cli] refusing to overwrite existing '${pepperOutPath}'. Move it aside first.`,
+      );
+    }
     await mkdir(dirname(target), { recursive: true });
     const content =
       format === 'json'
@@ -115,22 +131,43 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
     if (appModulePath !== undefined) {
       await writeFile(appModulePath, renderAppModule(), { mode: 0o600 });
     }
+    if (pepperOutPath !== undefined) {
+      await mkdir(dirname(pepperOutPath), { recursive: true });
+      await writeFile(pepperOutPath, `${pepperHex}\n`, { mode: 0o600 });
+    }
   }
 
   print(`[graphorin/cli] wrote ${target}`);
   if (appModulePath !== undefined) {
     print(`[graphorin/cli] wrote ${appModulePath} (app-compose module; edit it to shape your API)`);
   }
-  print(`[graphorin/cli] server pepper hex (store in your keyring as 'graphorin_server_pepper'):`);
-  print(`  ${pepperHex}`);
+  // deep-retest-0.13.11: `--pepper-out` keeps the pepper hex OUT of the
+  // terminal/CI log - the one-time print below is fine interactively
+  // but a build log retains it forever.
+  if (pepperOutPath !== undefined) {
+    print(
+      `[graphorin/cli] server pepper hex written to ${pepperOutPath} (mode 0600) - not printed`,
+    );
+  } else {
+    print(
+      `[graphorin/cli] server pepper hex (store in your keyring as 'graphorin_server_pepper'):`,
+    );
+    print(`  ${pepperHex}`);
+  }
   print('');
   print('Next steps:');
   // W-041: never put the pepper on argv - shell history and the process
   // list would hold the key material behind every token HMAC (the
   // secrets CLI itself refuses plaintext on the command line).
-  print(
-    `  1. Persist the pepper WITHOUT argv: printf '%s' '<hex-from-above>' | graphorin secrets set graphorin_server_pepper --from-stdin`,
-  );
+  if (pepperOutPath !== undefined) {
+    print(
+      `  1. Persist the pepper WITHOUT argv: graphorin secrets set graphorin_server_pepper --from-stdin < ${shellQuotePath(pepperOutPath)} - then delete the file.`,
+    );
+  } else {
+    print(
+      `  1. Persist the pepper WITHOUT argv: printf '%s' '<hex-from-above>' | graphorin secrets set graphorin_server_pepper --from-stdin`,
+    );
+  }
   print(
     `  2. Run \`graphorin migrate --config ${shellQuotePath(target)}\` to apply storage migrations.`,
   );
@@ -152,6 +189,7 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
     cloudConsent,
     storageEncrypted,
     ...(appModulePath !== undefined ? { appPath: appModulePath } : {}),
+    ...(pepperOutPath !== undefined ? { pepperOutPath } : {}),
   });
 }
 

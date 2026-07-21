@@ -114,6 +114,32 @@ describe('runDoctor', () => {
   );
 });
 
+describe('deep-retest-0.13.11 - doctor on an uninitialized host', () => {
+  it('audit-db reports skip (not fail) when the home does not exist and no config is supplied', async () => {
+    const dir = await fixtureDir();
+    const report = await runDoctor({
+      home: join(dir, 'never-created'),
+      checkEncryption: true,
+      print: () => undefined,
+    });
+    const auditCheck = report.checks.find((c) => c.check === 'audit-db');
+    expect(auditCheck?.status).toBe('skip');
+    expect(auditCheck?.message).toContain('before bootstrap');
+    expect(auditCheck?.hint).toContain('graphorin init');
+  });
+
+  it('an existing home keeps the strict fail on a missing binding', async () => {
+    const dir = await fixtureDir();
+    const report = await runDoctor({
+      home: dir,
+      checkEncryption: true,
+      print: () => undefined,
+    });
+    const auditCheck = report.checks.find((c) => c.check === 'audit-db');
+    expect(auditCheck?.status).toBe('fail');
+  });
+});
+
 describe('P2-1 (deep retest 2026-07-19) - config-driven doctor respects a disabled audit log', () => {
   it('init --no-encrypted then doctor --all skips the audit-encryption check instead of failing', async () => {
     const dir = await fixtureDir();
