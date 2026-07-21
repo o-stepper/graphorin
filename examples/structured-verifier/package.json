@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-structured-verifier",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "private": true,
   "description": "Structured-output + response-verifier acceptance demo for the Graphorin framework. An extraction agent declares outputType { kind: 'structured' } with a closed JSON Schema and a zod parse gate, while a deterministic ResponseVerifier bounces a placeholder draft back to the model for one C3 continuation round - all against an in-tree stub provider. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

@@ -1,5 +1,14 @@
 # @graphorin/mcp
 
+## 0.13.10
+
+### Patch Changes
+
+- Updated dependencies [[`7d47994`](https://github.com/o-stepper/graphorin/commit/7d4799415263d72e4c6744362504b290b55fade4)]:
+  - @graphorin/security@0.13.10
+  - @graphorin/tools@0.13.10
+  - @graphorin/core@0.13.10
+
 ## 0.13.9
 
 ### Patch Changes

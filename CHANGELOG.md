@@ -14,6 +14,73 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.10 - 2026-07-21
+
+The **modern-model compatibility + sandbox-contract patch** (PR #237):
+remediation of the eleventh external deep retest, which re-audited the
+released 0.13.9 - it confirmed the pricing aliases, the fail-closed
+cost cap, the published-peer audit, and the 1Password argv fix live,
+and found two P1s: current OpenAI reasoning models rejected every
+Graphorin path that pins `temperature: 0`, and `DockerSandbox` typed
+but did not execute part of the stable per-call contract. No breaking
+changes.
+
+### Provider - unsupported-parameter recovery (`@graphorin/provider`)
+
+- Current OpenAI reasoning models (GPT-5 family, o-series) reject any
+  non-default `temperature` with HTTP 400, and reject function tools
+  on chat completions unless `reasoning_effort` is explicitly
+  `'none'` - a server-side model default; the adapter never sent the
+  field. Every memory phase, the reconciler, the LLM judge, and the
+  LLM reranker pin `temperature: 0`, so those paths hard-failed. The
+  OpenAI-shaped adapters now follow the `tokenLimitParam`
+  learned-remap precedent: on the specific 400 the request is re-sent
+  once (without `temperature`, or with `reasoning_effort: 'none'`
+  scoped to tool-carrying requests), the instance keeps the switch,
+  and one WARN is logged. Nothing is substituted for `temperature` -
+  the determinism intent cannot be honored, so the field is omitted.
+- New `unsupportedParamRecovery: 'auto' | 'off'` option (default
+  `'auto'`); an explicit `providerOptions` value for either field
+  disables that field's recovery so overrides keep failing loudly. No
+  model tables are involved - the behavior stays provider-agnostic
+  across the OpenAI-compatible ecosystem.
+
+### Security - `DockerSandbox` executes the full per-call contract (`@graphorin/security`)
+
+- The `SandboxRunOptions.env` allowlist is forwarded as the container
+  `Env` (previously silently dropped; the image baseline such as
+  `PATH` remains and is documented), per-call `maxMemoryMb` overrides
+  the constructor-level limit, and `signal` now aborts the run: an
+  abort force-removes the container and resolves `kind: 'aborted'`,
+  including aborts that race container start.
+- Failure diagnostics are no longer discarded: the log stream is
+  demultiplexed into separate stdout/stderr channels, a non-zero exit
+  surfaces the wrapper's stderr first line in the error message and
+  both streams in the cause, and the `__INPUT__` source-input binding
+  is documented. Verified against a live daemon (env visibility,
+  stderr round-trip, mid-run abort).
+
+### Benchmarks - honest `costPricingMatched` (private packages)
+
+- Under `--allow-unpriced-model`, a run failing before the first
+  usage response stamped `costPricingMatched: true` for a model the
+  preflight already knew it cannot price. Both runners now stamp the
+  report, the RESULTS header, and the post-run WARN from the
+  preflight/observed union.
+
+### Docs - links live on `docs.graphorin.com` (`@graphorin/store-sqlite` + repo)
+
+- The root README release teaser and the store-sqlite
+  concurrency-matrix link put docs paths on the bare landing domain -
+  a guaranteed live 404 the offline lychee gate could not see. Both
+  links fixed; a new `check-doc-links` CI gate bans docs paths on the
+  bare domain across all tracked markdown (it promptly caught its own
+  changeset quoting the retired URL).
+- `mvp-readiness` now captures both output streams of a failed gate
+  and prints a 16 KB tail next to the summary verdict (and a
+  `failure` object in `--json`), so first-failure causes survive
+  parallel turbo noise.
+
 ## 0.13.9 - 2026-07-21
 
 The **pricing-honesty + supply-chain-audit patch** (PR #235):

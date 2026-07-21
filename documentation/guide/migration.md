@@ -52,6 +52,44 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.9 -> 0.13.10
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **Current OpenAI reasoning models work out of the box.** The
+  OpenAI-shaped adapters now recover, once per provider instance and
+  with a WARN, from the two GPT-5.6-class HTTP 400s: a rejection of
+  `temperature` re-sends the request without the field (nothing is
+  substituted - the determinism intent cannot be honored) and omits
+  it for the instance's lifetime, and a function-tools rejection
+  naming `reasoning_effort` re-sends with `reasoning_effort: 'none'`,
+  scoped to tool-carrying requests. Memory consolidation, the LLM
+  judge, and the LLM reranker (all of which pin `temperature: 0`) no
+  longer hard-fail against such models. Set
+  `unsupportedParamRecovery: 'off'` to restore fail-loud passthrough;
+  an explicit `providerOptions` value for either field already keeps
+  failing loudly.
+- **`DockerSandbox` honors the whole per-call contract.** The
+  `SandboxRunOptions.env` allowlist now reaches the container (on top
+  of the image's own baseline such as `PATH`), per-call `maxMemoryMb`
+  overrides the constructor default, and an `AbortSignal` abort
+  force-removes the container and resolves `kind: 'aborted'` - code
+  that treated Docker runs as non-abortable will now see aborted
+  results. Failures carry the wrapper's stderr (first line in the
+  message, both streams in the cause) instead of an empty
+  `cause.stdout`.
+- **Benchmark cost reports cannot claim matched pricing they never
+  observed.** Under `--allow-unpriced-model`, `costPricingMatched`
+  and `unpricedModels` now come from the union of the preflight
+  result and the ceiling's observations, so a run that fails before
+  the first usage response stamps `costPricingMatched: false` for a
+  model the preflight already knew it cannot price.
+- **Docs links moved to `docs.graphorin.com`.** Two shipped links put
+  docs paths on the bare landing domain (a live 404); both are fixed
+  and a `check-doc-links` repo gate now bans the class in tracked
+  markdown - relevant if you vendor or fork the docs.
+
 ### 0.13.8 -> 0.13.9
 
 A patch release; nothing to migrate. Behavioural refinements worth

@@ -1,5 +1,14 @@
 # @graphorin/security
 
+## 0.13.10
+
+### Patch Changes
+
+- [#237](https://github.com/o-stepper/graphorin/pull/237) [`7d47994`](https://github.com/o-stepper/graphorin/commit/7d4799415263d72e4c6744362504b290b55fade4) Thanks [@o-stepper](https://github.com/o-stepper)! - DockerSandbox now executes the full stable `SandboxRunOptions` contract (eleventh deep retest P1). The `env` allowlist is forwarded as the container `Env` (previously silently dropped; the image baseline such as `PATH` remains and is documented), per-call `maxMemoryMb` overrides the constructor-level limit in `HostConfig.Memory`, and `signal` now aborts the run: an abort force-removes the container and resolves with `kind: 'aborted'`, including aborts that race container start. Failure diagnostics are no longer discarded - the log stream is demultiplexed into separate stdout/stderr channels, a non-zero exit surfaces the wrapper's stderr first line in the error message and the full text in `cause.stderr` (previously `logs({ stderr: false })` returned an empty cause), and the `__INPUT__` source-code input binding is documented.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.10
+
 ## 0.13.9
 
 ### Patch Changes

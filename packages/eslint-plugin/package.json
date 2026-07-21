@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/eslint-plugin",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "description": "ESLint plugin for projects that build on Graphorin. Ships nine active rules: tool-definition quality (descriptions, examples, parameter naming), secret-handling discipline (no-secret-unwrap, no-secret-in-deps), network hygiene (no-implicit-network-call), provider middleware ordering, tool cancellation propagation, and workflow naming.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-locomo-multilingual",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "private": true,
   "description": "Reserved per-locale LoCoMo contribution hooks for the Graphorin framework. Ships empty subset directories (ar/de/es/fr/hi/it/ja/pt/ru/zh) and a documented contribution flow for community-translated question packs consumed by @graphorin/benchmark-memory-smoke via --subset. No datasets are bundled, so the per-locale subsets are not runnable until a locale pack is contributed. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/reranker-transformersjs",
-  "version": "0.13.9",
+  "version": "0.13.10",
   "description": "Cross-encoder reranker adapter for the Graphorin framework. Wraps `@huggingface/transformers@^4.1.0` to score query / passage pairs in-process via the BAAI BGE family of cross-encoder models. Automatic model selection from the agent locale: `'en'` defaults to `Xenova/bge-reranker-base` (278M); every other locale defaults to `BAAI/bge-reranker-v2-m3` (568M, multilingual). Device-aware precision default: Q8 on CPU, FP16 on accelerated devices; FP32 / Q4 opt-in. Lazy-loaded with an optional idle-eviction timer to bound resident memory. Implements the `ReRanker` contract exposed by `@graphorin/memory/search`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

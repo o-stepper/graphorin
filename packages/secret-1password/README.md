@@ -6,14 +6,14 @@
 > pluggable `SecretResolver` registry by shelling out to the official
 > 1Password CLI (`op read 'op://<vault>/<item>/<field>'`).
 >
-> Project Graphorin · v0.13.9 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.13.10 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.13.9 (optional sub-pack)
+- **Published:** v0.13.10 (optional sub-pack)
 - Reference adapter - community packages should follow this template
   when wiring HashiCorp Vault, AWS Secrets Manager, GCP Secret
   Manager, Azure Key Vault, Bitwarden, or Unix `pass`.
@@ -167,4 +167,4 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.13.9 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.13.10 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
