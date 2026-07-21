@@ -98,7 +98,18 @@ export function run() {
   let bad = 0;
   for (const file of collectFiles()) {
     if (allowed.has(file)) continue;
-    const hits = scanText(readFileSync(join(ROOT, file), 'utf8'));
+    let text;
+    try {
+      text = readFileSync(join(ROOT, file), 'utf8');
+    } catch (err) {
+      // `git ls-files` reads the INDEX: a tracked file deleted from
+      // the working tree but not yet staged (e.g. changesets consumed
+      // by a release version pass) still lists. Nothing on disk means
+      // nothing to scan.
+      if (err !== null && typeof err === 'object' && err.code === 'ENOENT') continue;
+      throw err;
+    }
+    const hits = scanText(text);
     for (const h of hits) {
       console.error(`${file}:${h.line}:${h.column}: ${h.name}`);
       bad += 1;

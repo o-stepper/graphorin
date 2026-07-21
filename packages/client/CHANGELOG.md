@@ -1,5 +1,12 @@
 # @graphorin/client
 
+## 0.13.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/protocol@0.13.10
+
 ## 0.13.9
 
 ### Patch Changes
