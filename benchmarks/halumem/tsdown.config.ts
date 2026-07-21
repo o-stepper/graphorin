@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown';
 
 export default defineConfig({
-  entry: ['src/runner.ts'],
+  entry: ['src/runner.ts', 'src/compare.ts'],
   format: ['esm'],
   platform: 'node',
   target: 'node22',

@@ -107,6 +107,8 @@ export {
   goldTokenCoverage,
   helpfulnessScorer,
   type JsonPathOptions,
+  JUDGE_OFF_FORMAT_MARKER,
+  JudgeOffFormatError,
   jsonPath,
   type LlmJudgeOptions,
   llmJudge,

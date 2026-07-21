@@ -101,6 +101,22 @@ describe('hardening/doctor', () => {
       expect(r[0]?.status).toBe('fail');
       expect(r[0]?.hint).not.toContain('Phase 05');
     });
+
+    it('an unbootstrapped host (no home, no config) skips instead of failing (0.13.11)', () => {
+      const r = checkEncryption({ bootstrapped: false });
+      expect(r[0]?.status).toBe('skip');
+      expect(r[0]?.message).toContain('before bootstrap');
+    });
+
+    it('bootstrapped: false never masks an audit-enabled config', () => {
+      const r = checkEncryption({ auditEnabled: true, bootstrapped: false });
+      expect(r[0]?.status).toBe('fail');
+    });
+
+    it('a bootstrapped host without a config keeps the strict fail', () => {
+      const r = checkEncryption({ bootstrapped: true });
+      expect(r[0]?.status).toBe('fail');
+    });
   });
 
   describe('checkSystemd', () => {

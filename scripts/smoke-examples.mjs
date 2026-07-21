@@ -10,6 +10,14 @@
  *
  * Run locally: `node ./scripts/smoke-examples.mjs`
  * Used by CI:  `.github/workflows/ci.yml` (job `examples-smoke`).
+ *
+ * deep-retest-0.13.11: `--exclude <name>` (repeatable, or a
+ * comma-separated list; also `GRAPHORIN_SMOKE_EXCLUDE=a,b`) skips
+ * named examples - external audits that must not execute
+ * security-flavoured samples (e.g. `secure-replay-agent`) get an
+ * official switch instead of ad-hoc source edits. Unknown names fail
+ * loudly, and every exclusion is printed so a partial run can never
+ * read as full coverage.
  */
 
 import { spawnSync } from 'node:child_process';
@@ -74,9 +82,48 @@ const CASES = [
   },
 ];
 
+function parseExcludes(argv, envValue) {
+  const raw = [];
+  for (let i = 2; i < argv.length; i++) {
+    if (argv[i] === '--exclude') {
+      const next = argv[i + 1];
+      if (next === undefined || next.startsWith('--')) {
+        console.error('smoke-examples: --exclude requires a value');
+        process.exit(1);
+      }
+      raw.push(next);
+      i += 1;
+    } else {
+      console.error(
+        `smoke-examples: unknown option ${argv[i]} (only --exclude <name> is supported)`,
+      );
+      process.exit(1);
+    }
+  }
+  if (envValue) raw.push(envValue);
+  const names = raw
+    .flatMap((v) => v.split(','))
+    .map((v) => v.trim())
+    .filter((v) => v.length > 0);
+  const known = new Set(CASES.map((c) => c.name));
+  for (const name of names) {
+    if (!known.has(name)) {
+      console.error(`smoke-examples: --exclude names an unknown example: ${name}`);
+      process.exit(1);
+    }
+  }
+  return new Set(names);
+}
+
+const excluded = parseExcludes(process.argv, process.env.GRAPHORIN_SMOKE_EXCLUDE);
+for (const name of excluded) {
+  console.log(`smoke-examples: EXCLUDED ${name} (--exclude / GRAPHORIN_SMOKE_EXCLUDE)`);
+}
+const selected = CASES.filter((c) => !excluded.has(c.name));
+
 let failures = 0;
 
-for (const c of CASES) {
+for (const c of selected) {
   const expectExit = c.expectExit ?? 0;
   const env = { ...process.env, GRAPHORIN_LLM_RECIPE: 'stub', ...(c.env ?? {}) };
   const started = Date.now();
@@ -112,4 +159,5 @@ if (failures > 0) {
   console.error(`\nsmoke-examples: FAIL — ${failures} example(s) broken.`);
   process.exit(1);
 }
-console.log(`\nsmoke-examples: PASS — ${CASES.length} example(s) ran clean.`);
+const excludedNote = excluded.size > 0 ? ` (${excluded.size} excluded by request)` : '';
+console.log(`\nsmoke-examples: PASS — ${selected.length} example(s) ran clean.${excludedNote}`);

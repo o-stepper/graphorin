@@ -58,7 +58,10 @@ graphorin init                       # writes ./graphorin.config.ts + prints the
 graphorin init --format json         # writes ./graphorin.config.json (defineConfig-free)
 graphorin init --app                 # + graphorin.app.mjs compose module (full REST surface)
 graphorin init --non-interactive --encrypted --out ./deploy/graphorin.config.json
+graphorin init --non-interactive --pepper-out ./pepper.hex   # CI-safe: pepper goes to a 0600 file, not the log
 ```
+
+In CI or image builds, pass `--pepper-out <path>`: the server pepper hex is written to that file (mode `0600`, never overwrites) instead of being printed, so build logs stop retaining the key material behind every token HMAC. Persist it with `graphorin secrets set graphorin_server_pepper --from-stdin < <path>` and delete the file.
 
 With `--app`, init also scaffolds a working `graphorin.app.mjs` next to the config (SQLite store + memory + sessions REST adapters over the configured storage) and points the config's `app` field at it, so the very first `graphorin start` serves `/v1/sessions` and `/v1/memory` instead of a bare infrastructure daemon. Edit the module to add agents, workflows, or your own adapters.
 
@@ -76,7 +79,7 @@ Runs a sanity audit:
 - The audit-log encryption binding (the SQLite cipher peer).
 - Optional systemd unit validation (Linux).
 
-A bare `graphorin doctor` runs the perms check only; opt in to the others with `--check-secrets` / `--check-encryption` / `--check-systemd`, or run everything with `--all`. Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. The doctor never writes to disk unless `--fix-perms` is supplied, and it opens no network connection unless `--smoke-local` is supplied (those legs talk to the local Ollama daemon only).
+A bare `graphorin doctor` runs the perms check only; opt in to the others with `--check-secrets` / `--check-encryption` / `--check-systemd`, or run everything with `--all`. Each check reports a status of `ok` / `warn` / `fail` / `skip` with an actionable remediation hint; any `fail` makes the command exit `1`. On an uninitialized host (no `~/.graphorin` and no `--config`), the `audit-db` encryption check reports `skip` with an init hint rather than `fail` - nothing could have registered an audit binding before bootstrap; configured deployments keep the strict fail. The doctor never writes to disk unless `--fix-perms` is supplied, and it opens no network connection unless `--smoke-local` is supplied (those legs talk to the local Ollama daemon only).
 
 By default the perms check targets the `~/.graphorin` layout. Pass `--config <path>` to check a project deployment instead - the config file itself plus the storage and audit database paths it resolves to:
 

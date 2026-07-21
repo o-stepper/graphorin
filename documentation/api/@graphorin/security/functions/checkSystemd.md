@@ -10,7 +10,7 @@
 function checkSystemd(opts): Promise<CheckResult[]>;
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:208
+Defined in: packages/security/src/hardening/doctor.ts:226
 
 **`Stable`**
 

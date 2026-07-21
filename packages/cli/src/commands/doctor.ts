@@ -23,6 +23,7 @@ import pkg from '../../package.json' with { type: 'json' };
  * @packageDocumentation
  */
 
+import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -201,7 +202,16 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   }
 
   if (enable.encryption) {
-    checks.push(...checkEncryption(auditEnabled !== undefined ? { auditEnabled } : {}));
+    // deep-retest-0.13.11: without a config, tell the check whether the
+    // host is bootstrapped at all - an uninitialized home downgrades
+    // the missing-binding fail to a skip (nothing could have
+    // registered a binding before `graphorin init`).
+    checks.push(
+      ...checkEncryption({
+        ...(auditEnabled !== undefined ? { auditEnabled } : {}),
+        ...(options.config === undefined ? { bootstrapped: existsSync(home) } : {}),
+      }),
+    );
   }
 
   if (enable.systemd) {

@@ -9,6 +9,7 @@ import {
   CliUsageError,
   combineUnpricedModels,
   countInfrastructureFailures,
+  countJudgeOffFormatFailures,
   createOperationsAgent,
   INFRA_MARKER,
   parseArgs,
@@ -98,6 +99,25 @@ describe('benchmark-halumem operations stage (offline stub)', () => {
     for (const result of report.results) {
       expect(result.output?.answer).toBe('I do not have that information.');
     }
+  });
+
+  it('classifies judge off-format replies as JUDGE failures, not subject quality (0.13.11 P3)', async () => {
+    // The stub judge never emits a SCORE marker, so after the
+    // constrained retry the scorer throws JudgeOffFormatError - the
+    // runner must classify those cases separately from subject quality.
+    const report = await runHaluMemBenchmark({
+      datasetPath: FIXTURE,
+      stage: 'qa',
+      provider: createHaluMemStubProvider(),
+      judgeProvider: createHaluMemStubProvider(),
+      smoke: true,
+    });
+    const judge = countJudgeOffFormatFailures(report);
+    expect(judge.count).toBe(2);
+    const reason = report.results[0]?.scores[0]?.result.reason ?? '';
+    expect(reason).toContain('judge-off-format:');
+    // Judge failures are NOT ingest infrastructure failures.
+    expect(countInfrastructureFailures(report).count).toBe(0);
   });
 });
 

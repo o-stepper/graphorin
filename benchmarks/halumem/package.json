@@ -37,7 +37,8 @@
     "lint": "biome check .",
     "clean": "rimraf dist .turbo *.tsbuildinfo",
     "benchmark:run": "node ./dist/runner.js",
-    "benchmark:smoke": "node ./dist/runner.js --smoke"
+    "benchmark:smoke": "node ./dist/runner.js --smoke",
+    "benchmark:compare": "node ./dist/compare.js"
   },
   "dependencies": {
     "@graphorin/core": "workspace:*",

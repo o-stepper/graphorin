@@ -112,6 +112,43 @@ describe('createLlmReranker', () => {
     expect(reranker.lastErrorCount).toBe(1);
   });
 
+  it('records actionable failure details in lastFailures (deep-retest-0.13.11)', async () => {
+    class FakeHttpError extends Error {
+      readonly status = 429;
+      constructor() {
+        super('HTTP 429 from server: rate limited');
+        this.name = 'ProviderHttpError';
+      }
+    }
+    const { provider } = buildStubProvider((req) => {
+      const text = firstText(req.messages[0]?.content);
+      if (text.includes('banana bread')) throw new FakeHttpError();
+      if (text.includes('carrot cake')) return 'as an integer scorer I decline';
+      return '9';
+    });
+    const reranker = createLlmReranker({ provider });
+    await reranker.rerank('q', [
+      [hit('r1', 'apple pie', 0.6), hit('r2', 'banana bread', 0.5), hit('r3', 'carrot cake', 0.4)],
+    ]);
+    expect(reranker.lastErrorCount).toBe(1);
+    expect(reranker.lastOffFormatCount).toBe(1);
+    expect(reranker.lastFailures).toHaveLength(2);
+    const providerFailure = reranker.lastFailures.find((f) => f.kind === 'provider-error');
+    expect(providerFailure).toMatchObject({
+      passageIndex: 1,
+      name: 'ProviderHttpError',
+      status: 429,
+    });
+    expect(providerFailure?.message).toContain('rate limited');
+    const offFormat = reranker.lastFailures.find((f) => f.kind === 'off-format');
+    expect(offFormat).toMatchObject({ passageIndex: 2 });
+    expect(offFormat?.message).toContain('decline');
+    // The next rerank resets the diagnostics.
+    await reranker.rerank('q', [[hit('r1', 'apple pie', 0.6)]]);
+    expect(reranker.lastFailures).toHaveLength(0);
+    expect(reranker.lastOffFormatCount).toBe(0);
+  });
+
   it('still propagates an AbortError thrown mid-scoring (PS-15)', async () => {
     const { provider } = buildStubProvider(() => {
       throw new DOMException('aborted', 'AbortError');

@@ -199,6 +199,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
     stripTemperature: false,
     toolsReasoningEffortNone: false,
   };
+  const recoveryFlight: RecoveryFlight = { settling: null, release: null };
 
   const provider: Provider = {
     name: opts.providerName,
@@ -211,6 +212,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
         url,
         tokenParam,
         paramCompat,
+        recoveryFlight,
         applyOpenAIShapedPreflight(req, capabilities),
       );
     },
@@ -220,6 +222,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
         url,
         tokenParam,
         paramCompat,
+        recoveryFlight,
         applyOpenAIShapedPreflight(req, capabilities),
       );
     },
@@ -403,43 +406,81 @@ function learnReasoningEffortNone(opts: OpenAIShapedOptions, state: ParamCompatS
 }
 
 /**
+ * deep-retest-0.13.11 P1 (single-flight cold recovery): while one call
+ * (the "leader") is climbing the recovery ladder, sibling calls that
+ * hit their own recoverable 400 wait for the leader to finish instead
+ * of climbing every remaining rung themselves - their retry then
+ * rebuilds from the fully learned state in one request. This trims a
+ * cold concurrent batch's doomed intermediate attempts (and the
+ * rate-limit pressure they add) without giving up the 0.13.10
+ * guarantee: every call keeps its own per-call ledger, so if the
+ * leader dies mid-ladder (429, network) each waiter still recovers
+ * independently - the wait is an optimization, never a dependency.
+ */
+interface RecoveryFlight {
+  settling: Promise<void> | null;
+  release: (() => void) | null;
+}
+
+/**
  * Sends the chat request, applying each learned-parameter recovery at
  * most once PER CALL. Bounded by the per-call ledger below, not by
  * the shared learned state: concurrent calls all recover
  * independently while the instance still learns (and warns) once.
  * Each retry re-snapshots, so it also picks up whatever a sibling
- * learned in the meantime.
+ * learned in the meantime; a non-leader additionally waits for an
+ * in-flight leader before retrying (see {@link RecoveryFlight}).
  */
 async function callChatWithRecovery(
   opts: OpenAIShapedOptions,
   url: string,
   tokenState: TokenParamState,
   compat: ParamCompatState,
+  flight: RecoveryFlight,
   req: ProviderRequest,
   stream: boolean,
 ): Promise<Response> {
   const attempted = { tokenParam: false, temperature: false, reasoning: false };
-  for (;;) {
-    const sent = snapshotAttempt(tokenState, compat, req);
-    try {
-      return await callChatHttp(opts, url, sent, req, stream);
-    } catch (err) {
-      if (!attempted.tokenParam && shouldRemapTokenParam(tokenState, sent, err, req)) {
-        attempted.tokenParam = true;
-        learnTokenParamRemap(opts, tokenState);
-        continue;
+  let leader = false;
+  try {
+    for (;;) {
+      const sent = snapshotAttempt(tokenState, compat, req);
+      try {
+        return await callChatHttp(opts, url, sent, req, stream);
+      } catch (err) {
+        if (!attempted.tokenParam && shouldRemapTokenParam(tokenState, sent, err, req)) {
+          attempted.tokenParam = true;
+          learnTokenParamRemap(opts, tokenState);
+        } else if (!attempted.temperature && shouldStripTemperature(compat, sent, err, req)) {
+          attempted.temperature = true;
+          learnStripTemperature(opts, compat);
+        } else if (!attempted.reasoning && shouldForceReasoningEffortNone(compat, sent, err, req)) {
+          attempted.reasoning = true;
+          learnReasoningEffortNone(opts, compat);
+        } else {
+          throw err;
+        }
+        if (!leader) {
+          if (flight.settling !== null) {
+            // The check and the leader election below run in one
+            // synchronous section, so exactly one call holds the flight
+            // at a time. The leader's `finally` always resolves this
+            // promise - waiting can delay a retry, never strand it.
+            await flight.settling;
+          } else {
+            leader = true;
+            flight.settling = new Promise<void>((resolve) => {
+              flight.release = resolve;
+            });
+          }
+        }
       }
-      if (!attempted.temperature && shouldStripTemperature(compat, sent, err, req)) {
-        attempted.temperature = true;
-        learnStripTemperature(opts, compat);
-        continue;
-      }
-      if (!attempted.reasoning && shouldForceReasoningEffortNone(compat, sent, err, req)) {
-        attempted.reasoning = true;
-        learnReasoningEffortNone(opts, compat);
-        continue;
-      }
-      throw err;
+    }
+  } finally {
+    if (leader) {
+      flight.release?.();
+      flight.settling = null;
+      flight.release = null;
     }
   }
 }
@@ -475,9 +516,10 @@ async function* streamOpenAIShaped(
   url: string,
   state: TokenParamState,
   compat: ParamCompatState,
+  flight: RecoveryFlight,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const resp = await callChatWithRecovery(opts, url, state, compat, req, true);
+  const resp = await callChatWithRecovery(opts, url, state, compat, flight, req, true);
 
   yield makeStreamStartEvent({ providerName: opts.providerName, modelId: opts.model });
 
@@ -583,9 +625,10 @@ async function generateOpenAIShaped(
   url: string,
   state: TokenParamState,
   compat: ParamCompatState,
+  flight: RecoveryFlight,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const resp = await callChatWithRecovery(opts, url, state, compat, req, false);
+  const resp = await callChatWithRecovery(opts, url, state, compat, flight, req, false);
   let json: OpenAIChunk;
   try {
     json = (await resp.json()) as OpenAIChunk;

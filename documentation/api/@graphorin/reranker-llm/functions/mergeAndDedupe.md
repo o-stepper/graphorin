@@ -10,7 +10,7 @@
 function mergeAndDedupe<TRecord>(lists): readonly MergedEntry<TRecord>[];
 ```
 
-Defined in: src/reranker.ts:282
+Defined in: src/reranker.ts:363
 
 **`Stable`**
 

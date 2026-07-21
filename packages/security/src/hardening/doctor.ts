@@ -166,7 +166,9 @@ export function checkSecrets(): CheckResult[] {
  *
  * @stable
  */
-export function checkEncryption(options: { readonly auditEnabled?: boolean } = {}): CheckResult[] {
+export function checkEncryption(
+  options: { readonly auditEnabled?: boolean; readonly bootstrapped?: boolean } = {},
+): CheckResult[] {
   if (options.auditEnabled === false) {
     return [
       {
@@ -179,6 +181,22 @@ export function checkEncryption(options: { readonly auditEnabled?: boolean } = {
   }
   const bindings = listAuditDbBindings();
   if (bindings.length === 0) {
+    // deep-retest-0.13.11: an UNINITIALIZED host (no Graphorin home,
+    // no config supplied) has nothing that could have registered a
+    // binding yet - a hard fail before bootstrap reads as breakage.
+    // `fail` stays reserved for configured/bootstrapped deployments
+    // where the audit binding is genuinely expected.
+    if (options.auditEnabled === undefined && options.bootstrapped === false) {
+      return [
+        {
+          check: 'audit-db',
+          status: 'skip',
+          message:
+            'no Graphorin home or config found - the encrypted audit binding is not required before bootstrap',
+          hint: 'Run `graphorin init` (or pass --config) and re-run doctor; configured deployments keep the strict check.',
+        },
+      ];
+    }
     return [
       {
         check: 'audit-db',

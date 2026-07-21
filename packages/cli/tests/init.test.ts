@@ -1,6 +1,7 @@
-import { mkdtemp, readFile } from 'node:fs/promises';
+import { mkdtemp, readFile, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import process from 'node:process';
 
 import { describe, expect, it } from 'vitest';
 
@@ -290,6 +291,57 @@ describe('deep-retest 0.13.1 P3 - copy/paste-safe next-step hints', () => {
       },
     });
     expect(lines.join('\n')).toContain(`graphorin migrate --config ${result.configPath}\``);
+  });
+});
+
+describe('deep-retest-0.13.11 - CI-safe pepper handling (--pepper-out)', () => {
+  it('writes the pepper to the file (0600) and never prints the hex', async () => {
+    const dir = await fixtureDir();
+    const lines: string[] = [];
+    const pepperOut = join(dir, 'secrets', 'pepper.hex');
+    const result = await runInit({
+      cwd: dir,
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      pepperOut,
+      print: (line) => {
+        lines.push(line);
+      },
+    });
+    expect(result.pepperOutPath).toBe(pepperOut);
+    const written = (await readFile(pepperOut, 'utf8')).trim();
+    expect(written).toBe(result.serverPepperHex);
+    if (process.platform !== 'win32') {
+      const mode = (await stat(pepperOut)).mode & 0o777;
+      expect(mode).toBe(0o600);
+    }
+    const joined = lines.join('\n');
+    // The key material must never reach the terminal/CI log.
+    expect(joined).not.toContain(result.serverPepperHex);
+    expect(joined).toContain('not printed');
+    // Step 1 walks the file-based path and tells the operator to
+    // delete the file afterwards.
+    expect(joined).toContain('--from-stdin <');
+    expect(joined).toContain('delete the file');
+  });
+
+  it('refuses to overwrite an existing pepper-out file', async () => {
+    const dir = await fixtureDir();
+    const pepperOut = join(dir, 'pepper.hex');
+    await writeFile(pepperOut, 'stale', 'utf8');
+    await expect(
+      runInit({
+        cwd: dir,
+        nonInteractive: true,
+        cloudConsent: 'public-only',
+        encrypted: false,
+        pepperOut,
+        print: () => undefined,
+      }),
+    ).rejects.toThrow(/refusing to overwrite/);
+    // The stale file is untouched.
+    expect(await readFile(pepperOut, 'utf8')).toBe('stale');
   });
 });
 

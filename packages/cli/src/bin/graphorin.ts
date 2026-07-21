@@ -210,6 +210,10 @@ function registerLifecycleCommands(program: Command): void {
       '--app',
       'Also scaffold a graphorin.app.mjs compose module (sessions + memory REST adapters over the configured store) and reference it from the config, so `graphorin start` serves the full domain surface.',
     )
+    .option(
+      '--pepper-out <path>',
+      'CI-safe: write the server pepper hex to this file (mode 0600, never overwrites) instead of printing it - build/CI logs otherwise retain the key material.',
+    )
     .action(
       async (opts: {
         out?: string;
@@ -218,6 +222,7 @@ function registerLifecycleCommands(program: Command): void {
         cloudConsent?: 'public-only' | 'public-and-internal' | 'all-with-warnings';
         encrypted?: boolean;
         app?: boolean;
+        pepperOut?: string;
       }) => {
         if (isOfflineMode()) {
           process.stderr.write(
@@ -231,6 +236,7 @@ function registerLifecycleCommands(program: Command): void {
           ...(opts.cloudConsent !== undefined ? { cloudConsent: opts.cloudConsent } : {}),
           ...(opts.encrypted !== undefined ? { encrypted: opts.encrypted } : {}),
           ...(opts.app !== undefined ? { app: opts.app } : {}),
+          ...(opts.pepperOut !== undefined ? { pepperOut: opts.pepperOut } : {}),
         });
       },
     );

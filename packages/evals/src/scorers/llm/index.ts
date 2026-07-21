@@ -6,6 +6,8 @@
 
 export {
   fenceForJudge,
+  JUDGE_OFF_FORMAT_MARKER,
+  JudgeOffFormatError,
   type LlmJudgeOptions,
   llmJudge,
   parseScore,

@@ -1172,4 +1172,131 @@ describe('deep-retest-0.13.10 P1 - concurrent cold-start recovery', () => {
     expect(gen.text).toBe('ok');
     expect(calls).toHaveLength(4);
   });
+
+  describe('deep-retest-0.13.11 P1 - single-flight cold recovery', () => {
+    it('five-way chained token+temperature: only the leader climbs the ladder', async () => {
+      const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+      const warns: string[] = [];
+      const provider = openAICompatibleAdapter({
+        model: 'gpt-5.6-luna',
+        baseUrl: 'http://127.0.0.1:1234/v1',
+        fetchImpl: makeBarrierFetch({
+          holdFirst: 5,
+          calls,
+          respond: (body) => {
+            if ('max_tokens' in body) return new Response(REJECT_MAX_TOKENS, { status: 400 });
+            if ('temperature' in body) return new Response(REJECT_TEMPERATURE, { status: 400 });
+            return new Response(OK_JSON, { status: 200 });
+          },
+        }),
+        logger: (level, message) => {
+          if (level === 'warn') warns.push(message);
+        },
+      });
+      const results = await Promise.all(
+        Array.from({ length: 5 }, (_, i) =>
+          provider.generate({
+            messages: [{ role: 'user', content: `p${i}` }],
+            temperature: 0,
+            maxTokens: 8,
+          }),
+        ),
+      );
+      expect(results.map((r) => r.text)).toEqual(['ok', 'ok', 'ok', 'ok', 'ok']);
+      // 5 cold sends + the leader's two remaining rungs + 4 waiter
+      // retries from the settled state = 11. Without the flight every
+      // sibling climbed both rungs itself: 15 calls, 10 of them 400s.
+      expect(calls).toHaveLength(11);
+      // The doomed intermediate shape (new token param, temperature
+      // still present) is sent exactly once - by the leader.
+      expect(
+        calls.filter((c) => 'max_completion_tokens' in c.body && 'temperature' in c.body),
+      ).toHaveLength(1);
+      expect(warns.filter((w) => w.includes('max_completion_tokens'))).toHaveLength(1);
+      expect(warns.filter((w) => w.includes("'temperature'"))).toHaveLength(1);
+    });
+
+    it('tri-recovery interleaving: token, temperature and reasoning_effort learn concurrently', async () => {
+      const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+      const warns: string[] = [];
+      const provider = openAICompatibleAdapter({
+        model: 'gpt-5.6-luna',
+        baseUrl: 'http://127.0.0.1:1234/v1',
+        fetchImpl: makeBarrierFetch({
+          holdFirst: 3,
+          calls,
+          respond: (body) => {
+            if ('max_tokens' in body) return new Response(REJECT_MAX_TOKENS, { status: 400 });
+            if ('temperature' in body) return new Response(REJECT_TEMPERATURE, { status: 400 });
+            if (body.tools !== undefined && body.reasoning_effort === undefined) {
+              return new Response(REJECT_TOOLS_REASONING, { status: 400 });
+            }
+            return new Response(OK_JSON, { status: 200 });
+          },
+        }),
+        logger: (level, message) => {
+          if (level === 'warn') warns.push(message);
+        },
+      });
+      const [t, p, m] = await Promise.all([
+        provider.generate({ messages: [{ role: 'user', content: 't' }], tools: TOOLS }),
+        provider.generate({ messages: [{ role: 'user', content: 'p' }], temperature: 0 }),
+        provider.generate({ messages: [{ role: 'user', content: 'm' }], maxTokens: 8 }),
+      ]);
+      expect([t.text, p.text, m.text]).toEqual(['ok', 'ok', 'ok']);
+      // Each call learned ITS dimension before waiting, so every waiter
+      // retry succeeds in one request: 3 cold sends + 3 retries.
+      expect(calls).toHaveLength(6);
+      expect(warns).toHaveLength(3);
+      // The instance is now fully learned: a request using all three
+      // features goes through in exactly ONE call.
+      const before = calls.length;
+      const combined = await provider.generate({
+        messages: [{ role: 'user', content: 'all' }],
+        temperature: 0,
+        maxTokens: 8,
+        tools: TOOLS,
+      });
+      expect(combined.text).toBe('ok');
+      expect(calls).toHaveLength(before + 1);
+      const last = calls.at(-1)?.body ?? {};
+      expect('max_tokens' in last).toBe(false);
+      expect('temperature' in last).toBe(false);
+      expect(last.max_completion_tokens).toBe(8);
+      expect(last.reasoning_effort).toBe('none');
+    });
+
+    it('a waiter survives the leader dying mid-ladder (non-recoverable 500)', async () => {
+      const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+      const provider = openAICompatibleAdapter({
+        model: 'gpt-5.6-luna',
+        baseUrl: 'http://127.0.0.1:1234/v1',
+        fetchImpl: makeBarrierFetch({
+          holdFirst: 2,
+          calls,
+          respond: (body) => {
+            if ('temperature' in body) return new Response(REJECT_TEMPERATURE, { status: 400 });
+            // The leader's retry (third call) dies on a server error;
+            // the waiter's retry must still go through on its own.
+            if (calls.length === 3) return new Response('{"error":{}}', { status: 500 });
+            return new Response(OK_JSON, { status: 200 });
+          },
+        }),
+        logger: () => {},
+      });
+      const settled = await Promise.allSettled([
+        provider.generate({ messages: [{ role: 'user', content: 'a' }], temperature: 0 }),
+        provider.generate({ messages: [{ role: 'user', content: 'b' }], temperature: 0 }),
+      ]);
+      const rejected = settled.filter((s) => s.status === 'rejected');
+      const fulfilled = settled.filter(
+        (s): s is PromiseFulfilledResult<Awaited<ReturnType<typeof provider.generate>>> =>
+          s.status === 'fulfilled',
+      );
+      expect(rejected).toHaveLength(1);
+      expect((rejected[0]?.reason as { status?: number }).status).toBe(500);
+      expect(fulfilled[0]?.value.text).toBe('ok');
+      expect(calls).toHaveLength(4);
+    });
+  });
 });

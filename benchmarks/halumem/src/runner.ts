@@ -44,6 +44,7 @@ import {
   createFakeEmbedder,
   type EvalReport,
   exitOnFailures,
+  JUDGE_OFF_FORMAT_MARKER,
   loadHaluMemDataset,
   type MemoryOperationsEvalInput,
   type MemoryOperationsObservation,
@@ -178,6 +179,24 @@ export function countInfrastructureFailures(
 ): { count: number; caseIds: string[] } {
   const caseIds = report.results
     .filter((r) => r.scores.some((s) => s.result.reason?.includes(INFRA_MARKER) === true))
+    .map((r) => r.caseId);
+  return { count: caseIds.length, caseIds };
+}
+
+/**
+ * deep-retest-0.13.11 P3: scan a report for cases the JUDGE failed to
+ * grade (`llmJudge` threw {@link JudgeOffFormatError} after its
+ * constrained retry). Those are judge/infrastructure failures - the
+ * subject's answer was never scored - and must not be read as subject
+ * quality results.
+ */
+export function countJudgeOffFormatFailures(
+  report: EvalReport<MemoryOperationsEvalInput, MemoryOperationsObservation>,
+): { count: number; caseIds: string[] } {
+  const caseIds = report.results
+    .filter((r) =>
+      r.scores.some((s) => s.result.reason?.includes(JUDGE_OFF_FORMAT_MARKER) === true),
+    )
     .map((r) => r.caseId);
   return { count: caseIds.length, caseIds };
 }
@@ -745,6 +764,20 @@ export async function main(): Promise<void> {
     );
     process.exitCode = 1;
   }
+  // deep-retest-0.13.11 P3: a judge that returns an off-format/empty
+  // grading reply is a JUDGE failure - the subject's answer was never
+  // scored, so name it separately from subject quality (still non-zero
+  // exit: an ungraded case is not a green case).
+  const judgeOffFormat = countJudgeOffFormatFailures(report);
+  if (judgeOffFormat.count > 0) {
+    console.error(
+      `[benchmark-halumem] status=JUDGE_FAILED cases=${judgeOffFormat.count}/${report.summary.total} ` +
+        `(${judgeOffFormat.caseIds.join(', ')}): the judge returned off-format/empty replies even ` +
+        'after the constrained retry - these subject answers were NOT graded. Treat as a ' +
+        'judge/infrastructure failure, not a subject quality result; prefer a stronger judge model.',
+    );
+    process.exitCode = 1;
+  }
   if (ceiling !== undefined && ceiling.observedCostUsd() === 0) {
     console.warn(
       '[benchmark-halumem] --max-cost-usd was set but the providers reported zero usage cost, ' +
@@ -806,6 +839,7 @@ export async function main(): Promise<void> {
         }
       : {}),
     ...(infra.count > 0 ? { infrastructureFailedCases: infra.caseIds } : {}),
+    ...(judgeOffFormat.count > 0 ? { judgeOffFormatCases: judgeOffFormat.caseIds } : {}),
   };
   await mkdir(dirname(args.results), { recursive: true });
   await writeFile(

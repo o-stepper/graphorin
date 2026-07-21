@@ -21,8 +21,38 @@
  * @packageDocumentation
  */
 
-import type { Provider } from '@graphorin/core';
+import type { Message, Provider } from '@graphorin/core';
 import type { Case, ScoreResult, Scorer } from '@graphorin/observability/eval';
+
+/**
+ * Stable machine-scannable token carried in every
+ * {@link JudgeOffFormatError} message. Benchmark runners classify a
+ * case failure whose scorer reason contains this token as a JUDGE
+ * failure (off-format / empty grading reply), never as a subject
+ * quality result.
+ *
+ * @stable
+ */
+export const JUDGE_OFF_FORMAT_MARKER = 'judge-off-format:';
+
+/**
+ * deep-retest-0.13.11 P3: the judge (not the subject) produced a reply
+ * with no parseable `SCORE: <n>` marker even after the constrained
+ * retry. Typed + marked so downstream reports can separate "the judge
+ * failed to grade" from "the subject answered badly".
+ *
+ * @stable
+ */
+export class JudgeOffFormatError extends Error {
+  constructor(scorerName: string, attempts: number, lastReply: string) {
+    super(
+      `${scorerName}: ${JUDGE_OFF_FORMAT_MARKER} judge reply did not contain a 'SCORE: <n>' ` +
+        `marker after ${attempts} attempt(s) (refusal or off-format response): ` +
+        `${JSON.stringify(lastReply.slice(0, 120))}`,
+    );
+    this.name = 'JudgeOffFormatError';
+  }
+}
 
 /** @stable */
 export interface LlmJudgeOptions<I, O> {
@@ -37,6 +67,15 @@ export interface LlmJudgeOptions<I, O> {
   readonly temperature?: number;
   /** Default `16` (headroom for the `SCORE: <n>` line). */
   readonly maxOutputTokens?: number;
+  /**
+   * How many constrained re-asks a missing `SCORE: <n>` marker earns
+   * before the scorer throws {@link JudgeOffFormatError}. Default `1`.
+   * The retry re-sends the conversation with an explicit
+   * marker-only instruction and a raised output budget (reasoning
+   * models can burn a tight `maxOutputTokens` on hidden reasoning and
+   * return an empty visible reply). `0` restores single-shot fail-loud.
+   */
+  readonly offFormatRetries?: number;
   /** Override the scoring prompt. The default is English. */
   readonly buildPrompt?: (input: {
     readonly case: Case<I, O>;
@@ -52,6 +91,7 @@ export function llmJudge<I = unknown, O = unknown>(options: LlmJudgeOptions<I, O
   const passThreshold = options.passThreshold ?? Math.ceil(maxScore * 0.7);
   const temperature = options.temperature ?? 0;
   const maxOutputTokens = options.maxOutputTokens ?? 16;
+  const offFormatRetries = options.offFormatRetries ?? 1;
   const builder = options.buildPrompt ?? defaultPromptBuilder<I, O>;
   return {
     name,
@@ -61,27 +101,52 @@ export function llmJudge<I = unknown, O = unknown>(options: LlmJudgeOptions<I, O
       // judge prompt (default or caller-supplied) so the `SCORE: <n>` marker the
       // parser anchors on is always requested and fenced content is off-limits.
       const system = `${prompt.system}\n\n${scoreContract(maxScore)}`;
-      const response = await options.provider.generate({
-        systemMessage: system,
-        messages: [
-          {
+      const messages: Message[] = [
+        {
+          role: 'user',
+          content: [{ type: 'text', text: prompt.user }],
+        },
+      ];
+      let attempts = 0;
+      let text = '';
+      let raw: number | null = null;
+      while (raw === null && attempts <= offFormatRetries) {
+        const isRetry = attempts > 0;
+        const response = await options.provider.generate({
+          systemMessage: system,
+          messages,
+          temperature,
+          // deep-retest-0.13.11 P3: reasoning-model judges can burn a
+          // tight budget on hidden reasoning and return an EMPTY visible
+          // reply - the retry raises the ceiling so the marker line fits.
+          maxTokens: isRetry ? Math.max(32, maxOutputTokens * 2) : maxOutputTokens,
+        });
+        attempts += 1;
+        text = response.text ?? '';
+        raw = parseScore(text);
+        if (raw === null && attempts <= offFormatRetries) {
+          if (text.length > 0) {
+            messages.push({ role: 'assistant', content: [{ type: 'text', text }] });
+          }
+          messages.push({
             role: 'user',
-            content: [{ type: 'text', text: prompt.user }],
-          },
-        ],
-        temperature,
-        maxTokens: maxOutputTokens,
-      });
-      const text = response.text ?? '';
-      const raw = parseScore(text);
+            content: [
+              {
+                type: 'text',
+                text:
+                  'Your previous reply did not contain the required marker. Reply with ONLY ' +
+                  `a single line in exactly this form:\nSCORE: <integer from 0 to ${maxScore}>`,
+              },
+            ],
+          });
+        }
+      }
       if (raw === null) {
         // A refusal / off-format reply is a scorer ERROR, not a silent 0 - the
         // runner's `safeScore` turns the throw into a no-score failure that
-        // can't be confused with a genuine low grade.
-        throw new Error(
-          `${name}: judge reply did not contain a 'SCORE: <n>' marker ` +
-            `(refusal or off-format response): ${JSON.stringify(text.slice(0, 120))}`,
-        );
+        // can't be confused with a genuine low grade, and the typed marker
+        // lets benchmark reports classify it as a JUDGE failure.
+        throw new JudgeOffFormatError(name, attempts, text);
       }
       const clamped = Math.max(0, Math.min(maxScore, raw));
       const pass = clamped >= passThreshold;

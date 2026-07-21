@@ -10,7 +10,7 @@
 function llmJudge<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:49
+Defined in: packages/evals/src/scorers/llm/judge.ts:88
 
 **`Stable`**
 

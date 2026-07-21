@@ -145,6 +145,17 @@ const memory = createMemory({
   rather than failing the whole query; tune this for your provider. The
   scoring prompt is English by default; pass a `scoringPrompt` builder for
   other locales.
+- **Diagnostics** - after each `rerank(...)`, `lastErrorCount` counts provider
+  failures that degraded to the fallback, `lastOffFormatCount` counts
+  unparseable replies, and `lastFailures` holds per-passage detail (error
+  class, HTTP status, off-format reply snippet; capped at 25 entries) so a
+  degraded live ranking is diagnosable without re-running billed calls.
+- **Live cloud usage** - the raw adapter retries nothing: a burst of
+  `batchSize` cold scoring calls can trip provider rate limits (HTTP 429) and
+  each such reject degrades one passage. For production and live probes,
+  compose the provider with `withRetry` (and optionally `withRateLimit`) from
+  `@graphorin/provider` before handing it to `createLlmReranker` - the
+  reranker inherits the middleware transparently.
 
 ## Query transformation
 

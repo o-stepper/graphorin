@@ -22,6 +22,12 @@ metadata:
     app.kubernetes.io/name: graphorin
     app.kubernetes.io/version: "0.13.11"
 data:
+  # SECURITY - trustProxy: true makes the server BELIEVE X-Forwarded-*
+  # headers. Keep it ONLY behind a trusted ingress / load balancer that
+  # OVERWRITES those headers (the ClusterIP Service below assumes one).
+  # If clients can reach the pod directly (NodePort, LoadBalancer,
+  # kubectl port-forward), set it to false - otherwise any client can
+  # spoof its source IP past rate limits and audit logs.
   config.json: |
     {
       "server": {
