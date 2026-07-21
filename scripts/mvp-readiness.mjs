@@ -386,6 +386,28 @@ async function main() {
   // instead of letting it scroll away among parallel turbo streams.
   const TAIL_BYTES = 16 * 1024;
   const tailOf = (s) => (s.length > TAIL_BYTES ? s.slice(-TAIL_BYTES) : s);
+  // deep-retest-0.13.10 P2: a 16 KB tail of an INTERLEAVED turbo
+  // stream can miss the actual assertion - the failing expectation
+  // scrolls out while sibling packages keep streaming. When the
+  // failed gate is a turbo run, turbo names the losers in a
+  // `Failed: pkg#task` summary line; extract the FIRST failed task's
+  // own prefixed lines as the primary evidence block.
+  const extractFirstFailingTask = (stdout, stderr) => {
+    const failedLine = /^\s*Failed:\s+(.+)$/m.exec(`${stdout}\n${stderr}`);
+    if (failedLine === null) return null;
+    const first = (failedLine[1] ?? '')
+      .split(/[,\s]+/)
+      .map((s) => s.trim())
+      .find((s) => s.includes('#'));
+    if (first === undefined) return null;
+    const prefix = `${first.replace('#', ':')}: `;
+    const lines = stdout
+      .split('\n')
+      .filter((l) => l.startsWith(prefix))
+      .map((l) => l.slice(prefix.length));
+    if (lines.length === 0) return null;
+    return { task: first, output: tailOf(lines.join('\n')) };
+  };
   let failureTail = null;
   for (const [index, gate] of gates.entries()) {
     if (gate.kind === 'cmd') {
@@ -396,10 +418,12 @@ async function main() {
       lines.push(summarise(gate.label, ok, result.elapsedMs));
       if (!ok && firstFailureIndex < 0) firstFailureIndex = index;
       if (!ok) {
+        const firstFailingTask = extractFirstFailingTask(result.stdout, result.stderr);
         failureTail = {
           gate: gate.label,
           stdout: tailOf(result.stdout),
           stderr: tailOf(result.stderr),
+          ...(firstFailingTask !== null ? { firstFailingTask } : {}),
         };
         break;
       }
@@ -455,6 +479,11 @@ async function main() {
       console.error(
         `mvp-readiness: FAIL — gate '${results.find((r) => !r.ok)?.gate ?? '<unknown>'}' failed; remaining gates skipped.`,
       );
+      if (failureTail !== null && failureTail.firstFailingTask !== undefined) {
+        console.error(`--- first failing task '${failureTail.firstFailingTask.task}' ---`);
+        console.error(failureTail.firstFailingTask.output.trimEnd());
+        console.error('--- end of first-failing-task output ---');
+      }
       if (failureTail !== null && (failureTail.stdout !== '' || failureTail.stderr !== '')) {
         console.error(`--- last output of failed gate '${failureTail.gate}' ---`);
         if (failureTail.stdout !== '') console.error(failureTail.stdout.trimEnd());
