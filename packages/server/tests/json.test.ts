@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { canonicalJson, fingerprintRequest, sha256Hex } from '../src/internal/json.js';
+import {
+  canonicalJson,
+  fingerprintRequest,
+  INVALID_JSON_BODY,
+  readJsonBody,
+  sha256Hex,
+} from '../src/internal/json.js';
 
 describe('canonicalJson', () => {
   it('sorts object keys recursively', () => {
@@ -44,5 +50,47 @@ describe('fingerprintRequest', () => {
 
   it('sha256Hex returns the lowercase hex digest', () => {
     expect(sha256Hex('abc')).toMatch(/^[0-9a-f]{64}$/);
+  });
+});
+
+describe('readJsonBody (deep-retest-0.13.10 P1)', () => {
+  function ctx(text: string | (() => Promise<string>)): {
+    readonly req: { readonly text: () => Promise<string> };
+  } {
+    return {
+      req: { text: typeof text === 'string' ? async () => text : text },
+    };
+  }
+
+  it('parses a valid JSON object', async () => {
+    await expect(readJsonBody(ctx('{"a":1}'))).resolves.toEqual({ a: 1 });
+  });
+
+  it('treats an EMPTY body as {} (bodiless POST convenience)', async () => {
+    await expect(readJsonBody(ctx(''))).resolves.toEqual({});
+    await expect(readJsonBody(ctx('  \n\t '))).resolves.toEqual({});
+  });
+
+  it('returns the sentinel for truncated JSON', async () => {
+    await expect(readJsonBody(ctx('{"input":'))).resolves.toBe(INVALID_JSON_BODY);
+  });
+
+  it('returns the sentinel for non-JSON text', async () => {
+    await expect(readJsonBody(ctx('hello world'))).resolves.toBe(INVALID_JSON_BODY);
+  });
+
+  it('passes through valid non-object JSON for the schema layer to reject', async () => {
+    await expect(readJsonBody(ctx('null'))).resolves.toBeNull();
+    await expect(readJsonBody(ctx('42'))).resolves.toBe(42);
+  });
+
+  it('returns the sentinel when the body stream itself fails', async () => {
+    await expect(
+      readJsonBody(
+        ctx(async () => {
+          throw new Error('stream broken');
+        }),
+      ),
+    ).resolves.toBe(INVALID_JSON_BODY);
   });
 });

@@ -10,11 +10,10 @@
 import type { AuthTokenStore } from '@graphorin/core/contracts';
 import { createToken, listTokens, revokeToken, type SecretValue } from '@graphorin/security';
 import { scopeSetMatches, tryParseScope, validateScopeSet } from '@graphorin/security/auth';
-import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
-
 import type { ServerVariables } from '../internal/context.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 
 /**
@@ -64,7 +63,11 @@ export function createTokensRoutes(deps: TokensRoutesDeps): Hono<{ Variables: Se
   });
 
   app.post('/', createScopeMiddleware('tokens:create'), async (c) => {
-    const parsed = CreateBodySchema.safeParse(await safelyParseJson(c));
+    const rawBody = await readJsonBody(c);
+    if (rawBody === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = CreateBodySchema.safeParse(rawBody);
     if (!parsed.success) {
       return c.json(
         {
@@ -165,12 +168,4 @@ export function createTokensRoutes(deps: TokensRoutesDeps): Hono<{ Variables: Se
   });
 
   return app;
-}
-
-async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }

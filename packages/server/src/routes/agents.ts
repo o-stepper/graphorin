@@ -22,6 +22,7 @@ import { z } from 'zod';
 import { AgentNotFoundError } from '../errors/index.js';
 import type { ServerVariables } from '../internal/context.js';
 import { newRequestId } from '../internal/ids.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import {
   checkScope,
   createAuthenticatedMiddleware,
@@ -97,7 +98,11 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
         const err = new AgentNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = RunBodySchema.safeParse(raw);
       if (!parsed.success) {
         return invalidBodyResponse(c, parsed.error);
       }
@@ -156,7 +161,11 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
       // empty prompt, burning provider tokens behind a 202 that looked
       // successful. Identical validation to the sibling /run route
       // (empty/absent bodies stay valid via the schema default).
-      const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
+      const raw = await readJsonBody(c);
+      if (raw === INVALID_JSON_BODY) {
+        return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+      }
+      const parsed = RunBodySchema.safeParse(raw);
       if (!parsed.success) {
         return invalidBodyResponse(c, parsed.error);
       }
@@ -413,7 +422,11 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
         );
       }
     }
-    const parsed = ResumeRunBodySchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = ResumeRunBodySchema.safeParse(raw);
     if (!parsed.success) {
       return invalidBodyResponse(c, parsed.error);
     }
@@ -516,12 +529,4 @@ function invalidBodyResponse(
     },
     400,
   );
-}
-
-async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }

@@ -8,11 +8,10 @@
  * @packageDocumentation
  */
 
-import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
-
 import type { ServerVariables } from '../internal/context.js';
+import { INVALID_JSON_BODY, readJsonBody } from '../internal/json.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 
 /**
@@ -54,7 +53,11 @@ export function createMcpRoutes(deps: McpRoutesDeps): Hono<{ Variables: ServerVa
   });
 
   app.post('/servers', createScopeMiddleware('mcp:admin'), async (c) => {
-    const parsed = RegisterBodySchema.safeParse(await safelyParseJson(c));
+    const raw = await readJsonBody(c);
+    if (raw === INVALID_JSON_BODY) {
+      return c.json({ error: 'invalid-json', message: 'Request body is not valid JSON.' }, 400);
+    }
+    const parsed = RegisterBodySchema.safeParse(raw);
     if (!parsed.success) {
       return c.json(
         {
@@ -86,12 +89,4 @@ export function createMcpRoutes(deps: McpRoutesDeps): Hono<{ Variables: ServerVa
   });
 
   return app;
-}
-
-async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {
-  try {
-    return await c.req.json();
-  } catch {
-    return {};
-  }
 }
