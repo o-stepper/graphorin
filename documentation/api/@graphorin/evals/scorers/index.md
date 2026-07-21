@@ -118,6 +118,18 @@ Re-exports [JsonPathOptions](/api/@graphorin/evals/interfaces/JsonPathOptions.md
 
 ***
 
+### JUDGE\_OFF\_FORMAT\_MARKER
+
+Re-exports [JUDGE_OFF_FORMAT_MARKER](/api/@graphorin/evals/variables/JUDGE_OFF_FORMAT_MARKER.md)
+
+***
+
+### JudgeOffFormatError
+
+Re-exports [JudgeOffFormatError](/api/@graphorin/evals/classes/JudgeOffFormatError.md)
+
+***
+
 ### llmJudge
 
 Re-exports [llmJudge](/api/@graphorin/evals/functions/llmJudge.md)

@@ -94,7 +94,9 @@ function parseExcludes(argv, envValue) {
       raw.push(next);
       i += 1;
     } else {
-      console.error(`smoke-examples: unknown option ${argv[i]} (only --exclude <name> is supported)`);
+      console.error(
+        `smoke-examples: unknown option ${argv[i]} (only --exclude <name> is supported)`,
+      );
       process.exit(1);
     }
   }

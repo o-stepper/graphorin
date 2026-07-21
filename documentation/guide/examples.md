@@ -18,6 +18,12 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/<name> dev
 ```
 :::
 
+`pnpm smoke-examples` runs the whole set (including the security-flavoured
+`secure-replay-agent`). Audits that must not execute security samples can skip
+named examples officially: `pnpm smoke-examples --exclude secure-replay-agent`
+(repeatable / comma-separated, or `GRAPHORIN_SMOKE_EXCLUDE=a,b`); every
+exclusion is printed so a partial run never reads as full coverage.
+
 ## `assistant-bot`
 
 The official whole-bot recipe: one long-living personal assistant composed from every framework leg. Facts ingested into memory answer a later question arriving through the channels front door (pairing challenge included), a REST run parks on a `needsApproval: true` tool and resumes through `POST /v1/runs/:runId/resume`, a heartbeat beat delivers a `notify` outcome, and one session exports the whole conversation as JSONL - all against the in-process hono app (`skipListen: true`), no sockets.

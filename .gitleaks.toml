@@ -1,0 +1,31 @@
+# Gitleaks configuration for the CI secret scan (security.yml, job
+# `secret-scan`). deep-retest-0.13.11: complements the redaction corpus
+# tests with a general-purpose scanner over the working tree.
+#
+# The allowlist below is PATH-based and deliberately narrow: runtime
+# source stays fully scanned. The excluded trees hold secret-SHAPED
+# strings by design:
+#
+#  - packages/*/tests/    synthetic fixtures - the redaction corpus and
+#                         policy tests REQUIRE realistic token shapes
+#                         (ghp_..., sk-..., PEM blocks, gph_live_v1_...).
+#  - tmp/                 audit/e2e campaign deliverables - reports and
+#                         repro scripts quoting the same fixtures.
+#  - benchmarks/.datasets/  downloaded research datasets (LoCoMo,
+#                         LongMemEval) containing sample JWTs/tokens;
+#                         gitignored, listed here for local runs.
+#
+# Trade-off, documented: a REAL secret pasted into one of these trees
+# would not be flagged. Reviews of test fixtures must keep treating
+# secret-shaped literals as synthetic-only.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Synthetic secret-shaped fixtures (tests, audit deliverables, research datasets)"
+paths = [
+  '''packages/[^/]+/tests/''',
+  '''(^|/)tmp/''',
+  '''benchmarks/\.datasets/''',
+]

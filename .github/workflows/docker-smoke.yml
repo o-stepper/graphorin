@@ -34,6 +34,33 @@ jobs:
       - name: CLI smoke (entrypoint + symlinked binary)
         run: docker run --rm graphorin:smoke --version
 
+      # deep-retest-0.13.11: the image carries the full builder tree
+      # (documented size/devDependency trade-off), so publish an SBOM of
+      # what actually ships - scanners and consumers audit the artifact
+      # instead of guessing from the npm graph. Binary pinned by version
+      # AND sha256 (osv-scanner precedent in security.yml).
+      - name: Generate image SBOM (syft, pinned)
+        run: |
+          set -euo pipefail
+          curl -sSL -o /tmp/syft.tar.gz \
+            https://github.com/anchore/syft/releases/download/v1.34.2/syft_1.34.2_linux_amd64.tar.gz
+          echo "b62a3d4167f9a04bc190a5e654b05711737527ed47b616dc398e541f903c2d72  /tmp/syft.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/syft.tar.gz -C /tmp syft
+          /tmp/syft scan docker:graphorin:smoke -o spdx-json > "${RUNNER_TEMP}/graphorin-image.spdx.json"
+          node -e "
+            const sbom = require(process.env.RUNNER_TEMP + '/graphorin-image.spdx.json');
+            const n = (sbom.packages ?? []).length;
+            if (n < 100) { console.error('SBOM suspiciously small: ' + n + ' packages'); process.exit(1); }
+            console.log('SBOM OK: ' + n + ' packages catalogued');
+          "
+
+      - name: Upload image SBOM artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: graphorin-image-sbom
+          path: ${{ runner.temp }}/graphorin-image.spdx.json
+          retention-days: 90
+
       - name: Boot the server with the shipped config and probe the published port
         run: |
           set -euo pipefail

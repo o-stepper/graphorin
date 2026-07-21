@@ -6,7 +6,7 @@
 
 # Interface: MergedEntry\&lt;TRecord\&gt;
 
-Defined in: src/reranker.ts:271
+Defined in: src/reranker.ts:352
 
 **`Stable`**
 
@@ -22,5 +22,5 @@ One merged row returned by [mergeAndDedupe](/api/@graphorin/reranker-llm/functio
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-firstseenorder"></a> `firstSeenOrder` | `readonly` | `number` | src/reranker.ts:273 |
-| <a id="property-hit"></a> `hit` | `readonly` | [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt; | src/reranker.ts:272 |
+| <a id="property-firstseenorder"></a> `firstSeenOrder` | `readonly` | `number` | src/reranker.ts:354 |
+| <a id="property-hit"></a> `hit` | `readonly` | [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt; | src/reranker.ts:353 |

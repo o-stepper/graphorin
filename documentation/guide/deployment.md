@@ -164,6 +164,8 @@ The `examples/k8s/` manifest set runs Graphorin as a non-root pod with:
 
 Two objects are prerequisites you create out-of-band (the manifest's header comment spells them out): the `graphorin-secrets` `Secret` (deployment pepper + provider keys) and the `graphorin-data` `PersistentVolumeClaim`.
 
+The template sets `trustProxy: true`, which makes the server believe `X-Forwarded-*` headers - correct **only** behind a trusted ingress that overwrites them. If clients can reach the pod directly (NodePort, LoadBalancer, an exposed `kubectl port-forward`), set it to `false`, or any client can spoof its source IP past rate limits and audit logs.
+
 ## GitHub Actions
 
 The `examples/github-actions/` folder ships CI/CD workflow **templates** for a downstream app that embeds Graphorin: a Changesets-based release pipeline (`release.yml`), a security job with dependency audit + Sigstore verification (`security.yml`), and a `renovate.json`. They are starting points to copy into your own repository, not runnable example apps.

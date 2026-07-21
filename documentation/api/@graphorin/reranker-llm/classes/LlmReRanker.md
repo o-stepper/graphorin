@@ -6,7 +6,7 @@
 
 # Class: LlmReRanker\&lt;TRecord\&gt;
 
-Defined in: src/reranker.ts:97
+Defined in: src/reranker.ts:130
 
 **`Stable`**
 
@@ -31,7 +31,7 @@ Defined in: src/reranker.ts:97
 new LlmReRanker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: src/reranker.ts:113
+Defined in: src/reranker.ts:148
 
 #### Parameters
 
@@ -47,13 +47,13 @@ Defined in: src/reranker.ts:113
 
 | Property | Modifier | Type | Default value | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | src/reranker.ts:101 |
-| <a id="property-fallbackscore"></a> `fallbackScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:104 |
-| <a id="property-id"></a> `id` | `readonly` | `"llm-judge"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | src/reranker.ts:98 |
-| <a id="property-maxoutputtokens"></a> `maxOutputTokens` | `readonly` | `number` | `undefined` | - | src/reranker.ts:103 |
-| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:100 |
-| <a id="property-provider"></a> `provider` | `readonly` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) | `undefined` | - | src/reranker.ts:99 |
-| <a id="property-temperature"></a> `temperature` | `readonly` | `number` | `undefined` | - | src/reranker.ts:102 |
+| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | src/reranker.ts:134 |
+| <a id="property-fallbackscore"></a> `fallbackScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:137 |
+| <a id="property-id"></a> `id` | `readonly` | `"llm-judge"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | src/reranker.ts:131 |
+| <a id="property-maxoutputtokens"></a> `maxOutputTokens` | `readonly` | `number` | `undefined` | - | src/reranker.ts:136 |
+| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:133 |
+| <a id="property-provider"></a> `provider` | `readonly` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) | `undefined` | - | src/reranker.ts:132 |
+| <a id="property-temperature"></a> `temperature` | `readonly` | `number` | `undefined` | - | src/reranker.ts:135 |
 
 ## Accessors
 
@@ -65,7 +65,7 @@ Defined in: src/reranker.ts:113
 get invocationCount(): number;
 ```
 
-Defined in: src/reranker.ts:142
+Defined in: src/reranker.ts:177
 
 **`Stable`**
 
@@ -86,11 +86,58 @@ for observability + the test suite.
 get lastErrorCount(): number;
 ```
 
-Defined in: src/reranker.ts:162
+Defined in: src/reranker.ts:197
 
 Number of per-passage provider failures swallowed (→ `fallbackScore`) on
 the most recent `rerank(...)`. A non-zero value means the ranking
 is partially degraded - surface it for observability.
+
+##### Returns
+
+`number`
+
+***
+
+### lastFailures
+
+#### Get Signature
+
+```ts
+get lastFailures(): readonly LlmRerankFailure[];
+```
+
+Defined in: src/reranker.ts:222
+
+**`Stable`**
+
+Per-passage failure details (both kinds) from the most recent
+`rerank(...)`, capped at 25 entries - enough to diagnose a live
+incident (status codes, error classes, off-format reply snippets)
+without re-running billed calls. The counters above keep full
+totals.
+
+##### Returns
+
+readonly [`LlmRerankFailure`](/api/@graphorin/reranker-llm/interfaces/LlmRerankFailure.md)[]
+
+***
+
+### lastOffFormatCount
+
+#### Get Signature
+
+```ts
+get lastOffFormatCount(): number;
+```
+
+Defined in: src/reranker.ts:209
+
+**`Stable`**
+
+Number of off-format replies (no parseable integer → `fallbackScore`)
+on the most recent `rerank(...)`. Distinct from `lastErrorCount`:
+the provider call SUCCEEDED but the model drifted off the
+integer-only contract.
 
 ##### Returns
 
@@ -106,7 +153,7 @@ is partially degraded - surface it for observability.
 get lastPromptTokens(): number;
 ```
 
-Defined in: src/reranker.ts:153
+Defined in: src/reranker.ts:188
 
 **`Stable`**
 
@@ -129,7 +176,7 @@ rerank<TInputRecord>(
 options?): Promise<readonly MemoryHit<TInputRecord>[]>;
 ```
 
-Defined in: src/reranker.ts:166
+Defined in: src/reranker.ts:226
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be

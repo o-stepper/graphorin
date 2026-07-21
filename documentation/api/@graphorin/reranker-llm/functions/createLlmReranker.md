@@ -10,7 +10,7 @@
 function createLlmReranker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: src/reranker.ts:85
+Defined in: src/reranker.ts:118
 
 **`Stable`**
 

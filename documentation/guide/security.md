@@ -196,6 +196,13 @@ The root check runs after the ed25519 signature itself is valid, so the result d
 
 The `publishers` leg is domain-bound: the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
 
+## CI scanning: secrets and image SBOM
+
+Two scans complement the dependency gates in CI (both binaries pinned by version and sha256):
+
+- **Secret scan** - the `secret-scan` job in the security workflow runs [gitleaks](https://github.com/gitleaks/gitleaks) over the checkout and **blocks** on findings. The repo-root `.gitleaks.toml` allowlists only synthetic-fixture trees (package `tests/`, `tmp/` audit deliverables, downloaded research datasets) - runtime source is fully scanned. The redaction corpus tests stay the deep, framework-aware layer; gitleaks is the general-purpose net for anything those patterns do not model.
+- **Image SBOM** - the Docker smoke workflow generates an SPDX SBOM of the built distribution image with [syft](https://github.com/anchore/syft) and uploads it as a build artifact (90-day retention). The image deliberately carries the full builder tree (a documented size/devDependency trade-off), so the SBOM describes what actually ships - point image scanners at it instead of inferring from the npm graph.
+
 ## Published dependency-graph advisories
 
 The workspace's vulnerability scanning runs over `pnpm-lock.yaml` - which applies the repo's pnpm overrides. npm consumers never inherit those overrides, so an advisory in the **published** auto-installed dependency/peer graph can be invisible to every workspace-side gate while being real for every consumer. The `published-peer-audit` job in the consumer-smoke workflow closes that blind spot: on a schedule (and on demand) it performs a fresh isolated `npm install` of every published `@graphorin/*` package and gates `npm audit --omit=dev` high/critical findings against the reviewed allowlist in `.github/published-peer-audit-allowlist.json`. An allowlisted advisory that stops appearing fails the job too, so accepted advisories and their documented mitigations cannot silently go stale.

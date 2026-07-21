@@ -10,7 +10,7 @@
 function parseSystemdScore(output): number | undefined;
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:275
+Defined in: packages/security/src/hardening/doctor.ts:293
 
 **`Stable`**
 

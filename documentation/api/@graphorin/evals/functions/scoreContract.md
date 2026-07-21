@@ -10,7 +10,7 @@
 function scoreContract(maxScore): string;
 ```
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:134
+Defined in: packages/evals/src/scorers/llm/judge.ts:199
 
 **`Stable`**
 

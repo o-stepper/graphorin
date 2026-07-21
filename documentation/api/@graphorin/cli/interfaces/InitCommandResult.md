@@ -6,7 +6,7 @@
 
 # Interface: InitCommandResult
 
-Defined in: packages/cli/src/commands/init.ts:71
+Defined in: packages/cli/src/commands/init.ts:78
 
 **`Stable`**
 
@@ -14,8 +14,9 @@ Defined in: packages/cli/src/commands/init.ts:71
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-apppath"></a> `appPath?` | `readonly` | `string` | Absolute path of the scaffolded app module (with `--app` only). | packages/cli/src/commands/init.ts:77 |
-| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | - | packages/cli/src/commands/init.ts:74 |
-| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | - | packages/cli/src/commands/init.ts:72 |
-| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | - | packages/cli/src/commands/init.ts:73 |
-| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | - | packages/cli/src/commands/init.ts:75 |
+| <a id="property-apppath"></a> `appPath?` | `readonly` | `string` | Absolute path of the scaffolded app module (with `--app` only). | packages/cli/src/commands/init.ts:84 |
+| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | - | packages/cli/src/commands/init.ts:81 |
+| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | - | packages/cli/src/commands/init.ts:79 |
+| <a id="property-pepperoutpath"></a> `pepperOutPath?` | `readonly` | `string` | Absolute path the pepper hex was written to (with `--pepper-out` only). | packages/cli/src/commands/init.ts:86 |
+| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | - | packages/cli/src/commands/init.ts:80 |
+| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | - | packages/cli/src/commands/init.ts:82 |

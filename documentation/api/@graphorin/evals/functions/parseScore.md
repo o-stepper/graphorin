@@ -10,7 +10,7 @@
 function parseScore(text): number | null;
 ```
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:107
+Defined in: packages/evals/src/scorers/llm/judge.ts:172
 
 Parse the score from the LAST `SCORE: <n>` (or `SCORE = <n>`) marker in
 the reply. Anchoring on a deliberate, trailing marker - rather than the first

@@ -26,8 +26,9 @@ subsystem the config turned off).
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | \{ `auditEnabled?`: `boolean`; \} |
+| `options` | \{ `auditEnabled?`: `boolean`; `bootstrapped?`: `boolean`; \} |
 | `options.auditEnabled?` | `boolean` |
+| `options.bootstrapped?` | `boolean` |
 
 ## Returns
 

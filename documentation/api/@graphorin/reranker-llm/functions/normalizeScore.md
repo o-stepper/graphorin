@@ -13,7 +13,7 @@ function normalizeScore(
    fallback): number;
 ```
 
-Defined in: src/reranker.ts:341
+Defined in: src/reranker.ts:422
 
 **`Stable`**
 
