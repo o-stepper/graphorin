@@ -76,22 +76,33 @@ function parseInvocation() {
 }
 
 /**
- * Run a child process and stream stdout / stderr to the parent. The
+ * Run a child process, stream stdout / stderr to the parent (unless
+ * quiet), and ALWAYS capture both for the failure summary. The
  * resolved promise carries the elapsed wall-clock time in milliseconds
  * and the exit code; the caller decides how to react.
+ *
+ * deep-retest-0.13.9: the aggregated output used to lose the failing
+ * task's diagnostics - vitest prints them to stdout, quiet mode only
+ * echoed stderr, and inherit mode captured nothing for the summary.
  */
 function runCommand(label, cmd, args, { quiet }) {
   return new Promise((resolveRun) => {
     const startedAt = Date.now();
     const child = spawn(cmd, args, {
       cwd: ROOT,
-      stdio: quiet ? ['ignore', 'pipe', 'pipe'] : 'inherit',
+      stdio: ['ignore', 'pipe', 'pipe'],
       env: { ...process.env, FORCE_COLOR: '0' },
     });
     let stdout = '';
     let stderr = '';
-    if (quiet && child.stdout) child.stdout.on('data', (b) => (stdout += b.toString('utf8')));
-    if (quiet && child.stderr) child.stderr.on('data', (b) => (stderr += b.toString('utf8')));
+    child.stdout?.on('data', (b) => {
+      stdout += b.toString('utf8');
+      if (!quiet) process.stdout.write(b);
+    });
+    child.stderr?.on('data', (b) => {
+      stderr += b.toString('utf8');
+      if (!quiet) process.stderr.write(b);
+    });
     child.on('close', (code) => {
       const elapsedMs = Date.now() - startedAt;
       resolveRun({ label, exitCode: code ?? 1, elapsedMs, stdout, stderr });
@@ -370,6 +381,12 @@ async function main() {
     );
   }
 
+  // deep-retest-0.13.9: keep a tail of the failed gate's output so the
+  // summary (and the --json report) carries the first-failure cause
+  // instead of letting it scroll away among parallel turbo streams.
+  const TAIL_BYTES = 16 * 1024;
+  const tailOf = (s) => (s.length > TAIL_BYTES ? s.slice(-TAIL_BYTES) : s);
+  let failureTail = null;
   for (const [index, gate] of gates.entries()) {
     if (gate.kind === 'cmd') {
       if (!json) console.log(`\n--- gate ${index + 1}/${gates.length}: ${gate.label} ---`);
@@ -379,7 +396,11 @@ async function main() {
       lines.push(summarise(gate.label, ok, result.elapsedMs));
       if (!ok && firstFailureIndex < 0) firstFailureIndex = index;
       if (!ok) {
-        if (!json && result.stderr) console.error(result.stderr);
+        failureTail = {
+          gate: gate.label,
+          stdout: tailOf(result.stdout),
+          stderr: tailOf(result.stderr),
+        };
         break;
       }
     } else {
@@ -415,7 +436,13 @@ async function main() {
   const overallOk = firstFailureIndex < 0;
 
   if (json) {
-    process.stdout.write(`${JSON.stringify({ ok: overallOk, results }, null, 2)}\n`);
+    process.stdout.write(
+      `${JSON.stringify(
+        { ok: overallOk, results, ...(failureTail !== null ? { failure: failureTail } : {}) },
+        null,
+        2,
+      )}\n`,
+    );
   } else {
     console.log('\n=== mvp-readiness summary ===');
     for (const line of lines) console.log(line);
@@ -428,6 +455,12 @@ async function main() {
       console.error(
         `mvp-readiness: FAIL — gate '${results.find((r) => !r.ok)?.gate ?? '<unknown>'}' failed; remaining gates skipped.`,
       );
+      if (failureTail !== null && (failureTail.stdout !== '' || failureTail.stderr !== '')) {
+        console.error(`--- last output of failed gate '${failureTail.gate}' ---`);
+        if (failureTail.stdout !== '') console.error(failureTail.stdout.trimEnd());
+        if (failureTail.stderr !== '') console.error(failureTail.stderr.trimEnd());
+        console.error('--- end of failed-gate output ---');
+      }
     }
   }
   process.exit(overallOk ? 0 : 1);
