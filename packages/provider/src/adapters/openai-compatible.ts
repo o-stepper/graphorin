@@ -15,9 +15,13 @@
 
 import type { Provider, ProviderCapabilities, Sensitivity } from '@graphorin/core';
 
-import { buildOpenAIShapedProvider, type TokenLimitParam } from '../internal/openai-shaped.js';
+import {
+  buildOpenAIShapedProvider,
+  type TokenLimitParam,
+  type UnsupportedParamRecovery,
+} from '../internal/openai-shaped.js';
 
-export type { TokenLimitParam } from '../internal/openai-shaped.js';
+export type { TokenLimitParam, UnsupportedParamRecovery } from '../internal/openai-shaped.js';
 
 /**
  * Options accepted by {@link openAICompatibleAdapter}.
@@ -51,6 +55,18 @@ export interface OpenAICompatibleAdapterOptions {
    * disables the auto-remap.
    */
   readonly tokenLimitParam?: TokenLimitParam;
+  /**
+   * One-shot HTTP 400 auto-recovery for model parameters the server
+   * rejects: a 400 naming `temperature` re-sends the request without
+   * the field (current OpenAI reasoning models accept only the
+   * default), and a 400 requiring `reasoning_effort` `'none'` for
+   * function tools on chat completions re-sends with it. The
+   * instance keeps each switch and WARNs once. An explicit
+   * `providerOptions` value for either field disables its recovery
+   * so the override keeps failing loudly. Default `'auto'`; set
+   * `'off'` to surface the original errors instead.
+   */
+  readonly unsupportedParamRecovery?: UnsupportedParamRecovery;
   /** Optional bearer-auth API key. */
   readonly apiKey?: string;
   /** Extra headers merged on top of `content-type` + `accept` defaults. */
@@ -98,6 +114,9 @@ export function openAICompatibleAdapter(options: OpenAICompatibleAdapterOptions)
     baseUrl: options.baseUrl,
     ...(options.chatPath !== undefined ? { chatPath: options.chatPath } : {}),
     ...(options.tokenLimitParam !== undefined ? { tokenLimitParam: options.tokenLimitParam } : {}),
+    ...(options.unsupportedParamRecovery !== undefined
+      ? { unsupportedParamRecovery: options.unsupportedParamRecovery }
+      : {}),
     ...(options.apiKey !== undefined ? { apiKey: options.apiKey } : {}),
     ...(options.headers !== undefined ? { headers: options.headers } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),

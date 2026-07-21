@@ -52,6 +52,19 @@ import { stripTrailingSlashes } from './url-utils.js';
 export type TokenLimitParam = 'max_tokens' | 'max_completion_tokens';
 
 /**
+ * Policy for the one-shot HTTP 400 auto-recovery of model parameters
+ * the server rejects (deep-retest-0.13.9 P1). `'auto'` (default): a
+ * 400 naming `temperature` re-sends the request without the field,
+ * and a 400 requiring `reasoning_effort` `'none'` for function tools
+ * re-sends with it; the instance keeps each switch and WARNs once.
+ * `'off'` disables both recoveries so the original error surfaces.
+ * The `max_tokens` remap is governed by `tokenLimitParam`, not this.
+ *
+ * @stable
+ */
+export type UnsupportedParamRecovery = 'auto' | 'off';
+
+/**
  * Options shared by every OpenAI-compatible adapter.
  *
  * @internal
@@ -69,6 +82,13 @@ export interface OpenAIShapedOptions {
    * the option pins the name and disables that auto-remap.
    */
   readonly tokenLimitParam?: TokenLimitParam;
+  /**
+   * One-shot HTTP 400 auto-recovery for `temperature` and the
+   * function-tools `reasoning_effort` contract. Default `'auto'`;
+   * `'off'` restores fail-loud passthrough. See
+   * {@link UnsupportedParamRecovery}.
+   */
+  readonly unsupportedParamRecovery?: UnsupportedParamRecovery;
   readonly apiKey?: string;
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetchImpl?: typeof fetch;
@@ -174,6 +194,11 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
     opts.chatPath ?? (base.endsWith('/v1') ? '/chat/completions' : '/v1/chat/completions');
   const url = `${base}${chatPath}`;
   const tokenParam: TokenParamState = { pinned: opts.tokenLimitParam, learned: null };
+  const paramCompat: ParamCompatState = {
+    recovery: opts.unsupportedParamRecovery ?? 'auto',
+    stripTemperature: false,
+    toolsReasoningEffortNone: false,
+  };
 
   const provider: Provider = {
     name: opts.providerName,
@@ -185,6 +210,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
         opts,
         url,
         tokenParam,
+        paramCompat,
         applyOpenAIShapedPreflight(req, capabilities),
       );
     },
@@ -193,6 +219,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
         opts,
         url,
         tokenParam,
+        paramCompat,
         applyOpenAIShapedPreflight(req, capabilities),
       );
     },
@@ -263,10 +290,120 @@ function learnTokenParamRemap(opts: OpenAIShapedOptions, state: TokenParamState)
   );
 }
 
+/**
+ * Per-provider-instance memory for model parameter compatibility
+ * (deep-retest-0.13.9 P1). Current OpenAI reasoning models (GPT-5
+ * family, o-series) reject any non-default `temperature` with HTTP
+ * 400, and reject function tools on `/v1/chat/completions` unless
+ * `reasoning_effort` is explicitly `'none'` - the server applies a
+ * model-side default; the adapter itself never sends the field
+ * unprompted. Each recovery fires only when `recovery` is `'auto'`,
+ * at most once per instance, and only when the caller did not pin
+ * the field via `providerOptions` (an explicit override keeps
+ * failing loudly).
+ */
+interface ParamCompatState {
+  readonly recovery: UnsupportedParamRecovery;
+  stripTemperature: boolean;
+  toolsReasoningEffortNone: boolean;
+}
+
+function shouldStripTemperature(
+  state: ParamCompatState,
+  err: unknown,
+  req: ProviderRequest,
+): boolean {
+  if (state.recovery === 'off' || state.stripTemperature) return false;
+  if (req.temperature === undefined || req.providerOptions?.temperature !== undefined) {
+    return false;
+  }
+  if (!(err instanceof ProviderHttpError) || err.status !== 400) return false;
+  // Both live OpenAI spellings: "Unsupported value: 'temperature' does
+  // not support 0 with this model." and "Unsupported parameter:
+  // 'temperature' is not supported with this model."
+  return (
+    err.message.includes("'temperature'") &&
+    (err.message.includes('does not support') || err.message.includes('nsupported'))
+  );
+}
+
+function learnStripTemperature(opts: OpenAIShapedOptions, state: ParamCompatState): void {
+  state.stripTemperature = true;
+  const log = opts.logger ?? defaultLogger;
+  log(
+    'warn',
+    `[${opts.providerName}] server rejected 'temperature' for model '${opts.model}' (HTTP 400); ` +
+      `re-sending without it and omitting the parameter for this provider instance ` +
+      `(set unsupportedParamRecovery: 'off' to fail loudly instead)`,
+  );
+}
+
+function shouldForceReasoningEffortNone(
+  state: ParamCompatState,
+  err: unknown,
+  req: ProviderRequest,
+): boolean {
+  if (state.recovery === 'off' || state.toolsReasoningEffortNone) return false;
+  if (req.tools === undefined || req.tools.length === 0) return false;
+  if (req.providerOptions?.reasoning_effort !== undefined) return false;
+  return (
+    err instanceof ProviderHttpError &&
+    err.status === 400 &&
+    err.message.includes('reasoning_effort')
+  );
+}
+
+function learnReasoningEffortNone(opts: OpenAIShapedOptions, state: ParamCompatState): void {
+  state.toolsReasoningEffortNone = true;
+  const log = opts.logger ?? defaultLogger;
+  log(
+    'warn',
+    `[${opts.providerName}] server requires reasoning_effort 'none' for function tools on this ` +
+      `endpoint (HTTP 400); re-sending with reasoning_effort: 'none' and keeping it for this ` +
+      `instance's tool requests (set unsupportedParamRecovery: 'off' to fail loudly instead)`,
+  );
+}
+
+/**
+ * Sends the chat request, applying each learned-parameter recovery at
+ * most once. Bounded: every recoverable 400 class flips instance
+ * state on its first firing and its predicate refuses thereafter, so
+ * the loop iterates at most once per class plus the final attempt.
+ */
+async function callChatWithRecovery(
+  opts: OpenAIShapedOptions,
+  url: string,
+  tokenState: TokenParamState,
+  compat: ParamCompatState,
+  req: ProviderRequest,
+  stream: boolean,
+): Promise<Response> {
+  for (;;) {
+    try {
+      return await callChatHttp(opts, url, effectiveTokenParam(tokenState), compat, req, stream);
+    } catch (err) {
+      if (shouldRemapTokenParam(tokenState, err, req)) {
+        learnTokenParamRemap(opts, tokenState);
+        continue;
+      }
+      if (shouldStripTemperature(compat, err, req)) {
+        learnStripTemperature(opts, compat);
+        continue;
+      }
+      if (shouldForceReasoningEffortNone(compat, err, req)) {
+        learnReasoningEffortNone(opts, compat);
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 function callChatHttp(
   opts: OpenAIShapedOptions,
   url: string,
   tokenParam: TokenLimitParam,
+  compat: ParamCompatState,
   req: ProviderRequest,
   stream: boolean,
 ): Promise<Response> {
@@ -277,6 +414,7 @@ function callChatHttp(
     opts.capabilities?.structuredOutput ?? true,
     conversionOptionsFor(opts),
     tokenParam,
+    compat,
   );
   return callJsonHttp({
     providerName: opts.providerName,
@@ -293,16 +431,10 @@ async function* streamOpenAIShaped(
   opts: OpenAIShapedOptions,
   url: string,
   state: TokenParamState,
+  compat: ParamCompatState,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  let resp: Response;
-  try {
-    resp = await callChatHttp(opts, url, effectiveTokenParam(state), req, true);
-  } catch (err) {
-    if (!shouldRemapTokenParam(state, err, req)) throw err;
-    learnTokenParamRemap(opts, state);
-    resp = await callChatHttp(opts, url, 'max_completion_tokens', req, true);
-  }
+  const resp = await callChatWithRecovery(opts, url, state, compat, req, true);
 
   yield makeStreamStartEvent({ providerName: opts.providerName, modelId: opts.model });
 
@@ -407,16 +539,10 @@ async function generateOpenAIShaped(
   opts: OpenAIShapedOptions,
   url: string,
   state: TokenParamState,
+  compat: ParamCompatState,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  let resp: Response;
-  try {
-    resp = await callChatHttp(opts, url, effectiveTokenParam(state), req, false);
-  } catch (err) {
-    if (!shouldRemapTokenParam(state, err, req)) throw err;
-    learnTokenParamRemap(opts, state);
-    resp = await callChatHttp(opts, url, 'max_completion_tokens', req, false);
-  }
+  const resp = await callChatWithRecovery(opts, url, state, compat, req, false);
   let json: OpenAIChunk;
   try {
     json = (await resp.json()) as OpenAIChunk;
@@ -459,6 +585,7 @@ function buildBody(
   structuredOutput: boolean,
   conversion: ChatMessageConversionOptions,
   tokenParam: TokenLimitParam,
+  compat: ParamCompatState,
 ): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
@@ -478,7 +605,13 @@ function buildBody(
     // servers that reject the field.
     body.stream_options = { include_usage: true };
   }
-  if (req.temperature !== undefined) body.temperature = req.temperature;
+  // deep-retest-0.13.9 P1: once the instance has learned (via HTTP
+  // 400) that the model only accepts default sampling, the field is
+  // omitted rather than mechanically replaced with 1 - the caller's
+  // determinism intent cannot be honored, so nothing is sent.
+  if (req.temperature !== undefined && !compat.stripTemperature) {
+    body.temperature = req.temperature;
+  }
   if (req.maxTokens !== undefined) body[tokenParam] = req.maxTokens;
   if (req.tools !== undefined && req.tools.length > 0) {
     // C2: fold worked examples in the adapter itself (idempotent when an
@@ -519,6 +652,16 @@ function buildBody(
   }
   if (req.providerOptions !== undefined) {
     Object.assign(body, req.providerOptions);
+  }
+  // deep-retest-0.13.9 P1: applied after the providerOptions merge so
+  // an explicit caller reasoning_effort always wins over the learned
+  // tool-contract recovery.
+  if (
+    compat.toolsReasoningEffortNone &&
+    body.tools !== undefined &&
+    body.reasoning_effort === undefined
+  ) {
+    body.reasoning_effort = 'none';
   }
   return body;
 }

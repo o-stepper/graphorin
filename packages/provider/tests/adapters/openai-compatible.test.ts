@@ -618,6 +618,263 @@ describe('deep-retest-0.13.6 P2-2 - completion-token wire parameter', () => {
   });
 });
 
+describe('deep-retest-0.13.9 P1 - unsupported-parameter recovery', () => {
+  const OK_JSON = JSON.stringify({
+    choices: [{ message: { content: 'ok' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+  });
+  const REJECT_TEMPERATURE = JSON.stringify({
+    error: {
+      message:
+        "Unsupported value: 'temperature' does not support 0 with this model. " +
+        'Only the default (1) value is supported.',
+      type: 'invalid_request_error',
+      param: 'temperature',
+      code: 'unsupported_value',
+    },
+  });
+  const REJECT_TOOLS_REASONING = JSON.stringify({
+    error: {
+      message:
+        'Function tools with reasoning_effort are not supported for gpt-5.6-luna in ' +
+        "/v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.",
+      type: 'invalid_request_error',
+      param: null,
+      code: 'unsupported_parameter',
+    },
+  });
+  const TOOLS = [
+    {
+      name: 'add_numbers',
+      description: 'Add two numbers',
+      inputSchema: { type: 'object', properties: { a: { type: 'number' } } },
+    },
+  ];
+
+  function makeSequencedFetch(
+    responses: ReadonlyArray<() => Response>,
+    calls: Array<{ url: string; body: Record<string, unknown> }>,
+  ): typeof fetch {
+    return (async (input: unknown, init?: RequestInit): Promise<Response> => {
+      calls.push({
+        url: String(input),
+        body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+      });
+      const next = responses[Math.min(calls.length - 1, responses.length - 1)];
+      if (next === undefined) throw new Error('sequenced fetch exhausted');
+      return next();
+    }) as typeof fetch;
+  }
+
+  it('generate(): a 400 rejecting temperature is retried once without it, then learned', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () => new Response(REJECT_TEMPERATURE, { status: 400 }),
+          () => new Response(OK_JSON, { status: 200 }),
+          () => new Response(OK_JSON, { status: 200 }),
+        ],
+        calls,
+      ),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const first = await provider.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      temperature: 0,
+    });
+    expect(first.text).toBe('ok');
+    expect(calls).toHaveLength(2);
+    expect(calls[0]?.body.temperature).toBe(0);
+    expect('temperature' in (calls[1]?.body ?? {})).toBe(false);
+    expect(warns.some((w) => w.includes("'temperature'"))).toBe(true);
+
+    // The instance remembers: later requests skip the doomed attempt.
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }], temperature: 0 });
+    expect(calls).toHaveLength(3);
+    expect('temperature' in (calls[2]?.body ?? {})).toBe(false);
+  });
+
+  it('stream(): the alternate "Unsupported parameter" spelling also recovers', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'o1',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () =>
+            new Response(
+              JSON.stringify({
+                error: {
+                  message: "Unsupported parameter: 'temperature' is not supported with this model.",
+                  type: 'invalid_request_error',
+                },
+              }),
+              { status: 400 },
+            ),
+          () =>
+            new Response(
+              makeSseStream([
+                { choices: [{ delta: { content: 'ok' } }] },
+                { choices: [{ finish_reason: 'stop' }] },
+                '[DONE]',
+              ]),
+              { status: 200 },
+            ),
+        ],
+        calls,
+      ),
+      logger: () => {},
+    });
+    const events = await collect(
+      provider.stream({ messages: [{ role: 'user', content: 'hi' }], temperature: 0 }),
+    );
+    expect(calls).toHaveLength(2);
+    expect('temperature' in (calls[1]?.body ?? {})).toBe(false);
+    expect(events.at(-1)?.type).toBe('finish');
+  });
+
+  it('a tools 400 naming reasoning_effort retries with reasoning_effort none, scoped to tool requests', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () => new Response(REJECT_TOOLS_REASONING, { status: 400 }),
+          () => new Response(OK_JSON, { status: 200 }),
+          () => new Response(OK_JSON, { status: 200 }),
+          () => new Response(OK_JSON, { status: 200 }),
+        ],
+        calls,
+      ),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    const first = await provider.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      tools: TOOLS,
+    });
+    expect(first.text).toBe('ok');
+    expect(calls).toHaveLength(2);
+    expect('reasoning_effort' in (calls[0]?.body ?? {})).toBe(false);
+    expect(calls[1]?.body.reasoning_effort).toBe('none');
+    expect(warns.some((w) => w.includes('reasoning_effort'))).toBe(true);
+
+    // Learned - but only for requests that actually carry tools.
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }], tools: TOOLS });
+    expect(calls[2]?.body.reasoning_effort).toBe('none');
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }] });
+    expect('reasoning_effort' in (calls[3]?.body ?? {})).toBe(false);
+  });
+
+  it('an explicit providerOptions.temperature disables the recovery - the 400 propagates', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [() => new Response(REJECT_TEMPERATURE, { status: 400 })],
+        calls,
+      ),
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({
+        messages: [{ role: 'user', content: 'hi' }],
+        temperature: 0,
+        providerOptions: { temperature: 0 },
+      }),
+    ).rejects.toThrow(/temperature/);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('an explicit providerOptions.reasoning_effort disables that recovery too', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [() => new Response(REJECT_TOOLS_REASONING, { status: 400 })],
+        calls,
+      ),
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: TOOLS,
+        providerOptions: { reasoning_effort: 'low' },
+      }),
+    ).rejects.toThrow(/reasoning_effort/);
+    expect(calls).toHaveLength(1);
+  });
+
+  it("unsupportedParamRecovery: 'off' restores fail-loud passthrough", async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      unsupportedParamRecovery: 'off',
+      fetchImpl: makeSequencedFetch(
+        [() => new Response(REJECT_TEMPERATURE, { status: 400 })],
+        calls,
+      ),
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({
+        messages: [{ role: 'user', content: 'hi' }],
+        temperature: 0,
+      }),
+    ).rejects.toThrow(/temperature/);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('chained recovery: token-param 400 then temperature 400 both learn in one call', async () => {
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-5.6-luna',
+      baseUrl: 'http://127.0.0.1:1234/v1',
+      fetchImpl: makeSequencedFetch(
+        [
+          () =>
+            new Response(
+              JSON.stringify({
+                error: {
+                  message:
+                    "Unsupported parameter: 'max_tokens' is not supported with this model. " +
+                    "Use 'max_completion_tokens' instead.",
+                },
+              }),
+              { status: 400 },
+            ),
+          () => new Response(REJECT_TEMPERATURE, { status: 400 }),
+          () => new Response(OK_JSON, { status: 200 }),
+        ],
+        calls,
+      ),
+      logger: () => {},
+    });
+    const out = await provider.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      temperature: 0,
+      maxTokens: 64,
+    });
+    expect(out.text).toBe('ok');
+    expect(calls).toHaveLength(3);
+    expect(calls[2]?.body.max_completion_tokens).toBe(64);
+    expect('temperature' in (calls[2]?.body ?? {})).toBe(false);
+  });
+});
+
 describe('W-095 - multimodal image passing', () => {
   const IMG = new Uint8Array([1, 2, 3]);
   const RESPONSE = {
