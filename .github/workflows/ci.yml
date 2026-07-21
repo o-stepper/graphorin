@@ -141,6 +141,13 @@ jobs:
       - name: Character rules gate
         run: pnpm run check-character-rules
 
+      # deep-retest-0.13.9 P2: docs links on the landing domain
+      # (graphorin.com/guide|api|reference) are guaranteed live 404s -
+      # the site is docs.graphorin.com and the offline lychee gate
+      # cannot see external URLs. Shipped twice before this gate.
+      - name: Docs-domain link gate
+        run: pnpm run check-doc-links
+
       # Deep retest 2026-07-19 P1-1: the `file://${process.argv[1]}`
       # entrypoint idiom silently no-ops in checkouts whose path contains
       # a space (12 runners + 2 doc gates shipped it). Static sweep here;

@@ -34,3 +34,9 @@ policy table, one error type.
 ### TokenLimitParam
 
 Re-exports [TokenLimitParam](/api/@graphorin/provider/type-aliases/TokenLimitParam.md)
+
+***
+
+### UnsupportedParamRecovery
+
+Re-exports [UnsupportedParamRecovery](/api/@graphorin/provider/type-aliases/UnsupportedParamRecovery.md)

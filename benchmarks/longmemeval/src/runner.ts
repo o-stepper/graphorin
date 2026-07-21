@@ -190,6 +190,21 @@ export function preflightUnpricedModels(providers: ReadonlyArray<Provider>): Rea
 }
 
 /**
+ * Deep-retest 0.13.9 P2: the report stamps must union the preflight
+ * knowledge with the ceiling's observations. The ceiling's set fills
+ * only when a usage response arrives, so a run that fails before the
+ * first response would otherwise stamp `costPricingMatched: true` for
+ * a model the preflight already knew it cannot price. Keep in sync
+ * with the HaluMem twin.
+ */
+export function combineUnpricedModels(
+  preflight: ReadonlyArray<string>,
+  observed: ReadonlyArray<string>,
+): ReadonlyArray<string> {
+  return [...new Set([...preflight, ...observed])];
+}
+
+/**
  * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default - and any
  * `stub` name - is the deterministic offline stub, labelled
  * `stub (plumbing-only)` so a plumbing run can never be mistaken for a real
@@ -1142,6 +1157,7 @@ export async function main(): Promise<void> {
   const judgeLabel = judgeResolved?.label ?? label;
   // D1 (W-084): one shared ceiling caps the run's TOTAL spend (SUT + judge).
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
+  let preflightUnpriced: ReadonlyArray<string> = [];
   let sutProvider = provider;
   if (args.maxCostUsd !== undefined) {
     // Deep-retest 0.13.8 P1: fail closed BEFORE the first request when the
@@ -1151,6 +1167,7 @@ export async function main(): Promise<void> {
       provider,
       ...(judgeResolved !== undefined ? [judgeResolved.provider] : []),
     ]);
+    preflightUnpriced = unpriced;
     if (unpriced.length > 0 && !args.allowUnpricedModel) {
       console.error(
         `[benchmark-longmemeval] --max-cost-usd cannot observe spend for: ${unpriced.join(', ')} ` +
@@ -1216,10 +1233,14 @@ export async function main(): Promise<void> {
   }
   // Deep-retest 0.13.7 P3: the run's actual spend was tracked but never
   // reported - it could only be reconstructed from the billing console.
+  // Deep-retest 0.13.9 P2: stamps below use the preflight/observed
+  // union so a fail-before-usage run cannot claim pricing matched.
+  const allUnpriced =
+    ceiling !== undefined ? combineUnpricedModels(preflightUnpriced, ceiling.unpricedModels()) : [];
   if (ceiling !== undefined) {
-    if (ceiling.unpricedModels().length > 0) {
+    if (allUnpriced.length > 0) {
       console.warn(
-        `[benchmark-longmemeval] no snapshot price for: ${ceiling.unpricedModels().join(', ')} - ` +
+        `[benchmark-longmemeval] no snapshot price for: ${allUnpriced.join(', ')} - ` +
           'observed cost under-counts their usage (costPricingMatched=false in benchConfig).',
       );
     }
@@ -1258,10 +1279,8 @@ export async function main(): Promise<void> {
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),
-          costPricingMatched: ceiling.unpricedModels().length === 0,
-          ...(ceiling.unpricedModels().length > 0
-            ? { unpricedModels: ceiling.unpricedModels() }
-            : {}),
+          costPricingMatched: allUnpriced.length === 0,
+          ...(allUnpriced.length > 0 ? { unpricedModels: allUnpriced } : {}),
         }
       : {}),
   };
@@ -1284,7 +1303,7 @@ export async function main(): Promise<void> {
       ? {
           observedCostUsd: ceiling.observedCostUsd(),
           maxCostUsd: args.maxCostUsd,
-          unpricedModels: ceiling.unpricedModels(),
+          unpricedModels: allUnpriced,
         }
       : {}),
   });

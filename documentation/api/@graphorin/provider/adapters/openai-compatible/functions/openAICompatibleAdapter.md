@@ -10,7 +10,7 @@
 function openAICompatibleAdapter(options): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/openai-compatible.ts:93
+Defined in: packages/provider/src/adapters/openai-compatible.ts:109
 
 **`Stable`**
 

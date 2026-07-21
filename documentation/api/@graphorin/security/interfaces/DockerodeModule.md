@@ -6,7 +6,7 @@
 
 # Interface: DockerodeModule
 
-Defined in: packages/security/src/sandbox/docker.ts:75
+Defined in: packages/security/src/sandbox/docker.ts:89
 
 **`Stable`**
 
@@ -17,4 +17,4 @@ Structural view of the `dockerode` module returned by
 
 | Property | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | (`opts?`) => [`DockerodeClient`](/api/@graphorin/security/interfaces/DockerodeClient.md) | packages/security/src/sandbox/docker.ts:76 |
+| <a id="property-default"></a> `default?` | (`opts?`) => [`DockerodeClient`](/api/@graphorin/security/interfaces/DockerodeClient.md) | packages/security/src/sandbox/docker.ts:90 |

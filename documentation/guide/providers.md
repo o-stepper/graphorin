@@ -250,10 +250,11 @@ const provider = createProvider(
 
 Both base-URL conventions work: a bare origin (`http://127.0.0.1:1234`) gets the classic `/v1/chat/completions` default path, while a base that already ends in `/v1` (the `api.openai.com/v1` / LM Studio / vLLM convention, as above) gets `/chat/completions` appended - either way the request reaches the server's single real endpoint instead of a `/v1/v1/...` 404. An explicit `chatPath` always wins verbatim for exotic layouts.
 
-Two knobs matter when pointing this adapter at current cloud models:
+Three knobs matter when pointing this adapter at current cloud models:
 
 - `tokenLimitParam: 'max_completion_tokens'` pins the wire name for `maxTokens` - current OpenAI models reject the classic `max_tokens` with HTTP 400. Left unset, the adapter reacts to that exact 400 by re-sending the request once with the remapped name and remembers the switch for the provider instance, so eval CLIs work against the GPT-5.6 family without extra flags.
-- Extra body fields (for example `reasoning_effort: 'none'` on reasoning models) pass through per request via `providerOptions`, which is merged onto the wire body last.
+- `unsupportedParamRecovery` (default `'auto'`) covers the other two GPT-5.6-class 400s the same way. Current OpenAI reasoning models accept only the default sampling: a 400 rejecting `temperature` re-sends the request without the field (the caller's determinism intent cannot be honored, so nothing is substituted) and omits it for the instance's lifetime - this is what keeps the memory pipeline, the LLM judge, and the LLM reranker (all of which pin `temperature: 0`) working against such models. A 400 requiring `reasoning_effort: 'none'` for function tools on chat completions re-sends with it, scoped to tool-carrying requests. Each recovery WARNs once; set `'off'` to surface the original errors, and note the Responses route via `vercelAdapter(openai.responses(...))` needs none of this.
+- Extra body fields (for example `reasoning_effort: 'low'` on reasoning models) pass through per request via `providerOptions`, which is merged onto the wire body last. An explicit `providerOptions` value for `temperature` or `reasoning_effort` disables that field's auto-recovery, so explicit overrides keep failing loudly.
 
 ### `llama.cpp` HTTP server
 
