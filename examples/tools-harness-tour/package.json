@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-tools-harness-tour",
-  "version": "0.13.8",
+  "version": "0.13.9",
   "private": true,
   "description": "Tools-harness tour for the Graphorin framework: MCP client against an in-process server, skills loader, defer-loading + tool_search, one code-mode call, and spill + read_result paging - fully offline on deterministic stubs. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

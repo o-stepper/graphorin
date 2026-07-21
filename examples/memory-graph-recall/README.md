@@ -215,4 +215,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.13.8 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.13.9 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

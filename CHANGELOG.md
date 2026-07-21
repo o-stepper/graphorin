@@ -14,6 +14,62 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.9 - 2026-07-21
+
+The **pricing-honesty + supply-chain-audit patch** (PR #235):
+remediation of the tenth external deep retest, which re-audited the
+released 0.13.8 - it confirmed all four 0.13.7 fixes live on the
+published packages (real `op` CLI, real OpenAI API, the memory-scorer
+A/B measuring as designed) and found a P1 pricing-alias gap that
+partially defeated `--max-cost-usd`, plus a high `npm audit` advisory
+visible only in the PUBLISHED dependency graph. No breaking changes.
+
+### Pricing - official aliases, both date formats, `-latest` (`@graphorin/pricing`)
+
+- `priceLookupByModel({ modelId: 'gpt-4o-mini' })` returned `null`:
+  the bundled snapshot retained only dated legacy rows, and the lookup
+  only stripped compact date suffixes. The snapshot now carries
+  explicit alias rows for `gpt-4o`, `gpt-4o-mini`, `o1`, and `o3-mini`
+  at their verified routing targets' rates (official per-model pages,
+  2026-07-20), plus input-billed `text-embedding-3-small` /
+  `text-embedding-3-large` entries. There is deliberately NO blind
+  undated-to-dated reverse strip - an alias may route to any
+  snapshot - and an alias/dated price-equality invariant is pinned by
+  test.
+- The date-suffix fallback now recognises the dashed OpenAI form
+  (`gpt-4.1-mini-2025-04-14`) alongside compact Anthropic dates, and
+  `<family>-latest` resolves to the family's dateless entry (or its
+  single retained dated snapshot; two candidates stay `null` rather
+  than guessing which one "latest" bills as).
+
+### Benchmark harnesses - the cost cap fails closed
+
+- With `--max-cost-usd` set, the HaluMem and LongMemEval runners now
+  resolve pricing for the subject AND judge before the first request
+  and abort when any model is unpriced (the agent-level
+  `RunBudget.onUnpriced: 'fail'` precedent) - previously an unpriced
+  model contributed $0 to the shared accumulator, silently making the
+  cap porous. The new `--allow-unpriced-model` flag accepts
+  under-counted spend explicitly and is stamped into `benchConfig`.
+
+### Supply chain - auditing what consumers actually install
+
+- New `published-peer-audit` job (consumer-smoke workflow, weekly +
+  on demand): a fresh isolated `npm install` of every published
+  package, with `npm audit --omit=dev` high/critical findings gated
+  against the reviewed allowlist in
+  `.github/published-peer-audit-allowlist.json`. Unlisted advisories
+  fail the job, and so does an allowlisted advisory that stops
+  appearing, so accepted advisories and their documented mitigations
+  cannot go stale. Rationale: the workspace lockfile applies pnpm
+  overrides that npm consumers never inherit, so workspace-side
+  scanners are structurally blind to the published graph.
+- The known `adm-zip` advisory under the transformers.js
+  embedder/reranker chains is documented in the security guide's new
+  "Published dependency-graph advisories" section together with the
+  VERIFIED one-line consumer override (`adm-zip ^0.6.0`); the exposure
+  itself is install-script-only.
+
 ## 0.13.8 - 2026-07-20
 
 The **1Password + eval-honesty patch** (PR #233): remediation of the

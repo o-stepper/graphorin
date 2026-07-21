@@ -52,6 +52,33 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.8 -> 0.13.9
+
+A patch release; nothing to migrate. Behavioural refinements worth
+noting:
+
+- **Cost numbers appear where they used to be null.** The bundled
+  pricing snapshot now prices the official undated OpenAI aliases
+  (`gpt-4o-mini`, `gpt-4o`, `o1`, `o3-mini`), the OpenAI embedding
+  models, dashed date suffixes (`gpt-4.1-mini-2025-04-14`), and
+  `<family>-latest` ids. Cost tracking that previously reported `null`
+  (with a WARN) for those ids now reports real USD amounts, and bench
+  reports stamp `costPricingMatched: true` for them.
+- **Benchmark cost caps fail closed.** With `--max-cost-usd` set, the
+  HaluMem/LongMemEval runners resolve pricing for the subject and the
+  judge BEFORE the first request and abort when any model has no
+  snapshot entry, instead of running with a silently porous ceiling.
+  Pass `--allow-unpriced-model` to restore the old
+  proceed-with-under-counted-spend behaviour (stamped
+  `allowUnpricedModel: true` in `benchConfig`).
+- **Fresh installs of the transformers.js adapters and `npm audit`.**
+  The embedder/reranker peer graphs currently inherit one high
+  `adm-zip` advisory through `onnxruntime-node` (install-script-only
+  exposure). The security guide's new "Published dependency-graph
+  advisories" section documents the verified one-line consumer
+  override (`adm-zip ^0.6.0`), and a weekly CI job now audits every
+  published package graph against a reviewed allowlist.
+
 ### 0.13.7 -> 0.13.8
 
 A patch release; nothing to migrate. Behavioural refinements worth

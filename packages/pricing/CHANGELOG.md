@@ -1,5 +1,14 @@
 # @graphorin/pricing
 
+## 0.13.9
+
+### Patch Changes
+
+- [#235](https://github.com/o-stepper/graphorin/pull/235) [`d7f335e`](https://github.com/o-stepper/graphorin/commit/d7f335e55e0cbc9cc81e064aae9130f8f559d689) Thanks [@o-stepper](https://github.com/o-stepper)! - Price the official undated OpenAI aliases and `-latest` ids (tenth deep retest P1). The bundled snapshot gains explicit rows for `gpt-4o`, `gpt-4o-mini`, `o1`, and `o3-mini` at their verified routing targets' rates plus input-billed `text-embedding-3-small`/`text-embedding-3-large` entries; `lookupPrice`/`priceLookupByModel` now strip dashed OpenAI date suffixes (`-2025-04-14`) alongside compact Anthropic ones and resolve `<family>-latest` to the family's dateless entry (or its single retained dated snapshot - two candidates stay null rather than guessing). Previously `priceLookupByModel({ modelId: 'gpt-4o-mini' })` returned `null`, so bench cost ceilings silently could not observe spend for one of the most common judge models.
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.9
+
 ## 0.13.8
 
 ### Patch Changes
