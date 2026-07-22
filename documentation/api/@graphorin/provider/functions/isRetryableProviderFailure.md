@@ -21,7 +21,7 @@ Decision order:
 
 1. Non-object throws are never retryable.
 2. An aborted request is never retryable, even when it surfaces as
-   a `status: 0` network error (PS-2). The retry loop also
+   a `status: 0` network error. The retry loop also
    short-circuits on `req.signal?.aborted`, but the predicate must
    exclude abort independently so an internally-aborted call is not
    retried.

@@ -102,7 +102,7 @@ export interface LlamaCppNodeAdapterOptions {
    * `generate` route through the same streaming path, so the scope is
    * identical for both. On expiry the stream surfaces an in-band
    * `error` event with kind `'transient'` and a
-   * `request timed out ...` message (this adapter's PS-4 error
+   * `request timed out ...` message (this adapter's errors-as-events
    * idiom); `generate()` re-throws it as
    * `ProviderHttpError{ status: 0 }`, the retryable shape
    * `withRetry` / `withFallback` recognise. A caller abort via
