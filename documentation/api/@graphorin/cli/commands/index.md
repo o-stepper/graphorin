@@ -624,6 +624,12 @@ Re-exports [runSecretsRef](/api/@graphorin/cli/functions/runSecretsRef.md)
 
 ***
 
+### runSecretsRekey
+
+Re-exports [runSecretsRekey](/api/@graphorin/cli/functions/runSecretsRekey.md)
+
+***
+
 ### runSecretsRotate
 
 Re-exports [runSecretsRotate](/api/@graphorin/cli/functions/runSecretsRotate.md)
@@ -861,6 +867,12 @@ Re-exports [SecretsRefOptions](/api/@graphorin/cli/interfaces/SecretsRefOptions.
 ### SecretsRefResult
 
 Re-exports [SecretsRefResult](/api/@graphorin/cli/interfaces/SecretsRefResult.md)
+
+***
+
+### SecretsRekeyOptions
+
+Re-exports [SecretsRekeyOptions](/api/@graphorin/cli/interfaces/SecretsRekeyOptions.md)
 
 ***
 

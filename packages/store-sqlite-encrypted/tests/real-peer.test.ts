@@ -10,7 +10,8 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { encryptDatabase } from '../src/encrypt.js';
+import { backupEncryptedDatabase } from '../src/backup.js';
+import { EncryptSwapLiveWriterError, encryptDatabase } from '../src/encrypt.js';
 import { rekeyDatabase } from '../src/rekey.js';
 
 async function peerAvailable(): Promise<boolean> {
@@ -184,4 +185,102 @@ describe.skipIf(!available)('W-064 - encrypted parity: incremental auto-vacuum',
     expect(Number(conn.pragma('auto_vacuum', { simple: true }))).toBe(2);
     conn.close();
   });
+});
+
+describe.skipIf(!available)('backupEncryptedDatabase - stopped-server byte copy', () => {
+  it('backs up an encrypted store, the copy opens with the key, and a live holder is refused', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-real-encbk-'));
+    const plainPath = join(dir, 'data.db');
+    const { createSqliteStore } = await import('@graphorin/store-sqlite');
+    const plain = await createSqliteStore({ path: plainPath, skipSqliteVec: true });
+    await plain.init();
+    await plain.memory.semantic.remember({
+      id: 'fact-bk-1',
+      kind: 'semantic',
+      userId: 'u1',
+      sensitivity: 'internal',
+      text: 'the backup survives the volume wipe',
+      createdAt: new Date().toISOString(),
+    } as never);
+    await plain.close();
+
+    const encPath = join(dir, 'data.enc.db');
+    await encryptDatabase({
+      sourcePath: plainPath,
+      targetPath: encPath,
+      passphrase: 'bk-pass',
+    });
+
+    // The driver's page-level backup() is exactly what CANNOT work on
+    // an encrypted database - this regression probe keeps the reason
+    // for the byte-copy path honest. If the driver ever learns keyed
+    // backups, this expectation flips and the byte-copy path can go.
+    const mod = (await import('better-sqlite3-multiple-ciphers')) as {
+      default: new (
+        path: string,
+      ) => {
+        pragma(sql: string): unknown;
+        backup(dest: string): Promise<unknown>;
+        close(): void;
+      };
+    };
+    const rawKeyed = new mod.default(encPath);
+    rawKeyed.pragma("cipher = 'sqlcipher'");
+    rawKeyed.pragma('legacy = 4');
+    rawKeyed.pragma("key = 'bk-pass'");
+    await expect(rawKeyed.backup(join(dir, 'naive.db'))).rejects.toThrow(/not supported/);
+    rawKeyed.close();
+
+    const destPath = join(dir, 'backup.db');
+    const result = await backupEncryptedDatabase({
+      sourcePath: encPath,
+      destPath,
+      passphrase: 'bk-pass',
+    });
+    expect(result.integrityCheck.ok).toBe(true);
+
+    // The copy opens with the same key and the data is there.
+    const restored = await createSqliteStore({
+      path: destPath,
+      skipSqliteVec: true,
+      encryption: {
+        enabled: true,
+        cipher: 'sqlcipher',
+        passphraseResolver: async () => 'bk-pass',
+      },
+    });
+    await restored.init();
+    const hits = await restored.memory.semantic.search(
+      { userId: 'u1' },
+      { query: 'backup survives', topK: 5 },
+    );
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0]?.record.id).toBe('fact-bk-1');
+    await restored.close();
+
+    // A live holder must be refused (whichever guard layer fires, the
+    // shared live-writer class surfaces).
+    const { createEncryptedConnection } = await import('../src/connection.js');
+    const holder = await createEncryptedConnection({
+      path: encPath,
+      skipSqliteVec: true,
+      encryption: {
+        enabled: true,
+        cipher: 'sqlcipher',
+        passphraseResolver: async () => 'bk-pass',
+      },
+    });
+    holder.pragma('user_version');
+    try {
+      await expect(
+        backupEncryptedDatabase({
+          sourcePath: encPath,
+          destPath: join(dir, 'backup2.db'),
+          passphrase: 'bk-pass',
+        }),
+      ).rejects.toBeInstanceOf(EncryptSwapLiveWriterError);
+    } finally {
+      holder.close();
+    }
+  }, 90_000);
 });

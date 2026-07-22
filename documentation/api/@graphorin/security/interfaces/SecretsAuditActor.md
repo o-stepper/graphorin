@@ -6,7 +6,7 @@
 
 # Interface: SecretsAuditActor
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:39
+Defined in: packages/security/src/secrets/audit-emitter.ts:40
 
 **`Stable`**
 
@@ -18,8 +18,8 @@ factory caller supplied.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:41 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"cli"` \| `"agent"` \| `"tool"` \| `"system"` \| `"subagent"` | packages/security/src/secrets/audit-emitter.ts:40 |
-| <a id="property-runid"></a> `runId?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:43 |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:44 |
-| <a id="property-toolname"></a> `toolName?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:42 |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:42 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"cli"` \| `"agent"` \| `"tool"` \| `"system"` \| `"subagent"` | packages/security/src/secrets/audit-emitter.ts:41 |
+| <a id="property-runid"></a> `runId?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:44 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:45 |
+| <a id="property-toolname"></a> `toolName?` | `readonly` | `string` | packages/security/src/secrets/audit-emitter.ts:43 |

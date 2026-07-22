@@ -6,7 +6,7 @@
 
 # Class: CassetteFormatInvalidError
 
-Defined in: packages/sessions/src/errors/index.ts:149
+Defined in: packages/sessions/src/errors/index.ts:154
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ Thrown when the cassette JSONL stream does not begin with a
 new CassetteFormatInvalidError(reason): CassetteFormatInvalidError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:150
+Defined in: packages/sessions/src/errors/index.ts:155
 
 #### Parameters
 

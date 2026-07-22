@@ -6,7 +6,7 @@
 
 # Class: RunStateMalformedError
 
-Defined in: packages/agent/src/errors/index.ts:229
+Defined in: packages/agent/src/errors/index.ts:234
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ shape-match the documented `SerializedRunState`.
 new RunStateMalformedError(reason): RunStateMalformedError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:230
+Defined in: packages/agent/src/errors/index.ts:235
 
 #### Parameters
 

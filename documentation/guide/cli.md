@@ -156,6 +156,7 @@ graphorin secrets get <key> --reveal           # audited reveal
 graphorin secrets set <key> --from-stdin       # never accepts plaintext on argv
 graphorin secrets set <key> --value <v>
 graphorin secrets rotate <key> --new-value <v>
+graphorin secrets rekey --new-passphrase-from <ref>  # re-encrypt the encrypted-file bundle under a new passphrase
 graphorin secrets delete <key>
 graphorin secrets ref <uri>                    # test resolution of a SecretRef URI
 ```
@@ -204,7 +205,7 @@ OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free 
 
 ```bash
 graphorin storage status
-graphorin storage backup ./backups/data.db.bak      # online backup (page-level backup API)
+graphorin storage backup ./backups/data.db.bak      # plaintext: online page-level copy; encrypted: stopped-server byte copy
 graphorin storage cleanup-backups
 graphorin storage compact
 graphorin storage compact --batch-pages 200 --json
@@ -212,7 +213,7 @@ graphorin storage encrypt --passphrase-from file:./pass --swap
 graphorin storage rekey --old-passphrase-from file:./old --new-passphrase-from file:./new
 ```
 
-`backup`, `encrypt`, and `rekey` are documented in depth on their own pages rather than here: [Storage](/guide/storage) covers the backup API and the encryption lifecycle, [Persistence](/guide/persistence) the file layout, [Deployment](/guide/deployment) the operational recipes, and [Migration](/guide/migration) the schema side. In one line each: `storage backup` snapshots the live database through the SQLite online-backup API; `storage encrypt --swap` converts a plaintext database to an encrypted one and refuses while a live writer holds the file; `storage rekey` rewraps the encryption key and fails fast with `database is locked` if the server is still running. `encrypt` and `rekey` exit with code `2` unless the optional `@graphorin/store-sqlite-encrypted` sub-pack is installed.
+`backup`, `encrypt`, and `rekey` are documented in depth on their own pages rather than here: [Storage](/guide/storage) covers the backup API and the encryption lifecycle, [Persistence](/guide/persistence) the file layout, [Deployment](/guide/deployment) the operational recipes, and [Migration](/guide/migration) the schema side. In one line each: `storage backup` snapshots a plaintext database online through the SQLite page-level backup API, and takes a stopped-server byte copy of an encrypted one (refusing with a live-writer error while the server runs); `storage encrypt --swap` converts a plaintext database to an encrypted one and refuses while a live writer holds the file; `storage rekey` rewraps the encryption key and fails fast with `database is locked` if the server is still running. `encrypt`, `rekey`, and `backup`-on-an-encrypted-store exit with code `2` unless the optional `@graphorin/store-sqlite-encrypted` sub-pack is installed.
 
 `compact` returns pruned pages to the OS: it runs `PRAGMA wal_checkpoint(TRUNCATE)` and then batched `PRAGMA incremental_vacuum` - the rowid-safe compaction path (unlike `VACUUM`, which is forbidden because it corrupts the FTS5 rowid mappings). It requires a database created with `auto_vacuum=2`; every database created from this version on qualifies, including encrypted ones. On an older database the command reports the high-water-mark limitation honestly and exits `0` without modifying the file - see [the storage guide](/guide/storage) for the recreation path. `--batch-pages <n>` bounds each vacuum bite (default 1000) so a huge freelist never holds the writer lock long.
 

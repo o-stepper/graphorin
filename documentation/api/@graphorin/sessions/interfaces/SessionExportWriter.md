@@ -6,7 +6,7 @@
 
 # Interface: SessionExportWriter
 
-Defined in: packages/sessions/src/export/writer.ts:88
+Defined in: packages/sessions/src/export/writer.ts:89
 
 **`Stable`**
 
@@ -24,7 +24,7 @@ caller-supplied `sink`.
 close(): Promise<SessionExportFooterRecord>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:92
+Defined in: packages/sessions/src/export/writer.ts:93
 
 Emit the footer + any opt-in `--hash` body checksum. Idempotent.
 
@@ -40,7 +40,7 @@ Emit the footer + any opt-in `--hash` body checksum. Idempotent.
 writeRecord(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:90
+Defined in: packages/sessions/src/export/writer.ts:91
 
 Write a single body record. The header is emitted lazily.
 

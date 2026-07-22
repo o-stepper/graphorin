@@ -10,15 +10,25 @@
 function runStorageBackup(options): Promise<StorageBackupResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:157
+Defined in: packages/cli/src/commands/storage.ts:169
 
 **`Stable`**
 
-Online backup via the driver's page-level `backup()` API -
-consistent under a live writer (the daemon can keep running),
-preserves rowids so FTS5 external-content mappings survive, and for
-an encrypted store produces an equally-encrypted copy (same key).
-This is the ONLY supported SQL-level backup: `VACUUM INTO`
+Backup with two honest modes, selected by the config's
+`storage.encryption.enabled`:
+
+- **Plaintext store**: online backup via the driver's page-level
+  `backup()` API - consistent under a live writer (the daemon can
+  keep running) and preserves rowids so FTS5 external-content
+  mappings survive.
+- **Encrypted store**: a consistent stopped-server byte copy
+  (checkpoint, prove no live holder, copy, verify the copy's
+  cipher integrity). The driver's page-level API cannot key either
+  side of the transfer, so an online encrypted backup is not
+  possible; a live server makes this command fail with a clear
+  live-writer error instead of shipping a torn copy.
+
+Either way this is the ONLY supported backup: `VACUUM INTO`
 renumbers rowids and corrupts the FTS mapping on restore.
 
 ## Parameters

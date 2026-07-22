@@ -10,7 +10,7 @@
 function createSessionExportWriter(sink, options): SessionExportWriter;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:112
+Defined in: packages/sessions/src/export/writer.ts:113
 
 **`Stable`**
 

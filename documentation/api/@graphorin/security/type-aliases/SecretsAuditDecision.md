@@ -10,7 +10,7 @@
 type SecretsAuditDecision = "success" | "denied" | "not-found" | "error";
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:30
+Defined in: packages/security/src/secrets/audit-emitter.ts:31
 
 **`Stable`**
 

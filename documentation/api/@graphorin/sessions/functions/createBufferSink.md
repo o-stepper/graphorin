@@ -14,7 +14,7 @@ function createBufferSink(): {
 };
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:227
+Defined in: packages/sessions/src/export/writer.ts:228
 
 **`Stable`**
 
@@ -33,6 +33,6 @@ by tests + the simple in-memory export path.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `lines` | `string`[] | packages/sessions/src/export/writer.ts:229 |
-| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | packages/sessions/src/export/writer.ts:228 |
-| `toString()` | () => `string` | packages/sessions/src/export/writer.ts:230 |
+| `lines` | `string`[] | packages/sessions/src/export/writer.ts:230 |
+| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | packages/sessions/src/export/writer.ts:229 |
+| `toString()` | () => `string` | packages/sessions/src/export/writer.ts:231 |

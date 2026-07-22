@@ -37,8 +37,13 @@ export type SessionErrorCode =
  */
 export class SessionError extends Error {
   readonly code: SessionErrorCode;
-  constructor(code: SessionErrorCode, message: string, name = 'SessionError') {
-    super(message);
+  constructor(
+    code: SessionErrorCode,
+    message: string,
+    name = 'SessionError',
+    opts: { readonly cause?: unknown } = {},
+  ) {
+    super(message, opts.cause !== undefined ? { cause: opts.cause } : undefined);
     this.name = name;
     this.code = code;
   }

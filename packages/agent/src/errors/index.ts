@@ -41,8 +41,13 @@ export type AgentRuntimeErrorCode =
  */
 export class AgentRuntimeError extends Error {
   readonly code: AgentRuntimeErrorCode;
-  constructor(code: AgentRuntimeErrorCode, message: string, name = 'AgentRuntimeError') {
-    super(message);
+  constructor(
+    code: AgentRuntimeErrorCode,
+    message: string,
+    name = 'AgentRuntimeError',
+    opts: { readonly cause?: unknown } = {},
+  ) {
+    super(message, opts.cause !== undefined ? { cause: opts.cause } : undefined);
     this.name = name;
     this.code = code;
   }

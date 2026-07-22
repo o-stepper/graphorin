@@ -14,6 +14,7 @@ import {
   namespaceFor,
   sleepUntil,
   TimerDriverStoreUnsupportedError,
+  WorkflowError,
 } from '../src/index.js';
 
 const WAKE_AT = Date.parse('2030-01-01T00:00:00.000Z');
@@ -235,9 +236,21 @@ describe('W-032 - createTimerDriver', () => {
       list: store.list.bind(store),
       deleteThread: store.deleteThread.bind(store),
     };
-    expect(() =>
-      createTimerDriver({ workflows: [{ workflow: wf, checkpointStore: bareStore as never }] }),
-    ).toThrow(TimerDriverStoreUnsupportedError);
+    const make = () =>
+      createTimerDriver({ workflows: [{ workflow: wf, checkpointStore: bareStore as never }] });
+    expect(make).toThrow(TimerDriverStoreUnsupportedError);
+    // The error participates in the package's typed hierarchy: catch
+    // sites filtering on WorkflowError + code must see it.
+    let thrown: unknown;
+    try {
+      make();
+    } catch (err) {
+      thrown = err;
+    }
+    expect(thrown).toBeInstanceOf(WorkflowError);
+    expect((thrown as TimerDriverStoreUnsupportedError).code).toBe(
+      'timer-driver-store-unsupported',
+    );
   });
 
   it('the full event stream of a driver-resumed thread stays well-formed', async () => {

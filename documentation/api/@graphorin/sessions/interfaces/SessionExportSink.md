@@ -6,7 +6,7 @@
 
 # Interface: SessionExportSink
 
-Defined in: packages/sessions/src/export/writer.ts:103
+Defined in: packages/sessions/src/export/writer.ts:104
 
 **`Stable`**
 
@@ -23,7 +23,7 @@ sink built on `node:stream`.
 write(line): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:104
+Defined in: packages/sessions/src/export/writer.ts:105
 
 #### Parameters
 

@@ -10,7 +10,7 @@
 function createTimerDriver(options): TimerDriver;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:112
+Defined in: packages/workflow/src/timer-driver.ts:114
 
 **`Stable`**
 

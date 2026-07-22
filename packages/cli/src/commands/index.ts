@@ -127,6 +127,7 @@ export {
   runSecretsGet,
   runSecretsList,
   runSecretsRef,
+  runSecretsRekey,
   runSecretsRotate,
   runSecretsSet,
   type SecretsCommonOptions,
@@ -136,6 +137,7 @@ export {
   type SecretsListOptions,
   type SecretsRefOptions,
   type SecretsRefResult,
+  type SecretsRekeyOptions,
   type SecretsRotateOptions,
   type SecretsSetOptions,
 } from './secrets.js';

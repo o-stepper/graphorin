@@ -6,7 +6,7 @@
 
 # Class: SessionExportFormatInvalidError
 
-Defined in: packages/sessions/src/errors/index.ts:165
+Defined in: packages/sessions/src/errors/index.ts:170
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ begin with the expected `kind: 'meta'` sentinel header.
 new SessionExportFormatInvalidError(reason): SessionExportFormatInvalidError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:166
+Defined in: packages/sessions/src/errors/index.ts:171
 
 #### Parameters
 

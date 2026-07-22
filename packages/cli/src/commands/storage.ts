@@ -142,14 +142,26 @@ export interface StorageBackupResult {
   readonly source: string;
   readonly dest: string;
   readonly sizeBytes?: number;
+  /** Present when the store is encrypted (stopped-server byte-copy path). */
+  readonly encrypted?: true;
 }
 
 /**
- * Online backup via the driver's page-level `backup()` API -
- * consistent under a live writer (the daemon can keep running),
- * preserves rowids so FTS5 external-content mappings survive, and for
- * an encrypted store produces an equally-encrypted copy (same key).
- * This is the ONLY supported SQL-level backup: `VACUUM INTO`
+ * Backup with two honest modes, selected by the config's
+ * `storage.encryption.enabled`:
+ *
+ * - **Plaintext store**: online backup via the driver's page-level
+ *   `backup()` API - consistent under a live writer (the daemon can
+ *   keep running) and preserves rowids so FTS5 external-content
+ *   mappings survive.
+ * - **Encrypted store**: a consistent stopped-server byte copy
+ *   (checkpoint, prove no live holder, copy, verify the copy's
+ *   cipher integrity). The driver's page-level API cannot key either
+ *   side of the transfer, so an online encrypted backup is not
+ *   possible; a live server makes this command fail with a clear
+ *   live-writer error instead of shipping a torn copy.
+ *
+ * Either way this is the ONLY supported backup: `VACUUM INTO`
  * renumbers rowids and corrupts the FTS mapping on restore.
  *
  * @stable
@@ -157,7 +169,6 @@ export interface StorageBackupResult {
 export async function runStorageBackup(
   options: StorageBackupOptions,
 ): Promise<StorageBackupResult> {
-  const { openStoreContext } = await import('../internal/store-context.js');
   const dest = isAbsolute(options.dest) ? options.dest : resolve(process.cwd(), options.dest);
   const destStat = await statSafely(dest);
   if (destStat.exists && options.overwrite !== true) {
@@ -165,6 +176,64 @@ export async function runStorageBackup(
       `[graphorin/cli] backup destination already exists: ${dest}. Pass --overwrite to replace it.`,
     );
   }
+  const loaded = await loadConfig(options.config);
+  const config = parseServerConfig(loaded.config);
+
+  if (config.storage.encryption.enabled) {
+    // Encrypted path: never open the store (that would make US the
+    // live writer the guard refuses on) - hand the file to the
+    // sub-pack's stopped-server backup routine.
+    const subpack = await loadEncryptedSubpack();
+    if (subpack === null || typeof subpack.backupEncryptedDatabase !== 'function') {
+      return failUnsupported(
+        options,
+        `'graphorin storage backup' on an encrypted store requires the optional sub-pack '@graphorin/store-sqlite-encrypted' (with backupEncryptedDatabase support) and the cipher peer 'better-sqlite3-multiple-ciphers'.`,
+        'Install (or upgrade) @graphorin/store-sqlite-encrypted to the same version as the CLI before running this command.',
+      );
+    }
+    if (config.storage.encryption.passphraseRef === undefined) {
+      throw new Error(
+        '[graphorin/cli] storage.encryption.enabled is true but no passphraseRef is configured.',
+      );
+    }
+    const source = resolveStoragePath(config.storage.path);
+    if (source === dest) {
+      throw new Error('[graphorin/cli] backup destination must differ from the store path.');
+    }
+    const passphrase = await resolvePassphraseRef(config.storage.encryption.passphraseRef);
+    try {
+      await passphrase.use((raw) =>
+        subpack.backupEncryptedDatabase?.({
+          sourcePath: source,
+          destPath: dest,
+          passphrase: raw,
+          ...(config.storage.encryption.cipher !== undefined
+            ? { cipher: config.storage.encryption.cipher }
+            : {}),
+        }),
+      );
+    } finally {
+      passphrase.dispose();
+    }
+    // S-14b: mirror the source file mode on the copy.
+    const sourceStat = await stat(source);
+    await chmod(dest, sourceStat.mode & 0o777);
+    const written = await statSafely(dest);
+    const out: StorageBackupResult = Object.freeze({
+      source,
+      dest,
+      ...(written.size !== undefined ? { sizeBytes: written.size } : {}),
+      encrypted: true,
+    });
+    emitReport(options, out, () => {
+      const print = options.print ?? defaultPrintSink;
+      print(brand('storage backup (encrypted store, stopped-server byte copy)'));
+      print(`  ${statusMarker('ok')} ${out.source} -> ${out.dest} (${formatSize(out.sizeBytes)})`);
+    });
+    return out;
+  }
+
+  const { openStoreContext } = await import('../internal/store-context.js');
   const ctx = await openStoreContext({
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
@@ -594,6 +663,21 @@ interface EncryptedSubpack {
   }>;
   rekeyDatabase(args: { path: string; oldPassphrase: string; newPassphrase: string }): Promise<{
     path: string;
+    cipher: string;
+    integrityCheck: { ok: boolean; rows: ReadonlyArray<string> };
+  }>;
+  /**
+   * Optional: absent when an older sub-pack version is installed next
+   * to a newer CLI - the backup command reports UNSUPPORTED then.
+   */
+  backupEncryptedDatabase?(args: {
+    sourcePath: string;
+    destPath: string;
+    passphrase: string;
+    cipher?: string;
+  }): Promise<{
+    sourcePath: string;
+    destPath: string;
     cipher: string;
     integrityCheck: { ok: boolean; rows: ReadonlyArray<string> };
   }>;

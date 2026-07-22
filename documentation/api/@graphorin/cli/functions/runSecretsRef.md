@@ -10,7 +10,7 @@
 function runSecretsRef(options): Promise<SecretsRefResult>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:213
+Defined in: packages/cli/src/commands/secrets.ts:216
 
 **`Stable`**
 

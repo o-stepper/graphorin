@@ -6,7 +6,7 @@
 
 # Class: ReplayAccessDeniedError
 
-Defined in: packages/sessions/src/errors/index.ts:53
+Defined in: packages/sessions/src/errors/index.ts:58
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ scope set does not include `traces:read:raw`.
 new ReplayAccessDeniedError(target): ReplayAccessDeniedError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:54
+Defined in: packages/sessions/src/errors/index.ts:59
 
 #### Parameters
 

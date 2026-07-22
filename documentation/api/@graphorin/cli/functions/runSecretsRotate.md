@@ -12,7 +12,7 @@ function runSecretsRotate(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:275
+Defined in: packages/cli/src/commands/secrets.ts:278
 
 **`Stable`**
 

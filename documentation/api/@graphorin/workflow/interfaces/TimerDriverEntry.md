@@ -6,7 +6,7 @@
 
 # Interface: TimerDriverEntry
 
-Defined in: packages/workflow/src/timer-driver.ts:31
+Defined in: packages/workflow/src/timer-driver.ts:32
 
 One workflow the driver polls, paired with its checkpoint store.
 
@@ -14,5 +14,5 @@ One workflow the driver polls, paired with its checkpoint store.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-checkpointstore"></a> `checkpointStore` | `readonly` | [`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md) | packages/workflow/src/timer-driver.ts:33 |
-| <a id="property-workflow"></a> `workflow` | `readonly` | [`TickableWorkflow`](/api/@graphorin/workflow/interfaces/TickableWorkflow.md) | packages/workflow/src/timer-driver.ts:32 |
+| <a id="property-checkpointstore"></a> `checkpointStore` | `readonly` | [`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md) | packages/workflow/src/timer-driver.ts:34 |
+| <a id="property-workflow"></a> `workflow` | `readonly` | [`TickableWorkflow`](/api/@graphorin/workflow/interfaces/TickableWorkflow.md) | packages/workflow/src/timer-driver.ts:33 |

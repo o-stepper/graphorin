@@ -6,7 +6,7 @@
 
 # Class: EvaluatorOptimizerConfigError
 
-Defined in: packages/agent/src/errors/index.ts:95
+Defined in: packages/agent/src/errors/index.ts:100
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ rather than failing on the first run.
 new EvaluatorOptimizerConfigError(reason): EvaluatorOptimizerConfigError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:96
+Defined in: packages/agent/src/errors/index.ts:101
 
 #### Parameters
 

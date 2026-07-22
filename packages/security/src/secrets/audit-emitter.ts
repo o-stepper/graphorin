@@ -20,6 +20,7 @@ export type SecretsAuditAction =
   | 'secret:set'
   | 'secret:delete'
   | 'secret:list'
+  | 'secret:rekey'
   | 'secrets:downgrade';
 
 /**

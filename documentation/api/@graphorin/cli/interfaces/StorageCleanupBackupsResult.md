@@ -6,7 +6,7 @@
 
 # Interface: StorageCleanupBackupsResult
 
-Defined in: packages/cli/src/commands/storage.ts:466
+Defined in: packages/cli/src/commands/storage.ts:535
 
 **`Stable`**
 
@@ -14,6 +14,6 @@ Defined in: packages/cli/src/commands/storage.ts:466
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/storage.ts:467 |
-| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:469 |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/storage.ts:468 |
+| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/storage.ts:536 |
+| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:538 |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/storage.ts:537 |

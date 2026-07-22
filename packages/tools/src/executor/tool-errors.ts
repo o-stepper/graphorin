@@ -13,6 +13,8 @@
  * @packageDocumentation
  */
 
+import { GraphorinToolsError } from '../errors/index.js';
+
 /**
  * Throw from a tool's `execute(...)` when the upstream service rate-limits
  * the call. The executor maps it to the `'rate_limited'` ToolErrorKind and
@@ -21,12 +23,12 @@
  *
  * @stable
  */
-export class ToolRateLimitError extends Error {
+export class ToolRateLimitError extends GraphorinToolsError {
   /** Milliseconds the caller should wait before retrying, when known. */
   readonly retryAfterMs?: number;
 
   constructor(message: string, options?: { readonly retryAfterMs?: number }) {
-    super(message);
+    super('rate-limited', message);
     this.name = 'ToolRateLimitError';
     if (options?.retryAfterMs !== undefined) {
       this.retryAfterMs = options.retryAfterMs;

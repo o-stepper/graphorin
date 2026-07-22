@@ -6,7 +6,7 @@
 
 # Class: ProviderMiddlewareOrderError
 
-Defined in: packages/agent/src/errors/index.ts:372
+Defined in: packages/agent/src/errors/index.ts:377
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ ordering (DEC-145 / ADR-039).
 new ProviderMiddlewareOrderError(reason): ProviderMiddlewareOrderError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:373
+Defined in: packages/agent/src/errors/index.ts:378
 
 #### Parameters
 

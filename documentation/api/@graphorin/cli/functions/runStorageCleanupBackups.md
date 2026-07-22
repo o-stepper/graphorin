@@ -10,7 +10,7 @@
 function runStorageCleanupBackups(options?): Promise<StorageCleanupBackupsResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:479
+Defined in: packages/cli/src/commands/storage.ts:548
 
 **`Stable`**
 

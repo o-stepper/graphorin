@@ -34,11 +34,13 @@ jobs:
       - name: CLI smoke (entrypoint + symlinked binary)
         run: docker run --rm graphorin:smoke --version
 
-      # deep-retest-0.13.11: the image carries the full builder tree
-      # (documented size/devDependency trade-off), so publish an SBOM of
-      # what actually ships - scanners and consumers audit the artifact
-      # instead of guessing from the npm graph. Binary pinned by version
-      # AND sha256 (osv-scanner precedent in security.yml).
+      # deep-retest-0.13.11: publish an SBOM of what actually ships -
+      # scanners and consumers audit the artifact instead of guessing
+      # from the npm graph. Binary pinned by version AND sha256
+      # (osv-scanner precedent in security.yml). Floor calibrated for
+      # the pruned production-closure image (~88 dpkg + ~51 npm
+      # store entries measured on 0.14.0): it guards against a
+      # catastrophically empty scan, not against normal size drift.
       - name: Generate image SBOM (syft, pinned)
         run: |
           set -euo pipefail
@@ -50,7 +52,7 @@ jobs:
           node -e "
             const sbom = require(process.env.RUNNER_TEMP + '/graphorin-image.spdx.json');
             const n = (sbom.packages ?? []).length;
-            if (n < 100) { console.error('SBOM suspiciously small: ' + n + ' packages'); process.exit(1); }
+            if (n < 60) { console.error('SBOM suspiciously small: ' + n + ' packages'); process.exit(1); }
             console.log('SBOM OK: ' + n + ' packages catalogued');
           "
 
@@ -131,13 +133,78 @@ jobs:
           echo "::error::/v1/health did not become ready within 45s"
           exit 1
 
+      # operations.md runbook drill: prove backup -> destroy -> restore
+      # end-to-end on the exact shipped artifact. Data proof = an auth
+      # token minted BEFORE the backup must verify (via `token list`)
+      # AFTER the original volume is destroyed and a fresh volume is
+      # seeded from nothing but the backup file - tokens live in the
+      # main store, so a hollow restore cannot pass. The raw token is
+      # discarded (never logged). The shipped config enables the
+      # ENCRYPTED store, so the backup is the stopped-server byte-copy
+      # mode: stop the server first, then back up via a one-shot
+      # helper container on the same volume. No `docker cp`: the
+      # backup lands on the data volume and moves between volumes via
+      # a helper container (docker cp cannot see tmpfs mounts).
+      - name: Backup/restore runbook drill (data survives a volume wipe)
+        run: |
+          set -euo pipefail
+          docker exec graphorin-smoke graphorin token create \
+            --scopes agent:run --label smoke-drill --config /etc/graphorin/config.json > /dev/null
+          docker exec graphorin-smoke graphorin token list \
+            --config /etc/graphorin/config.json --json | grep -q 'smoke-drill'
+          # Encrypted store => stopped-server backup (runbook order).
+          docker stop graphorin-smoke
+          docker run --rm \
+            -v graphorin-data:/data \
+            -v "${GITHUB_WORKSPACE}/examples/docker/config.example.json:/etc/graphorin/config.json:ro" \
+            -v "${RUNNER_TEMP}/gsecrets:/run/secrets/graphorin:ro" \
+            graphorin:smoke storage backup /data/drill-backup.db --config /etc/graphorin/config.json
+          docker rm -f graphorin-smoke
+          # Seed a FRESH volume with only the backup file (runbook step:
+          # restore the file as storage.path with tight permissions; a
+          # fresh volume has no stale -wal/-shm sidecars by
+          # construction), then destroy the original volume entirely.
+          docker volume create graphorin-data-restored
+          docker run --rm --entrypoint sh \
+            -v graphorin-data:/old:ro \
+            -v graphorin-data-restored:/data \
+            graphorin:smoke -c 'cp /old/drill-backup.db /data/data.db && chmod 0600 /data/data.db'
+          docker volume rm graphorin-data
+          # Reboot with the same recipe against the restored volume.
+          docker run -d --name graphorin-smoke \
+            --read-only --tmpfs /tmp \
+            --security-opt no-new-privileges \
+            --cap-drop=ALL \
+            -v graphorin-data-restored:/data \
+            -v "${GITHUB_WORKSPACE}/examples/docker/config.example.json:/etc/graphorin/config.json:ro" \
+            -v "${RUNNER_TEMP}/gsecrets:/run/secrets/graphorin:ro" \
+            -p 8080:8080 \
+            graphorin:smoke
+          for i in $(seq 1 45); do
+            if curl -fsS http://localhost:8080/v1/health >/dev/null 2>&1; then
+              echo "restored server healthy after ${i}s"
+              break
+            fi
+            if [ "$i" = "45" ]; then
+              echo "::error::restored server did not become ready within 45s"
+              exit 1
+            fi
+            sleep 1
+          done
+          # The token minted before the backup must still be there.
+          docker exec graphorin-smoke graphorin token list \
+            --config /etc/graphorin/config.json --json | grep -q 'smoke-drill'
+          echo "backup/restore drill OK: pre-backup token survived the volume wipe"
+
       - name: Container logs (on failure)
         if: failure()
         run: docker logs graphorin-smoke || true
 
       - name: Teardown
         if: always()
-        run: docker rm -f graphorin-smoke || true
+        run: |
+          docker rm -f graphorin-smoke || true
+          docker volume rm -f graphorin-data graphorin-data-restored || true
 
   # E3: a red weekly run must not die silently in the Actions tab - this is
   # the exact CI-11 regression class this workflow exists to catch.

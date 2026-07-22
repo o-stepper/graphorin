@@ -6,7 +6,7 @@
 
 # Interface: SecretsRefResult
 
-Defined in: packages/cli/src/commands/secrets.ts:198
+Defined in: packages/cli/src/commands/secrets.ts:201
 
 **`Stable`**
 
@@ -14,8 +14,8 @@ Defined in: packages/cli/src/commands/secrets.ts:198
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-length"></a> `length?` | `readonly` | `number` | packages/cli/src/commands/secrets.ts:202 |
-| <a id="property-resolved"></a> `resolved` | `readonly` | `boolean` | packages/cli/src/commands/secrets.ts:201 |
-| <a id="property-scheme"></a> `scheme` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:200 |
-| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:199 |
-| <a id="property-value"></a> `value?` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:203 |
+| <a id="property-length"></a> `length?` | `readonly` | `number` | packages/cli/src/commands/secrets.ts:205 |
+| <a id="property-resolved"></a> `resolved` | `readonly` | `boolean` | packages/cli/src/commands/secrets.ts:204 |
+| <a id="property-scheme"></a> `scheme` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:203 |
+| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:202 |
+| <a id="property-value"></a> `value?` | `readonly` | `string` | packages/cli/src/commands/secrets.ts:206 |
