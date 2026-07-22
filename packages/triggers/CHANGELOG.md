@@ -1,5 +1,12 @@
 # @graphorin/triggers
 
+## 0.15.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.15.0
+
 ## 0.14.0
 
 ### Patch Changes

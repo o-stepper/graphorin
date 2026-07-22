@@ -1,5 +1,17 @@
 # @graphorin/evals
 
+## 0.15.0
+
+### Minor Changes
+
+- [#249](https://github.com/o-stepper/graphorin/pull/249) [`f28d394`](https://github.com/o-stepper/graphorin/commit/f28d3947598c71c43dd0a3f5327fbe0f277ced3a) Thanks [@o-stepper](https://github.com/o-stepper)! - Benchmark evidence and honest uncertainty. The markdown and terminal reporters now render the Wilson 95% CI (and `pass^k` under repeats) the runner always computes, so a small-n run can never read as a confident result; the LLM judge persists its raw reply as `metadata.judgeText` beside the parsed score. The benchmark runners (private packages) additionally stamp `datasetPath` + `datasetSha256` and structured `subjectSpec`/`judgeSpec` model identities into `benchConfig`, generalize `--think` to effort levels, add `--num-ctx`, and bring the HaluMem runner to knob parity (`--think`, `--timeout-ms`).
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.15.0
+  - @graphorin/observability@0.15.0
+
 ## 0.14.0
 
 ### Patch Changes

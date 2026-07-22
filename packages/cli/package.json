@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/cli",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Operator CLI for the Graphorin framework. The `graphorin` binary covers the standalone server and the local stores end to end: `start`, `init`, `migrate`, `doctor`, `token`, `secrets`, `storage`, `audit`, `memory`, `consolidator`, `triggers`, `auth`, `pricing`, `skills`, `traces`, `guard`, `telemetry`, `tools`, and `migrate-export`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -1,5 +1,21 @@
 # @graphorin/server
 
+## 0.15.0
+
+### Minor Changes
+
+- [#249](https://github.com/o-stepper/graphorin/pull/249) [`f28d394`](https://github.com/o-stepper/graphorin/commit/f28d3947598c71c43dd0a3f5327fbe0f277ced3a) Thanks [@o-stepper](https://github.com/o-stepper)! - `POST /v1/agents/:id/run` now answers `409` with `error: 'agent-busy'` when the target agent instance already has a run in flight (the mapping `POST /v1/runs/:runId/resume` always had), instead of `500 run-failed`. A busy single-flight instance is client-addressable contention - pace, retry, or target another instance from a pool - not a server fault. Found by the new soak leg driving one instance concurrently.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/core@0.15.0
+  - @graphorin/protocol@0.15.0
+  - @graphorin/security@0.15.0
+  - @graphorin/store-sqlite@0.15.0
+  - @graphorin/tools@0.15.0
+  - @graphorin/triggers@0.15.0
+
 ## 0.14.0
 
 ### Patch Changes

@@ -54,6 +54,49 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.14.0 -> 0.15.0
+
+A consolidation minor: no breaking API changes, one wire-contract
+correction worth auditing your client code for.
+
+- **`POST /v1/agents/:id/run` on a busy agent instance now answers
+  `409` with `error: 'agent-busy'`** instead of `500` with
+  `error: 'run-failed'`. An `Agent` instance is single-flight by
+  contract; the resume route always mapped this condition to 409 and
+  the run route now matches it. If a client switched on `run-failed`
+  to detect this case, switch on `agent-busy` (and treat it as
+  contention: retry later or target another instance from a pool).
+  Nothing else about the run route's responses changed.
+- **Provider recovery surface is now exported**: build custom retry
+  loops on `isRetryableProviderFailure(err)` and `readRetryAfterMs(err)`
+  from `@graphorin/provider` - the exact classification `withRetry` and
+  `withFallback` share. `ProviderHttpError` gains an optional
+  `retryAfterMs` field (stamped from a numeric `Retry-After` header).
+  Additive; existing predicates keep working.
+- **Opt-in `timeoutMs` on the two adapters that lacked it**:
+  `vercelAdapter` (bounds time to the first stream chunk, or the whole
+  `generate()` call) and `llamaCppNodeAdapter` (bounds time to the
+  first token, model load included). Both surface expiry as the same
+  retryable `ProviderHttpError{ status: 0 }` the HTTP adapters throw.
+  Unset = previous behavior, no deadline; nothing changes unless you
+  pass the option. The shared primitive is exported as
+  `createRequestTimeout` for custom adapter authors.
+- **Evals reporters now render uncertainty**: the markdown and
+  terminal reporters print the Wilson 95% CI (and `pass^k` under
+  repeats) that `runEvals` always computed, and the LLM judge persists
+  its raw reply as `metadata.judgeText`. If you diff generated reports
+  byte-for-byte, expect the new lines/fields.
+- **New guide surface**: three [golden paths](/guide/golden-path-local)
+  (local agent, production API, safe code execution), an honest
+  [scaling model](/guide/operations#scaling-model) and published
+  [load/soak SLOs](/guide/operations#load-and-soak-slos) - the latter
+  enforced weekly in CI alongside a crash-resume drill and per-PR
+  validation of the k8s/systemd deployment templates.
+- **systemd template fix**: if you copied `examples/systemd/graphorin.service`,
+  re-copy or move `StartLimitIntervalSec`/`StartLimitBurst` from
+  `[Service]` to `[Unit]` - systemd silently ignores them in
+  `[Service]`, so the intended restart rate-limit was not applied.
+
 ### 0.13.13 -> 0.14.0
 
 A minor with new operational primitives, one behavior fix and small
