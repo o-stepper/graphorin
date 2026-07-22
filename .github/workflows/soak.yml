@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       seconds:
-        description: 'Load duration in seconds'
+        description: 'Load duration in seconds (3600 = the published long-soak envelope)'
         required: false
         default: '300'
       concurrency:
@@ -36,7 +36,8 @@ jobs:
   soak:
     name: soak /v1/agents run path
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # Room for the 1-hour dispatch envelope (build ~8 min + soak + teardown).
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0

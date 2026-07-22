@@ -42,8 +42,8 @@
  */
 
 import { realpathSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { readdir, readFile } from 'node:fs/promises';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -155,6 +155,22 @@ export function parseCommandTree(src) {
         prev.requiredFlags.push(...requiredFlags);
         if (takesArgs) prev.takesArgs = true;
       }
+    }
+  }
+  // Shared-helper pattern (`const commonOpts = (cmd) => cmd.option(...)`
+  // between a group's .command('<group>') and its first subcommand):
+  // the textual attribution above lands those options on the GROUP
+  // command, while commander-wise the helper applies them to every
+  // subcommand. Mirror that by folding group-level options into each
+  // subcommand's set - the widened corpus sweep flagged
+  // `secrets rekey --secrets-source` as drift exactly because of this.
+  for (const [group, subs] of groups) {
+    const groupMeta = commandMeta.get(group);
+    if (groupMeta === undefined) continue;
+    for (const sub of subs) {
+      const meta = commandMeta.get(`${group} ${sub}`);
+      if (meta === undefined) continue;
+      for (const f of groupMeta.options) meta.options.add(f);
     }
   }
   return { topLevel, groups, commandMeta, globalOptions };
@@ -347,6 +363,32 @@ async function run() {
   const documented = parseDocumentedCommands(md);
   const invocations = parseBashInvocations(md);
   const violations = [...diffCommands(tree, documented), ...diffInvocations(tree, invocations)];
+  // 1.0 residue ("автоматически проверять все команды из README"): the
+  // invocation-level checks (names + flags + positionals inside bash
+  // fences) sweep the WHOLE user-facing corpus, not just cli.md -
+  // README and every guide page drift the same way. The documented-
+  // reference and reverse passes stay cli.md-scoped: only the CLI
+  // guide owes completeness.
+  const extraDocs = [
+    join(ROOT, 'README.md'),
+    ...(await readdir(join(ROOT, 'documentation/guide')))
+      .filter((f) => f.endsWith('.md') && f !== 'cli.md')
+      .sort()
+      .map((f) => join(ROOT, 'documentation/guide', f)),
+  ];
+  let extraInvocations = 0;
+  for (const path of extraDocs) {
+    let text;
+    try {
+      text = await readFile(path, 'utf8');
+    } catch {
+      continue;
+    }
+    const extra = parseBashInvocations(text);
+    extraInvocations += extra.length;
+    const rel = relative(ROOT, path);
+    for (const v of diffInvocations(tree, extra)) violations.push(`${rel}: ${v}`);
+  }
   for (const v of violations) console.error(`✗ ${v}`);
   const missing = undocumentedCommands(tree, documented);
   const { hard, soft } = partitionUndocumented(missing, KNOWN_UNDOCUMENTED);
@@ -359,7 +401,7 @@ async function run() {
     );
   }
   console.log(
-    `[check-cli-docs] checked ${documented.length} documented reference(s) + ${invocations.length} bash invocation(s) against ${tree.topLevel.size} real commands; ${violations.length} drift(s), ${hard.length} undocumented (fail), ${soft.length} allowlisted (warn).`,
+    `[check-cli-docs] checked ${documented.length} documented reference(s) + ${invocations.length} cli.md bash invocation(s) + ${extraInvocations} invocation(s) across README + guide pages against ${tree.topLevel.size} real commands; ${violations.length} drift(s), ${hard.length} undocumented (fail), ${soft.length} allowlisted (warn).`,
   );
   process.exit(violations.length > 0 || hard.length > 0 ? 1 : 0);
 }
@@ -382,6 +424,11 @@ function registerAuthCommands(program) {
 function registerLifecycleCommands(program) {
   program.command('start').option('-c, --config <path>', 'config file');
   program.command('migrate-export <input>').requiredOption('-o, --out <file>', 'output path');
+}
+function registerSecretsCommands(program) {
+  const s = program.command('secrets');
+  const commonOpts = (cmd) => cmd.option('--secrets-source <kind>', 'source');
+  commonOpts(s.command('list'));
 }
 `;
   const tree = parseCommandTree(src);
@@ -409,6 +456,18 @@ function registerLifecycleCommands(program) {
       label: 'real flag passes',
       md: '```bash\ngraphorin auth login --server https://x --device-flow\n```',
       want: 0,
+    },
+    {
+      // The `const commonOpts = (cmd) => cmd.option(...)` idiom: the
+      // group-level fold must credit the shared flag to the sub.
+      label: 'group-helper common flag passes on the sub',
+      md: '```bash\ngraphorin secrets list --secrets-source env\n```',
+      want: 0,
+    },
+    {
+      label: 'unknown flag on a sub still fails',
+      md: '```bash\ngraphorin secrets list --nope\n```',
+      want: 1,
     },
     {
       label: 'fake flag fails',

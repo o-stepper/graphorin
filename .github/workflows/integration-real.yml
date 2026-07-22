@@ -274,8 +274,133 @@ jobs:
             | length == 1
           ' packages/secret-1password/op-vitest.json
 
+  # 1.0 criterion 6, local half: a REPRODUCIBLE quality baseline for a
+  # local provider path. Pinned Ollama runtime (same checksum-verified
+  # artifact as ollama-doctor), pinned model tag, content-hashed
+  # committed dataset, stamped subject/judge specs - every axis a
+  # future run needs to reproduce the numbers is in the report itself.
+  # HONESTY CONTRACT: quality numbers are PUBLISHED (step summary +
+  # artifact), not gated - n=3 with a 0.6b model is a reproducibility
+  # baseline, not a quality claim (and it is stamped selfJudged: the
+  # subject grades itself, labelled as such). What DOES gate:
+  # infrastructure honesty - a provider/judge failure exits non-zero
+  # (INFRASTRUCTURE_FAILED / JUDGE_FAILED escape --gate-on regressions
+  # by design), and the evidence stamps must be present in the report.
+  longmemeval-ollama-baseline:
+    name: LongMemEval local baseline (qwen3:0.6b, published not gated)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the benchmark runner (turbo builds its dependencies)
+        run: pnpm exec turbo run build --filter=@graphorin/benchmark-longmemeval
+
+      - name: Install and start Ollama (pinned artifact, checksum-verified)
+        env:
+          # Same pin discipline as ollama-doctor - bump both together.
+          OLLAMA_VERSION: 0.32.0
+          OLLAMA_SHA256: 56362d7609dfa9e35aaebb7c9cab25605d8f0528ec3d5d585dc83d6642002bab
+        run: |
+          set -euo pipefail
+          curl -fsSL -o /tmp/ollama.tar.zst \
+            "https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/ollama-linux-amd64.tar.zst"
+          echo "${OLLAMA_SHA256}  /tmp/ollama.tar.zst" | sha256sum -c -
+          mkdir -p "${HOME}/ollama-dist"
+          tar --zstd -xf /tmp/ollama.tar.zst -C "${HOME}/ollama-dist"
+          rm /tmp/ollama.tar.zst
+          echo "${HOME}/ollama-dist/bin" >> "${GITHUB_PATH}"
+          export PATH="${HOME}/ollama-dist/bin:${PATH}"
+          ollama --version
+          (nohup ollama serve >/tmp/ollama-serve.log 2>&1 &)
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:11434/api/version >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'Ollama daemon did not become reachable' >&2
+          cat /tmp/ollama-serve.log 2>/dev/null || true
+          exit 1
+
+      - name: Pull and warm the model
+        run: |
+          set -euo pipefail
+          ollama pull qwen3:0.6b
+          warm() { ollama run qwen3:0.6b "Reply with the single word OK."; }
+          if ! warm; then
+            echo 'warm-up failed once; retrying after 5s' >&2
+            sleep 5
+            warm
+          fi
+
+      - name: Run the baseline (full-context, smoke scale, self-judged)
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/ollama-baseline"
+          # --gate-on regressions with NO --baseline: quality misses do
+          # not fail the job; INFRASTRUCTURE_FAILED / JUDGE_FAILED still
+          # force a non-zero exit (0.13.13 contract). full-context mode
+          # keeps the leg embedder-free; think:false keeps the 0.6b
+          # subject from burning its budget on the hidden chain. NO
+          # --judge-provider on purpose: the SUT grades itself and the
+          # report stamps selfJudged (the honest label for a
+          # one-model leg); --allow-self-judge acknowledges it for the
+          # --json write.
+          node benchmarks/longmemeval/dist/runner.js \
+            --provider ollama --model qwen3:0.6b --allow-self-judge \
+            --mode full-context --smoke --think false --timeout-ms 300000 \
+            --gate-on regressions \
+            --results "${RUNNER_TEMP}/ollama-baseline/RESULTS.md" \
+            --json "${RUNNER_TEMP}/ollama-baseline/report.json"
+
+      - name: Assert the evidence stamps and publish the numbers
+        run: |
+          set -euo pipefail
+          R="${RUNNER_TEMP}/ollama-baseline/report.json"
+          jq -e '.benchConfig.datasetSha256 | length == 64' "$R" > /dev/null
+          jq -e '.benchConfig.subjectSpec.model == "qwen3:0.6b"' "$R" > /dev/null
+          jq -e '.benchConfig.selfJudged == true' "$R" > /dev/null
+          jq -e '.summary.passRateCi.lo != null' "$R" > /dev/null
+          echo "evidence stamps OK (datasetSha256, subjectSpec, selfJudged, passRateCi)"
+          {
+            echo "## LongMemEval local baseline (qwen3:0.6b, self-judged, n=$(jq -r '.summary.total' "$R"))"
+            echo ""
+            echo "Reproducibility baseline, NOT a quality claim: pinned runtime + model + hashed dataset."
+            echo ""
+            echo "| Metric | Value |"
+            echo "| --- | --- |"
+            echo "| Pass | $(jq -r '.summary.passed' "$R")/$(jq -r '.summary.total' "$R") (95% CI $(jq -r '(.summary.passRateCi.lo * 100 | floor)' "$R")%-$(jq -r '(.summary.passRateCi.hi * 100 | floor)' "$R")%) |"
+            echo "| Dataset sha256 | \`$(jq -r '.benchConfig.datasetSha256' "$R" | head -c 16)...\` |"
+            echo "| Subject / judge | $(jq -r '.benchConfig.provider' "$R") / $(jq -r '.benchConfig.judge' "$R") (self-judged) |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload the baseline report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: longmemeval-ollama-baseline
+          path: ${{ runner.temp }}/ollama-baseline/
+          retention-days: 90
+
+      - name: Ollama server log (on failure)
+        if: failure()
+        run: tail -n 100 /tmp/ollama-serve.log || true
+
   notify-on-failure:
-    needs: [docker-sandbox, ollama-doctor, onepassword-cli]
+    needs: [docker-sandbox, ollama-doctor, onepassword-cli, longmemeval-ollama-baseline]
     if: failure() && github.event_name == 'schedule'
     permissions:
       issues: write

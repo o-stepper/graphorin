@@ -243,8 +243,20 @@ and leaks, not 10% drift. The driver paces to ~300 requests/second
 (still far above real LLM-bound traffic) rather than hammering at max
 throughput: run-tracker bookkeeping retains terminal records for five
 minutes by design, so memory scales with request RATE, and an unpaced
-stub can push it anywhere. Reference numbers from the leg's local
-validation: ~287 req/s sustained, p95 11 ms, RSS flat around 150 MB.
+stub can push it anywhere.
+
+### Published soak runs
+
+Every run below is a public GitHub Actions run of `soak.yml` on an
+`ubuntu-latest` runner (2 vCPU class), reproducible via
+Actions -> "Server soak (stub provider)" -> Run workflow with the
+listed inputs. The weekly schedule runs the 600 s variant; the 3600 s
+row is the long-soak envelope, re-dispatched after operationally
+significant changes rather than weekly.
+
+| Date | Duration | Concurrency / target rps | Requests (all `200`) | p50 / p95 / p99 | RSS first-quarter -> peak | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-07-22 | 300 s | 8 / 300 | 91,534 | 2.6 / 4.3 / 6.4 ms | 156 -> 225 MB | PASS |
 
 ## What CI proves
 

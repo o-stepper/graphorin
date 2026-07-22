@@ -1,5 +1,5 @@
 {
-  "$comment": "Known advisories in the PUBLISHED dependency graph of @graphorin packages, reviewed and accepted with mitigation. The consumer-smoke published-peer-audit job fails on any high/critical advisory NOT listed here, and ALSO fails when a listed advisory stops appearing (stale entries must be removed together with their docs). Workspace-side scanners (osv-scanner over pnpm-lock.yaml) cannot see these: the workspace lockfile applies pnpm overrides that npm consumers never inherit.",
+  "$comment": "Known advisories in the PUBLISHED dependency graph of @graphorin packages, reviewed and accepted with mitigation. The consumer-smoke published-peer-audit job fails on any high/critical advisory NOT listed here, and ALSO fails when a listed advisory stops appearing (stale entries must be removed together with their docs). Workspace-side scanners (osv-scanner over pnpm-lock.yaml) cannot see these: the workspace lockfile applies pnpm overrides that npm consumers never inherit. Every entry carries an owner and a hard 'expires' date (YYYY-MM-DD): past it the audit FAILS until the entry is deleted (removeWhen met) or re-reviewed and extended.",
   "advisories": [
     {
       "ghsa": "GHSA-xcpc-8h2w-3j85",
@@ -13,7 +13,9 @@
         "overrides": {
           "adm-zip": "^0.6.0"
         }
-      }
+      },
+      "owner": "o-stepper",
+      "expires": "2026-10-20"
     },
     {
       "ghsa": "GHSA-f88m-g3jw-g9cj",
@@ -27,7 +29,9 @@
         "overrides": {
           "sharp": "^0.35.0"
         }
-      }
+      },
+      "owner": "o-stepper",
+      "expires": "2026-10-22"
     }
   ]
 }
