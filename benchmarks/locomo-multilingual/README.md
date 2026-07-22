@@ -13,7 +13,7 @@ Per-locale folders may be added under this directory (for example `ru/`, `es/`, 
 ## Contributing a locale pack
 
 1. Translate the benchmark prompts and expected answers while keeping `expected` as a short substring that must appear in retrieved fact text.
-2. Validate locally: `pnpm install && pnpm --filter @graphorin/benchmark-memory-smoke build && node ./benchmarks/locomo/dist/runner.js --subset <locale>`.
+2. Validate locally: `pnpm install && pnpm --filter @graphorin/benchmark-memory-smoke build && node ./benchmarks/memory-smoke/dist/runner.js --subset <locale>`.
 3. Open a pull request with translation provenance (reviewers, source language).
 
 Community-maintained packs ship **after** the v0.6.0 tag; the hooks and procedure above are stable from v0.6.0 onward.

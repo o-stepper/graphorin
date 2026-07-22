@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { fromIterable } from '../src/loaders/iterable.js';
-import { EvalConcurrencyError, runEvals } from '../src/runner.js';
+import { AGENT_RUN_THREW_MARKER, EvalConcurrencyError, runEvals } from '../src/runner.js';
 import { exactMatch } from '../src/scorers/code/exact-match.js';
 import type { AgentLike } from '../src/types.js';
 
@@ -99,6 +99,46 @@ describe('runEvals', () => {
     });
     expect(report.summary.failed).toBe(1);
     expect(report.results[0]?.scores[0]?.result.reason).toMatch(/agent crashed/);
+    // deep-retest-0.13.12 P1: the reason leads with the STABLE marker so
+    // benchmark runners can classify the case as infrastructure (the
+    // subject never answered), never as a quality miss.
+    expect(report.results[0]?.scores[0]?.result.reason?.startsWith(AGENT_RUN_THREW_MARKER)).toBe(
+      true,
+    );
+  });
+
+  it('deep-retest-0.13.12: echoes the case reference answer into results for auditability', async () => {
+    const dataset = fromIterable([
+      { id: 'with-ref', input: 'a', expected: 'a' },
+      { id: 'without-ref', input: 'b' },
+    ]);
+    const report = await runEvals({
+      agent: {
+        async run(input: string) {
+          return input;
+        },
+      },
+      dataset,
+      scorers: [exactMatch()],
+    });
+    const withRef = report.results.find((r) => r.caseId === 'with-ref');
+    const withoutRef = report.results.find((r) => r.caseId === 'without-ref');
+    expect(withRef?.expected).toBe('a');
+    expect(withoutRef).toBeDefined();
+    expect('expected' in (withoutRef ?? {})).toBe(false);
+
+    // The throw path echoes the reference too - a timed-out case can
+    // still be adjudicated by hand from the persisted report alone.
+    const crashed = await runEvals({
+      agent: {
+        async run() {
+          throw new Error('boom');
+        },
+      },
+      dataset: fromIterable([{ id: 'crash', input: 'x', expected: 'ref-answer' }]),
+      scorers: [exactMatch()],
+    });
+    expect(crashed.results[0]?.expected).toBe('ref-answer');
   });
 
   it('emits onProgress events for every case', async () => {

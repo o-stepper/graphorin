@@ -7,6 +7,7 @@
 export {
   fenceForJudge,
   JUDGE_OFF_FORMAT_MARKER,
+  JUDGE_RETRY_MARKER,
   JudgeOffFormatError,
   type LlmJudgeOptions,
   llmJudge,

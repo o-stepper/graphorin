@@ -45,6 +45,7 @@ import {
   type EvalReport,
   exitOnFailures,
   JUDGE_OFF_FORMAT_MARKER,
+  JUDGE_RETRY_MARKER,
   loadHaluMemDataset,
   type MemoryOperationsEvalInput,
   type MemoryOperationsObservation,
@@ -137,6 +138,73 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): {
   };
 }
 
+/** The one host where an unauthenticated request is GUARANTEED to 401. */
+const OPENAI_OFFICIAL_HOST = 'api.openai.com';
+
+function hostOf(baseUrl: string | undefined): string | null {
+  if (baseUrl === undefined || baseUrl === '') return null;
+  try {
+    return new URL(baseUrl).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function isLoopbackHost(host: string): boolean {
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '0.0.0.0';
+}
+
+/** Result of {@link resolveBenchApiKey}. Keep in sync with the longmemeval twin. */
+export interface ResolvedBenchApiKey {
+  readonly apiKey?: string;
+  readonly source?: 'GRAPHORIN_BENCH_API_KEY' | 'OPENAI_API_KEY';
+  /** Fail-fast message: the run would send EVERY case into HTTP 401. */
+  readonly error?: string;
+  /** Best-effort caution for keyless remote endpoints the runner cannot judge. */
+  readonly warning?: string;
+}
+
+/**
+ * deep-retest-0.13.12 P2: resolve the bench API key BEFORE any case
+ * runs. `GRAPHORIN_BENCH_API_KEY` stays authoritative; when it is
+ * absent and `--provider openai-compatible` targets the official
+ * OpenAI endpoint, the standard `OPENAI_API_KEY` is accepted as a
+ * fallback. A keyless run against the official host fails in
+ * preflight; loopback endpoints legally run keyless. Keep in sync
+ * with the longmemeval twin.
+ */
+export function resolveBenchApiKey(
+  providerName: string | undefined,
+  baseUrl: string | undefined,
+  env: Readonly<Record<string, string | undefined>>,
+): ResolvedBenchApiKey {
+  const dedicated = env.GRAPHORIN_BENCH_API_KEY;
+  if (dedicated !== undefined && dedicated !== '') {
+    return { apiKey: dedicated, source: 'GRAPHORIN_BENCH_API_KEY' };
+  }
+  if (providerName !== 'openai-compatible') return {};
+  const host = hostOf(baseUrl);
+  if (host === OPENAI_OFFICIAL_HOST) {
+    const fallback = env.OPENAI_API_KEY;
+    if (fallback !== undefined && fallback !== '') {
+      return { apiKey: fallback, source: 'OPENAI_API_KEY' };
+    }
+    return {
+      error:
+        'no API key for the official OpenAI endpoint: set GRAPHORIN_BENCH_API_KEY ' +
+        '(or OPENAI_API_KEY) - refusing to run every case into HTTP 401.',
+    };
+  }
+  if (host !== null && !isLoopbackHost(host)) {
+    return {
+      warning:
+        `no GRAPHORIN_BENCH_API_KEY set for remote endpoint ${host} - ` +
+        'requests will be unauthenticated and may fail with HTTP 401.',
+    };
+  }
+  return {};
+}
+
 /** Embedder axis (P2-Q): `'fake'` arms the vector leg offline. */
 export type BenchEmbedderMode = 'none' | 'fake';
 
@@ -197,6 +265,21 @@ export function countJudgeOffFormatFailures(
     .filter((r) =>
       r.scores.some((s) => s.result.reason?.includes(JUDGE_OFF_FORMAT_MARKER) === true),
     )
+    .map((r) => r.caseId);
+  return { count: caseIds.length, caseIds };
+}
+
+/**
+ * deep-retest-0.13.12 P3: cases where the judge's first reply was
+ * off-format and the constrained retry recovered a valid grade. The
+ * grades are real - this is cost/robustness telemetry, never a
+ * failure class.
+ */
+export function countJudgeRetriedCases(
+  report: EvalReport<MemoryOperationsEvalInput, MemoryOperationsObservation>,
+): { count: number; caseIds: string[] } {
+  const caseIds = report.results
+    .filter((r) => r.scores.some((s) => s.result.reason?.includes(JUDGE_RETRY_MARKER) === true))
     .map((r) => r.caseId);
   return { count: caseIds.length, caseIds };
 }
@@ -666,7 +749,24 @@ export async function main(): Promise<void> {
   const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;
   const model = args.model ?? process.env.GRAPHORIN_BENCH_MODEL;
   const baseUrl = args.baseUrl ?? process.env.GRAPHORIN_BENCH_BASE_URL;
-  const apiKey = process.env.GRAPHORIN_BENCH_API_KEY;
+  // deep-retest 0.13.12 P2: preflight the key instead of running every
+  // case into HTTP 401 (see resolveBenchApiKey).
+  const keyResolution = resolveBenchApiKey(providerName, baseUrl, process.env);
+  if (keyResolution.error !== undefined) {
+    console.error(`[benchmark-halumem] ${keyResolution.error}`);
+    process.exitCode = 1;
+    return;
+  }
+  if (keyResolution.warning !== undefined) {
+    console.warn(`[benchmark-halumem] ${keyResolution.warning}`);
+  }
+  if (keyResolution.source === 'OPENAI_API_KEY') {
+    console.log(
+      '[benchmark-halumem] using OPENAI_API_KEY for the official OpenAI endpoint ' +
+        '(GRAPHORIN_BENCH_API_KEY not set)',
+    );
+  }
+  const apiKey = keyResolution.apiKey;
   const { provider, label } = resolveBenchProvider({
     ...(providerName !== undefined ? { name: providerName } : {}),
     ...(model !== undefined ? { model } : {}),
@@ -778,6 +878,15 @@ export async function main(): Promise<void> {
     );
     process.exitCode = 1;
   }
+  // Informational only: recovered judge retries are real grades, but the
+  // extra judge calls (and their cost) should be visible in the report.
+  const judgeRetried = countJudgeRetriedCases(report);
+  if (judgeRetried.count > 0) {
+    console.warn(
+      `[benchmark-halumem] judge retried off-format replies on ${judgeRetried.count} case(s) ` +
+        `(${judgeRetried.caseIds.join(', ')}) - grades are valid; extra judge calls were spent.`,
+    );
+  }
   if (ceiling !== undefined && ceiling.observedCostUsd() === 0) {
     console.warn(
       '[benchmark-halumem] --max-cost-usd was set but the providers reported zero usage cost, ' +
@@ -840,6 +949,7 @@ export async function main(): Promise<void> {
       : {}),
     ...(infra.count > 0 ? { infrastructureFailedCases: infra.caseIds } : {}),
     ...(judgeOffFormat.count > 0 ? { judgeOffFormatCases: judgeOffFormat.caseIds } : {}),
+    ...(judgeRetried.count > 0 ? { judgeRetriedCases: judgeRetried.caseIds } : {}),
   };
   await mkdir(dirname(args.results), { recursive: true });
   await writeFile(

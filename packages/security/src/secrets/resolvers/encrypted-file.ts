@@ -165,7 +165,7 @@ export async function decryptBundle(
   const key = await deriveAesKey(passphrase, salt);
   let plaintext: Buffer;
   try {
-    const decipher = createDecipheriv('aes-256-gcm', key, nonce);
+    const decipher = createDecipheriv('aes-256-gcm', key, nonce, { authTagLength: 16 });
     decipher.setAuthTag(tag);
     plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
   } catch (err) {

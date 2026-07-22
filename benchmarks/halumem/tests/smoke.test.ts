@@ -10,10 +10,12 @@ import {
   combineUnpricedModels,
   countInfrastructureFailures,
   countJudgeOffFormatFailures,
+  countJudgeRetriedCases,
   createOperationsAgent,
   INFRA_MARKER,
   parseArgs,
   preflightUnpricedModels,
+  resolveBenchApiKey,
   runHaluMemBenchmark,
   USAGE,
   withBenchCostCeiling,
@@ -118,6 +120,33 @@ describe('benchmark-halumem operations stage (offline stub)', () => {
     expect(reason).toContain('judge-off-format:');
     // Judge failures are NOT ingest infrastructure failures.
     expect(countInfrastructureFailures(report).count).toBe(0);
+    // ...and exhausted retries are NOT "recovered retry" telemetry.
+    expect(countJudgeRetriedCases(report).count).toBe(0);
+  });
+});
+
+// deep-retest 0.13.12 P2: key preflight twin (see the longmemeval
+// suite for the full matrix - the resolvers must stay in sync).
+describe('deep-retest-0.13.12 P2: resolveBenchApiKey preflight (halumem twin)', () => {
+  it('falls back to OPENAI_API_KEY only for the official endpoint', () => {
+    expect(
+      resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {
+        OPENAI_API_KEY: 'fallback',
+      }),
+    ).toEqual({ apiKey: 'fallback', source: 'OPENAI_API_KEY' });
+    expect(
+      resolveBenchApiKey('openai-compatible', 'https://llm.internal.example/v1', {
+        OPENAI_API_KEY: 'real-key',
+      }).apiKey,
+    ).toBeUndefined();
+  });
+
+  it('fails fast on the official endpoint with no key, stays quiet on loopback', () => {
+    expect(resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {}).error).toMatch(
+      /OPENAI_API_KEY/,
+    );
+    expect(resolveBenchApiKey('openai-compatible', 'http://127.0.0.1:18089/v1', {})).toEqual({});
+    expect(resolveBenchApiKey('ollama', undefined, {})).toEqual({});
   });
 });
 

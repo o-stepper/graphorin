@@ -6,6 +6,7 @@ import {
   fenceForJudge,
   helpfulnessScorer,
   JUDGE_OFF_FORMAT_MARKER,
+  JUDGE_RETRY_MARKER,
   JudgeOffFormatError,
   llmJudge,
   parseScore,
@@ -126,6 +127,38 @@ describe('llmJudge', () => {
     expect(lastText).toContain('did not contain the required marker');
     // An EMPTY prior reply is not echoed back as an assistant turn.
     expect(requests[1]?.messages.some((m) => m.role === 'assistant')).toBe(false);
+  });
+
+  it('deep-retest-0.13.12 P3: a recovered retry is visible in reason + metadata', async () => {
+    let calls = 0;
+    const scorer = llmJudge({
+      provider: buildProvider(() => {
+        calls += 1;
+        return calls === 1 ? '' : 'SCORE: 8';
+      }),
+    });
+    const recovered = await scorer.score(CASE);
+    expect(recovered.pass).toBe(true);
+    expect(recovered.reason).toContain(JUDGE_RETRY_MARKER);
+    expect(recovered.metadata?.judgeRetries).toBe(1);
+
+    // A clean first grade carries judgeRetries: 0 and NO retry marker.
+    const clean = await llmJudge({ provider: buildProvider('SCORE: 8') }).score(CASE);
+    expect(clean.pass).toBe(true);
+    expect(clean.reason ?? '').not.toContain(JUDGE_RETRY_MARKER);
+    expect(clean.metadata?.judgeRetries).toBe(0);
+
+    // A recovered FAILING grade keeps the score reason and appends the marker.
+    let failCalls = 0;
+    const failing = await llmJudge({
+      provider: buildProvider(() => {
+        failCalls += 1;
+        return failCalls === 1 ? '' : 'SCORE: 2';
+      }),
+    }).score(CASE);
+    expect(failing.pass).toBe(false);
+    expect(failing.reason).toContain('judge score 2 < threshold');
+    expect(failing.reason).toContain(JUDGE_RETRY_MARKER);
   });
 
   it('echoes a non-empty off-format reply back as an assistant turn on retry', async () => {

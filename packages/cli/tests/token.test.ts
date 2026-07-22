@@ -116,6 +116,11 @@ describe('token CRUD against a real SQLite store', () => {
       config: cfg,
       id: created.id,
       print: () => undefined,
+      // deep-retest 0.13.12 P2: without the stub the rotate path wrote
+      // the new token-shaped value to the REAL stdout - the one place
+      // the CLI suite leaked a gph_live_v1_... string into CI logs
+      // (generic secret scanners flag exactly that shape).
+      stdoutPrint: () => undefined,
     });
     expect(rotated.raw).not.toBe(created.raw);
     expect(rotated.scopes).toEqual(['agent:run']);

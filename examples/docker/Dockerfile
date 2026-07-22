@@ -41,7 +41,20 @@ RUN pnpm install --frozen-lockfile \
 # ---------- Runtime ----------
 FROM node:22-slim AS runtime
 
-# Distroless-style: only the bits we need.
+# Compatibility-first runtime: a full node:22-slim base carrying the
+# builder tree (see the COPY note below), NOT a distroless image - a
+# pruned runtime target is tracked separately. What we can drop, we do:
+# the entrypoint execs node directly, so the npm/corepack toolchain
+# (historically where image scanners find the fixable advisories) is
+# removed, and Debian security fixes are applied at build time. The
+# docker-smoke workflow gates the final image on fixable high/critical
+# findings.
+RUN apt-get update \
+ && apt-get upgrade -y \
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
+      /usr/local/bin/corepack /opt/yarn*
+
 RUN groupadd --system --gid 10001 graphorin \
  && useradd --system --uid 10001 --gid 10001 --create-home --shell /usr/sbin/nologin graphorin
 

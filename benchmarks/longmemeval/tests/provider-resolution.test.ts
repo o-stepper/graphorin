@@ -15,6 +15,7 @@ import {
   buildResultsHeader,
   combineUnpricedModels,
   preflightUnpricedModels,
+  resolveBenchApiKey,
   resolveBenchProvider,
   resolveJudgeSpec,
   withBenchCostCeiling,
@@ -217,5 +218,88 @@ describe('W-021: judge resolution from CLI + env', () => {
     const resolved = resolveBenchProvider(spec ?? {});
     expect(resolved.provider.name).not.toBe('stub');
     expect(resolved.label).toBe('ollama:cli-model');
+  });
+});
+
+// deep-retest 0.13.12 P2: key preflight - the documented Graphorin
+// variable was missed live and every case burned through as HTTP 401
+// before a late exit. The resolver must accept the standard
+// OPENAI_API_KEY for the official endpoint, fail fast when the
+// official endpoint has no key at all, and leave loopback (llama-server
+// and friends) legally keyless.
+describe('deep-retest-0.13.12 P2: resolveBenchApiKey preflight', () => {
+  it('prefers GRAPHORIN_BENCH_API_KEY regardless of endpoint', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {
+      GRAPHORIN_BENCH_API_KEY: 'dedicated',
+      OPENAI_API_KEY: 'fallback',
+    });
+    expect(res).toEqual({ apiKey: 'dedicated', source: 'GRAPHORIN_BENCH_API_KEY' });
+  });
+
+  it('falls back to OPENAI_API_KEY for the official OpenAI endpoint', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {
+      OPENAI_API_KEY: 'fallback',
+    });
+    expect(res).toEqual({ apiKey: 'fallback', source: 'OPENAI_API_KEY' });
+  });
+
+  it('fails fast on the official endpoint with no key at all', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {});
+    expect(res.error).toMatch(/GRAPHORIN_BENCH_API_KEY/);
+    expect(res.error).toMatch(/OPENAI_API_KEY/);
+    expect(res.apiKey).toBeUndefined();
+  });
+
+  it('treats an empty dedicated key as unset', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://api.openai.com/v1', {
+      GRAPHORIN_BENCH_API_KEY: '',
+      OPENAI_API_KEY: 'fallback',
+    });
+    expect(res).toEqual({ apiKey: 'fallback', source: 'OPENAI_API_KEY' });
+  });
+
+  it('lets loopback endpoints run keyless without warning', () => {
+    for (const url of ['http://127.0.0.1:18089/v1', 'http://localhost:11434/v1']) {
+      const res = resolveBenchApiKey('openai-compatible', url, {});
+      expect(res).toEqual({});
+    }
+  });
+
+  it('warns (but does not fail) for a keyless non-official remote endpoint', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://llm.internal.example/v1', {});
+    expect(res.error).toBeUndefined();
+    expect(res.warning).toMatch(/llm\.internal\.example/);
+  });
+
+  it('does not demand keys for non-openai-compatible providers', () => {
+    expect(resolveBenchApiKey('ollama', undefined, {})).toEqual({});
+    expect(resolveBenchApiKey(undefined, undefined, {})).toEqual({});
+  });
+
+  it('ignores OPENAI_API_KEY for non-official endpoints (never leak the real key sideways)', () => {
+    const res = resolveBenchApiKey('openai-compatible', 'https://llm.internal.example/v1', {
+      OPENAI_API_KEY: 'real-key',
+    });
+    expect(res.apiKey).toBeUndefined();
+  });
+});
+
+// deep-retest 0.13.12 P2: --timeout-ms threads into every adapter shape
+// (construction only - the network is never touched before generate()).
+describe('deep-retest-0.13.12 P2: timeoutMs threading', () => {
+  it('constructs all three real adapters with a timeout override', () => {
+    for (const spec of [
+      { name: 'ollama', model: 'm', timeoutMs: 300000 },
+      { name: 'llamacpp', model: 'm', timeoutMs: 300000 },
+      {
+        name: 'openai-compatible',
+        model: 'm',
+        baseUrl: 'http://127.0.0.1:9/v1',
+        timeoutMs: 300000,
+      },
+    ]) {
+      const { provider } = resolveBenchProvider(spec);
+      expect(provider.name).not.toBe('stub');
+    }
   });
 });

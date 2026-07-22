@@ -122,6 +122,13 @@ jobs:
       - name: CLI docs command diff
         run: pnpm run check-cli-docs
 
+      # deep-retest 0.13.12 P2: a benchmark README shipped a runner path
+      # whose package directory does not exist (MODULE_NOT_FOUND on first
+      # contact). Benchmark READMEs now get the same documented-command
+      # validation the CLI/example docs already have.
+      - name: Benchmark README command gate
+        run: pnpm run check-benchmark-readmes
+
       # Every version-bearing site (workspace manifests, badges, footers,
       # image tags, baselines) must agree with packages/core/package.json;
       # code derives its version from package.json, so a reintroduced

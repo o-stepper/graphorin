@@ -12,6 +12,12 @@ updates:
       day: monday
       time: '06:00'
       timezone: Etc/UTC
+    # deep-retest 0.13.12 P3: a short maturity window for routine action
+    # bumps (supply-chain hygiene: freshly published releases are the
+    # highest-risk window). Dependabot SECURITY updates ignore version-
+    # update configs, so advisory-driven fixes still arrive immediately.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: 'chore(actions)'
     labels:

@@ -39,6 +39,31 @@ describe('benchmarks/longmemeval CLI args', () => {
     expect(() => parseArgs(['node', 'runner.js', '--judge-model'])).toThrow(/requires a value/);
   });
 
+  // deep-retest 0.13.12 P2: the subject-leg think override and the
+  // per-request timeout were programmatic-only; both must parse (and
+  // reject garbage loudly - a typo must never run the full benchmark).
+  it('parses --think as a strict boolean for the subject leg', () => {
+    expect(parseArgs(['node', 'runner.js', '--think', 'false']).think).toBe(false);
+    expect(parseArgs(['node', 'runner.js', '--think', 'true']).think).toBe(true);
+    expect(parseArgs(['node', 'runner.js']).think).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--think', 'nope'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--think'])).toThrow(/requires a value/);
+  });
+
+  it('parses --timeout-ms as a positive integer', () => {
+    expect(parseArgs(['node', 'runner.js', '--timeout-ms', '300000']).timeoutMs).toBe(300000);
+    expect(parseArgs(['node', 'runner.js']).timeoutMs).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--timeout-ms', '0'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--timeout-ms', '-5'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--timeout-ms', 'soon'])).toThrow(CliUsageError);
+  });
+
+  it('documents --think and --timeout-ms in USAGE', () => {
+    expect(USAGE).toContain('--think <true|false>');
+    expect(USAGE).toContain('--timeout-ms <n>');
+    expect(USAGE).toContain('OPENAI_API_KEY');
+  });
+
   it('skips the literal -- separator pnpm 10 forwards into argv', () => {
     const args = parseArgs(['node', 'runner.js', '--', '--results', '/tmp/r.md']);
     expect(args.results).toBe('/tmp/r.md');

@@ -36,6 +36,19 @@ import type { Case, ScoreResult, Scorer } from '@graphorin/observability/eval';
 export const JUDGE_OFF_FORMAT_MARKER = 'judge-off-format:';
 
 /**
+ * Stable machine-scannable token the scorer puts into the result
+ * `reason` (and `metadata.judgeRetries`) when the judge's FIRST reply
+ * was off-format and the constrained retry recovered a valid
+ * `SCORE: <n>` marker. A recovered grade is a real grade - the case
+ * still passes or fails on its score - but reports can now count the
+ * hidden retries (extra judge calls, extra cost) instead of presenting
+ * a recovered reply as a clean first response.
+ *
+ * @stable
+ */
+export const JUDGE_RETRY_MARKER = 'judge-retries:';
+
+/**
  * deep-retest-0.13.11 P3: the judge (not the subject) produced a reply
  * with no parseable `SCORE: <n>` marker even after the constrained
  * retry. Typed + marked so downstream reports can separate "the judge
@@ -150,12 +163,26 @@ export function llmJudge<I = unknown, O = unknown>(options: LlmJudgeOptions<I, O
       }
       const clamped = Math.max(0, Math.min(maxScore, raw));
       const pass = clamped >= passThreshold;
-      const metadata = { raw, clamped, passThreshold, maxScore };
-      if (pass) return { pass, score: clamped / maxScore, metadata };
+      const judgeRetries = attempts - 1;
+      const metadata = { raw, clamped, passThreshold, maxScore, judgeRetries };
+      // deep-retest-0.13.12 P3: surface recovered off-format retries so
+      // reports can distinguish a clean first grade from a recovered one
+      // (and attribute the extra judge call's cost).
+      const retryNote = judgeRetries > 0 ? `${JUDGE_RETRY_MARKER} ${judgeRetries} (recovered)` : '';
+      if (pass) {
+        return {
+          pass,
+          score: clamped / maxScore,
+          ...(retryNote !== '' ? { reason: retryNote } : {}),
+          metadata,
+        };
+      }
       return {
         pass,
         score: clamped / maxScore,
-        reason: `judge score ${clamped} < threshold ${passThreshold}`,
+        reason:
+          `judge score ${clamped} < threshold ${passThreshold}` +
+          (retryNote !== '' ? ` (${retryNote})` : ''),
         metadata,
       };
     },

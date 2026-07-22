@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { Provider, SessionScope } from '@graphorin/core';
 import {
+  AGENT_RUN_THREW_MARKER,
   type AgentLike,
   type Case,
   createFakeEmbedder,
@@ -35,6 +36,8 @@ import {
   type EvalReport,
   exitOnFailures,
   fenceForJudge,
+  JUDGE_OFF_FORMAT_MARKER,
+  JUDGE_RETRY_MARKER,
   llmJudge,
   loadDmrDataset,
   loadLocomoDataset,
@@ -101,9 +104,17 @@ export interface BenchProviderSpec {
    * its whole output budget on the chain and returns an empty reply,
    * so `llm-judge-j` never sees its `SCORE: <n>` marker (observed live
    * 2026-07-17: 3/3 judge replies empty). The SUT leg keeps the model
-   * default.
+   * default unless `--think false` is passed (deep-retest 0.13.12 P2:
+   * a thinking subject on the same models returned EMPTY answers for
+   * 2/3 LOCOMO cases until `think: false` was set programmatically).
    */
   readonly think?: boolean;
+  /**
+   * Per-request HTTP timeout forwarded to the adapter (deep-retest
+   * 0.13.12 P2: slow local full-context runs hit the adapters' default
+   * ceiling mid-generation; `--timeout-ms` makes it configurable).
+   */
+  readonly timeoutMs?: number;
 }
 
 /** A resolved {@link Provider} plus the provenance label stamped into RESULTS. */
@@ -242,6 +253,7 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
             model,
             ...(baseUrl ? { baseUrl } : {}),
             ...(spec.think !== undefined ? { think: spec.think } : {}),
+            ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
           }),
           opts,
         ),
@@ -250,7 +262,11 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
     case 'llamacpp':
       return {
         provider: createProvider(
-          llamaCppServerAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }),
+          llamaCppServerAdapter({
+            model,
+            ...(baseUrl ? { baseUrl } : {}),
+            ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+          }),
           opts,
         ),
         label: `llamacpp:${model}`,
@@ -269,6 +285,7 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
             model,
             baseUrl,
             ...(spec.apiKey ? { apiKey: spec.apiKey } : {}),
+            ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
           }),
           opts,
         ),
@@ -276,6 +293,95 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
       };
     }
   }
+}
+
+/** The one host where an unauthenticated request is GUARANTEED to 401. */
+const OPENAI_OFFICIAL_HOST = 'api.openai.com';
+
+function hostOf(baseUrl: string | undefined): string | null {
+  if (baseUrl === undefined || baseUrl === '') return null;
+  try {
+    return new URL(baseUrl).hostname;
+  } catch {
+    return null;
+  }
+}
+
+function isLoopbackHost(host: string): boolean {
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '0.0.0.0';
+}
+
+/** Result of {@link resolveBenchApiKey}. Keep in sync with the HaluMem twin. */
+export interface ResolvedBenchApiKey {
+  readonly apiKey?: string;
+  readonly source?: 'GRAPHORIN_BENCH_API_KEY' | 'OPENAI_API_KEY';
+  /** Fail-fast message: the run would send EVERY case into HTTP 401. */
+  readonly error?: string;
+  /** Best-effort caution for keyless remote endpoints the runner cannot judge. */
+  readonly warning?: string;
+}
+
+/**
+ * deep-retest-0.13.12 P2: resolve the bench API key BEFORE any case
+ * runs. `GRAPHORIN_BENCH_API_KEY` stays authoritative; when it is
+ * absent and `--provider openai-compatible` targets the official
+ * OpenAI endpoint, the standard `OPENAI_API_KEY` is accepted as a
+ * fallback (observed live: the documented Graphorin-specific variable
+ * was missed and all cases burned through as HTTP 401 before a late
+ * exit). A keyless run against the official host now fails in
+ * preflight; loopback endpoints (llama-server and friends) legally
+ * run keyless. Keep in sync with the HaluMem twin.
+ */
+export function resolveBenchApiKey(
+  providerName: string | undefined,
+  baseUrl: string | undefined,
+  env: Readonly<Record<string, string | undefined>>,
+): ResolvedBenchApiKey {
+  const dedicated = env.GRAPHORIN_BENCH_API_KEY;
+  if (dedicated !== undefined && dedicated !== '') {
+    return { apiKey: dedicated, source: 'GRAPHORIN_BENCH_API_KEY' };
+  }
+  if (providerName !== 'openai-compatible') return {};
+  const host = hostOf(baseUrl);
+  if (host === OPENAI_OFFICIAL_HOST) {
+    const fallback = env.OPENAI_API_KEY;
+    if (fallback !== undefined && fallback !== '') {
+      return { apiKey: fallback, source: 'OPENAI_API_KEY' };
+    }
+    return {
+      error:
+        'no API key for the official OpenAI endpoint: set GRAPHORIN_BENCH_API_KEY ' +
+        '(or OPENAI_API_KEY) - refusing to run every case into HTTP 401.',
+    };
+  }
+  if (host !== null && !isLoopbackHost(host)) {
+    return {
+      warning:
+        `no GRAPHORIN_BENCH_API_KEY set for remote endpoint ${host} - ` +
+        'requests will be unauthenticated and may fail with HTTP 401.',
+    };
+  }
+  return {};
+}
+
+/**
+ * deep-retest-0.13.12 P1: count report cases whose failure reason
+ * carries a stable classification marker (`AGENT_RUN_THREW_MARKER`,
+ * `JUDGE_OFF_FORMAT_MARKER`, `JUDGE_RETRY_MARKER`). Mirrors the
+ * HaluMem classifiers: a case the subject never answered (provider
+ * timeout/HTTP error) or the judge never graded is an INFRASTRUCTURE
+ * result, not a quality miss, and must fail the process even under
+ * `--gate-on regressions` (observed live 2026-07-22: two 120s provider
+ * timeouts scored as ordinary misses and the run exited 0).
+ */
+export function countMarkedCases<I, O>(
+  report: EvalReport<I, O>,
+  marker: string,
+): { count: number; caseIds: string[] } {
+  const caseIds = report.results
+    .filter((r) => r.scores.some((s) => s.result.reason?.includes(marker) === true))
+    .map((r) => r.caseId);
+  return { count: caseIds.length, caseIds };
 }
 
 type LoaderName = 'longmemeval' | 'locomo' | 'dmr';
@@ -799,6 +905,13 @@ export interface CliArgs {
   allowUnpricedModel: boolean;
   /** C8 (evals-05): repeat cases for variance. */
   iterations?: number;
+  /**
+   * deep-retest 0.13.12 P2: SUBJECT-leg Ollama `think` override (the
+   * judge leg is always `think: false`). Previously programmatic-only.
+   */
+  think?: boolean;
+  /** deep-retest 0.13.12 P2: per-request HTTP timeout for subject + judge adapters. */
+  timeoutMs?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
   help: boolean;
   /**
@@ -852,10 +965,20 @@ Flags:
   --allow-unpriced-model      Proceed under --max-cost-usd despite unpriced
                               models (their spend stays under-counted)
   --iterations <n>            Repeat cases for variance reporting
+  --think <true|false>        Ollama subject-leg think override (the judge leg is
+                              always think:false). Thinking-default models can
+                              burn their whole output budget and answer empty
+  --timeout-ms <n>            Per-request HTTP timeout for subject and judge
+                              adapters (slow local full-context runs need more
+                              than the adapter default)
   --help, -h                  Show this help
 
 Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
-GRAPHORIN_BENCH_JUDGE_* configure the judge. Secrets are env-only.`;
+GRAPHORIN_BENCH_JUDGE_* configure the judge. Secrets are env-only.
+With --provider openai-compatible against the official https://api.openai.com
+endpoint, OPENAI_API_KEY is accepted when GRAPHORIN_BENCH_API_KEY is not set;
+a keyless run against that host fails in preflight instead of burning every
+case as HTTP 401.`;
 
 function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -961,6 +1084,20 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       i++;
     } else if (a === '--iterations') {
       args.iterations = Number.parseInt(value(a, next), 10);
+      i++;
+    } else if (a === '--think') {
+      const flag = value(a, next);
+      if (flag !== 'true' && flag !== 'false') {
+        throw new CliUsageError(`--think must be 'true' or 'false', got '${flag}'`);
+      }
+      args.think = flag === 'true';
+      i++;
+    } else if (a === '--timeout-ms') {
+      const timeout = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(timeout) || timeout <= 0) {
+        throw new CliUsageError(`--timeout-ms must be a positive integer, got '${next}'`);
+      }
+      args.timeoutMs = timeout;
       i++;
     } else if (a === '--allow-self-judge') {
       args.allowSelfJudge = true;
@@ -1138,12 +1275,31 @@ export async function main(): Promise<void> {
   const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;
   const model = args.model ?? process.env.GRAPHORIN_BENCH_MODEL;
   const baseUrl = args.baseUrl ?? process.env.GRAPHORIN_BENCH_BASE_URL;
-  const apiKey = process.env.GRAPHORIN_BENCH_API_KEY;
+  // deep-retest 0.13.12 P2: preflight the key instead of running every
+  // case into HTTP 401 (see resolveBenchApiKey).
+  const keyResolution = resolveBenchApiKey(providerName, baseUrl, process.env);
+  if (keyResolution.error !== undefined) {
+    console.error(`[benchmark-longmemeval] ${keyResolution.error}`);
+    process.exitCode = 1;
+    return;
+  }
+  if (keyResolution.warning !== undefined) {
+    console.warn(`[benchmark-longmemeval] ${keyResolution.warning}`);
+  }
+  if (keyResolution.source === 'OPENAI_API_KEY') {
+    console.log(
+      '[benchmark-longmemeval] using OPENAI_API_KEY for the official OpenAI endpoint ' +
+        '(GRAPHORIN_BENCH_API_KEY not set)',
+    );
+  }
+  const apiKey = keyResolution.apiKey;
   const { provider, label } = resolveBenchProvider({
     ...(providerName !== undefined ? { name: providerName } : {}),
     ...(model !== undefined ? { model } : {}),
     ...(baseUrl !== undefined ? { baseUrl } : {}),
     ...(apiKey !== undefined ? { apiKey } : {}),
+    ...(args.think !== undefined ? { think: args.think } : {}),
+    ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
   });
   if (label.startsWith('stub')) {
     console.warn(
@@ -1170,7 +1326,13 @@ export async function main(): Promise<void> {
   // Judges never think out loud: they must spend their output budget on
   // the SCORE-marker verdict (see BenchProviderSpec.think).
   let judgeResolved =
-    judgeSpec !== undefined ? resolveBenchProvider({ ...judgeSpec, think: false }) : undefined;
+    judgeSpec !== undefined
+      ? resolveBenchProvider({
+          ...judgeSpec,
+          think: false,
+          ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
+        })
+      : undefined;
   const judgeLabel = judgeResolved?.label ?? label;
   // D1 (W-084): one shared ceiling caps the run's TOTAL spend (SUT + judge).
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
@@ -1266,6 +1428,40 @@ export async function main(): Promise<void> {
         `(cap $${args.maxCostUsd})`,
     );
   }
+  // deep-retest 0.13.12 P1: name infrastructure results BEFORE any score
+  // line, and fail the process on them REGARDLESS of --gate-on. A case
+  // the subject never answered (agent.run threw: provider timeout/HTTP
+  // error) or the judge never graded is not a quality miss - observed
+  // live 2026-07-22: two 120s provider timeouts read as ordinary misses
+  // and a regressions-gated run without a baseline exited 0.
+  const infra = countMarkedCases(report, AGENT_RUN_THREW_MARKER);
+  if (infra.count > 0) {
+    console.error(
+      `[benchmark-longmemeval] status=INFRASTRUCTURE_FAILED cases=${infra.count}/${report.summary.total} ` +
+        `(${infra.caseIds.join(', ')}): agent.run threw (provider/network/timeout errors) - ` +
+        'the scores below are NOT quality results. Per-case reasons carry the original error.',
+    );
+    process.exitCode = 1;
+  }
+  const judgeOffFormat = countMarkedCases(report, JUDGE_OFF_FORMAT_MARKER);
+  if (judgeOffFormat.count > 0) {
+    console.error(
+      `[benchmark-longmemeval] status=JUDGE_FAILED cases=${judgeOffFormat.count}/${report.summary.total} ` +
+        `(${judgeOffFormat.caseIds.join(', ')}): the judge returned off-format/empty replies even ` +
+        'after the constrained retry - these subject answers were NOT graded. Treat as a ' +
+        'judge/infrastructure failure, not a subject quality result; prefer a stronger judge model.',
+    );
+    process.exitCode = 1;
+  }
+  // Informational only: recovered judge retries are real grades, but the
+  // extra judge calls (and their cost) should be visible in the report.
+  const judgeRetried = countMarkedCases(report, JUDGE_RETRY_MARKER);
+  if (judgeRetried.count > 0) {
+    console.warn(
+      `[benchmark-longmemeval] judge retried off-format replies on ${judgeRetried.count} case(s) ` +
+        `(${judgeRetried.caseIds.join(', ')}) - grades are valid; extra judge calls were spent.`,
+    );
+  }
   const tokensPerQuery = meter.queries > 0 ? meter.totalTokens / meter.queries : 0;
   const aggregates = computeBenchAggregates(report);
   console.log(
@@ -1293,6 +1489,8 @@ export async function main(): Promise<void> {
     ...(args.ability !== undefined ? { ability: args.ability } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
     ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
+    ...(args.think !== undefined ? { think: args.think } : {}),
+    ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),
@@ -1300,6 +1498,9 @@ export async function main(): Promise<void> {
           ...(allUnpriced.length > 0 ? { unpricedModels: allUnpriced } : {}),
         }
       : {}),
+    ...(infra.count > 0 ? { infrastructureFailedCases: infra.caseIds } : {}),
+    ...(judgeOffFormat.count > 0 ? { judgeOffFormatCases: judgeOffFormat.caseIds } : {}),
+    ...(judgeRetried.count > 0 ? { judgeRetriedCases: judgeRetried.caseIds } : {}),
   };
   await writeResults(args.results, report, label, {
     mode,
@@ -1358,7 +1559,10 @@ export async function main(): Promise<void> {
   }
   // `all` (default) fails on any failed case or regression; `regressions`
   // gates only on the baseline comparison (used by the dispatch CI job, where
-  // a placeholder provider may legitimately fail individual cases).
+  // a placeholder provider may legitimately fail individual cases). The
+  // INFRASTRUCTURE_FAILED/JUDGE_FAILED classification above has already set a
+  // non-zero exit code when applicable - infrastructure failures escape BOTH
+  // gate modes (deep-retest 0.13.12 P1).
   if (args.gateOn === 'regressions') {
     if (regression?.hasRegressions === true) process.exitCode = 1;
   } else {

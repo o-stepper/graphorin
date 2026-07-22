@@ -319,7 +319,9 @@ export function decryptBody(body: Uint8Array, key: Uint8Array): Uint8Array {
   const iv = body.subarray(0, 12);
   const tag = body.subarray(body.length - 16);
   const ciphertext = body.subarray(12, body.length - 16);
-  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(key), Buffer.from(iv));
+  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(key), Buffer.from(iv), {
+    authTagLength: 16,
+  });
   decipher.setAuthTag(Buffer.from(tag));
   return new Uint8Array(
     Buffer.concat([decipher.update(Buffer.from(ciphertext)), decipher.final()]),
