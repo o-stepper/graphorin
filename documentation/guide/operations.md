@@ -256,7 +256,14 @@ significant changes rather than weekly.
 
 | Date | Duration | Concurrency / target rps | Requests (all `200`) | p50 / p95 / p99 | RSS first-quarter -> peak | Verdict |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-07-22 | 3600 s | 8 / 300 | 1,101,486 | 2.5 / 4.1 / 6.1 ms | 234 -> 290 MB | PASS |
 | 2026-07-22 | 300 s | 8 / 300 | 91,534 | 2.6 / 4.3 / 6.4 ms | 156 -> 225 MB | PASS |
+
+The hour-long run is the long-soak envelope: over a million full agent
+turns with zero non-200s, flat tail latencies, and last-quarter mean
+RSS (280 MB) within 20% of the first quarter - the run-tracker's
+five-minute retention window plateaus exactly as designed instead of
+growing with total request count.
 
 ## What CI proves
 
