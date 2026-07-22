@@ -16,14 +16,17 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-const DIST_ENTRY = fileURLToPath(new URL('../dist/index.js', import.meta.url));
+const DIST_URL = new URL('../dist/index.js', import.meta.url);
+const DIST_ENTRY = fileURLToPath(DIST_URL);
 
 describe('createRequestTimeout loop semantics', () => {
   it.skipIf(!existsSync(DIST_ENTRY))(
     'an armed deadline keeps a bare process alive until it fires',
     () => {
       const script = [
-        `import { createRequestTimeout } from ${JSON.stringify(DIST_ENTRY)};`,
+        // The file:// URL form works on every platform; a bare
+        // Windows drive path (D:\...) is rejected by the ESM loader.
+        `import { createRequestTimeout } from ${JSON.stringify(DIST_URL.href)};`,
         'const t = createRequestTimeout({ timeoutMs: 100 });',
         "t.signal.addEventListener('abort', () => {",
         "  if (t.fired) console.log('deadline-fired');",
