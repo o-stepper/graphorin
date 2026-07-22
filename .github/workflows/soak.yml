@@ -1,0 +1,136 @@
+name: Server soak (stub provider)
+
+# 0.13.12 assessment, block 4: "no load/soak proofs". This leg drives
+# sustained load through the FULL server turn path (auth middleware,
+# agent runtime, provider streaming, run tracking, SQLite persistence)
+# against a deterministic in-file stub provider - no API keys, no
+# network, no spend - and gates on the published SLOs (see
+# documentation/guide/operations.md and scripts/soak-driver.mjs for
+# the exact budgets: zero errors, p95 latency, RSS ceiling + leak
+# heuristic). Weekly + on demand, NOT per-PR: a useful soak needs
+# minutes of wall clock.
+
+on:
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: 'Load duration in seconds'
+        required: false
+        default: '300'
+      concurrency:
+        description: 'Concurrent workers'
+        required: false
+        default: '8'
+  schedule:
+    # Wednesdays 06:00 UTC (docker-smoke owns Mondays).
+    - cron: '0 6 * * 3'
+
+concurrency:
+  group: soak-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  soak:
+    name: soak /v1/agents run path
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build framework packages
+        run: pnpm build
+
+      - name: Compose, migrate, mint a token, start the server
+        run: |
+          set -euo pipefail
+          SOAK_DIR="${RUNNER_TEMP}/soak"
+          mkdir -p "${SOAK_DIR}/secrets"
+          openssl rand -hex 32 > "${SOAK_DIR}/secrets/pepper"
+          chmod 0600 "${SOAK_DIR}/secrets/pepper"
+          # The app module must live inside a workspace project whose
+          # node_modules can resolve ALL its bare @graphorin/* imports
+          # (agent + server + store-sqlite + core). In the WORKSPACE
+          # that is examples/assistant-bot - the widest dependency
+          # surface in the repo (packages/cli does NOT declare agent).
+          # Dot-prefixed + untracked; nothing publishes from examples.
+          cp .github/smoke/soak.app.mjs examples/assistant-bot/.soak.app.mjs
+          cat > "${SOAK_DIR}/config.json" <<EOF
+          {
+            "server": {
+              "host": "127.0.0.1",
+              "port": 8090,
+              "rateLimit": { "enabled": false },
+              "csrf": { "enabled": false }
+            },
+            "auth": { "kind": "token", "pepperRef": "file:${SOAK_DIR}/secrets/pepper" },
+            "storage": { "path": "${SOAK_DIR}/data.db", "mode": "server" },
+            "secrets": { "source": "auto", "strict": false },
+            "observability": { "logger": "json" },
+            "app": "${GITHUB_WORKSPACE}/examples/assistant-bot/.soak.app.mjs"
+          }
+          EOF
+          node packages/cli/dist/bin/graphorin.js migrate --config "${SOAK_DIR}/config.json"
+          # Raw token stays in the env file - never logged.
+          SOAK_TOKEN=$(node packages/cli/dist/bin/graphorin.js token create \
+            --scopes agents:invoke,agents:read --label soak \
+            --config "${SOAK_DIR}/config.json" | tail -1)
+          node packages/cli/dist/bin/graphorin.js start --config "${SOAK_DIR}/config.json" \
+            > "${SOAK_DIR}/server.log" 2>&1 &
+          SERVER_PID=$!
+          echo "SERVER_PID=${SERVER_PID}" >> "${GITHUB_ENV}"
+          echo "SOAK_DIR=${SOAK_DIR}" >> "${GITHUB_ENV}"
+          {
+            echo "SOAK_TOKEN=${SOAK_TOKEN}"
+          } >> "${GITHUB_ENV}"
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8090/v1/health >/dev/null 2>&1; then
+              echo "soak server healthy after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::soak server did not become ready within 30s"
+          exit 1
+
+      - name: Drive load and gate on SLOs
+        env:
+          SOAK_URL: http://127.0.0.1:8090
+          SOAK_SECONDS: ${{ inputs.seconds || '600' }}
+          SOAK_CONCURRENCY: ${{ inputs.concurrency || '8' }}
+        run: |
+          set -euo pipefail
+          SOAK_SERVER_PID="${SERVER_PID}" node scripts/soak-driver.mjs
+
+      - name: Server log tail (on failure)
+        if: failure()
+        run: tail -n 100 "${SOAK_DIR}/server.log" || true
+
+      - name: Teardown
+        if: always()
+        run: |
+          kill "${SERVER_PID}" 2>/dev/null || true
+          rm -f examples/assistant-bot/.soak.app.mjs
+
+  # A red weekly soak must not die silently in the Actions tab.
+  notify-on-failure:
+    needs: [soak]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

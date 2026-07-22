@@ -262,6 +262,14 @@ export class ProviderHttpError extends GraphorinProviderError {
    * `withRetry`'s Retry-After hint reader consumes them.
    */
   readonly headers?: Readonly<Record<string, string>>;
+  /**
+   * Server-provided backoff hint in milliseconds, stamped at
+   * construction when the captured `retry-after` header carries a
+   * numeric seconds value. HTTP-date `Retry-After` values are left to
+   * `readRetryAfterMs` (resolved against the clock at retry time, not
+   * at construction).
+   */
+  readonly retryAfterMs?: number;
 
   constructor(args: {
     providerName: string;
@@ -277,7 +285,16 @@ export class ProviderHttpError extends GraphorinProviderError {
     this.providerName = args.providerName;
     this.status = args.status;
     this.errorKind = args.errorKind ?? classifyHttpStatus(args.status, args.message);
-    if (args.headers !== undefined) this.headers = args.headers;
+    if (args.headers !== undefined) {
+      this.headers = args.headers;
+      const retryAfter = args.headers['retry-after'];
+      if (retryAfter !== undefined && retryAfter.length > 0) {
+        const seconds = Number(retryAfter);
+        if (Number.isFinite(seconds) && seconds >= 0) {
+          this.retryAfterMs = Math.round(seconds * 1000);
+        }
+      }
+    }
   }
 }
 

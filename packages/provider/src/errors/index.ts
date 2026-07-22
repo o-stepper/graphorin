@@ -19,3 +19,4 @@ export {
   ProviderToolChoiceUnsupportedError,
   RateLimitExceededError,
 } from './errors.js';
+export { isRetryableProviderFailure, readRetryAfterMs } from './retryability.js';

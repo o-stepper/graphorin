@@ -265,6 +265,7 @@ See [Memory system](/guide/memory-system) for the full tier model and the confli
 
 ## Next steps
 
+- [Golden path: a local agent in 10 minutes](/guide/golden-path-local) - the same loop on a real local model, with a custom tool and expected output.
 - [Architecture](/guide/architecture) - how the layers fit together.
 - [Memory system](/guide/memory-system) - the six tiers, hybrid search, and the consolidator.
 - [Agent runtime](/guide/agent-runtime) - streaming, HITL, multi-agent handoffs.

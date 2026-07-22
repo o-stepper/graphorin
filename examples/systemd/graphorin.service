@@ -19,6 +19,11 @@ Description=Graphorin standalone server (TypeScript framework for personal AI as
 Documentation=https://github.com/o-stepper/graphorin
 After=network-online.target
 Wants=network-online.target
+; Restart-rate limit: these two live in [Unit] (systemd >= 230); in
+; [Service] they are silently ignored - which is exactly what happened
+; until the CI unit-verify gate flagged it.
+StartLimitIntervalSec=120
+StartLimitBurst=5
 
 [Service]
 Type=simple
@@ -80,10 +85,9 @@ KillSignal=SIGTERM
 TimeoutStopSec=30
 
 ; -- Self-healing --
+; (the StartLimit* pair lives in [Unit] - see above)
 Restart=on-failure
 RestartSec=5
-StartLimitIntervalSec=120
-StartLimitBurst=5
 
 ; -- Logging --
 StandardOutput=journal

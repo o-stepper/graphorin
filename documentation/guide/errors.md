@@ -79,23 +79,32 @@ plus a classified `errorKind`:
 | 503 / 529 | `capacity` | yes |
 | other 5xx | `transient` | yes |
 
-```ts
-import { ProviderHttpError } from '@graphorin/provider';
+The table above is not something you re-encode by hand - the exact
+predicate `withRetry` and `withFallback` share is exported, together
+with the `Retry-After` reader:
 
-function isRetryableProviderFailure(err: unknown): boolean {
-  // `status` and `errorKind` are stable; message text is not.
-  return (
-    err instanceof ProviderHttpError &&
-    (err.errorKind === 'transient' ||
-      err.errorKind === 'rate-limit' ||
-      err.errorKind === 'capacity')
-  );
+```ts
+import { isRetryableProviderFailure, readRetryAfterMs } from '@graphorin/provider';
+
+async function callWithOneRetry<T>(attempt: () => Promise<T>): Promise<T> {
+  try {
+    return await attempt();
+  } catch (err) {
+    if (!isRetryableProviderFailure(err)) throw err;
+    const delayMs = readRetryAfterMs(err) ?? 500;
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    return await attempt();
+  }
 }
 ```
 
-(In practice you rarely write this by hand - the `withRetry` /
-`withFallback` [provider middleware](/guide/providers) encode exactly
-these rules.)
+A numeric `Retry-After` response header is additionally stamped onto
+the error as `ProviderHttpError.retryAfterMs` at construction;
+HTTP-date values resolve through `readRetryAfterMs` against the clock
+at retry time. (In practice reach for the `withRetry` / `withFallback`
+[provider middleware](/guide/providers) first - the exports exist so
+custom recovery loops share their classification instead of forking
+it.)
 
 ## Server wire formats
 
@@ -104,7 +113,11 @@ Three surfaces, one envelope convention:
 - **REST routes** answer errors as a JSON body with an `error` field
   (the kind) and a `message` field, plus a meaningful HTTP status
   (`404` for unknown agents/workflows/threads, `400` for validation,
-  `409` for conflicts).
+  `409` for conflicts). One 409 worth knowing by name: a run against
+  a busy single-flight agent instance answers `409` with
+  `error: 'agent-busy'` on both `POST /v1/agents/:id/run` and
+  `POST /v1/runs/:runId/resume` - contention to pace or route around,
+  never a server fault (deploy an instance pool for parallel turns).
 - **Auth middleware** answers `401` / `429` with stable `error` codes:
   `auth-required`, `auth-invalid`, `auth-revoked`, `auth-expired`,
   `auth-locked-out`, `scope-denied`, `csrf-denied`, `cors-denied`,

@@ -150,13 +150,32 @@ block, so a number always says what configuration produced it:
   compares ALREADY-observed spend before each next request, so a run can
   overshoot the cap by at most one request's cost - it is a run-level
   budget guard, not a per-cent hard stop.
-- `--think true|false` overrides the SUBJECT leg's Ollama `think` mode
-  (the judge leg is always `think: false`). Thinking-default local models
-  (qwen3) can burn their whole output budget on the hidden chain and
-  answer EMPTY; `--think false` is the fix, and the setting is stamped
-  into `benchConfig`. `--timeout-ms N` raises the per-request HTTP
-  timeout on the subject and judge adapters - slow local full-context
-  runs exceed the adapter default mid-generation.
+- `--think <mode>` overrides the SUBJECT leg's Ollama `think` mode:
+  `true | false | low | medium | high` (effort levels pass through for
+  models that grade thinking depth; the judge leg is always
+  `think: false`). Thinking-default local models (qwen3) can burn their
+  whole output budget on the hidden chain and answer EMPTY;
+  `--think false` is the fix, and the setting is stamped into
+  `benchConfig`. `--timeout-ms N` raises the per-request HTTP timeout
+  on the subject and judge adapters - slow local full-context runs
+  exceed the adapter default mid-generation. `--num-ctx N` overrides
+  the subject leg's Ollama `num_ctx` so a full-context haystack
+  actually fits the window instead of silently truncating. All three
+  knobs exist on BOTH runners (`benchmark-longmemeval` and
+  `benchmark-halumem` - the HaluMem runner takes `--think` and
+  `--timeout-ms`).
+- Every report pins its own evidence (0.13.12 assessment, block 3):
+  `benchConfig.datasetPath` + `benchConfig.datasetSha256` (content hash
+  of the dataset file) identify WHICH dataset revision produced the
+  numbers, `benchConfig.subjectSpec` / `judgeSpec` record the exact
+  `{ provider, model, baseUrl }` behind the human-readable labels, and
+  each judged case persists the judge's raw reply
+  (`metadata.judgeText`) beside the parsed score - a persisted report
+  is auditable months later without the shell history that produced
+  it. The markdown/terminal reporters render the Wilson 95% CI (and
+  `pass^k` when `--iterations` > 1) the runner always computes, so a
+  3-case smoke reads as `100.0% (95% CI 43.9%-100.0%, n=3)`, never as
+  a bare 100%.
 - Infrastructure failures are classified, never averaged away
   (deep-retest 0.13.12): a case whose reason carries the stable
   `agent.run threw:` marker (provider timeout/HTTP error - the subject

@@ -10,7 +10,7 @@
 function __resetVercelRuntimeCache(): void;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:704
+Defined in: packages/provider/src/adapters/vercel.ts:800
 
 **`Internal`**
 

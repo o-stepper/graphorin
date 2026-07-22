@@ -10,7 +10,7 @@
 function llamaCppNodeAdapter(options): Provider;
 ```
 
-Defined in: src/adapter.ts:118
+Defined in: src/adapter.ts:135
 
 **`Stable`**
 

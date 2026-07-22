@@ -17,6 +17,18 @@ export function renderTerminalReport<I, O>(report: EvalReport<I, O>): string {
   lines.push(`passed:  ${summary.passed}`);
   lines.push(`failed:  ${summary.failed}`);
   lines.push(`avg ms:  ${summary.avgDurationMs.toFixed(2)}`);
+  // Render the uncertainty the runner already computes - a small-n run
+  // must not read as a confident result.
+  if (summary.passRateCi !== undefined && summary.total > 0) {
+    const rate = ((summary.passed / summary.total) * 100).toFixed(1);
+    const lo = (summary.passRateCi.lo * 100).toFixed(1);
+    const hi = (summary.passRateCi.hi * 100).toFixed(1);
+    lines.push(`pass:    ${rate}% (95% CI ${lo}%-${hi}%, n=${summary.total})`);
+  }
+  if (summary.passHatK !== undefined) {
+    const { k, baseCases, value } = summary.passHatK;
+    lines.push(`pass^${k}:  ${(value * 100).toFixed(1)}% over ${baseCases} base cases`);
+  }
   lines.push('');
   lines.push('per-scorer:');
   for (const [scorer, row] of Object.entries(summary.byScorer)) {

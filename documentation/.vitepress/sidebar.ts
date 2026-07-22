@@ -26,6 +26,15 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
     ],
   },
   {
+    text: 'Golden paths',
+    collapsed: false,
+    items: [
+      { text: 'Local agent in 10 minutes', link: '/guide/golden-path-local' },
+      { text: 'Production API server', link: '/guide/golden-path-production' },
+      { text: 'Safe code execution', link: '/guide/golden-path-sandbox' },
+    ],
+  },
+  {
     text: 'Core subsystems',
     collapsed: false,
     items: [

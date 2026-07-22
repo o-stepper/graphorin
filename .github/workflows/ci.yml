@@ -273,6 +273,55 @@ jobs:
       - name: Smoke-test examples
         run: pnpm run smoke-examples
 
+  # 0.13.12 assessment, block 4: the k8s manifest and the systemd unit
+  # were shipped, doc-linked, and never validated - a schema typo or a
+  # key in the wrong section (silently ignored by systemd) broke users,
+  # not a badge. Cheap (~seconds), so it runs per-PR. The first local
+  # run of this gate immediately caught StartLimitIntervalSec living in
+  # [Service], where systemd ignores it.
+  deploy-templates:
+    name: Deployment templates (kubeconform + systemd verify)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Validate the Kubernetes manifest (kubeconform, pinned)
+        run: |
+          set -euo pipefail
+          curl -sSL -o /tmp/kubeconform.tar.gz \
+            https://github.com/yannh/kubeconform/releases/download/v0.8.0/kubeconform-linux-amd64.tar.gz
+          echo "9bc2bffbf71f261128533edaf912153948b7ff238f9a531ae6d34466ec287883  /tmp/kubeconform.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/kubeconform.tar.gz -C /tmp kubeconform
+          /tmp/kubeconform -strict -summary examples/k8s/deployment.yaml
+
+      - name: Verify the systemd unit (syntax + offline security score)
+        run: |
+          set -euo pipefail
+          # verify needs the referenced user and ExecStart binary to
+          # exist; stub both (the unit is a template - its contract is
+          # syntax + hardening posture, not the binary).
+          sudo useradd --system --no-create-home graphorin || true
+          printf '#!/bin/sh\nexit 0\n' | sudo install -m 0755 /dev/stdin /usr/bin/graphorin
+          sudo cp examples/systemd/graphorin.service /etc/systemd/system/graphorin.service
+          # verify exits 0 even for silently-ignored keys (it only
+          # WARNS) - treat any output as a failure so the
+          # StartLimit*-in-wrong-section class cannot regress.
+          out=$(sudo systemd-analyze verify /etc/systemd/system/graphorin.service 2>&1 || true)
+          if [ -n "${out}" ]; then
+            echo "${out}"
+            echo "::error::systemd-analyze verify reported problems"
+            exit 1
+          fi
+          # Gate on the exposure score the unit header itself documents
+          # (target < 5). --offline analyzes the unit file without a
+          # running manager.
+          score=$(sudo systemd-analyze security --offline=true /etc/systemd/system/graphorin.service --no-pager 2>/dev/null \
+            | grep -o 'Overall exposure level for [^:]*: [0-9.]*' | grep -o '[0-9.]*$')
+          echo "systemd exposure score: ${score} (unit-documented target < 5)"
+          awk -v s="${score}" 'BEGIN { exit (s < 5.0) ? 0 : 1 }'
+
   # W-071: the pack gate. Everything above validates the WORKSPACE,
   # where workspace:* symlinks and shared root devDependencies mask
   # defects of the published artifacts; this job validates the packed

@@ -21,6 +21,7 @@ import pkg from '../package.json' with { type: 'json' };
  * nothing here touches the network.
  */
 
+import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -107,14 +108,22 @@ export interface BenchProviderSpec {
    * default unless `--think false` is passed (deep-retest 0.13.12 P2:
    * a thinking subject on the same models returned EMPTY answers for
    * 2/3 LOCOMO cases until `think: false` was set programmatically).
+   * Effort levels (`'low' | 'medium' | 'high'`) pass through to the
+   * adapter for models that grade thinking depth.
    */
-  readonly think?: boolean;
+  readonly think?: boolean | 'low' | 'medium' | 'high';
   /**
    * Per-request HTTP timeout forwarded to the adapter (deep-retest
    * 0.13.12 P2: slow local full-context runs hit the adapters' default
    * ceiling mid-generation; `--timeout-ms` makes it configurable).
    */
   readonly timeoutMs?: number;
+  /**
+   * Ollama `num_ctx` override for the SUBJECT leg. Full-context runs
+   * must fit the whole haystack in the model's context window; the
+   * adapter default (model-defined, often 4-8k) silently truncates it.
+   */
+  readonly numCtx?: number;
 }
 
 /** A resolved {@link Provider} plus the provenance label stamped into RESULTS. */
@@ -254,6 +263,7 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
             ...(baseUrl ? { baseUrl } : {}),
             ...(spec.think !== undefined ? { think: spec.think } : {}),
             ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+            ...(spec.numCtx !== undefined ? { numCtx: spec.numCtx } : {}),
           }),
           opts,
         ),
@@ -907,11 +917,15 @@ export interface CliArgs {
   iterations?: number;
   /**
    * deep-retest 0.13.12 P2: SUBJECT-leg Ollama `think` override (the
-   * judge leg is always `think: false`). Previously programmatic-only.
+   * judge leg is always `think: false`). Previously programmatic-only;
+   * effort levels (`low|medium|high`) added for models that grade
+   * thinking depth.
    */
-  think?: boolean;
+  think?: boolean | 'low' | 'medium' | 'high';
   /** deep-retest 0.13.12 P2: per-request HTTP timeout for subject + judge adapters. */
   timeoutMs?: number;
+  /** SUBJECT-leg Ollama `num_ctx` override (full-context runs must fit the haystack). */
+  numCtx?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
   help: boolean;
   /**
@@ -965,12 +979,15 @@ Flags:
   --allow-unpriced-model      Proceed under --max-cost-usd despite unpriced
                               models (their spend stays under-counted)
   --iterations <n>            Repeat cases for variance reporting
-  --think <true|false>        Ollama subject-leg think override (the judge leg is
-                              always think:false). Thinking-default models can
-                              burn their whole output budget and answer empty
+  --think <mode>              Ollama subject-leg think override: true | false |
+                              low | medium | high (the judge leg is always
+                              think:false). Thinking-default models can burn
+                              their whole output budget and answer empty
   --timeout-ms <n>            Per-request HTTP timeout for subject and judge
                               adapters (slow local full-context runs need more
                               than the adapter default)
+  --num-ctx <n>               Ollama subject-leg num_ctx override (full-context
+                              runs must fit the whole haystack in the window)
   --help, -h                  Show this help
 
 Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
@@ -1087,10 +1104,22 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
       i++;
     } else if (a === '--think') {
       const flag = value(a, next);
-      if (flag !== 'true' && flag !== 'false') {
-        throw new CliUsageError(`--think must be 'true' or 'false', got '${flag}'`);
+      if (flag === 'true' || flag === 'false') {
+        args.think = flag === 'true';
+      } else if (flag === 'low' || flag === 'medium' || flag === 'high') {
+        args.think = flag;
+      } else {
+        throw new CliUsageError(
+          `--think must be 'true', 'false', 'low', 'medium' or 'high', got '${flag}'`,
+        );
       }
-      args.think = flag === 'true';
+      i++;
+    } else if (a === '--num-ctx') {
+      const numCtx = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(numCtx) || numCtx <= 0) {
+        throw new CliUsageError(`--num-ctx must be a positive integer, got '${next}'`);
+      }
+      args.numCtx = numCtx;
       i++;
     } else if (a === '--timeout-ms') {
       const timeout = Number.parseInt(value(a, next), 10);
@@ -1116,6 +1145,27 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     }
   }
   return args;
+}
+
+/**
+ * Dataset identity evidence stamped into `benchConfig`: the path plus
+ * a sha256 of the file bytes so a persisted report pins WHICH dataset
+ * revision produced the numbers. Unreadable paths (or directories)
+ * degrade to path-only - identity evidence must never fail a run the
+ * loader itself accepted.
+ */
+export async function datasetEvidenceFor(
+  path: string,
+): Promise<{ datasetPath: string; datasetSha256?: string }> {
+  try {
+    const bytes = await readFile(path);
+    return {
+      datasetPath: path,
+      datasetSha256: createHash('sha256').update(bytes).digest('hex'),
+    };
+  } catch {
+    return { datasetPath: path };
+  }
 }
 
 /** Run metadata stamped into the RESULTS header beside the provider (SOTA-1). */
@@ -1300,6 +1350,7 @@ export async function main(): Promise<void> {
     ...(apiKey !== undefined ? { apiKey } : {}),
     ...(args.think !== undefined ? { think: args.think } : {}),
     ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
+    ...(args.numCtx !== undefined ? { numCtx: args.numCtx } : {}),
   });
   if (label.startsWith('stub')) {
     console.warn(
@@ -1473,6 +1524,10 @@ export async function main(): Promise<void> {
         ? ` abstentionRate=${(aggregates.abstentionRate * 100).toFixed(1)}%`
         : ''),
   );
+  // Evidence fields (0.13.12 assessment, block 3): pin WHICH dataset
+  // revision and WHICH exact models produced the numbers - labels alone
+  // cannot re-identify a run months later.
+  const datasetEvidence = await datasetEvidenceFor(args.dataset);
   const benchConfig = {
     mode,
     retrieval: args.retrieval ?? 'default',
@@ -1483,6 +1538,21 @@ export async function main(): Promise<void> {
     provider: label,
     judge: judgeLabel,
     selfJudged,
+    subjectSpec: {
+      ...(providerName !== undefined ? { provider: providerName } : {}),
+      ...(model !== undefined ? { model } : {}),
+      ...(baseUrl !== undefined ? { baseUrl } : {}),
+    },
+    ...(judgeSpec !== undefined
+      ? {
+          judgeSpec: {
+            provider: judgeSpec.name,
+            ...(judgeSpec.model !== undefined ? { model: judgeSpec.model } : {}),
+            ...(judgeSpec.baseUrl !== undefined ? { baseUrl: judgeSpec.baseUrl } : {}),
+          },
+        }
+      : {}),
+    ...datasetEvidence,
     iterations: args.iterations ?? 1,
     loader: args.loader,
     ...(args.variant !== undefined ? { variant: args.variant } : {}),
@@ -1491,6 +1561,7 @@ export async function main(): Promise<void> {
     ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
     ...(args.think !== undefined ? { think: args.think } : {}),
     ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
+    ...(args.numCtx !== undefined ? { numCtx: args.numCtx } : {}),
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),

@@ -21,6 +21,19 @@ export function renderMarkdownReport<I, O>(report: EvalReport<I, O>): string {
   lines.push(`| Passed | ${report.summary.passed} |`);
   lines.push(`| Failed | ${report.summary.failed} |`);
   lines.push(`| Avg duration (ms) | ${report.summary.avgDurationMs.toFixed(2)} |`);
+  // The runner always computes the Wilson interval; rendering it keeps
+  // a small-n run from reading as a confident result (a 3-case 100%
+  // shows as 100% with a 44-100% interval, not a bare 100%).
+  if (report.summary.passRateCi !== undefined && report.summary.total > 0) {
+    const rate = pct(report.summary.passed / report.summary.total);
+    const lo = pct(report.summary.passRateCi.lo);
+    const hi = pct(report.summary.passRateCi.hi);
+    lines.push(`| Pass rate (95% CI) | ${rate} (${lo} - ${hi}, n=${report.summary.total}) |`);
+  }
+  if (report.summary.passHatK !== undefined) {
+    const { k, baseCases, value } = report.summary.passHatK;
+    lines.push(`| pass^${k} stability | ${pct(value)} over ${baseCases} base cases |`);
+  }
   lines.push('');
   lines.push('## Per-scorer');
   lines.push('');
@@ -51,6 +64,10 @@ export function renderMarkdownReport<I, O>(report: EvalReport<I, O>): string {
     lines.push('');
   }
   return lines.join('\n');
+}
+
+function pct(fraction: number): string {
+  return `${(fraction * 100).toFixed(1)}%`;
 }
 
 /**

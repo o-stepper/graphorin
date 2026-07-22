@@ -10,7 +10,7 @@
 function vercelAdapter(model, options?): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:189
+Defined in: packages/provider/src/adapters/vercel.ts:206
 
 **`Stable`**
 

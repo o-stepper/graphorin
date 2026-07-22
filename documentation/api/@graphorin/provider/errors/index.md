@@ -34,6 +34,12 @@ Re-exports [InvalidProviderError](/api/@graphorin/provider/classes/InvalidProvid
 
 ***
 
+### isRetryableProviderFailure
+
+Re-exports [isRetryableProviderFailure](/api/@graphorin/provider/functions/isRetryableProviderFailure.md)
+
+***
+
 ### LocalProviderInsecureTransportError
 
 Re-exports [LocalProviderInsecureTransportError](/api/@graphorin/provider/classes/LocalProviderInsecureTransportError.md)
@@ -85,3 +91,9 @@ Re-exports [ProviderToolChoiceUnsupportedError](/api/@graphorin/provider/classes
 ### RateLimitExceededError
 
 Re-exports [RateLimitExceededError](/api/@graphorin/provider/classes/RateLimitExceededError.md)
+
+***
+
+### readRetryAfterMs
+
+Re-exports [readRetryAfterMs](/api/@graphorin/provider/functions/readRetryAfterMs.md)

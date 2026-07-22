@@ -132,6 +132,16 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
         deps.runs.complete(runId, 'completed');
         return c.json({ runId, status: 'completed', result }, 200);
       } catch (err) {
+        // Same mapping the resume route already applies: a busy
+        // single-flight agent instance is a client-addressable
+        // contention condition (retry later, or target another
+        // instance), not a server fault. The old 500 made load
+        // clients read a documented guard as an outage - found by
+        // the soak leg driving one instance concurrently.
+        if (err instanceof Error && err.name === 'ConcurrentRunError') {
+          deps.runs.complete(runId, 'failed', err);
+          return c.json({ error: 'agent-busy', runId, message: err.message }, 409);
+        }
         const aborted = tracker.signal.aborted;
         deps.runs.complete(runId, aborted ? 'aborted' : 'failed', err);
         return c.json(

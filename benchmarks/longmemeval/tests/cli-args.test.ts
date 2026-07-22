@@ -42,12 +42,22 @@ describe('benchmarks/longmemeval CLI args', () => {
   // deep-retest 0.13.12 P2: the subject-leg think override and the
   // per-request timeout were programmatic-only; both must parse (and
   // reject garbage loudly - a typo must never run the full benchmark).
-  it('parses --think as a strict boolean for the subject leg', () => {
+  it('parses --think as a boolean or effort level for the subject leg', () => {
     expect(parseArgs(['node', 'runner.js', '--think', 'false']).think).toBe(false);
     expect(parseArgs(['node', 'runner.js', '--think', 'true']).think).toBe(true);
+    expect(parseArgs(['node', 'runner.js', '--think', 'low']).think).toBe('low');
+    expect(parseArgs(['node', 'runner.js', '--think', 'medium']).think).toBe('medium');
+    expect(parseArgs(['node', 'runner.js', '--think', 'high']).think).toBe('high');
     expect(parseArgs(['node', 'runner.js']).think).toBeUndefined();
     expect(() => parseArgs(['node', 'runner.js', '--think', 'nope'])).toThrow(CliUsageError);
     expect(() => parseArgs(['node', 'runner.js', '--think'])).toThrow(/requires a value/);
+  });
+
+  it('parses --num-ctx as a positive integer for the subject leg', () => {
+    expect(parseArgs(['node', 'runner.js', '--num-ctx', '40960']).numCtx).toBe(40960);
+    expect(parseArgs(['node', 'runner.js']).numCtx).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--num-ctx', '0'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--num-ctx', 'big'])).toThrow(CliUsageError);
   });
 
   it('parses --timeout-ms as a positive integer', () => {
@@ -58,9 +68,10 @@ describe('benchmarks/longmemeval CLI args', () => {
     expect(() => parseArgs(['node', 'runner.js', '--timeout-ms', 'soon'])).toThrow(CliUsageError);
   });
 
-  it('documents --think and --timeout-ms in USAGE', () => {
-    expect(USAGE).toContain('--think <true|false>');
+  it('documents --think, --timeout-ms and --num-ctx in USAGE', () => {
+    expect(USAGE).toContain('--think <mode>');
     expect(USAGE).toContain('--timeout-ms <n>');
+    expect(USAGE).toContain('--num-ctx <n>');
     expect(USAGE).toContain('OPENAI_API_KEY');
   });
 

@@ -16,6 +16,7 @@ import type {
   Sensitivity,
   Usage,
 } from '@graphorin/core';
+import { createRequestTimeout } from '@graphorin/provider';
 import { ProviderHttpError } from '@graphorin/provider/errors';
 import { applyReasoningPolicy, resolveReasoningRetention } from '@graphorin/provider/reasoning';
 import {
@@ -94,6 +95,22 @@ export interface LlamaCppNodeAdapterOptions {
    * cannot re-sync and silently degrade to per-request behaviour.
    */
   readonly persistentSession?: boolean;
+  /**
+   * Opt-in deadline in milliseconds bounding the time to the FIRST
+   * generated token (model load included - a deadline that excluded
+   * the load would never catch the headline hang). Both `stream` and
+   * `generate` route through the same streaming path, so the scope is
+   * identical for both. On expiry the stream surfaces an in-band
+   * `error` event with kind `'transient'` and a
+   * `request timed out ...` message (this adapter's errors-as-events
+   * idiom); `generate()` re-throws it as
+   * `ProviderHttpError{ status: 0 }`, the retryable shape
+   * `withRetry` / `withFallback` recognise. A caller abort via
+   * `req.signal` still surfaces as `finishReason: 'aborted'`. Unset
+   * or `0` disables (no default - in-process inference has no
+   * universal "reasonable" bound).
+   */
+  readonly timeoutMs?: number;
 }
 
 const DEFAULT_CAPABILITIES: ProviderCapabilities = {
@@ -216,6 +233,14 @@ async function* streamLlamaCppNode(
   options: LlamaCppNodeAdapterOptions,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
+  // Armed before the (potentially slow) model load so a hung load is
+  // bounded too; the merged signal cancels the prompt, and the loop's
+  // user-abort checks keep reading the ORIGINAL `req.signal` so a
+  // fired deadline is never mistaken for a caller cancellation.
+  const timeout = createRequestTimeout({
+    ...(req.signal !== undefined ? { signal: req.signal } : {}),
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
+  });
   const { model } = await ensureModel();
   const lease = await acquireSession(
     model,
@@ -253,10 +278,11 @@ async function* streamLlamaCppNode(
   let aborted = false;
   try {
     const streamOptions: { signal?: AbortSignal; maxTokens?: number; temperature?: number } = {};
-    if (req.signal !== undefined) streamOptions.signal = req.signal;
+    if (timeout.signal !== undefined) streamOptions.signal = timeout.signal;
     if (req.maxTokens !== undefined) streamOptions.maxTokens = req.maxTokens;
     if (req.temperature !== undefined) streamOptions.temperature = req.temperature;
     for await (const piece of session.promptStreamingResponse(prompt, streamOptions)) {
+      timeout.clear();
       if (req.signal?.aborted) {
         aborted = true;
         break;
@@ -271,8 +297,22 @@ async function* streamLlamaCppNode(
     }
   } catch (err) {
     errored = true;
-    yield { type: 'error', error: { kind: 'unknown', message: (err as Error).message } };
+    // A deadline-triggered abort is a timeout (retryable
+    // 'transient'), not an opaque 'unknown' failure - and never a
+    // caller cancellation.
+    if (timeout.fired && req.signal?.aborted !== true) {
+      yield {
+        type: 'error',
+        error: {
+          kind: 'transient',
+          message: `request timed out after ${options.timeoutMs}ms before the model produced output`,
+        },
+      };
+    } else {
+      yield { type: 'error', error: { kind: 'unknown', message: (err as Error).message } };
+    }
   } finally {
+    timeout.clear();
     lease.release();
   }
   // W-096: tokenize the ASSEMBLED response once - per-chunk tokenization

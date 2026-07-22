@@ -33,7 +33,8 @@ import pkg from '../package.json' with { type: 'json' };
  * `:memory:` store.
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -87,6 +88,14 @@ export interface BenchProviderSpec {
   readonly model?: string;
   readonly baseUrl?: string;
   readonly apiKey?: string;
+  /**
+   * Ollama `think` override (longmemeval-twin parity). The judge leg
+   * always resolves with `think: false` - a thinking-default model
+   * otherwise burns its output budget on the chain and answers empty.
+   */
+  readonly think?: boolean | 'low' | 'medium' | 'high';
+  /** Per-request HTTP timeout forwarded to the adapter (twin parity). */
+  readonly timeoutMs?: number;
 }
 
 const REAL_PROVIDER_NAMES = ['ollama', 'llamacpp', 'openai-compatible'] as const;
@@ -113,14 +122,26 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): {
   const baseUrl = spec.baseUrl !== undefined && spec.baseUrl !== '' ? spec.baseUrl : undefined;
   if (name === 'ollama') {
     return {
-      provider: createProvider(ollamaAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }), opts),
+      provider: createProvider(
+        ollamaAdapter({
+          model,
+          ...(baseUrl ? { baseUrl } : {}),
+          ...(spec.think !== undefined ? { think: spec.think } : {}),
+          ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+        }),
+        opts,
+      ),
       label: `ollama:${model}`,
     };
   }
   if (name === 'llamacpp') {
     return {
       provider: createProvider(
-        llamaCppServerAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }),
+        llamaCppServerAdapter({
+          model,
+          ...(baseUrl ? { baseUrl } : {}),
+          ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+        }),
         opts,
       ),
       label: `llamacpp:${model}`,
@@ -131,7 +152,12 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): {
   }
   return {
     provider: createProvider(
-      openAICompatibleAdapter({ model, baseUrl, ...(spec.apiKey ? { apiKey: spec.apiKey } : {}) }),
+      openAICompatibleAdapter({
+        model,
+        baseUrl,
+        ...(spec.apiKey ? { apiKey: spec.apiKey } : {}),
+        ...(spec.timeoutMs !== undefined ? { timeoutMs: spec.timeoutMs } : {}),
+      }),
       opts,
     ),
     label: `openai-compatible:${model}`,
@@ -485,7 +511,31 @@ export interface CliArgs {
    * preflight under `--max-cost-usd` (spend stays under-counted).
    */
   allowUnpricedModel: boolean;
+  /** SUBJECT-leg Ollama `think` override (the judge leg is always `think: false`). */
+  think?: boolean | 'low' | 'medium' | 'high';
+  /** Per-request HTTP timeout for subject + judge adapters (twin parity). */
+  timeoutMs?: number;
   help: boolean;
+}
+
+/**
+ * Dataset identity evidence stamped into `benchConfig`: the path plus
+ * a sha256 of the file bytes so a persisted report pins WHICH dataset
+ * revision produced the numbers (longmemeval-twin). Unreadable paths
+ * degrade to path-only.
+ */
+export async function datasetEvidenceFor(
+  path: string,
+): Promise<{ datasetPath: string; datasetSha256?: string }> {
+  try {
+    const bytes = await readFile(path);
+    return {
+      datasetPath: path,
+      datasetSha256: createHash('sha256').update(bytes).digest('hex'),
+    };
+  } catch {
+    return { datasetPath: path };
+  }
 }
 
 /** A bad invocation (unknown flag, missing value) - report usage, never run. */
@@ -521,6 +571,11 @@ Flags:
                               subject/judge model has no pricing-snapshot entry
   --allow-unpriced-model      Proceed under --max-cost-usd despite unpriced
                               models (their spend stays under-counted)
+  --think <mode>              Ollama subject-leg think override: true | false |
+                              low | medium | high (the judge leg is always
+                              think:false)
+  --timeout-ms <n>            Per-request HTTP timeout for subject and judge
+                              adapters
   --help, -h                  Show this help
 
 Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
@@ -602,6 +657,25 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
         throw new CliUsageError(`--max-cost-usd must be a positive number, got '${next}'`);
       }
       args.maxCostUsd = ceiling;
+      i++;
+    } else if (a === '--think') {
+      const flag = value(a, next);
+      if (flag === 'true' || flag === 'false') {
+        args.think = flag === 'true';
+      } else if (flag === 'low' || flag === 'medium' || flag === 'high') {
+        args.think = flag;
+      } else {
+        throw new CliUsageError(
+          `--think must be 'true', 'false', 'low', 'medium' or 'high', got '${flag}'`,
+        );
+      }
+      i++;
+    } else if (a === '--timeout-ms') {
+      const timeout = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(timeout) || timeout <= 0) {
+        throw new CliUsageError(`--timeout-ms must be a positive integer, got '${next}'`);
+      }
+      args.timeoutMs = timeout;
       i++;
     } else if (a === '--allow-unpriced-model') {
       args.allowUnpricedModel = true;
@@ -772,6 +846,8 @@ export async function main(): Promise<void> {
     ...(model !== undefined ? { model } : {}),
     ...(baseUrl !== undefined ? { baseUrl } : {}),
     ...(apiKey !== undefined ? { apiKey } : {}),
+    ...(args.think !== undefined ? { think: args.think } : {}),
+    ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
   });
   if (label.startsWith('stub')) {
     console.warn(
@@ -792,6 +868,10 @@ export async function main(): Promise<void> {
           ...(judgeModel !== undefined ? { model: judgeModel } : {}),
           ...(judgeBaseUrl !== undefined ? { baseUrl: judgeBaseUrl } : {}),
           ...(judgeApiKey !== undefined ? { apiKey: judgeApiKey } : {}),
+          // Judges never think out loud: the output budget must go to
+          // the verdict marker (longmemeval-twin rule).
+          think: false,
+          ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
         })
       : undefined;
   if (args.stage === 'qa' && judgeResolved === undefined && !label.startsWith('stub')) {
@@ -932,12 +1012,33 @@ export async function main(): Promise<void> {
         `failed=${report.summary.failed}`,
     );
   }
+  // Evidence fields (0.13.12 assessment, block 3): pin WHICH dataset
+  // revision and WHICH exact models produced the numbers (twin of the
+  // longmemeval stamp).
+  const datasetEvidence = await datasetEvidenceFor(args.dataset);
   const benchConfig = {
     stage: args.stage,
     conflictPipeline,
     embedder,
     provider: label,
+    subjectSpec: {
+      ...(providerName !== undefined ? { provider: providerName } : {}),
+      ...(model !== undefined ? { model } : {}),
+      ...(baseUrl !== undefined ? { baseUrl } : {}),
+    },
     ...(judgeResolved !== undefined ? { judge: judgeResolved.label } : {}),
+    ...(judgeName !== undefined && judgeName !== ''
+      ? {
+          judgeSpec: {
+            provider: judgeName,
+            ...(judgeModel !== undefined ? { model: judgeModel } : {}),
+            ...(judgeBaseUrl !== undefined ? { baseUrl: judgeBaseUrl } : {}),
+          },
+        }
+      : {}),
+    ...datasetEvidence,
+    ...(args.think !== undefined ? { think: args.think } : {}),
+    ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
     ...(args.maxCostUsd !== undefined ? { maxCostUsd: args.maxCostUsd } : {}),
     ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
     ...(ceiling !== undefined
