@@ -61,13 +61,16 @@ export function createRequestTimeout(args: {
   }
   const ctl = new AbortController();
   let fired = false;
+  // Deliberately NOT unref'd, matching `callJsonHttp`'s timer: the
+  // armed deadline must keep the event loop alive so a call whose
+  // transport holds no handle of its own (fixture overrides, some
+  // in-process paths) still FAILS with the timeout error instead of
+  // the process draining and exiting mid-call. Leaks are prevented
+  // structurally - every consumer clears in a `finally`.
   const timer = setTimeout(() => {
     fired = true;
     ctl.abort();
   }, timeoutMs);
-  // A leaked timer must never hold the process open (Node-only API;
-  // absent in other runtimes).
-  (timer as { unref?: () => void }).unref?.();
   const signal =
     args.signal !== undefined ? AbortSignal.any([args.signal, ctl.signal]) : ctl.signal;
   return {
