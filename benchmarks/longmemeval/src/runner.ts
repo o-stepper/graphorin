@@ -753,6 +753,11 @@ export interface RunLongMemEvalOptions {
   readonly topK?: number;
   readonly consolidate?: boolean;
   readonly concurrency?: number;
+  /**
+   * Wall-clock ceiling per CASE (see {@link withCaseWallClock}); expiry
+   * classifies the case INFRASTRUCTURE_FAILED instead of a quality miss.
+   */
+  readonly caseTimeoutMs?: number;
   /** System-under-test: `memory` (default) or the `full-context` baseline (SOTA-1). */
   readonly mode?: BenchMode;
   /** Optional usage meter; populated with tokens/query across the run (SOTA-1). */
@@ -767,6 +772,38 @@ export interface RunLongMemEvalOptions {
   readonly retrievalStats?: RetrievalStats;
   /** Repeat every case N times for variance reporting (C8). Default 1. */
   readonly iterations?: number;
+}
+
+/**
+ * Bound each case's SUBJECT call with a wall clock. `--timeout-ms`
+ * bounds each individual HTTP request; a case that fans out into
+ * several requests (iterative retrieval, consolidation) or a runtime
+ * that stalls between requests escapes it. On expiry `run()` rejects,
+ * the library runner tags the case with `AGENT_RUN_THREW_MARKER`, and
+ * the classifier stamps it INFRASTRUCTURE_FAILED (non-zero exit) -
+ * never a silent quality miss. The guard bounds the CASE VERDICT; the
+ * underlying request keeps running until its own HTTP timeout.
+ */
+export function withCaseWallClock<I, O>(agent: AgentLike<I, O>, ms: number): AgentLike<I, O> {
+  return {
+    run(input: I, ctx?: { signal?: AbortSignal }): Promise<O> {
+      return new Promise<O>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error(`case wall-clock timeout after ${ms}ms (subject still pending)`));
+        }, ms);
+        agent.run(input, ctx).then(
+          (value) => {
+            clearTimeout(timer);
+            resolve(value);
+          },
+          (err: unknown) => {
+            clearTimeout(timer);
+            reject(err);
+          },
+        );
+      });
+    },
+  };
 }
 
 /** Run the benchmark and return the eval report (does not write RESULTS). */
@@ -801,8 +838,10 @@ export async function runLongMemEvalBenchmark(
             ? { retrievalStats: options.retrievalStats }
             : {}),
         });
+  const boundAgent =
+    options.caseTimeoutMs !== undefined ? withCaseWallClock(agent, options.caseTimeoutMs) : agent;
   return runEvals<MemoryEvalInput, string>({
-    agent,
+    agent: boundAgent,
     dataset: { cases },
     scorers: [judgeScorer(options.judgeProvider ?? options.provider), abstentionScorer()],
     concurrency: options.concurrency ?? 1,
@@ -924,6 +963,8 @@ export interface CliArgs {
   think?: boolean | 'low' | 'medium' | 'high';
   /** deep-retest 0.13.12 P2: per-request HTTP timeout for subject + judge adapters. */
   timeoutMs?: number;
+  /** Wall-clock ceiling per CASE (multi-request cases escape --timeout-ms). */
+  caseTimeoutMs?: number;
   /** SUBJECT-leg Ollama `num_ctx` override (full-context runs must fit the haystack). */
   numCtx?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
@@ -986,6 +1027,9 @@ Flags:
   --timeout-ms <n>            Per-request HTTP timeout for subject and judge
                               adapters (slow local full-context runs need more
                               than the adapter default)
+  --case-timeout-ms <n>       Wall-clock ceiling per CASE; expiry classifies
+                              the case INFRASTRUCTURE_FAILED (multi-request
+                              cases escape the per-request --timeout-ms)
   --num-ctx <n>               Ollama subject-leg num_ctx override (full-context
                               runs must fit the whole haystack in the window)
   --help, -h                  Show this help
@@ -1127,6 +1171,13 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
         throw new CliUsageError(`--timeout-ms must be a positive integer, got '${next}'`);
       }
       args.timeoutMs = timeout;
+      i++;
+    } else if (a === '--case-timeout-ms') {
+      const caseTimeout = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(caseTimeout) || caseTimeout <= 0) {
+        throw new CliUsageError(`--case-timeout-ms must be a positive integer, got '${next}'`);
+      }
+      args.caseTimeoutMs = caseTimeout;
       i++;
     } else if (a === '--allow-self-judge') {
       args.allowSelfJudge = true;
@@ -1444,6 +1495,7 @@ export async function main(): Promise<void> {
     ...(args.ability !== undefined ? { ability: args.ability } : {}),
     smoke: args.smoke,
     ...(args.topK !== undefined ? { topK: args.topK } : {}),
+    ...(args.caseTimeoutMs !== undefined ? { caseTimeoutMs: args.caseTimeoutMs } : {}),
     consolidate: args.consolidate,
     mode,
     meter,
@@ -1561,6 +1613,7 @@ export async function main(): Promise<void> {
     ...(args.allowUnpricedModel ? { allowUnpricedModel: true } : {}),
     ...(args.think !== undefined ? { think: args.think } : {}),
     ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
+    ...(args.caseTimeoutMs !== undefined ? { caseTimeoutMs: args.caseTimeoutMs } : {}),
     ...(args.numCtx !== undefined ? { numCtx: args.numCtx } : {}),
     ...(ceiling !== undefined
       ? {

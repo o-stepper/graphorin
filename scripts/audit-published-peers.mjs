@@ -80,6 +80,50 @@ function main() {
     process.exit(2);
   }
   const allowlisted = new Map(allowlist.map((entry) => [entry.ghsa, entry]));
+  // 1.0 criterion: every temporary security exception has an owner, a
+  // rationale, and an END date. A hard `expires` forces a periodic
+  // re-review - on expiry either the removeWhen condition is met
+  // (delete the entry) or a fresh review extends the date in the same
+  // commit that re-justifies it. Without this, an allowlist entry is
+  // silently permanent.
+  const today = new Date().toISOString().slice(0, 10);
+  const soon = new Date(Date.now() + 14 * 86_400_000).toISOString().slice(0, 10);
+  let expiredEntries = 0;
+  for (const entry of allowlist) {
+    if (typeof entry.owner !== 'string' || entry.owner.length === 0) {
+      console.error(
+        `::error::allowlist entry ${entry.ghsa} has no 'owner' - every exception needs one.`,
+      );
+      expiredEntries += 1;
+      continue;
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.expires ?? '')) {
+      console.error(
+        `::error::allowlist entry ${entry.ghsa} has no 'expires' (YYYY-MM-DD) - exceptions must end.`,
+      );
+      expiredEntries += 1;
+      continue;
+    }
+    if (entry.expires < today) {
+      console.error(
+        `::error::allowlist entry ${entry.ghsa} EXPIRED on ${entry.expires} (owner: ${entry.owner}). ` +
+          `Re-review: if '${entry.removeWhen}' is now true, delete the entry (and its docs); ` +
+          'otherwise extend expires in the same commit that re-justifies it.',
+      );
+      expiredEntries += 1;
+    } else if (entry.expires <= soon) {
+      console.warn(
+        `[published-peer-audit] WARN: allowlist entry ${entry.ghsa} expires ${entry.expires} ` +
+          `(owner: ${entry.owner}) - re-review due.`,
+      );
+    }
+  }
+  if (expiredEntries > 0) {
+    console.error(
+      `[published-peer-audit] FAIL: ${expiredEntries} expired/incomplete allowlist entr(y/ies).`,
+    );
+    process.exit(1);
+  }
   const packages = publishedPackageNames();
   if (packages.length === 0) {
     console.error('::error::no published packages found under packages/ - wrong checkout?');

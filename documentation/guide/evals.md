@@ -158,12 +158,14 @@ block, so a number always says what configuration produced it:
   `--think false` is the fix, and the setting is stamped into
   `benchConfig`. `--timeout-ms N` raises the per-request HTTP timeout
   on the subject and judge adapters - slow local full-context runs
-  exceed the adapter default mid-generation. `--num-ctx N` overrides
-  the subject leg's Ollama `num_ctx` so a full-context haystack
-  actually fits the window instead of silently truncating. All three
-  knobs exist on BOTH runners (`benchmark-longmemeval` and
-  `benchmark-halumem` - the HaluMem runner takes `--think` and
-  `--timeout-ms`).
+  exceed the adapter default mid-generation. `--case-timeout-ms N`
+  (longmemeval) adds a wall clock per CASE on top: a case that fans
+  out into several requests (iterative retrieval, consolidation)
+  escapes the per-request bound, and on expiry the case classifies
+  INFRASTRUCTURE_FAILED instead of a silent quality miss. `--num-ctx N`
+  overrides the subject leg's Ollama `num_ctx` so a full-context
+  haystack actually fits the window instead of silently truncating.
+  The HaluMem runner shares `--think` and `--timeout-ms`.
 - Every report pins its own evidence (0.13.12 assessment, block 3):
   `benchConfig.datasetPath` + `benchConfig.datasetSha256` (content hash
   of the dataset file) identify WHICH dataset revision produced the

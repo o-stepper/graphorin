@@ -53,6 +53,17 @@ describe('benchmarks/longmemeval CLI args', () => {
     expect(() => parseArgs(['node', 'runner.js', '--think'])).toThrow(/requires a value/);
   });
 
+  it('parses --case-timeout-ms as a positive integer', () => {
+    expect(parseArgs(['node', 'runner.js', '--case-timeout-ms', '600000']).caseTimeoutMs).toBe(
+      600000,
+    );
+    expect(parseArgs(['node', 'runner.js']).caseTimeoutMs).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--case-timeout-ms', '0'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--case-timeout-ms', 'long'])).toThrow(
+      CliUsageError,
+    );
+  });
+
   it('parses --num-ctx as a positive integer for the subject leg', () => {
     expect(parseArgs(['node', 'runner.js', '--num-ctx', '40960']).numCtx).toBe(40960);
     expect(parseArgs(['node', 'runner.js']).numCtx).toBeUndefined();
