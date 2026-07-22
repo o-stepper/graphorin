@@ -1,5 +1,18 @@
 # @graphorin/sessions
 
+## 0.13.13
+
+### Patch Changes
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P2: `DockerSandbox` no longer inherits the image's default user (root in most bases) - containers now run as `10001:10001` by default with the `/work` tmpfs owned by that uid, plus a PID ceiling (`pidsLimit`, default 128) and a CPU allowance (`cpus`, default 1) so hostile code cannot fork or busy-loop until the external timeout; all three are `createDockerSandbox` options, and live negative tests prove the uid, rootfs/network denials, and the pids cgroup ceiling on a real daemon. AES-GCM call sites (sessions export, encrypted-file secret store/resolver) now pass an explicit `authTagLength: 16` - behaviour is unchanged (both formats already sliced exactly 16 tag bytes); the invariant is now self-documenting and scanner-quiet.
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P3: every package sitting between an application and a zod-peer package (`core`/`tools`/`memory`/`mcp`) now re-declares the `zod` peer as **optional** (`peerDependenciesMeta`), so strict Yarn PnP installs stop emitting `YN0086` "does not provide zod" warnings - the application root's zod instance flows through the intermediaries. npm/pnpm behaviour is unchanged (optional peers are not auto-installed; the underlying required peers still resolve exactly as before).
+
+- Updated dependencies [[`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab), [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab)]:
+  - @graphorin/observability@0.13.13
+  - @graphorin/tools@0.13.13
+  - @graphorin/core@0.13.13
+
 ## 0.13.12
 
 ### Patch Changes

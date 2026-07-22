@@ -1,5 +1,15 @@
 # @graphorin/memory
 
+## 0.13.13
+
+### Patch Changes
+
+- Updated dependencies [[`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab), [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab), [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab)]:
+  - @graphorin/observability@0.13.13
+  - @graphorin/security@0.13.13
+  - @graphorin/tools@0.13.13
+  - @graphorin/core@0.13.13
+
 ## 0.13.12
 
 ### Patch Changes

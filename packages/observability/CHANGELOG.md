@@ -1,5 +1,16 @@
 # @graphorin/observability
 
+## 0.13.13
+
+### Patch Changes
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P1: infrastructure failures can no longer exit a benchmark green. The eval runner's `agent.run threw:` reason prefix is now the exported stable `AGENT_RUN_THREW_MARKER`, and the LongMemEval runner classifies such cases (provider timeouts, HTTP errors) as `INFRASTRUCTURE_FAILED` and judge off-format exhaustion as `JUDGE_FAILED` - both force a non-zero exit even under `--gate-on regressions` (previously two 120s provider timeouts scored as ordinary misses and a baseline-less regressions-gated run exited 0). Recovered judge retries become visible telemetry: `llmJudge` stamps `judge-retries: N` (exported `JUDGE_RETRY_MARKER`) into the score reason and `metadata.judgeRetries`, and both benchmark runners report `judgeRetriedCases`. Eval case results now echo the dataset's reference answer (`EvalCaseResult.expected`) so persisted reports can be adjudicated without re-joining the dataset. Benchmark runner UX: `--think true|false` (subject-leg Ollama reasoning override), `--timeout-ms` (per-request adapter timeout), and a credentials preflight that accepts `OPENAI_API_KEY` for the official OpenAI endpoint and fails fast on a keyless official-endpoint run instead of burning every case as HTTP 401.
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P3: every package sitting between an application and a zod-peer package (`core`/`tools`/`memory`/`mcp`) now re-declares the `zod` peer as **optional** (`peerDependenciesMeta`), so strict Yarn PnP installs stop emitting `YN0086` "does not provide zod" warnings - the application root's zod instance flows through the intermediaries. npm/pnpm behaviour is unchanged (optional peers are not auto-installed; the underlying required peers still resolve exactly as before).
+
+- Updated dependencies []:
+  - @graphorin/core@0.13.13
+
 ## 0.13.12
 
 ### Patch Changes

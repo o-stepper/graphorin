@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.13.12**](../../index.md)
+[**Graphorin API reference v0.13.13**](../../index.md)
 
 ***
 
@@ -232,7 +232,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.13.12 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.13.13 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

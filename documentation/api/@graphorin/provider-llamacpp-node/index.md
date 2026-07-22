@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.13.12**](../../index.md)
+[**Graphorin API reference v0.13.13**](../../index.md)
 
 ***
 
@@ -84,7 +84,7 @@ discipline rather than enforcing it at runtime.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.13.12 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.13.13 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>
 
 ## Modules
