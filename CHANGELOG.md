@@ -14,6 +14,33 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.15.1 - 2026-07-22
+
+A one-fix patch, found by the 0.15.0 published-surface smoke minutes
+after the release went out.
+
+- **`createRequestTimeout` no longer `unref`s its deadline timer**,
+  matching the HTTP adapters' timer semantics. An armed deadline now
+  keeps the event loop alive, so a call whose transport holds no
+  handle of its own (fixture-driven overrides, bare one-shot scripts)
+  fails with the honest timeout error instead of the process draining
+  and exiting mid-call with an unsettled top-level await. Real network
+  transports were never affected - their sockets ref the loop - which
+  is exactly why every in-repo test passed while a bare npm consumer
+  script surfaced it. A subprocess regression test now pins the loop
+  semantics (a bare `node` child arming a deadline must observe it
+  fire, not exit silently).
+
+Alongside the patch (no package code, so no version implications), the
+repo closed the last no-spend 1.0 residue of the 0.13.12 assessment:
+a weekly reproducible local-model baseline leg (pinned Ollama +
+qwen3:0.6b, published-not-gated with the evidence stamps asserted), the
+1-hour soak dispatch envelope with a published-runs table, hard
+owner/expiry on every security-exception allowlist entry, the
+docs-command sweep widened from cli.md to README + every guide page
+(which immediately found and fixed a parser attribution gap), and a
+per-case wall clock for the LongMemEval runner (`--case-timeout-ms`).
+
 ## 0.15.0 - 2026-07-22
 
 The **proof minor** (PR #249): the residue of the 0.13.12 overall
