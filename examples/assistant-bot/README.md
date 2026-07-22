@@ -20,7 +20,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/assistant-bot dev
 Expected dev output:
 
 ```
-graphorin v0.15.0 assistant-bot: OK - recipe='stub', recall='Lisbon', hitl=completed(gated-executions=1), heartbeat=notify, session-messages=7.
+graphorin v0.15.1 assistant-bot: OK - recipe='stub', recall='Lisbon', hitl=completed(gated-executions=1), heartbeat=notify, session-messages=7.
 ```
 
 **What just happened?**
@@ -223,4 +223,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

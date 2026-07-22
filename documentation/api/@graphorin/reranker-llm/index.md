@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.15.0**](../../index.md)
+[**Graphorin API reference v0.15.1**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > `Promise.all()`. Implements the `ReRanker` contract from
 > `@graphorin/memory/search`.
 >
-> Project Graphorin · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.15.0 (optional sub-pack)
+- **Published:** v0.15.1 (optional sub-pack)
 - **Default temperature:** `0` (deterministic).
 - **Default batch size:** `5` parallel provider calls.
 - **Default max score:** `10` (operator-tunable; finer scales improve
@@ -136,7 +136,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

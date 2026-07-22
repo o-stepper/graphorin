@@ -175,5 +175,5 @@ text.
 
 ---
 
-**Project Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy
+**Project Graphorin** · v0.15.1 · MIT License · © 2026 Oleksiy
 Stepurenko · <https://github.com/o-stepper/graphorin>

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/secret-1password",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "description": "Reference 1Password secret-resolver adapter for the Graphorin framework. Registers the `op://` scheme on top of `@graphorin/security`'s pluggable `SecretResolver` registry by shelling out to the official 1Password CLI (`op read 'op://<vault>/<item>/<field>'`). The resolver enforces a strict timeout, validates the URI before invoking the CLI, redacts the resolved value behind a `SecretValue`, and surfaces actionable errors when the CLI is missing, the user is not signed in, or the requested field is not present. Serves as the canonical template community packages should follow when wiring HashiCorp Vault, AWS Secrets Manager, GCP Secret Manager, Azure Key Vault, Bitwarden, or Unix `pass` as additional `SecretResolver` implementations. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

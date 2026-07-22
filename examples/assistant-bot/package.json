@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-assistant-bot",
-  "version": "0.15.0",
+  "version": "0.15.1",
   "private": true,
   "description": "The official whole-bot recipe for the Graphorin framework. One long-living personal assistant composed from every framework leg: createAgent with typed tools (one needsApproval HITL gate), createMemory over createSqliteStore with facts auto-recall, SessionManager persistence with JSONL export, createServer REST surface driving run -> awaiting_approval -> resume, a createHeartbeat proactivity beat with a notify outcome, and the channels front door (pairing + sanitization + identity routing) on the loopback adapter. Fully deterministic: an in-tree stub Provider, no network. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

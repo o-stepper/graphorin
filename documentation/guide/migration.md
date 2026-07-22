@@ -54,6 +54,15 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.15.0 -> 0.15.1
+
+One-fix patch, no action needed. `createRequestTimeout` (and therefore
+the opt-in `timeoutMs` on `vercelAdapter` / `llamaCppNodeAdapter`) no
+longer `unref`s its deadline timer: an armed deadline keeps the event
+loop alive, so a bare script whose transport holds no handle of its
+own observes the honest timeout error instead of the process exiting
+mid-call. Real network transports behave identically before and after.
+
 ### 0.14.0 -> 0.15.0
 
 A consolidation minor: no breaking API changes, one wire-contract
