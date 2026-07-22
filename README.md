@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.15.0](https://img.shields.io/badge/version-v0.15.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.15.1](https://img.shields.io/badge/version-v0.15.1-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.15.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.15.1`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.15.0** (2026-07-22) - the proof minor: the residue of the external overall assessment, closed on four fronts. Three verified **golden paths** now pave the way in - [a local agent in 10 minutes](https://docs.graphorin.com/guide/golden-path-local), [a production API server](https://docs.graphorin.com/guide/golden-path-production), and [safe code execution](https://docs.graphorin.com/guide/golden-path-sandbox) - every snippet type-checked in CI. Provider recovery semantics are unified: one exported `isRetryableProviderFailure` backs both `withRetry` and `withFallback`, `ProviderHttpError` carries `retryAfterMs`, and the two adapters without a timeout knob (Vercel AI SDK, in-process GGUF) gained an opt-in `timeoutMs` with the same retryable expiry shape as the HTTP adapters. Operational claims are now re-earned by CI: a crash-resume drill proves a durable workflow survives `docker kill` and completes after restart with no operator action, a weekly soak leg gates published SLOs (first run: 305 req/s for 300 s, 91,534/91,534 responses `200`, p95 4.3 ms), and the k8s/systemd templates validate per-PR - which immediately caught the systemd restart rate-limit sitting in a section systemd silently ignores. The soak leg found a wire inconsistency too: a busy agent instance now answers `409 agent-busy` on the run route (previously `500`), matching the resume route. Benchmark reports carry their own evidence (dataset sha256, exact model identities, raw judge replies, Wilson 95% CI rendered in every report). See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-14-0-0-15-0) for upgrade notes.
+Latest release: **0.15.1** (2026-07-22) - the proof minor: the residue of the external overall assessment, closed on four fronts. Three verified **golden paths** now pave the way in - [a local agent in 10 minutes](https://docs.graphorin.com/guide/golden-path-local), [a production API server](https://docs.graphorin.com/guide/golden-path-production), and [safe code execution](https://docs.graphorin.com/guide/golden-path-sandbox) - every snippet type-checked in CI. Provider recovery semantics are unified: one exported `isRetryableProviderFailure` backs both `withRetry` and `withFallback`, `ProviderHttpError` carries `retryAfterMs`, and the two adapters without a timeout knob (Vercel AI SDK, in-process GGUF) gained an opt-in `timeoutMs` with the same retryable expiry shape as the HTTP adapters. Operational claims are now re-earned by CI: a crash-resume drill proves a durable workflow survives `docker kill` and completes after restart with no operator action, a weekly soak leg gates published SLOs (first run: 305 req/s for 300 s, 91,534/91,534 responses `200`, p95 4.3 ms), and the k8s/systemd templates validate per-PR - which immediately caught the systemd restart rate-limit sitting in a section systemd silently ignores. The soak leg found a wire inconsistency too: a busy agent instance now answers `409 agent-busy` on the run route (previously `500`), matching the resume route. Benchmark reports carry their own evidence (dataset sha256, exact model identities, raw judge replies, Wilson 95% CI rendered in every report). See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-14-0-0-15-0) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

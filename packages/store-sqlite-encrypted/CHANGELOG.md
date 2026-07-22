@@ -1,5 +1,12 @@
 # @graphorin/store-sqlite-encrypted
 
+## 0.15.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @graphorin/store-sqlite@0.15.1
+
 ## 0.15.0
 
 ### Patch Changes

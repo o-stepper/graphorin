@@ -1,6 +1,6 @@
 # benchmark-locomo-multilingual
 
-**Graphorin** v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko · https://github.com/o-stepper/graphorin
+**Graphorin** v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko · https://github.com/o-stepper/graphorin
 
 This package holds **optional locale-specific question files** for the memory-retrieval QA benchmark runner (`@graphorin/benchmark-memory-smoke`). The runner loads `questions.jsonl` from a locale directory when invoked with `--subset <locale>`.
 
@@ -20,4 +20,4 @@ Community-maintained packs ship **after** the v0.6.0 tag; the hooks and procedur
 
 ---
 
-**Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.15.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
