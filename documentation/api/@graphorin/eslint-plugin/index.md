@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.14.0**](../../index.md)
+[**Graphorin API reference v0.15.0**](../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > ESLint rules for projects that build on **Graphorin**.
 
-- **Status:** v0.14.0 - final Phase 16 ruleset.
+- **Status:** v0.15.0 - final Phase 16 ruleset.
 - **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
@@ -108,7 +108,7 @@ The discovery is **text-based by design** (one implementation serves both the CL
 
 ---
 
-**Graphorin** · v0.14.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.15.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

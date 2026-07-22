@@ -1,5 +1,17 @@
 # @graphorin/provider-llamacpp-node
 
+## 0.15.0
+
+### Minor Changes
+
+- [#249](https://github.com/o-stepper/graphorin/pull/249) [`f28d394`](https://github.com/o-stepper/graphorin/commit/f28d3947598c71c43dd0a3f5327fbe0f277ced3a) Thanks [@o-stepper](https://github.com/o-stepper)! - Unified provider recovery semantics. One exported retryability classification - `isRetryableProviderFailure(err)` - now backs both `withRetry` and `withFallback` (previously two hand-maintained copies), and the `Retry-After` reader is exported as `readRetryAfterMs(err)`; `ProviderHttpError` stamps a first-class `retryAfterMs` when the response carried a numeric `Retry-After` header. The timeout story now covers all five adapters: `vercelAdapter` gains an opt-in `timeoutMs` (bounds time to the first stream chunk, or the whole `generate()` call) and `llamaCppNodeAdapter` gains an opt-in `timeoutMs` (bounds time to the first token, model load included) - both surface expiry as the same retryable `ProviderHttpError{ status: 0 }` shape the HTTP adapters throw, never as a silent abort. The shared deadline primitive is exported as `createRequestTimeout` for custom adapter authors.
+
+### Patch Changes
+
+- Updated dependencies [[`f28d394`](https://github.com/o-stepper/graphorin/commit/f28d3947598c71c43dd0a3f5327fbe0f277ced3a)]:
+  - @graphorin/provider@0.15.0
+  - @graphorin/core@0.15.0
+
 ## 0.14.0
 
 ### Patch Changes

@@ -1065,7 +1065,7 @@ importers:
         specifier: workspace:*
         version: link:../core
       '@graphorin/memory':
-        specifier: workspace:>=0.14.0 <1.0.0
+        specifier: workspace:>=0.15.0 <1.0.0
         version: link:../memory
       '@graphorin/protocol':
         specifier: workspace:*

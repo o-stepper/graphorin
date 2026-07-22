@@ -25,6 +25,69 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.15.0 - 2026-07-22
+
+The **proof minor** (PR #249): the residue of the 0.13.12 overall
+assessment after 0.14.0 - the four fronts a framework needs between
+"the code is right" and "you can bet an evening on it": a paved user
+path, one recovery semantics across every provider, operational claims
+a CI runner re-earns weekly, and benchmark reports that carry their own
+evidence. Two of the new gates paid for themselves before the release
+existed: the soak leg exposed a wire-contract inconsistency (a busy
+agent instance answered `500 run-failed` on the run route but
+`409 agent-busy` on the resume route), and the systemd verify gate
+found the template's restart rate-limit sitting in a section where
+systemd silently ignores it.
+
+- **Golden paths.** Three verified guide pages - a local agent in 10
+  minutes (Ollama, a custom tool, memory across restarts, expected
+  output), a production API server (scaffold to `curl` proof, with the
+  demo-vs-production checklist), and safe code execution (DockerSandbox
+  threat model, worked example, enforced-limits table, explicit
+  out-of-scope list). Every fence passes the snippet type-checker.
+- **One provider recovery semantics.** `withRetry` and `withFallback`
+  now share one exported predicate, `isRetryableProviderFailure`
+  (previously two hand-maintained copies); `readRetryAfterMs` is
+  exported beside it and `ProviderHttpError` stamps a first-class
+  `retryAfterMs` from a numeric `Retry-After` header. The two adapters
+  without a timeout knob gained an opt-in `timeoutMs` - `vercelAdapter`
+  (time to first chunk / whole `generate()`) and `llamaCppNodeAdapter`
+  (time to first token, model load included) - both surfacing expiry as
+  the same retryable `ProviderHttpError{ status: 0 }` shape the HTTP
+  adapters throw, never as a silent abort. Provider idempotency
+  semantics are now written down (calls are not idempotent; replay
+  protection lives at the server's `Idempotency-Key` boundary).
+- **Operational claims CI re-earns.** The weekly Docker smoke gained a
+  crash-resume drill: a workflow run parked on a durable timer survives
+  `docker kill` (SIGKILL) and completes after restart with no operator
+  action (first CI run: resumed 14 s after boot). A new weekly soak leg
+  drives paced load through the full agent-turn path against a stub
+  provider and gates on published SLOs - first CI run: 300 s at
+  305 req/s, 91,534/91,534 responses `200`, p95 4.3 ms, RSS peak
+  225 MB. Per-PR, the k8s manifest now validates under kubeconform
+  `-strict` and the systemd unit under `systemd-analyze verify` plus an
+  offline security score gated below 5 (currently 1.6). The operations
+  guide gained the honest scaling model (single-writer: scale up or
+  partition, availability = fast restore) and the SLO table.
+- **`409 agent-busy` everywhere.** `POST /v1/agents/:id/run` on a busy
+  single-flight agent instance now answers `409` with
+  `error: 'agent-busy'` (the mapping the resume route always had)
+  instead of `500 run-failed` - contention to pace or route around,
+  not a server fault. The error-contract page documents it; deploy an
+  instance pool for parallel turns.
+- **Benchmark reports carry their own evidence.** `benchConfig` pins
+  the dataset (`datasetPath` + `datasetSha256`) and the exact
+  `subjectSpec`/`judgeSpec` model identities; the LLM judge persists
+  its raw reply (`metadata.judgeText`); the markdown/terminal reporters
+  render the Wilson 95% CI and `pass^k` the runner always computed, so
+  a 3-case smoke reads as `100.0% (95% CI 43.9%-100.0%, n=3)`, never
+  as a bare 100%. `--think` generalizes to effort levels, `--num-ctx`
+  lands, and the HaluMem runner reaches knob parity.
+- **systemd template fix.** `StartLimitIntervalSec`/`StartLimitBurst`
+  moved from `[Service]` (where systemd silently ignores them - the
+  restart rate-limit never applied) to `[Unit]`; the new verify gate
+  fails on any silently-ignored key from here on.
+
 ## 0.14.0 - 2026-07-22
 
 The **consolidation minor** (PR #247): the follow-up to the fifteenth
