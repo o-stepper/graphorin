@@ -198,12 +198,70 @@ Same store write as `set`, surfaced separately so audit logs
 distinguish a rotation from an initial write. Rotate the deployment
 pepper and provider API keys on your normal credential schedule.
 
+## Scaling model
+
+SQLite is a single-writer store, and the architecture is honest about
+it: **exactly one server process owns the database file**. WAL mode
+keeps concurrent reads cheap inside that process; a second process on
+the same file is refused by the write lock, not silently corrupted.
+
+What that means operationally:
+
+- **Scale up, not out.** More CPU/RAM on the one node; the k8s
+  template's `replicas: 1` + `strategy: Recreate` is a design
+  statement, not a placeholder.
+- **Scale by partition, not by replica.** Multiple tenants or
+  workloads = multiple server instances, each with its own volume,
+  secrets, and tokens. Nothing is shared, so nothing needs consensus.
+- **Availability = fast restore, not failover.** The backup/restore
+  runbook above plus the crash-resume behaviour below are the
+  availability story today. A shared-backend HA topology would need a
+  different store backend and is tracked on the
+  [road to 1.0](/guide/stability#road-to-1-0).
+- **Agent instances are single-flight.** One run at a time per
+  registered instance (`409 agent-busy` otherwise) - deploy an
+  instance pool sized to your target concurrency (see the
+  [production golden path](/guide/golden-path-production)).
+
+## Load and soak SLOs
+
+The weekly soak workflow (`soak.yml`) drives sustained, paced load
+through the full server turn path - auth, agent runtime, provider
+streaming, run tracking, SQLite - using a deterministic stub provider,
+and fails the run when any published budget is violated:
+
+| SLO | Budget |
+| --- | --- |
+| Transport errors / 5xx / any non-200 | zero |
+| Latency p95 (full `POST /v1/agents/:id/run` turn, loopback, stub provider) | < 1000 ms |
+| Server RSS peak | < 1 GB |
+| Memory growth | last-quarter mean RSS < 2x first-quarter mean + 64 MB |
+
+The budgets are deliberately generous - shared CI runners are noisy
+neighbours; the gate exists to catch order-of-magnitude regressions
+and leaks, not 10% drift. The driver paces to ~300 requests/second
+(still far above real LLM-bound traffic) rather than hammering at max
+throughput: run-tracker bookkeeping retains terminal records for five
+minutes by design, so memory scales with request RATE, and an unpaced
+stub can push it anywhere. Reference numbers from the leg's local
+validation: ~287 req/s sustained, p95 11 ms, RSS flat around 150 MB.
+
 ## What CI proves
 
 - **Weekly Docker smoke**: image build, boot with the shipped config
   (encrypted store + token auth), online backup, full
   destroy-and-restore drill, health + token survival - plus an image
   vulnerability gate on fixable high/critical findings.
+- **Crash-resume drill** (same workflow): a workflow run parked on a
+  durable 15 s timer survives `docker kill` (SIGKILL - no shutdown
+  hooks) and completes after restart with NO operator action; the
+  timer daemon's post-boot sweep fires the due timer read back from
+  SQLite.
+- **Weekly soak**: the SLO table above, enforced.
+- **Per-PR template validation**: the Kubernetes manifest under
+  kubeconform `-strict`; the systemd unit under `systemd-analyze
+  verify` (any warning fails) plus an offline security-exposure score
+  gated below 5.
 - **Package test suites**: online backup mode/permissions, encrypt +
   rekey + swap live-writer guards, token rekey semantics, secrets
   bundle rekey round-trip (old passphrase must fail afterwards),
@@ -212,8 +270,9 @@ pepper and provider API keys on your normal credential schedule.
 
 ## Not covered yet
 
-Horizontal scaling, HA topologies, rolling upgrades across replicas,
-and load/soak envelopes are not yet documented or proven - they are
+HA topologies with automatic failover, rolling upgrades across
+replicas, chaos/failure-injection beyond the SIGKILL drill, and soak
+runs against real (non-stub) providers are not yet proven - they are
 the operational tail tracked on the
 [road to 1.0](/guide/stability#road-to-1-0). Until then, size a single
 node with [Performance & scale](/guide/performance) and treat the

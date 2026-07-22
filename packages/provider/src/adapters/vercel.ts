@@ -42,6 +42,7 @@ import { isAbortError } from '../internal/abort.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { inferReasoningContract } from '../reasoning/classify-contract.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
+import { createRequestTimeout, type RequestTimeout } from '../request-timeout.js';
 import { foldToolExamples } from '../tool-examples.js';
 import {
   applyCacheAnchors,
@@ -157,6 +158,22 @@ export interface VercelAdapterOptions {
    * fixture-driven implementation directly.
    */
   readonly runtimeOverrides?: VercelRuntimeOverrides;
+  /**
+   * Opt-in deadline in milliseconds. Streaming: bounds the time to
+   * the FIRST chunk (the timer is cleared once the stream produces);
+   * `generate`: bounds the whole call - the SDK owns the transport,
+   * so headers are not observable and time-to-response scoping is
+   * impossible. On expiry the adapter throws
+   * `ProviderHttpError{ status: 0 }` (`errorKind: 'transient'`,
+   * message `request timed out ...`), the same shape the `baseUrl`
+   * adapters throw, so `withRetry` / `withFallback` treat a hung SDK
+   * call exactly like a hung HTTP server. A caller abort via
+   * `req.signal` still surfaces as `finishReason: 'aborted'`, never
+   * as a timeout. Unset or `0` = no adapter-level deadline (unlike
+   * the HTTP adapters there is no default: a whole-call deadline
+   * would break long `generate` calls if it defaulted on).
+   */
+  readonly timeoutMs?: number;
 }
 
 const DEFAULT_CAPABILITIES: Omit<ProviderCapabilities, 'reasoningContract'> = {
@@ -201,16 +218,17 @@ export function vercelAdapter(
     ...options.capabilities,
   };
   const runtime = options.runtimeOverrides;
+  const timeoutMs = options.timeoutMs;
 
   return {
     name,
     modelId: model.modelId,
     capabilities,
     stream(req) {
-      return streamFromVercel(model, name, capabilities, req, runtime);
+      return streamFromVercel(model, name, capabilities, req, runtime, timeoutMs);
     },
     async generate(req) {
-      return generateFromVercel(model, name, capabilities, req, runtime);
+      return generateFromVercel(model, name, capabilities, req, runtime, timeoutMs);
     },
   };
 }
@@ -221,14 +239,35 @@ async function* streamFromVercel(
   capabilities: ProviderCapabilities,
   req: ProviderRequest,
   overrides: VercelRuntimeOverrides | undefined,
+  timeoutMs: number | undefined,
 ): AsyncIterable<ProviderEvent> {
   const sdk = await loadRuntime(overrides);
-  const callArgs = buildCallArgs(model, applyRequestPreflight(req, capabilities));
+  // Deadline scope: time to the FIRST chunk. The SDK receives the
+  // merged signal; user-abort classification below keeps reading the
+  // ORIGINAL `req.signal` so a fired deadline is never mistaken for a
+  // caller cancellation.
+  const timeout = createRequestTimeout({
+    ...(req.signal !== undefined ? { signal: req.signal } : {}),
+    ...(timeoutMs !== undefined ? { timeoutMs } : {}),
+  });
+  const callReq =
+    timeout.signal !== undefined && timeout.signal !== req.signal
+      ? { ...req, signal: timeout.signal }
+      : req;
+  const callArgs = buildCallArgs(model, applyRequestPreflight(callReq, capabilities));
+  const timeoutError = (cause: unknown): ProviderHttpError =>
+    new ProviderHttpError({
+      providerName,
+      status: 0,
+      message: `request timed out after ${timeoutMs}ms before streamText() produced output`,
+      cause,
+    });
   let stream: AsyncIterable<AISDKChunk>;
   try {
     const result = sdk.streamText(callArgs);
     stream = result.fullStream;
   } catch (cause) {
+    timeout.clear();
     const headers = headersFromCause(cause);
     throw new ProviderHttpError({
       providerName,
@@ -237,6 +276,9 @@ async function* streamFromVercel(
       cause,
       ...(headers !== undefined ? { headers } : {}),
     });
+  }
+  if (timeout.signal !== undefined && timeout.signal !== req.signal) {
+    stream = guardFirstChunkTimeout(stream, timeout, req.signal, timeoutError);
   }
 
   // W-023: the AI SDK never throws from streamText() synchronously -
@@ -396,8 +438,13 @@ async function* streamFromVercel(
               ? (pickString((errorField as { message?: unknown }).message) ?? 'unknown error')
               : 'unknown error';
         // W-023: an abort surfacing as an error chunk is a cancellation,
-        // never a retryable failure (mirrors PS-12).
+        // never a retryable failure (mirrors PS-12) - unless the abort
+        // came from the adapter's own deadline, which must surface as a
+        // retryable timeout, not a silent 'aborted'. The deadline can
+        // only fire before the first chunk, so this throw is provably
+        // pre-yield (PS-1 safe).
         if (isAbortError(errorField) || req.signal?.aborted === true) {
+          if (timeout.fired && req.signal?.aborted !== true) throw timeoutError(errorField);
           finishReason = 'aborted';
           break;
         }
@@ -446,19 +493,66 @@ async function* streamFromVercel(
   };
 }
 
+/**
+ * Iterate the SDK stream under the adapter deadline: clear the timer
+ * the moment ANY chunk arrives (deadline scope = time to first
+ * chunk), and convert a deadline-triggered abort THROWN by the
+ * iterator into the retryable timeout `ProviderHttpError`. A
+ * caller-initiated abort re-throws untouched. In-band
+ * `{type:'error'}` abort chunks pass through to the main loop, which
+ * applies the same conversion.
+ */
+async function* guardFirstChunkTimeout(
+  stream: AsyncIterable<AISDKChunk>,
+  timeout: RequestTimeout,
+  userSignal: AbortSignal | undefined,
+  timeoutError: (cause: unknown) => ProviderHttpError,
+): AsyncIterable<AISDKChunk> {
+  try {
+    for await (const chunk of stream) {
+      timeout.clear();
+      yield chunk;
+    }
+  } catch (cause) {
+    if (timeout.fired && userSignal?.aborted !== true) throw timeoutError(cause);
+    throw cause;
+  } finally {
+    timeout.clear();
+  }
+}
+
 async function generateFromVercel(
   model: LanguageModelLike,
   providerName: string,
   capabilities: ProviderCapabilities,
   req: ProviderRequest,
   overrides: VercelRuntimeOverrides | undefined,
+  timeoutMs: number | undefined,
 ): Promise<ProviderResponse> {
   const sdk = await loadRuntime(overrides);
-  const callArgs = buildCallArgs(model, applyRequestPreflight(req, capabilities));
+  // Deadline scope: the WHOLE call - `generateText` resolves once, so
+  // there is no observable "first output" moment to clear on.
+  const timeout = createRequestTimeout({
+    ...(req.signal !== undefined ? { signal: req.signal } : {}),
+    ...(timeoutMs !== undefined ? { timeoutMs } : {}),
+  });
+  const callReq =
+    timeout.signal !== undefined && timeout.signal !== req.signal
+      ? { ...req, signal: timeout.signal }
+      : req;
+  const callArgs = buildCallArgs(model, applyRequestPreflight(callReq, capabilities));
   let result: Awaited<ReturnType<VercelRuntimeOverrides['generateText']>>;
   try {
     result = await sdk.generateText(callArgs);
   } catch (cause) {
+    if (timeout.fired && req.signal?.aborted !== true) {
+      throw new ProviderHttpError({
+        providerName,
+        status: 0,
+        message: `request timed out after ${timeoutMs}ms awaiting generateText()`,
+        cause,
+      });
+    }
     const headers = headersFromCause(cause);
     throw new ProviderHttpError({
       providerName,
@@ -467,6 +561,8 @@ async function generateFromVercel(
       cause,
       ...(headers !== undefined ? { headers } : {}),
     });
+  } finally {
+    timeout.clear();
   }
   const usage = mapUsage(result.usage) ?? {
     promptTokens: 0,

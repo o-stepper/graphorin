@@ -9,7 +9,7 @@
 
 import type { Provider, ProviderEvent, ProviderRequest, ProviderResponse } from '@graphorin/core';
 
-import { isAbortError } from '../internal/abort.js';
+import { isRetryableProviderFailure, readRetryAfterMs } from '../errors/retryability.js';
 import { defineProviderMiddleware } from './compose.js';
 
 /**
@@ -39,7 +39,7 @@ export const withRetry = defineProviderMiddleware<WithRetryOptions>({
     const initialDelay = opts.initialDelayMs ?? 250;
     const maxDelay = opts.maxDelayMs ?? 30_000;
     const jitter = opts.jitter ?? true;
-    const isRetryable = opts.retryableErrors ?? defaultRetryable;
+    const isRetryable = opts.retryableErrors ?? isRetryableProviderFailure;
     const sleep = opts.sleepImpl ?? defaultSleep;
     return (next: Provider): Provider => ({
       name: next.name,
@@ -70,7 +70,7 @@ export const withRetry = defineProviderMiddleware<WithRetryOptions>({
             if (req.signal?.aborted) throw err;
             if (attempt >= maxRetries) throw err;
             if (!isRetryable(err)) throw err;
-            const hint = readRetryAfter(err);
+            const hint = readRetryAfterMs(err);
             const delay =
               hint !== null
                 ? Math.min(hint, maxDelay)
@@ -123,7 +123,7 @@ async function* retryingStream(
       if (yieldedAny) throw err;
       if (attempt >= maxRetries) throw err;
       if (!isRetryable(err)) throw err;
-      const hint = readRetryAfter(err);
+      const hint = readRetryAfterMs(err);
       const delay =
         hint !== null
           ? Math.min(hint, maxDelay)
@@ -132,91 +132,6 @@ async function* retryingStream(
       attempt++;
     }
   }
-}
-
-/**
- * Read a `Retry-After` hint from a thrown error. Recognises:
- *
- * - `RateLimitExceededError`-shaped errors carrying a `retryAfterMs`
- *   field (already milliseconds).
- * - HTTP-shaped errors carrying a `headers['retry-after']` value
- *   (numeric seconds; we convert to milliseconds).
- * - HTTP-shaped errors carrying a `retryAfterSeconds` numeric field.
- *
- * Returns the resolved delay in milliseconds or `null` when no hint
- * is available.
- *
- * @internal
- */
-function readRetryAfter(err: unknown): number | null {
-  if (err === null || typeof err !== 'object') return null;
-  const e = err as {
-    retryAfterMs?: number;
-    retryAfterSeconds?: number;
-    headers?: Record<string, string | undefined>;
-  };
-  if (
-    typeof e.retryAfterMs === 'number' &&
-    Number.isFinite(e.retryAfterMs) &&
-    e.retryAfterMs >= 0
-  ) {
-    return e.retryAfterMs;
-  }
-  if (
-    typeof e.retryAfterSeconds === 'number' &&
-    Number.isFinite(e.retryAfterSeconds) &&
-    e.retryAfterSeconds >= 0
-  ) {
-    return Math.round(e.retryAfterSeconds * 1000);
-  }
-  const headerValue =
-    e.headers?.['retry-after'] ?? e.headers?.['Retry-After'] ?? e.headers?.['RETRY-AFTER'];
-  if (typeof headerValue === 'string' && headerValue.length > 0) {
-    const seconds = Number(headerValue);
-    if (Number.isFinite(seconds) && seconds >= 0) return Math.round(seconds * 1000);
-    const httpDateMs = Date.parse(headerValue);
-    if (Number.isFinite(httpDateMs)) {
-      const delta = httpDateMs - Date.now();
-      return delta > 0 ? delta : 0;
-    }
-  }
-  return null;
-}
-
-function defaultRetryable(err: unknown): boolean {
-  if (err === null || typeof err !== 'object') return false;
-  // An aborted request is never retryable, even when it surfaces as a
-  // `status: 0` network error (PS-2). The retry loop also short-circuits on
-  // `req.signal?.aborted`, but the predicate must exclude abort independently
-  // so an internally-aborted call is not retried.
-  if (isAbortError(err)) return false;
-  const e = err as { kind?: string; errorKind?: string; status?: number; name?: string };
-  // `ProviderHttpError.kind` is always 'provider-http'; the canonical
-  // mapped kind rides on `errorKind` - consult both.
-  const kinds = [e.kind, e.errorKind];
-  if (
-    kinds.includes('transient') ||
-    kinds.includes('rate-limit') ||
-    kinds.includes('rate-limit-exceeded') ||
-    kinds.includes('capacity')
-  ) {
-    return true;
-  }
-  if (
-    kinds.includes('unauthorized') ||
-    kinds.includes('invalid-request') ||
-    kinds.includes('context-length') ||
-    kinds.includes('content-filter')
-  ) {
-    return false;
-  }
-  if (typeof e.status === 'number' && e.status === 429) return true;
-  if (typeof e.status === 'number' && e.status >= 500 && e.status < 600) return true;
-  // PS-2: a `ProviderHttpError{ status: 0 }` is a fetch-level network failure
-  // (ECONNREFUSED, DNS, connection reset) - exactly the transient class
-  // `withRetry` documents. Retry it (abort already excluded above).
-  if (typeof e.status === 'number' && e.status === 0) return true;
-  return false;
 }
 
 function computeDelay(

@@ -6,7 +6,7 @@
 
 # Interface: LanguageModelLike
 
-Defined in: packages/provider/src/adapters/vercel.ts:60
+Defined in: packages/provider/src/adapters/vercel.ts:61
 
 **`Stable`**
 
@@ -18,7 +18,7 @@ here so we do not pin a hard dependency on `@ai-sdk/provider`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | - | packages/provider/src/adapters/vercel.ts:62 |
-| <a id="property-provider"></a> `provider` | `readonly` | `string` | - | packages/provider/src/adapters/vercel.ts:61 |
-| <a id="property-specificationversion"></a> `specificationVersion?` | `readonly` | `string` \| `number` | - | packages/provider/src/adapters/vercel.ts:63 |
-| <a id="property-supportedtoolcalltypes"></a> `supportedToolCallTypes?` | `readonly` | readonly `string`[] | Optional capability flags carried by the AI SDK model. The adapter forwards them onto the canonical `ProviderCapabilities` shape; missing values are filled in with conservative defaults. | packages/provider/src/adapters/vercel.ts:69 |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | - | packages/provider/src/adapters/vercel.ts:63 |
+| <a id="property-provider"></a> `provider` | `readonly` | `string` | - | packages/provider/src/adapters/vercel.ts:62 |
+| <a id="property-specificationversion"></a> `specificationVersion?` | `readonly` | `string` \| `number` | - | packages/provider/src/adapters/vercel.ts:64 |
+| <a id="property-supportedtoolcalltypes"></a> `supportedToolCallTypes?` | `readonly` | readonly `string`[] | Optional capability flags carried by the AI SDK model. The adapter forwards them onto the canonical `ProviderCapabilities` shape; missing values are filled in with conservative defaults. | packages/provider/src/adapters/vercel.ts:70 |

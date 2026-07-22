@@ -164,7 +164,11 @@ export function llmJudge<I = unknown, O = unknown>(options: LlmJudgeOptions<I, O
       const clamped = Math.max(0, Math.min(maxScore, raw));
       const pass = clamped >= passThreshold;
       const judgeRetries = attempts - 1;
-      const metadata = { raw, clamped, passThreshold, maxScore, judgeRetries };
+      // `judgeText` preserves the judge's raw reply as audit evidence -
+      // a persisted report can then show WHAT the judge said, not just
+      // the parsed number (replies are bounded by `maxOutputTokens`, so
+      // the field stays small).
+      const metadata = { raw, clamped, passThreshold, maxScore, judgeRetries, judgeText: text };
       // deep-retest-0.13.12 P3: surface recovered off-format retries so
       // reports can distinguish a clean first grade from a recovered one
       // (and attribute the extra judge call's cost).

@@ -196,15 +196,88 @@ jobs:
             --config /etc/graphorin/config.json --json | grep -q 'smoke-drill'
           echo "backup/restore drill OK: pre-backup token survived the volume wipe"
 
+      # operations.md runbook drill 2 (0.13.12 assessment, block 4):
+      # crash recovery of a partially executed workflow, operator-free.
+      # A run parks on a durable 15s timer (wakeAt persisted on the
+      # SQLite checkpoint), the server dies by SIGKILL mid-sleep (no
+      # shutdown hooks run - strictly harsher than graceful shutdown),
+      # a fresh container boots on the same volume, and the workflow
+      # timer daemon's post-boot sweep must fire the due timer and
+      # complete the run with no resume call. Compose assets live in
+      # .github/smoke/ (drill-config.json + drill.app.mjs); the module
+      # is mounted INSIDE /app/packages/cli so its bare @graphorin/*
+      # imports resolve through the image's production node_modules.
+      # Validated locally on the lean image before landing (resumed in
+      # ~4s after restart).
+      - name: Crash-resume drill (durable workflow survives SIGKILL)
+        run: |
+          set -euo pipefail
+          # The backup drill's server still holds port 8080 - retire it.
+          docker rm -f graphorin-smoke
+          docker volume create graphorin-drill-data
+          run_drill_server() {
+            docker run -d --name graphorin-drill \
+              --read-only --tmpfs /tmp \
+              --security-opt no-new-privileges \
+              --cap-drop=ALL \
+              -v graphorin-drill-data:/data \
+              -v "${GITHUB_WORKSPACE}/.github/smoke/drill-config.json:/etc/graphorin/config.json:ro" \
+              -v "${GITHUB_WORKSPACE}/.github/smoke/drill.app.mjs:/app/packages/cli/drill.app.mjs:ro" \
+              -v "${RUNNER_TEMP}/gsecrets:/run/secrets/graphorin:ro" \
+              -p 8080:8080 \
+              graphorin:smoke
+          }
+          wait_for_health() {
+            for i in $(seq 1 45); do
+              if curl -fsS http://localhost:8080/v1/health >/dev/null 2>&1; then
+                echo "drill server healthy after ${i}s"
+                return 0
+              fi
+              sleep 1
+            done
+            echo "::error::drill server did not become ready within 45s"
+            return 1
+          }
+          run_drill_server
+          wait_for_health
+          # Raw token stays in the shell variable - never logged.
+          TOKEN=$(docker exec graphorin-drill graphorin token create \
+            --scopes workflows:execute,workflows:read --label crash-drill \
+            --config /etc/graphorin/config.json | tail -1)
+          curl -fsS -X POST http://localhost:8080/v1/workflows/crash-drill/execute \
+            -H "Authorization: Bearer ${TOKEN}" -H 'Content-Type: application/json' \
+            -d '{"threadId":"drill-thread-1"}' > /dev/null
+          sleep 2
+          curl -fsS "http://localhost:8080/v1/workflows/crash-drill/state?threadId=drill-thread-1" \
+            -H "Authorization: Bearer ${TOKEN}" | grep -q '"status":"suspended"'
+          echo "run parked on the durable timer - killing the server mid-sleep"
+          docker kill graphorin-drill
+          docker rm graphorin-drill
+          run_drill_server
+          wait_for_health
+          for i in $(seq 1 45); do
+            STATE=$(curl -fsS "http://localhost:8080/v1/workflows/crash-drill/state?threadId=drill-thread-1" \
+              -H "Authorization: Bearer ${TOKEN}" || true)
+            if echo "${STATE}" | grep -q '"status":"completed"'; then
+              echo "crash-resume drill OK: run completed ${i}x2s after restart with no operator action"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::workflow did not auto-resume within 90s of restart"
+          exit 1
+
       - name: Container logs (on failure)
         if: failure()
-        run: docker logs graphorin-smoke || true
+        run: |
+          docker logs graphorin-smoke || true
+          docker logs graphorin-drill || true
 
       - name: Teardown
         if: always()
         run: |
-          docker rm -f graphorin-smoke || true
-          docker volume rm -f graphorin-data graphorin-data-restored || true
+          docker rm -f graphorin-smoke graphorin-drill || true
+          docker volume rm -f graphorin-data graphorin-data-restored graphorin-drill-data || true
 
   # E3: a red weekly run must not die silently in the Actions tab - this is
   # the exact CI-11 regression class this workflow exists to catch.

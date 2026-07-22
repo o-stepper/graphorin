@@ -159,6 +159,27 @@ Handoffs strip reasoning by default - the default handoff filter and every `filt
 
 The HTTP adapters (Ollama, OpenAI-compatible, `llama.cpp` server) apply a **default time-to-response timeout of 120 s** per request: a hung server that never answers surfaces as a retryable `ProviderHttpError` ("request timed out…") instead of stalling `generate()` forever. The timer is scoped to the response headers - once the server starts answering, a long streaming body is never killed. Override per adapter with `timeoutMs` (`0` disables); the caller's `signal` always composes.
 
+The non-HTTP adapters take the same option, **opt-in** (no default -
+their transports cannot observe headers, so a default would bound
+whole calls and break long generations):
+
+- **Vercel AI SDK**: `timeoutMs` bounds the time to the FIRST stream
+  chunk (the timer clears once output flows) and the whole call for
+  `generate()`. Expiry throws the same retryable
+  `ProviderHttpError{ status: 0 }` shape as the HTTP adapters, so a
+  hung SDK call retries and fails over identically.
+- **In-process GGUF**: `timeoutMs` bounds the time to the first
+  generated token, model load included. Expiry surfaces through the
+  adapter's in-band error idiom with kind `'transient'`; `generate()`
+  re-throws it as `ProviderHttpError{ status: 0 }`.
+
+A caller abort via `signal` always stays a cancellation
+(`finishReason: 'aborted'`) - a fired deadline is never misreported as
+an abort, and vice versa. All five adapters therefore answer the same
+two questions the same way: what bounds a hung call (`timeoutMs`), and
+what a timeout looks like to middleware (a retryable
+`ProviderHttpError` with `status: 0`).
+
 The same adapters now consume `ProviderRequest.outputType` (set by the agent's `outputType` config and the memory pipelines): a structured request with `outputType.jsonSchema` maps to the OpenAI-shaped strict `response_format: json_schema` and to Ollama's native `format` field. A SCHEMA-LESS structured request deliberately sends no `response_format` (live-verified: the Anthropic OpenAI-compat endpoint rejects every permissive spelling - `json_object`, `strict: false`, and open schemas under `strict: true`); the agent's trailing JSON instruction carries the contract and the local `schema.parse` validates. Note for the compat endpoint: an explicit `jsonSchema` must be CLOSED (`additionalProperties: false`, all properties required) or the server answers 400. The mapping is gated on the adapter's `capabilities.structuredOutput` - override it to `false` for servers that reject `response_format`.
 
 ## Adapters at a glance
@@ -182,11 +203,11 @@ override on the adapter options always wins (e.g. flip
 | Think control | `providerOptions` | native `think` option | `providerOptions.reasoning_effort` | `providerOptions.reasoning_effort` | n/a |
 | Prompt caching | `cachePolicy` -> Anthropic `cache_control` anchors; read + write usage legs | none | read-only (`cached_tokens` -> `cachedReadTokens`) | read-only | KV-cache reuse via `persistentSession` (no wire cache) |
 | Usage accounting | input/output/total + reasoning + cache read/write | prompt/completion/total + server timings metadata | prompt/completion/total + reasoning + cached read | same | prompt/completion/total |
-| `timeoutMs` option | no (compose `signal`; SDK owns transport) | yes (default 120 s) | yes (default 120 s) | yes (default 120 s) | n/a (in-process) |
+| `timeoutMs` option | yes (opt-in; first chunk / whole `generate`) | yes (default 120 s) | yes (default 120 s) | yes (default 120 s) | yes (opt-in; first token, load included) |
 | Abort via `signal` | yes | yes | yes | yes | yes |
 | Default context / max output | 200k / 16384 | 8192 / 4096 | 8192 / 4096 | 8192 / 4096 | 8192 / 4096 |
 
-Three cross-cutting notes:
+Cross-cutting notes:
 
 - **Aborts are results, not throws.** Every adapter maps a caller abort
   to `finishReason: 'aborted'` on the response instead of throwing, and
@@ -195,6 +216,23 @@ Three cross-cutting notes:
   tracing are middleware**, not adapter features - see the
   [middleware table](#why-a-provider-and-not-the-raw-sdk) above. Any
   adapter composes with all of them.
+- **One retryability classification.** `withRetry` and `withFallback`
+  share the exported `isRetryableProviderFailure(err)` predicate
+  (transient / rate-limit / capacity kinds, plus 429, 5xx, and
+  `status: 0` network failures; terminal kinds and aborts never
+  retry). Server-provided backoff resolves through the exported
+  `readRetryAfterMs(err)` - a numeric `Retry-After` header is also
+  stamped as `ProviderHttpError.retryAfterMs` at construction. Build
+  custom recovery loops on the same two exports and they can never
+  drift from the middleware.
+- **Provider calls are not idempotent.** No adapter sends an
+  idempotency key upstream (no major LLM API accepts one); retries are
+  therefore bounded to states that cannot double-charge or duplicate
+  output - `generate()` failures and pre-first-event stream failures.
+  Once a stream has yielded, neither `withRetry` nor `withFallback`
+  restarts it. Request-replay idempotency exists one layer up, at the
+  server HTTP boundary (`Idempotency-Key` header - see
+  [Standalone server](/guide/standalone-server#idempotency)).
 - **One-shot parameter recovery** (OpenAI-compatible + llama.cpp
   server only): on a matching HTTP 400 the adapter retries once with
   `max_tokens` remapped to `max_completion_tokens`, an unsupported
