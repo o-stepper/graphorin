@@ -14,6 +14,62 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.14.0 - 2026-07-22
+
+The **consolidation minor** (PR #247): the follow-up to the fifteenth
+external review, an overall assessment that scored the project
+"production-capable beta, 7.5/10" and whose remaining critique was not
+features but PROOF - a production-shaped container, a written
+stability contract, and operational runbooks that CI actually
+exercises. This release ships exactly that, and the new backup/restore
+drill immediately earned its keep by catching a real bug before it
+could reach an operator: `graphorin storage backup` on an encrypted
+store had never worked (the page-level backup API cannot key either
+side of the transfer, so the cipher driver refused with a cryptic
+"incompatible source and target databases" error).
+
+- **Encrypted backups are real now.** On an encrypted store,
+  `storage backup` takes a consistent **stopped-server byte copy**:
+  checkpoint the WAL, prove no other holder is live (a running server
+  gets a clear live-writer refusal instead of a torn copy), copy,
+  then verify the copy's cipher integrity. Plaintext stores keep the
+  online page-level path. New `backupEncryptedDatabase` +
+  `EncryptedBackupLiveWriterError` exports in
+  `@graphorin/store-sqlite-encrypted`; a real-peer regression test
+  pins the naive-path failure so the byte-copy rationale stays honest.
+- **Lean production image.** The Docker template's runtime stage now
+  ships the production dependency closure only - **298 MB measured
+  against 1.05 GB** before. The builder does the full workspace
+  build, promotes the runtime pieces the workspace dev-satisfies (the
+  SQLite natives, the cipher peer, the encrypted-store sub-pack, the
+  agent runtime, per-package zod), wipes `node_modules`, reinstalls
+  just the CLI subtree with `--prod`, and strips source/test trees.
+  grype reports no vulnerabilities at the gate settings; dockerode,
+  isolated-vm and `@graphorin/mcp` become documented derived-image
+  add-ons (registry consumers never received them by default either).
+- **Key rotation is fully tooled.** New `graphorin secrets rekey
+  --new-passphrase-from <ref>` re-encrypts the encrypted-file secrets
+  bundle under a new passphrase (fresh KDF salt, values unchanged;
+  exit `2` for sources without a bundle passphrase), backed by
+  `EncryptedFileSecretsStore.rekey()` and a `secret:rekey` audit
+  action - completing the set: `storage rekey` for the database key,
+  `token rekey` for the pepper, `secrets rotate` for individual
+  values, `secrets rekey` for the bundle.
+- **The contract is written down.** Three new guide pages - Stability
+  & versioning (tiers, deprecation policy, supported platforms,
+  artifact compatibility, the road to 1.0), Error contract (the
+  `code`/`kind` families, per-package bases, provider HTTP
+  classification, server wire formats, what is and is not
+  contractual), and Operations runbooks (backup, restore, upgrade,
+  rollback, key rotation - each with its CI proof; the weekly Docker
+  smoke now runs the full backup -> destroy-volume -> restore ->
+  data-survives drill). The Providers guide gained a per-adapter
+  capability matrix. Two stragglers were reparented so the error
+  contract holds: `ToolRateLimitError` joins `GraphorinToolsError`
+  (kind `'rate-limited'`), `TimerDriverStoreUnsupportedError` joins
+  `WorkflowError` (code `'timer-driver-store-unsupported'`), and the
+  `AgentRuntimeError` / `SessionError` bases now thread `{ cause }`.
+
 ## 0.13.13 - 2026-07-22
 
 The **dependency + benchmark-integrity patch** (PR #244): remediation of

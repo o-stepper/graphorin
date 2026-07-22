@@ -1,5 +1,26 @@
 # @graphorin/cli
 
+## 0.14.0
+
+### Minor Changes
+
+- [#247](https://github.com/o-stepper/graphorin/pull/247) [`8ff1d25`](https://github.com/o-stepper/graphorin/commit/8ff1d257a489e5da686318d8c617576fbf2b0002) Thanks [@o-stepper](https://github.com/o-stepper)! - Operational primitives for the key-rotation and backup runbooks. `graphorin storage backup` on an encrypted store previously failed with the cryptic driver error "backup is not supported with incompatible source and target databases" (the page-level backup API cannot key either side of the transfer); it is now a consistent stopped-server byte copy - checkpoint, prove no live holder (refusing with a clear live-writer error while the server runs), copy, verify the copy's cipher integrity - via the new `backupEncryptedDatabase` export (`EncryptedBackupLiveWriterError` extends `EncryptSwapLiveWriterError`). Plaintext stores keep the online page-level path. New `graphorin secrets rekey --new-passphrase-from <ref>` re-encrypts the encrypted-file secrets bundle under a new passphrase (fresh KDF salt, values unchanged; exit 2 for sources without a bundle passphrase), backed by `EncryptedFileSecretsStore.rekey()` and a new `secret:rekey` audit action.
+
+### Patch Changes
+
+- Updated dependencies [[`8ff1d25`](https://github.com/o-stepper/graphorin/commit/8ff1d257a489e5da686318d8c617576fbf2b0002), [`8ff1d25`](https://github.com/o-stepper/graphorin/commit/8ff1d257a489e5da686318d8c617576fbf2b0002)]:
+  - @graphorin/workflow@0.14.0
+  - @graphorin/sessions@0.14.0
+  - @graphorin/security@0.14.0
+  - @graphorin/memory@0.14.0
+  - @graphorin/server@0.14.0
+  - @graphorin/skills@0.14.0
+  - @graphorin/core@0.14.0
+  - @graphorin/eslint-plugin@0.14.0
+  - @graphorin/pricing@0.14.0
+  - @graphorin/provider@0.14.0
+  - @graphorin/store-sqlite@0.14.0
+
 ## 0.13.13
 
 ### Patch Changes
