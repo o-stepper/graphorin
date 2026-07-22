@@ -267,6 +267,18 @@ overrides:
 
 The same guidance is printed on both packages' npm pages (their READMEs carry the advisory sections verbatim), and the scheduled `published-peer-audit` job now also **proves the mitigations**: it installs a consumer fixture with each documented override against the live registry and fails if the one-liner ever stops removing its advisory.
 
+### Known advisory: nested @hono/node-server under @hono/node-ws
+
+`@graphorin/server` itself depends on `@hono/node-server` 2.x (patched), but its WebSocket helper `@hono/node-ws` (1.3.x, the latest) still peers on `@hono/node-server ^1.19`, so npm consumers get a **nested** 1.x copy and `npm audit` reports the **moderate** [GHSA-frvp-7c67-39w9](https://github.com/advisories/GHSA-frvp-7c67-39w9) (Windows path traversal in `serve-static`). Exposure: neither Graphorin nor `@hono/node-ws` imports the `serve-static` entry point - a tripwire test in `@graphorin/server` keeps it that way - so the vulnerable code is present but unreachable. Until `@hono/node-ws` widens its peer range, consumers who want the advisory gone can add a root-manifest override (verified: the nested copy dedupes onto 2.x, WebSockets keep working - the workspace's own suite runs `@hono/node-ws` against `@hono/node-server` 2.x - and `npm audit --omit=dev` comes back clean):
+
+```json
+{
+  "overrides": {
+    "@hono/node-server": "^2.0.5"
+  }
+}
+```
+
 ## Lateral-leak defense layer
 
 The agent runtime's defense layer composes orthogonally with the security primitives above:

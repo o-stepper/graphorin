@@ -98,13 +98,17 @@ jobs:
           # bind-mounted secrets: owned by the container user (uid/gid
           # 10001), mode 0400 - readable by exactly one uid, no
           # permission warnings. Mirrors examples/docker/README.md.
+          # Order matters: the file glob must expand BEFORE the directory
+          # is locked to uid 10001 - once the dir is 0500/10001 the
+          # runner's shell can no longer list it and `gsecrets/*` stays
+          # a literal star (first dispatch failed exactly there).
           mkdir -p "${RUNNER_TEMP}/gsecrets"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/pepper"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/db-passphrase"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/audit-passphrase"
+          sudo chmod 0400 "${RUNNER_TEMP}/gsecrets"/*
           sudo chown -R 10001:10001 "${RUNNER_TEMP}/gsecrets"
           sudo chmod 0500 "${RUNNER_TEMP}/gsecrets"
-          sudo chmod 0400 "${RUNNER_TEMP}/gsecrets"/*
           docker run -d --name graphorin-smoke \
             --read-only --tmpfs /tmp \
             --security-opt no-new-privileges \
