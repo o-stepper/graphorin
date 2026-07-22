@@ -6,7 +6,7 @@
 
 # Interface: StorageRekeyResult
 
-Defined in: packages/cli/src/commands/storage.ts:408
+Defined in: packages/cli/src/commands/storage.ts:477
 
 **`Stable`**
 
@@ -14,6 +14,6 @@ Defined in: packages/cli/src/commands/storage.ts:408
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cipher"></a> `cipher` | `readonly` | `string` | packages/cli/src/commands/storage.ts:410 |
-| <a id="property-integrityok"></a> `integrityOk` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:411 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | packages/cli/src/commands/storage.ts:409 |
+| <a id="property-cipher"></a> `cipher` | `readonly` | `string` | packages/cli/src/commands/storage.ts:479 |
+| <a id="property-integrityok"></a> `integrityOk` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:480 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/cli/src/commands/storage.ts:478 |

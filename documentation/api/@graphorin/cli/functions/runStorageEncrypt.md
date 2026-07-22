@@ -10,7 +10,7 @@
 function runStorageEncrypt(options): Promise<StorageEncryptResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:354
+Defined in: packages/cli/src/commands/storage.ts:423
 
 **`Stable`**
 

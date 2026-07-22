@@ -60,7 +60,8 @@ function expandTilde(p: string): string {
 export class EncryptedFileSecretsStore implements SecretsStore {
   readonly kind = 'encrypted-file' as const;
   readonly #path: string;
-  readonly #passphrase: SecretValue;
+  /** Mutable: `rekey()` swaps it after the bundle is rewritten. */
+  #passphrase: SecretValue;
   readonly #enforcePermissions: boolean;
   /**
    * In-process single-writer guard. Serialises the
@@ -158,6 +159,33 @@ export class EncryptedFileSecretsStore implements SecretsStore {
     });
   }
 
+  /**
+   * Re-encrypt the whole bundle under a new passphrase.
+   *
+   * Reads the bundle with the current passphrase (a wrong passphrase or
+   * a tampered bundle fails the GCM auth check and propagates), then
+   * atomically rewrites it keyed from `newPassphrase`. Every write uses
+   * a fresh random salt and nonce, so a rekey also rotates the KDF
+   * salt. On success the instance switches to the new passphrase for
+   * all subsequent operations.
+   *
+   * The store takes no ownership of either `SecretValue`: it disposes
+   * neither the old nor the new passphrase - lifecycle stays with the
+   * caller. A missing bundle file propagates as `ENOENT` (there is
+   * nothing to rekey; `set()` a first secret instead).
+   *
+   * @stable
+   */
+  async rekey(newPassphrase: SecretValue): Promise<void> {
+    return auditStoreOperation('secret:rekey', STORE_SOURCE, '*', async () => {
+      await this.#enqueueWrite(async () => {
+        const plain = await this.#readPlaintext();
+        await this.#writePlaintext(plain, newPassphrase);
+        this.#passphrase = newPassphrase;
+      });
+    });
+  }
+
   async list(_scope?: SessionScope): Promise<ReadonlyArray<SecretMetadata>> {
     void _scope;
     let plain: BundlePlaintext;
@@ -235,13 +263,16 @@ export class EncryptedFileSecretsStore implements SecretsStore {
     }
   }
 
-  async #writePlaintext(plain: BundlePlaintext): Promise<void> {
+  async #writePlaintext(
+    plain: BundlePlaintext,
+    passphrase: SecretValue = this.#passphrase,
+  ): Promise<void> {
     const salt = randomBytes(SALT_BYTES);
     const nonce = randomBytes(NONCE_BYTES);
     const plaintext = Buffer.from(JSON.stringify(plain), 'utf8');
     let key: Buffer | null = null;
     try {
-      key = await this.#passphrase.useBuffer((passBuf) => deriveAesKey(passBuf, salt));
+      key = await passphrase.useBuffer((passBuf) => deriveAesKey(passBuf, salt));
       const cipher = createCipheriv('aes-256-gcm', key, nonce, { authTagLength: 16 });
       const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
       const tag = cipher.getAuthTag();

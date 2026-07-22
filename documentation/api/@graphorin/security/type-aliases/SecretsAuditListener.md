@@ -10,7 +10,7 @@
 type SecretsAuditListener = (event) => void;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:80
+Defined in: packages/security/src/secrets/audit-emitter.ts:81
 
 **`Stable`**
 

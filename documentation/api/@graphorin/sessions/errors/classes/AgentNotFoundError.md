@@ -6,7 +6,7 @@
 
 # Class: AgentNotFoundError
 
-Defined in: packages/sessions/src/errors/index.ts:293
+Defined in: packages/sessions/src/errors/index.ts:298
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ for an unknown id and the caller passed `{ assertExists: true }`.
 new AgentNotFoundError(agentId): AgentNotFoundError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:295
+Defined in: packages/sessions/src/errors/index.ts:300
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: packages/sessions/src/errors/index.ts:295
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:294 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:299 |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`cause`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-code"></a> `code` | `readonly` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`code`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-code) | packages/sessions/src/errors/index.ts:39 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`message`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |

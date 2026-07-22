@@ -171,6 +171,94 @@ describe('graphorin storage backup', () => {
       expect((await stat(dest)).mode & 0o777).toBe(0o600);
     },
   );
+
+  it.skipIf(process.platform === 'win32')(
+    'encrypted store: backup takes a stopped-server byte copy that opens with the key',
+    async () => {
+      // Gate on the cipher peer being built (mirrors the sub-pack's
+      // real-peer suite) so exotic platforms stay green.
+      let peerOk = true;
+      try {
+        const mod = (await import('@graphorin/store-sqlite-encrypted')) as {
+          loadCipherPeer: () => Promise<unknown>;
+        };
+        await mod.loadCipherPeer();
+      } catch {
+        peerOk = false;
+      }
+      if (!peerOk) return;
+
+      const { _resetResolversForTesting, installBuiltinResolvers } = await import(
+        '@graphorin/security'
+      );
+      const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-encbk-'));
+      const plainPath = join(dir, 'data.db');
+      const { createSqliteStore } = await import('@graphorin/store-sqlite');
+      const seed = await createSqliteStore({ path: plainPath, mode: 'lib', skipSqliteVec: true });
+      await seed.init();
+      await seed.close();
+
+      const plainCfg = join(dir, 'plain.config.json');
+      await writeFile(
+        plainCfg,
+        JSON.stringify({ storage: { path: plainPath, mode: 'lib' }, auth: { kind: 'none' } }),
+        'utf8',
+      );
+      const prev = process.env.GRAPHORIN_TEST_ENCBK_PASS;
+      process.env.GRAPHORIN_TEST_ENCBK_PASS = 'cli-bk-pass';
+      _resetResolversForTesting();
+      installBuiltinResolvers({});
+      try {
+        const { runStorageBackup } = await import('../src/commands/storage.js');
+        const encPath = join(dir, 'data.enc.db');
+        await runStorageEncrypt({
+          config: plainCfg,
+          targetPath: encPath,
+          passphraseFrom: 'env:GRAPHORIN_TEST_ENCBK_PASS',
+          print: () => {},
+        });
+        const encCfg = join(dir, 'enc.config.json');
+        await writeFile(
+          encCfg,
+          JSON.stringify({
+            storage: {
+              path: encPath,
+              mode: 'lib',
+              encryption: {
+                enabled: true,
+                cipher: 'sqlcipher',
+                passphraseRef: 'env:GRAPHORIN_TEST_ENCBK_PASS',
+              },
+            },
+            auth: { kind: 'none' },
+          }),
+          'utf8',
+        );
+        const dest = join(dir, 'backup.db');
+        const out = await runStorageBackup({ config: encCfg, dest, print: () => {} });
+        expect(out.encrypted).toBe(true);
+        expect(out.dest).toBe(dest);
+        // The copy opens with the same key (byte-identical encrypted file).
+        const restored = await createSqliteStore({
+          path: dest,
+          mode: 'lib',
+          skipSqliteVec: true,
+          encryption: {
+            enabled: true,
+            cipher: 'sqlcipher',
+            passphraseResolver: async () => 'cli-bk-pass',
+          },
+        });
+        await restored.init();
+        await restored.close();
+      } finally {
+        _resetResolversForTesting();
+        if (prev === undefined) delete process.env.GRAPHORIN_TEST_ENCBK_PASS;
+        else process.env.GRAPHORIN_TEST_ENCBK_PASS = prev;
+      }
+    },
+    60_000,
+  );
 });
 
 describe('graphorin storage compact (W-064)', () => {

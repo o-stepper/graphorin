@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
 import { tool } from '../src/builder/index.js';
+import { GraphorinToolsError } from '../src/errors/index.js';
 import { createToolExecutor, ToolRateLimitError } from '../src/executor/index.js';
 import { createToolRegistry } from '../src/registry/index.js';
 import { makeRunContext } from './fixtures.js';
@@ -179,6 +180,11 @@ describe('SEP-1303 - every producible ToolErrorKind returns as a model-visible o
     const error = await runOne({ registry, toolName: 'limited' });
     expect(error.kind).toBe('rate_limited' satisfies ToolErrorKind);
     expect(error.hint).toBe('retry after 1500ms');
+    // The carrier participates in the package's typed hierarchy: catch
+    // sites filtering on GraphorinToolsError must see it.
+    const carrier = new ToolRateLimitError('x');
+    expect(carrier).toBeInstanceOf(GraphorinToolsError);
+    expect(carrier.kind).toBe('rate-limited');
   });
 
   it("sandbox_violation: a sandbox 'sandbox-violation' result returns 'sandbox_violation'", async () => {

@@ -10,7 +10,7 @@
 function deriveSessionExportKey(passphrase, salt): Promise<Uint8Array<ArrayBufferLike>>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:253
+Defined in: packages/sessions/src/export/writer.ts:254
 
 **`Stable`**
 

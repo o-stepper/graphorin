@@ -41,7 +41,8 @@ Base class for every error thrown from `@graphorin/sessions`.
 new SessionError(
    code, 
    message, 
-   name?): SessionError;
+   name?, 
+   opts?): SessionError;
 ```
 
 Defined in: packages/sessions/src/errors/index.ts:40
@@ -53,6 +54,8 @@ Defined in: packages/sessions/src/errors/index.ts:40
 | `code` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | `undefined` |
 | `message` | `string` | `undefined` |
 | `name` | `string` | `'SessionError'` |
+| `opts` | \{ `cause?`: `unknown`; \} | `{}` |
+| `opts.cause?` | `unknown` | `undefined` |
 
 #### Returns
 

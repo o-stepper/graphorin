@@ -27,7 +27,7 @@ Before promoting a Graphorin deployment to production:
 
 1. **Storage**
    - Pick a backend (local SQLite, encrypted SQLite, or a custom adapter).
-   - Schedule a snapshot / replication job around `graphorin storage backup <dest>` - an online, consistent page-level copy that is safe under a live writer and preserves rowids. **Never use `VACUUM` or `VACUUM INTO` for backups**: rowid renumbering corrupts the FTS5 external-content mappings on restore.
+   - Schedule a snapshot / replication job around `graphorin storage backup <dest>` - for a plaintext store an online, consistent page-level copy that is safe under a live writer and preserves rowids; for an **encrypted** store a consistent stopped-server byte copy (the command refuses with a live-writer error while the server runs - schedule it in the maintenance window, see [Operations runbooks](/guide/operations)). **Never use `VACUUM` or `VACUUM INTO` for backups**: rowid renumbering corrupts the FTS5 external-content mappings on restore.
    - Run `graphorin storage cleanup-backups` periodically to prune stale encryption backups on long-lived deployments.
    - Run `graphorin storage compact` after large prunes to return freed pages to the OS (rowid-safe batched `incremental_vacuum`; databases created before incremental auto-vacuum keep their high-water-mark size and the command says so honestly).
    - Backups are point-in-time copies: a later erasure (session delete, fact purge) does NOT propagate into backups already taken. Keep backup retention no longer than your erasure obligations and repeat the erasure after any restore - see [Erasure and retention](/guide/privacy#erasure-and-retention).
@@ -137,7 +137,7 @@ WantedBy=multi-user.target
 
 ## Docker
 
-The `examples/docker/` template ships a multi-stage build. The runtime stage is compatibility-first: it carries the builder's workspace tree (a documented size/devDependency trade-off; a pruned target is tracked separately), applies Debian security updates at build time, and strips the npm/corepack toolchain - the weekly Docker smoke workflow SBOMs the image and fails on fixable critical/high advisories in it. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
+The `examples/docker/` template ships a multi-stage build. The runtime stage carries the **production dependency closure only** (~300 MB on `node:22-slim`): the builder prunes to the CLI's production subtree plus the runtime pieces the workspace dev-satisfies (SQLite natives, the encrypted-store sub-pack, the agent runtime, zod), strips source/test trees, applies Debian security updates at build time, and removes the npm/corepack toolchain - the weekly Docker smoke workflow SBOMs the image, fails on fixable critical/high advisories, and runs the [backup/restore runbook drill](/guide/operations#restore) against it. Optional integrations (dockerode, isolated-vm, `@graphorin/mcp`) are consumer add-ons; see `examples/docker/README.md` for the derived-image recipe. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
 docker build -t graphorin:0.13.13 -f examples/docker/Dockerfile .

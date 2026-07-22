@@ -43,14 +43,59 @@ After upgrading:
 
 ### Before any upgrade
 
-- **Back up the SQLite file**: `graphorin storage backup <dest>` takes an
-  online, consistent copy (safe under a live writer; an encrypted store
-  produces an equally encrypted copy).
+- **Back up the SQLite file**: `graphorin storage backup <dest>` takes a
+  consistent copy - online for a plaintext store (safe under a live
+  writer); for an encrypted store a stopped-server byte copy that stays
+  encrypted with the same key (see
+  [Operations runbooks](/guide/operations)).
 - **Read the root [changelog](/reference/changelog) entry** for the target
   version.
 - **Bump every `@graphorin/*` package together** (lockstep):
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
+
+### 0.13.13 -> 0.14.0
+
+A minor with new operational primitives, one behavior fix and small
+error-hierarchy corrections:
+
+- **`storage backup` on an encrypted store actually works now.** It
+  previously failed with the cryptic driver error "backup is not
+  supported with incompatible source and target databases" (the
+  page-level backup API cannot key either side of the transfer). It is
+  now a consistent **stopped-server byte copy**: checkpoint, prove no
+  live holder (a running server makes the command fail with a clear
+  live-writer error), copy, verify the copy's cipher integrity.
+  Plaintext stores keep the online page-level path unchanged.
+  `StorageBackupResult` gains an optional `encrypted: true` marker, and
+  `@graphorin/store-sqlite-encrypted` exports the new
+  `backupEncryptedDatabase` + `EncryptedBackupLiveWriterError` (extends
+  `EncryptSwapLiveWriterError`, so existing catch sites keep working).
+- **New `graphorin secrets rekey --new-passphrase-from <ref>`**:
+  re-encrypts the encrypted-file secrets bundle under a new passphrase
+  (fresh KDF salt, values unchanged); exit `2` (unsupported) for
+  sources without a bundle passphrase. Programmatic twin:
+  `EncryptedFileSecretsStore.rekey(newPassphrase)`. The secrets audit
+  vocabulary gains the `secret:rekey` action.
+- **Error hierarchy corrections** (documented in the new
+  [error contract](/guide/errors) page): `ToolRateLimitError` now
+  extends `GraphorinToolsError` (kind `'rate-limited'`) and
+  `TimerDriverStoreUnsupportedError` now extends `WorkflowError`
+  (new code `'timer-driver-store-unsupported'` in the union) - both
+  were direct `Error` subclasses before, so catch sites filtering on
+  the package bases now see them too. `AgentRuntimeError` and
+  `SessionError` constructors accept a trailing `{ cause }` option.
+- **Docker template is production-closure only** (~300 MB instead of
+  the full builder tree): the runtime stage no longer contains
+  `dockerode`, `isolated-vm` or `@graphorin/mcp` (registry consumers
+  never got them by default either; the in-image `isolated-vm` was
+  unbuilt and non-functional anyway). If you exec'd into the container
+  relying on one of them, use the derived-image recipe in
+  `examples/docker/README.md`.
+- **New guide pages**: [Stability & versioning](/guide/stability),
+  [Error contract](/guide/errors),
+  [Operations runbooks](/guide/operations), plus a per-adapter
+  capability matrix in [Providers](/guide/providers).
 
 ### 0.13.12 -> 0.13.13
 

@@ -16,6 +16,7 @@
  */
 
 import type { CheckpointStore } from '@graphorin/core';
+import { WorkflowError } from './errors/index.js';
 import { namespaceFor } from './internal/engine.js';
 
 /** The slice of {@link Workflow} the driver needs (structural). */
@@ -41,10 +42,11 @@ export interface TimerDriverEntry {
  *
  * @stable
  */
-export class TimerDriverStoreUnsupportedError extends Error {
+export class TimerDriverStoreUnsupportedError extends WorkflowError {
   readonly workflowName: string;
   constructor(workflowName: string, storeName: string) {
     super(
+      'timer-driver-store-unsupported',
       `Timer driver cannot poll workflow '${workflowName}': its checkpoint store (${storeName}) does not implement listSuspended(). Use @graphorin/store-sqlite's checkpoint store or the InMemoryCheckpointStore, or implement the optional method on your custom store.`,
     );
     this.name = 'TimerDriverStoreUnsupportedError';

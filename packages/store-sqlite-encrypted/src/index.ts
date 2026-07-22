@@ -17,6 +17,9 @@
  *    into an encrypted one. Backs `graphorin storage encrypt`.
  *  - {@link rekeyDatabase} - re-keys an already encrypted file. Backs
  *    `graphorin storage rekey`.
+ *  - {@link backupEncryptedDatabase} - consistent stopped-server
+ *    backup copy of an encrypted file. Backs `graphorin storage
+ *    backup` when the store is encrypted.
  *  - {@link cipherIntegrityCheck} - runs `PRAGMA cipher_integrity_
  *    check`. Used by the triggers daemon's daily verification cron
  *    and the `/v1/health/storage` endpoint.
@@ -41,6 +44,12 @@ import pkg from '../package.json' with { type: 'json' };
 
 export const VERSION: string = pkg.version;
 
+export {
+  type BackupEncryptedDatabaseOptions,
+  type BackupEncryptedDatabaseResult,
+  backupEncryptedDatabase,
+  EncryptedBackupLiveWriterError,
+} from './backup.js';
 export {
   DEFAULT_CIPHER,
   type EncryptionCipher,

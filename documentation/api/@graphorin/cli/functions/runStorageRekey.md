@@ -10,7 +10,7 @@
 function runStorageRekey(options): Promise<StorageRekeyResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:415
+Defined in: packages/cli/src/commands/storage.ts:484
 
 **`Stable`**
 

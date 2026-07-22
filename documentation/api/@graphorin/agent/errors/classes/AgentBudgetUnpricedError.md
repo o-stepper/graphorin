@@ -6,7 +6,7 @@
 
 # Class: AgentBudgetUnpricedError
 
-Defined in: packages/agent/src/errors/index.ts:352
+Defined in: packages/agent/src/errors/index.ts:357
 
 **`Stable`**
 
@@ -32,7 +32,7 @@ into the old warn-once behaviour with `onUnpriced: 'warn'`.
 new AgentBudgetUnpricedError(): AgentBudgetUnpricedError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:353
+Defined in: packages/agent/src/errors/index.ts:358
 
 #### Returns
 

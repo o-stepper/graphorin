@@ -12,7 +12,7 @@ function runSecretsSet(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:139
+Defined in: packages/cli/src/commands/secrets.ts:142
 
 **`Stable`**
 

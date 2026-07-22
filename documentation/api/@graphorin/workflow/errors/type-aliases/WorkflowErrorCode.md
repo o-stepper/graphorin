@@ -30,7 +30,8 @@ type WorkflowErrorCode =
   | "workflow-divergence"
   | "pause-not-found"
   | "pause-replay-divergence"
-  | "awakeable-payload-invalid";
+  | "awakeable-payload-invalid"
+  | "timer-driver-store-unsupported";
 ```
 
 Defined in: packages/workflow/src/errors/index.ts:16

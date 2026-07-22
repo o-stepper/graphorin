@@ -6,7 +6,7 @@
 
 # Class: CassetteCursorViolationError
 
-Defined in: packages/sessions/src/errors/index.ts:136
+Defined in: packages/sessions/src/errors/index.ts:141
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ corrupted or maliciously crafted cassette.
 new CassetteCursorViolationError(message): CassetteCursorViolationError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:137
+Defined in: packages/sessions/src/errors/index.ts:142
 
 #### Parameters
 

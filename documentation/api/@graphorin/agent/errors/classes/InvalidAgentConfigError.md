@@ -6,7 +6,7 @@
 
 # Class: InvalidAgentConfigError
 
-Defined in: packages/agent/src/errors/index.ts:58
+Defined in: packages/agent/src/errors/index.ts:63
 
 **`Stable`**
 
@@ -26,7 +26,7 @@ structural validation (missing `provider`, empty `name`, an
 new InvalidAgentConfigError(reason): InvalidAgentConfigError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:59
+Defined in: packages/agent/src/errors/index.ts:64
 
 #### Parameters
 

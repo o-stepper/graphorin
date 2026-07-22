@@ -19,6 +19,10 @@ source file; a live writer would keep writing into the renamed
 
 - `Error`
 
+## Extended by
+
+- [`EncryptedBackupLiveWriterError`](/api/@graphorin/store-sqlite-encrypted/classes/EncryptedBackupLiveWriterError.md)
+
 ## Constructors
 
 ### Constructor

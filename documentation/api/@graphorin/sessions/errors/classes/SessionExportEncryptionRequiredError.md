@@ -6,7 +6,7 @@
 
 # Class: SessionExportEncryptionRequiredError
 
-Defined in: packages/sessions/src/errors/index.ts:244
+Defined in: packages/sessions/src/errors/index.ts:249
 
 **`Stable`**
 
@@ -25,7 +25,7 @@ caller did not supply the matching passphrase.
 new SessionExportEncryptionRequiredError(): SessionExportEncryptionRequiredError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:245
+Defined in: packages/sessions/src/errors/index.ts:250
 
 #### Returns
 

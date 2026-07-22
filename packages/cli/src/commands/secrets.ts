@@ -9,6 +9,8 @@
  *  - `graphorin secrets delete <key>`
  *  - `graphorin secrets ref <uri>` - test resolution of a `SecretRef` URI.
  *  - `graphorin secrets rotate <key> --new-value <v>`
+ *  - `graphorin secrets rekey --new-passphrase-from <ref>` - re-encrypt
+ *    the encrypted-file bundle under a new passphrase.
  *
  * Honours `--secrets-source <kind>` and `--strict-secrets` per
  * DEC-136 - both flags are forwarded to `createSecretsStore(...)` so
@@ -29,6 +31,7 @@ import { stdin } from 'node:process';
 import type { SecretMetadata } from '@graphorin/core/contracts';
 import {
   createSecretsStore,
+  EncryptedFileSecretsStore,
   getActiveSecretsStore,
   parseSecretRef,
   resolveSecret,
@@ -296,6 +299,68 @@ export async function runSecretsRotate(
   emitReport(options, { ok: true } as const, () => {
     const print = options.print ?? defaultPrintSink;
     print(brand(`secret '${options.key}' rotated.`));
+  });
+  return { ok: true };
+}
+
+/** @stable */
+export interface SecretsRekeyOptions extends SecretsCommonOptions {
+  /** SecretRef URI resolving to the NEW bundle passphrase. */
+  readonly newPassphraseFrom: string;
+}
+
+/**
+ * `graphorin secrets rekey` - re-encrypt the whole encrypted-file
+ * bundle under a new passphrase (fresh KDF salt and nonce; values
+ * unchanged). Complements the per-value `secrets rotate`: rotate
+ * replaces a protected VALUE, rekey replaces the KEY protecting the
+ * bundle - mirroring `storage rekey` (database passphrase) and
+ * `token rekey` (pepper compromise).
+ *
+ * Only the `encrypted-file` source has a bundle passphrase; for every
+ * other store (keyring, env, memory) the command exits `UNSUPPORTED`
+ * (2). The CURRENT passphrase comes from normal store activation
+ * (`GRAPHORIN_MASTER_PASSPHRASE`); the NEW one arrives as a SecretRef
+ * URI so raw key material never lands on argv.
+ *
+ * @stable
+ */
+export async function runSecretsRekey(options: SecretsRekeyOptions): Promise<{
+  readonly ok: boolean;
+  readonly unsupported?: true;
+}> {
+  let newPassphrase: SecretValue;
+  try {
+    newPassphrase = await resolveSecret(options.newPassphraseFrom);
+  } catch (err) {
+    throw new Error(
+      `[graphorin/cli] failed to resolve new passphrase '${options.newPassphraseFrom}': ${(err as Error).message}`,
+      { cause: err },
+    );
+  }
+  const store = await openStore(options);
+  if (!(store instanceof EncryptedFileSecretsStore)) {
+    const result = { ok: false, unsupported: true } as const;
+    emitReport(options, result, () => {
+      const print = options.print ?? defaultPrintSink;
+      print(
+        brand(
+          `secrets rekey: the active secrets source ('${(store as { kind?: string }).kind ?? 'unknown'}') has no bundle passphrase - only the encrypted-file store does.`,
+        ),
+      );
+      print(
+        brand(
+          'hint: pass --secrets-source encrypted-file (with GRAPHORIN_MASTER_PASSPHRASE set) to address the encrypted-file bundle.',
+        ),
+      );
+    });
+    process.exitCode = EXIT_CODES.UNSUPPORTED;
+    return result;
+  }
+  await store.rekey(newPassphrase);
+  emitReport(options, { ok: true } as const, () => {
+    const print = options.print ?? defaultPrintSink;
+    print(brand('secrets bundle rekeyed - subsequent reads and writes use the new passphrase.'));
   });
   return { ok: true };
 }

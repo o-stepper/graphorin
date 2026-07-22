@@ -14,6 +14,7 @@ import {
   runSecretsGet,
   runSecretsList,
   runSecretsRef,
+  runSecretsRekey,
   runSecretsRotate,
   runSecretsSet,
 } from '../src/commands/secrets.js';
@@ -99,6 +100,89 @@ describe('graphorin secrets', () => {
       else process.env.GRAPHORIN_MASTER_PASSPHRASE = prevPass;
       if (prevFile === undefined) delete process.env.GRAPHORIN_SECRETS_FILE;
       else process.env.GRAPHORIN_SECRETS_FILE = prevFile;
+    }
+  });
+
+  it('rekey re-encrypts the encrypted-file bundle under the new passphrase', async () => {
+    let hasArgon2 = true;
+    const argon2Module = '@node-rs/argon2';
+    try {
+      await import(argon2Module);
+    } catch {
+      hasArgon2 = false;
+    }
+    if (!hasArgon2) return;
+
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-rekey-'));
+    const prevPass = process.env.GRAPHORIN_MASTER_PASSPHRASE;
+    const prevFile = process.env.GRAPHORIN_SECRETS_FILE;
+    const prevNew = process.env.GRAPHORIN_TEST_REKEY_NEW;
+    process.env.GRAPHORIN_MASTER_PASSPHRASE = 'old-master-passphrase';
+    process.env.GRAPHORIN_SECRETS_FILE = join(dir, 'secrets.enc');
+    process.env.GRAPHORIN_TEST_REKEY_NEW = 'new-master-passphrase';
+    try {
+      const print = (): void => {};
+      await runSecretsSet({
+        key: 'rekey_probe',
+        value: 'survives',
+        secretsSource: 'encrypted-file',
+        print,
+      });
+      const result = await runSecretsRekey({
+        newPassphraseFrom: 'env:GRAPHORIN_TEST_REKEY_NEW',
+        secretsSource: 'encrypted-file',
+        print,
+      });
+      expect(result.ok).toBe(true);
+
+      // A store activated with the NEW passphrase reads the value.
+      process.env.GRAPHORIN_MASTER_PASSPHRASE = 'new-master-passphrase';
+      const got = await runSecretsGet({
+        key: 'rekey_probe',
+        reveal: true,
+        secretsSource: 'encrypted-file',
+        print,
+      });
+      expect(got.found).toBe(true);
+      expect(got.value).toBe('survives');
+
+      // The OLD passphrase no longer decrypts the bundle.
+      process.env.GRAPHORIN_MASTER_PASSPHRASE = 'old-master-passphrase';
+      await expect(
+        runSecretsGet({
+          key: 'rekey_probe',
+          reveal: true,
+          secretsSource: 'encrypted-file',
+          print,
+        }),
+      ).rejects.toThrow(/Authentication tag mismatch/);
+    } finally {
+      if (prevPass === undefined) delete process.env.GRAPHORIN_MASTER_PASSPHRASE;
+      else process.env.GRAPHORIN_MASTER_PASSPHRASE = prevPass;
+      if (prevFile === undefined) delete process.env.GRAPHORIN_SECRETS_FILE;
+      else process.env.GRAPHORIN_SECRETS_FILE = prevFile;
+      if (prevNew === undefined) delete process.env.GRAPHORIN_TEST_REKEY_NEW;
+      else process.env.GRAPHORIN_TEST_REKEY_NEW = prevNew;
+    }
+  }, 30_000);
+
+  it('rekey reports UNSUPPORTED (exit 2) when the active store has no bundle passphrase', async () => {
+    const prevNew = process.env.GRAPHORIN_TEST_REKEY_NEW;
+    const beforeExitCode = process.exitCode;
+    process.env.GRAPHORIN_TEST_REKEY_NEW = 'irrelevant';
+    try {
+      // beforeEach activated the in-memory store; rekey must refuse it.
+      const result = await runSecretsRekey({
+        newPassphraseFrom: 'env:GRAPHORIN_TEST_REKEY_NEW',
+        print: () => undefined,
+      });
+      expect(result.ok).toBe(false);
+      expect(result.unsupported).toBe(true);
+      expect(process.exitCode).toBe(2);
+    } finally {
+      process.exitCode = beforeExitCode;
+      if (prevNew === undefined) delete process.env.GRAPHORIN_TEST_REKEY_NEW;
+      else process.env.GRAPHORIN_TEST_REKEY_NEW = prevNew;
     }
   });
 

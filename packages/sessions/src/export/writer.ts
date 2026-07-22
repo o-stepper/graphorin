@@ -4,8 +4,9 @@
  *
  * The writer is async-iterable + push-friendly so callers can stream
  * megabytes of session history without buffering the full set into
- * memory. The CLI's `graphorin export session ...` command is a thin
- * shell over this.
+ * memory. `Session.export(...)` is the public entry point; the CLI's
+ * `graphorin migrate-export` round-trips existing export files through
+ * this writer to the current schema.
  *
  * @packageDocumentation
  */

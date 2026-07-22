@@ -6,7 +6,7 @@
 
 # Interface: SecretsCommonOptions
 
-Defined in: packages/cli/src/commands/secrets.ts:49
+Defined in: packages/cli/src/commands/secrets.ts:52
 
 **`Stable`**
 
@@ -20,6 +20,7 @@ Defined in: packages/cli/src/commands/secrets.ts:49
 - [`SecretsGetOptions`](/api/@graphorin/cli/interfaces/SecretsGetOptions.md)
 - [`SecretsListOptions`](/api/@graphorin/cli/interfaces/SecretsListOptions.md)
 - [`SecretsRefOptions`](/api/@graphorin/cli/interfaces/SecretsRefOptions.md)
+- [`SecretsRekeyOptions`](/api/@graphorin/cli/interfaces/SecretsRekeyOptions.md)
 - [`SecretsRotateOptions`](/api/@graphorin/cli/interfaces/SecretsRotateOptions.md)
 - [`SecretsSetOptions`](/api/@graphorin/cli/interfaces/SecretsSetOptions.md)
 
@@ -31,5 +32,5 @@ Defined in: packages/cli/src/commands/secrets.ts:49
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | [`JsonSink`](/api/@graphorin/cli/type-aliases/JsonSink.md) | Test seam - capture JSON documents instead of writing to stdout. | [`CommonOutputOptions`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`CommonOutputOptions`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |
 | <a id="property-print"></a> `print?` | `readonly` | [`PrintSink`](/api/@graphorin/cli/type-aliases/PrintSink.md) | Test seam - capture human lines instead of writing to stderr. | [`CommonOutputOptions`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md).[`print`](/api/@graphorin/cli/interfaces/CommonOutputOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |
-| <a id="property-secretssource"></a> `secretsSource?` | `readonly` | [`SecretsStoreKind`](/api/@graphorin/security/type-aliases/SecretsStoreKind.md) | Mirrors `--secrets-source` per DEC-136. | - | packages/cli/src/commands/secrets.ts:51 |
-| <a id="property-strictsecrets"></a> `strictSecrets?` | `readonly` | `boolean` | Mirrors `--strict-secrets` per DEC-136. | - | packages/cli/src/commands/secrets.ts:53 |
+| <a id="property-secretssource"></a> `secretsSource?` | `readonly` | [`SecretsStoreKind`](/api/@graphorin/security/type-aliases/SecretsStoreKind.md) | Mirrors `--secrets-source` per DEC-136. | - | packages/cli/src/commands/secrets.ts:54 |
+| <a id="property-strictsecrets"></a> `strictSecrets?` | `readonly` | `boolean` | Mirrors `--strict-secrets` per DEC-136. | - | packages/cli/src/commands/secrets.ts:56 |

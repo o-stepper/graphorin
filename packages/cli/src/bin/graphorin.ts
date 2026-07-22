@@ -69,6 +69,7 @@ import {
   runSecretsGet,
   runSecretsList,
   runSecretsRef,
+  runSecretsRekey,
   runSecretsRotate,
   runSecretsSet,
   runSkillsAudit,
@@ -574,6 +575,31 @@ function registerSecretsCommands(program: Command): void {
       });
     },
   );
+  commonOpts(
+    secrets
+      .command('rekey')
+      .description(
+        'Re-encrypt the encrypted-file bundle under a new passphrase (values unchanged).',
+      )
+      .requiredOption(
+        '--new-passphrase-from <ref>',
+        'SecretRef URI resolving to the NEW bundle passphrase (e.g. env:NEW_MASTER_PASSPHRASE).',
+      ),
+  ).action(
+    async (opts: {
+      newPassphraseFrom: string;
+      secretsSource?: 'auto' | 'keyring' | 'encrypted-file' | 'env';
+      strictSecrets?: boolean;
+      json?: boolean;
+    }) => {
+      await runSecretsRekey({
+        newPassphraseFrom: opts.newPassphraseFrom,
+        ...(opts.secretsSource !== undefined ? { secretsSource: opts.secretsSource } : {}),
+        ...(opts.strictSecrets !== undefined ? { strictSecrets: opts.strictSecrets } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    },
+  );
 }
 
 function registerStorageCommands(program: Command): void {
@@ -649,7 +675,7 @@ function registerStorageCommands(program: Command): void {
   storage
     .command('backup')
     .description(
-      'Online, consistent copy of the store via the page-level backup API (safe under a live writer; never use VACUUM INTO).',
+      'Consistent backup copy of the store: online page-level for plaintext stores, a stopped-server byte copy for encrypted stores. Never use VACUUM INTO.',
     )
     .argument('<dest>', 'Destination file path for the backup copy.')
     .option('-c, --config <path>', 'Path to the graphorin.config file.')

@@ -10,7 +10,7 @@
 function runStorageCompact(options?): Promise<StorageCompactResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:241
+Defined in: packages/cli/src/commands/storage.ts:310
 
 **`Stable`**
 

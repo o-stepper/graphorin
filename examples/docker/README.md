@@ -5,6 +5,34 @@ A hardened distribution `Dockerfile` for the **Graphorin standalone server**
 a runnable example app - there is no `package.json` and it is not part of the
 examples smoke test.
 
+## What is inside
+
+The runtime stage ships the **production dependency closure only**
+(~300 MB): the builder does a full workspace build, then prunes to the
+CLI's production subtree (plus the runtime pieces that are dev-satisfied
+in the workspace: the SQLite natives, the encrypted-store sub-pack, the
+agent runtime and zod), strips `src`/test trees, and removes the
+npm/corepack toolchain from the base image. Optional integrations are
+NOT included - registry consumers do not get them by default either:
+
+- `dockerode` (docker-tier sandbox controlled from inside the container),
+- `isolated-vm` (isolated-vm sandbox tier),
+- `@graphorin/mcp` (MCP client tool sources).
+
+Extend the image in a derived build if you need one of them. The
+runtime stage carries no npm/corepack (attack-surface removal), so
+install in a helper stage and merge into the root `node_modules` (it
+is on every package's module-resolution walk):
+
+```dockerfile
+FROM node:22-slim AS extra
+WORKDIR /extra
+RUN npm install dockerode@^5
+
+FROM graphorin:latest
+COPY --from=extra --chown=graphorin:graphorin /extra/node_modules /app/node_modules
+```
+
 ## Build
 
 ```bash

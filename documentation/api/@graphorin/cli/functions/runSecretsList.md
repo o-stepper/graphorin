@@ -10,7 +10,7 @@
 function runSecretsList(options?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:60
+Defined in: packages/cli/src/commands/secrets.ts:63
 
 **`Stable`**
 

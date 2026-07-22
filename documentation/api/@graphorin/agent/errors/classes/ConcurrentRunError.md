@@ -6,7 +6,7 @@
 
 # Class: ConcurrentRunError
 
-Defined in: packages/agent/src/errors/index.ts:159
+Defined in: packages/agent/src/errors/index.ts:164
 
 **`Stable`**
 
@@ -29,7 +29,7 @@ on its own `createAgent(...)` instance instead.
 new ConcurrentRunError(): ConcurrentRunError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:160
+Defined in: packages/agent/src/errors/index.ts:165
 
 #### Returns
 

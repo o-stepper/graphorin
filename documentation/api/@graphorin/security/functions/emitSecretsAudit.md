@@ -10,7 +10,7 @@
 function emitSecretsAudit(event): void;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:114
+Defined in: packages/security/src/secrets/audit-emitter.ts:115
 
 **`Stable`**
 

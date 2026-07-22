@@ -24,7 +24,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:60
 new EncryptedFileSecretsStore(opts): EncryptedFileSecretsStore;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:77
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
 delete(key, _scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:148
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:149
 
 #### Parameters
 
@@ -75,7 +75,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:148
 get(key, _scope?): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:96
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:97
 
 Returns the secret if it exists, `null` otherwise.
 
@@ -102,7 +102,7 @@ Returns the secret if it exists, `null` otherwise.
 list(_scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:161
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:189
 
 Returns metadata about every key - never the values themselves.
 
@@ -122,13 +122,49 @@ Returns metadata about every key - never the values themselves.
 
 ***
 
+### rekey()
+
+```ts
+rekey(newPassphrase): Promise<void>;
+```
+
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:179
+
+**`Stable`**
+
+Re-encrypt the whole bundle under a new passphrase.
+
+Reads the bundle with the current passphrase (a wrong passphrase or
+a tampered bundle fails the GCM auth check and propagates), then
+atomically rewrites it keyed from `newPassphrase`. Every write uses
+a fresh random salt and nonce, so a rekey also rotates the KDF
+salt. On success the instance switches to the new passphrase for
+all subsequent operations.
+
+The store takes no ownership of either `SecretValue`: it disposes
+neither the old nor the new passphrase - lifecycle stays with the
+caller. A missing bundle file propagates as `ENOENT` (there is
+nothing to rekey; `set()` a first secret instead).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `newPassphrase` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### require()
 
 ```ts
 require(key, _scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:118
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:119
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -160,7 +196,7 @@ set(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:131
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:132
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

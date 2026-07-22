@@ -10,7 +10,7 @@
 function _resetSecretsAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:103
+Defined in: packages/security/src/secrets/audit-emitter.ts:104
 
 **`Experimental`**
 

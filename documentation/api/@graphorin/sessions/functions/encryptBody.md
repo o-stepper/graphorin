@@ -10,7 +10,7 @@
 function encryptBody(body, key): Uint8Array;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:270
+Defined in: packages/sessions/src/export/writer.ts:271
 
 **`Stable`**
 

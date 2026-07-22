@@ -6,7 +6,7 @@
 
 # Interface: TimerDriver
 
-Defined in: packages/workflow/src/timer-driver.ts:90
+Defined in: packages/workflow/src/timer-driver.ts:92
 
 **`Stable`**
 
@@ -20,7 +20,7 @@ Handle returned by [createTimerDriver](/api/@graphorin/workflow/functions/create
 start(): void;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:91
+Defined in: packages/workflow/src/timer-driver.ts:93
 
 #### Returns
 
@@ -34,7 +34,7 @@ Defined in: packages/workflow/src/timer-driver.ts:91
 status(): TimerDriverStatus;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:93
+Defined in: packages/workflow/src/timer-driver.ts:95
 
 #### Returns
 
@@ -48,7 +48,7 @@ Defined in: packages/workflow/src/timer-driver.ts:93
 stop(): void;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:92
+Defined in: packages/workflow/src/timer-driver.ts:94
 
 #### Returns
 
@@ -62,7 +62,7 @@ Defined in: packages/workflow/src/timer-driver.ts:92
 sweep(): Promise<number>;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:95
+Defined in: packages/workflow/src/timer-driver.ts:97
 
 Run one poll pass immediately; resolves with the fired count.
 

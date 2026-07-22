@@ -43,7 +43,8 @@ Base class for every error thrown from `@graphorin/agent`.
 new AgentRuntimeError(
    code, 
    message, 
-   name?): AgentRuntimeError;
+   name?, 
+   opts?): AgentRuntimeError;
 ```
 
 Defined in: packages/agent/src/errors/index.ts:44
@@ -55,6 +56,8 @@ Defined in: packages/agent/src/errors/index.ts:44
 | `code` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | `undefined` |
 | `message` | `string` | `undefined` |
 | `name` | `string` | `'AgentRuntimeError'` |
+| `opts` | \{ `cause?`: `unknown`; \} | `{}` |
+| `opts.cause?` | `unknown` | `undefined` |
 
 #### Returns
 

@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/index.ts:42
+Defined in: packages/store-sqlite-encrypted/src/index.ts:45

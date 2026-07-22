@@ -163,6 +163,44 @@ The same adapters now consume `ProviderRequest.outputType` (set by the agent's `
 
 ## Adapters at a glance
 
+### Capability matrix
+
+What each bundled adapter supports out of the box. Every cell in the
+first block reflects the adapter's **default** `ProviderCapabilities` -
+they are declarations, not hard limits, and an explicit `capabilities`
+override on the adapter options always wins (e.g. flip
+`structuredOutput: false` for a server that rejects `response_format`).
+
+| Capability | Vercel AI SDK | Ollama | OpenAI-compatible | llama.cpp server | In-process GGUF |
+|---|---|---|---|---|---|
+| Streaming | yes | yes (ndjson) | yes (SSE) | yes (SSE) | yes |
+| Tool calling | yes | yes (`tool_choice: 'required'` unsupported, throws) | yes | yes | no |
+| Parallel tool calls | yes | no | no | no | no |
+| Multimodal input | yes | no | no | no | no |
+| Structured output | yes (via AI SDK) | yes (native `format` field) | yes (strict `response_format: json_schema`) | yes (same) | no |
+| Reasoning deltas | yes (incl. Anthropic signatures) | yes (`message.thinking`) | yes (`reasoning_content`) | yes (`reasoning_content`) | no |
+| Think control | `providerOptions` | native `think` option | `providerOptions.reasoning_effort` | `providerOptions.reasoning_effort` | n/a |
+| Prompt caching | `cachePolicy` -> Anthropic `cache_control` anchors; read + write usage legs | none | read-only (`cached_tokens` -> `cachedReadTokens`) | read-only | KV-cache reuse via `persistentSession` (no wire cache) |
+| Usage accounting | input/output/total + reasoning + cache read/write | prompt/completion/total + server timings metadata | prompt/completion/total + reasoning + cached read | same | prompt/completion/total |
+| `timeoutMs` option | no (compose `signal`; SDK owns transport) | yes (default 120 s) | yes (default 120 s) | yes (default 120 s) | n/a (in-process) |
+| Abort via `signal` | yes | yes | yes | yes | yes |
+| Default context / max output | 200k / 16384 | 8192 / 4096 | 8192 / 4096 | 8192 / 4096 | 8192 / 4096 |
+
+Three cross-cutting notes:
+
+- **Aborts are results, not throws.** Every adapter maps a caller abort
+  to `finishReason: 'aborted'` on the response instead of throwing, and
+  the retry/fallback middleware deliberately excludes aborts.
+- **Retry, fallback, rate limiting, cost control, redaction and
+  tracing are middleware**, not adapter features - see the
+  [middleware table](#why-a-provider-and-not-the-raw-sdk) above. Any
+  adapter composes with all of them.
+- **One-shot parameter recovery** (OpenAI-compatible + llama.cpp
+  server only): on a matching HTTP 400 the adapter retries once with
+  `max_tokens` remapped to `max_completion_tokens`, an unsupported
+  `temperature` stripped, or `reasoning_effort: 'none'` forced for
+  tool calls - governed by `unsupportedParamRecovery: 'auto' | 'off'`.
+
 ### Vercel AI SDK
 
 ```ts no-check

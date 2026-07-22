@@ -10,7 +10,7 @@
 function onSecretsAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:91
+Defined in: packages/security/src/secrets/audit-emitter.ts:92
 
 **`Stable`**
 

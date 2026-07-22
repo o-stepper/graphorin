@@ -10,7 +10,7 @@
 function runSecretsGet(options): Promise<SecretsGetResult>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:99
+Defined in: packages/cli/src/commands/secrets.ts:102
 
 **`Stable`**
 

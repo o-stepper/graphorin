@@ -36,7 +36,8 @@ export type WorkflowErrorCode =
   | 'workflow-divergence'
   | 'pause-not-found'
   | 'pause-replay-divergence'
-  | 'awakeable-payload-invalid';
+  | 'awakeable-payload-invalid'
+  | 'timer-driver-store-unsupported';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.

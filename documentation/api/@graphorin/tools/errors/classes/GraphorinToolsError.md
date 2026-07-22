@@ -24,6 +24,7 @@ Common base for every `@graphorin/tools` error.
 - [`InvalidSideEffectClassError`](/api/@graphorin/tools/errors/classes/InvalidSideEffectClassError.md)
 - [`ToolExecutionAggregateError`](/api/@graphorin/tools/errors/classes/ToolExecutionAggregateError.md)
 - [`ToolCollisionError`](/api/@graphorin/tools/errors/classes/ToolCollisionError.md)
+- [`ToolRateLimitError`](/api/@graphorin/tools/classes/ToolRateLimitError.md)
 
 ## Constructors
 
