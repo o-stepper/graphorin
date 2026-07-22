@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.13.13](https://img.shields.io/badge/version-v0.13.13-blue.svg)](./CHANGELOG.md)
+[![Version: 0.14.0](https://img.shields.io/badge/version-v0.14.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,11 +63,11 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.13.13`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.14.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
-Latest release: **0.13.13** (2026-07-22) - the dependency + benchmark-integrity patch: the advisory batch published hours after 0.13.12 is closed (`@hono/node-server` 2.x with a serve-static tripwire, `fast-uri`/`dompurify` refreshed, and the transformers.js `sharp` high handled like adm-zip: workspace override, documented consumer override, and a registry-verified published-peer-audit mitigation). Benchmarks can no longer exit green after infrastructure failures: LongMemEval stamps `INFRASTRUCTURE_FAILED`/`JUDGE_FAILED` (stable `AGENT_RUN_THREW_MARKER`) and fails the process in BOTH gate modes, recovered judge retries surface as `judge-retries` telemetry, case results echo the reference answer, and the runners gain `--think`, `--timeout-ms`, and an `OPENAI_API_KEY` preflight fallback that refuses to burn every case as HTTP 401. `DockerSandbox` now runs containers as a non-root user with PID/CPU ceilings (live-proven negatives), the Docker image drops the npm toolchain and gains a blocking fixable-critical/high grype gate, the gitleaks allowlist narrows to six exact fixture files, Ollama in CI installs from a checksum-verified artifact instead of `curl | sh`, and Yarn PnP stops warning about zod peers. See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-13-12-0-13-13) for upgrade notes.
+Latest release: **0.14.0** (2026-07-22) - the consolidation minor: the follow-up to an external overall assessment ("production-capable beta") that asked for proof, not features. The Docker template's runtime stage now ships the production dependency closure only (**298 MB vs 1.05 GB**, grype-clean, with a derived-image recipe for optional integrations), and the new weekly backup -> destroy-volume -> restore CI drill immediately caught a real bug: `storage backup` on an encrypted store had never worked (the page-level API cannot key either side of the copy) - it is now a consistent stopped-server byte copy with a live-writer guard and post-copy cipher verification. Key rotation is fully tooled with the new `graphorin secrets rekey` (bundle passphrase, fresh KDF salt), joining `storage rekey`, `token rekey` and `secrets rotate`. The contract is written down in three new guide pages - [Stability & versioning](https://docs.graphorin.com/guide/stability), [Error contract](https://docs.graphorin.com/guide/errors), [Operations runbooks](https://docs.graphorin.com/guide/operations) - plus a per-adapter capability matrix in Providers; `ToolRateLimitError` and `TimerDriverStoreUnsupportedError` were reparented into their packages' typed hierarchies and the agent/sessions error bases now thread `cause`. See the [changelog](./CHANGELOG.md) and the [migration guide](https://docs.graphorin.com/guide/migration#_0-13-13-0-14-0) for upgrade notes.
 
 ## Use cases
 
@@ -325,7 +325,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.13.13 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.14.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

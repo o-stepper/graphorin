@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/example-trace-helper",
-  "version": "0.13.13",
+  "version": "0.14.0",
   "private": true,
   "description": "Optional console tracing helper for Graphorin example apps. MIT License. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

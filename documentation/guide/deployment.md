@@ -140,7 +140,7 @@ WantedBy=multi-user.target
 The `examples/docker/` template ships a multi-stage build. The runtime stage carries the **production dependency closure only** (~300 MB on `node:22-slim`): the builder prunes to the CLI's production subtree plus the runtime pieces the workspace dev-satisfies (SQLite natives, the encrypted-store sub-pack, the agent runtime, zod), strips source/test trees, applies Debian security updates at build time, and removes the npm/corepack toolchain - the weekly Docker smoke workflow SBOMs the image, fails on fixable critical/high advisories, and runs the [backup/restore runbook drill](/guide/operations#restore) against it. Optional integrations (dockerode, isolated-vm, `@graphorin/mcp`) are consumer add-ons; see `examples/docker/README.md` for the derived-image recipe. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
-docker build -t graphorin:0.13.13 -f examples/docker/Dockerfile .
+docker build -t graphorin:0.14.0 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
   --read-only --tmpfs /tmp \
   --security-opt no-new-privileges \
@@ -149,7 +149,7 @@ docker run -d --name graphorin \
   -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
   -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
   -p 8080:8080 \
-  graphorin:0.13.13
+  graphorin:0.14.0
 ```
 
 The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.

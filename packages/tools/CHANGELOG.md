@@ -1,5 +1,18 @@
 # @graphorin/tools
 
+## 0.14.0
+
+### Minor Changes
+
+- [#247](https://github.com/o-stepper/graphorin/pull/247) [`8ff1d25`](https://github.com/o-stepper/graphorin/commit/8ff1d257a489e5da686318d8c617576fbf2b0002) Thanks [@o-stepper](https://github.com/o-stepper)! - Error-hierarchy corrections backing the new error-contract documentation: `ToolRateLimitError` now extends `GraphorinToolsError` (kind `'rate-limited'`) and `TimerDriverStoreUnsupportedError` now extends `WorkflowError` (new `'timer-driver-store-unsupported'` code in the union) - both were direct `Error` subclasses, invisible to catch sites filtering on the package bases. `AgentRuntimeError` and `SessionError` constructors accept a trailing `{ cause }` option so wrapped failures thread their root cause like every other package base.
+
+### Patch Changes
+
+- Updated dependencies [[`8ff1d25`](https://github.com/o-stepper/graphorin/commit/8ff1d257a489e5da686318d8c617576fbf2b0002)]:
+  - @graphorin/security@0.14.0
+  - @graphorin/core@0.14.0
+  - @graphorin/observability@0.14.0
+
 ## 0.13.13
 
 ### Patch Changes
