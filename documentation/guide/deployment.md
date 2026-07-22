@@ -140,7 +140,7 @@ WantedBy=multi-user.target
 The `examples/docker/` template ships a multi-stage build. The runtime stage is compatibility-first: it carries the builder's workspace tree (a documented size/devDependency trade-off; a pruned target is tracked separately), applies Debian security updates at build time, and strips the npm/corepack toolchain - the weekly Docker smoke workflow SBOMs the image and fails on fixable critical/high advisories in it. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
-docker build -t graphorin:0.13.12 -f examples/docker/Dockerfile .
+docker build -t graphorin:0.13.13 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
   --read-only --tmpfs /tmp \
   --security-opt no-new-privileges \
@@ -149,7 +149,7 @@ docker run -d --name graphorin \
   -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
   -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
   -p 8080:8080 \
-  graphorin:0.13.12
+  graphorin:0.13.13
 ```
 
 The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.

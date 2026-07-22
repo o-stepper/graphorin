@@ -52,6 +52,40 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.13.12 -> 0.13.13
+
+A patch release; nothing to migrate for typical deployments. One
+hardening default changed and several behaviours are worth knowing:
+
+- **`DockerSandbox` containers now run as `10001:10001` by default**
+  (previously the image's default user, root in most bases), with a PID
+  ceiling (128) and a CPU allowance (1 CPU). Plain `node -e` payloads
+  need no passwd entry and `/work` stays writable (uid-owned tmpfs). If
+  your sandbox image requires its own user, pass
+  `createDockerSandbox({ user: '...' })` - or `user: ''` to restore the
+  image default - and adjust `pidsLimit`/`cpus` as needed.
+- **LongMemEval exits non-zero on infrastructure failures in BOTH gate
+  modes.** A case whose reason starts with `agent.run threw:` (provider
+  timeout/HTTP error) or carries `judge-off-format:` now fails the
+  process even under `--gate-on regressions`. CI that relied on a green
+  exit from a baseline-less regressions-gated run while the provider was
+  down was reading a false signal - that signal is gone.
+- **Benchmark key preflight.** With `--provider openai-compatible`
+  against the official `https://api.openai.com` endpoint and no
+  `GRAPHORIN_BENCH_API_KEY`, the runners now use `OPENAI_API_KEY` when
+  present and otherwise fail BEFORE the first case. Loopback endpoints
+  still run keyless.
+- **`llmJudge` results may now carry a reason on PASS**: recovered
+  off-format retries stamp `judge-retries: N` (plus
+  `metadata.judgeRetries`). Code that treated `reason === undefined` as
+  the only passing shape should read `pass` instead.
+- **Eval reports echo `expected` per case** - persisted JSON grows by
+  the reference answers; baselines remain compatible (regression
+  detection reads results/summary only).
+- **Consumers of the transformers.js adapters**: add the documented
+  `sharp` override next to the `adm-zip` one to clear the new high
+  advisory from `npm audit` (see the security guide).
+
 ### 0.13.11 -> 0.13.12
 
 A patch release; nothing to migrate. Behavioural refinements worth

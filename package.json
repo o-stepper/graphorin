@@ -1,6 +1,6 @@
 {
   "name": "graphorin",
-  "version": "0.13.12",
+  "version": "0.13.13",
   "private": true,
   "description": "Graphorin - TypeScript framework for building long-living personal AI assistants. Created and maintained by Oleksiy Stepurenko. MIT License.",
   "license": "MIT",

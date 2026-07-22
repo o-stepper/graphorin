@@ -1,6 +1,0 @@
----
-'@graphorin/evals': patch
-'@graphorin/observability': patch
----
-
-Fourteenth deep retest P1: infrastructure failures can no longer exit a benchmark green. The eval runner's `agent.run threw:` reason prefix is now the exported stable `AGENT_RUN_THREW_MARKER`, and the LongMemEval runner classifies such cases (provider timeouts, HTTP errors) as `INFRASTRUCTURE_FAILED` and judge off-format exhaustion as `JUDGE_FAILED` - both force a non-zero exit even under `--gate-on regressions` (previously two 120s provider timeouts scored as ordinary misses and a baseline-less regressions-gated run exited 0). Recovered judge retries become visible telemetry: `llmJudge` stamps `judge-retries: N` (exported `JUDGE_RETRY_MARKER`) into the score reason and `metadata.judgeRetries`, and both benchmark runners report `judgeRetriedCases`. Eval case results now echo the dataset's reference answer (`EvalCaseResult.expected`) so persisted reports can be adjudicated without re-joining the dataset. Benchmark runner UX: `--think true|false` (subject-leg Ollama reasoning override), `--timeout-ms` (per-request adapter timeout), and a credentials preflight that accepts `OPENAI_API_KEY` for the official OpenAI endpoint and fails fast on a keyless official-endpoint run instead of burning every case as HTTP 401.

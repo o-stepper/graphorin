@@ -14,6 +14,103 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.13.13 - 2026-07-22
+
+The **dependency + benchmark-integrity patch** (PR #244): remediation of
+the fourteenth external deep retest, which verified every 0.13.12 fix
+live (single-flight recovery measured at exactly 11 cold HTTP calls in
+five independent processes) and then swept the remaining functional and
+security surfaces. It found no P0; the two P1s it did find - a batch of
+dependency advisories published hours after 0.13.12 shipped, and a
+benchmark runner that could exit green after infrastructure failures -
+are closed here together with the verified P2/P3 batch. No breaking
+changes; one hardening default changed (Docker sandbox user, below).
+
+### Dependency advisory closure (`@graphorin/server`, transformers.js adapters)
+
+- `@graphorin/server` moves `@hono/node-server` to 2.x
+  (GHSA-frvp-7c67-39w9, Windows path traversal in `serve-static`). The
+  vulnerable entry point was never imported - a tripwire test now keeps
+  it that way - and the MCP-SDK-side 1.x copy is overridden to 2.x in
+  the workspace lockfile.
+- `fast-uri` (two host-confusion highs) and `dompurify` (low) are closed
+  by override-driven lockfile refresh.
+- The `sharp` high under `@huggingface/transformers`
+  (GHSA-f88m-g3jw-g9cj, inherited libvips image-decoding CVEs) gets the
+  adm-zip treatment: the workspace runs `sharp@0.35.x` via a pnpm
+  override, both adapter READMEs and the security guide document the
+  consumer-side override (`sharp` is the IMAGE-input path; Graphorin's
+  adapters are text-only, so the vulnerable decode paths are not
+  reachable through Graphorin APIs - but `npm audit` is red for every
+  consumer until the override is applied), and the published-peer-audit
+  allowlist gains a reviewed entry whose mitigation is verified against
+  the live registry on every scheduled run.
+
+### Benchmark integrity - infrastructure failures can no longer exit green (`@graphorin/evals`, LongMemEval/HaluMem runners)
+
+- Live finding: two 120-second provider timeouts were stored as ordinary
+  failed answers, and `--gate-on regressions` without a baseline exited
+  0 - automation saw a green benchmark process while the evaluated
+  system produced no answers. The eval runner's `agent.run threw:`
+  reason prefix is now the exported stable `AGENT_RUN_THREW_MARKER`, and
+  the LongMemEval runner classifies such cases as
+  `INFRASTRUCTURE_FAILED` (and judge off-format exhaustion as
+  `JUDGE_FAILED`), forcing a non-zero exit in BOTH gate modes with case
+  ids stamped into `benchConfig`.
+- Recovered judge retries are now telemetry: `llmJudge` marks them
+  `judge-retries: N` (exported `JUDGE_RETRY_MARKER`) in the score reason
+  and `metadata.judgeRetries`, and both runners report
+  `judgeRetriedCases` - a recovered grade is a real grade, but its extra
+  billed call is no longer invisible.
+- Every persisted case result echoes the dataset's reference answer
+  (`EvalCaseResult.expected`), so a failed case can be adjudicated from
+  the report alone.
+- Runner UX: `--think true|false` exposes the subject-leg Ollama
+  reasoning override (previously programmatic-only; thinking-default
+  local models answered EMPTY on CLI defaults), `--timeout-ms` raises
+  the per-request adapter timeout for slow local full-context runs, and
+  a credentials preflight accepts `OPENAI_API_KEY` for the official
+  OpenAI endpoint while failing a keyless official-endpoint run BEFORE
+  the first case instead of burning every case as HTTP 401.
+
+### Docker sandbox hardening (`@graphorin/security`, `@graphorin/sessions`)
+
+- `DockerSandbox` containers no longer run as the image's default user
+  (root in most bases): the create request now sets `User: '10001:10001'`
+  by default with the `/work` tmpfs owned by that uid, plus a PID
+  ceiling (`pidsLimit`, default 128) and a CPU allowance (`cpus`,
+  default 1). All three are `createDockerSandbox` options; live
+  negative tests prove the uid, the rootfs/network denials, and the
+  pids cgroup ceiling on a real daemon. Set `user: ''` to restore the
+  old behaviour for images that require it.
+- AES-GCM call sites (sessions export, encrypted-file secret
+  store/resolver) pass an explicit `authTagLength: 16` - behaviour
+  unchanged, invariant now self-documenting.
+
+### Repository and CI hygiene
+
+- The gitleaks allowlist shrinks from the whole `packages/*/tests/`
+  tree to six exact fixture files - a real secret under a test path is
+  no longer invisible to CI - and the CLI test suite stops printing a
+  synthetic token-shaped value into logs.
+- integration-real installs Ollama from a checksum-verified versioned
+  release artifact instead of piping a mutable remote installer to sh.
+- The Docker smoke workflow now FAILS on fixable critical/high
+  advisories in the exact image SBOM (pinned grype); to keep that gate
+  meaningful the runtime image applies Debian security updates at build
+  time and drops the npm/corepack toolchain. Its secrets recipe (and
+  the documented one) becomes warning-free: bind-mounted secrets owned
+  by uid 10001 at mode 0400.
+- A new `check-benchmark-readmes` CI gate validates documented
+  benchmark commands (the multilingual LOCOMO README shipped a runner
+  path whose package directory does not exist); `pnpm
+  check-package-shape` becomes a root alias; dependabot gains a 7-day
+  cooldown and renovate a `minimumReleaseAge` (security updates exempt
+  in both).
+- Yarn PnP: an optional `zod` peer is propagated through 20
+  intermediary packages, silencing the YN0086 "does not provide zod"
+  warnings without changing npm/pnpm resolution.
+
 ## 0.13.12 - 2026-07-21
 
 The **reliability + audit-hygiene patch** (PR #242): remediation of the

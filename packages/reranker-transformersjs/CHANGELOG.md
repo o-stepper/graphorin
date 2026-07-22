@@ -1,5 +1,17 @@
 # @graphorin/reranker-transformersjs
 
+## 0.13.13
+
+### Patch Changes
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P1: close the advisory batch published after 0.13.12. `@graphorin/server` moves to `@hono/node-server` 2.x (GHSA-frvp-7c67-39w9; the vulnerable `serve-static` entry point was never imported, and a tripwire test now keeps it that way), the workspace lockfile refreshes `fast-uri` (two highs) and `dompurify`, and the `sharp` high under `@huggingface/transformers` (image-input path, not reachable through the text-only adapters) gets the adm-zip treatment: a workspace override to `sharp@0.35.x`, a documented consumer override in both adapter READMEs and the security guide, and a reviewed published-peer-audit allowlist entry whose mitigation is verified against the live registry.
+
+- [#244](https://github.com/o-stepper/graphorin/pull/244) [`0271df9`](https://github.com/o-stepper/graphorin/commit/0271df93b163af6fe6bdcba3462c13ef488a2aab) Thanks [@o-stepper](https://github.com/o-stepper)! - Fourteenth deep retest P3: every package sitting between an application and a zod-peer package (`core`/`tools`/`memory`/`mcp`) now re-declares the `zod` peer as **optional** (`peerDependenciesMeta`), so strict Yarn PnP installs stop emitting `YN0086` "does not provide zod" warnings - the application root's zod instance flows through the intermediaries. npm/pnpm behaviour is unchanged (optional peers are not auto-installed; the underlying required peers still resolve exactly as before).
+
+- Updated dependencies []:
+  - @graphorin/memory@0.13.13
+  - @graphorin/core@0.13.13
+
 ## 0.13.12
 
 ### Patch Changes
