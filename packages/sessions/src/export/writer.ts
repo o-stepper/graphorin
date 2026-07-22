@@ -269,7 +269,7 @@ export async function deriveSessionExportKey(
  */
 export function encryptBody(body: Uint8Array, key: Uint8Array): Uint8Array {
   const iv = randomBytes(12);
-  const cipher = createCipheriv('aes-256-gcm', Buffer.from(key), iv);
+  const cipher = createCipheriv('aes-256-gcm', Buffer.from(key), iv, { authTagLength: 16 });
   const encrypted = Buffer.concat([cipher.update(Buffer.from(body)), cipher.final()]);
   const tag = cipher.getAuthTag();
   return new Uint8Array(Buffer.concat([iv, encrypted, tag]));

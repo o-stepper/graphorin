@@ -89,7 +89,7 @@ export {
   renderMarkdownReport,
   renderTerminalReport,
 } from './reporters/index.js';
-export { EvalConcurrencyError, runEvals } from './runner.js';
+export { AGENT_RUN_THREW_MARKER, EvalConcurrencyError, runEvals } from './runner.js';
 export {
   type ArgumentValidityOptions,
   anyMatch,
@@ -108,6 +108,7 @@ export {
   helpfulnessScorer,
   type JsonPathOptions,
   JUDGE_OFF_FORMAT_MARKER,
+  JUDGE_RETRY_MARKER,
   JudgeOffFormatError,
   jsonPath,
   type LlmJudgeOptions,

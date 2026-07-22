@@ -61,6 +61,23 @@ jobs:
           path: ${{ runner.temp }}/graphorin-image.spdx.json
           retention-days: 90
 
+      # deep-retest 0.13.12: an SBOM without a verdict is visibility, not
+      # a gate - scan the EXACT artifact and fail on fixable
+      # critical/high findings. Debian fixes are applied at build time
+      # (apt-get upgrade) and the npm toolchain is removed from the
+      # runtime stage, so a red run here means a real, actionable
+      # advisory in what actually ships. Binary pinned by version AND
+      # sha256 (syft/osv-scanner precedent).
+      - name: Vulnerability-scan the image (grype, pinned, fail on fixable high)
+        run: |
+          set -euo pipefail
+          curl -sSL -o /tmp/grype.tar.gz \
+            https://github.com/anchore/grype/releases/download/v0.116.0/grype_0.116.0_linux_amd64.tar.gz
+          echo "40aff724297312f91ea390d003bed8d8651c74cc7f5b26732db80b3a408d2fc5  /tmp/grype.tar.gz" | sha256sum -c -
+          tar -xzf /tmp/grype.tar.gz -C /tmp grype
+          /tmp/grype "sbom:${RUNNER_TEMP}/graphorin-image.spdx.json" \
+            --fail-on high --only-fixed
+
       - name: Boot the server with the shipped config and probe the published port
         run: |
           set -euo pipefail
@@ -75,11 +92,19 @@ jobs:
           # config could never catch that class. (The previous
           # -e GRAPHORIN_CONFIG is gone: no such variable exists - the CMD
           # passes --config.)
+          # deep-retest 0.13.12 P2: the old recipe chmod'ed the secrets
+          # 0644 and then collected the server's own "should be 0600"
+          # warnings by construction. The clean non-root pattern for
+          # bind-mounted secrets: owned by the container user (uid/gid
+          # 10001), mode 0400 - readable by exactly one uid, no
+          # permission warnings. Mirrors examples/docker/README.md.
           mkdir -p "${RUNNER_TEMP}/gsecrets"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/pepper"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/db-passphrase"
           openssl rand -hex 32 > "${RUNNER_TEMP}/gsecrets/audit-passphrase"
-          chmod 0644 "${RUNNER_TEMP}/gsecrets"/*
+          sudo chown -R 10001:10001 "${RUNNER_TEMP}/gsecrets"
+          sudo chmod 0500 "${RUNNER_TEMP}/gsecrets"
+          sudo chmod 0400 "${RUNNER_TEMP}/gsecrets"/*
           docker run -d --name graphorin-smoke \
             --read-only --tmpfs /tmp \
             --security-opt no-new-privileges \

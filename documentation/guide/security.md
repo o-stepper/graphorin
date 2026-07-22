@@ -42,6 +42,8 @@ The `'worker-threads'` tier is **best-effort** isolation, not a security boundar
 
 When you do install `dockerode`, prefer **v5** (the peer range accepts `^4.0.0 || ^5.0.0`, and the workspace tests against 5.x): dockerode 4.x pulls in `uuid@10`, which carries a moderate advisory ([GHSA-w5hq-g745-h8pq](https://github.com/advisories/GHSA-w5hq-g745-h8pq)); dockerode 5 dropped the `uuid` dependency entirely. If you must stay on 4.x, add the override the workspace itself uses: `"dockerode>uuid": ">=11.1.1 <12"` (pnpm `overrides`).
 
+The `'docker'` tier's container defaults (deep-retest 0.13.12): network disabled, read-only root filesystem, a 64 MB `/work` tmpfs as the only writable mount, all capabilities dropped, `no-new-privileges`, a memory ceiling - and now a **non-root user** (`10001:10001`, so sandboxed code never inherits the image's default user, which is root in most base images), a **PID ceiling** (`pidsLimit`, default 128) and a **CPU allowance** (`cpus`, default 1) so hostile code cannot fork or busy-loop until the external timeout. All three are constructor options on `createDockerSandbox`; numeric `user` values need no passwd entry in the image, and the `/work` tmpfs is owned by that uid (mode `0700`). Live negative tests assert the uid, the rootfs/network denials, and the pids cgroup ceiling on a real daemon.
+
 ## Sensitivity model
 
 Every message, memory row, tool result, and trace attribute carries a `Sensitivity` tag:
@@ -200,8 +202,8 @@ The `publishers` leg is domain-bound: the frontmatter `publisher` string is NOT 
 
 Two scans complement the dependency gates in CI (both binaries pinned by version and sha256):
 
-- **Secret scan** - the `secret-scan` job in the security workflow runs [gitleaks](https://github.com/gitleaks/gitleaks) over the checkout and **blocks** on findings. The repo-root `.gitleaks.toml` allowlists only synthetic-fixture trees (package `tests/`, `tmp/` audit deliverables, downloaded research datasets) - runtime source is fully scanned. The redaction corpus tests stay the deep, framework-aware layer; gitleaks is the general-purpose net for anything those patterns do not model.
-- **Image SBOM** - the Docker smoke workflow generates an SPDX SBOM of the built distribution image with [syft](https://github.com/anchore/syft) and uploads it as a build artifact (90-day retention). The image deliberately carries the full builder tree (a documented size/devDependency trade-off), so the SBOM describes what actually ships - point image scanners at it instead of inferring from the npm graph.
+- **Secret scan** - the `secret-scan` job in the security workflow runs [gitleaks](https://github.com/gitleaks/gitleaks) over the checkout and **blocks** on findings. The repo-root `.gitleaks.toml` allowlist is file-precise (deep-retest 0.13.12): only the exact test files that hold secret-shaped synthetic fixtures by design are excluded - every other file, including every other test, is fully scanned, so a real credential under a test tree can no longer hide behind a blanket directory exception. A new fixture file with realistic token shapes fails the scan until its path is explicitly reviewed into the allowlist. The redaction corpus tests stay the deep, framework-aware layer; gitleaks is the general-purpose net for anything those patterns do not model.
+- **Image SBOM + vulnerability gate** - the Docker smoke workflow generates an SPDX SBOM of the built distribution image with [syft](https://github.com/anchore/syft), uploads it as a build artifact (90-day retention), and then **fails** the run when [grype](https://github.com/anchore/grype) finds fixable critical/high advisories in that exact artifact. To keep the gate meaningful, the runtime stage applies Debian security updates at build time and removes the npm/corepack toolchain (the entrypoint execs `node` directly; npm's bundled dependency tree is historically where image scanners find the fixable findings). The image still deliberately carries the full builder tree (a documented size/devDependency trade-off); a pruned runtime target is tracked separately.
 
 ## Published dependency-graph advisories
 
@@ -236,7 +238,34 @@ overrides:
 
 The Graphorin workspace itself ships the pnpm form of this override, which is exactly why lockfile-based scanners report it clean - treat a clean workspace scan as a statement about the workspace, never about the published graph.
 
-The same guidance is printed on both packages' npm pages (their READMEs carry the advisory section verbatim), and the scheduled `published-peer-audit` job now also **proves the mitigation**: it installs a consumer fixture with the documented override against the live registry and fails if the one-liner ever stops removing the advisory.
+### Known advisory: sharp under the transformers.js adapters
+
+The same two packages carry a second high advisory since 2026-07-22:
+
+- Chain: `@huggingface/transformers` -> `sharp@0.34.x` ([GHSA-f88m-g3jw-g9cj](https://github.com/advisories/GHSA-f88m-g3jw-g9cj), inherited libvips image-decoding CVEs; patched in `sharp@0.35.0`).
+- Exposure: `sharp` is transformers.js's **image-input** path. Graphorin's embedder and reranker adapters run text-only pipelines and never feed image files through `sharp`, so the vulnerable decode paths are not reachable through Graphorin APIs - but the advisory (and the red `npm audit`) is real for every consumer installing the adapters.
+- Upstream status: `@huggingface/transformers` (4.2.0, the latest at the time of review) pins `sharp ^0.34.5`, below the patched `0.35.0`, so no dependency bump resolves it today.
+
+Until upstream widens the range, mitigate in the consumer's root manifest exactly like `adm-zip` (verified: install and the text pipelines work unchanged on `sharp@0.35.3`):
+
+::: code-group
+
+```json [npm (package.json)]
+{
+  "overrides": {
+    "sharp": "^0.35.0"
+  }
+}
+```
+
+```yaml [pnpm (pnpm-workspace.yaml)]
+overrides:
+  'sharp@>=0.30.0 <0.35.0': '>=0.35.0 <0.36'
+```
+
+:::
+
+The same guidance is printed on both packages' npm pages (their READMEs carry the advisory sections verbatim), and the scheduled `published-peer-audit` job now also **proves the mitigations**: it installs a consumer fixture with each documented override against the live registry and fails if the one-liner ever stops removing its advisory.
 
 ## Lateral-leak defense layer
 

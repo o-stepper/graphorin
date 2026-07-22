@@ -64,6 +64,13 @@ export interface EvalCaseResult<I, O> {
   readonly caseId: string;
   readonly input: I;
   readonly output: O;
+  /**
+   * The dataset's reference answer for this case (`Case.expected`),
+   * echoed into the result so persisted reports can be audited without
+   * re-joining them against the dataset. Absent when the case declared
+   * no expectation.
+   */
+  readonly expected?: O;
   readonly durationMs: number;
   readonly scores: ReadonlyArray<{ readonly scorer: string; readonly result: ScoreResult }>;
 }

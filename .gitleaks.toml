@@ -2,30 +2,40 @@
 # `secret-scan`). deep-retest-0.13.11: complements the redaction corpus
 # tests with a general-purpose scanner over the working tree.
 #
-# The allowlist below is PATH-based and deliberately narrow: runtime
-# source stays fully scanned. The excluded trees hold secret-SHAPED
-# strings by design:
+# The allowlist below is PATH-based and file-precise. deep-retest
+# 0.13.12 P2: the original `packages/*/tests/` blanket exclusion meant
+# a REAL secret committed anywhere under a package test tree was
+# invisible to CI. Now only the exact files that hold secret-SHAPED
+# synthetic fixtures by design are excluded - the redaction corpus and
+# policy tests REQUIRE realistic token shapes (ghp_..., sk-..., PEM
+# blocks, AWS AKIA..., JWTs). Everything else, including every other
+# test file, is fully scanned.
 #
-#  - packages/*/tests/    synthetic fixtures - the redaction corpus and
-#                         policy tests REQUIRE realistic token shapes
-#                         (ghp_..., sk-..., PEM blocks, gph_live_v1_...).
-#  - tmp/                 audit/e2e campaign deliverables - reports and
-#                         repro scripts quoting the same fixtures.
+# Adding a new fixture file with secret-shaped literals will fail the
+# scan until its path is added here - that review step is the point.
+#
+#  - tmp/                   audit/e2e campaign deliverables - reports and
+#                           repro scripts quoting the same fixtures.
 #  - benchmarks/.datasets/  downloaded research datasets (LoCoMo,
-#                         LongMemEval) containing sample JWTs/tokens;
-#                         gitignored, listed here for local runs.
+#                           LongMemEval) containing sample JWTs/tokens;
+#                           gitignored, listed here for local runs.
 #
-# Trade-off, documented: a REAL secret pasted into one of these trees
-# would not be flagged. Reviews of test fixtures must keep treating
-# secret-shaped literals as synthetic-only.
+# Trade-off, documented: a REAL secret pasted into one of the listed
+# fixture FILES would not be flagged. Reviews of those files must keep
+# treating secret-shaped literals as synthetic-only.
 
 [extend]
 useDefault = true
 
 [allowlist]
-description = "Synthetic secret-shaped fixtures (tests, audit deliverables, research datasets)"
+description = "Synthetic secret-shaped fixtures (exact files), audit deliverables, research datasets"
 paths = [
-  '''packages/[^/]+/tests/''',
+  '''packages/agent/tests/subagent-hitl\.test\.ts''',
+  '''packages/observability/tests/redaction/patterns\.test\.ts''',
+  '''packages/observability/tests/redaction/validator\.test\.ts''',
+  '''packages/provider/tests/middleware/with-redaction-pattern-corpus\.test\.ts''',
+  '''packages/server/tests/audit-binding-fencing\.test\.ts''',
+  '''packages/server/tests/middleware-idempotency\.test\.ts''',
   '''(^|/)tmp/''',
   '''benchmarks/\.datasets/''',
 ]

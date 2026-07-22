@@ -150,6 +150,34 @@ block, so a number always says what configuration produced it:
   compares ALREADY-observed spend before each next request, so a run can
   overshoot the cap by at most one request's cost - it is a run-level
   budget guard, not a per-cent hard stop.
+- `--think true|false` overrides the SUBJECT leg's Ollama `think` mode
+  (the judge leg is always `think: false`). Thinking-default local models
+  (qwen3) can burn their whole output budget on the hidden chain and
+  answer EMPTY; `--think false` is the fix, and the setting is stamped
+  into `benchConfig`. `--timeout-ms N` raises the per-request HTTP
+  timeout on the subject and judge adapters - slow local full-context
+  runs exceed the adapter default mid-generation.
+- Infrastructure failures are classified, never averaged away
+  (deep-retest 0.13.12): a case whose reason carries the stable
+  `agent.run threw:` marker (provider timeout/HTTP error - the subject
+  never answered) is stamped `INFRASTRUCTURE_FAILED`, judge off-format
+  exhaustion is stamped `JUDGE_FAILED`, and both force a non-zero exit
+  even under `--gate-on regressions` (case ids land in
+  `benchConfig.infrastructureFailedCases` / `judgeOffFormatCases`).
+  Recovered judge retries are telemetry, not failures: the scorer marks
+  them `judge-retries: N` in the reason (and `metadata.judgeRetries`),
+  the runner warns with the case list, and
+  `benchConfig.judgeRetriedCases` records them for cost attribution.
+  Every persisted case result now also echoes the dataset's reference
+  answer (`expected`), so a failed case can be adjudicated by hand from
+  the report alone.
+- Credentials preflight: `GRAPHORIN_BENCH_API_KEY` stays authoritative;
+  with `--provider openai-compatible` against the official
+  `https://api.openai.com` endpoint the standard `OPENAI_API_KEY` is
+  accepted as a fallback (the runner logs which variable it used - never
+  the value), and a keyless run against that host fails BEFORE the first
+  case instead of burning every case as HTTP 401. Loopback endpoints
+  (llama-server and friends) legally run keyless.
 
 The adaptive injected-task scenarios (verbatim / unicode-obfuscated /
 split / paraphrase exfiltration against the dataflow policy) live in

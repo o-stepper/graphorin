@@ -48,6 +48,18 @@ export class EvalConcurrencyError extends Error {
 }
 
 /**
+ * Stable machine-scannable prefix of the scorer reason the runner
+ * records when `agent.run` itself threw (provider/network/timeout
+ * errors), as opposed to the agent answering and a scorer failing the
+ * answer. Benchmark runners classify such cases as INFRASTRUCTURE
+ * failures - the system under test never produced an answer, so the
+ * case is not a quality result.
+ *
+ * @stable
+ */
+export const AGENT_RUN_THREW_MARKER = 'agent.run threw:';
+
+/**
  * @stable
  */
 export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport<I, O>> {
@@ -124,12 +136,13 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
           caseId,
           input: item.sample.input,
           output: undefined as unknown as O,
+          ...(item.sample.expected !== undefined ? { expected: item.sample.expected } : {}),
           durationMs,
           scores: opts.scorers.map((s) => ({
             scorer: s.name,
             result: {
               pass: false,
-              reason: `agent.run threw: ${err instanceof Error ? err.message : String(err)}`,
+              reason: `${AGENT_RUN_THREW_MARKER} ${err instanceof Error ? err.message : String(err)}`,
             },
           })),
         };
@@ -158,6 +171,7 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
         caseId,
         input: item.sample.input,
         output,
+        ...(item.sample.expected !== undefined ? { expected: item.sample.expected } : {}),
         durationMs,
         scores,
       };

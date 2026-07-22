@@ -14,6 +14,20 @@
           "adm-zip": "^0.6.0"
         }
       }
+    },
+    {
+      "ghsa": "GHSA-f88m-g3jw-g9cj",
+      "package": "sharp",
+      "severity": "high",
+      "reason": "@huggingface/transformers (4.2.0, latest at review time) pins sharp ^0.34.5, below the patched 0.35.0; it reaches consumers via @graphorin/embedder-transformersjs and @graphorin/reranker-transformersjs. sharp is transformers.js's IMAGE-input path (libvips decoding) - Graphorin's adapters run text-only embedder/reranker pipelines and never feed image files through sharp, so the vulnerable decode paths are not reachable through Graphorin APIs. The workspace itself is on sharp 0.35.3 via a pnpm override (fourteenth deep retest); the documented consumer mitigation is an equivalent override in the consumer's root manifest - see documentation/guide/security.md.",
+      "addedOn": "2026-07-22",
+      "removeWhen": "@huggingface/transformers widens its sharp range to >=0.35.0 (or drops sharp) and the adapters pick that release up.",
+      "mitigation": {
+        "package": "@graphorin/embedder-transformersjs",
+        "overrides": {
+          "sharp": "^0.35.0"
+        }
+      }
     }
   ]
 }

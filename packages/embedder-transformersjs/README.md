@@ -54,6 +54,29 @@ Full analysis in the
 scheduled published-consumer audit tracks the advisory against a
 reviewed allowlist and fails if the exposure ever widens.
 
+### Known advisory: sharp under transformers.js
+
+`npm audit` also flags a high advisory
+([GHSA-f88m-g3jw-g9cj](https://github.com/advisories/GHSA-f88m-g3jw-g9cj))
+in the chain `@huggingface/transformers -> sharp@0.34.x` (inherited
+libvips image-decoding CVEs; patched in `sharp@0.35.0`). `sharp` is
+transformers.js's image-input path - this package runs text-only
+pipelines and never feeds image files through `sharp` - but upstream
+pins `sharp ^0.34.5`, so no dependency bump resolves it today. Until
+upstream widens the range, add the verified override next to the
+`adm-zip` one (text pipelines and native loading work unchanged on
+`sharp@0.35.3`):
+
+```jsonc
+// npm / bun: package.json
+{ "overrides": { "sharp": "^0.35.0" } }
+```
+
+```jsonc
+// pnpm: package.json
+{ "pnpm": { "overrides": { "sharp@>=0.30.0 <0.35.0": ">=0.35.0 <0.36" } } }
+```
+
 ## Quick start
 
 ```ts

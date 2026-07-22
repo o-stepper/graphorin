@@ -9,6 +9,7 @@
   ],
   "timezone": "UTC",
   "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "7 days",
   "rangeStrategy": "bump",
   "commitMessagePrefix": "chore(deps):",
   "labels": ["dependencies"],
@@ -54,7 +55,8 @@
   "vulnerabilityAlerts": {
     "enabled": true,
     "labels": ["security"],
-    "schedule": ["at any time"]
+    "schedule": ["at any time"],
+    "minimumReleaseAge": null
   },
   "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/.turbo/**"]
 }

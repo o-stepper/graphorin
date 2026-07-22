@@ -118,6 +118,26 @@ export interface DockerSandboxOptions {
   /** Memory limit (MB). Defaults to 512. */
   readonly memoryLimitMb?: number;
   /**
+   * Container user as `"uid:gid"` (the create request's `User`).
+   * Defaults to `'10001:10001'` so sandboxed code never runs as the
+   * image's default user - which is root in most base images
+   * (deep-retest 0.13.12 P2). Numeric ids need no passwd entry. Pass
+   * `''` to keep the image default (NOT recommended; document why in
+   * your deployment notes if you do).
+   */
+  readonly user?: string;
+  /**
+   * PID ceiling for the container (`PidsLimit`) - bounds fork/spawn
+   * storms that would otherwise run until the timeout. Defaults to
+   * 128; clamped to `[16, 4096]`.
+   */
+  readonly pidsLimit?: number;
+  /**
+   * CPU allowance in CPUs (`NanoCpus`), fractional allowed. Bounds
+   * busy-loop burn. Defaults to 1; clamped to `[0.1, 8]`.
+   */
+  readonly cpus?: number;
+  /**
    * Override the peer-dep loader. Tests inject a stub here.
    */
   readonly peerLoader?: () => Promise<DockerodeModule>;
@@ -125,6 +145,9 @@ export interface DockerSandboxOptions {
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_MEMORY_LIMIT_MB = 512;
+const DEFAULT_USER = '10001:10001';
+const DEFAULT_PIDS_LIMIT = 128;
+const DEFAULT_CPUS = 1;
 
 /**
  * Construct a `DockerSandbox` instance. The adapter resolves the
@@ -136,6 +159,17 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
   const image = opts.image ?? 'graphorin-sandbox:latest';
   const defaultTimeoutMs = opts.defaultTimeoutMs ?? DEFAULT_TIMEOUT_MS;
   const memoryLimitMb = opts.memoryLimitMb ?? DEFAULT_MEMORY_LIMIT_MB;
+  const user = opts.user ?? DEFAULT_USER;
+  const pidsLimit = Math.min(4096, Math.max(16, Math.floor(opts.pidsLimit ?? DEFAULT_PIDS_LIMIT)));
+  const cpus = Math.min(8, Math.max(0.1, opts.cpus ?? DEFAULT_CPUS));
+  // When the container user is a numeric uid:gid, own the /work tmpfs
+  // by it (mode 0700) so the non-root default can actually write its
+  // one writable mount; a named/blank user keeps the kernel default.
+  const userMatch = /^(\d+):(\d+)$/.exec(user);
+  const workTmpfs =
+    userMatch !== null
+      ? `rw,size=64m,uid=${userMatch[1]},gid=${userMatch[2]},mode=0700`
+      : 'rw,size=64m';
   const peerLoader = opts.peerLoader ?? defaultPeerLoader;
 
   let cachedClient: DockerodeClient | null | 'unavailable' = null;
@@ -216,11 +250,17 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
           StdinOnce: true,
           Tty: false,
           NetworkDisabled: runOpts.allowNetwork !== true,
+          // deep-retest 0.13.12 P2: never inherit the image's default
+          // user (root in most base images); bound processes and CPU so
+          // hostile code cannot fork/burn until the external timeout.
+          ...(user !== '' ? { User: user } : {}),
           HostConfig: {
             // Per-call ceiling wins over the constructor default.
             Memory: (runOpts.maxMemoryMb ?? memoryLimitMb) * 1024 * 1024,
             ReadonlyRootfs: runOpts.allowFs !== true,
-            Tmpfs: { '/work': 'rw,size=64m' },
+            Tmpfs: { '/work': workTmpfs },
+            PidsLimit: pidsLimit,
+            NanoCpus: Math.round(cpus * 1e9),
             AutoRemove: false,
             CapDrop: ['ALL'],
             SecurityOpt: ['no-new-privileges'],

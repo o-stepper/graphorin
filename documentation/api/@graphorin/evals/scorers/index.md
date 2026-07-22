@@ -124,6 +124,12 @@ Re-exports [JUDGE_OFF_FORMAT_MARKER](/api/@graphorin/evals/variables/JUDGE_OFF_F
 
 ***
 
+### JUDGE\_RETRY\_MARKER
+
+Re-exports [JUDGE_RETRY_MARKER](/api/@graphorin/evals/variables/JUDGE_RETRY_MARKER.md)
+
+***
+
 ### JudgeOffFormatError
 
 Re-exports [JudgeOffFormatError](/api/@graphorin/evals/classes/JudgeOffFormatError.md)

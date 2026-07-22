@@ -156,6 +156,14 @@ const memory = createMemory({
   compose the provider with `withRetry` (and optionally `withRateLimit`) from
   `@graphorin/provider` before handing it to `createLlmReranker` - the
   reranker inherits the middleware transparently.
+- **Reasoning models need output headroom** - the scorer asks for a bare
+  integer, but a reasoning model (OpenAI `gpt-5.x`, o-series) burns hidden
+  reasoning tokens against `maxOutputTokens` first; at the default-tight
+  budgets an empty reply comes back and the passage degrades as off-format
+  (observed live: `maxOutputTokens: 16` failed intermittently, `48` was
+  reliably green). Give live reasoning-model rerankers
+  `maxOutputTokens: 48` or more - `lastOffFormatCount` climbing with empty
+  snippets in `lastFailures` is the signature of a too-tight budget.
 
 ## Query transformation
 

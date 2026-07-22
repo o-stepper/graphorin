@@ -242,7 +242,7 @@ export class EncryptedFileSecretsStore implements SecretsStore {
     let key: Buffer | null = null;
     try {
       key = await this.#passphrase.useBuffer((passBuf) => deriveAesKey(passBuf, salt));
-      const cipher = createCipheriv('aes-256-gcm', key, nonce);
+      const cipher = createCipheriv('aes-256-gcm', key, nonce, { authTagLength: 16 });
       const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final()]);
       const tag = cipher.getAuthTag();
       const magic = Buffer.alloc(4);

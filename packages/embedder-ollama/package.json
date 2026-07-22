@@ -62,5 +62,13 @@
   },
   "devDependencies": {
     "@graphorin/store-sqlite": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": true
+    }
   }
 }

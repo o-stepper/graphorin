@@ -6,7 +6,7 @@
 
 # Class: JudgeOffFormatError
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:46
+Defined in: packages/evals/src/scorers/llm/judge.ts:59
 
 **`Stable`**
 
@@ -30,7 +30,7 @@ new JudgeOffFormatError(
    lastReply): JudgeOffFormatError;
 ```
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:47
+Defined in: packages/evals/src/scorers/llm/judge.ts:60
 
 #### Parameters
 

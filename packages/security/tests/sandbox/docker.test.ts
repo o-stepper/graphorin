@@ -152,8 +152,10 @@ describe('DockerSandbox', () => {
       logs?: Buffer;
       wait?: () => Promise<{ StatusCode: number }>;
       onStart?: () => void;
+      sandboxOpts?: Parameters<typeof createDockerSandbox>[0];
     }) =>
       createDockerSandbox({
+        ...args.sandboxOpts,
         peerLoader: async () => ({
           default: class {
             async createContainer(opts: Record<string, unknown>): Promise<unknown> {
@@ -189,6 +191,55 @@ describe('DockerSandbox', () => {
       const sandbox = makeStubSandbox({ harness });
       await sandbox.run({ kind: 'source', source: 'return null;' }, { input: undefined });
       expect(harness.createCalls[0]?.Env).toEqual([]);
+    });
+
+    // deep-retest 0.13.12 P2: the container ran as the image default
+    // user (root in most bases) with no PID/CPU ceiling. Pin every
+    // hardening field of the create request so a silent drop of any of
+    // them fails here, not in an incident.
+    it('applies the full hardening contract by default (user, pids, cpu, fs, net, caps)', async () => {
+      const harness: StubHarness = { createCalls: [], removeCalls: [] };
+      const sandbox = makeStubSandbox({ harness });
+      await sandbox.run({ kind: 'source', source: 'return null;' }, { input: undefined });
+      const call = harness.createCalls[0] ?? {};
+      expect(call.User).toBe('10001:10001');
+      expect(call.NetworkDisabled).toBe(true);
+      const hostConfig = (call.HostConfig ?? {}) as Record<string, unknown>;
+      expect(hostConfig.ReadonlyRootfs).toBe(true);
+      expect(hostConfig.CapDrop).toEqual(['ALL']);
+      expect(hostConfig.SecurityOpt).toEqual(['no-new-privileges']);
+      expect(hostConfig.PidsLimit).toBe(128);
+      expect(hostConfig.NanoCpus).toBe(1_000_000_000);
+      // The one writable mount is owned by the non-root default user.
+      expect(hostConfig.Tmpfs).toEqual({ '/work': 'rw,size=64m,uid=10001,gid=10001,mode=0700' });
+    });
+
+    it('user/pidsLimit/cpus are configurable, clamped, and user="" keeps the image default', async () => {
+      const harness: StubHarness = { createCalls: [], removeCalls: [] };
+      const custom = makeStubSandbox({
+        harness,
+        sandboxOpts: { user: '1000:1000', pidsLimit: 999_999, cpus: 64 },
+      });
+      await custom.run({ kind: 'source', source: 'return null;' }, { input: undefined });
+      const customCall = harness.createCalls[0] ?? {};
+      expect(customCall.User).toBe('1000:1000');
+      const customHost = (customCall.HostConfig ?? {}) as Record<string, unknown>;
+      expect(customHost.PidsLimit).toBe(4096); // clamped ceiling
+      expect(customHost.NanoCpus).toBe(8_000_000_000); // clamped ceiling
+      expect(customHost.Tmpfs).toEqual({ '/work': 'rw,size=64m,uid=1000,gid=1000,mode=0700' });
+
+      const imageDefault = makeStubSandbox({
+        harness,
+        sandboxOpts: { user: '', pidsLimit: 1, cpus: 0.001 },
+      });
+      await imageDefault.run({ kind: 'source', source: 'return null;' }, { input: undefined });
+      const defaultCall = harness.createCalls[1] ?? {};
+      expect('User' in defaultCall).toBe(false);
+      const defaultHost = (defaultCall.HostConfig ?? {}) as Record<string, unknown>;
+      expect(defaultHost.PidsLimit).toBe(16); // clamped floor
+      expect(defaultHost.NanoCpus).toBe(100_000_000); // clamped floor (0.1 CPU)
+      // A non-numeric/blank user cannot own the tmpfs - kernel default stands.
+      expect(defaultHost.Tmpfs).toEqual({ '/work': 'rw,size=64m' });
     });
 
     it('per-call maxMemoryMb overrides the constructor default in HostConfig.Memory', async () => {
@@ -305,6 +356,70 @@ describe('DockerSandbox', () => {
       );
       expect(result.ok).toBe(true);
       if (result.ok) expect(result.output.ok).toBe(true);
+    }, 90_000);
+
+    // deep-retest 0.13.12 P2: prove the hardening NEGATIVELY on a real
+    // daemon - non-root uid, writable /work, read-only rootfs, no
+    // outbound network, and a visible PID ceiling. No fork bombs: the
+    // ceiling is asserted from the pids cgroup, not by exhausting it.
+    it('runs as uid 10001 with a writable /work and a denied rootfs/network', async () => {
+      const sandbox = createDockerSandbox({
+        image: process.env.GRAPHORIN_DOCKER_TEST_IMAGE ?? 'node:22-alpine',
+        defaultTimeoutMs: 60_000,
+      });
+      const result = await sandbox.run<
+        unknown,
+        { uid: number; wrote: boolean; fsDenied: boolean; netDenied: boolean }
+      >(
+        {
+          kind: 'source',
+          source: [
+            "const fs = require('node:fs');",
+            "fs.writeFileSync('/work/probe', 'x');",
+            "const wrote = fs.readFileSync('/work/probe', 'utf8') === 'x';",
+            'let fsDenied = false;',
+            "try { fs.writeFileSync('/etc/graphorin-probe', 'x'); } catch { fsDenied = true; }",
+            'let netDenied = false;',
+            'try {',
+            "  await fetch('http://1.1.1.1/', { signal: AbortSignal.timeout(3000) });",
+            '} catch { netDenied = true; }',
+            'return { uid: process.getuid(), wrote, fsDenied, netDenied };',
+          ].join('\n'),
+        },
+        { input: undefined },
+      );
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.output).toEqual({ uid: 10001, wrote: true, fsDenied: true, netDenied: true });
+      }
+    }, 90_000);
+
+    it('exposes the PID ceiling through the pids cgroup', async () => {
+      const sandbox = createDockerSandbox({
+        image: process.env.GRAPHORIN_DOCKER_TEST_IMAGE ?? 'node:22-alpine',
+        defaultTimeoutMs: 60_000,
+      });
+      const result = await sandbox.run<unknown, { max: string | null }>(
+        {
+          kind: 'source',
+          source: [
+            "const fs = require('node:fs');",
+            'let max = null;',
+            "for (const p of ['/sys/fs/cgroup/pids.max', '/sys/fs/cgroup/pids/pids.max']) {",
+            '  try { max = fs.readFileSync(p, "utf8").trim(); break; } catch {}',
+            '}',
+            'return { max };',
+          ].join('\n'),
+        },
+        { input: undefined },
+      );
+      expect(result.ok).toBe(true);
+      // cgroup v2 exposes pids.max inside the container; tolerate an
+      // unreadable file on exotic daemons, but when readable it must be
+      // the configured ceiling, never `max` (unlimited).
+      if (result.ok && result.output.max !== null) {
+        expect(result.output.max).toBe('128');
+      }
     }, 90_000);
 
     it('the env allowlist and the input binding are visible inside the container', async () => {

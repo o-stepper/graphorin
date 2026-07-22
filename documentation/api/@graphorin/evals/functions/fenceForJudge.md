@@ -10,7 +10,7 @@
 function fenceForJudge(label, value): string;
 ```
 
-Defined in: packages/evals/src/scorers/llm/judge.ts:189
+Defined in: packages/evals/src/scorers/llm/judge.ts:216
 
 **`Stable`**
 

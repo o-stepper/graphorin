@@ -137,7 +137,7 @@ WantedBy=multi-user.target
 
 ## Docker
 
-The `examples/docker/` template ships a multi-stage build that produces a slim image with only the runtime dependencies. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
+The `examples/docker/` template ships a multi-stage build. The runtime stage is compatibility-first: it carries the builder's workspace tree (a documented size/devDependency trade-off; a pruned target is tracked separately), applies Debian security updates at build time, and strips the npm/corepack toolchain - the weekly Docker smoke workflow SBOMs the image and fails on fixable critical/high advisories in it. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
 docker build -t graphorin:0.13.12 -f examples/docker/Dockerfile .
@@ -153,6 +153,8 @@ docker run -d --name graphorin \
 ```
 
 The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.
+
+Bind-mounted secret files must be readable by the container user (uid/gid `10001`) and by nobody else - root-owned `0600` files are unreadable to it, and `0644` files make the server warn on every boot. The clean pattern (`sudo chown -R 10001:10001 <dir> && sudo chmod 0400 <dir>/*`) is spelled out in [`examples/docker/README.md`](https://github.com/o-stepper/graphorin/blob/main/examples/docker/README.md), together with the orchestrator-managed-mount escape hatch.
 
 ## Kubernetes
 

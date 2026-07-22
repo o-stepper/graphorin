@@ -10,7 +10,7 @@
 function runEvals<I, O>(opts): Promise<EvalReport<I, O>>;
 ```
 
-Defined in: packages/evals/src/runner.ts:53
+Defined in: packages/evals/src/runner.ts:65
 
 **`Stable`**
 

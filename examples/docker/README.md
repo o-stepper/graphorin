@@ -52,6 +52,26 @@ workflow does) to prove reachability. See
 [Standalone server](../../documentation/guide/standalone-server.md)
 and [Security](../../documentation/guide/security.md).
 
+### Secret file ownership and mode
+
+The container runs as uid/gid **10001** (`graphorin`). Root-owned `0600`
+secret files are unreadable to it, and world-readable `0644` files make the
+server warn on every boot - both are wrong. For **bind-mounted** secret
+files, own them as the container user and keep them owner-read-only:
+
+```bash
+sudo chown -R 10001:10001 /run/secrets/graphorin
+sudo chmod 0500 /run/secrets/graphorin
+sudo chmod 0400 /run/secrets/graphorin/*
+```
+
+(The weekly smoke workflow runs exactly this pattern.) Orchestrator-managed
+secrets (Docker Swarm/Compose `secrets:`, Kubernetes `Secret` volumes) set
+ownership themselves; if your orchestrator fixes the mode to something the
+server flags and you cannot change it, the documented
+`?warnOnPermissions=0` suffix on the `file:` SecretRef silences that one
+ref's warning - reserve it for read-only orchestrator mounts.
+
 ## Supported platforms
 
 The image is built and health-checked for **`linux/amd64`** by the weekly
