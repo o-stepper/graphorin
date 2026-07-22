@@ -60,10 +60,14 @@ server warn on every boot - both are wrong. For **bind-mounted** secret
 files, own them as the container user and keep them owner-read-only:
 
 ```bash
+sudo chmod 0400 /run/secrets/graphorin/*
 sudo chown -R 10001:10001 /run/secrets/graphorin
 sudo chmod 0500 /run/secrets/graphorin
-sudo chmod 0400 /run/secrets/graphorin/*
 ```
+
+(Chmod the files before locking the directory: once the directory is
+`0500` and owned by uid 10001, your own shell can no longer expand the
+`/*` glob.)
 
 (The weekly smoke workflow runs exactly this pattern.) Orchestrator-managed
 secrets (Docker Swarm/Compose `secrets:`, Kubernetes `Secret` volumes) set
