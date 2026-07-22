@@ -5,9 +5,11 @@
   "rangeStrategy": "bump",
   "schedule": ["before 6am on Monday"],
   "timezone": "Europe/Kyiv",
+  "minimumReleaseAge": "7 days",
   "vulnerabilityAlerts": {
     "labels": ["security"],
-    "schedule": ["at any time"]
+    "schedule": ["at any time"],
+    "minimumReleaseAge": null
   },
   "packageRules": [
     {
