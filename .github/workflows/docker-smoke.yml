@@ -251,15 +251,36 @@ jobs:
           curl -fsS "http://localhost:8080/v1/workflows/crash-drill/state?threadId=drill-thread-1" \
             -H "Authorization: Bearer ${TOKEN}" | grep -q '"status":"suspended"'
           echo "run parked on the durable timer - killing the server mid-sleep"
+          # Recovery-time measurement (operations.md "What CI proves"):
+          # both clocks start at the SIGKILL, so the numbers include
+          # container teardown + boot + health, not just the app.
+          T_KILL=$(date +%s)
           docker kill graphorin-drill
           docker rm graphorin-drill
           run_drill_server
           wait_for_health
+          RTO_HEALTH=$(( $(date +%s) - T_KILL ))
           for i in $(seq 1 45); do
             STATE=$(curl -fsS "http://localhost:8080/v1/workflows/crash-drill/state?threadId=drill-thread-1" \
               -H "Authorization: Bearer ${TOKEN}" || true)
             if echo "${STATE}" | grep -q '"status":"completed"'; then
-              echo "crash-resume drill OK: run completed ${i}x2s after restart with no operator action"
+              RTO_WORK=$(( $(date +%s) - T_KILL ))
+              echo "crash-resume drill OK: healthy ${RTO_HEALTH}s after SIGKILL, parked run completed ${RTO_WORK}s after SIGKILL, no operator action"
+              # Budgets are deliberately generous (shared runners): the
+              # gate exists to catch order-of-magnitude regressions in
+              # boot or timer-sweep recovery, not seconds of CI noise.
+              if [ "${RTO_HEALTH}" -gt 60 ] || [ "${RTO_WORK}" -gt 150 ]; then
+                echo "::error::recovery-time budget violated: SIGKILL->healthy ${RTO_HEALTH}s (budget 60s), SIGKILL->completed ${RTO_WORK}s (budget 150s)"
+                exit 1
+              fi
+              {
+                echo "### Crash-resume recovery time"
+                echo ""
+                echo "| Metric | Measured | Budget |"
+                echo "| --- | --- | --- |"
+                echo "| SIGKILL -> \`/v1/health\` OK | ${RTO_HEALTH} s | 60 s |"
+                echo "| SIGKILL -> parked run completed | ${RTO_WORK} s | 150 s |"
+              } >> "${GITHUB_STEP_SUMMARY}"
               exit 0
             fi
             sleep 2
