@@ -215,8 +215,9 @@ What that means operationally:
   secrets, and tokens. Nothing is shared, so nothing needs consensus.
 - **Availability = fast restore, not failover.** The backup/restore
   runbook above plus the crash-resume behaviour below are the
-  availability story today. A shared-backend HA topology would need a
-  different store backend and is tracked on the
+  availability story today; crash recovery time is budgeted and
+  measured weekly (see What CI proves). A shared-backend HA topology
+  would need a different store backend and is tracked on the
   [road to 1.0](/guide/stability#road-to-1-0).
 - **Agent instances are single-flight.** One run at a time per
   registered instance (`409 agent-busy` otherwise) - deploy an
@@ -301,7 +302,12 @@ queued, while a worker waits out a slow turn.
   durable 15 s timer survives `docker kill` (SIGKILL - no shutdown
   hooks) and completes after restart with NO operator action; the
   timer daemon's post-boot sweep fires the due timer read back from
-  SQLite.
+  SQLite. Recovery time is measured and gated on every run, both
+  clocks starting at the SIGKILL (so container teardown + boot are
+  included): SIGKILL to `/v1/health` OK under **60 s**, SIGKILL to
+  the parked run completed under **150 s**. Budgets are generous for
+  the same shared-runner reason as the soak SLOs; the measured
+  numbers land in each run's step summary.
 - **Weekly soak**: the SLO table above, enforced.
 - **Per-PR template validation**: the Kubernetes manifest under
   kubeconform `-strict`; the systemd unit under `systemd-analyze
