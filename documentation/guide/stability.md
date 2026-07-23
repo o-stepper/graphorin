@@ -97,13 +97,19 @@ differ, deliberately:
 1.0 is a promise gate, not a feature gate. The remaining criteria, kept
 honest here rather than implied:
 
-- Load/soak evidence and a documented HA / scale-out story (today the
-  standalone server is single-node; see
-  [Operations runbooks](/guide/operations) for what IS covered).
+- HA / scale-out proofs: automatic failover and rolling upgrades
+  across replicas. The single-writer scaling model, the load/soak
+  evidence (weekly stub soak, the hour-long envelope, and a
+  real-provider soak), and what is deliberately NOT covered are
+  documented in [Operations runbooks](/guide/operations).
 - Verified upgrade / rollback / backup / restore drills in CI - the
   backup/restore drill already runs weekly in the Docker smoke
   workflow.
-- A reproducible quality baseline for at least one cloud and one local
-  provider path in the benchmark suite.
 - Freezing this page's tier assignments: everything `@stable` at 1.0
   carries full semver from then on.
+
+Closed since this list was written: the reproducible quality baseline
+for one local provider path (Ollama, reproduced weekly in CI) and one
+cloud provider path (OpenAI, published with stamped run conditions) -
+see [Benchmarks](/guide/benchmarks) and the
+[evals guide](/guide/evals).

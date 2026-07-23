@@ -63,6 +63,8 @@ import {
   openAICompatibleAdapter,
   withCostLimit,
   withCostTracking,
+  withRateLimit,
+  withRetry,
 } from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
@@ -501,6 +503,7 @@ async function answerFromContext(
   input: MemoryEvalInput,
   context: string,
   meter: BenchMeter | undefined,
+  maxOutputTokens?: number,
 ): Promise<string> {
   const askedAt = input.askedAt !== undefined ? `\nCURRENT DATE: ${input.askedAt}` : '';
   const response = await provider.generate({
@@ -520,7 +523,7 @@ async function answerFromContext(
       },
     ],
     temperature: 0,
-    maxTokens: 256,
+    maxTokens: maxOutputTokens ?? 256,
   });
   if (meter !== undefined) {
     meter.queries += 1;
@@ -534,6 +537,8 @@ export interface FullContextAgentOptions {
   readonly provider: Provider;
   /** Optional token/latency meter shared with the runner (SOTA-1). */
   readonly meter?: BenchMeter;
+  /** Subject-leg output-token ceiling per query (default 256). */
+  readonly maxOutputTokens?: number;
 }
 
 /**
@@ -559,7 +564,13 @@ export function createFullContextAgent(
           }),
         )
         .join('\n');
-      return answerFromContext(options.provider, input, context, options.meter);
+      return answerFromContext(
+        options.provider,
+        input,
+        context,
+        options.meter,
+        options.maxOutputTokens,
+      );
     },
   };
 }
@@ -581,6 +592,8 @@ export interface MemorySystemAgentOptions {
   readonly conflictPipeline?: ConflictPipelineMode;
   /** Iterative-retrieval abstention stats sink (C8). */
   readonly retrievalStats?: RetrievalStats;
+  /** Subject-leg output-token ceiling per query (default 256). */
+  readonly maxOutputTokens?: number;
   /**
    * EB-11 hook: fired once per ACTUAL conversation ingest (a cache miss), NOT
    * per QA case - lets a caller/test confirm a sample's N questions ingest the
@@ -676,7 +689,13 @@ export function createMemorySystemAgent(
         retrieval,
         options.retrievalStats,
       );
-      return answerFromContext(options.provider, input, context, options.meter);
+      return answerFromContext(
+        options.provider,
+        input,
+        context,
+        options.meter,
+        options.maxOutputTokens,
+      );
     },
   };
 }
@@ -772,6 +791,8 @@ export interface RunLongMemEvalOptions {
   readonly retrievalStats?: RetrievalStats;
   /** Repeat every case N times for variance reporting (C8). Default 1. */
   readonly iterations?: number;
+  /** Subject-leg output-token ceiling per query (default 256). */
+  readonly maxOutputTokens?: number;
 }
 
 /**
@@ -823,6 +844,9 @@ export async function runLongMemEvalBenchmark(
       ? createFullContextAgent({
           provider: options.provider,
           ...(options.meter !== undefined ? { meter: options.meter } : {}),
+          ...(options.maxOutputTokens !== undefined
+            ? { maxOutputTokens: options.maxOutputTokens }
+            : {}),
         })
       : createMemorySystemAgent({
           provider: options.provider,
@@ -836,6 +860,9 @@ export async function runLongMemEvalBenchmark(
             : {}),
           ...(options.retrievalStats !== undefined
             ? { retrievalStats: options.retrievalStats }
+            : {}),
+          ...(options.maxOutputTokens !== undefined
+            ? { maxOutputTokens: options.maxOutputTokens }
             : {}),
         });
   const boundAgent =
@@ -967,6 +994,26 @@ export interface CliArgs {
   caseTimeoutMs?: number;
   /** SUBJECT-leg Ollama `num_ctx` override (full-context runs must fit the haystack). */
   numCtx?: number;
+  /**
+   * Bounded eval-worker pool (`runEvals` `concurrency`). Default 1
+   * (sequential). The memory agent is concurrency-safe by design: the
+   * ingest cache stores the in-flight PROMISE per haystack (evals-09).
+   */
+  concurrency?: number;
+  /**
+   * SUBJECT-leg output-token ceiling per query (default 256). Reasoning
+   * models spend `max_completion_tokens` on hidden reasoning FIRST - a
+   * budget sized for a one-line answer can come back empty. Raise it for
+   * reasoning-default subjects; the judge leg is unaffected.
+   */
+  maxOutputTokens?: number;
+  /**
+   * Client-side token-bucket budget (tokens/minute) for the SUBJECT
+   * provider, queue mode. Matches the org's per-model TPM allowance so
+   * sustained runs pace themselves instead of exhausting the retry
+   * ladder on server 429s.
+   */
+  subjectTpm?: number;
   /** `--help`/`-h`: print usage and exit without running anything. */
   help: boolean;
   /**
@@ -1032,6 +1079,17 @@ Flags:
                               cases escape the per-request --timeout-ms)
   --num-ctx <n>               Ollama subject-leg num_ctx override (full-context
                               runs must fit the whole haystack in the window)
+  --concurrency <n>           Bounded eval-worker pool (default 1). The memory
+                              agent ingests each haystack exactly once even
+                              under concurrency (in-flight-promise cache)
+  --max-output-tokens <n>     Subject-leg output ceiling per query (default
+                              256). Reasoning-default models need headroom or
+                              they burn the whole budget thinking and answer
+                              empty
+  --subject-tpm <n>           Client-side tokens/minute budget for the subject
+                              provider (queue mode) - match your org's
+                              per-model TPM allowance so sustained runs pace
+                              themselves instead of dying on 429s
   --help, -h                  Show this help
 
 Env: GRAPHORIN_BENCH_PROVIDER/MODEL/BASE_URL/API_KEY fill provider gaps;
@@ -1164,6 +1222,27 @@ export function parseArgs(argv: ReadonlyArray<string>): CliArgs {
         throw new CliUsageError(`--num-ctx must be a positive integer, got '${next}'`);
       }
       args.numCtx = numCtx;
+      i++;
+    } else if (a === '--concurrency') {
+      const concurrency = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(concurrency) || concurrency <= 0) {
+        throw new CliUsageError(`--concurrency must be a positive integer, got '${next}'`);
+      }
+      args.concurrency = concurrency;
+      i++;
+    } else if (a === '--max-output-tokens') {
+      const maxOutputTokens = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(maxOutputTokens) || maxOutputTokens <= 0) {
+        throw new CliUsageError(`--max-output-tokens must be a positive integer, got '${next}'`);
+      }
+      args.maxOutputTokens = maxOutputTokens;
+      i++;
+    } else if (a === '--subject-tpm') {
+      const subjectTpm = Number.parseInt(value(a, next), 10);
+      if (!Number.isFinite(subjectTpm) || subjectTpm <= 0) {
+        throw new CliUsageError(`--subject-tpm must be a positive integer, got '${next}'`);
+      }
+      args.subjectTpm = subjectTpm;
       i++;
     } else if (a === '--timeout-ms') {
       const timeout = Number.parseInt(value(a, next), 10);
@@ -1403,6 +1482,33 @@ export async function main(): Promise<void> {
     ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
     ...(args.numCtx !== undefined ? { numCtx: args.numCtx } : {}),
   });
+  // Live-run resilience: a multi-hour billed run must not classify a
+  // transient 429/5xx as INFRASTRUCTURE_FAILED when one retry would have
+  // answered. Real subject providers get the standard retry middleware
+  // (rate-limit-aware via isRetryableProviderFailure + retry-after);
+  // the stub stays unwrapped so plumbing runs remain deterministic.
+  // Applied OUTSIDE the cost ceiling per the canonical middleware order
+  // (withRetry -> withCostLimit -> withCostTracking): every billed retry
+  // attempt is individually observed by the cap.
+  const subjectRetries = 4;
+  // `--subject-tpm` inserts a client-side token-bucket limiter (queue
+  // mode: requests WAIT for budget instead of burning server 429s) -
+  // the retry ladder alone cannot pace sustained oversubscription of a
+  // small org TPM allowance (observed live 2026-07-23: gpt-5.6-luna at
+  // 200k TPM exhausted 4 retries on 150/1500 cases). Canonical order:
+  // withRetry OUTSIDE withRateLimit OUTSIDE the cost ceiling.
+  const wrapSubjectRetry = (p: Provider): Provider => {
+    if (label.startsWith('stub')) return p;
+    const limited =
+      args.subjectTpm !== undefined
+        ? withRateLimit({
+            requestsPerMinute: 400,
+            tokensPerMinute: args.subjectTpm,
+            mode: 'queue',
+          })(p)
+        : p;
+    return withRetry({ maxRetries: subjectRetries })(limited);
+  };
   if (label.startsWith('stub')) {
     console.warn(
       '[benchmark-longmemeval] no real Provider selected; using the deterministic offline stub - ' +
@@ -1410,7 +1516,9 @@ export async function main(): Promise<void> {
         'or the GRAPHORIN_BENCH_* env vars) for meaningful numbers.',
     );
   } else {
-    console.log(`[benchmark-longmemeval] provider=${label}`);
+    console.log(
+      `[benchmark-longmemeval] provider=${label} (subject retries: ${subjectRetries}, rate-limit-aware)`,
+    );
   }
   const mode: BenchMode = args.mode ?? 'memory';
   // C8 (evals-04): a dedicated judge, resolved exactly like the SUT
@@ -1439,7 +1547,7 @@ export async function main(): Promise<void> {
   // D1 (W-084): one shared ceiling caps the run's TOTAL spend (SUT + judge).
   let ceiling: ReturnType<typeof withBenchCostCeiling> | undefined;
   let preflightUnpriced: ReadonlyArray<string> = [];
-  let sutProvider = provider;
+  let sutProvider = wrapSubjectRetry(provider);
   if (args.maxCostUsd !== undefined) {
     // Deep-retest 0.13.8 P1: fail closed BEFORE the first request when the
     // cap cannot observe a model's spend, instead of running with a
@@ -1465,7 +1573,7 @@ export async function main(): Promise<void> {
       );
     }
     ceiling = withBenchCostCeiling(args.maxCostUsd);
-    sutProvider = ceiling.wrap(provider);
+    sutProvider = wrapSubjectRetry(ceiling.wrap(provider));
     if (judgeResolved !== undefined) {
       judgeResolved = { ...judgeResolved, provider: ceiling.wrap(judgeResolved.provider) };
     }
@@ -1505,6 +1613,8 @@ export async function main(): Promise<void> {
     ...(args.embedder !== undefined ? { embedder: args.embedder } : {}),
     ...(args.conflictPipeline !== undefined ? { conflictPipeline: args.conflictPipeline } : {}),
     ...(args.iterations !== undefined ? { iterations: args.iterations } : {}),
+    ...(args.concurrency !== undefined ? { concurrency: args.concurrency } : {}),
+    ...(args.maxOutputTokens !== undefined ? { maxOutputTokens: args.maxOutputTokens } : {}),
     retrievalStats,
   });
   if (ceiling !== undefined && ceiling.observedCostUsd() === 0) {
@@ -1615,6 +1725,10 @@ export async function main(): Promise<void> {
     ...(args.timeoutMs !== undefined ? { timeoutMs: args.timeoutMs } : {}),
     ...(args.caseTimeoutMs !== undefined ? { caseTimeoutMs: args.caseTimeoutMs } : {}),
     ...(args.numCtx !== undefined ? { numCtx: args.numCtx } : {}),
+    ...(args.concurrency !== undefined ? { concurrency: args.concurrency } : {}),
+    ...(args.maxOutputTokens !== undefined ? { maxOutputTokens: args.maxOutputTokens } : {}),
+    ...(args.subjectTpm !== undefined ? { subjectTpm: args.subjectTpm } : {}),
+    ...(label.startsWith('stub') ? {} : { subjectRetries }),
     ...(ceiling !== undefined
       ? {
           observedCostUsd: ceiling.observedCostUsd(),
@@ -1652,10 +1766,33 @@ export async function main(): Promise<void> {
   if (args.json !== undefined) {
     // benchConfig rides as an EXTRA key: detectRegressions reads only
     // results/summary, so existing baselines stay compatible while every
-    // new report says exactly what it measured (evals-01).
+    // new report says exactly what it measured (evals-01). tokensPerQuery
+    // joins the aggregates so the published-page generator can render the
+    // memory-vs-full-context token asymmetry straight from the artifact.
+    // `haystackSessions` are dropped at write time (question/askedAt/
+    // ability stay for human context - same fields strip-baseline.mjs
+    // kept): no consumer reads them from the JSON, every committed copy
+    // stripped them anyway, and a full 500-case x3-iteration suite run
+    // embeds ~900 MB of haystacks - past V8's maximum string length, so
+    // JSON.stringify threw AFTER the billed run finished (observed live
+    // 2026-07-22, cell M3).
+    const resultsForJson = report.results.map((row) => {
+      if (row.input === undefined || !('haystackSessions' in row.input)) return row;
+      const { haystackSessions: _dropped, ...inputRest } = row.input;
+      return { ...row, input: inputRest };
+    });
     await writeFile(
       args.json,
-      JSON.stringify({ ...report, benchConfig, aggregates }, null, 2),
+      JSON.stringify(
+        {
+          ...report,
+          results: resultsForJson,
+          benchConfig,
+          aggregates: { ...aggregates, ...(meter.queries > 0 ? { tokensPerQuery } : {}) },
+        },
+        null,
+        2,
+      ),
       'utf8',
     );
     console.log(`[benchmark-longmemeval] wrote JSON report to ${args.json}`);

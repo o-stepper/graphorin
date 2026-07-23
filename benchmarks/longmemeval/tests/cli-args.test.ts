@@ -71,6 +71,35 @@ describe('benchmarks/longmemeval CLI args', () => {
     expect(() => parseArgs(['node', 'runner.js', '--num-ctx', 'big'])).toThrow(CliUsageError);
   });
 
+  // OpenAI matrix campaign 2026-07-22: multi-hour live runs need a bounded
+  // worker pool and reasoning-model output headroom, both CLI-reachable.
+  it('parses --concurrency as a positive integer', () => {
+    expect(parseArgs(['node', 'runner.js', '--concurrency', '6']).concurrency).toBe(6);
+    expect(parseArgs(['node', 'runner.js']).concurrency).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--concurrency', '0'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--concurrency', 'many'])).toThrow(CliUsageError);
+  });
+
+  it('parses --max-output-tokens as a positive integer for the subject leg', () => {
+    expect(parseArgs(['node', 'runner.js', '--max-output-tokens', '2048']).maxOutputTokens).toBe(
+      2048,
+    );
+    expect(parseArgs(['node', 'runner.js']).maxOutputTokens).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--max-output-tokens', '0'])).toThrow(
+      CliUsageError,
+    );
+    expect(() => parseArgs(['node', 'runner.js', '--max-output-tokens', 'lots'])).toThrow(
+      CliUsageError,
+    );
+  });
+
+  it('parses --subject-tpm as a positive integer (client-side TPM pacing)', () => {
+    expect(parseArgs(['node', 'runner.js', '--subject-tpm', '150000']).subjectTpm).toBe(150000);
+    expect(parseArgs(['node', 'runner.js']).subjectTpm).toBeUndefined();
+    expect(() => parseArgs(['node', 'runner.js', '--subject-tpm', '0'])).toThrow(CliUsageError);
+    expect(() => parseArgs(['node', 'runner.js', '--subject-tpm', 'lots'])).toThrow(CliUsageError);
+  });
+
   it('parses --timeout-ms as a positive integer', () => {
     expect(parseArgs(['node', 'runner.js', '--timeout-ms', '300000']).timeoutMs).toBe(300000);
     expect(parseArgs(['node', 'runner.js']).timeoutMs).toBeUndefined();
@@ -83,6 +112,9 @@ describe('benchmarks/longmemeval CLI args', () => {
     expect(USAGE).toContain('--think <mode>');
     expect(USAGE).toContain('--timeout-ms <n>');
     expect(USAGE).toContain('--num-ctx <n>');
+    expect(USAGE).toContain('--concurrency <n>');
+    expect(USAGE).toContain('--max-output-tokens <n>');
+    expect(USAGE).toContain('--subject-tpm <n>');
     expect(USAGE).toContain('OPENAI_API_KEY');
   });
 

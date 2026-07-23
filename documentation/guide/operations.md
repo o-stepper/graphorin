@@ -265,6 +265,32 @@ RSS (280 MB) within 20% of the first quarter - the run-tracker's
 five-minute retention window plateaus exactly as designed instead of
 growing with total request count.
 
+### Real-provider soak
+
+The stub rows above prove the server; this run proves the same turn
+path against a LIVE cloud provider - TLS, streaming, retry middleware,
+real latency and error behaviour - paced at realistic LLM-bound
+traffic. It is maintainer-gated (costs real money, needs
+`OPENAI_API_KEY`), runs from a workstation rather than CI (the
+repository deliberately carries no provider secret), and reproduces
+with `scripts/soak-real.sh`; the compose module is
+`.github/smoke/soak-real.app.mjs` (agent pool over the
+`openai-compatible` adapter wrapped in `withRetry`, output capped at
+128 tokens/turn).
+
+| Date | Subject | Duration | Target rps | Requests (all `200`) | p50 / p95 / p99 | RSS quarters -> peak | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-07-22 | `gpt-4.1-nano` (api.openai.com) | 3600 s (+ drain) | 2 | 6,322 | 831 / 1,786 / 5,347 ms | 94 -> 97 -> 132 MB | PASS |
+
+SLO envelope for this variant: zero non-200/transport errors, p95
+< 20 s (cloud latency, not the stub's 1 s), same RSS ceiling and
+growth bound. One turn peaked at ~16.7 min: the retry middleware
+absorbed a provider-side stall and the request still returned `200`
+with every concurrent request unaffected (p99 stayed at 5.3 s) - which
+is exactly the behaviour the middleware exists to prove. Achieved rate
+was 1.5 rps against the 2 rps target: pacing slots are skipped, not
+queued, while a worker waits out a slow turn.
+
 ## What CI proves
 
 - **Weekly Docker smoke**: image build, boot with the shipped config
@@ -290,9 +316,8 @@ growing with total request count.
 ## Not covered yet
 
 HA topologies with automatic failover, rolling upgrades across
-replicas, chaos/failure-injection beyond the SIGKILL drill, and soak
-runs against real (non-stub) providers are not yet proven - they are
-the operational tail tracked on the
+replicas, and chaos/failure-injection beyond the SIGKILL drill are not
+yet proven - they are the operational tail tracked on the
 [road to 1.0](/guide/stability#road-to-1-0). Until then, size a single
 node with [Performance & scale](/guide/performance) and treat the
 restore runbook as the availability story.

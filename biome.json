@@ -21,7 +21,8 @@
       "!**/*.tsbuildinfo",
       "!documentation/api",
       "!documentation/.vitepress/dist",
-      "!documentation/.vitepress/cache"
+      "!documentation/.vitepress/cache",
+      "!benchmarks/longmemeval/baselines/published"
     ]
   },
   "formatter": {

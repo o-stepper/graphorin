@@ -51,6 +51,18 @@ export function isPlumbingOnly(report) {
   return String(cfg.provider ?? '').includes('stub') || String(cfg.judge ?? '').includes('stub');
 }
 
+/** True for a HaluMem-shaped report (`benchConfig.stage`, no loader). */
+export function isHaluMemShaped(report) {
+  return report.benchConfig?.stage !== undefined;
+}
+
+/** `$0.123456 (cap $2)` or null when the run carried no cost meter. */
+function costCell(cfg) {
+  if (typeof cfg.observedCostUsd !== 'number') return null;
+  const cap = typeof cfg.maxCostUsd === 'number' ? ` (cap $${cfg.maxCostUsd})` : '';
+  return `$${cfg.observedCostUsd.toFixed(4)}${cap}`;
+}
+
 /** Render one report section. Exported for the self-test. */
 export function renderReport(name, report) {
   const cfg = report.benchConfig ?? {};
@@ -67,19 +79,44 @@ export function renderReport(name, report) {
       '',
     );
   }
+  const cost = costCell(cfg);
+  const datasetRow =
+    cfg.datasetSha256 !== undefined
+      ? [
+          `| Dataset | \`${cfg.datasetPath ?? 'unknown'}\` (sha256 \`${String(cfg.datasetSha256).slice(0, 12)}…\`) |`,
+        ]
+      : [];
   lines.push(
     'Run conditions (from the stamped `benchConfig` of the committed report):',
     '',
     '| Condition | Value |',
     '|---|---|',
-    `| Loader | \`${cfg.loader ?? 'unknown'}\` |`,
-    `| Mode | \`${cfg.mode ?? 'unknown'}\` |`,
-    `| Retrieval | \`${cfg.retrieval ?? 'default'}\` (topK ${cfg.topK ?? '?'}, consolidate ${cfg.consolidate === true}) |`,
-    `| Embedder | \`${cfg.embedder ?? 'none'}\` |`,
-    `| Provider | \`${cfg.provider ?? 'unknown'}\` |`,
-    `| Judge | \`${cfg.judge ?? 'unknown'}\`${cfg.selfJudged === false ? ' (non-self)' : ''} |`,
-    `| Iterations | ${cfg.iterations ?? 1} |`,
-    '',
+  );
+  if (isHaluMemShaped(report)) {
+    lines.push(
+      `| Stage | \`${cfg.stage}\` |`,
+      `| Conflict pipeline | \`${cfg.conflictPipeline ?? 'off'}\` |`,
+      `| Embedder | \`${cfg.embedder ?? 'none'}\` |`,
+      `| Provider | \`${cfg.provider ?? 'unknown'}\` |`,
+      ...datasetRow,
+      ...(cost !== null ? [`| Observed cost | ${cost} |`] : []),
+      '',
+    );
+  } else {
+    lines.push(
+      `| Loader | \`${cfg.loader ?? 'unknown'}\`${cfg.variant !== undefined ? ` (variant ${cfg.variant})` : ''} |`,
+      `| Mode | \`${cfg.mode ?? 'unknown'}\` |`,
+      `| Retrieval | \`${cfg.retrieval ?? 'default'}\` (topK ${cfg.topK ?? '?'}, consolidate ${cfg.consolidate === true}) |`,
+      `| Embedder | \`${cfg.embedder ?? 'none'}\` |`,
+      `| Provider | \`${cfg.provider ?? 'unknown'}\` |`,
+      `| Judge | \`${cfg.judge ?? 'unknown'}\`${cfg.selfJudged === false ? ' (non-self)' : ''} |`,
+      `| Iterations | ${cfg.iterations ?? 1} |`,
+      ...datasetRow,
+      ...(cost !== null ? [`| Observed cost | ${cost} |`] : []),
+      '',
+    );
+  }
+  lines.push(
     '| Metric | Value |',
     '|---|---|',
     `| Cases | ${summary.total ?? 0} |`,
@@ -111,12 +148,22 @@ export function renderReport(name, report) {
 }
 
 /**
- * Render the ablation matrix when 2+ reports share a loader and
- * differ only in `benchConfig.retrieval`.
+ * Cross-report summary tables:
+ *
+ *  - a subject/mode matrix whenever 2+ reports share a loader (the
+ *    published model-x-mode grid, with the tokens/query cost axis);
+ *  - a retrieval ablation ONLY when the group actually varies
+ *    `benchConfig.retrieval` (an all-default group is not an ablation);
+ *  - a HaluMem conflict-pipeline A/B when both arms are present.
  */
 export function renderAblation(entries) {
   const byLoader = new Map();
+  const halumem = [];
   for (const { name, report } of entries) {
+    if (isHaluMemShaped(report)) {
+      halumem.push({ name, report });
+      continue;
+    }
     const loader = report.benchConfig?.loader ?? 'unknown';
     if (!byLoader.has(loader)) byLoader.set(loader, []);
     byLoader.get(loader).push({ name, report });
@@ -124,6 +171,26 @@ export function renderAblation(entries) {
   const lines = [];
   for (const [loader, group] of [...byLoader.entries()].sort()) {
     if (group.length < 2) continue;
+    lines.push(`### Subject / mode matrix (\`${loader}\`)`, '');
+    lines.push(
+      '| Subject | Mode | Iterations | Pass rate | 95% CI | Tokens/query | Observed cost | Report |',
+      '|---|---|---|---|---|---|---|---|',
+    );
+    for (const { name, report } of group) {
+      const cfg = report.benchConfig ?? {};
+      const s = report.summary ?? { passed: 0, total: 0 };
+      const ci = wilson(s.passed ?? 0, s.total ?? 0);
+      const tokens = report.aggregates?.tokensPerQuery;
+      const subject = cfg.subjectSpec?.model ?? cfg.provider ?? 'unknown';
+      lines.push(
+        `| \`${subject}\` | \`${cfg.mode ?? 'unknown'}\` | ${cfg.iterations ?? 1} | ${pct((s.passed ?? 0) / Math.max(1, s.total ?? 0))} | ${pct(ci.low)} to ${pct(ci.high)} | ${tokens === undefined ? 'n/a' : Math.round(tokens)} | ${costCell(cfg) ?? 'n/a'} | \`${name}\` |`,
+      );
+    }
+    lines.push('');
+    const retrievals = new Set(
+      group.map(({ report }) => report.benchConfig?.retrieval ?? 'default'),
+    );
+    if (retrievals.size < 2) continue;
     lines.push(`### Retrieval ablation (\`${loader}\`)`, '');
     lines.push('| Retrieval | Pass rate | 95% CI | Abstention | Report |', '|---|---|---|---|---|');
     for (const { name, report } of group) {
@@ -132,6 +199,36 @@ export function renderAblation(entries) {
       const ab = report.aggregates?.abstentionRate;
       lines.push(
         `| \`${report.benchConfig?.retrieval ?? 'default'}\` | ${pct((s.passed ?? 0) / Math.max(1, s.total ?? 0))} | ${pct(ci.low)} to ${pct(ci.high)} | ${ab === undefined ? 'n/a' : pct(ab)} | \`${name}\` |`,
+      );
+    }
+    lines.push('');
+  }
+  if (halumem.length >= 2) {
+    lines.push('### Conflict-pipeline A/B (`halumem` operations)', '');
+    lines.push(
+      'The synthetic operations fixture holds 4 cases. At that size, run-to-run LLM-extraction variance can exceed the difference between the arms - this table proves the A/B axis is wired and config-stamped, not a quality conclusion; drawing one needs a larger operations dataset.',
+      '',
+    );
+    lines.push(
+      '| Conflict pipeline | Per-scorer pass/fail | Observed cost | Report |',
+      '|---|---|---|---|',
+    );
+    for (const { name, report } of [...halumem].sort((a, b) =>
+      String(a.report.benchConfig?.conflictPipeline).localeCompare(
+        String(b.report.benchConfig?.conflictPipeline),
+      ),
+    )) {
+      const cfg = report.benchConfig ?? {};
+      const byScorer = report.summary?.byScorer ?? {};
+      const scorerCells = Object.keys(byScorer)
+        .sort()
+        .map(
+          (k) =>
+            `\`${k}\` ${byScorer[k].passed ?? 0}/${(byScorer[k].passed ?? 0) + (byScorer[k].failed ?? 0)}`,
+        )
+        .join(', ');
+      lines.push(
+        `| \`${cfg.conflictPipeline ?? 'off'}\` | ${scorerCells} | ${costCell(cfg) ?? 'n/a'} | \`${name}\` |`,
       );
     }
     lines.push('');
@@ -251,7 +348,47 @@ function selfTest() {
     { name: 'b.json', report: mk('real', 'hyde', 75, 100) },
   ]);
   cases.push(['ablation matrix across retrieval variants', page.includes('Retrieval ablation')]);
+  cases.push(['subject/mode matrix rendered', page.includes('Subject / mode matrix')]);
   cases.push(['no-real banner absent when real present', !page.includes('No real-provider run')]);
+  const allDefaultPage = buildPage([
+    { name: 'a.json', report: mk('real-1', 'default', 70, 100) },
+    { name: 'b.json', report: mk('real-2', 'default', 75, 100) },
+  ]);
+  cases.push([
+    'no retrieval ablation when retrieval never varies',
+    !allDefaultPage.includes('Retrieval ablation') &&
+      allDefaultPage.includes('Subject / mode matrix'),
+  ]);
+  const costed = mk('openai-compatible:gpt-x', 'default', 80, 100);
+  costed.benchConfig.observedCostUsd = 1.234567;
+  costed.benchConfig.maxCostUsd = 5;
+  costed.benchConfig.subjectSpec = { provider: 'openai-compatible', model: 'gpt-x' };
+  costed.aggregates.tokensPerQuery = 3421.4;
+  const costedSection = renderReport('c.json', costed);
+  cases.push(['observed cost row rendered', costedSection.includes('$1.2346 (cap $5)')]);
+  const halumemArm = (mode, passed) => ({
+    benchConfig: {
+      stage: 'operations',
+      conflictPipeline: mode,
+      embedder: 'fake',
+      provider: 'openai-compatible:gpt-x',
+      observedCostUsd: 0.02,
+      maxCostUsd: 2,
+    },
+    summary: {
+      total: 4,
+      passed,
+      failed: 4 - passed,
+      byScorer: { 'memory-update-omission': { passed, failed: 4 - passed } },
+    },
+  });
+  const halumemSection = renderReport('h.json', halumemArm('on', 2));
+  cases.push(['halumem stage row rendered', halumemSection.includes('| Stage | `operations` |')]);
+  const abPage = buildPage([
+    { name: 'halumem.operations.conflict-off.json', report: halumemArm('off', 1) },
+    { name: 'halumem.operations.conflict-on.json', report: halumemArm('on', 2) },
+  ]);
+  cases.push(['halumem A/B table rendered', abPage.includes('Conflict-pipeline A/B')]);
   const stubPage = buildPage([{ name: 's.json', report: stub }]);
   cases.push([
     'no-real banner present on all-stub page',

@@ -166,6 +166,20 @@ block, so a number always says what configuration produced it:
   overrides the subject leg's Ollama `num_ctx` so a full-context
   haystack actually fits the window instead of silently truncating.
   The HaluMem runner shares `--think` and `--timeout-ms`.
+- Live-run scale knobs (longmemeval): `--concurrency N` runs cases
+  through a bounded worker pool (the memory agent ingests each haystack
+  exactly once even under concurrency - the ingest cache stores the
+  in-flight promise, so two workers sharing a conversation cannot
+  double-ingest), and `--max-output-tokens N` raises the subject leg's
+  per-query output ceiling (default 256) - reasoning-default cloud
+  models spend `max_completion_tokens` on hidden reasoning FIRST and
+  answer EMPTY inside a one-line budget (observed live: gpt-5-nano
+  returned `''` on 3/3 smoke cases at 256, real answers at 2048). Real
+  subject providers are wrapped in the standard rate-limit-aware retry
+  middleware (4 retries, `retry-after` honoured, applied OUTSIDE the
+  cost ceiling so every billed attempt counts); `concurrency`,
+  `maxOutputTokens`, and `subjectRetries` are stamped into
+  `benchConfig`.
 - Every report pins its own evidence (0.13.12 assessment, block 3):
   `benchConfig.datasetPath` + `benchConfig.datasetSha256` (content hash
   of the dataset file) identify WHICH dataset revision produced the

@@ -338,6 +338,9 @@ importers:
       '@graphorin/proactive':
         specifier: workspace:*
         version: link:../../packages/proactive
+      '@graphorin/provider':
+        specifier: workspace:*
+        version: link:../../packages/provider
       '@graphorin/security':
         specifier: workspace:*
         version: link:../../packages/security

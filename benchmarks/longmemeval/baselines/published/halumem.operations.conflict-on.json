@@ -1,0 +1,414 @@
+{
+  "results": [
+    {
+      "caseId": "relocation",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s1",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I live in Berlin and I work as a nurse at the Charite hospital.",
+                "timestamp": "2025-10-01T09:00:00Z"
+              },
+              {
+                "role": "assistant",
+                "content": "Berlin and nursing at Charite, noted."
+              }
+            ]
+          },
+          {
+            "id": "s2",
+            "turns": [
+              {
+                "role": "user",
+                "content": "Update: I moved to Kyiv last month, the Berlin chapter is over.",
+                "timestamp": "2025-12-05T18:00:00Z"
+              }
+            ]
+          }
+        ],
+        "goldPoints": [
+          {
+            "kind": "extract",
+            "content": "User works as a nurse at the Charite hospital",
+            "sessionId": "s1"
+          },
+          {
+            "kind": "extract",
+            "content": "User lives in Kyiv",
+            "sessionId": "s2"
+          },
+          {
+            "kind": "update",
+            "content": "User lives in Kyiv",
+            "previous": "User lives in Berlin",
+            "sessionId": "s2"
+          }
+        ],
+        "ability": "knowledge-update"
+      },
+      "output": {
+        "memoryPoints": [
+          "The user is located in Berlin.",
+          "The user is involved in nursing at Charité – Universitätsmedizin Berlin."
+        ]
+      },
+      "durationMs": 51636,
+      "scores": [
+        {
+          "scorer": "memory-extraction-recall",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "extraction recall 0.00 < threshold 0.5",
+            "metadata": {
+              "matched": 0,
+              "total": 2,
+              "missed": [
+                "User works as a nurse at the Charite hospital",
+                "User lives in Kyiv"
+              ]
+            }
+          }
+        },
+        {
+          "scorer": "memory-extraction-precision",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "matched": 2,
+              "total": 2,
+              "hallucinated": []
+            }
+          }
+        },
+        {
+          "scorer": "memory-update-omission",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "update omission 1.00 > threshold 0.5",
+            "metadata": {
+              "applied": 0,
+              "total": 1,
+              "omissionRate": 1,
+              "omitted": [
+                "User lives in Kyiv"
+              ],
+              "stale": [
+                "User lives in Berlin"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "diet",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s1",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I am vegetarian, please remember that for restaurant suggestions.",
+                "timestamp": "2025-11-11T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "id": "s2",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I started eating fish again, so pescatarian is the right label now.",
+                "timestamp": "2026-01-20T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "goldPoints": [
+          {
+            "kind": "extract",
+            "content": "User is pescatarian",
+            "sessionId": "s2"
+          },
+          {
+            "kind": "update",
+            "content": "User is pescatarian",
+            "previous": "User is vegetarian",
+            "sessionId": "s2"
+          }
+        ],
+        "ability": "knowledge-update"
+      },
+      "output": {
+        "memoryPoints": [
+          "The user is vegetarian and asked the assistant to remember this preference for restaurant suggestions (asserted on 2025-11-11T12:00:00Z).",
+          "The user adopted a pescatarian diet starting on 2026-01-20T12:00:00Z.",
+          "The user started eating fish again on 2026-01-20T12:00:00Z."
+        ]
+      },
+      "durationMs": 31319,
+      "scores": [
+        {
+          "scorer": "memory-extraction-recall",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "matched": 1,
+              "total": 1,
+              "missed": []
+            }
+          }
+        },
+        {
+          "scorer": "memory-extraction-precision",
+          "result": {
+            "pass": true,
+            "score": 0.6666666666666666,
+            "metadata": {
+              "matched": 2,
+              "total": 3,
+              "hallucinated": [
+                "The user started eating fish again on 2026-01-20T12:00:00Z."
+              ]
+            }
+          }
+        },
+        {
+          "scorer": "memory-update-omission",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "update omission 1.00 > threshold 0.5",
+            "metadata": {
+              "applied": 0,
+              "total": 1,
+              "omissionRate": 1,
+              "omitted": [
+                "User is pescatarian"
+              ],
+              "stale": [
+                "User is vegetarian"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "subscription",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s1",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I subscribed to the MusicApp premium plan yesterday.",
+                "timestamp": "2025-11-20T08:00:00Z"
+              }
+            ]
+          },
+          {
+            "id": "s2",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I cancelled MusicApp completely, drop anything you remember about it.",
+                "timestamp": "2026-01-02T08:00:00Z"
+              }
+            ]
+          }
+        ],
+        "goldPoints": [
+          {
+            "kind": "delete",
+            "content": "User has an active MusicApp premium subscription",
+            "sessionId": "s2"
+          }
+        ],
+        "ability": "knowledge-update"
+      },
+      "output": {
+        "memoryPoints": [
+          "The user cancelled their MusicApp account completely on 2026-01-02T08:00:00Z.",
+          "The user asked the assistant on 2026-01-02T08:00:00Z to drop or delete any memories the assistant had about MusicApp."
+        ]
+      },
+      "durationMs": 27980,
+      "scores": [
+        {
+          "scorer": "memory-extraction-recall",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "total": 0,
+              "reasonCode": "no-gold-extract"
+            }
+          }
+        },
+        {
+          "scorer": "memory-extraction-precision",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "extraction precision 0.00 < threshold 0.5",
+            "metadata": {
+              "matched": 0,
+              "total": 2,
+              "hallucinated": [
+                "The user cancelled their MusicApp account completely on 2026-01-02T08:00:00Z.",
+                "The user asked the assistant on 2026-01-02T08:00:00Z to drop or delete any memories the assistant had about MusicApp."
+              ]
+            }
+          }
+        },
+        {
+          "scorer": "memory-update-omission",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "applied": 1,
+              "total": 1,
+              "omissionRate": 0,
+              "omitted": [],
+              "stale": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "family",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s1",
+            "turns": [
+              {
+                "role": "user",
+                "content": "My sister Anna is a violinist in the city orchestra.",
+                "timestamp": "2025-12-24T19:00:00Z"
+              },
+              {
+                "role": "user",
+                "content": "My brother Tom teaches physics in Hamburg.",
+                "timestamp": "2025-12-24T19:05:00Z"
+              }
+            ]
+          }
+        ],
+        "goldPoints": [
+          {
+            "kind": "extract",
+            "content": "User's sister Anna is a violinist",
+            "sessionId": "s1"
+          },
+          {
+            "kind": "extract",
+            "content": "User's brother Tom teaches physics in Hamburg",
+            "sessionId": "s1"
+          }
+        ],
+        "ability": "info-extraction"
+      },
+      "output": {
+        "memoryPoints": [
+          "The user's sister Anna is a violinist in the city orchestra.",
+          "The user's brother Tom teaches physics in Hamburg."
+        ]
+      },
+      "durationMs": 19695,
+      "scores": [
+        {
+          "scorer": "memory-extraction-recall",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "matched": 2,
+              "total": 2,
+              "missed": []
+            }
+          }
+        },
+        {
+          "scorer": "memory-extraction-precision",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "matched": 2,
+              "total": 2,
+              "hallucinated": []
+            }
+          }
+        },
+        {
+          "scorer": "memory-update-omission",
+          "result": {
+            "pass": true,
+            "score": 1,
+            "metadata": {
+              "total": 0,
+              "omissionRate": 0,
+              "reasonCode": "no-gold-updates"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 1,
+    "failed": 3,
+    "avgDurationMs": 32657.5,
+    "byScorer": {
+      "memory-extraction-recall": {
+        "passed": 3,
+        "failed": 1,
+        "avgScore": 0.75
+      },
+      "memory-extraction-precision": {
+        "passed": 3,
+        "failed": 1,
+        "avgScore": 0.6666666666666666
+      },
+      "memory-update-omission": {
+        "passed": 2,
+        "failed": 2,
+        "avgScore": 0.5
+      }
+    },
+    "passRateCi": {
+      "lo": 0.045586062644636216,
+      "hi": 0.6993639475573634
+    }
+  },
+  "benchConfig": {
+    "stage": "operations",
+    "conflictPipeline": "on",
+    "embedder": "fake",
+    "provider": "openai-compatible:gpt-5-mini",
+    "subjectSpec": {
+      "provider": "openai-compatible",
+      "model": "gpt-5-mini",
+      "baseUrl": "https://api.openai.com/v1"
+    },
+    "datasetPath": "benchmarks/halumem/fixtures/halumem.synthetic.json",
+    "datasetSha256": "31a82043d0ad3a3e01dd1ff391942e1feb95c18fdbd5352ccbd5d7b5406b5e10",
+    "maxCostUsd": 2,
+    "observedCostUsd": 0.024118249999999997,
+    "costPricingMatched": true
+  }
+}

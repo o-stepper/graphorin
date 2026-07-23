@@ -29,6 +29,14 @@ results.
 4. Regenerate the page:
    `node documentation/scripts/build-benchmark-results.mjs --update`
    and commit both the JSON and `documentation/guide/benchmarks.md`.
-5. Replace `longmemeval.plumbing-fixture.json` with real reports once
-   the first real run lands - the fixture exists only so the page and
-   its gate are wired end to end.
+5. The plumbing fixture (`longmemeval.plumbing-fixture.json`) was
+   removed when the first real runs landed (2026-07-23: the OpenAI
+   subject/mode matrix - three memory-mode models x3 iterations plus
+   the gpt-5-mini full-context SOTA-1 arm, judge `ollama:qwen3:8b-q4_K_M`
+   for comparability with the committed per-ability baselines - and the
+   HaluMem conflict A/B pair). Long-run practicalities their execution
+   taught, wired into the runner: `--concurrency`, `--max-output-tokens`
+   (reasoning-default models answer empty inside a 256-token budget),
+   `--subject-tpm` (client-side token-bucket pacing below the org's
+   per-model TPM allowance - the retry ladder alone cannot pace
+   sustained oversubscription).
