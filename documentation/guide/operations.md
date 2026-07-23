@@ -305,9 +305,10 @@ queued, while a worker waits out a slow turn.
   SQLite. Recovery time is measured and gated on every run, both
   clocks starting at the SIGKILL (so container teardown + boot are
   included): SIGKILL to `/v1/health` OK under **60 s**, SIGKILL to
-  the parked run completed under **150 s**. Budgets are generous for
-  the same shared-runner reason as the soak SLOs; the measured
-  numbers land in each run's step summary.
+  the parked run completed under **150 s** (measured 2 s / 14 s on a
+  shared `ubuntu-latest` runner, 2026-07-23, run 30005490068).
+  Budgets are generous for the same shared-runner reason as the soak
+  SLOs; each run's measured numbers land in its step summary.
 - **Weekly soak**: the SLO table above, enforced.
 - **Per-PR template validation**: the Kubernetes manifest under
   kubeconform `-strict`; the systemd unit under `systemd-analyze
