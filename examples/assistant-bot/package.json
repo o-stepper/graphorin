@@ -42,6 +42,7 @@
     "@graphorin/channels": "workspace:*",
     "@graphorin/memory": "workspace:*",
     "@graphorin/proactive": "workspace:*",
+    "@graphorin/provider": "workspace:*",
     "@graphorin/security": "workspace:*",
     "@graphorin/server": "workspace:*",
     "@graphorin/sessions": "workspace:*",

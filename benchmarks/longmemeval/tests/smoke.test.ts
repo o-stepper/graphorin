@@ -39,6 +39,25 @@ describe('benchmarks/longmemeval', () => {
     expect(report.summary.byScorer['llm-judge-j']?.avgScore).not.toBeNull();
   });
 
+  it('a concurrent run scores identically to the sequential run (evals-09 wiring)', async () => {
+    const sequential = await runLongMemEvalBenchmark({
+      datasetPath: fixture,
+      provider: createDefaultStubProvider(),
+    });
+    const concurrent = await runLongMemEvalBenchmark({
+      datasetPath: fixture,
+      provider: createDefaultStubProvider(),
+      concurrency: 3,
+    });
+    expect(concurrent.summary.total).toBe(sequential.summary.total);
+    expect(concurrent.summary.passed).toBe(sequential.summary.passed);
+    const byCase = (r: typeof sequential) =>
+      [...r.results]
+        .sort((a, b) => a.caseId.localeCompare(b.caseId))
+        .map((row) => ({ caseId: row.caseId, scores: row.scores.map((s) => s.result.score) }));
+    expect(byCase(concurrent)).toEqual(byCase(sequential));
+  });
+
   it('filters to a single ability for per-category gates', async () => {
     const report = await runLongMemEvalBenchmark({
       datasetPath: fixture,

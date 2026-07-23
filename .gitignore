@@ -27,6 +27,9 @@ benchmarks/.datasets/
 # Ephemeral LongMemEval run reports (curated baselines live in baselines/)
 benchmarks/longmemeval/reports/
 
+# Runtime copies of soak compose modules (canonical files live in .github/smoke/)
+examples/assistant-bot/.soak*.app.mjs
+
 # Local data emitted by the framework at runtime
 .graphorin/
 *.db
