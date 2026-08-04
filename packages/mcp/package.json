@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "fast-check": "^3.23.0",
-    "hono": "^4.12.21",
+    "hono": "^4.12.34",
     "zod": "^3.25.0"
   }
 }
