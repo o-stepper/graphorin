@@ -106,7 +106,7 @@ jobs:
           languages: javascript-typescript
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4
+        uses: github/codeql-action/analyze@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4
 
   # E3: the weekly cron is the only run that catches a CVE disclosed between
   # PRs - a silent red run defeats its purpose.
