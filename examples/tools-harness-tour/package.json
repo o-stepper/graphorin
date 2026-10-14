@@ -42,7 +42,7 @@
     "@graphorin/mcp": "workspace:*",
     "@graphorin/skills": "workspace:*",
     "@graphorin/example-trace-helper": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "zod": "^3.25.0"
   },
   "bin": {
